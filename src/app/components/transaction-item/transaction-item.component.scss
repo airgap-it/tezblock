@@ -1,0 +1,9 @@
+::ng-deep transaction-item {
+  .row {
+    min-height: 52px;
+  }
+  fa-icon {
+    font-size: 24px;
+    transform: scaleX(-1);
+  }
+}

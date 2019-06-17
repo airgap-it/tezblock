@@ -1,0 +1,8 @@
+<img class="rounded-circle" *ngIf="identicon" [src]="identicon" [ngClass]="sizeLarge ? 'img--lg' : 'img--sm'" />
+<div *ngIf="!identicon" [ngClass]="sizeLarge ? 'img--lg' : 'img--sm'"></div>
+<!--
+
+	<img class="rounded-circle" src="{{ url | identiconFallback }}" *ngIf="!sizeLarge" height="30" width="30" />
+<img class="rounded-circle" src="{{ url | identiconFallback }}" *ngIf="sizeLarge" height="70" width="70" />
+
+-->

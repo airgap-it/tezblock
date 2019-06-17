@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <identicon [address]="qrdata" [sizeLarge]="true" class="d-block"></identicon>
+  <address-item class="d-inline-flex" [address]="qrdata" [clickableButton]="false" [hideIdenticon]="true"></address-item>
+  <a
+    [@changeBtnColor]="current"
+    (click)="copyToClipboard(qrdata); changeState(qrdata)"
+    value="click to copy"
+    class="btn btn-sm btn-icon btn-light rounded-circle ml-1"
+  >
+    <fa-icon [icon]="icon('copy')" class="text-secondary"></fa-icon>
+  </a>
+  <div class="mt-3">
+    <qr [level]="level" [qrdata]="qrdata" [size]="size"></qr>
+  </div>
+</div>

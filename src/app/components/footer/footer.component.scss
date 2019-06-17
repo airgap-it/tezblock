@@ -1,0 +1,16 @@
+::ng-deep app-footer {
+  footer {
+    background: linear-gradient(90deg, #2e5bff 0%, #1b3f92 50%);
+    a,
+    p {
+      font-size: 12px;
+    }
+    .list-group {
+      list-style: none;
+      .list-group-item {
+        background: transparent;
+        border: none;
+      }
+    }
+  }
+}

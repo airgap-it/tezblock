@@ -1,0 +1,27 @@
+::ng-deep identicon {
+  img {
+    overflow: hidden;
+    border-radius: 50%;
+    min-width: 24px;
+    min-height: 24px;
+    object-fit: contain;
+  }
+  div {
+    background-image: url('/assets/img/identicon_placeholder.png');
+    background-size: contain;
+    border-radius: 50%;
+    width: inherit;
+    height: inherit;
+    min-width: 24px;
+    min-height: 24px;
+  }
+  /* identicon image size */
+  .img--lg {
+    width: 48px;
+    height: 48px;
+  }
+  .img--sm {
+    width: 24px;
+    height: 24px;
+  }
+}

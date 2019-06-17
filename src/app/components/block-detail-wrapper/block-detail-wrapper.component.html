@@ -1,0 +1,168 @@
+<div class="card-body p-4">
+  <h5 class="card-title mb-3 ">
+    Block Details
+  </h5>
+  <div class="row">
+    <div class="col-md-3">
+      <p class="text-secondary">Block Height</p>
+    </div>
+
+    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+      {{ block.level }}
+      <ng-container *ngIf="confirmations$ | async as confirmations">
+        <span *ngIf="confirmations > 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
+      </ng-container>
+    </div>
+    <ng-template #loadingTemplate>
+      <div class=" col-md-9">
+        <loading-skeleton [loadingWidth]="'360px'"></loading-skeleton>
+      </div>
+    </ng-template>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <p class="text-secondary">Baker</p>
+    </div>
+    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+      <address-item [address]="block.baker" ng-href="#here"></address-item>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <p class="text-secondary">Timestamp</p>
+    </div>
+    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+      <p>{{ block.timestamp | amTimeAgo }} ({{ block.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3">
+      <p class="text-secondary">Value</p>
+    </div>
+    <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+      <div
+        class=" col-md-9"
+        *ngIf="
+          (block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
+          else hideValue
+        "
+      >
+        <p>
+          <span
+            class="d-inline-block"
+            [innerHtml]="
+              block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
+            "
+          ></span>
+          ꜩ
+          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+            <span class="badge badge-pill badge-primary-light ml-1">
+              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+              {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
+            </span>
+          </ng-container>
+        </p>
+      </div>
+    </ng-container>
+  </div>
+  <div class="row mb-2">
+    <div class="col-md-3">
+      <p class="text-secondary">Transaction Fees</p>
+    </div>
+    <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+      <div
+        class=" col-md-9"
+        *ngIf="
+          (block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
+          else hideValue
+        "
+      >
+        <p>
+          <span
+            class="d-inline-block"
+            [innerHtml]="
+              block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
+            "
+          ></span>
+          ꜩ
+          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+            <span class="badge badge-pill badge-primary-light ml-1">
+              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+              {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
+            </span>
+          </ng-container>
+        </p>
+      </div>
+    </ng-container>
+    <ng-template #hideValue>
+      <div class=" col-md-9">
+        <span>0</span>
+      </div>
+    </ng-template>
+  </div>
+  <button
+    type="button"
+    class="btn btn-link p-0 collapse--btn"
+    (click)="isCollapsed = !isCollapsed"
+    [attr.aria-expanded]="!isCollapsed"
+    aria-controls="collapseBasic"
+    [ngClass]="{ 'btn--rotated': !isCollapsed }"
+  >
+    <span>{{ isCollapsed ? 'More' : 'Less' }}</span>
+    Details
+    <fa-icon [icon]="icon('longArrowAltDown')" class="ml-1"></fa-icon>
+  </button>
+  <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
+    <div class="row mt-3">
+      <div class="col-md-3">
+        <p class="text-secondary">Block Hash</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.hash }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Cycle</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.meta_cycle }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Cycle Position</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.meta_cycle_position }} of 4095</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Signature</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.signature }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Fitness</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.fitness }}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Endorsements</p>
+      </div>
+      <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
+      <ng-template #loaded>
+        <div class=" col-md-9">
+          <p>{{ endorsements$ | async }}</p>
+        </div>
+      </ng-template>
+    </div>
+  </div>
+</div>

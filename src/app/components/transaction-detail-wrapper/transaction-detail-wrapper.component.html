@@ -1,0 +1,119 @@
+<div>
+  <div class="card-body p-4">
+    <h5 class="card-title mb-3 ">
+      Transaction Details
+    </h5>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Transaction Hash</p>
+      </div>
+      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+        <p>
+          {{ latestTransaction.operation_group_hash }}
+          <a
+            (click)="copyToClipboard(latestTransaction.operation_group_hash)"
+            value="click to copy"
+            class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+          >
+            <fa-icon [icon]="icon('copy')" class="text-secondary"></fa-icon>
+          </a>
+        </p>
+      </div>
+    </div>
+    <ng-template #loadingTemplate>
+      <div class=" col-md-9">
+        <loading-skeleton [loadingWidth]="'400px'"></loading-skeleton>
+      </div>
+    </ng-template>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Block</p>
+      </div>
+      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+        <button type="button" class="btn btn-link p-0" ng-href="#here" [routerLink]="['/block', latestTransaction.block_level]">
+          {{ latestTransaction.block_level }}
+          <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
+            {{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}
+          </span>
+        </button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Timestamp</p>
+      </div>
+      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+        <p>{{ latestTransaction.timestamp | amTimeAgo }} ({{ latestTransaction.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Value</p>
+      </div>
+      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+        <ng-container *ngIf="amount$ | async as amount">
+          <div
+            class="col col-md-9"
+            *ngIf="
+              (amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
+              else hideValue
+            "
+          >
+            <p>
+              <span
+                class="d-inline-block"
+                [innerHtml]="
+                  amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
+                "
+              ></span>
+              ꜩ
+              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+                <span class="badge badge-pill badge-primary-light ml-1">
+                  {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                  {{ amount | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
+                </span>
+              </ng-container>
+            </p>
+          </div>
+        </ng-container>
+      </ng-container>
+      <ng-template #hideValue>
+        <div class="col col-md-9">
+          <span>0</span>
+        </div>
+      </ng-template>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="text-secondary">Transaction Fees</p>
+      </div>
+      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+        <ng-container *ngIf="fee$ | async as fee">
+          <div
+            class=" col-md-9"
+            *ngIf="
+              (fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
+              else hideValue
+            "
+          >
+            <p>
+              <span
+                class="d-inline-block"
+                [innerHtml]="
+                  fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
+                "
+              ></span>
+              ꜩ
+              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+                <span class="badge badge-pill badge-primary-light ml-1">
+                  {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                  {{ fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
+                </span>
+              </ng-container>
+            </p>
+          </div>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+</div>

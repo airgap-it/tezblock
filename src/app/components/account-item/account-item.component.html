@@ -1,0 +1,6 @@
+<div *ngFor="let dataPoint of data | async">
+  <p (click)="inspectDetail(dataPoint.account_id)">
+    {{ dataPoint.balance }} {{ dataPoint.account_id }}
+    {{ dataPoint.period_kind }}
+  </p>
+</div>

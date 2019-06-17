@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: tezblock-frontend
+  namespace: tezblock
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: tezblock-frontend
+    spec:
+      containers:
+        - name: tezblock-frontend
+          image: _TO_BE_REPLACED_BY_IMAGE_TAG_
+          imagePullPolicy: IfNotPresent
+          envFrom:
+            - configMapRef:
+                name: tezblock-frontend-config-map
+            # - secretRef:
+            #     name: tezblock-frontend-secret
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+      imagePullSecrets:
+        - name: regsecret
+      restartPolicy: Always
+status: {}

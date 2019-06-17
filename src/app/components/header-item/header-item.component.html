@@ -1,0 +1,152 @@
+<div class="container">
+  <nav class="navbar navbar-light navbar-expand-lg py-4 px-0">
+    <div class="d-block">
+      <div class="d-flex align-items-end">
+        <a class="navbar-brand mr-0 p-0" [routerLink]="['/']">
+          <img src="/assets/img/tezblock_logo.svg" width="160px" height="auto" />
+        </a>
+        <a href="https://airgap.it" target="_blank" class="text-dark">
+          <small>
+            MVP by AirGap
+          </small>
+        </a>
+      </div>
+
+      <div class="pt-2 d-none d-sm-block" *ngIf="!isMinimized">
+        <span class="badge badge-pill badge-light">
+          Cycle {{ currentCycle | async }}: {{ cycleProgress | async }}% {{ remainingTime | async }}
+        </span>
+      </div>
+    </div>
+    <button
+      class="hamburger hamburger--spring navbar-toggler p-0"
+      type="button"
+      (click)="isCollapsed = !isCollapsed; dp.hide()"
+      [attr.aria-expanded]="!isCollapsed"
+      aria-controls="collapseBasic"
+      [class.is-active]="!isCollapsed"
+    >
+      <span class="hamburger-box">
+        <span class="hamburger-inner"></span>
+      </span>
+    </button>
+
+    <div class="pt-3 w-100 d-block d-sm-none" *ngIf="!isMinimized">
+      <div class="input-group input-group-main">
+        <input
+          [(ngModel)]="searchTerm"
+          [typeaheadAsync]="true"
+          [typeahead]="data"
+          [adaptivePosition]="true"
+          [typeaheadMinLength]="2"
+          [typeaheadOptionsLimit]="7"
+          typeaheadOptionField="name"
+          typeaheadGroupField="type"
+          placeholder="Search by Address / Alias / Tx Hash / Block Hash"
+          class="form-control form-control--focus-white"
+          (keydown.enter)="searchService.search(searchTerm); dp.hide()"
+        />
+        <div class="input-group-append">
+          <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
+            <fa-icon [icon]="icon('search')" class="text-white  d-inline-block d-sm-none"></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapse navbar-collapse" [collapse]="isCollapsed" [isAnimated]="true" [ngStyle]="isCollapsed && { overflow: 'initial' }">
+      <div class="d-block ml-auto mt-2 mt-lg-0">
+        <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
+          <div class="input-group input-group-main">
+            <input
+              [(ngModel)]="searchTerm"
+              [typeaheadAsync]="true"
+              [typeahead]="data"
+              [adaptivePosition]="true"
+              [typeaheadMinLength]="2"
+              [typeaheadOptionsLimit]="7"
+              typeaheadOptionField="name"
+              typeaheadGroupField="type"
+              placeholder="Search by Address / Alias / Tx Hash / Block Hash"
+              class="form-control form-control--focus-white"
+              (keydown.enter)="searchService.search(searchTerm); dp.hide()"
+            />
+            <div class="input-group-append">
+              <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
+                <fa-icon [icon]="icon('search')" class="text-white"></fa-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <button
+              type="button"
+              (click)="dp.hide()"
+              class="btn"
+              routerLinkActive="btn-link"
+              [routerLinkActiveOptions]="{ exact: true }"
+              [routerLink]="['/']"
+            >
+              Overview
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <div class="btn-group" dropdown triggers="hover" #dp="bs-dropdown">
+              <button
+                id="button-basic"
+                type="button"
+                class="btn dropdown-toggle "
+                routerLinkActive="btn-link"
+                [ngClass]="{ 'btn-link': activeLinkBlockchain }"
+                (mouseleave)="dp.hide(); showDropdown = true"
+                (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+              >
+                Blockchain
+                <span class="caret"></span>
+              </button>
+              <ul *dropdownMenu class="dropdown-menu" role="menu" (mouseleave)="dp.hide()" (click)="dp.hide()">
+                <li role="menuitem">
+                  <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/block/list']">Blocks</a>
+                </li>
+                <li role="menuitem">
+                  <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/transaction/list']">
+                    Transactions
+                  </a>
+                </li>
+                <li role="menuitem">
+                  <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/activation/list']">
+                    Activations
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item">
+            <div class="btn-group" dropdown>
+              <button
+                id="button-basic"
+                dropdownToggle
+                type="button"
+                class="btn btn-link dropdown-toggle disabled"
+                aria-controls="dropdown-basic"
+              >
+                Resources
+                <span class="caret"></span>
+              </button>
+              <ul id="dropdown-basic" *dropdownMenu class="dropdown-menu" role="menu" aria-labelledby="button-basic">
+                <li role="menuitem"><a class="dropdown-item" href="#">Action</a></li>
+                <li role="menuitem"><a class="dropdown-item" href="#">Another action</a></li>
+                <li role="menuitem"><a class="dropdown-item" href="#">Something else here</a></li>
+                <li class="divider dropdown-divider"></li>
+                <li role="menuitem"><a class="dropdown-item" href="#">Separated link</a></li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div>

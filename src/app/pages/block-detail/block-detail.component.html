@@ -1,0 +1,28 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3">
+      <block-detail-wrapper
+        [wrapperBlock$]="block$"
+        [fiatInfo$]="fiatCurrencyInfo$"
+        [endorsements$]="endorsements$"
+        [confirmations$]="numberOfConfirmations$"
+        [blockLoading$]="blockLoading$"
+      ></block-detail-wrapper>
+    </div>
+
+    <div class="pt-5">
+      <div class="card pt-3">
+        <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
+          <tabbed-table
+            [tabs]="tabs"
+            [page]="'block'"
+            [loading]="transactionsLoading$"
+            [data]="transactions$"
+            [dataService]="transactionSingleService"
+            (tabClicked)="tabSelected($event)"
+          ></tabbed-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3">
+      <div class="card-body p-4 ">
+        <h5 class="card-title mb-3 ">
+          <ng-container *ngIf="page === 'transaction'">
+            Transactions
+          </ng-container>
+          <ng-container *ngIf="page === 'block'">
+            Blocks
+          </ng-container>
+          <ng-container *ngIf="page === 'activation'">
+            Activations
+          </ng-container>
+        </h5>
+        <div class="row">
+          <div class="col px-2">
+            <tezblock-table
+              [loading]="loading$"
+              [data]="data$"
+              [page]="page"
+              [type]="type"
+              [showLoadMoreButton]="true"
+              (loadMoreClicked)="loadMore()"
+            ></tezblock-table>
+          </div>
+        </div>
+        <ng-template list></ng-template>
+      </div>
+    </div>
+  </div>
+</div>

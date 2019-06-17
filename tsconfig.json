@@ -1,0 +1,39 @@
+{
+  "compileOnSave": false,
+  "allowJs": true,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es5",
+    "types": ["jasmine", "node"],
+
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2018", "dom"],
+    /* Strict Type-Checking Options */
+    "strict": false /* Enable all strict type-checking options. */,
+    "noImplicitAny": false /* OK Raise error on expressions and declarations with an implied 'any' type. */,
+    "strictNullChecks": false /* OK Enable strict null checks. */,
+    "strictFunctionTypes": true /* OK Enable strict checking of function types. */,
+    "strictBindCallApply": true /* OK Enable strict 'bind', 'call', and 'apply' methods on functions. */,
+    "strictPropertyInitialization": false /* OK Enable strict checking of property initialization in classes. */,
+    "noImplicitThis": true /* OK Raise error on 'this' expressions with an implied 'any' type. */,
+    "alwaysStrict": true /* OK Parse in strict mode and emit "use strict" for each source file. */,
+
+    /* Additional Checks */
+    "noUnusedLocals": false /* OK Report errors on unused locals. */,
+    "noUnusedParameters": false /* OK? Report errors on unused parameters. */,
+    "noImplicitReturns": true /* OK Report error when not all code paths in function return a value. */,
+    "noFallthroughCasesInSwitch": true /* OK Report errors for fallthrough cases in switch statement. */
+  },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "fullTemplateTypeCheck": true
+  }
+}

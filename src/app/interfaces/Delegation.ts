@@ -1,0 +1,33 @@
+export interface Delegation {
+  secret?: any
+  storage_size?: any
+  delegatable?: any
+  source: string
+  consumed_gas?: any
+  timestamp: number
+  pkh?: any
+  nonce?: any
+  block_level: number
+  balance?: any
+  operation_group_hash: string
+  public_key?: any
+  paid_storage_size_diff?: any
+  amount?: any
+  delegate: string
+  block_hash: string
+  spendable?: any
+  status: string
+  operation_id: number
+  manager_pubkey?: any
+  slots?: any
+  storage_limit: number
+  storage?: any
+  counter: number
+  script?: any
+  kind: string
+  gas_limit: number
+  parameters?: any
+  destination?: any
+  fee: number
+  level?: any
+}

@@ -1,0 +1,8 @@
+::ng-deep tabbed-table {
+  width: 100%;
+  .nav-item {
+    &.disabled {
+      opacity: 0.3;
+    }
+  }
+}

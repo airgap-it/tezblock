@@ -1,0 +1,113 @@
+image: docker:latest
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GOOGLE_TAG: eu.gcr.io/papers-kubernetes/tezblock-frontend:$CI_COMMIT_SHA
+  GOOGLE_TAG_LATEST: eu.gcr.io/papers-kubernetes/tezblock-frontend:latest
+
+stages:
+  - build
+  - test
+  - qa
+  - build_serve
+  - publish
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg CONSEIL_BASE_URL --build-arg CONSEIL_API_KEY --target angular-build -t $GOOGLE_TAG .
+  tags:
+    - docker
+
+build_serve:
+  stage: build_serve
+  when: manual
+  script:
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg CONSEIL_BASE_URL --build-arg CONSEIL_API_KEY -t $GOOGLE_TAG .
+  tags:
+    - docker
+
+test:
+  stage: test
+  script:
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name lint-$CI_COMMIT_SHA $GOOGLE_TAG npm run lint-ci
+    - docker cp unit-$CI_COMMIT_SHA:/app/coverage/tezblock/lcov.info lcov.info
+    - docker cp lint-$CI_COMMIT_SHA:/app/lintReport.json lintReport.json
+  after_script:
+    - docker rm -f unit-$CI_COMMIT_SHA || true
+    - docker rm -f lint-$CI_COMMIT_SHA || true
+  tags:
+    - docker
+  artifacts:
+    paths:
+      - lcov.info
+      - lintReport.json
+
+qa:
+  allow_failure: false
+  stage: qa
+  script:
+    - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X
+      -Dsonar.typescript.lcov.reportPaths=lcov.info
+      -Dsonar.typescript.tslint.reportPaths=lintReport.json
+      -Dsonar.test.inclusions=**/*.spec.ts
+      -Dsonar.tests=src/
+      -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
+      -Dsonar.sources=src/
+      -Dsonar.host.url=$SONAR_URL
+      -Dsonar.login=$SONAR_LOGIN
+      -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA
+      -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+      -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+      -Dsonar.branch.name=$CI_BUILD_REF_NAME
+    - docker cp lcov.info qa-$CI_PIPELINE_ID:/app/lcov.info
+    - docker cp lintReport.json qa-$CI_PIPELINE_ID:/app/lintReport.json
+    - docker start -a qa-$CI_PIPELINE_ID
+  after_script:
+    - docker rm -f qa-$CI_PIPELINE_ID || true
+  tags:
+    - docker
+
+publish:
+  stage: publish
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud auth configure-docker
+  script:
+    - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST
+    - docker push $GOOGLE_TAG
+    - docker push $GOOGLE_TAG_LATEST
+  only:
+    - master
+    - develop
+  tags:
+    - docker
+
+k8s-deploy-development:
+  stage: deploy
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - gcloud container clusters get-credentials papers-cluster-development
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - kubectl apply -f k8s/tezblock/common/namespace.yaml
+    - kubectl apply -f k8s/tezblock/development/ --recursive
+    - kubectl apply -f k8s/tezblock/common/ --recursive
+  only:
+    - master
+    - develop
+  tags:
+    - docker
