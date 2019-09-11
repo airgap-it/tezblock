@@ -48,7 +48,7 @@
         />
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-            <fa-icon [icon]="icon('search')" class="text-white  d-inline-block d-sm-none"></fa-icon>
+            <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
           </button>
         </div>
       </div>
@@ -73,7 +73,7 @@
             />
             <div class="input-group-append">
               <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-                <fa-icon [icon]="icon('search')" class="text-white"></fa-icon>
+                <fa-icon [icon]="'search' | iconPipe" class="text-white"></fa-icon>
               </button>
             </div>
           </div>

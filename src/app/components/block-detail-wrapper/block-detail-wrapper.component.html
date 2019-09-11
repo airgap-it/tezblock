@@ -110,7 +110,7 @@
   >
     <span>{{ isCollapsed ? 'More' : 'Less' }}</span>
     Details
-    <fa-icon [icon]="icon('longArrowAltDown')" class="ml-1"></fa-icon>
+    <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
   </button>
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
     <div class="row mt-3">

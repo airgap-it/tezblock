@@ -14,6 +14,7 @@ import { BlockItemComponent } from './../../components/block-item/block-item.com
 import { PricechartItemComponent } from './../../components/pricechart-item/pricechart-item.component'
 import { TransactionItemComponent } from './../../components/transaction-item/transaction-item.component'
 import { DashboardComponent } from './dashboard.component'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent
@@ -24,7 +25,7 @@ describe('DashboardComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AlertConfig, TypeaheadConfig, ProgressbarConfig, TooltipConfig],
+        providers: [AlertConfig, TypeaheadConfig, ProgressbarConfig, TooltipConfig, IconPipe],
         imports: [FontAwesomeModule, ProgressbarModule, MomentModule, TooltipModule, AlertModule, TypeaheadModule, ModalModule.forRoot()],
         declarations: [
           PricechartItemComponent,
