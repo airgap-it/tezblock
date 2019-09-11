@@ -60,11 +60,11 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
 
   public ngOnInit() {
     const paramBlockLevel = this.route.snapshot.params.id
+    let blockHash: string | undefined
 
     this.blockSingleService.updateId(paramBlockLevel)
 
     this.block$ = this.blockSingleService.block$.pipe(map(blocks => blocks[0]))
-    // this.block$ = this.blockService.getById(paramBlockLevel).pipe(map(blocks => blocks[0]))
 
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsements(block.hash)))
 
@@ -83,9 +83,12 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
 
     // TODO: Try to  get rid of this subscription
     this.subscriptions.add(
-      this.block$.subscribe(async (block: Block) => {
+      this.block$.subscribe((block: Block) => {
         if (block) {
-          this.transactionSingleService.updateBlockHash(block.hash)
+          if (block.hash !== blockHash) {
+            this.transactionSingleService.updateBlockHash(block.hash)
+            blockHash = block.hash
+          }
         }
 
         // console.log(await this.blockService.getAdditionalBlockData([block]))

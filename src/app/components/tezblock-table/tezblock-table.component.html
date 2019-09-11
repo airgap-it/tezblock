@@ -1,4 +1,4 @@
-<div class="container py-2" *ngIf="loading$ | async; else loading">
+<div class="container py-2" *ngIf="loading$ | async; else loaded">
   <table class="table" style="border-collapse: initial">
     <thead>
       <tr>
@@ -25,30 +25,39 @@
   </table>
 </div>
 
-<ng-template #loading>
+<ng-template #loaded>
   <div class="table-responsive mb-3">
     <table class="table table-hover">
-      <thead>
-        <tr>
-          <th *ngFor="let col of config" scope="col" [width]="col.width">
-            {{ col.name }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngIf="transactions">
-          <ng-container *ngFor="let transaction of transactions; let i = index">
-            <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }">
-              <!--tx status is always 'null' for endorsements-->
-              <td *ngFor="let col of config; let j = index">
-                <!--<ng-container *ngTemplateOutlet="dynamic; context: transaction"></ng-container>-->
-                <ng-template #dynamic></ng-template>
-              </td>
-            </tr>
-            <tr *ngIf="transactions.length === 0"><td width="180">NO TRANSACTIONS</td></tr>
+      <ng-container *ngIf="transactions">
+        <ng-container *ngIf="transactions.length > 0; then thenTemplate; else elseTemplate"></ng-container>
+      </ng-container>
+      <ng-template #thenTemplate>
+        <thead>
+          <tr>
+            <th *ngFor="let col of config" scope="col" [width]="col.width">
+              {{ col.name }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="transactions">
+            <ng-container *ngFor="let transaction of transactions; let i = index">
+              <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }">
+                <!--tx status is always 'null' for endorsements-->
+                <td *ngFor="let col of config; let j = index">
+                  <!--<ng-container *ngTemplateOutlet="dynamic; context: transaction"></ng-container>-->
+                  <ng-template #dynamic></ng-template>
+                </td>
+              </tr>
+            </ng-container>
           </ng-container>
-        </ng-container>
-      </tbody>
+        </tbody>
+      </ng-template>
+      <ng-template #elseTemplate>
+        <thead width="180">
+          <tr><th>No Transactions</th></tr>
+        </thead>
+      </ng-template>
     </table>
     <button *ngIf="showLoadMoreButton" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
   </div>

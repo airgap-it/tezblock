@@ -45,7 +45,7 @@ test:
       - lintReport.json
 
 qa:
-  allow_failure: false
+  allow_failure: true
   stage: qa
   script:
     - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X

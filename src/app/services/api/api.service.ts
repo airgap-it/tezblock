@@ -329,6 +329,30 @@ export class ApiService {
     )
   }
 
+  public getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
+    return this.http.post<Account[]>(
+      this.accountsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'account_id',
+            operation: 'eq',
+            set: [ktAddress],
+            inverse: false
+          }
+        ],
+        orderBy: [
+          {
+            field: 'balance',
+            direction: 'desc'
+          }
+        ],
+        limit
+      },
+      this.options
+    )
+  }
+
   public getAccountStatus(address: string): Promise<string> {
     return new Promise(resolve => {
       this.http
