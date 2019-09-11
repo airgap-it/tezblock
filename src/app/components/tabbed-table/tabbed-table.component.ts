@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import { ApiService } from 'src/app/services/api/api.service'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
+import { IconService } from 'src/app/services/icon/icon.service'
 
 export interface Tab {
   title: string
@@ -124,9 +124,5 @@ export class TabbedTableComponent {
     if (this.dataService && this.dataService.loadMore) {
       this.dataService.loadMore()
     }
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

@@ -16,8 +16,8 @@ import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
+import { IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
-import { IconService, IconRef } from '../../services/icon/icon.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -248,9 +248,5 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public loadMore(): void {
     this.transactionSingleService.loadMore()
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

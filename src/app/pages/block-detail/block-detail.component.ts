@@ -10,8 +10,8 @@ import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../../services/api/api.service'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconService } from '../../services/icon/icon.service'
+import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 
 @Component({
   selector: 'app-block-detail',
@@ -35,7 +35,13 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconService.iconProperties('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconService.iconProperties('link') },
     { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconService.iconProperties('stamp') },
-    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconService.iconProperties('handHoldingSeedling') }
+    {
+      title: 'Activations',
+      active: false,
+      kind: 'activate_account',
+      count: 0,
+      icon: this.iconService.iconProperties('handHoldingSeedling')
+    }
   ]
 
   public readonly transactionSingleService: TransactionSingleService
