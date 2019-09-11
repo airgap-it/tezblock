@@ -68,7 +68,7 @@ export class BlockService extends Facade<BlockServiceState> {
             this.updateState({ ...this._state, blocks, loading: false })
           }
 
-          return this.getAdditionalBlockData(blocks, this._state.pagination.selectedSize)
+          return this.getAdditionalBlockData(blocks, this._state.pagination.selectedSize * this._state.pagination.currentPage)
         })
       )
       .subscribe(blocks => {

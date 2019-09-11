@@ -50,7 +50,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public account$: Observable<Account> = new Observable()
   public delegatedAccounts: Observable<Account[]> = new Observable()
   public delegatedAccountAddress: string | undefined
-  public relatedAccounts: Observable<Account[]>
+  public relatedAccounts: Observable<Account[]> = new Observable()
   public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
 
@@ -157,7 +157,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async getBakingInfos(address: string) {
-    if (address.startsWith('KT')) {
+    if (address.startsWith('KT') || !this.isValidBaker) {
       this.tezosBakerFee = 'not available'
     }
     this.bakingInfos = await this.bakingService.getBakerInfos(address)

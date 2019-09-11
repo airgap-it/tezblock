@@ -5,7 +5,7 @@ import * as cryptocompare from 'cryptocompare'
 import { BehaviorSubject, combineLatest, Observable, timer, from } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
-import { Facade } from '../facade/facade'
+import { Facade, disctinctChartData } from '../facade/facade'
 import { ObserveOnOperator } from 'rxjs/internal/operators/observeOn'
 
 export interface CurrencyInfo {
@@ -52,9 +52,7 @@ export class CryptoPricesService extends Facade<CryptoPricesServiceState> {
   )
   public historicData$ = this.state$.pipe(
     map(state => state.historicData),
-    distinctUntilChanged(
-      (previous, current) => previous.map(sample => sample.close.toString(10)) === current.map(sample => sample.close.toString(10))
-    )
+    distinctUntilChanged(disctinctChartData)
   )
   public growthPercentage$ = this.state$.pipe(
     map(state => state.percentage),

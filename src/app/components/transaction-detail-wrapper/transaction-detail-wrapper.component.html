@@ -11,7 +11,8 @@
         <p>
           {{ latestTransaction.operation_group_hash }}
           <a
-            (click)="copyToClipboard(latestTransaction.operation_group_hash)"
+            [@changeBtnColor]="current"
+            (click)="copyToClipboard(latestTransaction.operation_group_hash); changeState(latestTransaction.operation_group_hash)"
             value="click to copy"
             class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
           >

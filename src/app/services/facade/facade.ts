@@ -1,4 +1,6 @@
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import { Observable, ReplaySubject, timer } from 'rxjs'
+import { Account } from 'src/app/interfaces/Account'
 
 export interface Pagination {
   selectedSize: number
@@ -41,4 +43,18 @@ export function distinctPagination(previous: Pagination, current: Pagination): b
     previous.pageSizes !== current.pageSizes ||
     previous.selectedSize !== current.selectedSize
   )
+}
+
+export function disctinctChartData(previous: MarketDataSample[], current: MarketDataSample[]): boolean {
+  const previousData = [{ data: [] }]
+  const currentData = [{ data: [] }]
+
+  previousData[0].data = previous.map(data => data.open)
+  currentData[0].data = current.map(data => data.open)
+
+  return !(previousData[0].data.slice(-1).pop() !== currentData[0].data.slice(-1).pop())
+}
+
+export function distinctAccounts(previous: Account[], current: Account[]): boolean {
+  return !(previous.length !== current.length)
 }

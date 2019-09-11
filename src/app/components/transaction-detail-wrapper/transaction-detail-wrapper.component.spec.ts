@@ -6,6 +6,8 @@ import { TransactionDetailWrapperComponent } from './transaction-detail-wrapper.
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
 import { MomentModule } from 'ngx-moment'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
+import { ModalModule, BsModalService } from 'ngx-bootstrap'
+import { ToastrModule, ToastrService } from 'ngx-toastr'
 
 describe('TransactionDetailWrapperComponent', () => {
   let component: TransactionDetailWrapperComponent
@@ -17,8 +19,8 @@ describe('TransactionDetailWrapperComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe],
-        imports: [FontAwesomeModule, MomentModule],
+        providers: [AmountConverterPipe, BsModalService, ToastrService],
+        imports: [FontAwesomeModule, MomentModule, ModalModule.forRoot(), ToastrModule.forRoot()],
         declarations: [TransactionDetailWrapperComponent, LoadingSkeletonComponent]
       })
     )

@@ -3,7 +3,7 @@ import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 import { Account } from 'src/app/interfaces/Account'
 import { ApiService } from '../api/api.service'
-import { Facade } from '../facade/facade'
+import { Facade, distinctAccounts } from '../facade/facade'
 import { Delegation } from 'src/app/interfaces/Delegation'
 
 interface AccountSingleServiceState {
@@ -43,7 +43,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
 
   public originatedAccounts$ = this.state$.pipe(
     map(state => state.originatedAccounts),
-    distinctUntilChanged()
+    distinctUntilChanged(distinctAccounts)
   )
 
   constructor(private readonly apiService: ApiService) {
@@ -67,29 +67,47 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
 
   // TODO: Include into combineLatest
   private getDelegatedAccounts(address: string): void {
-    this.apiService.getDelegatedAccounts(address, 10).subscribe((accounts: Account[]) => {
-      const delegatedAccounts: Account[] = []
-      const originatedAccounts: Account[] = []
-      if (accounts.length === 0) {
-        // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
-        this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-          if (accounts[0].delegate_value) {
-            delegatedAccounts.push(accounts[0])
+    if (address) {
+      if (address.startsWith('tz')) {
+        this.apiService.getDelegatedAccounts(address, 10).subscribe((accounts: Account[]) => {
+          const delegatedAccounts: Account[] = []
+          const originatedAccounts: Account[] = []
+          if (accounts.length === 0) {
+            // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
+            this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
+              if (accounts[0].delegate_value) {
+                delegatedAccounts.push(accounts[0])
+                this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
+              }
+            })
+          } else {
+            accounts.forEach(account => {
+              if (account.account_id !== account.manager) {
+                originatedAccounts.push(account)
+              }
+              if (account.delegate_value) {
+                delegatedAccounts.push(account)
+              }
+            })
             this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
           }
         })
       } else {
-        accounts.forEach(account => {
-          if (account.account_id !== account.manager) {
-            originatedAccounts.push(account)
-          }
-          if (account.delegate_value) {
-            delegatedAccounts.push(account)
-          }
+        this.apiService.getManagerAccount(address, 10).subscribe((managerAccounts: Account[]) => {
+          const originAccounts: Account[] = []
+          managerAccounts.forEach(account => {
+            if (account.manager) {
+              this.apiService.getAccountById(account.manager).subscribe((accounts: Account[]) => {
+                if (accounts[0].account_id) {
+                  originAccounts.push(accounts[0])
+                  this.updateState({ ...this._state, originatedAccounts: originAccounts, loading: false })
+                }
+              })
+            }
+          })
         })
-        this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
       }
-    })
+    }
   }
 
   public setAddress(address) {
