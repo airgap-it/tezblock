@@ -10,8 +10,8 @@ import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../../services/api/api.service'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-block-detail',
@@ -31,16 +31,16 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
   public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconService.iconProperties('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconService.iconProperties('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconService.iconProperties('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconService.iconProperties('stamp') },
+    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
     {
       title: 'Activations',
       active: false,
       kind: 'activate_account',
       count: 0,
-      icon: this.iconService.iconProperties('handHoldingSeedling')
+      icon: this.iconPipe.transform('handHoldingSeedling')
     }
   ]
 
@@ -54,7 +54,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly blockService: BlockService,
     private readonly apiService: ApiService,
-    private readonly iconService: IconService
+    private readonly iconPipe: IconPipe
   ) {
     this.transactionSingleService = new TransactionSingleService(this.apiService)
     this.blockSingleService = new BlockSingleService(this.blockService)

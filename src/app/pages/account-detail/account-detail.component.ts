@@ -16,8 +16,8 @@ import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -89,11 +89,11 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public transactionSingleService: TransactionSingleService
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconService.iconProperties('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconService.iconProperties('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconService.iconProperties('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconService.iconProperties('stamp') },
-    { title: 'Vote', active: false, kind: 'ballot', count: 0, icon: this.iconService.iconProperties('boxBallot') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
+    { title: 'Vote', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
@@ -111,7 +111,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
-    private readonly iconService: IconService
+    private readonly iconPipe: IconPipe
   ) {
     this.address = this.route.snapshot.params.id
     this.transactionSingleService = new TransactionSingleService(this.apiService)
