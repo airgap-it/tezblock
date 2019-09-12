@@ -10,10 +10,10 @@ import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
 
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
-import { BakingBadResponse } from '../../interfaces/BakingBadResponse'
 // import { BakerConfig } from '../remote-config/remote-config.service'
 import { OperationsService } from '../operations/operations.service'
 import { Observable } from 'rxjs'
+import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -51,33 +51,19 @@ export class BakingService {
     public operationsService: OperationsService
   ) {}
 
-  public async getBakingBadRatings(address: string): Promise<ApiErrorObject> {
-    return new Promise(resolve => {
-      this.http.get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`).subscribe(
-        (response: BakingBadResponse) => {
-          console.log('response: ', response)
-          resolve({ status: 'success', rating: response.status })
-        },
-        err => {
-          resolve({ status: 'error' })
-        }
-      )
-    })
-  }
-
-  public getBakingBadRatings2(address: string): Promise<ApiErrorObject> {
+  public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
       this.http
-        .get(`${this.newBakingBadUrl}/${address}`, { params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' } })
-        .subscribe(
-          response => {
-            console.log('antwort: ', response)
+        .get<BakingBadResponse>(`${this.newBakingBadUrl}/${address}`, {
+          params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' }
+        })
+        .subscribe((response: BakingBadResponse) => {
+          if (response !== null) {
             resolve({ status: 'success', rating: response.rating.status })
-          },
-          err => {
+          } else {
             resolve({ status: 'error' })
           }
-        )
+        })
     })
   }
 

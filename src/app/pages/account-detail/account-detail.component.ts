@@ -170,11 +170,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     //this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
-    this.bakingService
-      .getBakingBadRatings2(address)
-      .then(result => {
-        console.log('rating: ', result.rating)
 
+    this.bakingService
+      .getBakingBadRatings(address)
+      .then(result => {
         if (result.rating === 0 && result.status === 'success') {
           console.log('awesome')
           this.bakingBadRating = 'awesome'
@@ -207,19 +206,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       .catch(error => {
         this.isValidBaker = false
       })
-
-    // this.bakingService
-    //   .getBakingBadRatings(address)
-    //   .then(result => {
-    //     if (result.status === 'success' && result.rating) {
-    //       this.bakingBadRating = result.rating
-    //     } else if (result.status === 'error') {
-    //       this.bakingBadRating = 'not available'
-    //     }
-    //   })
-    //   .catch(error => {
-    //     this.isValidBaker = false
-    //   })
 
     // TODO: Move to component
     await this.bakingService
