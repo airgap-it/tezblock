@@ -16,6 +16,7 @@ export class ApiService {
   private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
   private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
   private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
+  private readonly balanceUpdatesApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/balance_updates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -556,6 +557,39 @@ export class ApiService {
         )
         .subscribe((transactions: Transaction[]) => {
           resolve(transactions.length)
+        })
+    })
+  }
+  public getBalanceUpdates<T>(tzAddress: string, limit?: number): Promise<T[]> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post<T[]>(
+          this.balanceUpdatesApiUrl,
+          {
+            predicates: [
+              {
+                field: 'delegate',
+                operation: 'eq',
+                set: [tzAddress],
+                inverse: false
+              },
+              {
+                field: 'category',
+                operation: 'in',
+                set: ['rewards', 'deposits']
+              }
+            ],
+            orderBy: [
+              {
+                field: 'delegate',
+                direction: 'desc'
+              }
+            ]
+          },
+          this.options
+        )
+        .subscribe((transactions: T[]) => {
+          resolve(transactions)
         })
     })
   }

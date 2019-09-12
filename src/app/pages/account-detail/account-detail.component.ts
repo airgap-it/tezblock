@@ -154,6 +154,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
+    const test = this.accountService.getAccumulatedDepositsAndRewards(address).then(response => console.log('antwort: ', response))
   }
 
   public async getBakingInfos(address: string) {

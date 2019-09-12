@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { combineLatest } from 'rxjs'
+import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { Account } from '../../interfaces/Account'
@@ -81,5 +81,8 @@ export class AccountService extends Facade<AccountServiceState> {
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
 
     this.updateState({ ...this._state, pagination, loading: true })
+  }
+  public getAccumulatedDepositsAndRewards(address: string, limit?: number): Promise<any> {
+    return this.apiService.getBalanceUpdates(address, limit)
   }
 }
