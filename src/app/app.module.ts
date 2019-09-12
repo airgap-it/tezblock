@@ -38,6 +38,7 @@ import { TezblockTableComponent } from './components/tezblock-table/tezblock-tab
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
 import { TransactionItemComponent } from './components/transaction-item/transaction-item.component'
+import { addFontAwesome } from './fa-add'
 import { AccountDetailComponent } from './pages/account-detail/account-detail.component'
 import { BlockDetailComponent } from './pages/block-detail/block-detail.component'
 import { DashboardComponent } from './pages/dashboard/dashboard.component'
@@ -48,8 +49,6 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { IconService } from './services/icon/icon.service'
-import { addFontAwesome } from './fa-add'
 
 @NgModule({
   imports: [
@@ -108,7 +107,7 @@ import { addFontAwesome } from './fa-add'
     LoadingSkeletonComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, IconService],
+  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
   entryComponents: [
     BlockItemComponent,
     IdenticonComponent,
