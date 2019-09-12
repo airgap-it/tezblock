@@ -170,6 +170,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     //this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
+    this.bakingService.getBakingBadRatings2(address)
     this.bakingService
       .getBakingBadRatings(address)
       .then(result => {

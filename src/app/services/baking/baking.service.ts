@@ -1,5 +1,5 @@
 import { Location } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
@@ -13,6 +13,7 @@ import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
 import { BakingBadResponse } from '../../interfaces/BakingBadResponse'
 // import { BakerConfig } from '../remote-config/remote-config.service'
 import { OperationsService } from '../operations/operations.service'
+import { Observable } from 'rxjs'
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -23,6 +24,7 @@ const hoursPerCycle = 68
 export class BakingService {
   public bakerInfo?: BakerInfo
 
+  private readonly newBakingBadUrl = 'https://test.baking-bad.org/v1/bakers'
   private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/ratings'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
 
@@ -49,11 +51,26 @@ export class BakingService {
     public operationsService: OperationsService
   ) {}
 
-  public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
+  public async getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
       this.http.get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`).subscribe(
         (response: BakingBadResponse) => {
+          console.log('response: ', response)
           resolve({ status: 'success', rating: response.status })
+        },
+        err => {
+          resolve({ status: 'error' })
+        }
+      )
+    })
+  }
+
+  public getBakingBadRatings2(address: string): Promise<ApiErrorObject> {
+    return new Promise(resolve => {
+      this.http.get(`${this.newBakingBadUrl}/${address}`, { params: { ['rating']: 'true' } }).subscribe(
+        response => {
+          console.log('antwort: ', response)
+          resolve({ status: 'success' })
         },
         err => {
           resolve({ status: 'error' })
