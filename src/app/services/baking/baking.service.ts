@@ -67,15 +67,17 @@ export class BakingService {
 
   public getBakingBadRatings2(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
-      this.http.get(`${this.newBakingBadUrl}/${address}`, { params: { ['rating']: 'true' } }).subscribe(
-        response => {
-          console.log('antwort: ', response)
-          resolve({ status: 'success' })
-        },
-        err => {
-          resolve({ status: 'error' })
-        }
-      )
+      this.http
+        .get(`${this.newBakingBadUrl}/${address}`, { params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' } })
+        .subscribe(
+          response => {
+            console.log('antwort: ', response)
+            resolve({ status: 'success', rating: response.rating.status })
+          },
+          err => {
+            resolve({ status: 'error' })
+          }
+        )
     })
   }
 
