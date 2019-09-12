@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 
+import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
@@ -560,10 +561,10 @@ export class ApiService {
         })
     })
   }
-  public getBalanceUpdates<T>(tzAddress: string, limit?: number): Promise<T[]> {
+  public getBalanceUpdates<BalanceUpdate>(tzAddress: string, limit?: number): Promise<BalanceUpdate[]> {
     return new Promise((resolve, reject) => {
       this.http
-        .post<T[]>(
+        .post<BalanceUpdate[]>(
           this.balanceUpdatesApiUrl,
           {
             predicates: [
@@ -588,8 +589,8 @@ export class ApiService {
           },
           this.options
         )
-        .subscribe((transactions: T[]) => {
-          resolve(transactions)
+        .subscribe((balances: BalanceUpdate[]) => {
+          resolve(balances)
         })
     })
   }
