@@ -582,7 +582,7 @@ export class ApiService {
             ],
             orderBy: [
               {
-                field: 'delegate',
+                field: 'level',
                 direction: 'desc'
               }
             ]

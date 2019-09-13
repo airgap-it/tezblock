@@ -16,8 +16,8 @@ import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
+import { IconRef, IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
-import { IconService, IconRef } from '../../services/icon/icon.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -99,6 +99,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
   public address: string
+  public accumulatedDeposits: number | undefined
+  public accumulatedRewards: number | undefined
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -154,7 +156,21 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
-    const test = this.accountService.getAccumulatedDepositsAndRewards(address).then(response => console.log('antwort: ', response))
+    const test = this.accountService.getDepositsAndRewards(address).then(balances => {
+      let depositBalances = 0
+      let rewardBalances = 0
+      balances.forEach(balance => {
+        if (balance.category === 'deposits') {
+          depositBalances += balance.change
+        } else {
+          rewardBalances += balance.change
+        }
+      })
+      console.log('deposits: ', depositBalances)
+      this.accumulatedDeposits = depositBalances
+      console.log('rewards: ', rewardBalances)
+      this.accumulatedRewards = rewardBalances
+    })
   }
 
   public async getBakingInfos(address: string) {
@@ -167,8 +183,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
     this.stakingBond = this.bakingInfos.selfBond
     this.isValidBaker = true
-    //this.nextPayout = this.bakingInfos.nextPayout
-    //this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+    // this.nextPayout = this.bakingInfos.nextPayout
+    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
     this.bakingService

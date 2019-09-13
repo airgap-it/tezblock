@@ -5,6 +5,7 @@ import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 import { Account } from '../../interfaces/Account'
 import { ApiService } from '../api/api.service'
 import { Facade, Pagination } from '../facade/facade'
+import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 
 interface AccountServiceState {
   accounts: Account[]
@@ -82,7 +83,7 @@ export class AccountService extends Facade<AccountServiceState> {
 
     this.updateState({ ...this._state, pagination, loading: true })
   }
-  public getAccumulatedDepositsAndRewards(address: string, limit?: number): Promise<any> {
+  public getDepositsAndRewards(address: string, limit?: number): Promise<BalanceUpdate[]> {
     return this.apiService.getBalanceUpdates(address, limit)
   }
 }
