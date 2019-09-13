@@ -333,13 +333,15 @@
                       <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
                     </ng-container>
                     <ng-template #deposits>
-                      <span class="d-inline-block">
-                        {{
+                      <span
+                        class="d-inline-block"
+                        [innerHtml]="
                           accumulatedDeposits
                             | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                        }}
-                        ꜩ
-                      </span>
+                            | safeHtml
+                        "
+                      ></span>
+                      ꜩ
                     </ng-template>
                   </h3>
                 </div>
@@ -373,13 +375,15 @@
                       <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
                     </ng-container>
                     <ng-template #rewards>
-                      <span class="d-inline-block">
-                        {{
+                      <span
+                        class="d-inline-block"
+                        [innerHtml]="
                           accumulatedRewards
                             | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                        }}
-                        ꜩ
-                      </span>
+                            | safeHtml
+                        "
+                      ></span>
+                      ꜩ
                     </ng-template>
                   </h3>
                 </div>
