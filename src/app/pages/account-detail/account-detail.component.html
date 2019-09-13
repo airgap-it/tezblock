@@ -373,7 +373,13 @@
                       <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
                     </ng-container>
                     <ng-template #rewards>
-                      <span class="d-inline-block">{{ accumulatedRewards | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }} ꜩ</span>
+                      <span class="d-inline-block">
+                        {{
+                          accumulatedRewards
+                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
+                        }}
+                        ꜩ
+                      </span>
                     </ng-template>
                   </h3>
                 </div>
