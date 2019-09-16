@@ -12,10 +12,10 @@
                   value="click to copy"
                   class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none"
                 >
-                  <fa-icon [icon]="icon('copy')" class="text-secondary"></fa-icon>
+                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
                 <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showQr()">
-                  <fa-icon [icon]="icon('qrcode')" class="text-secondary"></fa-icon>
+                  <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
               </div>
               <div class="col-md-10 pl-sm-0 ">
@@ -34,10 +34,10 @@
                   value="click to copy"
                   class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block"
                 >
-                  <fa-icon [icon]="icon('copy')" class="text-secondary"></fa-icon>
+                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
                 <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showQr()">
-                  <fa-icon [icon]="icon('qrcode')" class="text-secondary"></fa-icon>
+                  <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
 
                 <div>
@@ -112,7 +112,7 @@
                   [ngClass]="{ 'btn--rotated': !isCollapsed }"
                 >
                   <span>Show All Accounts</span>
-                  <fa-icon [icon]="icon('longArrowAltDown')" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
                 </button>
 
                 <button
@@ -122,7 +122,7 @@
                   [ngClass]="{ 'btn--rotated': isCollapsed }"
                 >
                   <span>Minimize</span>
-                  <fa-icon [icon]="icon('longArrowAltDown')" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
                 </button>
               </div>
             </ng-container>

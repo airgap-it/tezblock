@@ -11,7 +11,6 @@ import { SearchService } from '../../services/search/search.service'
 import { TypeAheadObject } from './../../interfaces/TypeAheadObject'
 import { ApiService } from './../../services/api/api.service'
 import { TransactionService } from './../../services/transaction /transaction.service'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -47,8 +46,7 @@ export class DashboardComponent {
     private readonly transactionService: TransactionService,
     private readonly apiService: ApiService,
     private readonly cryptoPricesService: CryptoPricesService,
-    private readonly cycleService: CycleService,
-    private readonly iconService: IconService
+    private readonly cycleService: CycleService
   ) {
     this.bakers = Object.keys(accounts)
     this.blocks$ = this.blocksService.list$
@@ -96,9 +94,5 @@ export class DashboardComponent {
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

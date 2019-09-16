@@ -8,6 +8,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { AddressItemComponent } from './../address-item/address-item.component'
 import { IdenticonComponent } from './../identicon/identicon'
 import { TransactionItemComponent } from './transaction-item.component'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 describe('TransactionItemComponent', () => {
   let component: TransactionItemComponent
@@ -19,7 +20,7 @@ describe('TransactionItemComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [ShortenStringPipe],
+        providers: [ShortenStringPipe, IconPipe],
         imports: [MomentModule, TooltipModule, FontAwesomeModule],
         declarations: [TransactionItemComponent, AddressItemComponent, IdenticonComponent]
       })

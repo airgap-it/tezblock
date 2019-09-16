@@ -28,7 +28,7 @@
         />
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm)">
-            <fa-icon [icon]="icon('search')" class="text-white  d-inline-block d-sm-none"></fa-icon>
+            <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
             <span class="d-none d-sm-inline-block">Search</span>
           </button>
         </div>
