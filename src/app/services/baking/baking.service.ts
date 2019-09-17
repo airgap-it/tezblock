@@ -24,8 +24,7 @@ const hoursPerCycle = 68
 export class BakingService {
   public bakerInfo?: BakerInfo
 
-  private readonly newBakingBadUrl = 'https://test.baking-bad.org/v1/bakers'
-  private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/ratings'
+  private readonly bakingBadUrl = 'https://test.baking-bad.org/v1/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
 
   public bakerConfigError: string | undefined
@@ -54,7 +53,7 @@ export class BakingService {
   public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
       this.http
-        .get<BakingBadResponse>(`${this.newBakingBadUrl}/${address}`, {
+        .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
           params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' }
         })
         .subscribe((response: BakingBadResponse) => {
