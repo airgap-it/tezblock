@@ -35,6 +35,10 @@
     "alias": "PayTezos",
     "hasLogo": true
   },
+  "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
+    "alias": "PayTezos Payouts",
+    "hasLogo": true
+  },
   "tz1LesY3S4wfe15SNm1W3qJmQzWxLqVjTruH": {
     "alias": "Xtez",
     "hasLogo": true
