@@ -35,6 +35,10 @@
     "alias": "PayTezos",
     "hasLogo": true
   },
+  "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
+    "alias": "PayTezos Payouts",
+    "hasLogo": true
+  },
   "tz1LesY3S4wfe15SNm1W3qJmQzWxLqVjTruH": {
     "alias": "Xtez",
     "hasLogo": true
@@ -63,9 +67,13 @@
     "alias": "AirGap",
     "hasLogo": true
   },
+  "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
+    "alias": "AirGap Payout",
+    "hasLogo": true
+  },
   "tz1MQJPGNMijnXnVoBENFz9rUhaPt3S7rWoz": {
     "alias": "Tezmania",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1MXFrtZoaXckE41bjUCSjAjAap3AFDSr3N": {
     "alias": "Everstake",
@@ -97,7 +105,7 @@
   },
   "tz1NpWrAyDL9k2Lmnyxcgr9xuJakbBxdq7FB": {
     "alias": "Gate.io",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1NqKH9D5HdfvoEQssMS5Up13CVypVxLA1k": {
     "alias": "Cypher-Baker",
@@ -273,6 +281,14 @@
   },
   "tz1Vtimi84kLh9RANfRVX2JvYtP4NPCT1aFm": {
     "alias": "TezTech Labs",
+    "hasLogo": true
+  },
+  "tz1RAzdkp1x5ZDqms4ZUrSdfJuUYGH9JTPK2": {
+    "alias": "Tezos Spanish",
+    "hasLogo": true
+  },
+  "tz1W5VkdB5s7ENMESVBtwyt9kyvLqPcUczRT": {
+    "alias": "Tezgate",
     "hasLogo": true
   },
   "tz1Vyuu4EJ5Nym4JcrfRLnp3hpaq1DSEp1Ke": {
@@ -535,6 +551,10 @@
     "alias": "Stakery",
     "hasLogo": true
   },
+  "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS": {
+    "alias": "Stakery Payouts",
+    "hasLogo": true
+  },
   "tz1hAYfexyzPGG6RhZZMpDvAHifubsbb6kgn": {
     "alias": "Tezos Suisse",
     "hasLogo": true
@@ -561,7 +581,7 @@
   },
   "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk": {
     "alias": "Coinbase Custody",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1isXamBXpTUgbByQ6gXgZQg4GWNW7r6rKE": {
     "alias": "Tez Whale",
@@ -585,27 +605,27 @@
   },
   "tz3NExpXn9aPNZPorRE4SdjJ2RGrfbJgMAaV": {
     "alias": "Foundation Baker 5",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3RB4aoyjov4KEVRbuhvQ1CKJgBJMWhaeB8": {
     "alias": "Foundation Baker 3",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9": {
     "alias": "Foundation Baker 1",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3UoffC7FG7zfpmvmjUmUeAaHvzdcUvAj6r": {
     "alias": "Foundation Baker 6",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3VEZ4k6a4Wx42iyev6i2aVAptTRLEAivNN": {
     "alias": "Foundation Baker 8",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3WMqdzXqRWXwyvj5Hp2H7QEepaUuS7vd9K": {
     "alias": "Foundation Baker 7",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3adcvQaKXTCg12zbninqo3q8ptKKtDFTLv": {
     "alias": "Tezzigator",
@@ -629,6 +649,10 @@
   },
   "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194": {
     "alias": "StakeNow",
+    "hasLogo": true
+  },
+  "KT1RCAETpkm9z44MW7Cph3mrWshqVURPubT4": {
+    "alias": "Bake’n’Rolls Payouts",
     "hasLogo": true
   }
 }

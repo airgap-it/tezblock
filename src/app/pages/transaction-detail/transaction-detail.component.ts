@@ -11,7 +11,7 @@ import { BlockService } from '../../services/blocks/blocks.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
-import { IconService } from '../../services/icon/icon.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -29,10 +29,10 @@ export class TransactionDetailComponent implements OnInit {
   public totalFee$: Observable<BigNumber> = new Observable()
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconService.iconProperties('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconService.iconProperties('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconService.iconProperties('link') },
-    { title: 'Reveal', active: false, kind: 'reveal', count: 0, icon: this.iconService.iconProperties('eye') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Reveal', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') }
   ]
 
   public transactionSingleService: TransactionSingleService
@@ -47,7 +47,7 @@ export class TransactionDetailComponent implements OnInit {
     private readonly blockService: BlockService,
     private readonly copyService: CopyService,
     private readonly apiService: ApiService,
-    private readonly iconService: IconService
+    private readonly iconPipe: IconPipe
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
