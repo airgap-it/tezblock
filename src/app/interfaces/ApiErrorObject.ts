@@ -1,5 +1,5 @@
 export interface ApiErrorObject {
   status: string
-  rating?: string
+  rating?: number | string
   fee?: string
 }

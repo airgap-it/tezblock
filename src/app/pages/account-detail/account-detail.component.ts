@@ -170,12 +170,36 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     //this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
+
     this.bakingService
       .getBakingBadRatings(address)
       .then(result => {
-        if (result.status === 'success' && result.rating) {
-          this.bakingBadRating = result.rating
-        } else if (result.status === 'error') {
+        if (result.rating === 0 && result.status === 'success') {
+          console.log('awesome')
+          this.bakingBadRating = 'awesome'
+        } else if (result.rating === 1 && result.status === 'success') {
+          console.log('so-so')
+          this.bakingBadRating = 'so-so'
+        } else if (result.rating === 2 && result.status === 'success') {
+          console.log('dead')
+          this.bakingBadRating = 'dead'
+        } else if (result.rating === 3 && result.status === 'success') {
+          console.log('specific')
+          this.bakingBadRating = 'specific'
+        } else if (result.rating === 4 && result.status === 'success') {
+          console.log('hidden')
+          this.bakingBadRating = 'hidden'
+        } else if (result.rating === 5 && result.status === 'success') {
+          console.log('new')
+          this.bakingBadRating = 'new'
+        } else if (result.rating === 6 && result.status === 'success') {
+          console.log('closed')
+          this.bakingBadRating = 'closed'
+        } else if (result.rating === 9 && result.status === 'success') {
+          console.log('unkown')
+          this.bakingBadRating = 'unknown'
+        } else {
+          console.log('not available')
           this.bakingBadRating = 'not available'
         }
       })
