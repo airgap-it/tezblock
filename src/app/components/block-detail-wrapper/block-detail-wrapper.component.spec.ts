@@ -10,6 +10,7 @@ import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-conve
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { IdenticonComponent } from '../identicon/identicon'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 describe('BlockDetailWrapperComponent', () => {
   let component: BlockDetailWrapperComponent
@@ -20,7 +21,7 @@ describe('BlockDetailWrapperComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe],
+        providers: [AmountConverterPipe, IconPipe],
         imports: [FontAwesomeModule, MomentModule, CollapseModule, BrowserAnimationsModule],
         declarations: [IdenticonComponent, AddressItemComponent, BlockDetailWrapperComponent, LoadingSkeletonComponent]
       })

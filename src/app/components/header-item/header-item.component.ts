@@ -1,12 +1,11 @@
-import { ApiService } from './../../services/api/api.service'
-import { mergeMap } from 'rxjs/operators'
 import { Component, Input } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable, race, Subscription } from 'rxjs'
+import { mergeMap } from 'rxjs/operators'
+import { TypeAheadObject } from 'src/app/interfaces/TypeAheadObject'
 import { CycleService } from 'src/app/services/cycle/cycle.service'
 import { SearchService } from 'src/app/services/search/search.service'
-import { TypeAheadObject } from 'src/app/interfaces/TypeAheadObject'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
+import { ApiService } from './../../services/api/api.service'
 
 @Component({
   selector: 'header-item',
@@ -30,8 +29,7 @@ export class HeaderItemComponent {
     private readonly router: Router,
     public readonly searchService: SearchService,
     private readonly cycleService: CycleService,
-    private readonly apiService: ApiService,
-    private readonly iconService: IconService
+    private readonly apiService: ApiService
   ) {
     this.currentCycle = this.cycleService.currentCycle$
     this.cycleProgress = this.cycleService.cycleProgress$
@@ -68,10 +66,6 @@ export class HeaderItemComponent {
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 
   @Input()

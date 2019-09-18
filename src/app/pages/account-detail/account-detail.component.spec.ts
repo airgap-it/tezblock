@@ -14,6 +14,7 @@ import { AccountDetailComponent } from './account-detail.component'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { MomentModule } from 'ngx-moment'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -24,7 +25,7 @@ describe('AccountDetailComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe, BsModalService, TabsetConfig, ToastrService],
+        providers: [AmountConverterPipe, BsModalService, TabsetConfig, ToastrService, IconPipe],
         imports: [
           ProgressbarModule,
           TooltipModule,

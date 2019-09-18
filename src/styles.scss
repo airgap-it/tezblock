@@ -117,29 +117,4 @@ typeahead-container {
   overflow: visible !important;
 }
 
-.loading {
-  &--paragraph--skeleton {
-    height: 15px;
-    margin: 3px 0;
-    animation: pulse 1s infinite ease-in-out;
-  }
-  &--table--skeleton {
-    height: 24px;
-    margin: 12px 0;
-    width: 100%;
-    animation: pulse 1s infinite ease-in-out;
-  }
-  @keyframes pulse {
-    0% {
-      background-color: rgba(165, 165, 165, 0.1);
-    }
-    50% {
-      background-color: rgba(165, 165, 165, 0.3);
-    }
-    100% {
-      background-color: rgba(165, 165, 165, 0.1);
-    }
-  }
-}
-
 @import '../node_modules/bootstrap/scss/bootstrap';
