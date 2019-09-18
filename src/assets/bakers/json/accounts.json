@@ -581,7 +581,7 @@
   },
   "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk": {
     "alias": "Coinbase Custody",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1isXamBXpTUgbByQ6gXgZQg4GWNW7r6rKE": {
     "alias": "Tez Whale",
