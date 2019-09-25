@@ -88,13 +88,13 @@ export class TabbedTableComponent {
     } else if (this.page === 'account') {
       const fromPromise = this.apiService.getOperationCount('source', ownId).toPromise()
       const toPromise = this.apiService.getOperationCount('destination', ownId).toPromise()
-      // const delegatePromise = this.apiService.getOperationCount('delegate', ownId).toPromise()
+      const delegatePromise = this.apiService.getOperationCount('delegate', ownId).toPromise()
 
-      Promise.all([fromPromise, toPromise /*, delegatePromise */])
-        .then(([from, to /*, delegate */]) => {
+      Promise.all([fromPromise, toPromise, delegatePromise])
+        .then(([from, to, delegate]) => {
           from.forEach(aggregateFunction)
           to.forEach(aggregateFunction)
-          // delegate.forEach(aggregateFunction)
+          delegate.forEach(aggregateFunction)
 
           setFirstActiveTab()
         })
