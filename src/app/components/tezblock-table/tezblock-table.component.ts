@@ -46,7 +46,10 @@ enum OperationTypes {
   Reveal = 'reveal',
   Ballot = 'ballot',
   Activation = 'activate_account',
-  Overview = 'overview'
+  Overview = 'overview',
+  OriginationOverview = 'origination_overview',
+  DelegationOverview = 'delegation_overview',
+  EndorsementOverview = 'endorsement_overview'
 }
 
 interface Layout {
@@ -69,9 +72,12 @@ interface Layout {
     [OperationTypes.Transaction]: Column[]
     [OperationTypes.Overview]: Column[]
     [OperationTypes.Delegation]: Column[]
+    [OperationTypes.DelegationOverview]: Column[]
     [OperationTypes.Origination]: Column[]
+    [OperationTypes.OriginationOverview]: Column[]
     [OperationTypes.Reveal]: Column[]
     [OperationTypes.Activation]: Column[]
+    [OperationTypes.EndorsementOverview]: Column[]
   }
 }
 
@@ -314,6 +320,29 @@ const layouts: Layout = {
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ],
+    [OperationTypes.DelegationOverview]: [
+      {
+        name: 'Delegator',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+      { name: 'Gas Limit', property: 'gas_limit', width: '' },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
     [OperationTypes.Origination]: [
       {
         name: 'New Account',
@@ -337,6 +366,29 @@ const layouts: Layout = {
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ],
+    [OperationTypes.OriginationOverview]: [
+      {
+        name: 'New Account',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+
+      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      {
+        name: 'Originator',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
     [OperationTypes.Reveal]: [
       {
         name: 'Account',
@@ -350,6 +402,19 @@ const layouts: Layout = {
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
+    ],
+    [OperationTypes.EndorsementOverview]: [
+      {
+        name: 'Endorser',
+        property: 'delegate',
+        width: '',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Slots', property: 'slots', width: '' },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ]
   }
 }
