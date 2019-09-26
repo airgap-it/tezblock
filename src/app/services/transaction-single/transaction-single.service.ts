@@ -104,12 +104,12 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
     return forkJoin([
       this.apiService.getTransactionsByField(address, 'source', kind, limit),
-      this.apiService.getTransactionsByField(address, 'destination', kind, limit)
-      // this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
+      this.apiService.getTransactionsByField(address, 'destination', kind, limit),
+      this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
     ]).pipe(
-      map(([from, to /*, delegate*/]) => {
+      map(([from, to, delegate]) => {
         let transactions: Transaction[] = []
-        transactions.push(...from, ...to /*, ...delegate */)
+        transactions.push(...from, ...to, ...delegate)
         transactions.sort((a, b) => {
           return b.timestamp - a.timestamp
         })

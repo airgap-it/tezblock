@@ -93,7 +93,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
     { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Vote', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
+    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined

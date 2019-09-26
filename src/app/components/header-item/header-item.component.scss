@@ -1,17 +1,32 @@
 ::ng-deep header-item {
-  .collapse.show {
-    overflow: initial !important;
-    display: table !important;
-    .dropdown-menu.show {
-      box-shadow: none;
+  .mega-dropdown {
+    position: unset;
+  }
+  .mega-dropdown-menu {
+    width: 100%;
+    position: absolute;
+    top: 60px !important;
+  }
+  .mega-dropdown-menu ul {
+    list-style: none;
+  }
+  .mega-dropdown-menu__header {
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+  }
+  .display--inline-table {
+    display: inline-table !important;
+  }
+  .display--none {
+    display: none !important;
+  }
+  @media (max-width: 576px) {
+    .mega-dropdown-menu {
       border: none;
-      border-left: 3px solid var(--primary);
-      margin-left: 15px;
+      box-shadow: none;
     }
   }
-  .navbar-light .navbar-toggler {
-    outline: none;
-  }
+
   /*!
    * Hamburgers
    * @description Tasty CSS-animated hamburgers
@@ -110,19 +125,5 @@
     top: 0;
     transition: top 0.2s cubic-bezier(0.33333, 0, 0.66667, 0.33333), transform 0.13s 0.22s cubic-bezier(0.215, 0.61, 0.355, 1);
     transform: translate3d(0, 8px, 0) rotate(-45deg);
-  }
-  .open > .dropdown-menu {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .dropdown-menu {
-    display: block;
-    opacity: 1;
-    visibility: hidden;
-    -webkit-transition: opacity 500ms ease, visibility 500ms ease;
-    -moz-transition: opacity 500ms ease, visibility 500ms ease;
-    -o-transition: opacity 500ms ease, visibility 500ms ease;
-    transition: opacity 400ms ease, visibility 500ms ease;
   }
 }
