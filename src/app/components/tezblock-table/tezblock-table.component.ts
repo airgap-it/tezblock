@@ -153,11 +153,11 @@ const layouts: Layout = {
     ],
     [OperationTypes.Ballot]: [
       { name: 'Ballot', property: 'ballot', width: '' },
-      { name: 'Voting Period', property: 'voting_period', width: '' },
-      { name: 'Kind', property: 'kind', width: '' },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Rolls', property: 'timestamp', width: '' },
-      { name: 'Proposal Hash', property: 'timestamp', width: '', component: HashCellComponent },
+      { name: 'Kind', property: 'kind', width: '' },
+      { name: 'Voting Period', property: '', width: '' },
+      { name: 'Rolls', property: '', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '' },
       ...baseTx
     ]
   },
