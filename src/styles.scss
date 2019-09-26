@@ -8,9 +8,19 @@
 }
 
 @font-face {
-  font-family: 'Manrope-Light';
+  font-family: 'Manrope';
   src: url(/assets/fonts/Manrope/manrope-light.woff) format('truetype');
   font-weight: 200;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url(/assets/fonts/Manrope/manrope-bold.woff) format('truetype');
+  font-weight: 600;
+}
+
+th {
+  font-weight: 400;
 }
 
 $primary-light-color: #d6dfff;
@@ -56,6 +66,8 @@ $tooltip-bg: map_get($theme-colors, 'secondary');
 $list-group-item-padding-y: 0.25rem;
 $list-group-item-padding-x: 0;
 $modal-header-border-color: transparent;
+$badge-font-weight: 400;
+$dropdown-link-hover-bg: #fff;
 
 /* identicon image size */
 identicon {
@@ -78,7 +90,7 @@ tabset {
 
 /* font family & weight of secondary colored text */
 .text-secondary {
-  font-family: 'Manrope-Light', sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-weight: 200;
 }
 

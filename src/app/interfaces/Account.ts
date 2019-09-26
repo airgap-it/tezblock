@@ -10,4 +10,5 @@ export interface Account {
   block_id: string
   script?: any
   delegate_setable: boolean
+  proposal: string
 }
