@@ -3,14 +3,23 @@
     <div class="card h-100 pt-3">
       <div class="card-body p-4 ">
         <h5 class="card-title mb-3 ">
-          <ng-container *ngIf="page === 'transaction'">
+          <ng-container *ngIf="page === 'transaction' && type === 'overview'">
             Transactions
           </ng-container>
           <ng-container *ngIf="page === 'block'">
             Blocks
           </ng-container>
-          <ng-container *ngIf="page === 'activation'">
+          <ng-container *ngIf="type === 'activate_account'">
             Activations
+          </ng-container>
+          <ng-container *ngIf="type === 'origination_overview'">
+            Originations
+          </ng-container>
+          <ng-container *ngIf="type === 'delegation_overview'">
+            Delegations
+          </ng-container>
+          <ng-container *ngIf="type === 'endorsement_overview'">
+            Endorsements
           </ng-container>
         </h5>
         <div class="row">
