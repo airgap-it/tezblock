@@ -30,4 +30,5 @@ export interface Transaction {
   destination?: any
   fee: number
   level: number
+  delegatedBalance?: number
 }

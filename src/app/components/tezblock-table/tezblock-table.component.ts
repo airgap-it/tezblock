@@ -120,7 +120,7 @@ const layouts: Layout = {
         options: { showFullAddress: false, pageId: 'oo' }
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       ...baseTx
     ],
     [OperationTypes.Origination]: [
