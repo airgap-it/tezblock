@@ -9,6 +9,7 @@ import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
+
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class ApiService {
   private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
   private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
   private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
-  private readonly balanceUpdatesApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/balance_updates`
+  private readonly frozenBalanceApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -561,36 +562,26 @@ export class ApiService {
         })
     })
   }
-  public getBalanceUpdates<BalanceUpdate>(tzAddress: string, limit?: number): Promise<BalanceUpdate[]> {
+
+  public getFrozenBalance(tzAddress: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
-        .post<BalanceUpdate[]>(
-          this.balanceUpdatesApiUrl,
+        .post(
+          this.frozenBalanceApiUrl,
           {
             predicates: [
               {
-                field: 'delegate',
+                field: 'pkh',
                 operation: 'eq',
                 set: [tzAddress],
                 inverse: false
-              },
-              {
-                field: 'category',
-                operation: 'in',
-                set: ['rewards', 'deposits']
-              }
-            ],
-            orderBy: [
-              {
-                field: 'level',
-                direction: 'desc'
               }
             ]
           },
           this.options
         )
-        .subscribe((balances: BalanceUpdate[]) => {
-          resolve(balances)
+        .subscribe(result => {
+          resolve(result[0].frozen_balance)
         })
     })
   }

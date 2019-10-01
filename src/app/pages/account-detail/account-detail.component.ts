@@ -99,8 +99,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
   public address: string
-  public accumulatedDeposits: number | undefined
-  public accumulatedRewards: number | undefined
+  public frozenBalance: number | undefined
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -156,21 +155,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
-    const test = this.accountService.getDepositsAndRewards(address).then(balances => {
-      let depositBalances = 0
-      let rewardBalances = 0
-      balances.forEach(balance => {
-        if (balance.category === 'deposits') {
-          depositBalances += balance.change
-        } else {
-          rewardBalances += balance.change
-        }
-      })
-      console.log('deposits: ', depositBalances)
-      this.accumulatedDeposits = depositBalances
-      console.log('rewards: ', rewardBalances)
-      this.accumulatedRewards = rewardBalances
-    })
+    this.frozenBalance = await this.accountService.getFrozen(address)
   }
 
   public async getBakingInfos(address: string) {

@@ -83,7 +83,8 @@ export class AccountService extends Facade<AccountServiceState> {
 
     this.updateState({ ...this._state, pagination, loading: true })
   }
-  public getDepositsAndRewards(address: string, limit?: number): Promise<BalanceUpdate[]> {
-    return this.apiService.getBalanceUpdates(address, limit)
+
+  public getFrozen(address: string): Promise<number> {
+    return this.apiService.getFrozenBalance(address)
   }
 }

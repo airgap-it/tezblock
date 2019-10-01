@@ -326,17 +326,17 @@
               <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
                 <div class="mb-4">
                   <h5 class="card-title mb-3 ">
-                    Current Deposits
+                    Frozen Balance
                   </h5>
                   <h3>
-                    <ng-container *ngIf="!accumulatedDeposits; else deposits">
+                    <ng-container *ngIf="!frozenBalance; else deposits">
                       <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
                     </ng-container>
                     <ng-template #deposits>
                       <span
                         class="d-inline-block"
                         [innerHtml]="
-                          accumulatedDeposits
+                        frozenBalance
                             | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                             | safeHtml
                         "
@@ -366,7 +366,7 @@
                 </div>
               </div>
               <div class=" col-md-6 col-lg-4">
-                <div class="mb-4">
+                <!-- <div class="mb-4">
                   <h5 class="card-title mb-3">
                     Pending Rewards
                   </h5>
@@ -386,7 +386,7 @@
                       ꜩ
                     </ng-template>
                   </h3>
-                </div>
+                </div> -->
                 <div class="mb-3">
                   <h5 class="card-title ">
                     Payout Accuracy
