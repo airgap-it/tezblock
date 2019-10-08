@@ -79,21 +79,49 @@ export class ApiService {
   }
 
   public getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'operation_group_hash',
-            operation: 'eq',
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+    console.log('by id')
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'eq',
+              set: [id],
+              inverse: false
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map((transactions: Transaction[]) => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const sources = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'delegation') {
+              sources.push(transaction.source)
+            }
+          })
+
+          const delegateSources = this.getAccountsByIds(sources)
+          delegateSources.subscribe(delegators => {
+            finalTransactions.forEach(transaction => {
+              delegators.forEach(delegator => {
+                if (transaction.source === delegator.account_id) {
+                  transaction.delegatedBalance = delegator.balance
+                }
+              })
+            })
+          })
+
+          return finalTransactions
+        })
+      )
   }
 
   public getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
@@ -130,36 +158,63 @@ export class ApiService {
   }
 
   public getTransactionsByField(value: string, field: string, kind: string, limit: number): Observable<Transaction[]> {
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'operation_group_hash',
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field,
-            operation: 'eq',
-            set: [value]
-          },
-          {
-            field: 'kind',
-            operation: 'eq',
-            set: [kind]
-          }
-        ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field,
+              operation: 'eq',
+              set: [value]
+            },
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: [kind]
+            }
+          ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map((transactions: Transaction[]) => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const sources = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'delegation') {
+              sources.push(transaction.source)
+            }
+          })
+
+          const delegateSources = this.getAccountsByIds(sources)
+          delegateSources.subscribe(delegators => {
+            finalTransactions.forEach(transaction => {
+              delegators.forEach(delegator => {
+                if (transaction.source === delegator.account_id) {
+                  transaction.delegatedBalance = delegator.balance
+                }
+              })
+            })
+          })
+
+          return finalTransactions
+        })
+      )
   }
 
   public getLatestAccounts(limit: number): Observable<Account[]> {

@@ -132,8 +132,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           })
         })
 
-        console.log('sources: ', sources)
-
         return transactions
       })
     )
