@@ -209,6 +209,22 @@ export class ApiService {
       this.options
     )
   }
+  public getAccountsByIds(ids: string[]): Observable<Account[]> {
+    return this.http.post<Account[]>(
+      this.accountsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'account_id',
+            operation: 'in',
+            set: ids,
+            inverse: false
+          }
+        ]
+      },
+      this.options
+    )
+  }
 
   public getAccountsStartingWith(id: string): Observable<Object[]> {
     const result: Object[] = []
