@@ -16,7 +16,6 @@ import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { IconRef, IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
