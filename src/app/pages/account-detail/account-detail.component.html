@@ -112,7 +112,7 @@
                   [ngClass]="{ 'btn--rotated': !isCollapsed }"
                 >
                   <span>Show All Accounts</span>
-                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                 </button>
 
                 <button
@@ -122,7 +122,7 @@
                   [ngClass]="{ 'btn--rotated': isCollapsed }"
                 >
                   <span>Minimize</span>
-                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                 </button>
               </div>
             </ng-container>
@@ -336,7 +336,7 @@
                       <span
                         class="d-inline-block"
                         [innerHtml]="
-                        frozenBalance
+                          frozenBalance
                             | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                             | safeHtml
                         "
@@ -344,25 +344,6 @@
                       ꜩ
                     </ng-template>
                   </h3>
-                </div>
-                <div class="mb-3">
-                  <h5 class="card-title ">
-                    Baking Efficiency
-                  </h5>
-                  <div class="d-block">
-                    <div>
-                      <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
-
-                      <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here" (click)="goToMYTB()">
-                        <ng-container *ngIf="!tezosBakerRating">
-                          <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
-                        </ng-container>
-                        <ng-container *ngIf="tezosBakerRating">
-                          {{ tezosBakerRating }}
-                        </ng-container>
-                      </button>
-                    </div>
-                  </div>
                 </div>
               </div>
               <div class=" col-md-6 col-lg-4">
@@ -387,7 +368,7 @@
                     </ng-template>
                   </h3>
                 </div> -->
-                <div class="mb-3">
+                <div class="mb-4">
                   <h5 class="card-title ">
                     Payout Accuracy
                   </h5>
@@ -401,6 +382,25 @@
                   <ng-container *ngIf="!bakingBadRating">
                     <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
                   </ng-container>
+                </div>
+                <div>
+                  <h5 class="card-title ">
+                    Baking Efficiency
+                  </h5>
+                  <div class="d-block">
+                    <div>
+                      <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
+
+                      <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here" (click)="goToMYTB()">
+                        <ng-container *ngIf="!tezosBakerRating">
+                          <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
+                        </ng-container>
+                        <ng-container *ngIf="tezosBakerRating">
+                          {{ tezosBakerRating }}
+                        </ng-container>
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
