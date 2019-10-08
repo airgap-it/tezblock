@@ -31,4 +31,5 @@ export interface Transaction {
   fee: number
   level: number
   delegatedBalance?: number
+  proposal?: string
 }

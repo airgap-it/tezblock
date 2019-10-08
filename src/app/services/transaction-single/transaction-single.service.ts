@@ -109,6 +109,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
       ]).pipe(
         map(([ballot, proposals]) => {
+          proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
           let source: Transaction[] = []
           source.push(...ballot, ...proposals)
           source.sort((a, b) => {
