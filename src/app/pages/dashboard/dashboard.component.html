@@ -2,8 +2,8 @@
   <alert type="primary">
     <h5 class="alert-heading d-inline-block m-0 mr-2 text-dark">tezblock MVP</h5>
     <span class="text-dark d-inline-block">
-      this is a initial release with limited functionalities, please report any issue and feedback with the
-      <a href="https://docs.google.com/forms/d/e/1FAIpQLSe36278v3sH5wNITsEMAjFa3DYILv3rCyhI1q0FsbkwZQJH0w/viewform" target="_blank">form</a>
+      this is a initial release with limited functionalities, please report any issue and feedback on
+      <a href="https://github.com/airgap-it/tezblock/issues" target="_blank">GitHub</a>
       or to
       <a href="mailto:hi@airgap.it" class="d-inline-block">hi@airgap.it</a>
     </span>
@@ -28,7 +28,7 @@
         />
         <div class="input-group-append">
           <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm)">
-            <fa-icon [icon]="icon('search')" class="text-white  d-inline-block d-sm-none"></fa-icon>
+            <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
             <span class="d-none d-sm-inline-block">Search</span>
           </button>
         </div>
@@ -80,14 +80,14 @@
               <h5 class="card-title mb-3 ">
                 Circulating Supply
               </h5>
-              <h3>806,714,596 ꜩ</h3>
+              <h3>808,637,613 ꜩ</h3>
               <!--TODO-->
             </div>
 
             <h5 class="card-title mb-3 ">
               Market Cap
             </h5>
-            <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('806714596').toFormat(0) }}</h3>
+            <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('808637613').toFormat(0) }}</h3>
           </div>
           <div class=" col-md-6 col-lg-4">
             <h5 class="card-title mb-3">

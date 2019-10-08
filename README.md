@@ -55,6 +55,8 @@ The above command will create and start a docker container with Conseil running 
 
 Clone the tezblock repository.
 
+    git clone https://github.com/airgap-it/tezblock
+
 Change the value of `conseilBaseUrl` in `src/environments/environment.ts` to point to the locally deployed instance of Conseil, http://localhost:1337. Also change the `conseilApiKey` value to the API key of your local Conseil instance.
 
 From the root of the tezblock folder, execute the following command to build tezblock:

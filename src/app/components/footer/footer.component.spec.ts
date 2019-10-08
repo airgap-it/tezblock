@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { FooterComponent } from './footer.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 describe('FooterComponent', () => {
   let component: FooterComponent
@@ -14,7 +15,7 @@ describe('FooterComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [],
+        providers: [IconPipe],
         imports: [FontAwesomeModule],
         declarations: [FooterComponent]
       })

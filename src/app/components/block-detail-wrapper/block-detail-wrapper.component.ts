@@ -3,7 +3,6 @@ import { ActivatedRoute } from '@angular/router'
 import { Observable } from 'rxjs'
 import { Block } from 'src/app/interfaces/Block'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
 
 @Component({
   selector: 'block-detail-wrapper',
@@ -28,11 +27,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   @Input()
   public blockLoading$: Observable<boolean> | undefined
 
-  constructor(private readonly route: ActivatedRoute, private readonly iconService: IconService) {}
+  constructor(private readonly route: ActivatedRoute) {}
 
   public ngOnInit() {}
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
-  }
 }

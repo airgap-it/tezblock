@@ -1,15 +1,13 @@
 import { Component, Input } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import BigNumber from 'bignumber.js'
 import { CopyService } from 'src/app/services/copy/copy.service'
-import { ActivatedRoute } from '@angular/router'
 
-import { ApiService } from 'src/app/services/api/api.service'
+import { animate, state, style, transition, trigger } from '@angular/animations'
+import { ToastrService } from 'ngx-toastr'
+import { Observable } from 'rxjs'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
-import { Observable } from 'rxjs'
-import { trigger, state, style, transition, animate } from '@angular/animations'
-import { ToastrService } from 'ngx-toastr'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -52,8 +50,7 @@ export class TransactionDetailWrapperComponent {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
-    private readonly toastrService: ToastrService,
-    private readonly iconService: IconService
+    private readonly toastrService: ToastrService
   ) {}
 
   public copyToClipboard(val: string) {
@@ -66,9 +63,5 @@ export class TransactionDetailWrapperComponent {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

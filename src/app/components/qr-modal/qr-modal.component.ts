@@ -1,10 +1,9 @@
 import { Component, Input } from '@angular/core'
 import { BsModalRef } from 'ngx-bootstrap/modal'
 
-import { CopyService } from '../../services/copy/copy.service'
-import { trigger, state, style, animate, transition, group } from '@angular/animations'
+import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ToastrService } from 'ngx-toastr'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
+import { CopyService } from '../../services/copy/copy.service'
 
 @Component({
   selector: 'qr-modal',
@@ -40,7 +39,7 @@ export class QrModalComponent {
   @Input()
   public size: number = 300
 
-  constructor(public bsModalRef: BsModalRef, private readonly copyService: CopyService, private readonly toastrService: ToastrService, private readonly iconService: IconService) {}
+  constructor(public bsModalRef: BsModalRef, private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
 
   public copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
@@ -52,9 +51,5 @@ export class QrModalComponent {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

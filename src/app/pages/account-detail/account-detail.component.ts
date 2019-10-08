@@ -18,6 +18,7 @@ import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { IconRef, IconService } from '../../services/icon/icon.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -89,11 +90,11 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public transactionSingleService: TransactionSingleService
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconService.iconProperties('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconService.iconProperties('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconService.iconProperties('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconService.iconProperties('stamp') },
-    { title: 'Vote', active: false, kind: 'ballot', count: 0, icon: this.iconService.iconProperties('boxBallot') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
+    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
@@ -112,7 +113,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
-    private readonly iconService: IconService
+    private readonly iconPipe: IconPipe
   ) {
     this.address = this.route.snapshot.params.id
     this.transactionSingleService = new TransactionSingleService(this.apiService)
@@ -172,12 +173,36 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
+
     this.bakingService
       .getBakingBadRatings(address)
       .then(result => {
-        if (result.status === 'success' && result.rating) {
-          this.bakingBadRating = result.rating
-        } else if (result.status === 'error') {
+        if (result.rating === 0 && result.status === 'success') {
+          console.log('awesome')
+          this.bakingBadRating = 'awesome'
+        } else if (result.rating === 1 && result.status === 'success') {
+          console.log('so-so')
+          this.bakingBadRating = 'so-so'
+        } else if (result.rating === 2 && result.status === 'success') {
+          console.log('dead')
+          this.bakingBadRating = 'dead'
+        } else if (result.rating === 3 && result.status === 'success') {
+          console.log('specific')
+          this.bakingBadRating = 'specific'
+        } else if (result.rating === 4 && result.status === 'success') {
+          console.log('hidden')
+          this.bakingBadRating = 'hidden'
+        } else if (result.rating === 5 && result.status === 'success') {
+          console.log('new')
+          this.bakingBadRating = 'new'
+        } else if (result.rating === 6 && result.status === 'success') {
+          console.log('closed')
+          this.bakingBadRating = 'closed'
+        } else if (result.rating === 9 && result.status === 'success') {
+          console.log('unkown')
+          this.bakingBadRating = 'unknown'
+        } else {
+          console.log('not available')
           this.bakingBadRating = 'not available'
         }
       })
@@ -250,9 +275,5 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public loadMore(): void {
     this.transactionSingleService.loadMore()
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

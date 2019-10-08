@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ApiService } from 'src/app/services/api/api.service'
-import { IconService, IconRef } from 'src/app/services/icon/icon.service'
 
 export interface Tab {
   title: string
@@ -53,7 +53,7 @@ export class TabbedTableComponent {
   @Output()
   public readonly tabClicked: EventEmitter<string> = new EventEmitter()
 
-  constructor(private readonly apiService: ApiService, private readonly router: Router, private iconService: IconService) {}
+  constructor(private readonly apiService: ApiService, private readonly router: Router, private iconPipe: IconPipe) {}
 
   public getTabCount(tabs: Tab[]) {
     let ownId: string = this.router.url
@@ -88,13 +88,13 @@ export class TabbedTableComponent {
     } else if (this.page === 'account') {
       const fromPromise = this.apiService.getOperationCount('source', ownId).toPromise()
       const toPromise = this.apiService.getOperationCount('destination', ownId).toPromise()
-      // const delegatePromise = this.apiService.getOperationCount('delegate', ownId).toPromise()
+      const delegatePromise = this.apiService.getOperationCount('delegate', ownId).toPromise()
 
-      Promise.all([fromPromise, toPromise /*, delegatePromise */])
-        .then(([from, to /*, delegate */]) => {
+      Promise.all([fromPromise, toPromise, delegatePromise])
+        .then(([from, to, delegate]) => {
           from.forEach(aggregateFunction)
           to.forEach(aggregateFunction)
-          // delegate.forEach(aggregateFunction)
+          delegate.forEach(aggregateFunction)
 
           setFirstActiveTab()
         })
@@ -124,9 +124,5 @@ export class TabbedTableComponent {
     if (this.dataService && this.dataService.loadMore) {
       this.dataService.loadMore()
     }
-  }
-
-  public icon(name: IconRef): string[] {
-    return this.iconService.iconProperties(name)
   }
 }

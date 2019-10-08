@@ -1,5 +1,5 @@
 import { Location } from '@angular/common'
-import { HttpClient } from '@angular/common/http'
+import { HttpClient, HttpParams } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
@@ -10,9 +10,10 @@ import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
 
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
-import { BakingBadResponse } from '../../interfaces/BakingBadResponse'
 // import { BakerConfig } from '../remote-config/remote-config.service'
 import { OperationsService } from '../operations/operations.service'
+import { Observable } from 'rxjs'
+import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -23,7 +24,7 @@ const hoursPerCycle = 68
 export class BakingService {
   public bakerInfo?: BakerInfo
 
-  private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/ratings'
+  private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
 
   public bakerConfigError: string | undefined
@@ -51,14 +52,17 @@ export class BakingService {
 
   public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
-      this.http.get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`).subscribe(
-        (response: BakingBadResponse) => {
-          resolve({ status: 'success', rating: response.status })
-        },
-        err => {
-          resolve({ status: 'error' })
-        }
-      )
+      this.http
+        .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
+          params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' }
+        })
+        .subscribe((response: BakingBadResponse) => {
+          if (response !== null) {
+            resolve({ status: 'success', rating: response.rating.status })
+          } else {
+            resolve({ status: 'error' })
+          }
+        })
     })
   }
 
