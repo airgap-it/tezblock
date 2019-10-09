@@ -102,8 +102,27 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   }
 
   private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
+    let combinedSource = this.apiService.getTransactionsByField(address, 'source', kind, limit)
+    if (kind === 'ballot') {
+      combinedSource = forkJoin([
+        this.apiService.getTransactionsByField(address, 'source', kind, limit),
+        this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
+      ]).pipe(
+        map(([ballot, proposals]) => {
+          proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
+          let source: Transaction[] = []
+          source.push(...ballot, ...proposals)
+          source.sort((a, b) => {
+            return b.timestamp - a.timestamp
+          })
+          source = source.slice(0, limit)
+
+          return source
+        })
+      )
+    }
     return forkJoin([
-      this.apiService.getTransactionsByField(address, 'source', kind, limit),
+      combinedSource,
       this.apiService.getTransactionsByField(address, 'destination', kind, limit),
       this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
     ]).pipe(
