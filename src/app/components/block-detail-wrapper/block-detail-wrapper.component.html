@@ -115,11 +115,14 @@
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
     <div class="row mt-3">
       <div class="col-md-3">
-        <p class="text-secondary">Block Hash</p>
+        <p class="text-secondary">Endorsements</p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.hash }}</p>
-      </div>
+      <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
+      <ng-template #loaded>
+        <div class=" col-md-9">
+          <p>{{ endorsements$ | async }}</p>
+        </div>
+      </ng-template>
     </div>
     <div class="row">
       <div class="col-md-3">
@@ -135,6 +138,14 @@
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
         <p>{{ block.meta_cycle_position }} of 4095</p>
+      </div>
+    </div>
+    <div class="row ">
+      <div class="col-md-3">
+        <p class="text-secondary">Block Hash</p>
+      </div>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.hash }}</p>
       </div>
     </div>
     <div class="row">
@@ -155,14 +166,11 @@
     </div>
     <div class="row">
       <div class="col-md-3">
-        <p class="text-secondary">Endorsements</p>
+        <p class="text-secondary">Protocol</p>
       </div>
-      <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
-      <ng-template #loaded>
-        <div class=" col-md-9">
-          <p>{{ endorsements$ | async }}</p>
-        </div>
-      </ng-template>
+      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+        <p>{{ block.protocol }}</p>
+      </div>
     </div>
   </div>
 </div>

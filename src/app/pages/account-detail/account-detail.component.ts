@@ -99,6 +99,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
   public address: string
+  public frozenBalance: number | undefined
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -154,6 +155,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
+    this.frozenBalance = await this.accountService.getFrozen(address)
   }
 
   public async getBakingInfos(address: string) {
@@ -166,8 +168,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
     this.stakingBond = this.bakingInfos.selfBond
     this.isValidBaker = true
-    //this.nextPayout = this.bakingInfos.nextPayout
-    //this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+    // this.nextPayout = this.bakingInfos.nextPayout
+    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
 

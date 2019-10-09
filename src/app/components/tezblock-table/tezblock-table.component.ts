@@ -126,7 +126,7 @@ const layouts: Layout = {
     [OperationTypes.Origination]: [
       {
         name: 'New Account',
-        property: 'source',
+        property: 'originated_contracts',
         width: '',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
@@ -212,7 +212,7 @@ const layouts: Layout = {
     [OperationTypes.Origination]: [
       {
         name: 'New Account',
-        property: 'source',
+        property: 'originated_contracts',
         width: '1',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
@@ -346,7 +346,7 @@ const layouts: Layout = {
     [OperationTypes.Origination]: [
       {
         name: 'New Account',
-        property: 'source',
+        property: 'originated_contracts',
         width: '1',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
@@ -369,7 +369,7 @@ const layouts: Layout = {
     [OperationTypes.OriginationOverview]: [
       {
         name: 'New Account',
-        property: 'source',
+        property: 'originated_contracts',
         width: '1',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
