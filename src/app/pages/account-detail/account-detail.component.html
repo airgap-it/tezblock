@@ -112,7 +112,7 @@
                   [ngClass]="{ 'btn--rotated': !isCollapsed }"
                 >
                   <span>Show All Accounts</span>
-                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                 </button>
 
                 <button
@@ -122,7 +122,7 @@
                   [ngClass]="{ 'btn--rotated': isCollapsed }"
                 >
                   <span>Minimize</span>
-                  <fa-icon [icon]="'longArrowAltDown'|iconPipe" class="ml-1"></fa-icon>
+                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                 </button>
               </div>
             </ng-container>
@@ -326,32 +326,64 @@
               <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
                 <div class="mb-4">
                   <h5 class="card-title mb-3 ">
-                    Current Deposits
+                    Frozen Balance
                   </h5>
-                  <div class="mt-2 container">
-                    <div class="row">
-                      <div class="col p-0">
-                        <p class="m-0 text-secondary">Baking</p>
-                      </div>
-                      <div class="col p-0">
-                        <!-- TODO: baking deposits -->
-                        <p class="m-0 ">not available</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mt-2 container">
-                    <div class="row">
-                      <div class="col p-0">
-                        <!-- TODO: endorsment deposits -->
-                        <p class="m-0 text-secondary">Endorsments</p>
-                      </div>
-                      <div class="col p-0">
-                        <p class="m-0 ">not available</p>
-                      </div>
-                    </div>
-                  </div>
+                  <h3>
+                    <ng-container *ngIf="!frozenBalance; else deposits">
+                      <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                    </ng-container>
+                    <ng-template #deposits>
+                      <span
+                        class="d-inline-block"
+                        [innerHtml]="
+                          frozenBalance
+                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
+                            | safeHtml
+                        "
+                      ></span>
+                      ꜩ
+                    </ng-template>
+                  </h3>
                 </div>
-                <div class="mb-3">
+              </div>
+              <div class=" col-md-6 col-lg-4">
+                <!-- <div class="mb-4">
+                  <h5 class="card-title mb-3">
+                    Pending Rewards
+                  </h5>
+                  <h3>
+                    <ng-container *ngIf="!accumulatedRewards; else rewards">
+                      <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                    </ng-container>
+                    <ng-template #rewards>
+                      <span
+                        class="d-inline-block"
+                        [innerHtml]="
+                          accumulatedRewards
+                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
+                            | safeHtml
+                        "
+                      ></span>
+                      ꜩ
+                    </ng-template>
+                  </h3>
+                </div> -->
+                <div class="mb-4">
+                  <h5 class="card-title ">
+                    Payout Accuracy
+                  </h5>
+                  <div class="d-block" *ngIf="bakingBadRating">
+                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
+
+                    <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
+                      {{ bakingBadRating }}
+                    </button>
+                  </div>
+                  <ng-container *ngIf="!bakingBadRating">
+                    <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                  </ng-container>
+                </div>
+                <div>
                   <h5 class="card-title ">
                     Baking Efficiency
                   </h5>
@@ -369,50 +401,6 @@
                       </button>
                     </div>
                   </div>
-                </div>
-              </div>
-              <div class=" col-md-6 col-lg-4">
-                <div class="mb-4">
-                  <h5 class="card-title mb-3">
-                    Pending Rewards
-                  </h5>
-                  <div class="mt-2 container">
-                    <div class="row">
-                      <div class="col p-0">
-                        <p class="m-0 text-secondary">Baking</p>
-                      </div>
-                      <div class="col p-0">
-                        <!-- TODO: baking rewards -->
-                        <p class="m-0 ">not available</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="mt-2 container">
-                    <div class="row">
-                      <div class="col p-0">
-                        <p class="m-0 text-secondary">Endorsments</p>
-                      </div>
-                      <div class="col p-0">
-                        <!-- TODO: endorsment rewards -->
-                        <p class="m-0 ">not available</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="mb-3">
-                  <h5 class="card-title ">
-                    Payout Accuracy
-                  </h5>
-                  <div class="d-block" *ngIf="bakingBadRating">
-                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
-
-                    <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                      {{ bakingBadRating }}
-                    </button>
-                  </div>
-                  <ng-container *ngIf="!bakingBadRating">
-                    <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                  </ng-container>
                 </div>
               </div>
             </div>
