@@ -114,6 +114,23 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           return b.timestamp - a.timestamp
         })
         transactions = transactions.slice(0, limit)
+        const sources = []
+
+        transactions.forEach(transaction => {
+          if (transaction.kind === 'delegation') {
+            sources.push(transaction.source)
+          }
+        })
+        const delegateSources = this.apiService.getAccountsByIds(sources)
+        delegateSources.subscribe(delegators => {
+          transactions.forEach(transaction => {
+            delegators.forEach(delegator => {
+              if (transaction.source === delegator.account_id) {
+                transaction.delegatedBalance = delegator.balance
+              }
+            })
+          })
+        })
 
         return transactions
       })

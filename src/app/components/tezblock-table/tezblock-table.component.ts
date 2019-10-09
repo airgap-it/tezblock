@@ -120,7 +120,7 @@ const layouts: Layout = {
         options: { showFullAddress: false, pageId: 'oo' }
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       ...baseTx
     ],
     [OperationTypes.Origination]: [
@@ -204,7 +204,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
@@ -314,7 +314,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
