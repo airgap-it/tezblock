@@ -128,9 +128,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           })
           // source.map(transaction => (transaction.votes = 1008))
           source = source.slice(0, limit)
-
-          console.log('getAllTransactionsByAddress', source)
-
           return source
         })
       )
