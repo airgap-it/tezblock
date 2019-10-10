@@ -420,7 +420,7 @@ const layouts: Layout = {
     ],
     [OperationTypes.BallotOverview]: [
       {
-        name: 'Delegator',
+        name: 'Baker',
         property: 'source',
         width: '1',
         component: AddressCellComponent,
