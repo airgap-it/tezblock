@@ -15,7 +15,9 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router) {}
+  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router) {
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+  }
 
   public search(searchTerm: string) {
     // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
@@ -27,8 +29,6 @@ export class SearchService {
         trimmedSearchTerm = address
       }
     })
-
-    console.log(searchTerm, trimmedSearchTerm)
 
     let found = false
     let counter = 0
