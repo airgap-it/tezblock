@@ -32,4 +32,6 @@ export interface Transaction {
   level: number
   delegatedBalance?: number
   proposal?: string
+  // These are our own properties
+  votes?: number
 }

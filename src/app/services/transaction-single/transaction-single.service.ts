@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, forkJoin, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import axios, { AxiosResponse } from 'axios'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
@@ -14,6 +15,11 @@ interface TransactionSingleServiceState {
   kind: string
   pagination: Pagination
   loading: boolean
+}
+
+interface VotingInfo {
+  pkh: string
+  rolls: number
 }
 
 const initialState: TransactionSingleServiceState = {
@@ -34,6 +40,8 @@ const initialState: TransactionSingleServiceState = {
   providedIn: 'root'
 })
 export class TransactionSingleService extends Facade<TransactionSingleServiceState> {
+  public readonly baseApiUrl: string = 'https://mainnet.tezrpc.me/chains/main/blocks/'
+
   public transactions$ = this.state$.pipe(
     map(state => state.transactions),
     distinctUntilChanged(distinctTransactionArray)
@@ -108,14 +116,20 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         this.apiService.getTransactionsByField(address, 'source', kind, limit),
         this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
       ]).pipe(
-        map(([ballot, proposals]) => {
+        map(([ballots, proposals]) => {
           proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
           let source: Transaction[] = []
-          source.push(...ballot, ...proposals)
+          source.push(...ballots, ...proposals)
           source.sort((a, b) => {
             return b.timestamp - a.timestamp
           })
+          source.map(async transaction => {
+            await this.addVotesForTransaction(transaction)
+          })
+          // source.map(transaction => (transaction.votes = 1008))
           source = source.slice(0, limit)
+
+          console.log('getAllTransactionsByAddress', source)
 
           return source
         })
@@ -154,6 +168,12 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         return transactions
       })
     )
+  }
+
+  private async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
+    const { data }: AxiosResponse = await axios.get(`${this.baseApiUrl}/${transaction.block_hash}/votes/listings`)
+    transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+    return transaction
   }
 
   public loadMore() {

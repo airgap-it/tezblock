@@ -158,7 +158,7 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
       { name: 'Voting Period', property: '', width: '' },
-      { name: '# of Votes', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
     ]
@@ -430,7 +430,7 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
       { name: 'Voting Period', property: '', width: '' },
-      { name: '# of Votes', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
     ]
