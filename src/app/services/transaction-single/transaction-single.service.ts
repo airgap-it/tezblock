@@ -102,8 +102,27 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   }
 
   private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
+    let combinedSource = this.apiService.getTransactionsByField(address, 'source', kind, limit)
+    if (kind === 'ballot') {
+      combinedSource = forkJoin([
+        this.apiService.getTransactionsByField(address, 'source', kind, limit),
+        this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
+      ]).pipe(
+        map(([ballot, proposals]) => {
+          proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
+          let source: Transaction[] = []
+          source.push(...ballot, ...proposals)
+          source.sort((a, b) => {
+            return b.timestamp - a.timestamp
+          })
+          source = source.slice(0, limit)
+
+          return source
+        })
+      )
+    }
     return forkJoin([
-      this.apiService.getTransactionsByField(address, 'source', kind, limit),
+      combinedSource,
       this.apiService.getTransactionsByField(address, 'destination', kind, limit),
       this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
     ]).pipe(
@@ -114,6 +133,23 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           return b.timestamp - a.timestamp
         })
         transactions = transactions.slice(0, limit)
+        const sources = []
+
+        transactions.forEach(transaction => {
+          if (transaction.kind === 'delegation') {
+            sources.push(transaction.source)
+          }
+        })
+        const delegateSources = this.apiService.getAccountsByIds(sources)
+        delegateSources.subscribe(delegators => {
+          transactions.forEach(transaction => {
+            delegators.forEach(delegator => {
+              if (transaction.source === delegator.account_id) {
+                transaction.delegatedBalance = delegator.balance
+              }
+            })
+          })
+        })
 
         return transactions
       })

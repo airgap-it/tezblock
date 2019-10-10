@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
-import { combineLatest } from 'rxjs'
+import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { Account } from '../../interfaces/Account'
 import { ApiService } from '../api/api.service'
 import { Facade, Pagination } from '../facade/facade'
+import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 
 interface AccountServiceState {
   accounts: Account[]
@@ -81,5 +82,9 @@ export class AccountService extends Facade<AccountServiceState> {
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
 
     this.updateState({ ...this._state, pagination, loading: true })
+  }
+
+  public getFrozen(address: string): Promise<number> {
+    return this.apiService.getFrozenBalance(address)
   }
 }

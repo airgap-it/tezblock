@@ -61,7 +61,10 @@ export class TabbedTableComponent {
     ownId = split.slice(-1).pop()
 
     const aggregateFunction = info => {
-      const tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
+      let tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
+      if (info.kind === 'proposals') {
+        tab = tabs.find(tabArgument => tabArgument.kind === 'ballot')
+      }
       if (tab) {
         const count = parseInt(info.count_operation_group_hash, 10)
         tab.count = tab.count ? tab.count + count : count

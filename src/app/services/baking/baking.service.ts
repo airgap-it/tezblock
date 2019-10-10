@@ -24,7 +24,7 @@ const hoursPerCycle = 68
 export class BakingService {
   public bakerInfo?: BakerInfo
 
-  private readonly bakingBadUrl = 'https://test.baking-bad.org/v1/bakers'
+  private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
 
   public bakerConfigError: string | undefined
