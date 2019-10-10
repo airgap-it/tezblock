@@ -9,12 +9,14 @@ import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
+import { VotingInfo } from '../transaction-single/transaction-single.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
+  private readonly baseRPCUrl: string = 'https://mainnet.tezrpc.me/chains/main/blocks/'
   private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
   private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
   private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
@@ -593,6 +595,15 @@ export class ApiService {
       },
       this.options
     )
+  }
+
+  public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
+    return new Promise(resolve => {
+      this.http.get<Array<VotingInfo>>(`${this.baseRPCUrl}/${transaction.block_hash}/votes/listings`).subscribe(data => {
+        transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+        resolve(transaction)
+      })
+    })
   }
 
   public getEndorsements(blockHash: string): Promise<number> {

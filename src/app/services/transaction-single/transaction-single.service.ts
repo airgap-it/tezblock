@@ -17,7 +17,7 @@ interface TransactionSingleServiceState {
   loading: boolean
 }
 
-interface VotingInfo {
+export interface VotingInfo {
   pkh: string
   rolls: number
 }
@@ -40,8 +40,6 @@ const initialState: TransactionSingleServiceState = {
   providedIn: 'root'
 })
 export class TransactionSingleService extends Facade<TransactionSingleServiceState> {
-  public readonly baseApiUrl: string = 'https://mainnet.tezrpc.me/chains/main/blocks/'
-
   public transactions$ = this.state$.pipe(
     map(state => state.transactions),
     distinctUntilChanged(distinctTransactionArray)
@@ -124,9 +122,8 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
             return b.timestamp - a.timestamp
           })
           source.map(async transaction => {
-            await this.addVotesForTransaction(transaction)
+            await this.apiService.addVotesForTransaction(transaction)
           })
-          // source.map(transaction => (transaction.votes = 1008))
           source = source.slice(0, limit)
           return source
         })
@@ -165,12 +162,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         return transactions
       })
     )
-  }
-
-  private async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
-    const { data }: AxiosResponse = await axios.get(`${this.baseApiUrl}/${transaction.block_hash}/votes/listings`)
-    transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
-    return transaction
   }
 
   public loadMore() {
