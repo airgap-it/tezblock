@@ -126,7 +126,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
+          this.bakerAddress = delegatedAccounts[0].delegate
 
           this.getBakingInfos(this.address)
 
