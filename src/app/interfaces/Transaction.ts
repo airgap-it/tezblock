@@ -32,4 +32,5 @@ export interface Transaction {
   level: number
   delegatedBalance?: number
   proposal?: string
+  originated_contracts?: string
 }

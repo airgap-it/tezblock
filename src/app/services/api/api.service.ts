@@ -379,28 +379,101 @@ export class ApiService {
       )
   }
 
-  public getDelegatedAccounts(tzAddress: string, limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'manager',
-            operation: 'eq',
-            set: [tzAddress],
-            inverse: false
-          }
-        ],
-        orderBy: [
-          {
-            field: 'balance',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+  // public getDelegatedAccounts(tzAddress: string, limit: number): Observable<Account[]> {
+  //   return this.http.post<Account[]>(
+  //     this.accountsApiUrl,
+  //     {
+  //       predicates: [
+  //         {
+  //           field: 'manager',
+  //           operation: 'eq',
+  //           set: [tzAddress],
+  //           inverse: false
+  //         }
+  //       ],
+  //       orderBy: [
+  //         {
+  //           field: 'balance',
+  //           direction: 'desc'
+  //         }
+  //       ],
+  //       limit
+  //     },
+  //     this.options
+  //   )
+  // }
+  public getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
+    if (address.startsWith('tz')) {
+      console.log('with tz')
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'manager_pubkey',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'originated_contracts',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    } else {
+      console.log('with kt')
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'originated_contracts',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'manager_pubkey',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    }
   }
 
   public getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
