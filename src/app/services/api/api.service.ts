@@ -60,7 +60,7 @@ export class ApiService {
     )
   }
 
-  public getLatestTransactions(limit: number, kind: string): Observable<Transaction[]> {
+  public getLatestTransactions(limit: number, kindList: Array<string>): Observable<Transaction[]> {
     return this.http.post<Transaction[]>(
       this.transactionsApiUrl,
       {
@@ -72,8 +72,8 @@ export class ApiService {
           },
           {
             field: 'kind',
-            operation: 'eq',
-            set: [kind]
+            operation: 'in',
+            set: kindList
           }
         ],
         orderBy: [this.orderByBlockLevelDesc],
@@ -84,7 +84,6 @@ export class ApiService {
   }
 
   public getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
-    console.log('by id')
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,

@@ -69,7 +69,7 @@ export class ListComponent {
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('ballot')
+            this.dataService.updateKind(['ballot', 'proposals'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'ballot_overview'
