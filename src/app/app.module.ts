@@ -49,6 +49,7 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 
 @NgModule({
   imports: [
@@ -104,7 +105,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
-    LoadingSkeletonComponent
+    LoadingSkeletonComponent,
+    TelegramModalComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
@@ -116,6 +118,7 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
     AccountItemComponent,
     AddressItemComponent,
     QrModalComponent,
+    TelegramModalComponent,
     QrItemComponent,
     BlockCellComponent,
     PlainValueCellComponent,
