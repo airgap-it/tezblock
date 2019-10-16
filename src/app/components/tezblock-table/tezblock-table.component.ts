@@ -49,7 +49,9 @@ enum OperationTypes {
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
-  EndorsementOverview = 'endorsement_overview'
+  EndorsementOverview = 'endorsement_overview',
+  DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
+  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
 }
 
 interface Layout {
@@ -78,6 +80,8 @@ interface Layout {
     [OperationTypes.Reveal]: Column[]
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
+    [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
+    [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
   }
 }
 
@@ -414,6 +418,56 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.DoubleBakingEvidenceOverview]: [
+      {
+        name: 'Baker',
+        property: '',
+        width: '',
+        component: AddressCellComponent
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      {
+        name: 'Reward',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Offender', property: '', width: '', component: AddressCellComponent },
+      { name: 'Denounced Level', property: '', width: '', component: BlockCellComponent },
+      {
+        name: 'Lost Amount',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Level', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.DoubleEndorsementEvidenceOverview]: [
+      {
+        name: 'Baker',
+        property: '',
+        width: '',
+        component: AddressCellComponent
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      {
+        name: 'Reward',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Offender', property: '', width: '', component: AddressCellComponent },
+      { name: 'Denounced Level', property: '', width: '', component: BlockCellComponent },
+      {
+        name: 'Lost Amount',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Level', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ]
   }

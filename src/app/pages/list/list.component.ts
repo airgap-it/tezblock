@@ -67,6 +67,20 @@ export class ListComponent {
             this.page = 'transaction'
             this.type = 'endorsement_overview'
             break
+          case 'double-baking':
+            this.dataService = new TransactionService(this.apiService)
+            this.dataService.updateKind('double_baking_evidence')
+            this.dataService.setPageSize(10)
+            this.page = 'transaction'
+            this.type = 'double_baking_evidence_overview'
+            break
+          case 'double-endorsement':
+            this.dataService = new TransactionService(this.apiService)
+            this.dataService.updateKind('double-endorsement-evidence')
+            this.dataService.setPageSize(10)
+            this.page = 'transaction'
+            this.type = 'double_endorsement_evidence_overview'
+            break
           default:
             throw new Error('unknown route')
         }
