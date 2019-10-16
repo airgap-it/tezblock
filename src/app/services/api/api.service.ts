@@ -111,16 +111,18 @@ export class ApiService {
             }
           })
 
-          const delegateSources = this.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            finalTransactions.forEach(transaction => {
-              delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
-                  transaction.delegatedBalance = delegator.balance
-                }
+          if (sources.length > 0) {
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
+                })
               })
             })
-          })
+          }
 
           return finalTransactions
         })
@@ -204,17 +206,18 @@ export class ApiService {
             }
           })
 
-          const delegateSources = this.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            finalTransactions.forEach(transaction => {
-              delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
-                  transaction.delegatedBalance = delegator.balance
-                }
+          if (sources.length > 0) {
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
+                })
               })
             })
-          })
-
+          }
           return finalTransactions
         })
       )
