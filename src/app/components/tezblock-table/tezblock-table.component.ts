@@ -490,7 +490,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         if (t.length > 0) {
           setTimeout(() => {
             this.renderComponents()
-          }, 250) // TODO: Find a better way than this
+          }, 300) // TODO: Find a better way than this. # of votes might not display if the timeout is not sufficiently long
         }
       })
     }
