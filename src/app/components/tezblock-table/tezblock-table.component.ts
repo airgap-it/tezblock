@@ -153,7 +153,7 @@ const layouts: Layout = {
     [OperationTypes.Endorsement]: [
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
-      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Endorsed Level', property: 'level', width: '', component: BlockCellComponent },
       ...baseTx
     ],
     [OperationTypes.Ballot]: [
