@@ -140,7 +140,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
             sources.push(transaction.source)
           }
         })
-        if (Object.keys(sources).length) {
+        if (sources.length > 0) {
           const delegateSources = this.apiService.getAccountsByIds(sources)
           delegateSources.subscribe(delegators => {
             transactions.forEach(transaction => {
