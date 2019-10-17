@@ -658,5 +658,9 @@
   "tz1gg5bjopPcr9agjamyu9BbXKLibNc2rbAq": {
     "alias": "hodl.farm",
     "hasLogo": true
+  },
+  "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9": {
+    "alias": "hodl.farm Payouts",
+    "hasLogo": true
   }
 }
