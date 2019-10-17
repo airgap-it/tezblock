@@ -1,6 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faGithub, faMedium, faTelegram, faTwitter } from '@fortawesome/free-brands-svg-icons'
 import {
+  faBell,
   faCopy,
   faLevelDownAlt,
   faLevelUpAlt,
@@ -18,6 +19,7 @@ import {
 
 export const addFontAwesome = () => {
   library.add(
+    faBell,
     faCopy,
     faLevelDownAlt,
     faLevelUpAlt,
