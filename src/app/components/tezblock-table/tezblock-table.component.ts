@@ -131,7 +131,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: 'amount', width: '' },
+      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       {
         name: 'Originator',
@@ -148,7 +148,6 @@ const layouts: Layout = {
         options: { showFullAddress: false, pageId: 'oo' }
       },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       ...baseTx
     ],
     [OperationTypes.Endorsement]: [
@@ -223,7 +222,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -363,7 +362,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
