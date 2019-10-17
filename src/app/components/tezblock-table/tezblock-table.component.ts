@@ -260,8 +260,9 @@ const layouts: Layout = {
         property: 'pkh',
         width: '',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: true, pageId: 'oo' }
       },
+      { name: 'Secret', property: 'secret', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ]
   },
@@ -303,7 +304,7 @@ const layouts: Layout = {
     ],
 
     [OperationTypes.Activation]: [
-      { name: 'Account', property: 'pkh', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      { name: 'Account', property: 'pkh', width: '1', component: AddressCellComponent, options: { showFullAddress: true, pageId: 'oo' } },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Secret', property: 'secret', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
