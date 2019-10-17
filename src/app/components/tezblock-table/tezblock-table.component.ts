@@ -131,7 +131,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '' },
+      { name: 'Balance', property: 'amount', width: '' },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       {
         name: 'Originator',
@@ -140,7 +140,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       ...baseTx
@@ -217,7 +223,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -225,7 +231,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent },
       { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
@@ -351,7 +363,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -359,7 +371,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
@@ -376,7 +394,7 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
 
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -384,7 +402,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
