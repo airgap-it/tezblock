@@ -95,12 +95,21 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
       } else {
         this.apiService.getManagerAccount(address, 10).subscribe((managerAccounts: Account[]) => {
           const originAccounts: Account[] = []
+          const delegatedAccounts: Account[] = []
+          if (managerAccounts[0].delegate_value) {
+            delegatedAccounts.push(managerAccounts[0])
+          }
           managerAccounts.forEach(account => {
             if (account.manager) {
               this.apiService.getAccountById(account.manager).subscribe((accounts: Account[]) => {
                 if (accounts[0].account_id) {
                   originAccounts.push(accounts[0])
-                  this.updateState({ ...this._state, originatedAccounts: originAccounts, loading: false })
+                  this.updateState({
+                    ...this._state,
+                    delegatedAccounts: delegatedAccounts,
+                    originatedAccounts: originAccounts,
+                    loading: false
+                  })
                 }
               })
             }
