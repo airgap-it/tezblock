@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, forkJoin, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import axios, { AxiosResponse } from 'axios'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
@@ -14,6 +15,11 @@ interface TransactionSingleServiceState {
   kind: string
   pagination: Pagination
   loading: boolean
+}
+
+export interface VotingInfo {
+  pkh: string
+  rolls: number
 }
 
 const initialState: TransactionSingleServiceState = {
@@ -108,15 +114,17 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         this.apiService.getTransactionsByField(address, 'source', kind, limit),
         this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
       ]).pipe(
-        map(([ballot, proposals]) => {
+        map(([ballots, proposals]) => {
           proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
           let source: Transaction[] = []
-          source.push(...ballot, ...proposals)
+          source.push(...ballots, ...proposals)
           source.sort((a, b) => {
             return b.timestamp - a.timestamp
           })
+          source.map(async transaction => {
+            await this.apiService.addVotesForTransaction(transaction)
+          })
           source = source.slice(0, limit)
-
           return source
         })
       )
