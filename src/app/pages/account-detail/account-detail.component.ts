@@ -70,6 +70,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public hasLogo: boolean | undefined
 
   public transactions$: Observable<Object> = new Observable()
+  public bakingRights$: Observable<Object> = new Observable()
+
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
   public tezosBakerAcceptingDelegation: string | undefined
@@ -96,6 +98,14 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
     { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
+
+  public bakingTabs: Tab[] = [
+    { title: 'Baker Overview', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Bakings', active: false, kind: 'rights', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Rewards', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Balance', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') }
+  ]
+
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
@@ -116,6 +126,12 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly iconPipe: IconPipe
   ) {
     this.address = this.route.snapshot.params.id
+    this.apiService.getBakingRights().subscribe(response => {
+      console.log('baking rights', response)
+    })
+    this.apiService.getEndorsingRights(this.address).subscribe(response => {
+      console.log('endorsing rights', response)
+    })
     this.transactionSingleService = new TransactionSingleService(this.apiService)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
@@ -148,6 +164,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     }
 
     this.transactions$ = this.transactionSingleService.transactions$
+    this.bakingRights$ = this.apiService.getBakingRights()
 
     this.transactionSingleService.updateAddress(address)
 

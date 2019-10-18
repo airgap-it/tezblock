@@ -45,6 +45,7 @@ enum OperationTypes {
   Endorsement = 'endorsement',
   Reveal = 'reveal',
   Ballot = 'ballot',
+  Rights = 'rights',
   Activation = 'activate_account',
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
@@ -59,6 +60,7 @@ interface Layout {
     [OperationTypes.Origination]: Column[]
     [OperationTypes.Endorsement]: Column[]
     [OperationTypes.Ballot]: Column[]
+    [OperationTypes.Rights]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -159,6 +161,20 @@ const layouts: Layout = {
       { name: 'Rolls', property: '', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '' },
       ...baseTx
+    ],
+    [OperationTypes.Rights]: [
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
+      {
+        name: 'Delegate',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+
+      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Priority', property: 'priority', width: '' }
     ]
   },
   [LayoutPages.Block]: {
