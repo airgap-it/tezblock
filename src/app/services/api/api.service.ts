@@ -268,7 +268,6 @@ export class ApiService {
     )
   }
   public getAccountsByIds(ids: string[]): Observable<Account[]> {
-    console.log('getAccountsByIds', ids)
     return this.http.post<Account[]>(
       this.accountsApiUrl,
       {
