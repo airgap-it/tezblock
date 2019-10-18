@@ -134,7 +134,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         }
       })
     )
-    this.relatedAccounts = this.accountSingleService.originatedAccounts$
+    this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
   }
 

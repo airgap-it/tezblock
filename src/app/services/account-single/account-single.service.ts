@@ -11,7 +11,7 @@ interface AccountSingleServiceState {
   address: string
   account: Account
   delegatedAccounts: Account[]
-  originatedAccounts: Account[]
+  relatedAccounts: Account[]
   loading: boolean
 }
 
@@ -19,7 +19,7 @@ const initalState: AccountSingleServiceState = {
   address: '',
   account: undefined,
   delegatedAccounts: [],
-  originatedAccounts: [],
+  relatedAccounts: [],
   loading: false
 }
 
@@ -42,8 +42,8 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
     distinctUntilChanged()
   )
 
-  public originatedAccounts$ = this.state$.pipe(
-    map(state => state.originatedAccounts),
+  public relatedAccounts$ = this.state$.pipe(
+    map(state => state.relatedAccounts),
     distinctUntilChanged(distinctAccounts)
   )
 
@@ -114,47 +114,38 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
     if (address) {
       this.apiService.getDelegatedAccounts(address, 10).subscribe((transactions: Transaction[]) => {
         const delegatedAccounts: Account[] = []
-        let originatedAccounts: Account[] = []
+        let relatedAccounts: Account[] = []
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
             if (accounts[0].delegate) {
               delegatedAccounts.push(accounts[0])
-              this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             }
           })
         } else {
           if (address.startsWith('tz')) {
-            const tempList: string[] = []
-            transactions.forEach(transaction => {
-              if (!tempList.includes(transaction.originated_contracts)) {
-                tempList.push(transaction.originated_contracts)
-              }
-            })
-            this.apiService.getAccountsByIds(tempList).subscribe((accounts: Account[]) => {
+            const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
+            this.apiService.getAccountsByIds(originatedContracts).subscribe((accounts: Account[]) => {
               accounts.forEach(account => {
                 if (account.delegate && !delegatedAccounts.includes(account)) {
                   delegatedAccounts.push(account)
                 }
               })
-              originatedAccounts = accounts
-              this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
+              relatedAccounts = accounts
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             })
           } else {
-            const tempList: string[] = []
-            transactions.forEach(transaction => {
-              if (!tempList.includes(transaction.manager_pubkey)) {
-                tempList.push(transaction.manager_pubkey)
+            this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
+              if (accounts[0].delegate) {
+                this.updateState({ ...this._state, delegatedAccounts: accounts, relatedAccounts, loading: false })
               }
             })
-            this.apiService.getAccountsByIds(tempList).subscribe((accounts: Account[]) => {
-              accounts.forEach(account => {
-                if (account.delegate && !delegatedAccounts.includes(account)) {
-                  delegatedAccounts.push(account)
-                }
-              })
-              originatedAccounts = accounts
-              this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
+
+            const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
+            this.apiService.getAccountsByIds(managerPubKeys).subscribe((accounts: Account[]) => {
+              relatedAccounts = accounts
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             })
           }
         }
