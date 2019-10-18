@@ -125,8 +125,17 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
           })
         } else {
           if (address.startsWith('tz')) {
+            // since babylon, also tz addresses themselves can be delegated
+
+            this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
+              if (accounts[0].delegate) {
+                this.updateState({ ...this._state, delegatedAccounts: accounts, relatedAccounts, loading: false })
+              }
+            })
+
             const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
             this.apiService.getAccountsByIds(originatedContracts).subscribe((accounts: Account[]) => {
+              console.log('accounts', accounts)
               accounts.forEach(account => {
                 if (account.delegate && !delegatedAccounts.includes(account)) {
                   delegatedAccounts.push(account)
