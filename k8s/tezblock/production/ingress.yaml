@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: tezblock-frontend
+  namespace: tezblock
+  annotations:
+    kubernetes.io/ingress.class: 'nginx'
+    certmanager.k8s.io/cluster-issuer: 'letsencrypt-prod'
+    certmanager.k8s.io/acme-challenge-type: http01
+spec:
+  tls:
+    - hosts:
+        - tezblock.prod.gke.papers.tech
+      secretName: tezblock-prod-tls
+  rules:
+    - host: tezblock.prod.gke.papers.tech
+      http:
+        paths:
+          - backend:
+              serviceName: tezblock-frontend
+              servicePort: 80
