@@ -283,6 +283,7 @@ const layouts: Layout = {
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
+      { name: 'Parameters', property: 'parameters', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ],
 
