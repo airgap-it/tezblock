@@ -3,6 +3,7 @@ import { findIconDefinition, IconDefinition, IconLookup, IconName, IconPrefix } 
 import { environment } from 'src/environments/environment'
 
 export type IconRef =
+  | 'bell'
   | 'copy'
   | 'levelDownAlt'
   | 'levelUpAlt'
@@ -39,6 +40,7 @@ export class IconPipe implements PipeTransform {
       handHoldingSeedling = 'seedling'
     }
     this.iconNameMap = {
+      bell: { prefix, iconName: 'bell' },
       copy: { prefix, iconName: 'copy' },
       levelDownAlt: { prefix, iconName: 'level-down-alt' },
       levelUpAlt: { prefix, iconName: 'level-up-alt' },

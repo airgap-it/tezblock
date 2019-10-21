@@ -1,0 +1,50 @@
+<div class="modal-header">
+  <h5 class="modal-title pull-left">
+    Telegram Tezos Notifier Bot
+  </h5>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body">
+  With the Telegram
+  <a href="https://tzsnt.fr/" target="_blank">Tezos Notifier Bot</a>
+  , you can stay up-to-date about accounts and be notified for delegations, transactions and much more directly in Telegram.
+  <br />
+  <br />
+  <strong>You'll be notified about the following address</strong>
+  <div class="row py-2">
+    <div class="col">
+      <address-item
+        class="d-inline-flex"
+        [address]="botAddress"
+        [clickableButton]="false"
+        [hideIdenticon]="false"
+        [forceIdenticon]="true"
+        [showFull]="true"
+      ></address-item>
+    </div>
+  </div>
+  <div class="row py-2">
+    <div class="col">
+      <strong>Choose a corresponding name</strong>
+    </div>
+  </div>
+  <form>
+    <div class="form-group">
+      <input
+        class="form-control"
+        [(ngModel)]="botName"
+        name="first"
+        id="exampleInputEmail1"
+        value="{{ botName }}"
+        placeholder="Enter a name for this address"
+      />
+    </div>
+
+    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botName }">
+      Start Notifications
+    </button>
+  </form>
+</div>

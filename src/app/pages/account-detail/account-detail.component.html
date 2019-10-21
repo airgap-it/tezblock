@@ -17,8 +17,11 @@
                 <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showQr()">
                   <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
+                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showTelegramModal()">
+                  <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                </a>
               </div>
-              <div class="col-md-10 p-0">
+              <div class="col-md-10 pl-sm-0 pr-0 address--item__container">
                 <address-item
                   class="d-inline-flex"
                   [address]="account.account_id"
@@ -39,7 +42,9 @@
                 <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showQr()">
                   <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
                 </a>
-
+                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showTelegramModal()">
+                  <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                </a>
                 <div>
                   <address-item *ngIf="hasAlias" class="d-inline-flex" [address]="account.account_id" [hideIdenticon]="true"></address-item>
                   <span *ngIf="revealed === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
@@ -94,7 +99,7 @@
                 </h5>
               </div>
             </div>
-            <h5 class="card-title mb-3 pt-3">
+            <h5 class="card-title__secondary mb-3 pt-3">
               Related Accounts
             </h5>
             <ng-container *ngIf="relatedAccounts | async as relatedAccountsList">
@@ -132,7 +137,7 @@
       <div class=" col-lg-6 mb-4 mb-lg-0">
         <div class="card h-100 pt-3">
           <div class="card-body p-4">
-            <h5 class="card-title mb-3 ">
+            <h5 class="card-title mb-4 ">
               Delegation
             </h5>
 
@@ -227,7 +232,7 @@
             <div class="row">
               <div class=" col-md-6 col-lg-4">
                 <div class="mb-4">
-                  <h5 class="card-title mb-3">
+                  <h5 class="card-title__secondary mb-3">
                     Staking Bond
                   </h5>
                   <h3>
@@ -325,7 +330,7 @@
               </div>
               <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
                 <div class="mb-4">
-                  <h5 class="card-title mb-3 ">
+                  <h5 class="card-title__secondary mb-3 ">
                     Frozen Balance
                   </h5>
                   <h3>
@@ -369,7 +374,7 @@
                   </h3>
                 </div> -->
                 <div class="mb-4">
-                  <h5 class="card-title ">
+                  <h5 class="card-title__secondary mb-3">
                     Payout Accuracy
                   </h5>
                   <div class="d-block" *ngIf="bakingBadRating">
@@ -384,7 +389,7 @@
                   </ng-container>
                 </div>
                 <div>
-                  <h5 class="card-title ">
+                  <h5 class="card-title__secondary mb-3">
                     Baking Efficiency
                   </h5>
                   <div class="d-block">

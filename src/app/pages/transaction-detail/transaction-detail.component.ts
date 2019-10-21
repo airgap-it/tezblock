@@ -32,7 +32,8 @@ export class TransactionDetailComponent implements OnInit {
     { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Reveal', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') }
+    { title: 'Reveals', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') },
+    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') }
   ]
 
   public transactionSingleService: TransactionSingleService

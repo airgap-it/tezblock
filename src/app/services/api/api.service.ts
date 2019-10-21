@@ -1,14 +1,14 @@
 import { environment } from './../../../environments/environment'
-import { Delegation } from './../../interfaces/Delegation'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
+import { VotingInfo } from '../transaction-single/transaction-single.service'
+import { TezosProtocol } from 'airgap-coin-lib'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
@@ -58,31 +58,44 @@ export class ApiService {
     )
   }
 
-  public getLatestTransactions(limit: number, kind: string): Observable<Transaction[]> {
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'operation_group_hash',
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'kind',
-            operation: 'eq',
-            set: [kind]
+  public getLatestTransactions(limit: number, kindList: Array<string>): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'kind',
+              operation: 'in',
+              set: kindList
+            }
+          ],
+          orderBy: [this.orderByBlockLevelDesc],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map(transactions => {
+          if (kindList.includes('ballot' || 'proposals')) {
+            let source: Transaction[] = []
+            source.push(...transactions)
+            source.map(async transaction => {
+              await this.addVotesForTransaction(transaction)
+            })
+            return source
           }
-        ],
-        orderBy: [this.orderByBlockLevelDesc],
-        limit
-      },
-      this.options
-    )
+          return transactions
+        })
+      )
   }
 
   public getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
-    console.log('by id')
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -111,16 +124,18 @@ export class ApiService {
             }
           })
 
-          const delegateSources = this.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            finalTransactions.forEach(transaction => {
-              delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
-                  transaction.delegatedBalance = delegator.balance
-                }
+          if (sources.length > 0) {
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
+                })
               })
             })
-          })
+          }
 
           return finalTransactions
         })
@@ -204,17 +219,18 @@ export class ApiService {
             }
           })
 
-          const delegateSources = this.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            finalTransactions.forEach(transaction => {
-              delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
-                  transaction.delegatedBalance = delegator.balance
-                }
+          if (sources.length > 0) {
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
+                })
               })
             })
-          })
-
+          }
           return finalTransactions
         })
       )
@@ -666,6 +682,15 @@ export class ApiService {
       },
       this.options
     )
+  }
+
+  public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
+    return new Promise(async resolve => {
+      const protocol = new TezosProtocol()
+      const data = await protocol.getTezosVotingInfo(transaction.block_hash)
+      transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+      resolve(transaction)
+    })
   }
 
   public getEndorsements(blockHash: string): Promise<number> {

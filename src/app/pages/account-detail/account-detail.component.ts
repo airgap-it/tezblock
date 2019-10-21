@@ -1,3 +1,4 @@
+import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -249,6 +250,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public showQr() {
     const initialState = { qrdata: this.route.snapshot.params.id, size: 200 }
     const modalRef = this.modalService.show(QrModalComponent, { initialState })
+    modalRef.content.closeBtnName = 'Close'
+  }
+
+  public showTelegramModal() {
+    const initialState = {
+      botAddress: this.route.snapshot.params.id,
+      botName: this.aliasPipe.transform(this.route.snapshot.params.id)
+    }
+    const modalRef = this.modalService.show(TelegramModalComponent, { initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 

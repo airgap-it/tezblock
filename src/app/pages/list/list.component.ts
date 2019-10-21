@@ -67,6 +67,13 @@ export class ListComponent {
             this.page = 'transaction'
             this.type = 'endorsement_overview'
             break
+          case 'vote':
+            this.dataService = new TransactionService(this.apiService)
+            this.dataService.updateKind(['ballot', 'proposals'])
+            this.dataService.setPageSize(10)
+            this.page = 'transaction'
+            this.type = 'ballot_overview'
+            break
           default:
             throw new Error('unknown route')
         }
