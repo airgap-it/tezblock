@@ -2,8 +2,8 @@
   <ng-container *ngFor="let tab of tabs">
     <tab heading="{{ tab.title }}">
       <ng-container *ngIf="tab.kind === 'baker_overview'">
-        <div class="pt-5" *ngIf="isValidBaker">
-          <div class="card pt-3">
+        <div *ngIf="isValidBaker">
+          <div class="pt-3">
             <div class="card-body p-4 ">
               <div class="container p-0">
                 <div class="row">
@@ -172,7 +172,16 @@
       </ng-container>
 
       <ng-container *ngIf="tab.kind === 'bakings'"><p>bakings</p></ng-container>
-      <ng-container *ngIf="tab.kind === 'rewards'"><p>rewards</p></ng-container>
+      <ng-container *ngIf="tab.kind === 'rewards'">
+        <tezblock-table
+          [loading]="loading"
+          [data]="data"
+          [page]="page"
+          [type]="selectedTab.kind"
+          [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
+          (loadMoreClicked)="loadMore()"
+        ></tezblock-table>
+      </ng-container>
       <ng-container *ngIf="tab.kind === 'balance'"><p>balance</p></ng-container>
 
       <div ng-bind-html="tabDynamicContent"></div>

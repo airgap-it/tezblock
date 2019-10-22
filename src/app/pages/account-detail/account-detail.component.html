@@ -228,7 +228,13 @@
     <div class="pt-5">
       <div class="card pt-3">
         <div class="card-body p-4 ">
-          <rewards-table [tabs]="rewardsTabs" [page]="'account'"></rewards-table>
+          <rewards-table
+            [tabs]="rewardsTabs"
+            [page]="'account'"
+            [loading]="transactionsLoading$"
+            [data]="transactions$"
+            (tabClicked)="tabSelected($event)"
+          ></rewards-table>
         </div>
       </div>
     </div>

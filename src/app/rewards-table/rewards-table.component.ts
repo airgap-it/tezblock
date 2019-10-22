@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Subscription } from 'rxjs'
+import { Subscription, Observable } from 'rxjs'
 import { Account } from '../interfaces/Account'
 import { AccountSingleService } from '../services/account-single/account-single.service'
 import { AccountService } from '../services/account/account.service'
@@ -9,12 +9,14 @@ import { BakingService } from '../services/baking/baking.service'
 import { CryptoPricesService } from '../services/crypto-prices/crypto-prices.service'
 
 import { AliasPipe } from '../pipes/alias/alias.pipe'
+import { TransactionSingleService } from '../services/transaction-single/transaction-single.service'
 
 export interface Tab {
   title: string
   active: boolean
   kind: string
   icon?: string[]
+  count: number
 }
 
 @Component({
@@ -37,6 +39,7 @@ export class RewardsTableComponent implements OnInit {
   public isValidBaker: boolean | undefined
 
   public accountSingleService: AccountSingleService
+  public transactionSingleService: TransactionSingleService
 
   private readonly subscriptions: Subscription = new Subscription()
 
@@ -45,11 +48,15 @@ export class RewardsTableComponent implements OnInit {
   public frozenBalance: number | undefined
 
   @Input()
+  public page: string = 'account'
+
+  @Input()
   set tabs(tabs: Tab[]) {
     this._tabs = tabs
     if (!this.selectedTab) {
       this.selectedTab = tabs[0]
     }
+    this.getTabCount(tabs)
   }
 
   get tabs() {
@@ -61,7 +68,10 @@ export class RewardsTableComponent implements OnInit {
   }
 
   @Input()
-  public page: string = 'account'
+  public data?: Observable<any> // TODO: <any>
+
+  @Input()
+  public loading?: Observable<boolean>
 
   @Output()
   public readonly tabClicked: EventEmitter<string> = new EventEmitter()
@@ -80,6 +90,7 @@ export class RewardsTableComponent implements OnInit {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
     this.accountSingleService = new AccountSingleService(this.apiService)
+    this.transactionSingleService = new TransactionSingleService(this.apiService)
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
@@ -94,6 +105,7 @@ export class RewardsTableComponent implements OnInit {
     const address: string = this.route.snapshot.params.id
 
     this.accountSingleService.setAddress(address)
+    this.transactionSingleService.updateAddress(address)
 
     this.frozenBalance = await this.accountService.getFrozen(address)
   }
@@ -169,5 +181,43 @@ export class RewardsTableComponent implements OnInit {
     if (this.myTBUrl) {
       window.open(this.myTBUrl, '_blank')
     }
+  }
+  public getTabCount(tabs: Tab[]) {
+    let ownId: string = this.router.url
+    const split = ownId.split('/')
+    ownId = split.slice(-1).pop()
+
+    const aggregateFunction = info => {
+      let tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
+      if (info.kind === 'proposals') {
+        tab = tabs.find(tabArgument => tabArgument.kind === 'ballot')
+      }
+      if (tab) {
+        const count = parseInt(info.count_operation_group_hash, 10)
+        tab.count = tab.count ? tab.count + count : count
+      }
+    }
+
+    const setFirstActiveTab = () => {
+      const firstActiveTab = this.tabs.find(tab => tab.count > 0)
+      if (firstActiveTab) {
+        this.selectTab(firstActiveTab)
+      }
+    }
+
+    if (this.page === 'transaction') {
+      const transactionPromise = this.apiService.getOperationCount('operation_group_hash', ownId).toPromise()
+
+      transactionPromise
+        .then(transactionCounts => {
+          transactionCounts.forEach(aggregateFunction)
+
+          setFirstActiveTab()
+        })
+        .catch(console.error)
+    }
+  }
+  public loadMore(): void {
+    this.transactionSingleService.loadMore()
   }
 }
