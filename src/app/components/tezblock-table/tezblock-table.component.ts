@@ -50,7 +50,8 @@ enum OperationTypes {
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
-  EndorsementOverview = 'endorsement_overview'
+  EndorsementOverview = 'endorsement_overview',
+  Rewards = 'rewards'
 }
 
 interface Layout {
@@ -60,6 +61,7 @@ interface Layout {
     [OperationTypes.Origination]: Column[]
     [OperationTypes.Endorsement]: Column[]
     [OperationTypes.Ballot]: Column[]
+    [OperationTypes.Rewards]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -166,6 +168,16 @@ const layouts: Layout = {
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
+    [OperationTypes.Rewards]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Delegations', property: 'delegations', width: '' },
+      { name: 'Staking Balance', property: 'staking_balance', width: '' },
+      { name: 'Block Rewards', property: 'block_rewards', width: '' },
+      { name: 'Endorsement Rewards', property: 'endorsement_rewards', width: '' },
+      { name: 'Losses', property: 'losses', width: '' },
+      { name: 'Fees', property: 'fees', width: '' },
+      { name: 'Status', property: 'status', width: '' }
     ]
   },
   [LayoutPages.Block]: {
@@ -556,6 +568,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
+    console.log('type opf page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
         // tslint:disable-next-line:no-console

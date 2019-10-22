@@ -2,7 +2,7 @@ import { TelegramModalComponent } from './../../components/telegram-modal/telegr
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { BakerInfo } from 'airgap-coin-lib'
+import { BakerInfo, TezosProtocol } from 'airgap-coin-lib'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription } from 'rxjs'
@@ -19,6 +19,10 @@ import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Transaction } from 'src/app/interfaces/Transaction'
+import { OperationsService } from 'src/app/services/operations/operations.service'
+import { map } from 'rxjs/operators'
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -66,7 +70,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public hasAlias: boolean | undefined
   public hasLogo: boolean | undefined
 
-  public transactions$: Observable<Object> = new Observable()
+  public transactions$: Observable<Transaction[]> = new Observable()
+  public rewards$: Promise<TezosRewards>
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
   public tezosBakerAcceptingDelegation: string | undefined
@@ -104,6 +109,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public myTBUrl: string | undefined
   public address: string
   public frozenBalance: number | undefined
+  public rewardsTransaction: any
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -116,7 +122,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private readonly operationsService: OperationsService
   ) {
     this.address = this.route.snapshot.params.id
     this.transactionSingleService = new TransactionSingleService(this.apiService)
@@ -151,6 +158,38 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     }
 
     this.transactions$ = this.transactionSingleService.transactions$
+    this.transactions$.pipe(
+      map(transactions => {
+        const protocol = new TezosProtocol()
+
+        transactions.forEach(async transaction => {
+          const data = await protocol
+            .calculateRewards(this.bakerAddress, transaction.cycle)
+            .then(async data => {
+              console.log('awaiit: ', await protocol.calculateRewards(this.bakerAddress, transaction.cycle))
+              transaction.stakingBalance = data.stakingBalance
+              transaction.bakingRewards = data.bakingRewards
+              transaction.endorsingRewards = data.endorsingRewards
+              transaction.totalRewards = data.totalRewards
+              return transaction
+            })
+            .catch(async error => console.error('something is wrong:', error))
+        })
+
+        return transactions
+      })
+    )
+
+    this.transactions$.subscribe(transactions => {
+      const protocol = new TezosProtocol()
+      transactions.forEach(async transaction => {
+        this.rewards$ = await protocol.calculateRewards(this.bakerAddress, transaction.cycle)
+        this.rewards$.then(response => {
+          console.log('rewards_ ', response)
+          const reward = response
+        })
+      })
+    })
 
     this.transactionSingleService.updateAddress(address)
 
