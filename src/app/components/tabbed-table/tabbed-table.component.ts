@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ApiService } from 'src/app/services/api/api.service'
+import { map } from 'rxjs/operators'
 
 export interface Tab {
   title: string
@@ -60,13 +61,13 @@ export class TabbedTableComponent {
     const split = ownId.split('/')
     ownId = split.slice(-1).pop()
 
-    const aggregateFunction = info => {
+    const aggregateFunction = (info, field) => {
       let tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
       if (info.kind === 'proposals') {
         tab = tabs.find(tabArgument => tabArgument.kind === 'ballot')
       }
       if (tab) {
-        const count = parseInt(info.count_operation_group_hash, 10)
+        const count = parseInt(info[`count_${field}`], 10)
         tab.count = tab.count ? tab.count + count : count
       }
     }
@@ -83,7 +84,7 @@ export class TabbedTableComponent {
 
       transactionPromise
         .then(transactionCounts => {
-          transactionCounts.forEach(aggregateFunction)
+          transactionCounts.forEach(info => aggregateFunction(info, 'operation_group_hash'))
 
           setFirstActiveTab()
         })
@@ -91,13 +92,20 @@ export class TabbedTableComponent {
     } else if (this.page === 'account') {
       const fromPromise = this.apiService.getOperationCount('source', ownId).toPromise()
       const toPromise = this.apiService.getOperationCount('destination', ownId).toPromise()
-      const delegatePromise = this.apiService.getOperationCount('delegate', ownId).toPromise()
+      const delegatePromise = this.apiService.getOperationCount('delegate', ownId).pipe(map(counts => {
+        counts.forEach(count => { 
+          if (count.kind === 'origination') {
+            count.kind = 'delegation'
+          }
+        })
+        return counts
+      })).toPromise()
 
       Promise.all([fromPromise, toPromise, delegatePromise])
         .then(([from, to, delegate]) => {
-          from.forEach(aggregateFunction)
-          to.forEach(aggregateFunction)
-          delegate.forEach(aggregateFunction)
+          from.forEach(info => aggregateFunction(info, 'source'))
+          to.forEach(info => aggregateFunction(info, 'destination'))
+          delegate.forEach(info => aggregateFunction(info, 'delegate'))
 
           setFirstActiveTab()
         })

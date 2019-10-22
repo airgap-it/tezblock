@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, forkJoin, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
-import axios, { AxiosResponse } from 'axios'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
@@ -107,63 +106,67 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     this.updateState({ ...this._state, kind, loading: true })
   }
 
-  private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
-    let combinedSource = this.apiService.getTransactionsByField(address, 'source', kind, limit)
-    if (kind === 'ballot') {
-      combinedSource = forkJoin([
-        this.apiService.getTransactionsByField(address, 'source', kind, limit),
-        this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
-      ]).pipe(
-        map(([ballots, proposals]) => {
-          proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
-          let source: Transaction[] = []
-          source.push(...ballots, ...proposals)
-          source.sort((a, b) => {
-            return b.timestamp - a.timestamp
-          })
-          source.map(async transaction => {
-            await this.apiService.addVotesForTransaction(transaction)
-          })
-          source = source.slice(0, limit)
-          return source
-        })
-      )
-    }
-    return forkJoin([
-      combinedSource,
-      this.apiService.getTransactionsByField(address, 'destination', kind, limit),
-      this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
-    ]).pipe(
-      map(([from, to, delegate]) => {
-        let transactions: Transaction[] = []
-        transactions.push(...from, ...to, ...delegate)
-        transactions.sort((a, b) => {
-          return b.timestamp - a.timestamp
-        })
-        transactions = transactions.slice(0, limit)
-        const sources = []
+  private kindToFieldsMap = {
+    'transaction': ['source', 'destination'],
+    'delegation': ['source', 'delegate'],
+    'origination': ['source'],
+    'endorsement': ['delegate'],
+    'ballot': ['source'],
+    'proposals': ['source']
+  }
 
-        transactions.forEach(transaction => {
-          if (transaction.kind === 'delegation') {
-            sources.push(transaction.source)
-          }
-        })
-        if (sources.length > 0) {
-          const delegateSources = this.apiService.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            transactions.forEach(transaction => {
+  private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
+    let fields = this.kindToFieldsMap[kind]
+    const operations: Observable<Transaction[]>[] = []
+    for (const field of fields) {
+      operations.push(this.apiService.getTransactionsByField(address, field, kind, limit))
+    }
+    if (kind === 'delegation') {
+      operations.push(this.apiService.getTransactionsByField(address, 'delegate', 'origination', limit))
+    }
+    if (kind === 'ballot') {
+      const fields = this.kindToFieldsMap['proposals']
+      for (const field of fields) {
+        operations.push(
+          this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
+            map((proposals) => {
+              proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
+              return proposals
+            })
+          )
+        )
+      }
+    }
+
+    return forkJoin(operations).pipe(map(
+      (operation) => {
+        let transactions = operation.reduce((current, next) => current.concat(next))
+        transactions.sort((a, b) => b.timestamp - a.timestamp)
+
+        transactions = transactions.slice(0, limit)
+
+        if (kind === 'delegation') {
+          const sources: string[] = transactions.map(transaction => transaction.source)
+          if (sources.length > 0) {
+            const delegateSources = this.apiService.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
               delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
+                const transaction = transactions.find(t => t.source === delegator.account_id )
+                if (transaction !== undefined) {
                   transaction.delegatedBalance = delegator.balance
                 }
               })
             })
-          })
+          }
+        }
+
+        if (kind === 'ballot') {
+          transactions.map(async transaction => await this.apiService.addVotesForTransaction(transaction))
         }
 
         return transactions
-      })
-    )
+      }
+    ))
   }
 
   public loadMore() {

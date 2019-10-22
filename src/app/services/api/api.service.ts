@@ -395,29 +395,6 @@ export class ApiService {
       )
   }
 
-  // public getDelegatedAccounts(tzAddress: string, limit: number): Observable<Account[]> {
-  //   return this.http.post<Account[]>(
-  //     this.accountsApiUrl,
-  //     {
-  //       predicates: [
-  //         {
-  //           field: 'manager',
-  //           operation: 'eq',
-  //           set: [tzAddress],
-  //           inverse: false
-  //         }
-  //       ],
-  //       orderBy: [
-  //         {
-  //           field: 'balance',
-  //           direction: 'desc'
-  //         }
-  //       ],
-  //       limit
-  //     },
-  //     this.options
-  //   )
-  // }
   public getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
     if (address.startsWith('tz')) {
       console.log('with tz')
@@ -625,25 +602,26 @@ export class ApiService {
     field: string,
     value: string
   ): Observable<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]> {
+    const body = {
+      fields: [field, 'kind'],
+      predicates: [
+        {
+          field,
+          operation: 'eq',
+          set: [value],
+          inverse: false
+        }
+      ],
+      aggregation: [
+        {
+          field,
+          function: 'count'
+        }
+      ]
+    }
     return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
       this.transactionsApiUrl,
-      {
-        fields: [field, 'operation_group_hash', 'kind'],
-        predicates: [
-          {
-            field,
-            operation: 'eq',
-            set: [value],
-            inverse: false
-          }
-        ],
-        aggregation: [
-          {
-            field: 'operation_group_hash',
-            function: 'count'
-          }
-        ]
-      },
+      body,
       this.options
     )
   }
