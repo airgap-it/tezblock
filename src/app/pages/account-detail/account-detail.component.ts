@@ -55,9 +55,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
 
-  public bakingBadRating: string | undefined
-  public tezosBakerRating: string | undefined
-  public stakingBalance: number | undefined
   public bakingInfos: any
   public tezosBakerFee: string | undefined
   public stakingCapacity: number | undefined
@@ -162,7 +159,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
-    this.frozenBalance = await this.accountService.getFrozen(address)
   }
 
   public async getBakingInfos(address: string) {
@@ -170,66 +166,22 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       this.tezosBakerFee = 'not available'
     }
     this.bakingInfos = await this.bakingService.getBakerInfos(address)
-    this.stakingBalance = this.bakingInfos.stakingBalance
-    this.stakingCapacity = this.bakingInfos.stakingCapacity
-    this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
-    this.stakingBond = this.bakingInfos.selfBond
-    this.isValidBaker = true
     // this.nextPayout = this.bakingInfos.nextPayout
     // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
     // TODO: Move to component
-
-    this.bakingService
-      .getBakingBadRatings(address)
-      .then(result => {
-        if (result.rating === 0 && result.status === 'success') {
-          console.log('awesome')
-          this.bakingBadRating = 'awesome'
-        } else if (result.rating === 1 && result.status === 'success') {
-          console.log('so-so')
-          this.bakingBadRating = 'so-so'
-        } else if (result.rating === 2 && result.status === 'success') {
-          console.log('dead')
-          this.bakingBadRating = 'dead'
-        } else if (result.rating === 3 && result.status === 'success') {
-          console.log('specific')
-          this.bakingBadRating = 'specific'
-        } else if (result.rating === 4 && result.status === 'success') {
-          console.log('hidden')
-          this.bakingBadRating = 'hidden'
-        } else if (result.rating === 5 && result.status === 'success') {
-          console.log('new')
-          this.bakingBadRating = 'new'
-        } else if (result.rating === 6 && result.status === 'success') {
-          console.log('closed')
-          this.bakingBadRating = 'closed'
-        } else if (result.rating === 9 && result.status === 'success') {
-          console.log('unkown')
-          this.bakingBadRating = 'unknown'
-        } else {
-          console.log('not available')
-          this.bakingBadRating = 'not available'
-        }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
 
     // TODO: Move to component
     await this.bakingService
       .getTezosBakerInfos(address)
       .then(result => {
         if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-          this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
           this.tezosBakerFee = result.fee + ' %'
           this.tezosBakerName = result.baker_name
           this.tezosBakerAvailableCap = result.available_capacity
-          this.myTBUrl = result.myTB
           this.tezosBakerAcceptingDelegation = result.accepting_delegation
           this.tezosBakerNominalStakingYield = result.nominal_staking_yield
         } else {
-          this.tezosBakerRating = 'not available'
           this.tezosBakerFee = 'not available'
         }
       })
@@ -244,12 +196,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
-  }
-
-  public goToMYTB() {
-    if (this.myTBUrl) {
-      window.open(this.myTBUrl, '_blank')
-    }
   }
 
   public showQr() {

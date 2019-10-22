@@ -1,18 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { BakerInfo } from 'airgap-coin-lib'
-import { Observable, Subscription } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { Account } from '../interfaces/Account'
 import { AccountSingleService } from '../services/account-single/account-single.service'
 import { AccountService } from '../services/account/account.service'
 import { ApiService } from '../services/api/api.service'
 import { BakingService } from '../services/baking/baking.service'
-import { CryptoPricesService, CurrencyInfo } from '../services/crypto-prices/crypto-prices.service'
-import { TransactionSingleService } from '../services/transaction-single/transaction-single.service'
+import { CryptoPricesService } from '../services/crypto-prices/crypto-prices.service'
 
 import { AliasPipe } from '../pipes/alias/alias.pipe'
-
-const accounts = require('../../assets/bakers/json/accounts.json')
 
 export interface Tab {
   title: string
