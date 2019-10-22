@@ -96,6 +96,12 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
     { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
+  public rewardsTabs: Tab[] = [
+    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0 },
+    { title: 'Bakings', active: false, kind: 'bakings', count: 0 },
+    { title: 'Rewards', active: false, kind: 'rewards', count: 0 },
+    { title: 'Balance', active: false, kind: 'balance', count: 0 }
+  ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
