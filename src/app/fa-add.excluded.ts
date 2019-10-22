@@ -14,7 +14,9 @@ import {
   faLongArrowAltDown,
   faQrcode,
   faSearch,
-  faStamp
+  faStamp,
+  faGlobe,
+  faLaptop
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -36,6 +38,9 @@ export const addFontAwesome = () => {
     faGithub,
     faMedium,
     faTelegram,
-    faTwitter
+    faTwitter,
+    faApple,
+    faAndroid,
+    faLaptop
   )
 }
