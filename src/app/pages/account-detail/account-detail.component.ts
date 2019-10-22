@@ -71,7 +71,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public hasLogo: boolean | undefined
 
   public transactions$: Observable<Transaction[]> = new Observable()
-  public rewards$: Promise<TezosRewards>
+  public rewards: TezosRewards
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
   public tezosBakerAcceptingDelegation: string | undefined
@@ -157,39 +157,26 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       this.hasLogo = accounts[address].hasLogo
     }
 
-    this.transactions$ = this.transactionSingleService.transactions$
-    this.transactions$.pipe(
+    this.transactions$ = this.transactionSingleService.transactions$.pipe(
       map(transactions => {
         const protocol = new TezosProtocol()
 
         transactions.forEach(async transaction => {
-          const data = await protocol
-            .calculateRewards(this.bakerAddress, transaction.cycle)
-            .then(async data => {
-              console.log('awaiit: ', await protocol.calculateRewards(this.bakerAddress, transaction.cycle))
-              transaction.stakingBalance = data.stakingBalance
-              transaction.bakingRewards = data.bakingRewards
-              transaction.endorsingRewards = data.endorsingRewards
-              transaction.totalRewards = data.totalRewards
-              return transaction
-            })
-            .catch(async error => console.error('something is wrong:', error))
+          this.rewards = await protocol.calculateRewards(this.bakerAddress, transaction.cycle).then(response => {
+            console.log('reward response: ', response)
+            return response
+          })
+
+          transaction.stakingBalance = this.rewards.stakingBalance
+          transaction.bakingRewards = this.rewards.bakingRewards
+          transaction.endorsingRewards = this.rewards.endorsingRewards
+          transaction.totalRewards = this.rewards.totalRewards
+          return transaction
         })
 
         return transactions
       })
     )
-
-    this.transactions$.subscribe(transactions => {
-      const protocol = new TezosProtocol()
-      transactions.forEach(async transaction => {
-        this.rewards$ = await protocol.calculateRewards(this.bakerAddress, transaction.cycle)
-        this.rewards$.then(response => {
-          console.log('rewards_ ', response)
-          const reward = response
-        })
-      })
-    })
 
     this.transactionSingleService.updateAddress(address)
 
