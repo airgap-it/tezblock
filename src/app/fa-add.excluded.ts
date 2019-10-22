@@ -41,6 +41,7 @@ export const addFontAwesome = () => {
     faTwitter,
     faApple,
     faAndroid,
-    faLaptop
+    faLaptop,
+    faGlobe
   )
 }
