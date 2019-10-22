@@ -75,5 +75,5 @@ export class HeaderItemComponent {
   public activeLinkBlockchain: boolean = false
 
   @Input()
-  public activeLinknResources: boolean = false
+  public activeLinkResources: boolean = false
 }

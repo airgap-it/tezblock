@@ -1,7 +1,8 @@
 <header-item
   class="bg-white"
   [isMinimized]="router.url === '/'"
-  [activeLinkBlockchain]="router.url === '/block/list' || router.url === '/transaction/list' || router.url === '/activation/list'"
+  [activeLinkBlockchain]="router.url.endsWith('/list')"
+  [activeLinkResources]="router.url.startsWith('/resources/')"
 ></header-item>
 <div class="container">
   <router-outlet></router-outlet>
