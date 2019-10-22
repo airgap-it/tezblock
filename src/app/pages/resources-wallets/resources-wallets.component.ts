@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-resources-wallets',
@@ -6,10 +7,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./resources-wallets.component.scss']
 })
 export class ResourcesWalletsComponent implements OnInit {
+  constructor() {}
 
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }
