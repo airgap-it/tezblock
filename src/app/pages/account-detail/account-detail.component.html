@@ -232,12 +232,13 @@
             [tabs]="rewardsTabs"
             [page]="'account'"
             [loading]="transactionsLoading$"
-            [data]=""
+            [data]="bakingRights$"
             (tabClicked)="tabSelected($event)"
           ></rewards-table>
         </div>
       </div>
     </div>
+
     <div class="pt-5">
       <div class="card pt-3">
         <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">

@@ -1,3 +1,5 @@
+import { EndorsingRights } from './../../interfaces/EndorsingRights'
+import { BakingRights } from './../../interfaces/BakingRights'
 import { environment } from './../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
@@ -15,6 +17,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   providedIn: 'root'
 })
 export class ApiService {
+  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/`
   private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
   private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
   private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
@@ -618,6 +621,27 @@ export class ApiService {
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)
     })
+  }
+
+  public getBakingRights(): Observable<BakingRights[]> {
+    return this.http.post<BakingRights[]>(
+      `${this.mainNetApiUrl}baking_rights`,
+      {
+        limit: 3
+      },
+      this.options
+    )
+    // .pipe(map((bakingRights: BakingRights[]) => bakingRights.filter(bakingRight => bakingRight.delegate === address)))
+  }
+
+  public getEndorsingRights(address: string): Observable<EndorsingRights[]> {
+    return this.http.post<EndorsingRights[]>(
+      `${this.mainNetApiUrl}endorsing_rights`,
+      {
+        limit: 3
+      },
+      this.options
+    )
   }
 
   public getEndorsements(blockHash: string): Promise<number> {

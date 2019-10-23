@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  conseilBaseUrl: 'CONSEIL_BASE_URL',
-  conseilApiKey: 'CONSEIL_API_KEY',
+  conseilBaseUrl: 'https://conseil-prod.cryptonomic-infra.tech',
+  conseilApiKey: 'airgap00391',
   proFontAwesomeAvailable: false
 }

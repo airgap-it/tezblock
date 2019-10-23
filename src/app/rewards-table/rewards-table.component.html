@@ -171,14 +171,12 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="tab.kind === 'bakings'"><p>bakings</p></ng-container>
-      <ng-container *ngIf="tab.kind === 'rewards'">
+      <ng-container *ngIf="tab.kind === 'rewards' || tab.kind === 'rights'">
         <tezblock-table
           [loading]="loading"
           [data]="data"
           [page]="page"
           [type]="selectedTab.kind"
-          [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
           (loadMoreClicked)="loadMore()"
         ></tezblock-table>
       </ng-container>
@@ -188,3 +186,5 @@
     </tab>
   </ng-container>
 </tabset>
+
+<!--           [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)" -->

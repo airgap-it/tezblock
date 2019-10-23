@@ -6,9 +6,7 @@ import { AccountSingleService } from '../services/account-single/account-single.
 import { AccountService } from '../services/account/account.service'
 import { ApiService } from '../services/api/api.service'
 import { BakingService } from '../services/baking/baking.service'
-import { CryptoPricesService } from '../services/crypto-prices/crypto-prices.service'
 
-import { AliasPipe } from '../pipes/alias/alias.pipe'
 import { TransactionSingleService } from '../services/transaction-single/transaction-single.service'
 
 export interface Tab {
@@ -81,10 +79,8 @@ export class RewardsTableComponent implements OnInit {
     private readonly router: Router,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-    private readonly cryptoPricesService: CryptoPricesService,
 
     private readonly apiService: ApiService,
-    private readonly aliasPipe: AliasPipe
   ) {
     this.address = this.route.snapshot.params.id
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
