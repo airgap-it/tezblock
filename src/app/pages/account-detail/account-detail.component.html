@@ -226,8 +226,9 @@
     </div>
 
     <div class="pt-5">
+      <!--TODO: add *ngIf="isValidBaker again -->
       <div class="card pt-3">
-        <div class="card-body p-4 ">
+        <div class="card-body px-3 py-0">
           <rewards-table
             [tabs]="rewardsTabs"
             [page]="'account'"
@@ -236,7 +237,9 @@
             (tabClicked)="tabSelected($event)"
           ></rewards-table>
         </div>
-        
+      </div>
+    </div>
+
     <div class="pt-5">
       <div class="card pt-3">
         <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
