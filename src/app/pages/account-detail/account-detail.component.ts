@@ -140,48 +140,33 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.relatedAccounts = this.accountSingleService.originatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
-  }
-
-  public async ngOnInit() {
-    const address: string = this.route.snapshot.params.id
-
-    if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
-      this.hasAlias = true
-      this.hasLogo = accounts[address].hasLogo
-    }
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
           this.bakerAddress = delegatedAccounts[0].delegate_value
-
-          this.getBakingInfos(address)
-          this.transactions$ = this.transactionSingleService.transactions$.pipe(
-            map(transactions => {
-              const protocol = new TezosProtocol()
-
-              transactions.forEach(async transaction => {
-                this.rewards = await protocol.calculateRewards(this.bakerAddress, transaction.cycle).then(response => {
-                  console.log('reward response: ', response)
-                  return response
-                })
-
-                transaction.stakingBalance = this.rewards.stakingBalance
-                transaction.bakingRewards = this.rewards.bakingRewards
-                transaction.endorsingRewards = this.rewards.endorsingRewards
-                transaction.totalRewards = this.rewards.totalRewards
-                return transaction
-              })
-
-              return transactions
-            })
-          )
-
           this.delegatedAmount = delegatedAccounts[0].balance
         }
       })
     )
+  }
+
+  public async ngOnInit() {
+    const address: string = this.route.snapshot.params.id
+    this.rightsSingleService.updateAddress(address)
+
+    this.rightsSingleService.rights$.subscribe(rights => {
+      console.log('getBakingRights', rights)
+    })
+
+    this.getBakingInfos(address)
+
+    if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
+      this.hasAlias = true
+      this.hasLogo = accounts[address].hasLogo
+    }
+    this.transactions$ = this.transactionSingleService.transactions$
 
     this.rights$ = this.rightsSingleService.rights$
 
@@ -195,7 +180,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async getBakingInfos(address: string) {
-    console.log
     if (address.startsWith('KT') || !this.isValidBaker) {
       this.tezosBakerFee = 'not available'
     }

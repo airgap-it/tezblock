@@ -7,6 +7,8 @@ import { distinctPagination, Facade, Pagination } from '../facade/facade'
 interface RightsSingleServiceState {
   rights: any
   kind: string
+  address: string | undefined
+
   pagination: Pagination
   loading: boolean
 }
@@ -19,6 +21,7 @@ export interface VotingInfo {
 const initialState: RightsSingleServiceState = {
   rights: [],
   kind: 'baking_rights',
+  address: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
   pagination: {
     currentPage: 1,
     selectedSize: 10,
@@ -39,6 +42,10 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
     map(state => state.kind),
     distinctUntilChanged()
   )
+  public address$ = this.state$.pipe(
+    map(state => state.address),
+    distinctUntilChanged()
+  )
   public pagination$ = this.state$.pipe(
     map(state => state.pagination),
     distinctUntilChanged(distinctPagination)
@@ -48,11 +55,11 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.kind$])
+    combineLatest([this.pagination$, this.kind$, this.address$])
       .pipe(
-        switchMap(([pagination, kind]) => {
+        switchMap(([pagination, kind, address]) => {
           if (kind === 'baking_rights') {
-            return this.apiService.getBakingRights(pagination.selectedSize * pagination.currentPage)
+            return this.apiService.getBakingRights(address, pagination.selectedSize * pagination.currentPage)
           } else if (kind === 'endorsing_rights') {
             return this.apiService.getEndorsingRights(pagination.selectedSize * pagination.currentPage)
           } else {
@@ -72,6 +79,9 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
     this.updateState({ ...this._state, kind, loading: true })
   }
 
+  public updateAddress(address: string) {
+    this.updateState({ ...this._state, address, loading: true })
+  }
   public loadMore() {
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })

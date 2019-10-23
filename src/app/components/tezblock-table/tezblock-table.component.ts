@@ -527,6 +527,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
+        console.log('TZ TABLE COMPONENTS txs', transactions)
         this.transactions = transactions
       })
     }

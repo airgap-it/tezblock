@@ -623,15 +623,27 @@ export class ApiService {
     })
   }
 
-  public getBakingRights(limit: number): Observable<BakingRights[]> {
+  public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
     return this.http.post<BakingRights[]>(
       `${this.mainNetApiUrl}baking_rights`,
       {
+        predicates: [
+          {
+            field: 'delegate',
+            operation: 'eq',
+            set: [address]
+          }
+        ],
+        orderBy: [
+          {
+            field: 'level',
+            direction: 'desc'
+          }
+        ],
         limit: limit
       },
       this.options
     )
-    // .pipe(map((bakingRights: BakingRights[]) => bakingRights.filter(bakingRight => bakingRight.delegate === address)))
   }
 
   public getEndorsingRights(limit: number): Observable<EndorsingRights[]> {
