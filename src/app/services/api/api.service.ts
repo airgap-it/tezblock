@@ -624,26 +624,35 @@ export class ApiService {
   }
 
   public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
-    return this.http.post<BakingRights[]>(
-      `${this.mainNetApiUrl}baking_rights`,
-      {
-        predicates: [
-          {
-            field: 'delegate',
-            operation: 'eq',
-            set: [address]
-          }
-        ],
-        orderBy: [
-          {
-            field: 'level',
-            direction: 'desc'
-          }
-        ],
-        limit: limit
-      },
-      this.options
-    )
+    return this.http
+      .post<BakingRights[]>(
+        `${this.mainNetApiUrl}baking_rights`,
+        {
+          predicates: [
+            {
+              field: 'delegate',
+              operation: 'eq',
+              set: [address]
+            }
+          ],
+          orderBy: [
+            {
+              field: 'level',
+              direction: 'desc'
+            }
+          ],
+          limit: limit
+        },
+        this.options
+      )
+      .pipe(
+        map((rights: BakingRights[]) => {
+          rights.forEach(right => {
+            right.cycle = Math.floor(right.level / 4096)
+          })
+          return rights
+        })
+      )
   }
 
   public getEndorsingRights(limit: number): Observable<EndorsingRights[]> {

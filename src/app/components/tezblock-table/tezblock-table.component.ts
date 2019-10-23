@@ -194,6 +194,7 @@ const layouts: Layout = {
       },
       { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Cycle', property: 'cycle', width: '' },
       { name: 'Priority', property: 'priority', width: '' }
     ],
     [OperationTypes.EndorsingRights]: [

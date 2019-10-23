@@ -4,4 +4,5 @@ export interface BakingRights {
   delegate: string
   block_hash: string
   level: number
+  cycle: number
 }
