@@ -1,3 +1,4 @@
+import { RightsSingleService } from './../services/rights-single/rights-single.service'
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Subscription, Observable } from 'rxjs'
@@ -79,7 +80,7 @@ export class RewardsTableComponent implements OnInit {
     private readonly router: Router,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-
+    private readonly rightsSingleService: RightsSingleService,
     private readonly apiService: ApiService
   ) {
     this.address = this.route.snapshot.params.id
@@ -167,7 +168,8 @@ export class RewardsTableComponent implements OnInit {
   }
 
   public selectTab(selectedTab: Tab) {
-    console.log('selectTab', selectedTab)
+    this.rightsSingleService.updateKind(selectedTab.kind)
+
     this.tabs.forEach(tab => (tab.active = false))
     selectedTab.active = true
     this.selectedTab = selectedTab

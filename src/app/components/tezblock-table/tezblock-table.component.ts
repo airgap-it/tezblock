@@ -46,7 +46,8 @@ enum OperationTypes {
   Reveal = 'reveal',
   Ballot = 'ballot',
   BallotOverview = 'ballot_overview',
-  Rights = 'rights',
+  BakingRights = 'baking_rights',
+  EndorsingRights = 'endorsing_rights',
   Activation = 'activate_account',
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
@@ -63,7 +64,8 @@ interface Layout {
     [OperationTypes.Endorsement]: Column[]
     [OperationTypes.Ballot]: Column[]
     [OperationTypes.Rewards]: Column[]
-    [OperationTypes.Rights]: Column[]
+    [OperationTypes.BakingRights]: Column[]
+    [OperationTypes.EndorsingRights]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -181,7 +183,7 @@ const layouts: Layout = {
       { name: 'Fees', property: 'fees', width: '' },
       { name: 'Status', property: 'status', width: '' }
     ],
-    [OperationTypes.Rights]: [
+    [OperationTypes.BakingRights]: [
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
       {
         name: 'Delegate',
@@ -193,6 +195,19 @@ const layouts: Layout = {
       { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Priority', property: 'priority', width: '' }
+    ],
+    [OperationTypes.EndorsingRights]: [
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
+      {
+        name: 'Delegate',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Slot', property: 'slot', width: '' }
     ]
   },
   [LayoutPages.Block]: {

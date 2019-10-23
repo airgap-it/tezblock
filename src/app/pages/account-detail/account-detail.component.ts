@@ -1,3 +1,4 @@
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, OnDestroy, OnInit } from '@angular/core'
@@ -72,7 +73,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public transactions$: Observable<Transaction[]> = new Observable()
   public rewards: TezosRewards
-  public bakingRights$: Observable<Object> = new Observable()
+  public rights$: Observable<Object> = new Observable()
 
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
@@ -102,7 +103,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   ]
   public rewardsTabs: Tab[] = [
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0 },
-    { title: 'Bakings', active: false, kind: 'rights', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Endorsing Rights', active: true, kind: 'endorsing_rights', count: 0 },
     { title: 'Rewards', active: false, kind: 'rewards', count: 0 },
     { title: 'Balance', active: false, kind: 'balance', count: 0 }
   ]
@@ -123,23 +125,17 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly copyService: CopyService,
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
+    private readonly rightsSingleService: RightsSingleService,
     private readonly toastrService: ToastrService,
-    private readonly iconPipe: IconPipe,
-    private readonly operationsService: OperationsService
+    private readonly iconPipe: IconPipe
   ) {
-    this.address = this.route.snapshot.params.id
-    this.apiService.getBakingRights().subscribe(response => {
-      console.log('baking rights', response)
-    })
-    this.apiService.getEndorsingRights(this.address).subscribe(response => {
-      console.log('endorsing rights', response)
-    })
     this.transactionSingleService = new TransactionSingleService(this.apiService)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
     this.accountSingleService = new AccountSingleService(this.apiService)
+    this.rightsSingleService = new RightsSingleService(this.apiService)
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
@@ -185,7 +181,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         return transactions
       })
     )
-    this.bakingRights$ = this.apiService.getBakingRights()
+    this.rights$ = this.rightsSingleService.rights$
 
     this.transactionSingleService.updateAddress(address)
 
@@ -226,6 +222,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public tabSelected(tab: string) {
+    // this.rightsSingleService.updateKind(tab)
     this.transactionSingleService.updateKind(tab)
   }
 

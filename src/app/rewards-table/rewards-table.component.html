@@ -171,7 +171,7 @@
         </div>
       </ng-container>
 
-      <ng-container *ngIf="tab.kind === 'rewards' || tab.kind === 'rights'">
+      <ng-container *ngIf="tab.kind === 'rewards' || tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
         <tezblock-table
           [loading]="loading"
           [data]="data"
