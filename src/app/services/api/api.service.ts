@@ -655,14 +655,36 @@ export class ApiService {
       )
   }
 
-  public getEndorsingRights(limit: number): Observable<EndorsingRights[]> {
-    return this.http.post<EndorsingRights[]>(
-      `${this.mainNetApiUrl}endorsing_rights`,
-      {
-        limit: limit
-      },
-      this.options
-    )
+  public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
+    return this.http
+      .post<EndorsingRights[]>(
+        `${this.mainNetApiUrl}endorsing_rights`,
+        {
+          predicates: [
+            {
+              field: 'delegate',
+              operation: 'eq',
+              set: [address]
+            }
+          ],
+          orderBy: [
+            {
+              field: 'level',
+              direction: 'desc'
+            }
+          ],
+          limit: limit
+        },
+        this.options
+      )
+      .pipe(
+        map((rights: EndorsingRights[]) => {
+          rights.forEach(right => {
+            right.cycle = Math.floor(right.level / 4096)
+          })
+          return rights
+        })
+      )
   }
 
   public getEndorsements(blockHash: string): Promise<number> {

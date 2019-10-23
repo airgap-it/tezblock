@@ -61,7 +61,7 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
           if (kind === 'baking_rights') {
             return this.apiService.getBakingRights(address, pagination.selectedSize * pagination.currentPage)
           } else if (kind === 'endorsing_rights') {
-            return this.apiService.getEndorsingRights(pagination.selectedSize * pagination.currentPage)
+            return this.apiService.getEndorsingRights(address, pagination.selectedSize * pagination.currentPage)
           } else {
             return new Observable<Object[]>(observer => {
               observer.next([])

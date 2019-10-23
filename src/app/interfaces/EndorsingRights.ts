@@ -4,4 +4,5 @@ export interface EndorsingRights {
   block_hash: string
   slot: number
   level: number
+  cycle: number
 }

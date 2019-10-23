@@ -39,6 +39,7 @@ export class RewardsTableComponent implements OnInit {
 
   public accountSingleService: AccountSingleService
   public transactionSingleService: TransactionSingleService
+  public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
 
@@ -85,6 +86,9 @@ export class RewardsTableComponent implements OnInit {
   ) {
     this.address = this.route.snapshot.params.id
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
+    this.rightsSingleService.updateAddress(this.address)
+
+    this.rights$ = this.rightsSingleService.rights$
 
     this.accountSingleService = new AccountSingleService(this.apiService)
     this.transactionSingleService = new TransactionSingleService(this.apiService)
@@ -168,6 +172,7 @@ export class RewardsTableComponent implements OnInit {
   }
 
   public selectTab(selectedTab: Tab) {
+    this.rightsSingleService.updateKind(selectedTab.kind)
     this.tabs.forEach(tab => (tab.active = false))
     selectedTab.active = true
     this.selectedTab = selectedTab

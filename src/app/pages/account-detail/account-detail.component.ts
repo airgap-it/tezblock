@@ -93,7 +93,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   private readonly subscriptions: Subscription = new Subscription()
   public current: string = 'copyGrey'
 
-  public transactionSingleService: TransactionSingleService
   public rightsSingleService: RightsSingleService
 
   public tabs: Tab[] = [
@@ -128,9 +127,9 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private readonly transactionSingleService: TransactionSingleService
   ) {
-    this.transactionSingleService = new TransactionSingleService(this.apiService)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
@@ -154,11 +153,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
-    this.rightsSingleService.updateAddress(address)
-
-    this.rightsSingleService.rights$.subscribe(rights => {
-      console.log('getBakingRights', rights)
-    })
+    // this.rightsSingleService.updateAddress(address)
 
     this.getBakingInfos(address)
 
@@ -170,7 +165,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.rights$ = this.rightsSingleService.rights$
 
-    this.transactionSingleService.updateAddress(address)
+    // this.transactionSingleService.updateAddress(address)
 
     this.accountSingleService.setAddress(address)
 
@@ -209,8 +204,12 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public tabSelected(tab: string) {
-    this.rightsSingleService.updateKind(tab)
     this.transactionSingleService.updateKind(tab)
+  }
+
+  public upperTabSelected(tab: string) {
+    console.log('upperTabSelected', tab)
+    this.rightsSingleService.updateKind(tab)
   }
 
   public copyToClipboard(val: string) {
