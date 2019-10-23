@@ -138,19 +138,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.accountSingleService = new AccountSingleService(this.apiService)
     this.rightsSingleService = new RightsSingleService(this.apiService)
 
-    this.subscriptions.add(
-      this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
-        if (delegatedAccounts.length > 0) {
-          console.log('delegatedAccounts', delegatedAccounts)
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
-
-          this.getBakingInfos(this.address)
-
-          this.delegatedAmount = delegatedAccounts[0].balance
-        }
-      })
-    )
     this.relatedAccounts = this.accountSingleService.originatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
   }
@@ -163,27 +150,39 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       this.hasLogo = accounts[address].hasLogo
     }
 
-    this.transactions$ = this.transactionSingleService.transactions$.pipe(
-      map(transactions => {
-        const protocol = new TezosProtocol()
+    this.subscriptions.add(
+      this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
+        if (delegatedAccounts.length > 0) {
+          this.delegatedAccountAddress = delegatedAccounts[0].account_id
+          this.bakerAddress = delegatedAccounts[0].delegate_value
 
-        transactions.forEach(async transaction => {
-          console.log('bakerAddress', this.bakerAddress)
-          this.rewards = await protocol.calculateRewards(this.bakerAddress, transaction.cycle).then(response => {
-            console.log('reward response: ', response)
-            return response
-          })
+          this.getBakingInfos(address)
+          this.transactions$ = this.transactionSingleService.transactions$.pipe(
+            map(transactions => {
+              const protocol = new TezosProtocol()
 
-          transaction.stakingBalance = this.rewards.stakingBalance
-          transaction.bakingRewards = this.rewards.bakingRewards
-          transaction.endorsingRewards = this.rewards.endorsingRewards
-          transaction.totalRewards = this.rewards.totalRewards
-          return transaction
-        })
+              transactions.forEach(async transaction => {
+                this.rewards = await protocol.calculateRewards(this.bakerAddress, transaction.cycle).then(response => {
+                  console.log('reward response: ', response)
+                  return response
+                })
 
-        return transactions
+                transaction.stakingBalance = this.rewards.stakingBalance
+                transaction.bakingRewards = this.rewards.bakingRewards
+                transaction.endorsingRewards = this.rewards.endorsingRewards
+                transaction.totalRewards = this.rewards.totalRewards
+                return transaction
+              })
+
+              return transactions
+            })
+          )
+
+          this.delegatedAmount = delegatedAccounts[0].balance
+        }
       })
     )
+
     this.rights$ = this.rightsSingleService.rights$
 
     this.transactionSingleService.updateAddress(address)
