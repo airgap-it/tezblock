@@ -18,7 +18,7 @@ export interface VotingInfo {
 
 const initialState: RightsSingleServiceState = {
   rights: [],
-  kind: 'endorsing_rights',
+  kind: 'baking_rights',
   pagination: {
     currentPage: 1,
     selectedSize: 10,
@@ -47,10 +47,6 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
 
   constructor(private readonly apiService: ApiService) {
     super(initialState)
-
-    this.rights$.subscribe(rights => {
-      console.log('RightsSingleService', rights)
-    })
 
     combineLatest([this.pagination$, this.kind$])
       .pipe(

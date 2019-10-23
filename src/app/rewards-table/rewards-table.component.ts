@@ -168,8 +168,6 @@ export class RewardsTableComponent implements OnInit {
   }
 
   public selectTab(selectedTab: Tab) {
-    this.rightsSingleService.updateKind(selectedTab.kind)
-
     this.tabs.forEach(tab => (tab.active = false))
     selectedTab.active = true
     this.selectedTab = selectedTab

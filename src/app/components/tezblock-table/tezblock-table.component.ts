@@ -527,8 +527,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
-        console.log('TZ TABLE DATA', transactions)
-
         this.transactions = transactions
       })
     }
@@ -600,12 +598,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
-    console.log('type of page:', this.type)
+    // console.log('type of page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
         // tslint:disable-next-line:no-console
-        console.log('have layout for type ', this.type)
-        console.log('have layout for page ', this.page)
+        // console.log('have layout for type ', this.type)
+        // console.log('have layout for page ', this.page)
 
         this.config = layouts[this.page][this.type]
       } else {

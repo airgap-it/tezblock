@@ -94,6 +94,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public current: string = 'copyGrey'
 
   public transactionSingleService: TransactionSingleService
+  public rightsSingleService: RightsSingleService
+
   public tabs: Tab[] = [
     { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
@@ -125,7 +127,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly copyService: CopyService,
     private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
-    private readonly rightsSingleService: RightsSingleService,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe
   ) {
@@ -140,6 +141,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
+          console.log('delegatedAccounts', delegatedAccounts)
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
           this.bakerAddress = delegatedAccounts[0].delegate_value
 
@@ -166,6 +168,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         const protocol = new TezosProtocol()
 
         transactions.forEach(async transaction => {
+          console.log('bakerAddress', this.bakerAddress)
           this.rewards = await protocol.calculateRewards(this.bakerAddress, transaction.cycle).then(response => {
             console.log('reward response: ', response)
             return response
@@ -193,6 +196,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async getBakingInfos(address: string) {
+    console.log
     if (address.startsWith('KT') || !this.isValidBaker) {
       this.tezosBakerFee = 'not available'
     }
@@ -222,7 +226,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public tabSelected(tab: string) {
-    // this.rightsSingleService.updateKind(tab)
+    this.rightsSingleService.updateKind(tab)
     this.transactionSingleService.updateKind(tab)
   }
 
