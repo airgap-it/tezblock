@@ -72,7 +72,7 @@ export class RewardsTableComponent implements OnInit {
   public loading?: Observable<boolean>
 
   @Output()
-  public readonly tabClicked: EventEmitter<string> = new EventEmitter()
+  public readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -80,7 +80,7 @@ export class RewardsTableComponent implements OnInit {
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
 
-    private readonly apiService: ApiService,
+    private readonly apiService: ApiService
   ) {
     this.address = this.route.snapshot.params.id
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
@@ -167,11 +167,12 @@ export class RewardsTableComponent implements OnInit {
   }
 
   public selectTab(selectedTab: Tab) {
+    console.log('selectTab', selectedTab)
     this.tabs.forEach(tab => (tab.active = false))
     selectedTab.active = true
     this.selectedTab = selectedTab
 
-    this.tabClicked.emit(selectedTab.kind)
+    this.overviewTabClicked.emit(selectedTab.kind)
   }
   public goToMYTB() {
     if (this.myTBUrl) {

@@ -1,6 +1,6 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
   <ng-container *ngFor="let tab of tabs">
-    <tab heading="{{ tab.title }}">
+    <tab heading="{{ tab.title }}" (selectTab)="selectTab(tab)">
       <ng-container *ngIf="tab.kind === 'baker_overview'">
         <div *ngIf="isValidBaker">
           <div class="pt-3">

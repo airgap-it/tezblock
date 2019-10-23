@@ -190,7 +190,6 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-
       { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Priority', property: 'priority', width: '' }
@@ -513,6 +512,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
+        console.log('TZ TABLE DATA', transactions)
+
         this.transactions = transactions
       })
     }
@@ -584,7 +585,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
-    console.log('type opf page:', this.type)
+    console.log('type of page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
         // tslint:disable-next-line:no-console
