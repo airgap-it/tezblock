@@ -142,7 +142,24 @@
             </h5>
 
             <ng-container *ngIf="delegatedAccountAddress === undefined">
-              LOADING
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+              </div>
             </ng-container>
 
             <ng-container *ngIf="delegatedAccountAddress === ''">
