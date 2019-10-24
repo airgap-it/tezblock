@@ -100,6 +100,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public frozenBalance: number | undefined
 
   constructor(
+    public readonly transactionSingleService: TransactionSingleService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly accountService: AccountService,
@@ -110,7 +111,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly transactionSingleService: TransactionSingleService,
     private readonly accountSingleService: AccountSingleService
   ) {
     this.address = this.route.snapshot.params.id
