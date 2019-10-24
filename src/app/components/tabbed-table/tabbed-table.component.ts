@@ -121,7 +121,7 @@ export class TabbedTableComponent {
 
       blockPromise
         .then(blockCounts => {
-          blockCounts.forEach(aggregateFunction)
+          blockCounts.forEach(info => aggregateFunction(info, 'block_level'))
 
           setFirstActiveTab()
         })
