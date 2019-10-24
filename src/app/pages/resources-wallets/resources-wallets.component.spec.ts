@@ -10,7 +10,8 @@ describe('ResourcesWalletsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ResourcesWalletsComponent, FontAwesomeModule, IconPipe]
+      providers: [IconPipe],
+      declarations: [ResourcesWalletsComponent, FontAwesomeModule]
     }).compileComponents()
   }))
 
