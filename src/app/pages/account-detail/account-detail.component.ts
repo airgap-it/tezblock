@@ -118,15 +118,13 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
+    this.getBakingInfos(this.address)
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
           this.bakerAddress = delegatedAccounts[0].delegate
-
-          this.getBakingInfos(this.address)
-
           this.delegatedAmount = delegatedAccounts[0].balance
         }
       })
@@ -175,31 +173,22 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       .getBakingBadRatings(address)
       .then(result => {
         if (result.rating === 0 && result.status === 'success') {
-          console.log('awesome')
           this.bakingBadRating = 'awesome'
         } else if (result.rating === 1 && result.status === 'success') {
-          console.log('so-so')
           this.bakingBadRating = 'so-so'
         } else if (result.rating === 2 && result.status === 'success') {
-          console.log('dead')
           this.bakingBadRating = 'dead'
         } else if (result.rating === 3 && result.status === 'success') {
-          console.log('specific')
           this.bakingBadRating = 'specific'
         } else if (result.rating === 4 && result.status === 'success') {
-          console.log('hidden')
           this.bakingBadRating = 'hidden'
         } else if (result.rating === 5 && result.status === 'success') {
-          console.log('new')
           this.bakingBadRating = 'new'
         } else if (result.rating === 6 && result.status === 'success') {
-          console.log('closed')
           this.bakingBadRating = 'closed'
         } else if (result.rating === 9 && result.status === 'success') {
-          console.log('unkown')
           this.bakingBadRating = 'unknown'
         } else {
-          console.log('not available')
           this.bakingBadRating = 'not available'
         }
       })
