@@ -3,20 +3,20 @@ import { ActivatedRoute } from '@angular/router'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
 import { Transaction } from '../../interfaces/Transaction'
-import { ApiService } from '../../services/api/api.service'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-transaction-detail',
   templateUrl: './transaction-detail.component.html',
-  styleUrls: ['./transaction-detail.component.scss']
+  styleUrls: ['./transaction-detail.component.scss'],
+  providers: [TransactionSingleService]
 })
 export class TransactionDetailComponent implements OnInit {
   public latestTx$: Observable<Transaction> = new Observable()
@@ -32,21 +32,20 @@ export class TransactionDetailComponent implements OnInit {
     { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Reveal', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') }
+    { title: 'Reveals', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') },
+    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') }
   ]
-
-  public transactionSingleService: TransactionSingleService
 
   private readonly kind = new BehaviorSubject(this.tabs[0].kind)
   public transactionsLoading$: Observable<boolean> = new Observable()
   public transactions$: Observable<Transaction[]> = new Observable()
   public filteredTransactions$: Observable<Transaction[]> = new Observable()
   constructor(
+    public readonly transactionSingleService: TransactionSingleService,
     private readonly route: ActivatedRoute,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly blockService: BlockService,
     private readonly copyService: CopyService,
-    private readonly apiService: ApiService,
     private readonly iconPipe: IconPipe
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
@@ -54,8 +53,6 @@ export class TransactionDetailComponent implements OnInit {
 
   public ngOnInit() {
     const transactionHash = this.route.snapshot.params.id
-
-    this.transactionSingleService = new TransactionSingleService(this.apiService)
 
     this.transactionSingleService.updateTransactionHash(transactionHash)
 

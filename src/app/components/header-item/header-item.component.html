@@ -164,17 +164,17 @@
                           Governance
                         </li>
                         <li>
-                          <a class="dropdown-item text-secondary" disabled>
+                          <a class="dropdown-item text-muted" disabled>
                             Voting Period
                           </a>
                         </li>
-                        <li>
-                          <a class="dropdown-item text-secondary" disabled>
+                        <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/vote/list']">
                             Votes
                           </a>
                         </li>
                         <li>
-                          <a class="dropdown-item text-secondary" disabled>
+                          <a class="dropdown-item text-muted" disabled>
                             Proposals
                           </a>
                         </li>
@@ -184,7 +184,7 @@
                           Statistics
                         </li>
                         <li>
-                          <a class="dropdown-item text-secondary" disabled>
+                          <a class="dropdown-item text-muted" disabled>
                             Roll Distribution
                           </a>
                         </li>
@@ -193,11 +193,40 @@
                   </ul>
                 </span>
               </li>
-              <li class="nav-item">
-                <button id="button-basic" type="button" class="btn btn-link dropdown-toggle disabled" aria-controls="dropdown-basic">
-                  Resources
-                  <span class="caret"></span>
-                </button>
+              <li class="nav-item dropdown">
+                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                  <a
+                    class="btn dropdown-toggle"
+                    href
+                    role="button"
+                    dropdownToggle
+                    (click)="(false)"
+                    id="button-basic"
+                    routerLinkActive="btn-link"
+                    [ngClass]="{ 'btn-link': activeLinkResources }"
+                    (mouseleave)="dp.hide(); showDropdown = true"
+                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                  >
+                    Resources
+                  </a>
+                  <ul class="dropdown-menu pb-4" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                    <li role="menuitem">
+                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
+                        Wallets
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-muted" disabled>
+                        Dapps
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-muted" disabled>
+                        Development
+                      </a>
+                    </li>
+                  </ul>
+                </span>
               </li>
             </ul>
           </div>

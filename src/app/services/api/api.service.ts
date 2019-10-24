@@ -1,14 +1,14 @@
 import { environment } from './../../../environments/environment'
-import { Delegation } from './../../interfaces/Delegation'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
+import { VotingInfo } from '../transaction-single/transaction-single.service'
+import { TezosProtocol } from 'airgap-coin-lib'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
@@ -58,31 +58,44 @@ export class ApiService {
     )
   }
 
-  public getLatestTransactions(limit: number, kind: string): Observable<Transaction[]> {
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'operation_group_hash',
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'kind',
-            operation: 'eq',
-            set: [kind]
+  public getLatestTransactions(limit: number, kindList: Array<string>): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'kind',
+              operation: 'in',
+              set: kindList
+            }
+          ],
+          orderBy: [this.orderByBlockLevelDesc],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map(transactions => {
+          if (kindList.includes('ballot' || 'proposals')) {
+            let source: Transaction[] = []
+            source.push(...transactions)
+            source.map(async transaction => {
+              await this.addVotesForTransaction(transaction)
+            })
+            return source
           }
-        ],
-        orderBy: [this.orderByBlockLevelDesc],
-        limit
-      },
-      this.options
-    )
+          return transactions
+        })
+      )
   }
 
   public getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
-    console.log('by id')
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -382,28 +395,78 @@ export class ApiService {
       )
   }
 
-  public getDelegatedAccounts(tzAddress: string, limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'manager',
-            operation: 'eq',
-            set: [tzAddress],
-            inverse: false
-          }
-        ],
-        orderBy: [
-          {
-            field: 'balance',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+  public getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
+    if (address.startsWith('tz')) {
+      console.log('with tz')
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'manager_pubkey',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'originated_contracts',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    } else {
+      console.log('with kt')
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'originated_contracts',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'manager_pubkey',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    }
   }
 
   public getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
@@ -539,25 +602,26 @@ export class ApiService {
     field: string,
     value: string
   ): Observable<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]> {
+    const body = {
+      fields: [field, 'kind'],
+      predicates: [
+        {
+          field,
+          operation: 'eq',
+          set: [value],
+          inverse: false
+        }
+      ],
+      aggregation: [
+        {
+          field,
+          function: 'count'
+        }
+      ]
+    }
     return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
       this.transactionsApiUrl,
-      {
-        fields: [field, 'operation_group_hash', 'kind'],
-        predicates: [
-          {
-            field,
-            operation: 'eq',
-            set: [value],
-            inverse: false
-          }
-        ],
-        aggregation: [
-          {
-            field: 'operation_group_hash',
-            function: 'count'
-          }
-        ]
-      },
+      body,
       this.options
     )
   }
@@ -596,6 +660,15 @@ export class ApiService {
       },
       this.options
     )
+  }
+
+  public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
+    return new Promise(async resolve => {
+      const protocol = new TezosProtocol()
+      const data = await protocol.getTezosVotingInfo(transaction.block_hash)
+      transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+      resolve(transaction)
+    })
   }
 
   public getEndorsements(blockHash: string): Promise<number> {

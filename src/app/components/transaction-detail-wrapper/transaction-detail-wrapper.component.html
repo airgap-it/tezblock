@@ -1,14 +1,14 @@
 <div>
   <div class="card-body p-4">
-    <h5 class="card-title mb-3 ">
+    <h5 class="card-title mb-4 ">
       Transaction Details
     </h5>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Transaction Hash</p>
+        <p class="text-secondary mb-0">Transaction Hash</p>
       </div>
       <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <p>
+        <p class="mb-0">
           {{ latestTransaction.operation_group_hash }}
           <a
             [@changeBtnColor]="current"
@@ -23,12 +23,12 @@
     </div>
     <ng-template #loadingTemplate>
       <div class=" col-md-9">
-        <loading-skeleton [loadingWidth]="'400px'"></loading-skeleton>
+        <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
       </div>
     </ng-template>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Block</p>
+        <p class="text-secondary mb-0">Block</p>
       </div>
       <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <button type="button" class="btn btn-link p-0" ng-href="#here" [routerLink]="['/block', latestTransaction.block_level]">
@@ -39,17 +39,17 @@
         </button>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Timestamp</p>
+        <p class="text-secondary mb-0">Timestamp</p>
       </div>
       <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <p>{{ latestTransaction.timestamp | amTimeAgo }} ({{ latestTransaction.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+        <p class="mb-0">{{ latestTransaction.timestamp | amTimeAgo }} ({{ latestTransaction.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Value</p>
+        <p class="text-secondary mb-0">Value</p>
       </div>
       <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <ng-container *ngIf="amount$ | async as amount">
@@ -60,7 +60,7 @@
               else hideValue
             "
           >
-            <p>
+            <p class="mb-0">
               <span
                 class="d-inline-block"
                 [innerHtml]="
@@ -84,9 +84,9 @@
         </div>
       </ng-template>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Transaction Fees</p>
+        <p class="text-secondary mb-0">Transaction Fees</p>
       </div>
       <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <ng-container *ngIf="fee$ | async as fee">
@@ -97,7 +97,7 @@
               else hideValue
             "
           >
-            <p>
+            <p class="mb-0">
               <span
                 class="d-inline-block"
                 [innerHtml]="
