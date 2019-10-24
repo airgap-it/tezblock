@@ -141,7 +141,11 @@
               Delegation
             </h5>
 
-            <ng-container *ngIf="!delegatedAccountAddress">
+            <ng-container *ngIf="delegatedAccountAddress === undefined">
+              LOADING
+            </ng-container>
+
+            <ng-container *ngIf="delegatedAccountAddress === ''">
               <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
               <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
             </ng-container>

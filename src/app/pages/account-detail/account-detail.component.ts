@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { BakerInfo } from 'airgap-coin-lib'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription } from 'rxjs'
+import { Observable, Subscription, combineLatest } from 'rxjs'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -121,13 +121,18 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.getBakingInfos(this.address)
 
     this.subscriptions.add(
-      this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
-        if (delegatedAccounts.length > 0) {
+      combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
+        console.log('DELEGATED ACCOUNT FIRING', address, delegatedAccounts)
+        if (!delegatedAccounts) {
+          this.delegatedAccountAddress = undefined
+        } else if (delegatedAccounts.length > 0) {
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
           this.bakerAddress = delegatedAccounts[0].delegate
 
 
           this.delegatedAmount = delegatedAccounts[0].balance
+        } else {
+          this.delegatedAccountAddress = ''
         }
       })
     )

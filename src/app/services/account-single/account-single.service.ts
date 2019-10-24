@@ -18,8 +18,8 @@ interface AccountSingleServiceState {
 const initalState: AccountSingleServiceState = {
   address: '',
   account: undefined,
-  delegatedAccounts: [],
-  relatedAccounts: [],
+  delegatedAccounts: undefined,
+  relatedAccounts: undefined,
   loading: false
 }
 
@@ -70,15 +70,15 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
   private getDelegatedAccounts(address: string) {
     if (address) {
       this.apiService.getDelegatedAccounts(address, 10).subscribe((transactions: Transaction[]) => {
-        const delegatedAccounts: Account[] = []
+        let delegatedAccounts: Account[] = []
         let relatedAccounts: Account[] = []
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
             if (accounts[0].delegate) {
               delegatedAccounts.push(accounts[0])
-              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             }
+            this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
           })
         } else {
           if (address.startsWith('tz')) {
@@ -86,13 +86,13 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
 
             this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
               if (accounts[0].delegate) {
-                this.updateState({ ...this._state, delegatedAccounts: accounts, relatedAccounts, loading: false })
+                delegatedAccounts = accounts
               }
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             })
 
             const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
             this.apiService.getAccountsByIds(originatedContracts).subscribe((accounts: Account[]) => {
-              console.log('accounts', accounts)
               accounts.forEach(account => {
                 if (account.delegate && !delegatedAccounts.includes(account)) {
                   delegatedAccounts.push(account)

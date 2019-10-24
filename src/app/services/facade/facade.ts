@@ -63,5 +63,6 @@ export function disctinctChartData(previous: MarketDataSample[], current: Market
 }
 
 export function distinctAccounts(previous: Account[], current: Account[]): boolean {
-  return !(previous.length !== current.length)
+  // If both are undefined, return true. Otherwise check length
+  return previous === undefined || current === undefined ? previous === current : previous.length === current.length
 }
