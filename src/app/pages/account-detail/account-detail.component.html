@@ -141,7 +141,28 @@
               Delegation
             </h5>
 
-            <ng-container *ngIf="!delegatedAccountAddress">
+            <ng-container *ngIf="delegatedAccountAddress === undefined">
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+              </div>
+              <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+              </div>
+            </ng-container>
+
+            <ng-container *ngIf="delegatedAccountAddress === ''">
               <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
               <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
             </ng-container>
@@ -377,16 +398,18 @@
                   <h5 class="card-title__secondary mb-3">
                     Payout Accuracy
                   </h5>
-                  <div class="d-block" *ngIf="bakingBadRating">
+                  <div class="d-block">
                     <img src="/assets/img/bakingbad_logo.png" width="24px" />
 
                     <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                      {{ bakingBadRating }}
+                      <ng-container *ngIf="!bakingBadRating">
+                        <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="bakingBadRating">
+                        {{ bakingBadRating }}
+                      </ng-container>
                     </button>
                   </div>
-                  <ng-container *ngIf="!bakingBadRating">
-                    <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                  </ng-container>
                 </div>
                 <div>
                   <h5 class="card-title__secondary mb-3">

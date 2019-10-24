@@ -50,7 +50,7 @@
     "@ng-toolkit/universal": "^1.1.21",
     "@nguniversal/express-engine": "^8.0.0-rc.1",
     "@nguniversal/module-map-ngfactory-loader": "^8.0.0-rc.1",
-    "airgap-coin-lib": "0.5.7",
+    "airgap-coin-lib": "0.5.13",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",

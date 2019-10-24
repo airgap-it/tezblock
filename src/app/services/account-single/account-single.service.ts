@@ -1,31 +1,32 @@
-import { Injectable } from '@angular/core'
+import { Injectable, OnDestroy } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 import { Account } from 'src/app/interfaces/Account'
+import { Transaction } from 'src/app/interfaces/Transaction'
+
 import { ApiService } from '../api/api.service'
-import { Facade, distinctAccounts } from '../facade/facade'
-import { Delegation } from 'src/app/interfaces/Delegation'
+import { distinctAccounts, Facade } from '../facade/facade'
 
 interface AccountSingleServiceState {
   address: string
   account: Account
   delegatedAccounts: Account[]
-  originatedAccounts: Account[]
+  relatedAccounts: Account[]
   loading: boolean
 }
 
 const initalState: AccountSingleServiceState = {
   address: '',
   account: undefined,
-  delegatedAccounts: [],
-  originatedAccounts: [],
+  delegatedAccounts: undefined,
+  relatedAccounts: undefined,
   loading: false
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class AccountSingleService extends Facade<AccountSingleServiceState> {
+export class AccountSingleService extends Facade<AccountSingleServiceState> implements OnDestroy {
   public address$ = this.state$.pipe(
     map(state => state.address),
     distinctUntilChanged()
@@ -41,15 +42,15 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
     distinctUntilChanged()
   )
 
-  public originatedAccounts$ = this.state$.pipe(
-    map(state => state.originatedAccounts),
+  public relatedAccounts$ = this.state$.pipe(
+    map(state => state.relatedAccounts),
     distinctUntilChanged(distinctAccounts)
   )
 
   constructor(private readonly apiService: ApiService) {
     super(initalState)
 
-    combineLatest([this.address$, this.timer$])
+    this.subscription = combineLatest([this.address$, this.timer$])
       .pipe(
         switchMap(([address, _]) => {
           return this.getById(address)
@@ -62,51 +63,59 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
 
   private getById(id: string): Observable<Account> {
     this.getDelegatedAccounts(id)
+
     return this.apiService.getAccountById(id).pipe(map(accounts => accounts[0]))
   }
 
-  // TODO: Include into combineLatest
-  private getDelegatedAccounts(address: string): void {
+  private getDelegatedAccounts(address: string) {
     if (address) {
-      if (address.startsWith('tz')) {
-        this.apiService.getDelegatedAccounts(address, 10).subscribe((accounts: Account[]) => {
-          const delegatedAccounts: Account[] = []
-          const originatedAccounts: Account[] = []
-          if (accounts.length === 0) {
-            // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
+      this.apiService.getDelegatedAccounts(address, 10).subscribe((transactions: Transaction[]) => {
+        let delegatedAccounts: Account[] = []
+        let relatedAccounts: Account[] = []
+        if (transactions.length === 0) {
+          // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
+          this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
+            if (accounts[0].delegate) {
+              delegatedAccounts.push(accounts[0])
+            }
+            this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
+          })
+        } else {
+          if (address.startsWith('tz')) {
+            // since babylon, also tz addresses themselves can be delegated
+
             this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-              if (accounts[0].delegate_value) {
-                delegatedAccounts.push(accounts[0])
-                this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
+              if (accounts[0].delegate) {
+                delegatedAccounts = accounts
               }
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
             })
-          } else {
-            accounts.forEach(account => {
-              if (account.account_id !== account.manager) {
-                originatedAccounts.push(account)
-              }
-              if (account.delegate_value) {
-                delegatedAccounts.push(account)
-              }
-            })
-            this.updateState({ ...this._state, delegatedAccounts, originatedAccounts, loading: false })
-          }
-        })
-      } else {
-        this.apiService.getManagerAccount(address, 10).subscribe((managerAccounts: Account[]) => {
-          const originAccounts: Account[] = []
-          managerAccounts.forEach(account => {
-            if (account.manager) {
-              this.apiService.getAccountById(account.manager).subscribe((accounts: Account[]) => {
-                if (accounts[0].account_id) {
-                  originAccounts.push(accounts[0])
-                  this.updateState({ ...this._state, originatedAccounts: originAccounts, loading: false })
+
+            const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
+            this.apiService.getAccountsByIds(originatedContracts).subscribe((accounts: Account[]) => {
+              accounts.forEach(account => {
+                if (account.delegate && !delegatedAccounts.includes(account)) {
+                  delegatedAccounts.push(account)
                 }
               })
-            }
-          })
-        })
-      }
+              relatedAccounts = accounts
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
+            })
+          } else {
+            this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
+              if (accounts[0].delegate) {
+                this.updateState({ ...this._state, delegatedAccounts: accounts, relatedAccounts, loading: false })
+              }
+            })
+
+            const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
+            this.apiService.getAccountsByIds(managerPubKeys).subscribe((accounts: Account[]) => {
+              relatedAccounts = accounts
+              this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
+            })
+          }
+        }
+      })
     }
   }
 
