@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core'
+import { Injectable, OnDestroy } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 import { Account } from 'src/app/interfaces/Account'
-import { ApiService } from '../api/api.service'
-import { Facade, distinctAccounts } from '../facade/facade'
-import { Delegation } from 'src/app/interfaces/Delegation'
 import { Transaction } from 'src/app/interfaces/Transaction'
+
+import { ApiService } from '../api/api.service'
+import { distinctAccounts, Facade } from '../facade/facade'
 
 interface AccountSingleServiceState {
   address: string
@@ -26,7 +26,7 @@ const initalState: AccountSingleServiceState = {
 @Injectable({
   providedIn: 'root'
 })
-export class AccountSingleService extends Facade<AccountSingleServiceState> {
+export class AccountSingleService extends Facade<AccountSingleServiceState> implements OnDestroy {
   public address$ = this.state$.pipe(
     map(state => state.address),
     distinctUntilChanged()
@@ -50,7 +50,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
   constructor(private readonly apiService: ApiService) {
     super(initalState)
 
-    combineLatest([this.address$, this.timer$])
+    this.subscription = combineLatest([this.address$, this.timer$])
       .pipe(
         switchMap(([address, _]) => {
           return this.getById(address)
@@ -63,9 +63,10 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> {
 
   private getById(id: string): Observable<Account> {
     this.getDelegatedAccounts(id)
+
     return this.apiService.getAccountById(id).pipe(map(accounts => accounts[0]))
   }
-  
+
   private getDelegatedAccounts(address: string) {
     if (address) {
       this.apiService.getDelegatedAccounts(address, 10).subscribe((transactions: Transaction[]) => {

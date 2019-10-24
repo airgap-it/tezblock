@@ -68,7 +68,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
+    this.subscription = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
       .pipe(
         switchMap(([pagination, hash, kind, address, block, _]) => {
           if (hash) {
@@ -106,17 +106,17 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     this.updateState({ ...this._state, kind, loading: true })
   }
 
-  private kindToFieldsMap = {
-    'transaction': ['source', 'destination'],
-    'delegation': ['source', 'delegate'],
-    'origination': ['source'],
-    'endorsement': ['delegate'],
-    'ballot': ['source'],
-    'proposals': ['source']
+  private readonly kindToFieldsMap = {
+    transaction: ['source', 'destination'],
+    delegation: ['source', 'delegate'],
+    origination: ['source'],
+    endorsement: ['delegate'],
+    ballot: ['source'],
+    proposals: ['source']
   }
 
   private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
-    let fields = this.kindToFieldsMap[kind]
+    const fields = this.kindToFieldsMap[kind]
     const operations: Observable<Transaction[]>[] = []
     for (const field of fields) {
       operations.push(this.apiService.getTransactionsByField(address, field, kind, limit))
@@ -125,12 +125,13 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
       operations.push(this.apiService.getTransactionsByField(address, 'delegate', 'origination', limit))
     }
     if (kind === 'ballot') {
-      const fields = this.kindToFieldsMap['proposals']
+      const fields = this.kindToFieldsMap.proposals
       for (const field of fields) {
         operations.push(
           this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
-            map((proposals) => {
+            map(proposals => {
               proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
+
               return proposals
             })
           )
@@ -138,8 +139,8 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
       }
     }
 
-    return forkJoin(operations).pipe(map(
-      (operation) => {
+    return forkJoin(operations).pipe(
+      map(operation => {
         let transactions = operation.reduce((current, next) => current.concat(next))
         transactions.sort((a, b) => b.timestamp - a.timestamp)
 
@@ -151,7 +152,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
             const delegateSources = this.apiService.getAccountsByIds(sources)
             delegateSources.subscribe(delegators => {
               delegators.forEach(delegator => {
-                const transaction = transactions.find(t => t.source === delegator.account_id )
+                const transaction = transactions.find(t => t.source === delegator.account_id)
                 if (transaction !== undefined) {
                   transaction.delegatedBalance = delegator.balance
                 }
@@ -161,12 +162,12 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         }
 
         if (kind === 'ballot') {
-          transactions.map(async transaction => await this.apiService.addVotesForTransaction(transaction))
+          transactions.map(async transaction => this.apiService.addVotesForTransaction(transaction))
         }
 
         return transactions
-      }
-    ))
+      })
+    )
   }
 
   public loadMore() {

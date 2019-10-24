@@ -1,5 +1,6 @@
+import { OnDestroy } from '@angular/core'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
-import { Observable, ReplaySubject, timer } from 'rxjs'
+import { Observable, ReplaySubject, Subscription, timer } from 'rxjs'
 import { Account } from 'src/app/interfaces/Account'
 
 export interface Pagination {
@@ -8,12 +9,18 @@ export interface Pagination {
   pageSizes: number[]
 }
 
-export class Facade<T> {
+export class Facade<T> implements OnDestroy {
   protected _state: T
   private readonly store: ReplaySubject<T> = new ReplaySubject<T>(1)
   protected readonly state$: Observable<T> = this.store.asObservable()
 
   protected timer$ = timer(0, 30000)
+
+  protected subscription: Subscription = new Subscription()
+
+  public ngOnDestroy(): void {
+    this.subscription.unsubscribe()
+  }
 
   constructor(state: T) {
     this.store.next((this._state = state))

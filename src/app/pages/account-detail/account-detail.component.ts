@@ -13,7 +13,6 @@ import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountSingleService } from '../../services/account-single/account-single.service'
 import { AccountService } from '../../services/account/account.service'
-import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
@@ -26,6 +25,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
+  providers: [AccountSingleService, TransactionSingleService],
 
   animations: [
     trigger('changeBtnColor', [
@@ -81,14 +81,11 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public paginationLimit: number = 2
   public numberOfInitialRelatedAccounts: number = 2
 
-  public accountSingleService: AccountSingleService
-
   public isCollapsed: boolean = true
 
   private readonly subscriptions: Subscription = new Subscription()
   public current: string = 'copyGrey'
 
-  public transactionSingleService: TransactionSingleService
   public tabs: Tab[] = [
     { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
@@ -110,18 +107,17 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
-    private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private readonly transactionSingleService: TransactionSingleService,
+    private readonly accountSingleService: AccountSingleService
   ) {
     this.address = this.route.snapshot.params.id
-    this.transactionSingleService = new TransactionSingleService(this.apiService)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
-    this.accountSingleService = new AccountSingleService(this.apiService)
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
