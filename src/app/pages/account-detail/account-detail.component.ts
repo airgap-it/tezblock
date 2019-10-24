@@ -122,7 +122,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
-        console.log('DELEGATED ACCOUNT FIRING', address, delegatedAccounts)
         if (!delegatedAccounts) {
           this.delegatedAccountAddress = undefined
         } else if (delegatedAccounts.length > 0) {
