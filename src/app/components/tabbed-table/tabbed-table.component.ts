@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ApiService } from 'src/app/services/api/api.service'
-import { map } from 'rxjs/operators'
 
 export interface Tab {
   title: string
@@ -92,14 +92,20 @@ export class TabbedTableComponent {
     } else if (this.page === 'account') {
       const fromPromise = this.apiService.getOperationCount('source', ownId).toPromise()
       const toPromise = this.apiService.getOperationCount('destination', ownId).toPromise()
-      const delegatePromise = this.apiService.getOperationCount('delegate', ownId).pipe(map(counts => {
-        counts.forEach(count => { 
-          if (count.kind === 'origination') {
-            count.kind = 'delegation'
-          }
-        })
-        return counts
-      })).toPromise()
+      const delegatePromise = this.apiService
+        .getOperationCount('delegate', ownId)
+        .pipe(
+          map(counts => {
+            counts.forEach(count => {
+              if (count.kind === 'origination') {
+                count.kind = 'delegation'
+              }
+            })
+
+            return counts
+          })
+        )
+        .toPromise()
 
       Promise.all([fromPromise, toPromise, delegatePromise])
         .then(([from, to, delegate]) => {
@@ -124,6 +130,11 @@ export class TabbedTableComponent {
   }
 
   public selectTab(selectedTab: Tab) {
+    const currentlySelectedTab = this.tabs.find(tab => tab.active)
+    // Don't change the tab if it's already selected
+    if (currentlySelectedTab && currentlySelectedTab.title === selectedTab.title) {
+      return
+    }
     this.tabs.forEach(tab => (tab.active = false))
     selectedTab.active = true
     this.selectedTab = selectedTab
