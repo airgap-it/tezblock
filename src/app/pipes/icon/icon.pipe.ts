@@ -21,6 +21,10 @@ export type IconRef =
   | 'medium'
   | 'telegram'
   | 'twitter'
+  | 'globe'
+  | 'apple'
+  | 'laptop'
+  | 'android'
 
 @Pipe({
   name: 'iconPipe'
@@ -57,7 +61,11 @@ export class IconPipe implements PipeTransform {
       github: { prefix: 'fab', iconName: 'github' },
       medium: { prefix: 'fab', iconName: 'medium' },
       telegram: { prefix: 'fab', iconName: 'telegram' },
-      twitter: { prefix: 'fab', iconName: 'twitter' }
+      twitter: { prefix: 'fab', iconName: 'twitter' },
+      globe: { prefix, iconName: 'globe' },
+      laptop: { prefix, iconName: 'laptop' },
+      apple: { prefix: 'fab', iconName: 'apple' },
+      android: { prefix: 'fab', iconName: 'android' }
     }
   }
 
