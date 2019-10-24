@@ -68,6 +68,10 @@
     "hasLogo": true
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
+    "alias": "AirGap Payout KT",
+    "hasLogo": true
+  },
+  "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9": {
     "alias": "AirGap Payout",
     "hasLogo": true
   },
@@ -651,7 +655,7 @@
     "alias": "StakeNow",
     "hasLogo": true
   },
-  "KT1RCAETpkm9z44MW7Cph3mrWshqVURPubT4": {
+  "tz1Zrqm4TkJwqTxm5TiyVFh6taXG4Wrq7tko": {
     "alias": "Bake’n’Rolls Payouts",
     "hasLogo": true
   },

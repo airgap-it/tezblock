@@ -2,21 +2,21 @@ import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BehaviorSubject, combineLatest, Observable, Subscription } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { BlockSingleService } from 'src/app/services/block-single/block-single.service'
 
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
-import { ApiService } from '../../services/api/api.service'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-block-detail',
   templateUrl: './block-detail.component.html',
-  styleUrls: ['./block-detail.component.scss']
+  styleUrls: ['./block-detail.component.scss'],
+  providers: [BlockSingleService, TransactionSingleService]
 })
 export class BlockDetailComponent implements OnInit, OnDestroy {
   public endorsements$: Observable<number> = new Observable()
@@ -44,21 +44,16 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     }
   ]
 
-  public readonly transactionSingleService: TransactionSingleService
-  private readonly blockSingleService: BlockSingleService
-
   private readonly subscriptions: Subscription = new Subscription()
 
   constructor(
+    public readonly transactionSingleService: TransactionSingleService,
+    private readonly blockSingleService: BlockSingleService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly route: ActivatedRoute,
     private readonly blockService: BlockService,
-    private readonly apiService: ApiService,
     private readonly iconPipe: IconPipe
   ) {
-    this.transactionSingleService = new TransactionSingleService(this.apiService)
-    this.blockSingleService = new BlockSingleService(this.blockService)
-
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.blockLoading$ = this.blockSingleService.loading$
