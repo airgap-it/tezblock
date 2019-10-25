@@ -688,7 +688,7 @@ export class ApiService {
             {
               field: 'priority',
               operation: 'eq',
-              set: [0]
+              set: ['0']
             }
           ],
           orderBy: [
