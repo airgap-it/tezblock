@@ -10,10 +10,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - tezblock.dev.gke.papers.tech
-      secretName: tezblock-dev-tls
+        - tezblock.prod.gke.papers.tech
+      secretName: tezblock-prod-tls
+    - hosts:
+        - mvp.tezblock.io
+      secretName: tezblock-mvp-prod-tls  
   rules:
-    - host: tezblock.dev.gke.papers.tech
+    - host: tezblock.prod.gke.papers.tech
+      http:
+        paths:
+          - backend:
+              serviceName: tezblock-frontend
+              servicePort: 80
+    - host: mvp.tezblock.io
       http:
         paths:
           - backend:

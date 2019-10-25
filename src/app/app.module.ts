@@ -51,6 +51,7 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component';
 import { RewardsTableComponent } from './rewards-table/rewards-table.component'
+import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 
 @NgModule({
   imports: [
@@ -108,7 +109,8 @@ import { RewardsTableComponent } from './rewards-table/rewards-table.component'
     TransactionDetailWrapperComponent,
     LoadingSkeletonComponent,
     TelegramModalComponent,
-    RewardsTableComponent
+    RewardsTableComponent,
+    ResourcesWalletsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],

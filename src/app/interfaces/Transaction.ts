@@ -38,6 +38,7 @@ export interface Transaction {
   endorsingRewards: string
   fees: string
   totalRewards: string
+  originated_contracts?: string
   // These are our own properties
   votes?: number
 }

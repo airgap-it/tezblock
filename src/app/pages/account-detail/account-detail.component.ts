@@ -3,10 +3,10 @@ import { TelegramModalComponent } from './../../components/telegram-modal/telegr
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { BakerInfo, TezosProtocol } from 'airgap-coin-lib'
+import { BakerInfo } from 'airgap-coin-lib'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription } from 'rxjs'
+import { Observable, Subscription, combineLatest } from 'rxjs'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -14,15 +14,12 @@ import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountSingleService } from '../../services/account-single/account-single.service'
 import { AccountService } from '../../services/account/account.service'
-import { ApiService } from '../../services/api/api.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
-import { OperationsService } from 'src/app/services/operations/operations.service'
-import { map } from 'rxjs/operators'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -31,6 +28,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
+  providers: [AccountSingleService, TransactionSingleService, RightsSingleService],
 
   animations: [
     trigger('changeBtnColor', [
@@ -60,6 +58,9 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
 
+  public bakingBadRating: string | undefined
+  public tezosBakerRating: string | undefined
+  public stakingBalance: number | undefined
   public bakingInfos: any
   public tezosBakerFee: string | undefined
   public stakingCapacity: number | undefined
@@ -72,8 +73,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public hasLogo: boolean | undefined
 
   public transactions$: Observable<Transaction[]> = new Observable()
-  public rewards: TezosRewards
-  public rights$: Observable<Object> = new Observable()
 
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
@@ -86,14 +85,13 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public paginationLimit: number = 2
   public numberOfInitialRelatedAccounts: number = 2
 
-  public accountSingleService: AccountSingleService
-
   public isCollapsed: boolean = true
+
+  public rewards: TezosRewards
+  public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
   public current: string = 'copyGrey'
-
-  public rightsSingleService: RightsSingleService
 
   public tabs: Tab[] = [
     { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
@@ -117,6 +115,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public rewardsTransaction: any
 
   constructor(
+    public readonly transactionSingleService: TransactionSingleService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly accountService: AccountService,
@@ -124,31 +123,39 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
-    private readonly apiService: ApiService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly transactionSingleService: TransactionSingleService
+    private readonly accountSingleService: AccountSingleService,
+    private readonly rightsSingleService: RightsSingleService
   ) {
+    this.address = this.route.snapshot.params.id
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
-    this.accountSingleService = new AccountSingleService(this.apiService)
-    this.rightsSingleService = new RightsSingleService(this.apiService)
-
-    this.relatedAccounts = this.accountSingleService.originatedAccounts$
+    this.relatedAccounts = this.accountSingleService.delegatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
+    this.getBakingInfos(this.address)
 
     this.subscriptions.add(
-      this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
-        if (delegatedAccounts.length > 0) {
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
-          this.delegatedAmount = delegatedAccounts[0].balance
+      combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
+        ([address, delegatedAccounts]: [string, Account[]]) => {
+          if (!delegatedAccounts) {
+            this.delegatedAccountAddress = undefined
+          } else if (delegatedAccounts.length > 0) {
+            this.delegatedAccountAddress = delegatedAccounts[0].account_id
+            this.bakerAddress = delegatedAccounts[0].delegate
+
+            this.delegatedAmount = delegatedAccounts[0].balance
+          } else {
+            this.delegatedAccountAddress = ''
+          }
         }
-      })
+      )
     )
+    this.relatedAccounts = this.accountSingleService.relatedAccounts$
+    this.transactionsLoading$ = this.transactionSingleService.loading$
   }
 
   public async ngOnInit() {
@@ -178,29 +185,71 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     if (address.startsWith('KT') || !this.isValidBaker) {
       this.tezosBakerFee = 'not available'
     }
-    this.bakingInfos = await this.bakingService.getBakerInfos(address)
-    // this.nextPayout = this.bakingInfos.nextPayout
-    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+    try {
+      this.bakingInfos = await this.bakingService.getBakerInfos(address)
 
-    // TODO: Move to component
+      this.stakingBalance = this.bakingInfos.stakingBalance
+      this.stakingCapacity = this.bakingInfos.stakingCapacity
+      this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
+      this.stakingBond = this.bakingInfos.selfBond
+      this.isValidBaker = true
+      this.frozenBalance = await this.accountService.getFrozen(address)
 
-    // TODO: Move to component
-    await this.bakingService
-      .getTezosBakerInfos(address)
-      .then(result => {
-        if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-          this.tezosBakerFee = result.fee + ' %'
-          this.tezosBakerName = result.baker_name
-          this.tezosBakerAvailableCap = result.available_capacity
-          this.tezosBakerAcceptingDelegation = result.accepting_delegation
-          this.tezosBakerNominalStakingYield = result.nominal_staking_yield
-        } else {
-          this.tezosBakerFee = 'not available'
-        }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
+      // this.nextPayout = this.bakingInfos.nextPayout
+      // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+
+      // TODO: Move to component
+
+      this.bakingService
+        .getBakingBadRatings(address)
+        .then(result => {
+          if (result.rating === 0 && result.status === 'success') {
+            this.bakingBadRating = 'awesome'
+          } else if (result.rating === 1 && result.status === 'success') {
+            this.bakingBadRating = 'so-so'
+          } else if (result.rating === 2 && result.status === 'success') {
+            this.bakingBadRating = 'dead'
+          } else if (result.rating === 3 && result.status === 'success') {
+            this.bakingBadRating = 'specific'
+          } else if (result.rating === 4 && result.status === 'success') {
+            this.bakingBadRating = 'hidden'
+          } else if (result.rating === 5 && result.status === 'success') {
+            this.bakingBadRating = 'new'
+          } else if (result.rating === 6 && result.status === 'success') {
+            this.bakingBadRating = 'closed'
+          } else if (result.rating === 9 && result.status === 'success') {
+            this.bakingBadRating = 'unknown'
+          } else {
+            this.bakingBadRating = 'not available'
+          }
+        })
+        .catch(error => {
+          this.isValidBaker = false
+        })
+
+      // TODO: Move to component
+      await this.bakingService
+        .getTezosBakerInfos(address)
+        .then(result => {
+          if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
+            this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
+            this.tezosBakerFee = result.fee + ' %'
+            this.tezosBakerName = result.baker_name
+            this.tezosBakerAvailableCap = result.available_capacity
+            this.myTBUrl = result.myTB
+            this.tezosBakerAcceptingDelegation = result.accepting_delegation
+            this.tezosBakerNominalStakingYield = result.nominal_staking_yield
+          } else {
+            this.tezosBakerRating = 'not available'
+            this.tezosBakerFee = 'not available'
+          }
+        })
+        .catch(error => {
+          this.isValidBaker = false
+        })
+    } catch (error) {
+      // If non tz* address is supplied
+    }
   }
 
   public tabSelected(tab: string) {
