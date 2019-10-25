@@ -175,12 +175,17 @@ const layouts: Layout = {
     ],
     [OperationTypes.Rewards]: [
       { name: 'Cycle', property: 'cycle', width: '' },
-      { name: 'Delegations', property: 'delegatedContracts', width: '' },
+      {
+        name: 'Delegations',
+        property: 'delegatedContracts',
+        width: '',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, multipleAddresses: true, pageId: 'oo' }
+      },
       { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
       { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
       { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
-      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: 'Status', property: 'status', width: '' }
+      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } }
     ],
     [OperationTypes.BakingRights]: [
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
