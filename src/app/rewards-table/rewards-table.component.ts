@@ -10,9 +10,7 @@ import { AccountSingleService } from '../services/account-single/account-single.
 import { AccountService } from '../services/account/account.service'
 import { ApiService } from '../services/api/api.service'
 import { BakingService } from '../services/baking/baking.service'
-
-import { map } from 'rxjs/operators'
-import { TezosRewards, TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 export interface Tab {
   title: string
@@ -43,6 +41,8 @@ export class RewardsTableComponent implements OnInit {
 
   public isValidBaker: boolean | undefined
   public rewardsLoading$: Observable<boolean>
+  public rightsLoading$: Observable<boolean>
+
   public rewards$: Observable<Object> = new Observable()
   public rights$: Observable<Object> = new Observable()
 
@@ -95,6 +95,10 @@ export class RewardsTableComponent implements OnInit {
     this.rightsSingleService.updateAddress(this.address)
 
     this.rights$ = this.rightsSingleService.rights$
+    this.rewards$ = this.rewardSingleService.rewards$
+    this.rightsLoading$ = this.rewardSingleService.loading$
+    this.rewardsLoading$ = this.rewardSingleService.loading$
+
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
@@ -107,11 +111,6 @@ export class RewardsTableComponent implements OnInit {
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
 
-    const protocol = new TezosProtocol()
-    this.transactions$ = this.transactionSingleService.transactions$
-
-    this.rewards$ = this.rewardSingleService.rewards$
-    this.rewardsLoading$ = this.rewardSingleService.loading$
     this.rewards$.subscribe(rewards => {
       console.log('rewards', rewards)
     })
@@ -119,7 +118,6 @@ export class RewardsTableComponent implements OnInit {
     this.rewardSingleService.updateAddress(address)
 
     this.accountSingleService.setAddress(address)
-    this.transactionSingleService.updateAddress(address)
 
     this.frozenBalance = await this.accountService.getFrozen(address)
   }
