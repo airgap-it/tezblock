@@ -1,3 +1,4 @@
+import { RewardSingleService } from './../services/reward-single/reward-single.service'
 import { TransactionSingleService } from './../services/transaction-single/transaction-single.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { RightsSingleService } from './../services/rights-single/rights-single.service'
@@ -25,7 +26,7 @@ export interface Tab {
   selector: 'rewards-table',
   templateUrl: './rewards-table.component.html',
   styleUrls: ['./rewards-table.component.scss'],
-  providers: [TransactionSingleService, AccountSingleService]
+  providers: [TransactionSingleService, AccountSingleService, RewardSingleService]
 })
 export class RewardsTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
@@ -41,7 +42,8 @@ export class RewardsTableComponent implements OnInit {
   public stakingBond: number | undefined
 
   public isValidBaker: boolean | undefined
-
+  public rewardsLoading$: Observable<boolean>
+  public rewards$: Observable<Object> = new Observable()
   public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
@@ -74,9 +76,6 @@ export class RewardsTableComponent implements OnInit {
   @Input()
   public data?: Observable<any> // TODO: <any>
 
-  @Input()
-  public loading?: Observable<boolean>
-
   @Output()
   public readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
 
@@ -87,6 +86,7 @@ export class RewardsTableComponent implements OnInit {
     private readonly bakingService: BakingService,
     private readonly rightsSingleService: RightsSingleService,
     private readonly accountSingleService: AccountSingleService,
+    private readonly rewardSingleService: RewardSingleService,
     private readonly transactionSingleService: TransactionSingleService,
     private readonly apiService: ApiService
   ) {
@@ -106,30 +106,17 @@ export class RewardsTableComponent implements OnInit {
 
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
+
     const protocol = new TezosProtocol()
     this.transactions$ = this.transactionSingleService.transactions$
 
-    this.transactions$.subscribe(txs => {
-      console.log('txs unmodified', txs)
+    this.rewards$ = this.rewardSingleService.rewards$
+    this.rewardsLoading$ = this.rewardSingleService.loading$
+    this.rewards$.subscribe(rewards => {
+      console.log('rewards', rewards)
     })
-    // this.transactions$
-    //   .pipe(
-    //     map((transactions: Transaction[]) => {
-    //       transactions.map(async transaction => {
-    //         const rewards = await protocol.calculateRewards(address, transaction.cycle)
-    //         transaction.stakingBalance = rewards.stakingBalance
-    //         transaction.bakingRewards = rewards.bakingRewards
-    //         transaction.endorsingRewards = rewards.endorsingRewards
-    //         transaction.totalRewards = rewards.totalRewards
-    //         return transaction
-    //       })
 
-    //       return transactions
-    //     })
-    //   )
-    //   .subscribe(txs => {
-    //     console.log('pipe txs', txs)
-    //   })
+    this.rewardSingleService.updateAddress(address)
 
     this.accountSingleService.setAddress(address)
     this.transactionSingleService.updateAddress(address)
