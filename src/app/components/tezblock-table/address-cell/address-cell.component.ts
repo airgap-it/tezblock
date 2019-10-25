@@ -8,13 +8,15 @@ import { Component, Input } from '@angular/core'
 export class AddressCellComponent {
   public clickable: boolean = true
   public address: string
+  public multipleAddresses: string[]
 
-  @Input() set data(value: string) {
-    this.address = value
+  @Input() set data(value: string | string[]) {
+    typeof value === 'string' ? (this.address = value) : (this.multipleAddresses = value)
+
     this.checkId()
   }
 
-  public options: any = { pageId: undefined, showFullAddress: false }
+  public options: any = { pageId: undefined, showFullAddress: false, multipleAddresses: false }
 
   public checkId() {
     let check: boolean

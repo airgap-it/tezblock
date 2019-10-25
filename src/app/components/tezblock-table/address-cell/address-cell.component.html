@@ -1,1 +1,10 @@
-<address-item [address]="address" [showFull]="options.showFullAddress" [clickableButton]="clickable"></address-item>
+<address-item
+  *ngIf="!options.multipleAddresses"
+  [address]="address"
+  [showFull]="options.showFullAddress"
+  [clickableButton]="clickable"
+></address-item>
+
+<ng-container *ngIf="multipleAddresses">
+  {{ multipleAddresses.length }}
+</ng-container>
