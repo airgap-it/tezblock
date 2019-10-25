@@ -1,5 +1,4 @@
 import { RewardSingleService } from './../services/reward-single/reward-single.service'
-import { TransactionSingleService } from './../services/transaction-single/transaction-single.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { RightsSingleService } from './../services/rights-single/rights-single.service'
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
@@ -24,7 +23,7 @@ export interface Tab {
   selector: 'rewards-table',
   templateUrl: './rewards-table.component.html',
   styleUrls: ['./rewards-table.component.scss'],
-  providers: [TransactionSingleService, AccountSingleService, RewardSingleService]
+  providers: [AccountSingleService, RewardSingleService]
 })
 export class RewardsTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
@@ -87,7 +86,6 @@ export class RewardsTableComponent implements OnInit {
     private readonly rightsSingleService: RightsSingleService,
     private readonly accountSingleService: AccountSingleService,
     private readonly rewardSingleService: RewardSingleService,
-    private readonly transactionSingleService: TransactionSingleService,
     private readonly apiService: ApiService
   ) {
     this.address = this.route.snapshot.params.id
@@ -101,7 +99,7 @@ export class RewardsTableComponent implements OnInit {
 
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
-        if (delegatedAccounts.length > 0) {
+        if (delegatedAccounts && delegatedAccounts.length > 0) {
           this.getBakingInfos(this.address)
         }
       })
