@@ -104,8 +104,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0 },
     { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Endorsing Rights', active: true, kind: 'endorsing_rights', count: 0 },
-    { title: 'Rewards', active: false, kind: 'rewards', count: 0 },
-    { title: 'Balance', active: false, kind: 'balance', count: 0 }
+    { title: 'Rewards', active: false, kind: 'rewards', count: 0 }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined

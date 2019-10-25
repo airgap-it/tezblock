@@ -111,10 +111,6 @@ export class RewardsTableComponent implements OnInit {
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
 
-    this.rewards$.subscribe(rewards => {
-      console.log('rewards', rewards)
-    })
-
     this.rewardSingleService.updateAddress(address)
 
     this.accountSingleService.setAddress(address)
