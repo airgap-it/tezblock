@@ -209,7 +209,7 @@
                   >
                     Resources
                   </a>
-                  <ul class="dropdown-menu pb-4" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <li role="menuitem">
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
                         Wallets
@@ -228,23 +228,36 @@
                   </ul>
                 </span>
               </li>
-              <!--TODO: open dropdown on click and hover-->
-              <li class="nav-item pl-2 btn-group" dropdown>
-                <button
-                  id="button-network"
-                  type="button"
-                  class="btn btn-sm btn-outline-dark dropdown-toggle"
-                  aria-controls="dropdown-network"
-                  dropdownToggle
-                >
-                  <!--TODO: change to selected network-->
-                  Mainnet
-                  <span class="caret"></span>
-                </button>
-                <ul id="dropdown-network" *dropdownNetwork class="dropdown-menu" role="menu" aria-labelledby="button-network">
-                  <li role="menuitem"><a class="dropdown-item">Babylonnet</a></li>
-                  <li role="menuitem"><a class="dropdown-item">Alphanet</a></li>
-                </ul>
+              <li class="nav-item dropdown pl-2 pl-sm-0">
+                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                  <a
+                    class="btn btn-sm btn-outline-dark dropdown-toggle"
+                    href
+                    role="button"
+                    dropdownToggle
+                    (click)="(false)"
+                    id="button-basic"
+                    routerLinkActive="btn-link"
+                    (mouseleave)="dp.hide(); showDropdown = true"
+                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                  >
+                    <!--TODO: set active network -->
+                    Mainnet
+                  </a>
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                    <!--TODO: display other networks -->
+                    <li role="menuitem">
+                      <a class="dropdown-item" href="https://babylonnet.tezblock.io">
+                        Babylonnet
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-muted" disabled>
+                        Zeronet
+                      </a>
+                    </li>
+                  </ul>
+                </span>
               </li>
             </ul>
           </div>
