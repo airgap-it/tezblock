@@ -12,6 +12,9 @@ spec:
     - hosts:
         - tezblock.prod.gke.papers.tech
       secretName: tezblock-prod-tls
+    - hosts:
+        - mvp.tezblock.io
+      secretName: tezblock-mvp-prod-tls  
   rules:
     - host: tezblock.prod.gke.papers.tech
       http:

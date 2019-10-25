@@ -11,7 +11,6 @@ spec:
   tls:
     - hosts:
         - tezblock.dev.gke.papers.tech
-        - mvp.tezblock.io
       secretName: tezblock-dev-tls
   rules:
     - host: tezblock.dev.gke.papers.tech
