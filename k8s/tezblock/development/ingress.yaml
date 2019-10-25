@@ -20,9 +20,3 @@ spec:
           - backend:
               serviceName: tezblock-frontend
               servicePort: 80
-    - host: mvp.tezblock.io
-      http:
-        paths:
-          - backend:
-              serviceName: tezblock-frontend
-              servicePort: 80
