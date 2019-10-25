@@ -41,28 +41,28 @@ export class ListComponent {
             break
           case 'activation':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('activate_account')
+            this.dataService.updateKind(['activate_account'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'activate_account'
             break
           case 'origination':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('origination')
+            this.dataService.updateKind(['origination'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'origination_overview'
             break
           case 'delegation':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('delegation')
+            this.dataService.updateKind(['delegation'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'delegation_overview'
             break
           case 'endorsement':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('endorsement')
+            this.dataService.updateKind(['endorsement'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'endorsement_overview'
