@@ -11,10 +11,16 @@ spec:
   tls:
     - hosts:
         - tezblock.dev.gke.papers.tech
-        - mvp.tezblock.io
+        - dev.tezblock.io
       secretName: tezblock-dev-tls
   rules:
     - host: tezblock.dev.gke.papers.tech
+      http:
+        paths:
+          - backend:
+              serviceName: tezblock-frontend
+              servicePort: 80
+    - host: dev.tezblock.io
       http:
         paths:
           - backend:
