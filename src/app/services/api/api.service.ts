@@ -684,6 +684,11 @@ export class ApiService {
               field: 'delegate',
               operation: 'eq',
               set: [address]
+            },
+            {
+              field: 'priority',
+              operation: 'eq',
+              set: [0]
             }
           ],
           orderBy: [
