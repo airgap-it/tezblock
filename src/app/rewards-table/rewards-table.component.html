@@ -169,24 +169,27 @@
 
       <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
         <tezblock-table
-          [showLoadMoreButton]="!(rightsLoading$ | async) && ((rights$ | async))"
-          [loading]="rightsLoading$"
+          [showLoadMoreButton]="true"
           [data]="rights$"
           [page]="page"
           [type]="selectedTab.kind"
           (loadMoreClicked)="loadMoreRights()"
         ></tezblock-table>
+        <!-- <tezblock-table [showLoadMoreButton]="!(rightsLoading$ | async) && ((rights$ | async))" [loading]="rightsLoading$"
+          [data]="rights$" [page]="page" [type]="selectedTab.kind" (loadMoreClicked)="loadMoreRights()"></tezblock-table> -->
       </ng-container>
 
       <ng-container *ngIf="tab.kind === 'rewards'">
         <tezblock-table
-          [showLoadMoreButton]="!(rewardsLoading$ | async) && ((rewards$ | async))"
+          [showLoadMoreButton]="true"
           [loading]="rewardsLoading$"
           [data]="rewards$"
           [page]="page"
           [type]="selectedTab.kind"
           (loadMoreClicked)="loadMoreRewards()"
         ></tezblock-table>
+        <!-- <tezblock-table [showLoadMoreButton]="!(rewardsLoading$ | async) && ((rewards$ | async))" [loading]="rewardsLoading$"
+          [data]="rewards$" [page]="page" [type]="selectedTab.kind" (loadMoreClicked)="loadMoreRewards()"></tezblock-table> -->
       </ng-container>
 
       <ng-container *ngIf="tab.kind === 'balance'"><p>balance</p></ng-container>
