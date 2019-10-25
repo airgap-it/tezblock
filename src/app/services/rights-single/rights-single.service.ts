@@ -58,6 +58,7 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
     combineLatest([this.pagination$, this.kind$, this.address$])
       .pipe(
         switchMap(([pagination, kind, address]) => {
+          console.log(pagination.selectedSize * pagination.currentPage)
           if (kind === 'baking_rights') {
             return this.apiService.getBakingRights(address, pagination.selectedSize * pagination.currentPage)
           } else if (kind === 'endorsing_rights') {
@@ -71,6 +72,7 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
         })
       )
       .subscribe(rights => {
+        console.log('rights', rights)
         this.updateState({ ...this._state, rights, loading: false })
       })
   }
@@ -83,6 +85,7 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
     this.updateState({ ...this._state, address, loading: true })
   }
   public loadMore() {
+    console.log('lets load more')
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }

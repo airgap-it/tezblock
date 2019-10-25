@@ -230,7 +230,11 @@ export class RewardsTableComponent implements OnInit {
         .catch(console.error)
     }
   }
-  public loadMore(): void {
-    this.transactionSingleService.loadMore()
+  public loadMoreRights(): void {
+    this.rightsSingleService.loadMore()
+  }
+
+  public loadMoreRewards(): void {
+    this.rewardSingleService.loadMore()
   }
 }
