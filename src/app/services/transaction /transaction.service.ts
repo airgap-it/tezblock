@@ -8,14 +8,14 @@ import { distinctPagination, distinctTransactionArray, Facade, Pagination } from
 
 interface TransactionServiceState {
   transactions: Transaction[]
-  kind: string
+  kindList: Array<string>
   pagination: Pagination
   loading: boolean
 }
 
 const initialState: TransactionServiceState = {
   transactions: [],
-  kind: 'transaction',
+  kindList: ['transaction'],
   pagination: {
     currentPage: 1,
     selectedSize: 6,
@@ -32,8 +32,8 @@ export class TransactionService extends Facade<TransactionServiceState> {
     map(state => state.transactions),
     distinctUntilChanged(distinctTransactionArray)
   )
-  public kind$ = this.state$.pipe(
-    map(state => state.kind),
+  public kindList$ = this.state$.pipe(
+    map(state => state.kindList),
     distinctUntilChanged()
   )
   public pagination$ = this.state$.pipe(
@@ -45,10 +45,10 @@ export class TransactionService extends Facade<TransactionServiceState> {
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.kind$, this.timer$])
+    combineLatest([this.pagination$, this.kindList$, this.timer$])
       .pipe(
-        switchMap(([pagination, kind, _]) => {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, kind)
+        switchMap(([pagination, kindList, _]) => {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, kindList)
         })
       )
       .subscribe(transactions => {
@@ -56,8 +56,8 @@ export class TransactionService extends Facade<TransactionServiceState> {
       })
   }
 
-  public updateKind(kind: string) {
-    this.updateState({ ...this._state, kind, loading: true })
+  public updateKind(kindList: Array<string>) {
+    this.updateState({ ...this._state, kindList, loading: true })
   }
 
   public loadMore() {

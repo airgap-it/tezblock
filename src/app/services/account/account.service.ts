@@ -64,7 +64,7 @@ export class AccountService extends Facade<AccountServiceState> {
         if (account.account_id !== account.manager) {
           relatedAccounts.push(account)
         }
-        if (account.delegate_value) {
+        if (account.delegate) {
           delegatedAccounts.push(account)
         }
       })

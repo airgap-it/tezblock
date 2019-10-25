@@ -1,10 +1,10 @@
 <div class="card-body p-4">
-  <h5 class="card-title mb-3 ">
+  <h5 class="card-title mb-4 ">
     Block Details
   </h5>
-  <div class="row">
+  <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary">Block Height</p>
+      <p class="text-secondary mb-0">Block Height</p>
     </div>
 
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
@@ -19,25 +19,25 @@
       </div>
     </ng-template>
   </div>
-  <div class="row">
+  <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary">Baker</p>
+      <p class="text-secondary mb-0">Baker</p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <address-item [address]="block.baker" ng-href="#here"></address-item>
     </div>
   </div>
-  <div class="row">
+  <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary">Timestamp</p>
+      <p class="text-secondary mb-0">Timestamp</p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <p>{{ block.timestamp | amTimeAgo }} ({{ block.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+      <p class="mb-0">{{ block.timestamp | amTimeAgo }} ({{ block.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
     </div>
   </div>
-  <div class="row">
+  <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary">Value</p>
+      <p class="text-secondary mb-0">Value</p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <div
@@ -47,7 +47,7 @@
           else hideValue
         "
       >
-        <p>
+        <p class="mb-0">
           <span
             class="d-inline-block"
             [innerHtml]="
@@ -65,9 +65,9 @@
       </div>
     </ng-container>
   </div>
-  <div class="row mb-2">
+  <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary">Transaction Fees</p>
+      <p class="text-secondary mb-0">Transaction Fees</p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <div
@@ -77,7 +77,7 @@
           else hideValue
         "
       >
-        <p>
+        <p class="mb-0">
           <span
             class="d-inline-block"
             [innerHtml]="
@@ -113,63 +113,63 @@
     <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
   </button>
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
-    <div class="row mt-3">
+    <div class="row mt-3 mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Endorsements</p>
+        <p class="text-secondary mb-0">Endorsements</p>
       </div>
       <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
       <ng-template #loaded>
         <div class=" col-md-9">
-          <p>{{ endorsements$ | async }}</p>
+          <p class="mb-0">{{ endorsements$ | async }}</p>
         </div>
       </ng-template>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Cycle</p>
+        <p class="text-secondary mb-0">Cycle</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.meta_cycle }}</p>
+        <p class="mb-0">{{ block.meta_cycle }}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Cycle Position</p>
+        <p class="text-secondary mb-0">Cycle Position</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.meta_cycle_position }} of 4095</p>
+        <p class="mb-0">{{ block.meta_cycle_position }} of 4095</p>
       </div>
     </div>
-    <div class="row ">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Block Hash</p>
+        <p class="text-secondary mb-0">Block Hash</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.hash }}</p>
+        <p class="mb-0">{{ block.hash }}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Signature</p>
+        <p class="text-secondary mb-0">Signature</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.signature }}</p>
+        <p class="mb-0">{{ block.signature }}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Fitness</p>
+        <p class="text-secondary mb-0">Fitness</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.fitness }}</p>
+        <p class="mb-0">{{ block.fitness }}</p>
       </div>
     </div>
-    <div class="row">
+    <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary">Protocol</p>
+        <p class="text-secondary mb-0">Protocol</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p>{{ block.protocol }}</p>
+        <p class="mb-0">{{ block.protocol }}</p>
       </div>
     </div>
   </div>

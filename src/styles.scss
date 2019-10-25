@@ -68,6 +68,8 @@ $list-group-item-padding-x: 0;
 $modal-header-border-color: transparent;
 $badge-font-weight: 400;
 $dropdown-link-hover-bg: #fff;
+$modal-content-border-radius: 0;
+$modal-content-border-color: rgba(46, 91, 255, 0.08);
 
 /* identicon image size */
 identicon {
@@ -106,10 +108,14 @@ tabset {
 
 /* card specific styling */
 .card {
-  .card-title {
+  .card-title__secondary {
     text-transform: uppercase;
     font-size: 14px;
     color: var(--secondary);
+  }
+  .card-title {
+    font-size: 16px;
+    color: var(--dark);
   }
   .card-header,
   .table thead th,

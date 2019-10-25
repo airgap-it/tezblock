@@ -2,4 +2,13 @@
   .btn--rotated fa-icon svg {
     transform: rotate(-180deg);
   }
+  .address--item__container {
+    overflow: hidden;
+    word-break: break-word;
+    address-item button {
+      text-align: left;
+      white-space: normal;
+      font-size: 13px;
+    }
+  }
 }

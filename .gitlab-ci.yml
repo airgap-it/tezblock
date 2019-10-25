@@ -107,7 +107,27 @@ k8s-deploy-development:
     - kubectl apply -f k8s/tezblock/development/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
   only:
-    - master
     - develop
+  tags:
+    - docker
+
+k8s-deploy-production:
+  stage: deploy
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud container clusters get-credentials papers-cluster-production
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - kubectl apply -f k8s/tezblock/common/namespace.yaml
+    - kubectl apply -f k8s/tezblock/production/ --recursive
+    - kubectl apply -f k8s/tezblock/common/ --recursive
+  only:
+    - master
   tags:
     - docker
