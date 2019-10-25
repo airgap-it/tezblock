@@ -160,7 +160,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
-    // this.rightsSingleService.updateAddress(address)
+    this.rightsSingleService.updateAddress(address)
 
     this.getBakingInfos(address)
 
@@ -172,7 +172,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.rights$ = this.rightsSingleService.rights$
 
-    // this.transactionSingleService.updateAddress(address)
+    this.transactionSingleService.updateAddress(address)
 
     this.accountSingleService.setAddress(address)
 

@@ -176,11 +176,11 @@ const layouts: Layout = {
     [OperationTypes.Rewards]: [
       { name: 'Cycle', property: 'cycle', width: '' },
       { name: 'Delegations', property: 'delegations', width: '' },
-      { name: 'Staking Balance', property: 'staking_balance', width: '' },
-      { name: 'Block Rewards', property: 'block_rewards', width: '' },
-      { name: 'Endorsement Rewards', property: 'endorsement_rewards', width: '' },
+      { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
+      { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
+      { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
       { name: 'Losses', property: 'losses', width: '' },
-      { name: 'Fees', property: 'fees', width: '' },
+      { name: 'Fee', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Status', property: 'status', width: '' }
     ],
     [OperationTypes.BakingRights]: [
@@ -528,7 +528,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
-        console.log('TZ TABLE COMPONENTS txs', transactions)
         this.transactions = transactions
       })
     }

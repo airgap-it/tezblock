@@ -1,3 +1,5 @@
+import { TransactionSingleService } from './../services/transaction-single/transaction-single.service'
+import { Transaction } from 'src/app/interfaces/Transaction'
 import { RightsSingleService } from './../services/rights-single/rights-single.service'
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
@@ -8,7 +10,8 @@ import { AccountService } from '../services/account/account.service'
 import { ApiService } from '../services/api/api.service'
 import { BakingService } from '../services/baking/baking.service'
 
-import { TransactionSingleService } from '../services/transaction-single/transaction-single.service'
+import { map } from 'rxjs/operators'
+import { TezosRewards, TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 export interface Tab {
   title: string
@@ -21,11 +24,13 @@ export interface Tab {
 @Component({
   selector: 'rewards-table',
   templateUrl: './rewards-table.component.html',
-  styleUrls: ['./rewards-table.component.scss']
+  styleUrls: ['./rewards-table.component.scss'],
+  providers: [TransactionSingleService, AccountSingleService]
 })
 export class RewardsTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
   public selectedTab: Tab | undefined = undefined
+  public transactions$: Observable<Transaction[]> = new Observable()
 
   public bakingBadRating: string | undefined
   public tezosBakerRating: string | undefined
@@ -37,11 +42,10 @@ export class RewardsTableComponent implements OnInit {
 
   public isValidBaker: boolean | undefined
 
-  public accountSingleService: AccountSingleService
-  public transactionSingleService: TransactionSingleService
   public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
+  public rewards: TezosRewards
 
   public myTBUrl: string | undefined
   public address: string
@@ -82,6 +86,8 @@ export class RewardsTableComponent implements OnInit {
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
     private readonly rightsSingleService: RightsSingleService,
+    private readonly accountSingleService: AccountSingleService,
+    private readonly transactionSingleService: TransactionSingleService,
     private readonly apiService: ApiService
   ) {
     this.address = this.route.snapshot.params.id
@@ -89,10 +95,6 @@ export class RewardsTableComponent implements OnInit {
     this.rightsSingleService.updateAddress(this.address)
 
     this.rights$ = this.rightsSingleService.rights$
-
-    this.accountSingleService = new AccountSingleService(this.apiService)
-    this.transactionSingleService = new TransactionSingleService(this.apiService)
-
     this.subscriptions.add(
       this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
         if (delegatedAccounts.length > 0) {
@@ -104,6 +106,30 @@ export class RewardsTableComponent implements OnInit {
 
   public async ngOnInit() {
     const address: string = this.route.snapshot.params.id
+    const protocol = new TezosProtocol()
+    this.transactions$ = this.transactionSingleService.transactions$
+
+    this.transactions$.subscribe(txs => {
+      console.log('txs unmodified', txs)
+    })
+    // this.transactions$
+    //   .pipe(
+    //     map((transactions: Transaction[]) => {
+    //       transactions.map(async transaction => {
+    //         const rewards = await protocol.calculateRewards(address, transaction.cycle)
+    //         transaction.stakingBalance = rewards.stakingBalance
+    //         transaction.bakingRewards = rewards.bakingRewards
+    //         transaction.endorsingRewards = rewards.endorsingRewards
+    //         transaction.totalRewards = rewards.totalRewards
+    //         return transaction
+    //       })
+
+    //       return transactions
+    //     })
+    //   )
+    //   .subscribe(txs => {
+    //     console.log('pipe txs', txs)
+    //   })
 
     this.accountSingleService.setAddress(address)
     this.transactionSingleService.updateAddress(address)

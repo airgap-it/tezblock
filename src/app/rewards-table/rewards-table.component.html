@@ -170,7 +170,7 @@
       <ng-container *ngIf="tab.kind === 'rewards' || tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
         <tezblock-table
           [loading]="loading"
-          [data]="rights$"
+          [data]="transactions$"
           [page]="page"
           [type]="selectedTab.kind"
           (loadMoreClicked)="loadMore()"
