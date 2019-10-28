@@ -49,9 +49,10 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component';
 import { RewardsTableComponent } from './rewards-table/rewards-table.component'
+import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
 @NgModule({
   imports: [
@@ -110,7 +111,8 @@ import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-w
     LoadingSkeletonComponent,
     TelegramModalComponent,
     RewardsTableComponent,
-    ResourcesWalletsComponent
+    ResourcesWalletsComponent,
+    ExtendTableCellComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
@@ -131,7 +133,8 @@ import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-w
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent
+    PricechartItemComponent,
+    ExtendTableCellComponent
   ],
   bootstrap: [AppComponent]
 })
