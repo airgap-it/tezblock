@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { ModalModule, TabsetConfig, TabsModule, TooltipModule } from 'ngx-bootstrap'
 import { BsModalService } from 'ngx-bootstrap/modal'
+import { ProgressbarConfig, ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
@@ -25,8 +26,16 @@ describe('AccountDetailComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe, BsModalService, TabsetConfig, ToastrService, IconPipe],
-        imports: [TooltipModule, FontAwesomeModule, TabsModule, ModalModule.forRoot(), ToastrModule.forRoot(), MomentModule],
+        providers: [AmountConverterPipe, BsModalService, TabsetConfig, ToastrService, IconPipe, ProgressbarConfig],
+        imports: [
+          TooltipModule,
+          ProgressbarModule,
+          FontAwesomeModule,
+          TabsModule,
+          ModalModule.forRoot(),
+          ToastrModule.forRoot(),
+          MomentModule
+        ],
         declarations: [
           AccountDetailComponent,
           BakerTableComponent,
