@@ -6,6 +6,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { BakerTableComponent } from './baker-table.component'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { TezblockTableComponent } from './../tezblock-table/tezblock-table.component'
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -15,7 +16,7 @@ describe('BakerTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [TabsModule, FontAwesomeModule],
+        providers: [TabsModule, FontAwesomeModule, RightsSingleService],
         declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
       })
     )
