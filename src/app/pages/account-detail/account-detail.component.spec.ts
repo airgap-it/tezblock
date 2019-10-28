@@ -11,6 +11,7 @@ import { AddressItemComponent } from './../../components/address-item/address-it
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
 import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
 import { AccountDetailComponent } from './account-detail.component'
+import { BakerTableComponent } from './../../components/baker-table/baker-table.component'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { MomentModule } from 'ngx-moment'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
@@ -37,6 +38,7 @@ describe('AccountDetailComponent', () => {
         ],
         declarations: [
           AccountDetailComponent,
+          BakerTableComponent,
           IdenticonComponent,
           AddressItemComponent,
           TabbedTableComponent,

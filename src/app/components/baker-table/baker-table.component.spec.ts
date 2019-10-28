@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { UnitHelper } from 'test-config/unit-test-helper'
+import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 
 import { BakerTableComponent } from './baker-table.component'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
@@ -17,6 +18,7 @@ describe('BakerTableComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [TabsModule, FontAwesomeModule, RightsSingleService],
+        imports: [ProgressbarModule],
         declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
       })
     )
