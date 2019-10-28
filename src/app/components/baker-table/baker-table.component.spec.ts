@@ -1,7 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { TabsModule } from 'ngx-bootstrap/tabs'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
 import { BakerTableComponent } from './baker-table.component'
+import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
+import { TezblockTableComponent } from './../tezblock-table/tezblock-table.component'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -11,8 +15,8 @@ describe('BakerTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [],
-        declarations: [BakerTableComponent]
+        providers: [TabsModule, FontAwesomeModule],
+        declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
       })
     )
       .compileComponents()
