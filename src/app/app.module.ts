@@ -49,7 +49,7 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { RewardsTableComponent } from './rewards-table/rewards-table.component'
+import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
@@ -110,7 +110,7 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
     TransactionDetailWrapperComponent,
     LoadingSkeletonComponent,
     TelegramModalComponent,
-    RewardsTableComponent,
+    BakerTableComponent,
     ResourcesWalletsComponent,
     ExtendTableCellComponent
   ],
