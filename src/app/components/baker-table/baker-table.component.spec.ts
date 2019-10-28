@@ -9,8 +9,12 @@ describe('BakerTableComponent', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()
-
-    TestBed.configureTestingModule(unitHelper.testBed({ providers: [] }))
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [],
+        declarations: [BakerTableComponent]
+      })
+    )
       .compileComponents()
       .catch(console.error)
   })
