@@ -19,6 +19,7 @@ import { Transaction } from '../../interfaces/Transaction'
 import { AddressCellComponent } from './address-cell/address-cell.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { BlockCellComponent } from './block-cell/block-cell.component'
+import { ExtendTableCellComponent } from './extend-table-cell/extend-table-cell.component'
 import { HashCellComponent } from './hash-cell/hash-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
@@ -185,7 +186,8 @@ const layouts: Layout = {
       { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
       { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
       { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
-      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } }
+      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+      { name: '', property: '', width: '', component: ExtendTableCellComponent }
     ],
     [OperationTypes.BakingRights]: [
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
