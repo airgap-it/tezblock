@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { TabsModule } from 'ngx-bootstrap/tabs'
+import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 
@@ -17,8 +17,8 @@ describe('BakerTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [TabsModule, FontAwesomeModule, RightsSingleService],
-        imports: [ProgressbarModule],
+        providers: [FontAwesomeModule, RightsSingleService, TabsetConfig],
+        imports: [ProgressbarModule, TabsModule],
         declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
       })
     )
