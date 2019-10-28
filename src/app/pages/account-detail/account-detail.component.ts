@@ -100,7 +100,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
     { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
-  public rewardsTabs: Tab[] = [
+  public bakerTabs: Tab[] = [
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0 },
     { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Endorsing Rights', active: true, kind: 'endorsing_rights', count: 0 },

@@ -1,14 +1,14 @@
-import { RewardSingleService } from './../services/reward-single/reward-single.service'
-import { Transaction } from 'src/app/interfaces/Transaction'
-import { RightsSingleService } from './../services/rights-single/rights-single.service'
+import { RewardSingleService } from './../../services/reward-single/reward-single.service'
+import { Transaction } from './../../interfaces/Transaction'
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Subscription, Observable } from 'rxjs'
-import { Account } from '../interfaces/Account'
-import { AccountSingleService } from '../services/account-single/account-single.service'
-import { AccountService } from '../services/account/account.service'
-import { ApiService } from '../services/api/api.service'
-import { BakingService } from '../services/baking/baking.service'
+import { Account } from './../../interfaces/Account'
+import { AccountSingleService } from './../../services/account-single/account-single.service'
+import { AccountService } from './../../services/account/account.service'
+import { ApiService } from './../../services/api/api.service'
+import { BakingService } from './../../services/baking/baking.service'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 export interface Tab {
@@ -20,12 +20,12 @@ export interface Tab {
 }
 
 @Component({
-  selector: 'rewards-table',
-  templateUrl: './rewards-table.component.html',
-  styleUrls: ['./rewards-table.component.scss'],
+  selector: 'baker-table',
+  templateUrl: './baker-table.component.html',
+  styleUrls: ['./baker-table.component.scss'],
   providers: [AccountSingleService, RewardSingleService]
 })
-export class RewardsTableComponent implements OnInit {
+export class BakerTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
   public selectedTab: Tab | undefined = undefined
   public transactions$: Observable<Transaction[]> = new Observable()
