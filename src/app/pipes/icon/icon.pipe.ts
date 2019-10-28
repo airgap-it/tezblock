@@ -25,6 +25,8 @@ export type IconRef =
   | 'apple'
   | 'laptop'
   | 'android'
+  | 'CaretUp'
+  | 'CaretDown'
 
 @Pipe({
   name: 'iconPipe'
@@ -65,7 +67,9 @@ export class IconPipe implements PipeTransform {
       globe: { prefix, iconName: 'globe' },
       laptop: { prefix, iconName: 'laptop' },
       apple: { prefix: 'fab', iconName: 'apple' },
-      android: { prefix: 'fab', iconName: 'android' }
+      android: { prefix: 'fab', iconName: 'android' },
+      CaretUp: { prefix, iconName: 'caret-up' },
+      CaretDown: { prefix, iconName: 'caret-down' }
     }
   }
 
