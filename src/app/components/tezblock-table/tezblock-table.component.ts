@@ -190,7 +190,10 @@ const layouts: Layout = {
       { name: '', property: '', width: '', component: ExtendTableCellComponent }
     ],
     [OperationTypes.BakingRights]: [
-      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
+      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       {
         name: 'Delegate',
         property: 'delegate',
@@ -198,13 +201,14 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
-      { name: 'Cycle', property: 'cycle', width: '' },
-      { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent }
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ],
     [OperationTypes.EndorsingRights]: [
-      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent },
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
+      { name: 'Slot', property: 'slot', width: '' },
+      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       {
         name: 'Delegate',
         property: 'delegate',
@@ -212,9 +216,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
-      { name: 'Slot', property: 'slot', width: '' }
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ]
   },
   [LayoutPages.Block]: {
