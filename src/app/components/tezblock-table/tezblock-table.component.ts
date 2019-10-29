@@ -193,7 +193,9 @@ const layouts: Layout = {
       { name: 'Cycle', property: 'cycle', width: '' },
       { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
-      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Fees', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       {
         name: 'Delegate',
         property: 'delegate',
@@ -208,7 +210,8 @@ const layouts: Layout = {
       { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
       { name: 'Slot', property: 'slot', width: '' },
-      { name: 'Estimated Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       {
         name: 'Delegate',
         property: 'delegate',
