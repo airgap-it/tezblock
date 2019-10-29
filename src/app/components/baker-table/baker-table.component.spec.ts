@@ -17,8 +17,8 @@ describe('BakerTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [FontAwesomeModule, RightsSingleService, TabsetConfig],
-        imports: [ProgressbarModule, TabsModule],
+        providers: [RightsSingleService, TabsetConfig],
+        imports: [ProgressbarModule, TabsModule, FontAwesomeModule],
         declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
       })
     )
