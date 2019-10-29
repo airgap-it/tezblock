@@ -16,7 +16,7 @@ const initialState: RewardSingleServiceState = {
   address: '',
   pagination: {
     currentPage: 1,
-    selectedSize: 5,
+    selectedSize: 3,
     pageSizes: [5, 10, 20, 50]
   },
   loading: true
@@ -49,7 +49,7 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
         switchMap(async ([pagination, address]) => {
           const currentCycle = await protocol.fetchCurrentCycle()
           const rewards: TezosRewards[] = []
-          // TODO fetching rewards for the current cycle takes a long time, thus we start at i=1 for now
+          // TODO fetching rewards for the current cycle takes a long time, thus we start at i=0 for now
 
           for (let i = 0; i < pagination.selectedSize * pagination.currentPage; i++) {
             const cycleRewards = await protocol.calculateRewards(address, currentCycle - i)
@@ -59,7 +59,6 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
         })
       )
       .subscribe(rewards => {
-        console.log('updating rewards: ', rewards)
         this.updateState({ ...this._state, rewards, loading: false })
       })
   }
