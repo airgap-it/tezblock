@@ -504,7 +504,11 @@
     "hasLogo": true
   },
   "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8": {
-    "alias": "My Tezos Baking",
+    "alias": "MyTezosBaking",
+    "hasLogo": true
+  },
+  "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5": {
+    "alias": "MyTezosBaking Payouts",
     "hasLogo": true
   },
   "tz1djEKk6j1FqigTgbRsunbnY9BB7qsn1aAQ": {
