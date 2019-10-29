@@ -101,10 +101,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
   public bakerTabs: Tab[] = [
-    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0, icon: this.iconPipe.transform('BreadLoaf') },
-    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('HatChef') },
+    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0, icon: this.iconPipe.transform('hatChef') },
+    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('breadLoaf') },
     { title: 'Endorsing Rights', active: true, kind: 'endorsing_rights', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Rewards', active: false, kind: 'rewards', count: 0, icon: this.iconPipe.transform('Coin') }
+    { title: 'Rewards', active: false, kind: 'rewards', count: 0, icon: this.iconPipe.transform('coin') }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
