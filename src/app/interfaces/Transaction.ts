@@ -31,6 +31,7 @@ export interface Transaction {
   fee: number
   level: number
   delegatedBalance?: number
+  originatedBalance?: number
   proposal?: string
   originated_contracts?: string
   // These are our own properties

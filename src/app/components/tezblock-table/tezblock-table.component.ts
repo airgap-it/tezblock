@@ -133,7 +133,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       {
         name: 'Originator',
@@ -224,7 +224,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -366,7 +366,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Balance', property: '', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
