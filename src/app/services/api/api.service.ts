@@ -732,4 +732,29 @@ export class ApiService {
         })
     })
   }
+
+  public getDelegatedAccountsList(tzAddress: string): Observable<any> {
+    return this.http.post(
+      this.accountsApiUrl,
+      {
+        fields: ['account_id', 'manager', 'delegate_value', 'balance'],
+        predicates: [
+          {
+            field: 'delegate_value',
+            operation: 'eq',
+            set: [tzAddress],
+            inverse: false
+          }
+        ],
+        orderBy: [{ field: 'count_account_id', direction: 'desc' }],
+        aggregation: [
+          {
+            field: 'account_id',
+            function: 'count'
+          }
+        ]
+      },
+      this.options
+    )
+  }
 }

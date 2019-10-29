@@ -98,6 +98,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public myTBUrl: string | undefined
   public address: string
   public frozenBalance: number | undefined
+  public activeDelegations$: Observable<number>
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -121,19 +122,24 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.getBakingInfos(this.address)
 
     this.subscriptions.add(
-      combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
-        if (!delegatedAccounts) {
-          this.delegatedAccountAddress = undefined
-        } else if (delegatedAccounts.length > 0) {
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate
+      combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
+        ([address, delegatedAccounts]: [string, Account[]]) => {
+          if (!delegatedAccounts) {
+            this.delegatedAccountAddress = undefined
+          } else if (delegatedAccounts.length > 0) {
+            this.delegatedAccountAddress = delegatedAccounts[0].account_id
+            this.bakerAddress = delegatedAccounts[0].delegate
 
+            this.activeDelegations$ = this.accountSingleService.activeDelegations$
+            this.activeDelegations$.subscribe(response => console.log('liste: ', response))
+            console.log('delegated length: ', delegatedAccounts.length)
 
-          this.delegatedAmount = delegatedAccounts[0].balance
-        } else {
-          this.delegatedAccountAddress = ''
+            this.delegatedAmount = delegatedAccounts[0].balance
+          } else {
+            this.delegatedAccountAddress = ''
+          }
         }
-      })
+      )
     )
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
@@ -171,12 +177,12 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       this.stakingBond = this.bakingInfos.selfBond
       this.isValidBaker = true
       this.frozenBalance = await this.accountService.getFrozen(address)
-  
+
       // this.nextPayout = this.bakingInfos.nextPayout
       // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
-  
+
       // TODO: Move to component
-  
+
       this.bakingService
         .getBakingBadRatings(address)
         .then(result => {
@@ -203,7 +209,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         .catch(error => {
           this.isValidBaker = false
         })
-  
+
       // TODO: Move to component
       await this.bakingService
         .getTezosBakerInfos(address)
@@ -223,7 +229,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         })
         .catch(error => {
           this.isValidBaker = false
-        })  
+        })
     } catch (error) {
       // If non tz* address is supplied
     }
