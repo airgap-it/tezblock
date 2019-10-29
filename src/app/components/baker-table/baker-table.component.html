@@ -15,7 +15,7 @@
     </h6>
 
     <ng-container *ngIf="tab.kind === 'baker_overview'">
-      <div class="card-body px-3 pt-4 pb-5">
+      <div class="card-body px-0 px-sm-3 pt-4 pb-5">
         <div class="container p-0">
           <div class="row">
             <div class=" col-md-6 col-lg-4">
@@ -144,16 +144,18 @@
                 <h5 class="card-title__secondary mb-3">
                   Payout Accuracy
                 </h5>
-                <div class="d-block" *ngIf="bakingBadRating">
+                <div class="d-block">
                   <img src="/assets/img/bakingbad_logo.png" width="24px" />
 
                   <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                    {{ bakingBadRating }}
+                    <ng-container *ngIf="!bakingBadRating">
+                      <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                    </ng-container>
+                    <ng-container *ngIf="bakingBadRating">
+                      {{ bakingBadRating }}
+                    </ng-container>
                   </button>
                 </div>
-                <ng-container *ngIf="!bakingBadRating">
-                  <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                </ng-container>
               </div>
               <div>
                 <h5 class="card-title__secondary mb-3">
