@@ -1,4 +1,4 @@
-import { TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosProtocol, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Injectable } from '@angular/core'
 import { combineLatest, of } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
@@ -16,7 +16,7 @@ const initialState: RewardSingleServiceState = {
   address: '',
   pagination: {
     currentPage: 1,
-    selectedSize: 2,
+    selectedSize: 5,
     pageSizes: [5, 10, 20, 50]
   },
   loading: true
@@ -48,9 +48,10 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
       .pipe(
         switchMap(async ([pagination, address]) => {
           const currentCycle = await protocol.fetchCurrentCycle()
-          const rewards = []
+          const rewards: TezosRewards[] = []
           // TODO fetching rewards for the current cycle takes a long time, thus we start at i=1 for now
-          for (let i = 1; i < pagination.selectedSize * pagination.currentPage; i++) {
+
+          for (let i = 0; i < pagination.selectedSize * pagination.currentPage; i++) {
             const cycleRewards = await protocol.calculateRewards(address, currentCycle - i)
             rewards.push(cycleRewards)
           }
@@ -58,6 +59,7 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
         })
       )
       .subscribe(rewards => {
+        console.log('updating rewards: ', rewards)
         this.updateState({ ...this._state, rewards, loading: false })
       })
   }

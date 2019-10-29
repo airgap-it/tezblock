@@ -192,8 +192,6 @@
           [data]="rewards$" [page]="page" [type]="selectedTab.kind" (loadMoreClicked)="loadMoreRewards()"></tezblock-table> -->
       </ng-container>
 
-      <ng-container *ngIf="tab.kind === 'balance'"><p>balance</p></ng-container>
-
       <div ng-bind-html="tabDynamicContent"></div>
     </tab>
   </ng-container>

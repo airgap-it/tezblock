@@ -42,7 +42,7 @@ export class BakerTableComponent implements OnInit {
   public rewardsLoading$: Observable<boolean>
   public rightsLoading$: Observable<boolean>
 
-  public rewards$: Observable<Object> = new Observable()
+  public rewards$: Observable<TezosRewards[]> = new Observable()
   public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
@@ -94,7 +94,7 @@ export class BakerTableComponent implements OnInit {
 
     this.rights$ = this.rightsSingleService.rights$
     this.rewards$ = this.rewardSingleService.rewards$
-    this.rightsLoading$ = this.rewardSingleService.loading$
+    this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
 
     this.subscriptions.add(

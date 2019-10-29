@@ -21,7 +21,7 @@ export interface VotingInfo {
 const initialState: RightsSingleServiceState = {
   rights: [],
   kind: 'baking_rights',
-  address: 'tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ',
+  address: '',
   pagination: {
     currentPage: 1,
     selectedSize: 10,
@@ -83,7 +83,6 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
     this.updateState({ ...this._state, address, loading: true })
   }
   public loadMore() {
-    console.log('lets load more')
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
