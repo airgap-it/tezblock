@@ -131,8 +131,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
             this.bakerAddress = delegatedAccounts[0].delegate
 
             this.activeDelegations$ = this.accountSingleService.activeDelegations$
-            this.activeDelegations$.subscribe(response => console.log('liste: ', response))
-            console.log('delegated length: ', delegatedAccounts.length)
 
             this.delegatedAmount = delegatedAccounts[0].balance
           } else {

@@ -66,6 +66,17 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
       .subscribe(account => {
         this.updateState({ ...this._state, account, loading: false })
       })
+    this.subscription.add(
+      combineLatest([this.address$, this.timer$])
+        .pipe(
+          switchMap(([address, _]) => {
+            return this.apiService.getDelegatedAccountsList(address)
+          })
+        )
+        .subscribe(list => {
+          this.updateState({ ...this._state, activeDelegations: list.length, loading: false })
+        })
+    )
   }
 
   private getById(id: string): Observable<Account> {
@@ -76,11 +87,6 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
 
   private getDelegatedAccounts(address: string) {
     if (address) {
-      this.apiService.getDelegatedAccountsList(address).subscribe(list => {
-        if (list.length > 0) {
-          this.updateState({ ...this._state, activeDelegations: list.length })
-        }
-      })
       this.apiService.getDelegatedAccounts(address, 10).subscribe((transactions: Transaction[]) => {
         let delegatedAccounts: Account[] = []
         let relatedAccounts: Account[] = []
