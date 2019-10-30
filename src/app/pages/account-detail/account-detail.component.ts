@@ -3,7 +3,6 @@ import { TelegramModalComponent } from './../../components/telegram-modal/telegr
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { BakerInfo } from 'airgap-coin-lib'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription, combineLatest } from 'rxjs'
@@ -49,23 +48,12 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   ]
 })
 export class AccountDetailComponent implements OnInit, OnDestroy {
-  public bakerInfo: BakerInfo | undefined
-
   public account$: Observable<Account> = new Observable()
   public delegatedAccounts: Observable<Account[]> = new Observable()
   public delegatedAccountAddress: string | undefined
   public relatedAccounts: Observable<Account[]> = new Observable()
   public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
-
-  public bakingBadRating: string | undefined
-  public tezosBakerRating: string | undefined
-  public stakingBalance: number | undefined
-  public bakingInfos: any
-  public tezosBakerFee: string | undefined
-  public stakingCapacity: number | undefined
-  public stakingProgress: number | undefined
-  public stakingBond: number | undefined
 
   public isValidBaker: boolean | undefined
   public revealed: string | undefined
@@ -129,8 +117,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly rightsSingleService: RightsSingleService
   ) {
     this.address = this.route.snapshot.params.id
+    this.checkIfValidBaker(this.address)
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
-
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
     this.subscriptions.add(
@@ -157,8 +145,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     const address: string = this.route.snapshot.params.id
     this.rightsSingleService.updateAddress(address)
 
-    // this.getBakingInfos(address)
-
     if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
       this.hasAlias = true
       this.hasLogo = accounts[address].hasLogo
@@ -175,13 +161,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.revealed = await this.accountService.getAccountStatus(address)
   }
+  public async checkIfValidBaker(address: string) {
+    this.isValidBaker = (await this.bakingService.getBakerInfos(address)) ? true : false
+  }
 
   public tabSelected(tab: string) {
     this.transactionSingleService.updateKind(tab)
   }
 
   public upperTabSelected(tab: string) {
-    console.log('upperTabSelected', tab)
     this.rightsSingleService.updateKind(tab)
   }
 
