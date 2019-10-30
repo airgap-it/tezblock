@@ -73,7 +73,19 @@ export class BakerTableComponent implements OnInit {
   }
 
   @Input()
-  public data?: Observable<any> // TODO: <any>
+  set data(bakerTableInfos: any) {
+    this.stakingBalance = bakerTableInfos.stakingBalance
+    this.stakingCapacity = bakerTableInfos.stakingCapacity
+    this.stakingProgress = bakerTableInfos.stakingProgress
+    this.stakingBond = bakerTableInfos.stakingBond
+    this.frozenBalance = bakerTableInfos.frozenBalance
+  }
+
+  @Input()
+  set ratings(bakerTableRatings: any) {
+    this.tezosBakerRating = bakerTableRatings.tezosBakerRating
+    this.bakingBadRating = bakerTableRatings.bakingBadRating
+  }
 
   @Output()
   public readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
@@ -97,7 +109,7 @@ export class BakerTableComponent implements OnInit {
     this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
 
-    this.getBakingInfos(this.address)
+    // this.getBakingInfos(this.address)
   }
 
   public async ngOnInit() {
@@ -108,66 +120,6 @@ export class BakerTableComponent implements OnInit {
     this.accountSingleService.setAddress(address)
 
     this.frozenBalance = await this.accountService.getFrozen(address)
-  }
-
-  public async getBakingInfos(address: string) {
-    this.bakingInfos = await this.bakingService.getBakerInfos(address)
-    this.stakingBalance = this.bakingInfos.stakingBalance
-    this.stakingCapacity = this.bakingInfos.stakingCapacity
-    this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
-    this.stakingBond = this.bakingInfos.selfBond
-    this.isValidBaker = true
-
-    this.bakingService
-      .getBakingBadRatings(address)
-      .then(result => {
-        if (result.rating === 0 && result.status === 'success') {
-          console.log('awesome')
-          this.bakingBadRating = 'awesome'
-        } else if (result.rating === 1 && result.status === 'success') {
-          console.log('so-so')
-          this.bakingBadRating = 'so-so'
-        } else if (result.rating === 2 && result.status === 'success') {
-          console.log('dead')
-          this.bakingBadRating = 'dead'
-        } else if (result.rating === 3 && result.status === 'success') {
-          console.log('specific')
-          this.bakingBadRating = 'specific'
-        } else if (result.rating === 4 && result.status === 'success') {
-          console.log('hidden')
-          this.bakingBadRating = 'hidden'
-        } else if (result.rating === 5 && result.status === 'success') {
-          console.log('new')
-          this.bakingBadRating = 'new'
-        } else if (result.rating === 6 && result.status === 'success') {
-          console.log('closed')
-          this.bakingBadRating = 'closed'
-        } else if (result.rating === 9 && result.status === 'success') {
-          console.log('unkown')
-          this.bakingBadRating = 'unknown'
-        } else {
-          console.log('not available')
-          this.bakingBadRating = 'not available'
-        }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
-
-    // TODO: Move to component
-    await this.bakingService
-      .getTezosBakerInfos(address)
-      .then(result => {
-        if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-          this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-          this.myTBUrl = result.myTB
-        } else {
-          this.tezosBakerRating = 'not available'
-        }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
   }
 
   public selectTab(selectedTab: Tab) {

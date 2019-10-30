@@ -57,7 +57,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public bakingBadRating: string | undefined
   public tezosBakerRating: string | undefined
+  public stakingBalance: number | undefined
+  public bakingInfos: any
+  public bakerTableInfos: any
+  public bakerTableRatings: any
+
   public tezosBakerFee: string | undefined
+  public stakingCapacity: number | undefined
+  public stakingProgress: number | undefined
+  public stakingBond: number | undefined
 
   public isValidBaker: boolean | undefined
   public revealed: string | undefined
@@ -121,7 +129,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly rightsSingleService: RightsSingleService
   ) {
     this.address = this.route.snapshot.params.id
-    this.checkIfValidBaker(this.address)
+    this.getBakingInfos(this.address)
+
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
@@ -165,8 +174,83 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.revealed = await this.accountService.getAccountStatus(address)
   }
-  public async checkIfValidBaker(address: string) {
-    this.isValidBaker = (await this.bakingService.getBakerInfos(address)) ? true : false
+
+  public async getBakingInfos(address: string) {
+    if (address.startsWith('KT') || !this.isValidBaker) {
+      this.tezosBakerFee = 'not available'
+    }
+    try {
+      this.bakingInfos = await this.bakingService.getBakerInfos(address)
+
+      this.isValidBaker = true
+      this.bakerTableInfos = {
+        stakingBalance: this.bakingInfos.stakingBalance,
+        stakingCapacity: this.bakingInfos.stakingCapacity,
+        stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
+        stakingBond: this.bakingInfos.selfBond,
+        frozenBalance: await this.accountService.getFrozen(address)
+      }
+
+      // this.nextPayout = this.bakingInfos.nextPayout
+      // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+
+      // TODO: Move to component
+
+      this.bakingService
+        .getBakingBadRatings(address)
+        .then(result => {
+          if (result.rating === 0 && result.status === 'success') {
+            this.bakingBadRating = 'awesome'
+          } else if (result.rating === 1 && result.status === 'success') {
+            this.bakingBadRating = 'so-so'
+          } else if (result.rating === 2 && result.status === 'success') {
+            this.bakingBadRating = 'dead'
+          } else if (result.rating === 3 && result.status === 'success') {
+            this.bakingBadRating = 'specific'
+          } else if (result.rating === 4 && result.status === 'success') {
+            this.bakingBadRating = 'hidden'
+          } else if (result.rating === 5 && result.status === 'success') {
+            this.bakingBadRating = 'new'
+          } else if (result.rating === 6 && result.status === 'success') {
+            this.bakingBadRating = 'closed'
+          } else if (result.rating === 9 && result.status === 'success') {
+            this.bakingBadRating = 'unknown'
+          } else {
+            this.bakingBadRating = 'not available'
+          }
+        })
+        .catch(error => {
+          this.isValidBaker = false
+        })
+
+      // TODO: Move to component
+      await this.bakingService
+        .getTezosBakerInfos(address)
+        .then(result => {
+          if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
+            this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
+            this.tezosBakerFee = result.fee + ' %'
+            this.tezosBakerName = result.baker_name
+            this.tezosBakerAvailableCap = result.available_capacity
+            this.myTBUrl = result.myTB
+            this.tezosBakerAcceptingDelegation = result.accepting_delegation
+            this.tezosBakerNominalStakingYield = result.nominal_staking_yield
+          } else {
+            this.tezosBakerRating = 'not available'
+            this.tezosBakerFee = 'not available'
+          }
+        })
+        .catch(error => {
+          this.isValidBaker = false
+        })
+
+      this.bakerTableRatings = {
+        tezosBakerRating: this.tezosBakerRating,
+        bakingBadRating: this.bakingBadRating
+      }
+    } catch (error) {
+      // If non tz* address is supplied
+    }
   }
 
   public tabSelected(tab: string) {
