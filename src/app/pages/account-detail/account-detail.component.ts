@@ -55,6 +55,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
 
+  public bakingBadRating: string | undefined
+  public tezosBakerRating: string | undefined
+  public tezosBakerFee: string | undefined
+
   public isValidBaker: boolean | undefined
   public revealed: string | undefined
   public hasAlias: boolean | undefined
