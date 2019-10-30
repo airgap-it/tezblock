@@ -133,10 +133,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
-    this.relatedAccounts = this.accountSingleService.delegatedAccounts$
-    this.transactionsLoading$ = this.transactionSingleService.loading$
-    this.getBakingInfos(this.address)
-
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
         ([address, delegatedAccounts]: [string, Account[]]) => {
@@ -161,7 +157,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     const address: string = this.route.snapshot.params.id
     this.rightsSingleService.updateAddress(address)
 
-    this.getBakingInfos(address)
+    // this.getBakingInfos(address)
 
     if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
       this.hasAlias = true
@@ -178,77 +174,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(address)
-  }
-
-  public async getBakingInfos(address: string) {
-    if (address.startsWith('KT') || !this.isValidBaker) {
-      this.tezosBakerFee = 'not available'
-    }
-    try {
-      this.bakingInfos = await this.bakingService.getBakerInfos(address)
-
-      this.stakingBalance = this.bakingInfos.stakingBalance
-      this.stakingCapacity = this.bakingInfos.stakingCapacity
-      this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
-      this.stakingBond = this.bakingInfos.selfBond
-      this.isValidBaker = true
-      this.frozenBalance = await this.accountService.getFrozen(address)
-
-      // this.nextPayout = this.bakingInfos.nextPayout
-      // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
-
-      // TODO: Move to component
-
-      this.bakingService
-        .getBakingBadRatings(address)
-        .then(result => {
-          if (result.rating === 0 && result.status === 'success') {
-            this.bakingBadRating = 'awesome'
-          } else if (result.rating === 1 && result.status === 'success') {
-            this.bakingBadRating = 'so-so'
-          } else if (result.rating === 2 && result.status === 'success') {
-            this.bakingBadRating = 'dead'
-          } else if (result.rating === 3 && result.status === 'success') {
-            this.bakingBadRating = 'specific'
-          } else if (result.rating === 4 && result.status === 'success') {
-            this.bakingBadRating = 'hidden'
-          } else if (result.rating === 5 && result.status === 'success') {
-            this.bakingBadRating = 'new'
-          } else if (result.rating === 6 && result.status === 'success') {
-            this.bakingBadRating = 'closed'
-          } else if (result.rating === 9 && result.status === 'success') {
-            this.bakingBadRating = 'unknown'
-          } else {
-            this.bakingBadRating = 'not available'
-          }
-        })
-        .catch(error => {
-          this.isValidBaker = false
-        })
-
-      // TODO: Move to component
-      await this.bakingService
-        .getTezosBakerInfos(address)
-        .then(result => {
-          if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-            this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-            this.tezosBakerFee = result.fee + ' %'
-            this.tezosBakerName = result.baker_name
-            this.tezosBakerAvailableCap = result.available_capacity
-            this.myTBUrl = result.myTB
-            this.tezosBakerAcceptingDelegation = result.accepting_delegation
-            this.tezosBakerNominalStakingYield = result.nominal_staking_yield
-          } else {
-            this.tezosBakerRating = 'not available'
-            this.tezosBakerFee = 'not available'
-          }
-        })
-        .catch(error => {
-          this.isValidBaker = false
-        })
-    } catch (error) {
-      // If non tz* address is supplied
-    }
   }
 
   public tabSelected(tab: string) {

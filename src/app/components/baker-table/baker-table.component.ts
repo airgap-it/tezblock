@@ -97,13 +97,7 @@ export class BakerTableComponent implements OnInit {
     this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
 
-    this.subscriptions.add(
-      this.accountSingleService.delegatedAccounts$.subscribe((delegatedAccounts: Account[]) => {
-        if (delegatedAccounts && delegatedAccounts.length > 0) {
-          this.getBakingInfos(this.address)
-        }
-      })
-    )
+    this.getBakingInfos(this.address)
   }
 
   public async ngOnInit() {
