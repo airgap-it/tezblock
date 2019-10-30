@@ -20,7 +20,7 @@ export interface VotingInfo {
 
 const initialState: RightsSingleServiceState = {
   rights: [],
-  kind: 'baking_rights',
+  kind: '',
   address: '',
   pagination: {
     currentPage: 1,

@@ -185,6 +185,7 @@
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
       <tezblock-table
         [showLoadMoreButton]="true"
+        [loading]="rightsLoading$"
         [data]="rights$"
         [page]="page"
         [type]="selectedTab.kind"
