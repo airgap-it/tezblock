@@ -16,6 +16,8 @@ import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { MomentModule } from 'ngx-moment'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
+import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -41,6 +43,8 @@ describe('AccountDetailComponent', () => {
           BakerTableComponent,
           IdenticonComponent,
           AddressItemComponent,
+          AddressCellComponent,
+          AmountCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent

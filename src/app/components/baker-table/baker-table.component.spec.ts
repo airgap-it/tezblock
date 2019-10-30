@@ -1,13 +1,16 @@
+import { AmountCellComponent } from './../tezblock-table/amount-cell/amount-cell.component'
+import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
-
 import { BakerTableComponent } from './baker-table.component'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { TezblockTableComponent } from './../tezblock-table/tezblock-table.component'
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
+import { AddressItemComponent } from '../address-item/address-item.component'
+import { IdenticonComponent } from '../identicon/identicon'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -19,7 +22,15 @@ describe('BakerTableComponent', () => {
       unitHelper.testBed({
         providers: [RightsSingleService, TabsetConfig],
         imports: [ProgressbarModule, TabsModule, FontAwesomeModule],
-        declarations: [BakerTableComponent, TezblockTableComponent, LoadingSkeletonComponent]
+        declarations: [
+          BakerTableComponent,
+          TezblockTableComponent,
+          LoadingSkeletonComponent,
+          AddressCellComponent,
+          IdenticonComponent,
+          AmountCellComponent,
+          AddressItemComponent
+        ]
       })
     )
       .compileComponents()
