@@ -1,5 +1,5 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs; let i = index" (selectTab)="selectTab(tab)">
+  <tab *ngFor="let tab of tabs; let i = index" [disabled]="tab.count === 0" (selectTab)="selectTab(tab)">
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -11,7 +11,7 @@
         {{ tab.count }}
       </span>
     </ng-template>
-    <h6 class="pt-3 mr-1 d-sm-none">
+    <h6 class="pt-3 pl-2 mr-1 d-sm-none">
       <span>
         {{ tab.title }}
       </span>
