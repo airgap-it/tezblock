@@ -51,10 +51,14 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
           const rewards: TezosRewards[] = []
           // TODO fetching rewards for the current cycle takes a long time, thus we start at i=0 for now
 
-          for (let i = 0; i < pagination.selectedSize * pagination.currentPage; i++) {
-            const cycleRewards = await protocol.calculateRewards(address, currentCycle - i)
+          for (let i = 1; i < pagination.selectedSize * pagination.currentPage; i++) {
+            const cycleRewards: any = await protocol.calculateRewards(address, currentCycle - i)
+            cycleRewards.payouts = await protocol.calculatePayouts(cycleRewards, 0, cycleRewards.delegatedContracts.length)
+            console.log('cycleRewards', cycleRewards)
+
             rewards.push(cycleRewards)
           }
+
           return rewards
         })
       )
