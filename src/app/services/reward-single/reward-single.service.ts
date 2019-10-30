@@ -54,8 +54,6 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
           for (let i = 1; i < pagination.selectedSize * pagination.currentPage; i++) {
             const cycleRewards: any = await protocol.calculateRewards(address, currentCycle - i)
             cycleRewards.payouts = await protocol.calculatePayouts(cycleRewards, 0, cycleRewards.delegatedContracts.length)
-            console.log('cycleRewards', cycleRewards)
-
             rewards.push(cycleRewards)
           }
 

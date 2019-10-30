@@ -6,13 +6,5 @@ import { Component, Input } from '@angular/core'
   styleUrls: ['./extend-table-cell.component.scss']
 })
 export class ExtendTableCellComponent {
-  public expanded: boolean = false
   constructor() {}
-
-  @Input()
-  public data: any
-
-  invertExpanded() {
-    this.expanded = !this.expanded
-  }
 }
