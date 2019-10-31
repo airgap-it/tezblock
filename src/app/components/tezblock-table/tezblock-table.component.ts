@@ -187,7 +187,7 @@ const layouts: Layout = {
       { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
       { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
       { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: '', property: '', width: '', component: ExtendTableCellComponent }
+      { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
     ],
     [OperationTypes.BakingRights]: [
       { name: 'Cycle', property: 'cycle', width: '' },
@@ -576,9 +576,10 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public expand(transaction: any) {
+    console.log('expand', transaction)
     if (transaction.expand) {
       transaction.expand = false
-    } else  {
+    } else {
       transaction.expand = true
     }
   }
