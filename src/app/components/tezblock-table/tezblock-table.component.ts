@@ -576,7 +576,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public expand(transaction: any) {
-    console.log('expand', transaction)
     if (transaction.expand) {
       transaction.expand = false
     } else {

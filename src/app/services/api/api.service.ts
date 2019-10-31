@@ -400,7 +400,6 @@ export class ApiService {
 
   public getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
     if (address.startsWith('tz')) {
-      console.log('with tz')
       return this.http.post<Transaction[]>(
         this.transactionsApiUrl,
         {
@@ -435,7 +434,6 @@ export class ApiService {
         this.options
       )
     } else {
-      console.log('with kt')
       return this.http.post<Transaction[]>(
         this.transactionsApiUrl,
         {
