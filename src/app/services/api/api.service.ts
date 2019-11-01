@@ -559,43 +559,76 @@ export class ApiService {
   }
 
   public getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<T[]>(
-          this.transactionsApiUrl,
+    let headers
+    if (field === 'operation_group_hash') {
+      // then we only care about spend transactions
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
           {
-            fields: [field, 'block_level'],
-            predicates: [
-              {
-                field,
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'block_level',
-                operation: 'in',
-                set: blockRange
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            aggregation: [
-              {
-                field,
-                function: operation
-              }
-            ],
-            limit
+            field,
+            operation: 'isnull',
+            inverse: true
           },
-          this.options
-        )
-        .subscribe((volumePerBlock: T[]) => {
-          resolve(volumePerBlock)
-        })
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          },
+          {
+            field: 'kind',
+            operation: 'in',
+            set: ['transaction']
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    } else {
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    }
+    return new Promise((resolve, reject) => {
+      this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
+        resolve(volumePerBlock)
+      })
     })
   }
 
