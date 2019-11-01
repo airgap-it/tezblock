@@ -32,6 +32,12 @@ export interface Transaction {
   level: number
   delegatedBalance?: number
   proposal?: string
+  cycle?: number
+  stakingBalance: string
+  bakingRewards: string
+  endorsingRewards: string
+  fees: string
+  totalRewards: string
   originated_contracts?: string
   // These are our own properties
   votes?: number
