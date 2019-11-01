@@ -31,6 +31,7 @@ interface Column {
   width: string
   component?: any // TODO: any
   options?: any // TODO: any, boolean?
+  transform?(value: any): any
 }
 
 enum LayoutPages {
@@ -180,8 +181,8 @@ const layouts: Layout = {
         name: 'Delegations',
         property: 'delegatedContracts',
         width: '',
-        component: AddressCellComponent,
-        options: { showFullAddress: false, multipleAddresses: true, pageId: 'oo' }
+        component: PlainValueCellComponent,
+        transform: (addresses: [string]): number => addresses.length
       },
       { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
       { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
@@ -603,7 +604,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         target.clear()
 
         const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent) // TODO: <any>
-        cmpRef.instance.data = data
+
+        cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
         if (cellType.options) {
           if (cellType.options.pageId) {
             cellType.options.pageId = ownId
