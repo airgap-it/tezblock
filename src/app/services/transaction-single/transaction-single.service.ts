@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, forkJoin, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
-import axios, { AxiosResponse } from 'axios'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'

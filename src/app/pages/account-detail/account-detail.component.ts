@@ -182,6 +182,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     try {
       this.bakingInfos = await this.bakingService.getBakerInfos(address)
 
+      this.stakingBalance = this.bakingInfos.stakingBalance
+      this.stakingCapacity = this.bakingInfos.stakingCapacity
+      this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
+      this.stakingBond = this.bakingInfos.stakingBond
       this.isValidBaker = true
       this.bakerTableInfos = {
         stakingBalance: this.bakingInfos.stakingBalance,
