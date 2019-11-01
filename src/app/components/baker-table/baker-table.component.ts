@@ -1,15 +1,15 @@
-import { RewardSingleService } from './../../services/reward-single/reward-single.service'
-import { Transaction } from './../../interfaces/Transaction'
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Subscription, Observable } from 'rxjs'
-import { Account } from './../../interfaces/Account'
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Observable, Subscription } from 'rxjs'
+
+import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
 import { BakingService } from './../../services/baking/baking.service'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { RewardSingleService } from './../../services/reward-single/reward-single.service'
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 
 export interface Tab {
   title: string
@@ -23,7 +23,7 @@ export interface Tab {
   selector: 'baker-table',
   templateUrl: './baker-table.component.html',
   styleUrls: ['./baker-table.component.scss'],
-  providers: [AccountSingleService, RewardSingleService]
+  providers: [AccountSingleService, RewardSingleService, RightsSingleService]
 })
 export class BakerTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
@@ -94,7 +94,6 @@ export class BakerTableComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly accountService: AccountService,
-    private readonly bakingService: BakingService,
     private readonly rightsSingleService: RightsSingleService,
     private readonly accountSingleService: AccountSingleService,
     private readonly rewardSingleService: RewardSingleService,

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, Observable } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+
 import { ApiService } from '../api/api.service'
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
 
@@ -55,7 +56,7 @@ export class RightsSingleService extends Facade<RightsSingleServiceState> {
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.kind$, this.address$])
+    this.subscription = combineLatest([this.pagination$, this.kind$, this.address$])
       .pipe(
         switchMap(([pagination, kind, address]) => {
           if (kind === 'baking_rights') {
