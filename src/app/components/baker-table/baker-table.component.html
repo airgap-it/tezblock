@@ -140,6 +140,23 @@
               </div>
 
               <div class="mb-4">
+                <h5 class="card-title__secondary mb-3 ">
+                  Active Delegations
+                </h5>
+                <h3>
+                  <ng-container *ngIf="!activeDelegations$; then loading; else loaded"></ng-container>
+                  <ng-template #loading>
+                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                  </ng-template>
+                  <ng-template #loaded>
+                    <ng-container *ngIf="activeDelegations$ | async as activeDelegations">
+                      <span class="d-inline-block" [innerHtml]="activeDelegations | safeHtml"></span>
+                    </ng-container>
+                  </ng-template>
+                </h3>
+              </div>
+
+              <div class="mb-4">
                 <h5 class="card-title__secondary mb-3">
                   Number of Rolls
                 </h5>

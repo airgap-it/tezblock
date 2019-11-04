@@ -111,7 +111,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public myTBUrl: string | undefined
   public address: string
   public frozenBalance: number | undefined
-  public activeDelegations$: Observable<number>
   public rewardsTransaction: any
 
   constructor(
@@ -135,7 +134,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
     this.getBakingInfos(this.address)
-    this.activeDelegations$ = this.accountSingleService.activeDelegations$
 
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
