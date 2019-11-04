@@ -60,23 +60,22 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
     this.subscription = combineLatest([this.address$, this.timer$])
       .pipe(
         switchMap(([address, _]) => {
+          return this.apiService.getDelegatedAccountsList(address)
+        })
+      )
+      .subscribe(list => {
+        this.updateState({ ...this._state, activeDelegations: list.length, loading: false })
+      })
+
+    this.subscription = combineLatest([this.address$, this.timer$])
+      .pipe(
+        switchMap(([address, _]) => {
           return this.getById(address)
         })
       )
       .subscribe(account => {
         this.updateState({ ...this._state, account, loading: false })
       })
-    this.subscription.add(
-      combineLatest([this.address$, this.timer$])
-        .pipe(
-          switchMap(([address, _]) => {
-            return this.apiService.getDelegatedAccountsList(address)
-          })
-        )
-        .subscribe(list => {
-          this.updateState({ ...this._state, activeDelegations: list.length, loading: false })
-        })
-    )
   }
 
   private getById(id: string): Observable<Account> {

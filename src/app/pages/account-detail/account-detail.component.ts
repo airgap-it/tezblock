@@ -120,6 +120,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
 
     this.getBakingInfos(this.address)
+    this.activeDelegations$ = this.accountSingleService.activeDelegations$
 
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
@@ -129,8 +130,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
           } else if (delegatedAccounts.length > 0) {
             this.delegatedAccountAddress = delegatedAccounts[0].account_id
             this.bakerAddress = delegatedAccounts[0].delegate
-
-            this.activeDelegations$ = this.accountSingleService.activeDelegations$
 
             this.delegatedAmount = delegatedAccounts[0].balance
           } else {
