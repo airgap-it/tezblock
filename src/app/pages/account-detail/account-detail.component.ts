@@ -182,18 +182,18 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     try {
       this.bakingInfos = await this.bakingService.getBakerInfos(address)
 
-      this.stakingBalance = this.bakingInfos.stakingBalance
-      this.stakingCapacity = this.bakingInfos.stakingCapacity
-      this.stakingProgress = Math.min(100, this.bakingInfos.stakingProgress)
-      this.stakingBond = this.bakingInfos.stakingBond
       this.isValidBaker = true
-      this.bakerTableInfos = {
-        stakingBalance: this.bakingInfos.stakingBalance,
-        stakingCapacity: this.bakingInfos.stakingCapacity,
-        stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
-        stakingBond: this.bakingInfos.selfBond,
-        frozenBalance: await this.accountService.getFrozen(address)
+      if (this.bakingInfos) {
+        this.bakerTableInfos = {
+          stakingBalance: this.bakingInfos.stakingBalance,
+          numberOfRolls: Math.floor(this.bakingInfos.stakingBalance / (8000 * 1000000)),
+          stakingCapacity: this.bakingInfos.stakingCapacity,
+          stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
+          stakingBond: this.bakingInfos.selfBond,
+          frozenBalance: await this.accountService.getFrozen(address)
+        }
       }
+
 
       // this.nextPayout = this.bakingInfos.nextPayout
       // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
