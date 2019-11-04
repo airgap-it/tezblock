@@ -23,8 +23,7 @@ export class ChainNetworkService implements OnInit {
     const url = this.getEnvironmentUrl()
     if (url === 'babylon') {
       return environment.babylonnet
-    }
-    if (url === 'mainnet') {
+    } else {
       return environment.mainnet
     }
   }
