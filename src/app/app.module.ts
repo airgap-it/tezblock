@@ -49,8 +49,9 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component';
+import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { ChainNetworkService } from './services/chain-network/chain-network.service'
 
 @NgModule({
   imports: [
@@ -111,7 +112,7 @@ import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-w
     ResourcesWalletsComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
+  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   entryComponents: [
     BlockItemComponent,
     IdenticonComponent,

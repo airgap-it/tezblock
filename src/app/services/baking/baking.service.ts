@@ -11,6 +11,7 @@ import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
 
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
 import { OperationsService } from '../operations/operations.service'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -42,8 +43,11 @@ export class BakingService {
     private readonly http: HttpClient,
     public location: Location,
     private readonly router: Router,
-    public operationsService: OperationsService
+    public operationsService: OperationsService,
+    public readonly chainNetworkService: ChainNetworkService
   ) {}
+
+  public environmentUrls = this.chainNetworkService.getEnvironment()
 
   public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
@@ -87,13 +91,13 @@ export class BakingService {
   }
 
   public async checkDelegated(address: string): Promise<DelegationInfo> {
-    const protocol = new TezosKtProtocol()
+    const protocol = new TezosKtProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
 
     return protocol.isAddressDelegated(address)
   }
 
   public async getBakerInfos(tzAddress: string) {
-    const tezosProtocol = new TezosProtocol()
+    const tezosProtocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
 
     this.bakerInfo = await tezosProtocol.bakerInfo(tzAddress)
 

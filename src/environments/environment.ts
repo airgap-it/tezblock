@@ -4,6 +4,15 @@
 
 export const environment = {
   production: false,
+  mainnet: {
+    rpc: 'https://tezos-node.prod.gke.papers.tech',
+    conseil: 'https://conseil-prod.cryptonomic-infra.tech'
+  },
+
+  babylonnet: {
+    rpc: 'https://tezos-dev.cryptonomic-infra.tech',
+    conseil: 'https://conseil-dev.cryptonomic-infra.tech'
+  },
   conseilBaseUrl: 'CONSEIL_BASE_URL',
   conseilApiKey: 'CONSEIL_API_KEY',
   proFontAwesomeAvailable: false
