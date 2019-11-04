@@ -504,7 +504,11 @@
     "hasLogo": true
   },
   "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8": {
-    "alias": "My Tezos Baking",
+    "alias": "MyTezosBaking",
+    "hasLogo": true
+  },
+  "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5": {
+    "alias": "MyTezosBaking Payouts",
     "hasLogo": true
   },
   "tz1djEKk6j1FqigTgbRsunbnY9BB7qsn1aAQ": {
@@ -641,11 +645,11 @@
   },
   "tz3bTdwZinP8U1JmSweNzVKhmwafqWmFWRfk": {
     "alias": "Foundation Baker 4",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5": {
     "alias": "Foundation Baker 2",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz3e75hU4EhDU3ukyJueh5v6UvEHzGwkg3yC": {
     "alias": "At James",
@@ -653,6 +657,10 @@
   },
   "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194": {
     "alias": "StakeNow",
+    "hasLogo": true
+  },
+  "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC": {
+    "alias": "StakeNow Payouts",
     "hasLogo": true
   },
   "tz1Zrqm4TkJwqTxm5TiyVFh6taXG4Wrq7tko": {

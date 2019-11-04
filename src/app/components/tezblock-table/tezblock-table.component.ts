@@ -19,6 +19,7 @@ import { Transaction } from '../../interfaces/Transaction'
 import { AddressCellComponent } from './address-cell/address-cell.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { BlockCellComponent } from './block-cell/block-cell.component'
+import { ExtendTableCellComponent } from './extend-table-cell/extend-table-cell.component'
 import { HashCellComponent } from './hash-cell/hash-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
@@ -30,6 +31,7 @@ interface Column {
   width: string
   component?: any // TODO: any
   options?: any // TODO: any, boolean?
+  transform?(value: any): any
 }
 
 enum LayoutPages {
@@ -46,11 +48,14 @@ enum OperationTypes {
   Reveal = 'reveal',
   Ballot = 'ballot',
   BallotOverview = 'ballot_overview',
+  BakingRights = 'baking_rights',
+  EndorsingRights = 'endorsing_rights',
   Activation = 'activate_account',
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
-  EndorsementOverview = 'endorsement_overview'
+  EndorsementOverview = 'endorsement_overview',
+  Rewards = 'rewards'
 }
 
 interface Layout {
@@ -60,6 +65,9 @@ interface Layout {
     [OperationTypes.Origination]: Column[]
     [OperationTypes.Endorsement]: Column[]
     [OperationTypes.Ballot]: Column[]
+    [OperationTypes.Rewards]: Column[]
+    [OperationTypes.BakingRights]: Column[]
+    [OperationTypes.EndorsingRights]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -166,6 +174,53 @@ const layouts: Layout = {
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
+    [OperationTypes.Rewards]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      {
+        name: 'Delegations',
+        property: 'delegatedContracts',
+        width: '',
+        component: PlainValueCellComponent,
+        transform: (addresses: [string]): number => addresses.length
+      },
+      { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
+      { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
+      { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
+      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+      { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
+    ],
+    [OperationTypes.BakingRights]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Fees', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      {
+        name: 'Delegate',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.EndorsingRights]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
+      { name: 'Slot', property: 'slot', width: '' },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      {
+        name: 'Delegate',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ]
   },
   [LayoutPages.Block]: {
@@ -521,6 +576,10 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
     }
   }
 
+  public expand(transaction: any) {
+    transaction.expand = transaction.expand ? false : true
+  }
+
   public renderComponents() {
     if (this.cells) {
       for (let i = 0; i < this.cells.toArray().length; i++) {
@@ -541,7 +600,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         target.clear()
 
         const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent) // TODO: <any>
-        cmpRef.instance.data = data
+
+        cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
         if (cellType.options) {
           if (cellType.options.pageId) {
             cellType.options.pageId = ownId
@@ -556,11 +616,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
+    // console.log('type of page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
         // tslint:disable-next-line:no-console
-        console.log('have layout for type ', this.type)
-        console.log('have layout for page ', this.page)
+        // console.log('have layout for type ', this.type)
+        // console.log('have layout for page ', this.page)
 
         this.config = layouts[this.page][this.type]
       } else {
