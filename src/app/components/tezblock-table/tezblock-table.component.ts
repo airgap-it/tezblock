@@ -397,7 +397,7 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
 
-      { name: 'Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',

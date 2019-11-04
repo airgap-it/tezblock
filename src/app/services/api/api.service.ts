@@ -82,15 +82,37 @@ export class ApiService {
       )
       .pipe(
         map(transactions => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const originatedAccounts = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'origination') {
+              originatedAccounts.push(transaction.originated_contracts)
+            }
+          })
+          if (originatedAccounts.length > 0) {
+            const originatedSources = this.getAccountsByIds(originatedAccounts)
+            originatedSources.subscribe(originators => {
+              finalTransactions.forEach(transaction => {
+                originators.forEach(originator => {
+                  if (transaction.originated_contracts === originator.account_id) {
+                    transaction.originatedBalance = originator.balance
+                  }
+                })
+              })
+            })
+          }
+
           if (kindList.includes('ballot' || 'proposals')) {
             let source: Transaction[] = []
-            source.push(...transactions)
+            source.push(...finalTransactions)
             source.map(async transaction => {
               await this.addVotesForTransaction(transaction)
             })
             return source
           }
-          return transactions
+          return finalTransactions
         })
       )
   }
