@@ -16,10 +16,12 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
-  private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
-  private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
-  private readonly frozenBalanceApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/delegates`
+  public environmentUrls = this.chainNetworkService.getEnvironment()
+
+  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/accounts`
+  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -38,7 +40,7 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient, public chainNetworkService: ChainNetworkService) {}
+  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -665,8 +667,7 @@ export class ApiService {
 
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
-      const environmentUrls = this.chainNetworkService.getEnvironment()
-      const protocol = new TezosProtocol(environmentUrls.rpc, environmentUrls.conseil)
+      const protocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)
