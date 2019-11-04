@@ -160,6 +160,21 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
             })
           }
         }
+        if (kind === 'origination') {
+          const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
+
+          if (originatedSources.length > 0) {
+            const originatedAccounts = this.apiService.getAccountsByIds(originatedSources)
+            originatedAccounts.subscribe(originators => {
+              originators.forEach(originator => {
+                const transaction = transactions.find(t => t.originated_contracts === originator.account_id)
+                if (transaction !== undefined) {
+                  transaction.originatedBalance = originator.balance
+                }
+              })
+            })
+          }
+        }
 
         if (kind === 'ballot') {
           transactions.map(async transaction => this.apiService.addVotesForTransaction(transaction))
