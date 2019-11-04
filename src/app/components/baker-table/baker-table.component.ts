@@ -33,6 +33,8 @@ export class BakerTableComponent implements OnInit {
   public bakingBadRating: string | undefined
   public tezosBakerRating: string | undefined
   public stakingBalance: number | undefined
+  public numberOfRolls: number | undefined
+
   public bakingInfos: any
   public stakingCapacity: number | undefined
   public stakingProgress: number | undefined
@@ -74,11 +76,14 @@ export class BakerTableComponent implements OnInit {
 
   @Input()
   set data(bakerTableInfos: any) {
-    this.stakingBalance = bakerTableInfos.stakingBalance
-    this.stakingCapacity = bakerTableInfos.stakingCapacity
-    this.stakingProgress = bakerTableInfos.stakingProgress
-    this.stakingBond = bakerTableInfos.stakingBond
-    this.frozenBalance = bakerTableInfos.frozenBalance
+    if (bakerTableInfos) {
+      this.stakingBalance = bakerTableInfos.stakingBalance
+      this.stakingCapacity = bakerTableInfos.stakingCapacity
+      this.stakingProgress = bakerTableInfos.stakingProgress
+      this.stakingBond = bakerTableInfos.stakingBond
+      this.frozenBalance = bakerTableInfos.frozenBalance
+      this.numberOfRolls = bakerTableInfos.numberOfRolls
+    }
   }
 
   @Input()
