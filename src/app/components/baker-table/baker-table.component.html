@@ -144,10 +144,9 @@
                   Active Delegations
                 </h5>
                 <h5>
-                  <ng-container *ngIf="!activeDelegations$; then loading; else loaded"></ng-container>
-                  <ng-template #loading>
+                  <ng-container *ngIf="accountLoading$ | async; else loaded">
                     <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                  </ng-template>
+                  </ng-container>
                   <ng-template #loaded>
                     <ng-container *ngIf="activeDelegations$ | async as activeDelegations">
                       <span class="d-inline-block" [innerHtml]="activeDelegations | safeHtml"></span>
@@ -161,7 +160,12 @@
                   Number of Rolls
                 </h5>
                 <h5>
-                  <span class="d-inline-block">{{ numberOfRolls }}</span>
+                  <ng-container *ngIf="!numberOfRolls; else rolls">
+                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                  </ng-container>
+                  <ng-template #rolls>
+                    <span class="d-inline-block">{{ numberOfRolls }}</span>
+                  </ng-template>
                 </h5>
               </div>
             </div>

@@ -21,7 +21,7 @@ const initalState: AccountSingleServiceState = {
   account: undefined,
   delegatedAccounts: undefined,
   relatedAccounts: undefined,
-  loading: false,
+  loading: true,
   activeDelegations: undefined
 }
 
@@ -53,6 +53,8 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
     map(state => state.activeDelegations),
     distinctUntilChanged()
   )
+
+  public loading$ = this.state$.pipe(map(state => state.loading))
 
   constructor(private readonly apiService: ApiService) {
     super(initalState)
@@ -140,7 +142,6 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
     this.updateState({ ...this._state, address, loading: true })
   }
 }
-
 
 //        })
 //       } else {
