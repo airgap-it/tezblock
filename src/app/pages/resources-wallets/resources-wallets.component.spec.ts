@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 
 import { ResourcesWalletsComponent } from './resources-wallets.component'
+import { ResourcesWalletItemComponent } from "../../components/resources-wallet-item/resources-wallet-item.component";
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
@@ -16,7 +17,10 @@ describe('ResourcesWalletsComponent', () => {
       unitHelper.testBed({
         providers: [IconPipe],
         imports: [FontAwesomeModule],
-        declarations: [ResourcesWalletsComponent]
+        declarations: [
+          ResourcesWalletItemComponent,
+          ResourcesWalletsComponent
+        ]
       })
     )
       .compileComponents()
