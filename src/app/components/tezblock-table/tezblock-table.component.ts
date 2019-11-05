@@ -531,6 +531,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public transactions: Transaction[] = []
   public loading$: Observable<boolean> = new Observable()
   private subscription: Subscription
+  public filterTerm: string | undefined
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
@@ -558,6 +559,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public page?: LayoutPages
   @Input()
   public type?: OperationTypes
+  @Input()
+  public enableSearch?: false
 
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
@@ -578,6 +581,18 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
   public expand(transaction: any) {
     transaction.expand = transaction.expand ? false : true
+  }
+
+  public filterTransactions(filterTerm: string) {
+    if (filterTerm) {
+      const filteredTransactions: any[] = this.transactions.map((transaction: any) => {
+        transaction.payouts = transaction.payouts.filter(payout => payout.delegator === filterTerm)
+
+        return transaction
+      })
+
+      this.transactions = filteredTransactions
+    }
   }
 
   public renderComponents() {

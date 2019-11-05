@@ -41,6 +41,16 @@
         </thead>
         <tbody>
           <ng-container *ngIf="transactions">
+            <ng-container *ngIf="enableSearch">
+              <div class="input-group input-group-main">
+                <input class="form-control form-control--focus-white" placeholder="Filter by Address" [(ngModel)]="filterTerm" />
+                <div class="input-group-append">
+                  <button class="btn btn-primary" type="submit" (click)="filterTransactions(filterTerm)">
+                    <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
             <ng-container *ngFor="let transaction of transactions; let i = index">
               <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
                 <!--tx status is always 'null' for endorsements-->
