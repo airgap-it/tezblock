@@ -21,10 +21,13 @@ export class ChainNetworkService implements OnInit {
 
   public getEnvironment() {
     const url = this.getEnvironmentUrl()
-    if (url === 'babylon') {
+    if (url === 'babylonnet') {
       return environment.babylonnet
     } else {
       return environment.mainnet
     }
+  }
+  public getEnvironmentVariable() {
+    return this.url
   }
 }

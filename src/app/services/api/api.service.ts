@@ -17,11 +17,12 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
 })
 export class ApiService {
   public environmentUrls = this.chainNetworkService.getEnvironment()
+  public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
 
-  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/blocks`
-  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/operations`
-  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/accounts`
-  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/mainnet/delegates`
+  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/accounts`
+  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
