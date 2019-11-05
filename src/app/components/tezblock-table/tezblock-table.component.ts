@@ -559,6 +559,9 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   @Input()
   public type?: OperationTypes
 
+  @Input()
+  public expandable?: boolean = false
+
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 
@@ -577,7 +580,9 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public expand(transaction: any) {
-    transaction.expand = transaction.expand ? false : true
+    if (this.expandable) {
+      transaction.expand = transaction.expand ? false : true
+    }
   }
 
   public renderComponents() {

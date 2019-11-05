@@ -211,6 +211,7 @@
         [data]="rewards$"
         [page]="page"
         [type]="selectedTab.kind"
+        [expandable]="true"
         (loadMoreClicked)="loadMoreRewards()"
       ></tezblock-table>
       <!-- <tezblock-table [showLoadMoreButton]="!(rewardsLoading$ | async) && ((rewards$ | async))" [loading]="rewardsLoading$"
