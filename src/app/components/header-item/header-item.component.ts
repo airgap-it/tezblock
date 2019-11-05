@@ -24,6 +24,7 @@ export class HeaderItemComponent {
   public title = 'tezblock'
   public isCollapsed = true
   public showDropdown = false
+  public selectedNetwork: string = 'Mainnet'
 
   constructor(
     private readonly router: Router,
@@ -76,4 +77,8 @@ export class HeaderItemComponent {
 
   @Input()
   public activeLinkResources: boolean = false
+
+  public changeNetwork(name: string) {
+    this.selectedNetwork = name
+  }
 }

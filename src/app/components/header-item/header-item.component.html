@@ -242,17 +242,29 @@
                     (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
                   >
                     <!--TODO: set active network -->
-                    Mainnet
+                    {{ selectedNetwork }}
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <!--TODO: display other networks -->
                     <li role="menuitem">
-                      <a class="dropdown-item" href="https://babylonnet.tezblock.io">
+                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'Mainnet' ? 'active' : ''" (click)="changeNetwork('Mainnet')">
+                        Mainnet
+                      </a>
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork == 'Babylonnet' ? 'active' : ''"
+                        (click)="changeNetwork('Babylonnet')"
+                      >
                         Babylonnet
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item text-muted" disabled>
+                      <a
+                        class="dropdown-item text-muted"
+                        [ngClass]="selectedNetwork == 'Zeronet' ? 'active' : ''"
+                        (click)="changeNetwork('Zeronet')"
+                        disabled
+                      >
                         Zeronet
                       </a>
                     </li>
