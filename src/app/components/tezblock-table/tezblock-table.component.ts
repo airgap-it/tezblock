@@ -532,6 +532,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public loading$: Observable<boolean> = new Observable()
   private subscription: Subscription
   public filterTerm: string | undefined
+  public backupTransactions: Transaction[] = []
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
@@ -541,6 +542,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
+        this.backupTransactions = transactions
         this.transactions = transactions
       })
     }
@@ -585,7 +587,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
   public filterTransactions(filterTerm: string) {
     if (filterTerm) {
-      const filteredTransactions: any[] = this.transactions.map((transaction: any) => {
+      const filteredTransactions: any[] = this.backupTransactions.map((transaction: any) => {
         transaction.payouts = transaction.payouts.filter(payout => payout.delegator === filterTerm)
 
         return transaction
