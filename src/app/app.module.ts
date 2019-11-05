@@ -52,7 +52,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
-import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
 
 @NgModule({
   imports: [
@@ -112,7 +113,8 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
     TelegramModalComponent,
     BakerTableComponent,
     ResourcesWalletsComponent,
-    ExtendTableCellComponent
+    ExtendTableCellComponent,
+    ResourcesWalletItemComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
