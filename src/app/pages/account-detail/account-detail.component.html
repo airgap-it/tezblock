@@ -25,7 +25,7 @@
                 <address-item
                   class="d-inline-flex"
                   [address]="account.account_id"
-                  [showFull]="true"
+                  [showFull]="!(isMobile$ | async)"
                   [clickableButton]="false"
                   [forceIdenticon]="true"
                   [hideIdenticon]="!hasLogo"
@@ -107,7 +107,7 @@
                 This account has no related accounts.
               </p>
               <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts | async | slice: 0:paginationLimit" [@AnimateList]>
-                <address-item [address]="relatedAccount.account_id" *ngIf="relatedAccount" [showFull]="true"></address-item>
+                <address-item [address]="relatedAccount.account_id" *ngIf="relatedAccount" [showFull]="!(isMobile$ | async)"></address-item>
               </div>
               <div *ngIf="relatedAccounts | async as relatedAccountsList">
                 <button
