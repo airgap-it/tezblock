@@ -13,6 +13,7 @@ interface AccountSingleServiceState {
   delegatedAccounts: Account[]
   relatedAccounts: Account[]
   loading: boolean
+  activeDelegations: number | undefined
 }
 
 const initalState: AccountSingleServiceState = {
@@ -20,7 +21,8 @@ const initalState: AccountSingleServiceState = {
   account: undefined,
   delegatedAccounts: undefined,
   relatedAccounts: undefined,
-  loading: false
+  loading: true,
+  activeDelegations: undefined
 }
 
 @Injectable({
@@ -47,8 +49,25 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
     distinctUntilChanged(distinctAccounts)
   )
 
+  public activeDelegations$ = this.state$.pipe(
+    map(state => state.activeDelegations),
+    distinctUntilChanged()
+  )
+
+  public loading$ = this.state$.pipe(map(state => state.loading))
+
   constructor(private readonly apiService: ApiService) {
     super(initalState)
+
+    this.subscription = combineLatest([this.address$, this.timer$])
+      .pipe(
+        switchMap(([address, _]) => {
+          return this.apiService.getDelegatedAccountsList(address)
+        })
+      )
+      .subscribe(list => {
+        this.updateState({ ...this._state, activeDelegations: list.length, loading: false })
+      })
 
     this.subscription = combineLatest([this.address$, this.timer$])
       .pipe(
@@ -123,7 +142,6 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
     this.updateState({ ...this._state, address, loading: true })
   }
 }
-
 
 //        })
 //       } else {

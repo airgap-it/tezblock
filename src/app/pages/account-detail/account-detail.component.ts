@@ -129,10 +129,11 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly rightsSingleService: RightsSingleService
   ) {
     this.address = this.route.snapshot.params.id
-    this.getBakingInfos(this.address)
 
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+
+    this.getBakingInfos(this.address)
 
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(

@@ -43,12 +43,15 @@ export class BakerTableComponent implements OnInit {
   public isValidBaker: boolean | undefined
   public rewardsLoading$: Observable<boolean>
   public rightsLoading$: Observable<boolean>
+  public accountLoading$: Observable<boolean>
 
   public rewards$: Observable<TezosRewards[]> = new Observable()
   public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
   public rewards: TezosRewards
+
+  public activeDelegations$: Observable<number>
 
   public myTBUrl: string | undefined
   public address: string
@@ -112,8 +115,9 @@ export class BakerTableComponent implements OnInit {
     this.rewards$ = this.rewardSingleService.rewards$
     this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
+    this.accountLoading$ = this.accountSingleService.loading$
 
-    // this.getBakingInfos(this.address)
+    this.activeDelegations$ = this.accountSingleService.activeDelegations$
   }
 
   public async ngOnInit() {
