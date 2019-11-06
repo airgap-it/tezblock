@@ -31,7 +31,7 @@ interface Column {
   width: string
   component?: any // TODO: any
   options?: any // TODO: any, boolean?
-  optionsTransaform?(value: any, options: any): any;
+  optionsTransform?(value: any, options: any): any
   transform?(value: any): any
 }
 
@@ -128,7 +128,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
@@ -265,7 +267,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -383,7 +387,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -406,9 +412,7 @@ const layouts: Layout = {
         width: '1',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' },
-        optionsTransaform: (value, options) => !value
-          ? { ...options, isText: true }
-          : options,
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
         transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
@@ -471,9 +475,7 @@ const layouts: Layout = {
         width: '1',
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' },
-        optionsTransaform: (value, options) => !value
-          ? { ...options, isText: true }
-          : options,
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
         transform: value => value || 'undelegate'
       },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -612,9 +614,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
 
-        const options = cellType.optionsTransaform
-          ? cellType.optionsTransaform(data, cellType.options)
-          : cellType.options;
+        const options = cellType.optionsTransform ? cellType.optionsTransform(data, cellType.options) : cellType.options
 
         if (options) {
           if (options.pageId) {
