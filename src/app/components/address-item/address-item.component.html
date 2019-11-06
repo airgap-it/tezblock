@@ -1,5 +1,5 @@
 <div [ngSwitch]="isText" class="media d-flex align-items-center" (click)="inspectDetail()">
-  <span *ngSwitchCase="true">{{ address }}</span>
+  <ng-container *ngSwitchCase="true">{{ address }}</ng-container>
   <ng-container *ngSwitchDefault>
     <identicon class="mr-2" [address]="address" *ngIf="!hideIdenticon" [forceIdenticon]="forceIdenticon"></identicon>
 
