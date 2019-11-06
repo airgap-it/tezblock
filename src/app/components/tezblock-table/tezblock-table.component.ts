@@ -31,6 +31,7 @@ interface Column {
   width: string
   component?: any // TODO: any
   options?: any // TODO: any, boolean?
+  optionsTransform?(value: any, options: any): any
   transform?(value: any): any
 }
 
@@ -127,7 +128,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
@@ -264,7 +267,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -382,7 +387,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -404,7 +411,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
@@ -465,7 +474,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
@@ -602,12 +613,15 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent) // TODO: <any>
 
         cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
-        if (cellType.options) {
-          if (cellType.options.pageId) {
-            cellType.options.pageId = ownId
+
+        const options = cellType.optionsTransform ? cellType.optionsTransform(data, cellType.options) : cellType.options
+
+        if (options) {
+          if (options.pageId) {
+            options.pageId = ownId
           }
-          cmpRef.instance.options = cellType.options
-          if (cellType.options.pageId) {
+          cmpRef.instance.options = options
+          if (options.pageId) {
             cmpRef.instance.checkId()
           }
         }
