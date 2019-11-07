@@ -1,3 +1,6 @@
+<span *ngIf="!data" class="text-secondary">
+  None
+</span>
 <button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">Show</button>
 
 <ng-template #template>
