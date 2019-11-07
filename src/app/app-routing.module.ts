@@ -7,6 +7,7 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component'
 import { ListComponent } from './pages/list/list.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { HealthComponent } from './pages/health/health.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -14,7 +15,8 @@ const routes: Routes = [
   { path: ':route/list', component: ListComponent },
   { path: 'block/:id', component: BlockDetailComponent },
   { path: 'account/:id', component: AccountDetailComponent },
-  { path: 'transaction/:id', component: TransactionDetailComponent }
+  { path: 'transaction/:id', component: TransactionDetailComponent },
+  { path: 'health', component: HealthComponent }
 ]
 
 @NgModule({
