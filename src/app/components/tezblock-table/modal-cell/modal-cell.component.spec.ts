@@ -1,5 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { ModalModule } from 'ngx-bootstrap/modal'
+import { BsModalService } from 'ngx-bootstrap'
 
 import { ModalCellComponent } from './modal-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
@@ -13,8 +15,8 @@ describe('ModalCellComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [],
-        imports: [FontAwesomeModule],
+        providers: [BsModalService],
+        imports: [ModalModule.forRoot(), FontAwesomeModule],
         declarations: [ModalCellComponent]
       })
     ).compileComponents()
