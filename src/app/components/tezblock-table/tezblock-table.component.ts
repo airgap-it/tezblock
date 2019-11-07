@@ -24,6 +24,7 @@ import { HashCellComponent } from './hash-cell/hash-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
+import { ModalCellComponent } from './modal-cell/modal-cell.component';
 
 interface Column {
   name: string
@@ -338,7 +339,7 @@ const layouts: Layout = {
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
-      { name: 'Parameters', property: 'parameters', width: '' },
+      { name: 'Parameters', property: 'parameters', width: '', component: ModalCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ],
 
@@ -356,7 +357,7 @@ const layouts: Layout = {
 
       { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fees', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: 'Parameters', property: 'parameters', width: '' },
+      { name: 'Parameters', property: 'parameters', width: '', component: ModalCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ],
