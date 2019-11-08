@@ -49,8 +49,7 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component';
-import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 
 @NgModule({
   imports: [
@@ -108,7 +107,12 @@ import { EndorsementDetailComponent } from './pages/endorsement-detail/endorseme
     TransactionDetailWrapperComponent,
     LoadingSkeletonComponent,
     TelegramModalComponent,
-    EndorsementDetailComponent
+    BakerTableComponent,
+    ResourcesWalletsComponent,
+    ExtendTableCellComponent,
+    ResourcesWalletItemComponent,
+    ModalCellComponent,
+EndorsementDetailComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
@@ -129,7 +133,9 @@ import { EndorsementDetailComponent } from './pages/endorsement-detail/endorseme
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent
+    PricechartItemComponent,
+    ExtendTableCellComponent,
+    ModalCellComponent
   ],
   bootstrap: [AppComponent]
 })

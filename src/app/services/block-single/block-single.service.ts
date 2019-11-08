@@ -1,9 +1,10 @@
-import { BlockService } from './../blocks/blocks.service'
-import { Block } from 'src/app/interfaces/Block'
-import { map, distinctUntilChanged, switchMap } from 'rxjs/operators'
-import { Facade, distinctPagination, Pagination } from './../facade/facade'
 import { Injectable } from '@angular/core'
-import { Observable, combineLatest } from 'rxjs'
+import { combineLatest, Observable } from 'rxjs'
+import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import { Block } from 'src/app/interfaces/Block'
+
+import { BlockService } from './../blocks/blocks.service'
+import { distinctPagination, Facade, Pagination } from './../facade/facade'
 
 interface BlockSingleServiceState {
   block: Block[] | undefined
@@ -54,7 +55,7 @@ export class BlockSingleService extends Facade<BlockSingleServiceState> {
   constructor(private readonly blockService: BlockService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.id$, this.hash$, this.timer$])
+    this.subscription = combineLatest([this.pagination$, this.id$, this.hash$, this.timer$])
       .pipe(
         switchMap(([pagination, id, hash, _]) => {
           if (id) {

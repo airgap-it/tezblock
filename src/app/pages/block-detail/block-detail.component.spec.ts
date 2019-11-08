@@ -1,3 +1,4 @@
+import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
@@ -14,6 +15,7 @@ import { AmountConverterPipe } from './../../pipes/amount-converter/amount-conve
 import { BlockDetailComponent } from './block-detail.component'
 import { BlockDetailWrapperComponent } from 'src/app/components/block-detail-wrapper/block-detail-wrapper.component'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
+import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 
 describe('BlockDetailComponent', () => {
   let component: BlockDetailComponent
@@ -30,6 +32,8 @@ describe('BlockDetailComponent', () => {
           BlockDetailComponent,
           IdenticonComponent,
           AddressItemComponent,
+          AmountCellComponent,
+          AddressCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,
           BlockDetailWrapperComponent,

@@ -1,21 +1,30 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faGithub, faMedium, faTelegram, faTwitter } from '@fortawesome/free-brands-svg-icons'
+import { faGithub, faMedium, faTelegram, faTwitter, faAndroid, faApple } from '@fortawesome/free-brands-svg-icons'
 import {
   faBell,
+  faBoxBallot,
   faCopy,
+  faExchangeAlt,
+  faEye,
+  faHandHoldingSeedling,
+  faHandReceiving,
   faLevelDownAlt,
   faLevelUpAlt,
+  faLink,
   faLongArrowAltDown,
   faQrcode,
   faSearch,
-  faExchangeAlt,
-  faHandshake,
-  faLink,
   faStamp,
-  faVoteYea,
-  faSeedling,
-  faEye
-} from '@fortawesome/free-solid-svg-icons'
+  faGlobe,
+  faLaptop,
+  faCaretUp,
+  faCaretDown,
+  faBreadLoaf,
+  faCoin,
+  faCoins,
+  faHatChef,
+  faListAlt
+} from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
   library.add(
@@ -27,15 +36,26 @@ export const addFontAwesome = () => {
     faQrcode,
     faSearch,
     faExchangeAlt,
-    faHandshake,
+    faHandReceiving,
     faLink,
     faStamp,
-    faVoteYea,
-    faSeedling,
+    faBoxBallot,
+    faHandHoldingSeedling,
     faEye,
     faGithub,
     faMedium,
     faTelegram,
-    faTwitter
+    faTwitter,
+    faApple,
+    faAndroid,
+    faLaptop,
+    faGlobe,
+    faCaretUp,
+    faCaretDown,
+    faBreadLoaf,
+    faCoin,
+    faCoins,
+    faHatChef,
+    faListAlt
   )
 }

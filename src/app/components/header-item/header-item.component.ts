@@ -36,7 +36,6 @@ export class HeaderItemComponent {
     this.remainingTime = this.cycleService.remainingTime$
     this.data = new Observable<any>((observer: any) => {
       observer.next(this.searchTerm)
-      console.log(this.searchTerm)
     }).pipe(
       mergeMap(token =>
         race(
@@ -73,4 +72,7 @@ export class HeaderItemComponent {
 
   @Input()
   public activeLinkBlockchain: boolean = false
+
+  @Input()
+  public activeLinkResources: boolean = false
 }

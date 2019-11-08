@@ -1,0 +1,19 @@
+<div class="container py-5">
+  <div class="row">
+    <div class="col">
+      <h5 class="mb-4">
+        Wallets
+      </h5>
+      <p>
+        A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list
+        updated and
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLScQBHm9-qIVRVrva3aVkDXb6Zza755BwY6TV8eOBGwkiRW-Fw/viewform" target="_blank">
+          let us know
+        </a>
+        if a wallet is missing.
+      </p>
+    </div>
+  </div>
+</div>
+
+<app-resources-wallet-item [wallet]="wallet" *ngFor="let wallet of wallets$ | async"></app-resources-wallet-item>

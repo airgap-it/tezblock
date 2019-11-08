@@ -1,19 +1,16 @@
 import { Location } from '@angular/common'
-import { HttpClient, HttpParams } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol } from 'airgap-coin-lib'
+import { Router } from '@angular/router'
+import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol, TezosProtocol } from 'airgap-coin-lib'
 import BigNumber from 'big-number'
-// import BigNumber from 'bignumber.js'
 import * as moment from 'moment'
+import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
 
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
-// import { BakerConfig } from '../remote-config/remote-config.service'
 import { OperationsService } from '../operations/operations.service'
-import { Observable } from 'rxjs'
-import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -40,13 +37,11 @@ export class BakingService {
   public nextPayout: Date
 
   public delegationInfo: DelegationInfo
-  // public bakerConfig: BakerConfig
 
   constructor(
     private readonly http: HttpClient,
     public location: Location,
     private readonly router: Router,
-    private readonly route: ActivatedRoute,
     public operationsService: OperationsService
   ) {}
 
@@ -98,50 +93,13 @@ export class BakingService {
   }
 
   public async getBakerInfos(tzAddress: string) {
-    const info: string = this.router.url.split('/').pop()
-    // this.delegationInfo = await this.operationsService.checkDelegated(info)
-    // this.isDelegated = this.delegationInfo.isDelegated
+    const tezosProtocol = new TezosProtocol()
 
-    const kt = new TezosKtProtocol()
+    this.bakerInfo = await tezosProtocol.bakerInfo(tzAddress)
 
-    this.bakerInfo = await kt.bakerInfo(tzAddress)
-    /*
-    try {
-      this.delegationRewards = await kt.delegationRewards(tzAddress)
-      this.avgRoIPerCyclePercentage = this.delegationRewards
-        .map(delegationInfo => {
-          return delegationInfo.totalRewards.plus(delegationInfo.totalFees).div(delegationInfo.stakingBalance)
-        })
-        .reduce((avg, value) => {
-          return avg.plus(value)
-        })
-        .div(this.delegationRewards.length)
-
-      this.avgRoIPerCycle = this.avgRoIPerCyclePercentage.multipliedBy(this.bakerInfo.stakingBalance.toNumber())
-      // we are already delegating, and to this address
-      if (this.delegationInfo.isDelegated && this.delegationInfo.value === tzAddress) {
-        const delegatedCycles = this.delegationRewards.filter(value => value.delegatedBalance.isGreaterThan(0))
-
-        this.nextPayout = delegatedCycles.length > 0 ? delegatedCycles[0].payout : this.addPayoutDelayToMoment(moment()).toDate()
-
-        // make sure there are at least 7 cycles to wait
-        if (this.addPayoutDelayToMoment(moment(this.delegationInfo.delegatedDate)).isAfter(this.nextPayout)) {
-          this.nextPayout = this.addPayoutDelayToMoment(moment(this.delegationInfo.delegatedDate)).toDate()
-        }
-      } else {
-        // if we are currently delegated, but to someone else, first payout is in 7 cycles, same for if we are undelegated
-        this.nextPayout = this.addPayoutDelayToMoment(moment()).toDate()
-      }
-    } catch (error) {
-      // If Baker has never delegated
-		}
-		*/
-    const bal1 = this.bakerInfo.stakingBalance.toNumber()
-    const cap2 = this.bakerInfo.bakerCapacity.multipliedBy(0.7).toNumber()
-    // End remove
-
-    const stakingBalance = bal1
-    const stakingCapacity = cap2
+    const stakingBond = this.bakerInfo.balance.toNumber()
+    const stakingBalance = this.bakerInfo.stakingBalance.toNumber()
+    const stakingCapacity = this.bakerInfo.bakerCapacity.multipliedBy(0.7).toNumber()
 
     let stakingProgress = 1 - (stakingCapacity - stakingBalance) / stakingCapacity
     stakingProgress = stakingProgress * 100
@@ -152,6 +110,7 @@ export class BakingService {
     return {
       stakingBalance,
       stakingCapacity,
+      stakingBond,
       stakingProgress,
       nextPayout,
       avgRoI,
