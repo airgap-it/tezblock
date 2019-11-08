@@ -111,7 +111,7 @@ const layouts: Layout = {
         options: { showFullAddress: false, pageId: 'oo' }
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       ...baseTx
     ],
@@ -134,7 +134,7 @@ const layouts: Layout = {
         transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       ...baseTx
     ],
     [OperationTypes.Origination]: [
@@ -224,17 +224,15 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ],
-
-    // TODO
     [OperationTypes.Overview]: [
       { name: 'Baker', property: 'baker', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'volume', width: '', component: AmountCellComponent },
+      { name: 'Transaction Volume', property: 'volume', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Transactions', property: 'txcount', width: '' },
       { name: 'Fitness', property: 'fitness', width: '' },
@@ -258,7 +256,7 @@ const layouts: Layout = {
         optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
         transform: value => value || 'undelegate'
       },
-      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
@@ -326,7 +324,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
@@ -346,7 +344,7 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
 
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fees', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Parameters', property: 'parameters', width: '', component: ModalCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
