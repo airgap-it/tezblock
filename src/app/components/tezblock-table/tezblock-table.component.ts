@@ -24,7 +24,7 @@ import { HashCellComponent } from './hash-cell/hash-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
-import { ModalCellComponent } from './modal-cell/modal-cell.component';
+import { ModalCellComponent } from './modal-cell/modal-cell.component'
 
 interface Column {
   name: string
@@ -201,13 +201,6 @@ const layouts: Layout = {
       { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
       { name: 'Fees', property: '', width: '', component: AmountCellComponent },
       { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      {
-        name: 'Delegate',
-        property: 'delegate',
-        width: '1',
-        component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
-      },
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ],
     [OperationTypes.EndorsingRights]: [
@@ -217,13 +210,6 @@ const layouts: Layout = {
       { name: 'Slot', property: 'slot', width: '' },
       { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
       { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      {
-        name: 'Delegate',
-        property: 'delegate',
-        width: '1',
-        component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
-      },
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ]
   },
