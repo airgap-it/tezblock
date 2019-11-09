@@ -183,6 +183,59 @@ export class ApiService {
       )
   }
 
+  public getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'eq',
+              set: [id],
+              inverse: false
+            },
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['endorsement']
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        //TODO: refactor this code
+        map((transactions: Transaction[]) => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const sources = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'delegation') {
+              sources.push(transaction.source)
+            }
+          })
+
+          if (sources.length > 0) {
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
+                })
+              })
+            })
+          }
+
+          return finalTransactions
+        })
+      )
+  }
+
   public getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
     return this.http.post<Transaction[]>(
       this.transactionsApiUrl,

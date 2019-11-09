@@ -48,6 +48,8 @@
     "@fortawesome/free-brands-svg-icons": "^5.9.0",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@ng-toolkit/universal": "^1.1.21",
+    "@ngrx/effects": "^8.5.0",
+    "@ngrx/store": "^8.5.0",
     "@nguniversal/express-engine": "^8.0.0-rc.1",
     "@nguniversal/module-map-ngfactory-loader": "^8.0.0-rc.1",
     "airgap-coin-lib": "0.5.14",

@@ -56,6 +56,11 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { StoreModule } from '@ngrx/store'
+import { ROOT_REDUCERS, metaReducers } from './reducers'
+import { EffectsModule } from '@ngrx/effects'
+import { AppEffects } from './app.effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
 
 @NgModule({
   imports: [
@@ -81,7 +86,15 @@ import { EndorsementDetailComponent } from './pages/endorsement-detail/endorseme
     QRCodeModule,
     ModalModule.forRoot(),
     FontAwesomeModule,
-    ChartsModule
+    ChartsModule,
+    StoreModule.forRoot(ROOT_REDUCERS, {
+      metaReducers,
+      runtimeChecks: {
+        strictStateImmutability: true,
+        strictActionImmutability: true
+      }
+    }),
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects])
   ],
   declarations: [
     AppComponent,
