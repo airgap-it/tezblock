@@ -11,3 +11,6 @@ export const loadEndorsementsFailed = createAction(`[${featureName}] Load Endors
 export const loadEndorsementDetails = createAction(`[${featureName}] Load Endorsement Details`, props<{ id: string }>())
 export const loadEndorsementDetailsSucceeded = createAction(`[${featureName}] Load Endorsement Details Succeeded`, props<{ endorsement: Transaction }>())
 export const loadEndorsementDetailsFailed = createAction(`[${featureName}] Load Endorsement Details Failed`, props<{ error: any }>())
+
+
+export const endorsementSelected = createAction(`[${featureName}] Endorsement Selected`, props<{ endorsement: Transaction }>())

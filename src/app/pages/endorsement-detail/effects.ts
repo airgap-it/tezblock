@@ -24,7 +24,10 @@ export class EndorsementDetailEffects {
   onEndorsementIdTriggerGetEndorsements$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EndorsementDetailActions.loadEndorsementDetailsSucceeded),
-      map(({ endorsement }) => EndorsementDetailActions.loadEndorsements({ blockHash: endorsement.block_hash }))
+      switchMap(({ endorsement }) => [
+        EndorsementDetailActions.loadEndorsements({ blockHash: endorsement.block_hash }),
+        EndorsementDetailActions.endorsementSelected({ endorsement })
+      ])
     )
   )
 

@@ -11,14 +11,14 @@
           </div>
           <div class="col-md-9">
             <p class="mb-0">
-              opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh
+              {{ (selectedEndorsement$ | async)?.operation_group_hash }}
               <a
-                (click)="copyToClipboard(latestTransaction.operation_group_hash); changeState(latestTransaction.operation_group_hash)"
+                (click)="copyToClipboard(latestTransaction.operation_group_hash)"
                 value="click to copy"
                 class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
               >
                 <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
-              </a><!-- [@changeBtnColor]="current" -->
+              </a>
             </p>
           </div>
         </div>
@@ -32,7 +32,7 @@
             <p class="text-secondary mb-0">Baker</p>
           </div>
           <div class="col-md-9">
-            <address-item [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" ng-href="#here"></address-item>
+            <address-item [address]="(selectedEndorsement$ | async)?.delegate"></address-item>
           </div>
         </div>
         <div class="row mb-3">
@@ -40,9 +40,8 @@
             <p class="text-secondary mb-0">Block</p>
           </div>
           <div class="col-md-9">
-            <button type="button" class="btn btn-link p-0" ng-href="#here">
-              <!--[routerLink]="['/block', latestTransaction.block_level]"-->
-              <!--{{ latestTransaction.block_level }}-->
+            <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.block_level]">
+              {{ (selectedEndorsement$ | async)?.block_level }}
               <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
                 <!--{{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}-->
               </span>
@@ -54,7 +53,7 @@
             <p class="text-secondary mb-0">Cycle</p>
           </div>
           <div class="col-md-9">
-            <!--{{ latestTransaction.block_cycle }}-->
+            {{ (selectedEndorsement$ | async)?.cycle }}
           </div>
         </div>
         <div class="row mb-3">
@@ -62,7 +61,7 @@
             <p class="text-secondary mb-0">Timestamp</p>
           </div>
           <div class="col-md-9">
-            <p><!--{{ latestTransaction.timestamp | amTimeAgo }} ({{ latestTransaction.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})--></p>
+            <p *ngIf="selectedEndorsement$ | async">{{ (selectedEndorsement$ | async)?.timestamp | amTimeAgo }} ({{ (selectedEndorsement$ | async)?.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
           </div>
         </div>
       </div>
@@ -80,7 +79,7 @@
           <p class="text-secondary mb-0">Endorsed Block</p>
         </div>
         <div class="col-md-9">
-          658347
+          {{ (selectedEndorsement$ | async)?.level }}
         </div>
       </div>
       <div class="row mb-3">
@@ -88,7 +87,7 @@
           <p class="text-secondary mb-0">Deposit</p>
         </div>
         <div class=" col-md-9">
-          12
+          <!-- TODO -->
         </div>
       </div>
       <div class="row mb-3">
@@ -96,7 +95,7 @@
           <p class="text-secondary mb-0">Reward</p>
         </div>
         <div class="col-md-9">
-          1
+          <!-- TODO -->
         </div>
       </div>
       <div class="row mb-3">
@@ -104,7 +103,7 @@
           <p class="text-secondary mb-0">Slots Endorsed</p>
         </div>
         <div class="col-md-9">
-          1
+          {{ getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }}
         </div>
       </div>
       <div class="row mx-1 mb-3">
