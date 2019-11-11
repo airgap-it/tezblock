@@ -3,10 +3,3 @@ kind: ConfigMap
 metadata:
   name: tezblock-frontend-config-map
   namespace: tezblock
-data:
-  # POSTGRES_DBNAME: hops-transaction-backend
-#   POSTGRES_HOST: dev-postgres-stolon-proxy.default
-#   WATCHED_PROTOCOLS: eth-erc20-hops
-#   SENTRY_DSN: 'https://2a5d20e20f84487e94ccb21ad5a6dacd@sentry.sook.ch/162'
-#   SENTRY_ENVIRONMENT: hops-development
-#   SENTRY_VERSION: '1.0.0'
