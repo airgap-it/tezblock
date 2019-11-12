@@ -13,7 +13,7 @@ export class ChainNetworkService implements OnInit {
     this.url = rawUrl.hostname
 
     //TODO remove
-    this.url = 'carthagenet'
+    this.url = 'mainnet'
     //end remove
 
     return this.url
@@ -33,7 +33,11 @@ export class ChainNetworkService implements OnInit {
     }
   }
   public getEnvironmentVariable(): string {
-    return this.url
+    if (this.url === 'carthagenet') {
+      return 'mainnet'
+    } else {
+      return this.url
+    }
   }
 
   public ngOnInit() {}
