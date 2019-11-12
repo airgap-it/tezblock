@@ -1,25 +1,34 @@
-import { TestBed, inject } from '@angular/core/testing';
-import { provideMockActions } from '@ngrx/effects/testing';
-import { Observable } from 'rxjs';
+import { TestBed } from '@angular/core/testing'
+import { provideMockActions } from '@ngrx/effects/testing'
+import { Observable } from 'rxjs'
+import { Store } from '@ngrx/store'
 
-import { EndorsementDetailEffects } from './effects';
+import { UnitHelper } from 'test-config/unit-test-helper'
+import { EndorsementDetailEffects } from './effects'
 
 describe('AppEffects', () => {
-  let actions$: Observable<any>;
-  let effects: EndorsementDetailEffects;
+  let actions$: Observable<any>
+  let effects: EndorsementDetailEffects
+  let storeMock;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      providers: [
-        EndorsementDetailEffects,
-        provideMockActions(() => actions$)
-      ]
-    });
+    const unitHelper = new UnitHelper()
 
-    effects = TestBed.get<EndorsementDetailEffects>(EndorsementDetailEffects);
-  });
+    storeMock = jasmine.createSpyObj('Store', ['select', 'dispatch'])
+
+    TestBed.configureTestingModule(
+      unitHelper.testBed({
+        providers: [
+          EndorsementDetailEffects, provideMockActions(() => actions$),
+          { provide: Store, useValue: storeMock }
+        ]
+      })
+    )
+
+    effects = TestBed.get<EndorsementDetailEffects>(EndorsementDetailEffects)
+  })
 
   it('should be created', () => {
-    expect(effects).toBeTruthy();
-  });
-});
+    expect(effects).toBeTruthy()
+  })
+})
