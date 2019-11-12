@@ -168,7 +168,8 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
       { name: 'Endorsed Level', property: 'level', width: '', component: BlockCellComponent },
-      ...baseTx
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent, options: { kind: 'endorsement' } }
     ],
     [OperationTypes.Ballot]: [
       { name: 'Ballot', property: 'ballot', width: '' },
@@ -633,4 +634,3 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
     this.loadMoreClicked.emit()
   }
 }
-
