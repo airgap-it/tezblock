@@ -228,6 +228,7 @@
                   </ul>
                 </span>
               </li>
+              <!-- TODO: unhide if switch works
               <li class="nav-item dropdown pl-2 pl-sm-0">
                 <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
                   <a
@@ -240,11 +241,9 @@
                     routerLinkActive="btn-link"
                     (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
                   >
-                    <!--TODO: set active network -->
                     {{ selectedNetwork }}
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
-                    <!--TODO: display other networks -->
                     <li role="menuitem">
                       <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
                         mainnet
@@ -264,19 +263,10 @@
                         carthagenet
                       </a>
                     </li>
-                    <li>
-                      <a
-                        class="dropdown-item text-muted"
-                        [ngClass]="selectedNetwork == 'zeronet' ? 'active' : ''"
-                        (click)="changeNetwork('zeronet')"
-                        disabled
-                      >
-                        zeronet
-                      </a>
-                    </li>
                   </ul>
                 </span>
               </li>
+              -->
             </ul>
           </div>
         </div>
