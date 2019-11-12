@@ -11,10 +11,8 @@ spec:
   tls:
     - hosts:
         - tezblock-babylonnet.prod.gke.papers.tech
-      secretName: tezblock-prod-tls
-    - hosts:
         - babylonnet.tezblock.io
-      secretName: tezblock-mvp-prod-tls  
+      secretName: tezblock-babylonnet-prod-tls  
   rules:
     - host: tezblock-babylonnet.prod.gke.papers.tech
       http:
