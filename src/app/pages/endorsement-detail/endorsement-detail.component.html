@@ -42,9 +42,9 @@
           <div class="col-md-9">
             <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.block_level]">
               {{ (selectedEndorsement$ | async)?.block_level }}
-              <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
-                <!--{{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}-->
-              </span>
+              <!-- <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
+                {{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}
+              </span> -->
             </button>
           </div>
         </div>
@@ -107,184 +107,12 @@
         </div>
       </div>
       <div class="row mx-1 mb-3">
-        <!--TODO: repeat untill all endorsements are visible-->
-        <!--TODO: set bg-primary for all slots endorsed in this endorsement operation by the same baker-->
-        <div class="col-2 col-md-1 bg-primary border text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <!--TODO Slot number-->
+        <div *ngFor="let slot of slots$ | async" (click)="select(slot.operation_group_hash)" class="col-2 col-md-1 border text-center p-2 endorsement__container"
+          [class.bg-primary]="slot.state === 'selected'" [class.bg-primary-light]="slot.state === 'not_selected'" [class.bg-primary-white]="slot.state === 'empty'">
+          <identicon [address]="slot.endorser" class="d-none d-sm-inline-block"></identicon>
           <p class="text-white m-0 pt-1">
             <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <!--TODO: set bg-primary for all slots endorsed in this endorsement operation by the same baker-->
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-white border border-primary-light endorsement__container text-center p-2">
-          <!--TODO: if no endorsement, no address-->
-          <identicon [address]="" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-dark m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
-          </p>
-        </div>
-        <div class="col-2 col-md-1 bg-primary-light border border-white endorsement__container text-center p-2">
-          <identicon [address]="'opMNd76SBntz2USRxZxx7ZEsam9EeSaXQNz4Fq2JKgLXsKJEGvh'" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-primary m-0 pt-1">
-            <span class="d-none d-sm-inline-block">Slot</span>
-            1
+            {{ slot.index }}
           </p>
         </div>
       </div>

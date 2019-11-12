@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of } from 'rxjs'
-import { map, catchError, switchMap } from 'rxjs/operators'
+import { filter, map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
+import { Store } from '@ngrx/store'
 
 import * as EndorsementDetailActions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import * as fromRoot from '@tezblock/reducers'
 
 @Injectable()
 export class EndorsementDetailEffects {
@@ -21,21 +23,20 @@ export class EndorsementDetailEffects {
     )
   )
 
-  onEndorsementIdTriggerGetEndorsements$ = createEffect(() =>
+  onEndorsementTriggerGetEndorsements$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EndorsementDetailActions.loadEndorsementDetailsSucceeded),
-      switchMap(({ endorsement }) => [
-        EndorsementDetailActions.loadEndorsements({ blockHash: endorsement.block_hash }),
-        EndorsementDetailActions.endorsementSelected({ endorsement })
-      ])
+      map(({ endorsement }) => EndorsementDetailActions.loadEndorsements())
     )
   )
 
   getEndorsements$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EndorsementDetailActions.loadEndorsements),
-      switchMap(({ blockHash }) =>
-        this.apiService.getTransactionsByField(blockHash, 'block_hash', 'endorsement', 100).pipe(
+      withLatestFrom(this.store$.select(state => state.endorsementDetails.selectedEndorsement)),
+      filter(([action, endorsement]) => !!endorsement),
+      switchMap(([action, endorsement]) =>
+        this.apiService.getTransactionsByField(endorsement.block_hash, 'block_hash', 'endorsement', 100).pipe(
           map((endorsements: Transaction[]) => EndorsementDetailActions.loadEndorsementsSucceeded({ endorsements })),
           catchError(error => of(EndorsementDetailActions.loadEndorsementsFailed({ error })))
         )
@@ -43,5 +44,5 @@ export class EndorsementDetailEffects {
     )
   )
 
-  constructor(private actions$: Actions, private apiService: ApiService) {}
+  constructor(private readonly actions$: Actions, private readonly apiService: ApiService, private readonly store$: Store<fromRoot.State>) {}
 }
