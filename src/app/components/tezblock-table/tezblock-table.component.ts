@@ -586,14 +586,18 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public filterTransactions(filterTerm: string) {
+    let copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
+
     if (filterTerm) {
-      const filteredTransactions: any[] = this.backupTransactions.map((transaction: any) => {
+      const filteredTransactions: any[] = copiedTransactions.map((transaction: any) => {
         transaction.payouts = transaction.payouts.filter(payout => payout.delegator === filterTerm)
 
         return transaction
       })
 
       this.transactions = filteredTransactions
+    } else {
+      this.transactions = copiedTransactions
     }
   }
 
