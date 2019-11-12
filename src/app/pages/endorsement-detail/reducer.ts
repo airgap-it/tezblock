@@ -23,15 +23,13 @@ const toParsedEndorsement = (endorsement: Transaction): ParsedTransaction => ({
 })
 
 const getSlots = (endorsements: ParsedTransaction[], selectedEndorsementId: string): Slot[] => {
-  const maxSlotNo = Math.max(..._.flatten(endorsements.map(endorsement => endorsement.parsedSlots)))
-
-  return _.range(1, maxSlotNo).map(index => {
+  return _.range(0, 32).map(index => {
     const endorsement = _.find(endorsements, endorsementItem => endorsementItem.parsedSlots.indexOf(index) !== -1)
 
     return <Slot>{
       index,
       operation_group_hash: endorsement ? endorsement.operation_group_hash : null,
-      endorser: endorsement ? endorsement.branch : null,
+      endorser: endorsement ? endorsement.delegate : null,
       state: endorsement ? (endorsement.operation_group_hash === selectedEndorsementId ? 'selected' : 'not_selected') : 'empty'
     }
   })

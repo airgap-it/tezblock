@@ -42,8 +42,8 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.subscriptions.push(timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(Actions.loadEndorsements())))
   }
 
-  copyToClipboard(value: string) {
-    this.copyService.copyToClipboard(value)
+  copyToClipboard() {
+    this.copyService.copyToClipboard(fromRoot.getState(this.store$).endorsementDetails.selectedEndorsement.operation_group_hash)
   }
 
   getSlotsEndorsed(value: string): string {

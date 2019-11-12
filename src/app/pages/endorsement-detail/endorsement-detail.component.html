@@ -13,9 +13,10 @@
             <p class="mb-0">
               {{ (selectedEndorsement$ | async)?.operation_group_hash }}
               <a
-                (click)="copyToClipboard(latestTransaction.operation_group_hash)"
+                (click)="copyToClipboard()"
                 value="click to copy"
                 class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                tooltip="Copy to clipboard"
               >
                 <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
               </a>
@@ -110,7 +111,7 @@
         <div *ngFor="let slot of slots$ | async" (click)="select(slot.operation_group_hash)" class="col-2 col-md-1 border text-center p-2 endorsement__container"
           [class.bg-primary]="slot.state === 'selected'" [class.bg-primary-light]="slot.state === 'not_selected'" [class.bg-primary-white]="slot.state === 'empty'">
           <identicon [address]="slot.endorser" class="d-none d-sm-inline-block"></identicon>
-          <p class="text-white m-0 pt-1">
+          <p [class.text-white]="slot.state !== 'empty'" class="m-0 pt-1">
             <span class="d-none d-sm-inline-block">Slot</span>
             {{ slot.index }}
           </p>
