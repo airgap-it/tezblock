@@ -22,7 +22,7 @@ describe('EndorsementDetailComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        imports: [FontAwesomeModule, MomentModule, TooltipModule],
+        imports: [FontAwesomeModule, MomentModule, TooltipModule.forRoot()],
         declarations: [AddressItemComponent, IdenticonComponent, LoadingSkeletonComponent, EndorsementDetailComponent],
         providers: [{ provide: Store, useValue: storeMock }]
       })
