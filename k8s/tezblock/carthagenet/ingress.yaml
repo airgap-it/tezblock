@@ -11,10 +11,8 @@ spec:
   tls:
     - hosts:
         - tezblock-carthagenet.prod.gke.papers.tech
-      secretName: tezblock-prod-tls
-    - hosts:
         - carthagenet.tezblock.io
-      secretName: tezblock-mvp-prod-tls  
+      secretName: tezblock-carthagenet-prod-tls  
   rules:
     - host: tezblock-carthagenet.prod.gke.papers.tech
       http:
