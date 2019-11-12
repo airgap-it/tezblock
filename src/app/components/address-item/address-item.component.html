@@ -1,9 +1,12 @@
-<div class="media d-flex align-items-center" (click)="inspectDetail()">
-  <identicon class="mr-2" [address]="address" *ngIf="!hideIdenticon" [forceIdenticon]="forceIdenticon"></identicon>
+<div [ngSwitch]="isText" class="media d-flex align-items-center" (click)="inspectDetail()">
+  <ng-container *ngSwitchCase="true">{{ address }}</ng-container>
+  <ng-container *ngSwitchDefault>
+    <identicon class="mr-2" [address]="address" *ngIf="!hideIdenticon" [forceIdenticon]="forceIdenticon"></identicon>
 
-  <div class="media-body">
-    <button type="button" class="btn p-0" [ngClass]="clickableButton ? 'btn-link' : ''">
-      {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
-    </button>
-  </div>
+    <div class="media-body">
+      <button type="button" class="btn p-0" [ngClass]="clickableButton ? 'btn-link' : ''">
+        {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
+      </button>
+    </div>
+  </ng-container>
 </div>

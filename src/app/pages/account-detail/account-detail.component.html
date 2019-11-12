@@ -1,8 +1,8 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
     <div *ngIf="account$ | async as account" class="row">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="card h-100 pt-3">
+      <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+        <div class="card h-100 pt-3 ">
           <div class="card-body p-4 ">
             <div class="row mb-4">
               <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
@@ -134,8 +134,8 @@
           </div>
         </div>
       </div>
-      <div class=" col-lg-6 mb-4 mb-lg-0">
-        <div class="card h-100 pt-3">
+      <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
+        <div class="card h-100 pt-3 ">
           <div class="card-body p-4">
             <h5 class="card-title mb-4 ">
               Delegation
@@ -158,7 +158,7 @@
                 <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
               </div>
               <div class="pb-3">
-                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
               </div>
             </ng-container>
 
@@ -248,194 +248,12 @@
 
     <div class="pt-5" *ngIf="isValidBaker">
       <div class="card pt-3">
-        <div class="card-body p-4 ">
-          <div class="container p-0">
-            <div class="row mb-3">
-              <div class=" col-md-6 col-lg-4">
-                <div class="mb-4">
-                  <h5 class="card-title__secondary mb-3">
-                    Staking Bond
-                  </h5>
-                  <h3>
-                    <span
-                      class="d-inline-block"
-                      [innerHtml]="
-                        stakingBond
-                          | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                          | safeHtml
-                      "
-                    ></span>
-                    ꜩ
-                  </h3>
-                </div>
-
-                <ng-container *ngIf="stakingBalance; else loadingGraph">
-                  <div class="container p-0">
-                    <div class="row mb-2">
-                      <div class="col">
-                        <p class="text-secondary m-0">Staking Balance</p>
-                      </div>
-                      <div class="col">
-                        <p class="text-right text-secondary m-0">
-                          Staking Capactiy
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div *ngIf="stakingBalance > stakingCapacity">
-                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px" type="danger"></progressbar>
-                  </div>
-                  <div *ngIf="stakingBalance <= stakingCapacity">
-                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px"></progressbar>
-                  </div>
-                  <div class="mt-2 container">
-                    <div class="row mb-3">
-                      <div class="col p-0">
-                        <p class="m-0">
-                          <span
-                            class="d-inline-block"
-                            [innerHtml]="
-                              stakingBalance
-                                | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                                | safeHtml
-                            "
-                          ></span>
-
-                          ꜩ
-                        </p>
-                      </div>
-                      <div class="col p-0">
-                        <div class="float-right">
-                          <p class="m-0 ">
-                            <span
-                              class="d-inline-block"
-                              [innerHtml]="
-                                stakingCapacity
-                                  | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                                  | safeHtml
-                              "
-                            ></span>
-
-                            ꜩ
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </ng-container>
-
-                <ng-template #loadingGraph>
-                  <div class="container p-0">
-                    <div class="row mb-2">
-                      <div class="col">
-                        <p class="text-secondary m-0">Staking Balance</p>
-                      </div>
-                      <div class="col">
-                        <p class="text-right text-secondary m-0">
-                          Staking Capactiy
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <progressbar [value]="0" style="height:6px"></progressbar>
-                  </div>
-                  <div class="mt-2 container">
-                    <div class="row mb-3">
-                      <div class="col p-0">
-                        <loading-skeleton></loading-skeleton>
-                      </div>
-                    </div>
-                  </div>
-                </ng-template>
-              </div>
-              <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
-                <div class="mb-4">
-                  <h5 class="card-title__secondary mb-3 ">
-                    Frozen Balance
-                  </h5>
-                  <h3>
-                    <ng-container *ngIf="!frozenBalance; else deposits">
-                      <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                    </ng-container>
-                    <ng-template #deposits>
-                      <span
-                        class="d-inline-block"
-                        [innerHtml]="
-                          frozenBalance
-                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                            | safeHtml
-                        "
-                      ></span>
-                      ꜩ
-                    </ng-template>
-                  </h3>
-                </div>
-              </div>
-              <div class=" col-md-6 col-lg-4">
-                <!-- <div class="mb-4">
-                  <h5 class="card-title mb-3">
-                    Pending Rewards
-                  </h5>
-                  <h3>
-                    <ng-container *ngIf="!accumulatedRewards; else rewards">
-                      <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                    </ng-container>
-                    <ng-template #rewards>
-                      <span
-                        class="d-inline-block"
-                        [innerHtml]="
-                          accumulatedRewards
-                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                            | safeHtml
-                        "
-                      ></span>
-                      ꜩ
-                    </ng-template>
-                  </h3>
-                </div> -->
-                <div class="mb-4">
-                  <h5 class="card-title__secondary mb-3">
-                    Payout Accuracy
-                  </h5>
-                  <div class="d-block">
-                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
-
-                    <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                      <ng-container *ngIf="!bakingBadRating">
-                        <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                      </ng-container>
-                      <ng-container *ngIf="bakingBadRating">
-                        {{ bakingBadRating }}
-                      </ng-container>
-                    </button>
-                  </div>
-                </div>
-                <div>
-                  <h5 class="card-title__secondary mb-3">
-                    Baking Efficiency
-                  </h5>
-                  <div class="d-block">
-                    <div>
-                      <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
-
-                      <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here" (click)="goToMYTB()">
-                        <ng-container *ngIf="!tezosBakerRating">
-                          <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
-                        </ng-container>
-                        <ng-container *ngIf="tezosBakerRating">
-                          {{ tezosBakerRating }}
-                        </ng-container>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        <div class="card-body px-3 py-0">
+          <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
         </div>
       </div>
     </div>
+
     <div class="pt-5">
       <div class="card pt-3">
         <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">

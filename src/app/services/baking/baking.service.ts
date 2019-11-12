@@ -101,6 +101,7 @@ export class BakingService {
 
     this.bakerInfo = await tezosProtocol.bakerInfo(tzAddress)
 
+    const stakingBond = this.bakerInfo.balance.toNumber()
     const stakingBalance = this.bakerInfo.stakingBalance.toNumber()
     const stakingCapacity = this.bakerInfo.bakerCapacity.multipliedBy(0.7).toNumber()
 
@@ -113,6 +114,7 @@ export class BakingService {
     return {
       stakingBalance,
       stakingCapacity,
+      stakingBond,
       stakingProgress,
       nextPayout,
       avgRoI,

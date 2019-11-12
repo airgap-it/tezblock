@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Observable } from "rxjs";
+
+import { WalletService } from "../../services/wallet/wallet.service";
+import { Wallet } from "../../interfaces/Wallet";
 
 @Component({
   selector: 'app-resources-wallets',
@@ -7,7 +10,11 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
   styleUrls: ['./resources-wallets.component.scss']
 })
 export class ResourcesWalletsComponent implements OnInit {
-  constructor() {}
+  constructor(private walletService: WalletService) {}
+
+  get wallets$(): Observable<Wallet[]> {
+    return this.walletService.get();
+  }
 
   ngOnInit() {}
 }

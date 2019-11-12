@@ -52,6 +52,10 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
+import { BakerTableComponent } from './components/baker-table/baker-table.component'
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component';
+import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 
 @NgModule({
   imports: [
@@ -109,7 +113,11 @@ import { ChainNetworkService } from './services/chain-network/chain-network.serv
     TransactionDetailWrapperComponent,
     LoadingSkeletonComponent,
     TelegramModalComponent,
-    ResourcesWalletsComponent
+    BakerTableComponent,
+    ResourcesWalletsComponent,
+    ExtendTableCellComponent,
+    ResourcesWalletItemComponent,
+    ModalCellComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
@@ -130,7 +138,9 @@ import { ChainNetworkService } from './services/chain-network/chain-network.serv
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent
+    PricechartItemComponent,
+    ExtendTableCellComponent,
+    ModalCellComponent
   ],
   bootstrap: [AppComponent]
 })

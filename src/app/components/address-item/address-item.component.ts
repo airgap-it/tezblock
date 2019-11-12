@@ -22,9 +22,14 @@ export class AddressItemComponent {
   @Input()
   public showFull: boolean = false
 
+  @Input()
+  public isText: boolean
+
   constructor(private readonly router: Router) {}
 
   public inspectDetail() {
-    this.router.navigate([`/account/${this.address}`])
+    if (!this.isText) {
+      this.router.navigate([`/account/${this.address}`])
+    }
   }
 }
