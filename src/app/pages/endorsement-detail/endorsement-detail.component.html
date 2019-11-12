@@ -3,7 +3,7 @@
     <div class="card h-100 pt-3 ">
       <div class="card-body p-4">
         <h5 class="card-title mb-4 ">
-          Endorsement Details
+          Endorsement
         </h5>
         <div class="row mb-3">
           <div class="col-md-3">
@@ -30,7 +30,7 @@
         </ng-template>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">Baker</p>
+            <p class="text-secondary mb-0">Endorser</p>
           </div>
           <div class="col-md-9">
             <address-item [address]="(selectedEndorsement$ | async)?.delegate"></address-item>
@@ -62,7 +62,11 @@
             <p class="text-secondary mb-0">Timestamp</p>
           </div>
           <div class="col-md-9">
-            <p *ngIf="selectedEndorsement$ | async">{{ (selectedEndorsement$ | async)?.timestamp | amTimeAgo }} ({{ (selectedEndorsement$ | async)?.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+            <p *ngIf="selectedEndorsement$ | async">
+              {{ (selectedEndorsement$ | async)?.timestamp | amTimeAgo }} ({{
+                (selectedEndorsement$ | async)?.timestamp | date: 'MMMM-d-y h:mm:ss a z'
+              }})
+            </p>
           </div>
         </div>
       </div>
@@ -73,14 +77,16 @@
   <div class="card h-100 pt-3 mb-">
     <div class="card-body p-4">
       <h5 class="card-title mb-4 ">
-        Endorsement
+        Endorsement Details
       </h5>
       <div class="row mb-3">
         <div class="col-md-3">
           <p class="text-secondary mb-0">Endorsed Block</p>
         </div>
         <div class="col-md-9">
-          {{ (selectedEndorsement$ | async)?.level }}
+          <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.level]">
+            {{ (selectedEndorsement$ | async)?.level }}
+          </button>
         </div>
       </div>
       <div class="row mb-3">
@@ -89,6 +95,7 @@
         </div>
         <div class=" col-md-9">
           <!-- TODO -->
+          not available
         </div>
       </div>
       <div class="row mb-3">
@@ -97,6 +104,7 @@
         </div>
         <div class="col-md-9">
           <!-- TODO -->
+          not available
         </div>
       </div>
       <div class="row mb-3">
@@ -108,10 +116,16 @@
         </div>
       </div>
       <div class="row mx-1 mb-3">
-        <div *ngFor="let slot of slots$ | async" (click)="select(slot.operation_group_hash)" class="col-2 col-md-1 border text-center p-2 endorsement__container"
-          [class.bg-primary]="slot.state === 'selected'" [class.bg-primary-light]="slot.state === 'not_selected'" [class.bg-primary-white]="slot.state === 'empty'">
+        <div
+          *ngFor="let slot of slots$ | async"
+          (click)="select(slot.operation_group_hash)"
+          class="col-2 col-md-1 border text-center p-2 endorsement__container"
+          [class.bg-primary]="slot.state === 'selected'"
+          [class.bg-primary-light]="slot.state === 'not_selected'"
+          [class.bg-primary-white]="slot.state === 'empty'"
+        >
           <identicon [address]="slot.endorser" class="d-none d-sm-inline-block"></identicon>
-          <p [class.text-white]="slot.state !== 'empty'" class="m-0 pt-1">
+          <p [class.text-dark]="slot.state === 'not_selected'" [class.text-white]="slot.state === 'selected'" class="m-0 pt-1">
             <span class="d-none d-sm-inline-block">Slot</span>
             {{ slot.index }}
           </p>
