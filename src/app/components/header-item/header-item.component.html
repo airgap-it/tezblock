@@ -238,7 +238,6 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (mouseleave)="dp.hide(); showDropdown = true"
                     (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
                   >
                     <!--TODO: set active network -->
@@ -247,25 +246,32 @@
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <!--TODO: display other networks -->
                     <li role="menuitem">
-                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'Mainnet' ? 'active' : ''" (click)="changeNetwork('Mainnet')">
-                        Mainnet
+                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
+                        mainnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'Babylonnet' ? 'active' : ''"
-                        (click)="changeNetwork('Babylonnet')"
+                        [ngClass]="selectedNetwork == 'babylonnet' ? 'active' : ''"
+                        (click)="changeNetwork('babylonnet')"
                       >
-                        Babylonnet
+                        babylonnet
+                      </a>
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork == 'carthagenet' ? 'active' : ''"
+                        (click)="changeNetwork('carthagenet')"
+                      >
+                        carthagenet
                       </a>
                     </li>
                     <li>
                       <a
                         class="dropdown-item text-muted"
-                        [ngClass]="selectedNetwork == 'Zeronet' ? 'active' : ''"
-                        (click)="changeNetwork('Zeronet')"
+                        [ngClass]="selectedNetwork == 'zeronet' ? 'active' : ''"
+                        (click)="changeNetwork('zeronet')"
                         disabled
                       >
-                        Zeronet
+                        zeronet
                       </a>
                     </li>
                   </ul>

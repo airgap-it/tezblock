@@ -3,8 +3,10 @@ import { Router } from '@angular/router'
 import { Observable, race, Subscription } from 'rxjs'
 import { mergeMap } from 'rxjs/operators'
 import { TypeAheadObject } from 'src/app/interfaces/TypeAheadObject'
+import { ChainNetworkService } from 'src/app/services/chain-network/chain-network.service'
 import { CycleService } from 'src/app/services/cycle/cycle.service'
 import { SearchService } from 'src/app/services/search/search.service'
+
 import { ApiService } from './../../services/api/api.service'
 
 @Component({
@@ -24,13 +26,14 @@ export class HeaderItemComponent {
   public title = 'tezblock'
   public isCollapsed = true
   public showDropdown = false
-  public selectedNetwork: string = 'Mainnet'
+  public selectedNetwork: string
 
   constructor(
     private readonly router: Router,
     public readonly searchService: SearchService,
     private readonly cycleService: CycleService,
-    private readonly apiService: ApiService
+    private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService
   ) {
     this.currentCycle = this.cycleService.currentCycle$
     this.cycleProgress = this.cycleService.cycleProgress$
@@ -47,6 +50,7 @@ export class HeaderItemComponent {
         )
       )
     )
+    this.selectedNetwork = this.chainNetworkService.getEnvironmentVariable()
   }
 
   public onKeyEnter(searchTerm: string) {

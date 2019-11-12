@@ -8,6 +8,10 @@ export const environment = {
     rpc: 'https://tezos-node.prod.gke.papers.tech',
     conseil: 'https://conseil-prod.cryptonomic-infra.tech'
   },
+  carthagenet: {
+    rpc: 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
+    conseil: 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech'
+  },
 
   babylonnet: {
     rpc: 'https://tezos-dev.cryptonomic-infra.tech',

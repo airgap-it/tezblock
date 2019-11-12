@@ -1,6 +1,7 @@
 export const environment = {
-  mainnet: { rcp: '', conseil: '' },
-  babylonnet: { rcp: '', conseil: '' },
+  mainnet: { rpc: '', conseil: '' },
+  babylonnet: { rpc: '', conseil: '' },
+  carthagenet: { rpc: '', conseil: '' },
   production: true,
   conseilBaseUrl: 'CONSEIL_BASE_URL',
   conseilApiKey: 'CONSEIL_API_KEY',

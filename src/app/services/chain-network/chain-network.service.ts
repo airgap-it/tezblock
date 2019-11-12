@@ -1,20 +1,20 @@
 import { Injectable, OnInit } from '@angular/core'
-import { Router } from '@angular/router'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChainNetworkService implements OnInit {
-  ngOnInit(): void {}
-
   public url: string
-  constructor(private readonly router: Router) {
-    this.url = this.router.url
-  }
+  constructor() {}
 
   private getEnvironmentUrl(): string {
-    this.url = 'mainnet'
+    const rawUrl = window.location
+    this.url = rawUrl.hostname
+
+    //TODO remove
+    this.url = 'carthagenet'
+    //end remove
 
     return this.url
   }
@@ -22,12 +22,19 @@ export class ChainNetworkService implements OnInit {
   public getEnvironment() {
     const url = this.getEnvironmentUrl()
     if (url === 'babylonnet') {
+      console.log('babylonnet')
       return environment.babylonnet
+    } else if (url === 'carthagenet') {
+      console.log('carthagenet')
+      return environment.carthagenet
     } else {
+      console.log('mainnet')
       return environment.mainnet
     }
   }
-  public getEnvironmentVariable() {
+  public getEnvironmentVariable(): string {
     return this.url
   }
+
+  public ngOnInit() {}
 }
