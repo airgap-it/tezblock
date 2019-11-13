@@ -1,16 +1,16 @@
 import { Injectable, OnInit } from '@angular/core'
 import { environment } from 'src/environments/environment'
-import { timingSafeEqual } from 'crypto'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChainNetworkService implements OnInit {
   private chainName: string
+  private defaultChain: string = 'mainnet'
   private readonly supportedChains = ['mainnet', 'babylonnet', 'carthagenet']
   constructor() {}
 
-  private getEnvironmentUrl(): string {
+  private getEnvironmentFromUrl(): string {
     const hostname = window.location.hostname
     const indexOfFirstDot = hostname.indexOf('.')
     if (indexOfFirstDot !== -1) {
@@ -18,21 +18,21 @@ export class ChainNetworkService implements OnInit {
       if (this.supportedChains.indexOf(name) !== -1) {
         this.chainName = name
       } else {
-        this.chainName = 'mainnet'
+        this.chainName = this.defaultChain
       }
     } else {
-      this.chainName = 'mainnet'
+      this.chainName = this.defaultChain
     }
 
     return this.chainName
   }
 
   public getEnvironment() {
-    const url = this.getEnvironmentUrl()
-    if (url === 'babylonnet') {
+    const envName = this.getEnvironmentFromUrl()
+    if (envName === 'babylonnet') {
       console.log('babylonnet')
       return environment.babylonnet
-    } else if (url === 'carthagenet') {
+    } else if (envName === 'carthagenet') {
       console.log('carthagenet')
       return environment.carthagenet
     } else {
