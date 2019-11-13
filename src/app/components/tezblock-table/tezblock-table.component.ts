@@ -57,7 +57,7 @@ enum OperationTypes {
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
   EndorsementOverview = 'endorsement_overview',
-  Rewards = 'rewards'
+  Rewards = 'rewards',
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
   DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
 }
@@ -513,6 +513,7 @@ const layouts: Layout = {
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
     [OperationTypes.DoubleBakingEvidenceOverview]: [
       {
         name: 'Baker',

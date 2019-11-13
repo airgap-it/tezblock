@@ -73,6 +73,7 @@ export class ListComponent {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'ballot_overview'
+            break
           case 'double-baking':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind('double_baking_evidence')
