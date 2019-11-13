@@ -4,6 +4,7 @@ import { combineLatest, of } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 
 interface RewardSingleServiceState {
   rewards: any
@@ -41,9 +42,10 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
   )
   public loading$ = this.state$.pipe(map(state => state.loading))
 
-  constructor() {
+  constructor(public readonly chainNetworkService: ChainNetworkService) {
     super(initialState)
-    const protocol = new TezosProtocol()
+    const environmentUrls = this.chainNetworkService.getEnvironment()
+    const protocol = new TezosProtocol(environmentUrls.rpc, environmentUrls.conseil)
 
     this.subscription = combineLatest([this.pagination$, this.address$])
       .pipe(
