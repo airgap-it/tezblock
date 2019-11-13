@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: tezblock-frontend
+  name: tezblock-carthagenet-frontend
   namespace: tezblock
   annotations:
     kubernetes.io/ingress.class: 'nginx'
@@ -9,21 +9,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - tezblock.prod.gke.papers.tech
-      secretName: tezblock-prod-tls
-    - hosts:
-        - mvp.tezblock.io
-      secretName: tezblock-mvp-prod-tls  
+        - tezblock-carthagenet.prod.gke.papers.tech
+        - carthagenet.tezblock.io
+      secretName: tezblock-carthagenet-prod-tls  
   rules:
-    - host: tezblock.prod.gke.papers.tech
+    - host: tezblock-carthagenet.prod.gke.papers.tech
       http:
         paths:
           - backend:
-              serviceName: tezblock-frontend
+              serviceName: tezblock-carthagenet-frontend
               servicePort: 80
-    - host: mvp.tezblock.io
+    - host: carthagenet.tezblock.io
       http:
         paths:
           - backend:
-              serviceName: tezblock-frontend
+              serviceName: tezblock-carthagenet-frontend
               servicePort: 80

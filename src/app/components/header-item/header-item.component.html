@@ -84,7 +84,7 @@
                 </div>
               </div>
             </div>
-            <ul class="navbar-nav ml-auto mt-2 mt-lg-0 mr-3">
+            <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
                 <button
                   type="button"
@@ -114,7 +114,7 @@
                     Blockchain
                   </a>
                   <ul
-                    class="dropdown-menu mega-dropdown-menu pb-4"
+                    class="dropdown-menu mega-dropdown-menu pb-4 "
                     *dropdownMenu
                     role="menu"
                     [ngClass]="{ 'display--none': !showDropdown }"
@@ -209,7 +209,7 @@
                   >
                     Resources
                   </a>
-                  <ul class="dropdown-menu pb-4" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <li role="menuitem">
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
                         Wallets
@@ -228,6 +228,45 @@
                   </ul>
                 </span>
               </li>
+              <!-- TODO: unhide if switch works
+              <li class="nav-item dropdown pl-2 pl-sm-0">
+                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                  <a
+                    class="btn btn-sm btn-outline-dark dropdown-toggle"
+                    href
+                    role="button"
+                    dropdownToggle
+                    (click)="(false)"
+                    id="button-basic"
+                    routerLinkActive="btn-link"
+                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                  >
+                    {{ selectedNetwork }}
+                  </a>
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                    <li role="menuitem">
+                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
+                        mainnet
+                      </a>
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork == 'babylonnet' ? 'active' : ''"
+                        (click)="changeNetwork('babylonnet')"
+                      >
+                        babylonnet
+                      </a>
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork == 'carthagenet' ? 'active' : ''"
+                        (click)="changeNetwork('carthagenet')"
+                      >
+                        carthagenet
+                      </a>
+                    </li>
+                  </ul>
+                </span>
+              </li>
+              -->
             </ul>
           </div>
         </div>

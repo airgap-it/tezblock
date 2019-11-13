@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: tezblock-frontend
+  name: tezblock-babylonnet-frontend
   namespace: tezblock
   annotations:
     kubernetes.io/ingress.class: 'nginx'
@@ -9,21 +9,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - tezblock.prod.gke.papers.tech
-      secretName: tezblock-prod-tls
-    - hosts:
-        - mvp.tezblock.io
-      secretName: tezblock-mvp-prod-tls  
+        - tezblock-babylonnet.prod.gke.papers.tech
+        - babylonnet.tezblock.io
+      secretName: tezblock-babylonnet-prod-tls  
   rules:
-    - host: tezblock.prod.gke.papers.tech
+    - host: tezblock-babylonnet.prod.gke.papers.tech
       http:
         paths:
           - backend:
-              serviceName: tezblock-frontend
+              serviceName: tezblock-babylonnet-frontend
               servicePort: 80
-    - host: mvp.tezblock.io
+    - host: babylonnet.tezblock.io
       http:
         paths:
           - backend:
-              serviceName: tezblock-frontend
+              serviceName: tezblock-babylonnet-frontend
               servicePort: 80

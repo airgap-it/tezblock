@@ -49,11 +49,12 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
-import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
-import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
+import { ChainNetworkService } from './services/chain-network/chain-network.service'
+import { BakerTableComponent } from './components/baker-table/baker-table.component'
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component';
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
 import { StoreModule } from '@ngrx/store'
@@ -134,7 +135,7 @@ import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
     EndorsementDetailComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
+  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   entryComponents: [
     BlockItemComponent,
     IdenticonComponent,
