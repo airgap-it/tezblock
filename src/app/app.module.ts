@@ -61,7 +61,8 @@ import { StoreModule } from '@ngrx/store'
 import { ROOT_REDUCERS, metaReducers } from './reducers'
 import { EffectsModule } from '@ngrx/effects'
 import { AppEffects } from './app.effects'
-import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects';
+import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 
 @NgModule({
   imports: [
@@ -132,7 +133,8 @@ import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
     ExtendTableCellComponent,
     ResourcesWalletItemComponent,
     ModalCellComponent,
-    EndorsementDetailComponent
+    EndorsementDetailComponent,
+    TooltipItemComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
