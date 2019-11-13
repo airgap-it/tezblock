@@ -56,6 +56,12 @@ import { BakerTableComponent } from './components/baker-table/baker-table.compon
 import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component';
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
+import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { StoreModule } from '@ngrx/store'
+import { ROOT_REDUCERS, metaReducers } from './reducers'
+import { EffectsModule } from '@ngrx/effects'
+import { AppEffects } from './app.effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
 
 @NgModule({
   imports: [
@@ -81,7 +87,15 @@ import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal
     QRCodeModule,
     ModalModule.forRoot(),
     FontAwesomeModule,
-    ChartsModule
+    ChartsModule,
+    StoreModule.forRoot(ROOT_REDUCERS, {
+      metaReducers,
+      runtimeChecks: {
+        strictStateImmutability: true,
+        strictActionImmutability: true
+      }
+    }),
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects])
   ],
   declarations: [
     AppComponent,
@@ -117,7 +131,8 @@ import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal
     ResourcesWalletsComponent,
     ExtendTableCellComponent,
     ResourcesWalletItemComponent,
-    ModalCellComponent
+    ModalCellComponent,
+    EndorsementDetailComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

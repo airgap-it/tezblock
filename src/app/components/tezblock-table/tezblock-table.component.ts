@@ -172,7 +172,8 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
       { name: 'Endorsed Level', property: 'level', width: '', component: BlockCellComponent },
-      ...baseTx
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent, options: { kind: 'endorsement' } }
     ],
     [OperationTypes.Ballot]: [
       { name: 'Ballot', property: 'ballot', width: '' },
@@ -303,7 +304,7 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
-      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent, options: { kind: 'endorsement' } }
     ],
     [OperationTypes.Activation]: [
       {
@@ -496,7 +497,7 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
-      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent, options: { kind: 'endorsement' } }
     ],
     [OperationTypes.BallotOverview]: [
       {
@@ -674,19 +675,10 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
-    // console.log('type of page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
-        // tslint:disable-next-line:no-console
-        // console.log('have layout for type ', this.type)
-        // console.log('have layout for page ', this.page)
-
         this.config = layouts[this.page][this.type]
       } else {
-        // tslint:disable-next-line:no-console
-        console.log(`NO layout for page ${this.page} and type ${this.type}`)
-        // tslint:disable-next-line:no-console
-        console.log('layouts[this.page]', layouts[this.page])
         this.config = []
       }
     }
