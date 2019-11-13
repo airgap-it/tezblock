@@ -76,14 +76,14 @@ export class ListComponent {
             break
           case 'double-baking':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('double_baking_evidence')
+            this.dataService.updateKind(['double_baking_evidence'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'double_baking_evidence_overview'
             break
           case 'double-endorsement':
             this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind('double-endorsement-evidence')
+            this.dataService.updateKind(['double_endorsement_evidence'])
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.type = 'double_endorsement_evidence_overview'
@@ -102,7 +102,7 @@ export class ListComponent {
     this.dataService.setPageSize(10)
   }
 
-  public loadMore(): void {
-    ;(this.dataService as any).loadMore()
+  loadMore() {
+    (this.dataService as any).loadMore()
   }
 }
