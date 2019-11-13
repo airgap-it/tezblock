@@ -8,4 +8,10 @@ import { Component, Input } from '@angular/core'
 export class HashCellComponent {
   @Input()
   public data: any // TODO: any
+
+  get linkPath(): string {
+    return `/${this.options && this.options.kind || 'transaction'}`;
+  }
+
+  public options: { kind: 'transaction' | 'endorsement' }
 }

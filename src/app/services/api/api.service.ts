@@ -187,6 +187,29 @@ export class ApiService {
       )
   }
 
+  public getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
+    return this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'operation_group_hash',
+            operation: 'eq',
+            set: [id],
+            inverse: false
+          },
+          {
+            field: 'kind',
+            operation: 'eq',
+            set: ['endorsement']
+          }
+        ],
+        limit
+      },
+      this.options
+    )
+  }
+
   public getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
     return this.http.post<Transaction[]>(
       this.transactionsApiUrl,
