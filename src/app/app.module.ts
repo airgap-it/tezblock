@@ -53,8 +53,8 @@ import { TelegramModalComponent } from './components/telegram-modal/telegram-mod
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { BakerTableComponent } from './components/baker-table/baker-table.component'
-import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
-import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component';
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
 import { StoreModule } from '@ngrx/store'
@@ -62,6 +62,7 @@ import { ROOT_REDUCERS, metaReducers } from './reducers'
 import { EffectsModule } from '@ngrx/effects'
 import { AppEffects } from './app.effects'
 import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
+import { ListEffects } from './pages/list/effects'
 
 @NgModule({
   imports: [
@@ -95,7 +96,7 @@ import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects])
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
   ],
   declarations: [
     AppComponent,
