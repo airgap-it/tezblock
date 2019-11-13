@@ -11,7 +11,16 @@
         {{ tab.count }}
       </span>
     </ng-template>
+    <h6 class="pt-3 mr-1 d-sm-none">
+      <span>
+        {{ tab.title }}
+      </span>
+      <span class="badge badge-pill badge-primary">
+        {{ tab.count }}
+      </span>
+    </h6>
   </tab>
+
   <tezblock-table
     [loading]="loading"
     [data]="data"

@@ -19,10 +19,12 @@ import { Transaction } from '../../interfaces/Transaction'
 import { AddressCellComponent } from './address-cell/address-cell.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { BlockCellComponent } from './block-cell/block-cell.component'
+import { ExtendTableCellComponent } from './extend-table-cell/extend-table-cell.component'
 import { HashCellComponent } from './hash-cell/hash-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
+import { ModalCellComponent } from './modal-cell/modal-cell.component'
 
 interface Column {
   name: string
@@ -30,6 +32,8 @@ interface Column {
   width: string
   component?: any // TODO: any
   options?: any // TODO: any, boolean?
+  optionsTransform?(value: any, options: any): any
+  transform?(value: any): any
 }
 
 enum LayoutPages {
@@ -45,11 +49,15 @@ enum OperationTypes {
   Endorsement = 'endorsement',
   Reveal = 'reveal',
   Ballot = 'ballot',
+  BallotOverview = 'ballot_overview',
+  BakingRights = 'baking_rights',
+  EndorsingRights = 'endorsing_rights',
   Activation = 'activate_account',
   Overview = 'overview',
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
   EndorsementOverview = 'endorsement_overview',
+  Rewards = 'rewards'
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
   DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
 }
@@ -61,6 +69,9 @@ interface Layout {
     [OperationTypes.Origination]: Column[]
     [OperationTypes.Endorsement]: Column[]
     [OperationTypes.Ballot]: Column[]
+    [OperationTypes.Rewards]: Column[]
+    [OperationTypes.BakingRights]: Column[]
+    [OperationTypes.EndorsingRights]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -80,6 +91,7 @@ interface Layout {
     [OperationTypes.Reveal]: Column[]
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
+    [OperationTypes.BallotOverview]: Column[]
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
   }
@@ -103,7 +115,7 @@ const layouts: Layout = {
         options: { showFullAddress: false, pageId: 'oo' }
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       ...baseTx
     ],
@@ -121,10 +133,12 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       ...baseTx
     ],
     [OperationTypes.Origination]: [
@@ -135,7 +149,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '' },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       {
         name: 'Originator',
@@ -144,15 +158,20 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       ...baseTx
     ],
     [OperationTypes.Endorsement]: [
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Slots', property: 'slots', width: '' },
-      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Endorsed Level', property: 'level', width: '', component: BlockCellComponent },
       ...baseTx
     ],
     [OperationTypes.Ballot]: [
@@ -160,9 +179,42 @@ const layouts: Layout = {
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
       { name: 'Voting Period', property: '', width: '' },
-      { name: 'Rolls', property: '', width: '' },
-      { name: 'Proposal Hash', property: 'proposal', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
+    [OperationTypes.Rewards]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      {
+        name: 'Delegations',
+        property: 'delegatedContracts',
+        width: '',
+        component: PlainValueCellComponent,
+        transform: (addresses: [string]): number => addresses.length
+      },
+      { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent },
+      { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent },
+      { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent },
+      { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+      { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
+    ],
+    [OperationTypes.BakingRights]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Fees', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.EndorsingRights]: [
+      { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
+      { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
+      { name: 'Slot', property: 'slot', width: '' },
+      { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
+      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
+      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
     ]
   },
   [LayoutPages.Block]: {
@@ -176,17 +228,15 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ],
-
-    // TODO
     [OperationTypes.Overview]: [
       { name: 'Baker', property: 'baker', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-      { name: 'Value', property: 'volume', width: '', component: AmountCellComponent },
+      { name: 'Transaction Volume', property: 'volume', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Transactions', property: 'txcount', width: '' },
       { name: 'Fitness', property: 'fitness', width: '' },
@@ -206,9 +256,11 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
-      { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
@@ -221,7 +273,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -229,7 +281,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent },
       { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
@@ -253,8 +311,9 @@ const layouts: Layout = {
         property: 'pkh',
         width: '',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: true, pageId: 'oo' }
       },
+      { name: 'Secret', property: 'secret', width: '' },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ]
   },
@@ -269,10 +328,11 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
       { name: 'Storage Limit', property: 'storage_limit', width: '' },
+      { name: 'Parameters', property: 'parameters', width: '', component: ModalCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ],
 
@@ -288,15 +348,15 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
 
-      { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent },
       { name: 'Fees', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
-      { name: 'Parameters', property: 'parameters', width: '' },
+      { name: 'Parameters', property: 'parameters', width: '', component: ModalCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ],
 
     [OperationTypes.Activation]: [
-      { name: 'Account', property: 'pkh', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      { name: 'Account', property: 'pkh', width: '1', component: AddressCellComponent, options: { showFullAddress: true, pageId: 'oo' } },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Secret', property: 'secret', width: '' },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
@@ -316,7 +376,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Value', property: 'delegatedBalance', width: '', component: AmountCellComponent },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -338,7 +400,9 @@ const layouts: Layout = {
         property: 'delegate',
         width: '1',
         component: AddressCellComponent,
-        options: { showFullAddress: false, pageId: 'oo' }
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Value', property: 'amount', width: '', component: AmountCellComponent },
@@ -355,7 +419,7 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -363,7 +427,13 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Burn', property: 'burn', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Gas Limit', property: 'gas_limit', width: '' },
@@ -380,7 +450,7 @@ const layouts: Layout = {
       },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
 
-      { name: 'Initial Balance', property: 'amount', width: '', component: AmountCellComponent },
+      { name: 'Balance', property: 'originatedBalance', width: '', component: AmountCellComponent },
       {
         name: 'Originator',
         property: 'source',
@@ -388,7 +458,15 @@ const layouts: Layout = {
         component: AddressCellComponent,
         options: { showFullAddress: false, pageId: 'oo' }
       },
-      { name: 'Baker', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+      {
+        name: 'Baker',
+        property: 'delegate',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' },
+        optionsTransform: (value, options) => (!value ? { ...options, isText: true } : options),
+        transform: value => value || 'undelegate'
+      },
       { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
@@ -420,6 +498,21 @@ const layouts: Layout = {
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
     ],
+    [OperationTypes.BallotOverview]: [
+      {
+        name: 'Baker',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Ballot', property: 'ballot', width: '' },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Kind', property: 'kind', width: '' },
+      { name: 'Voting Period', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+      ...baseTx
     [OperationTypes.DoubleBakingEvidenceOverview]: [
       {
         name: 'Baker',
@@ -515,6 +608,9 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   @Input()
   public type?: OperationTypes
 
+  @Input()
+  public expandable?: boolean = false
+
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 
@@ -526,9 +622,15 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         if (t.length > 0) {
           setTimeout(() => {
             this.renderComponents()
-          }, 250) // TODO: Find a better way than this
+          }, 300) // TODO: Find a better way than this. # of votes might not display if the timeout is not sufficiently long
         }
       })
+    }
+  }
+
+  public expand(transaction: any) {
+    if (this.expandable) {
+      transaction.expand = !transaction.expand
     }
   }
 
@@ -552,13 +654,17 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
         target.clear()
 
         const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent) // TODO: <any>
-        cmpRef.instance.data = data
-        if (cellType.options) {
-          if (cellType.options.pageId) {
-            cellType.options.pageId = ownId
+
+        cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
+
+        const options = cellType.optionsTransform ? cellType.optionsTransform(data, cellType.options) : cellType.options
+
+        if (options) {
+          if (options.pageId) {
+            options.pageId = ownId
           }
-          cmpRef.instance.options = cellType.options
-          if (cellType.options.pageId) {
+          cmpRef.instance.options = options
+          if (options.pageId) {
             cmpRef.instance.checkId()
           }
         }
@@ -567,11 +673,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   }
 
   public ngOnChanges() {
+    // console.log('type of page:', this.type)
     if (this.page && this.type) {
       if (layouts[this.page][this.type]) {
         // tslint:disable-next-line:no-console
-        console.log('have layout for type ', this.type)
-        console.log('have layout for page ', this.page)
+        // console.log('have layout for type ', this.type)
+        // console.log('have layout for page ', this.page)
 
         this.config = layouts[this.page][this.type]
       } else {

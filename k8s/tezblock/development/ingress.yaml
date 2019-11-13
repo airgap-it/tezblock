@@ -4,14 +4,14 @@ metadata:
   name: tezblock-frontend
   namespace: tezblock
   annotations:
-    kubernetes.io/ingress.class: 'nginx'
-    certmanager.k8s.io/cluster-issuer: 'letsencrypt-prod'
+    kubernetes.io/ingress.class: "nginx"
+    certmanager.k8s.io/cluster-issuer: "letsencrypt-prod"
     certmanager.k8s.io/acme-challenge-type: http01
 spec:
   tls:
     - hosts:
         - tezblock.dev.gke.papers.tech
-        - mvp.tezblock.io
+        - dev.tezblock.io
       secretName: tezblock-dev-tls
   rules:
     - host: tezblock.dev.gke.papers.tech
@@ -20,7 +20,7 @@ spec:
           - backend:
               serviceName: tezblock-frontend
               servicePort: 80
-    - host: mvp.tezblock.io
+    - host: dev.tezblock.io
       http:
         paths:
           - backend:

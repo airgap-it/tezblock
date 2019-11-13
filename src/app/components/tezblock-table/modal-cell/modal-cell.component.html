@@ -1,0 +1,15 @@
+<span *ngIf="!data" class="text-secondary">
+  None
+</span>
+<button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">Show</button>
+
+<ng-template #template>
+  <div class="modal-header">
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    {{ data }}
+  </div>
+</ng-template>

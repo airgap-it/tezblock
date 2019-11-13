@@ -18,7 +18,7 @@
       <div class="col-3 col-sm-2 p-0 d-flex align-items-center order-2 order-sm-3">
         <span
           [innerHtml]="
-            block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
+            block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 4, fontSmall: true, fontColor: true } | safeHtml
           "
         ></span>
         &nbsp;ꜩ

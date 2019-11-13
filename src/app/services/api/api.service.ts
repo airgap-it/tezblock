@@ -1,24 +1,31 @@
+import { EndorsingRights } from './../../interfaces/EndorsingRights'
+import { BakingRights } from './../../interfaces/BakingRights'
 import { environment } from './../../../environments/environment'
-import { Delegation } from './../../interfaces/Delegation'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 
-import { BalanceUpdate } from 'src/app/interfaces/BalanceUpdate'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
+import { VotingInfo } from '../transaction-single/transaction-single.service'
+import { TezosProtocol } from 'airgap-coin-lib'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
-  private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
-  private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
-  private readonly frozenBalanceApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/delegates`
+  public environmentUrls = this.chainNetworkService.getEnvironment()
+  public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+
+  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/${this.environmentVariable}/`
+  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/accounts`
+  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -37,7 +44,7 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -58,31 +65,66 @@ export class ApiService {
     )
   }
 
-  public getLatestTransactions(limit: number, kind: string): Observable<Transaction[]> {
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'operation_group_hash',
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'kind',
-            operation: 'eq',
-            set: [kind]
+  public getLatestTransactions(limit: number, kindList: Array<string>): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'kind',
+              operation: 'in',
+              set: kindList
+            }
+          ],
+          orderBy: [this.orderByBlockLevelDesc],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map(transactions => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const originatedAccounts = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'origination') {
+              originatedAccounts.push(transaction.originated_contracts)
+            }
+          })
+          if (originatedAccounts.length > 0) {
+            const originatedSources = this.getAccountsByIds(originatedAccounts)
+            originatedSources.subscribe(originators => {
+              finalTransactions.forEach(transaction => {
+                originators.forEach(originator => {
+                  if (transaction.originated_contracts === originator.account_id) {
+                    transaction.originatedBalance = originator.balance
+                  }
+                })
+              })
+            })
           }
-        ],
-        orderBy: [this.orderByBlockLevelDesc],
-        limit
-      },
-      this.options
-    )
+
+          if (kindList.includes('ballot' || 'proposals')) {
+            let source: Transaction[] = []
+            source.push(...finalTransactions)
+            source.map(async transaction => {
+              await this.addVotesForTransaction(transaction)
+            })
+            return source
+          }
+          return finalTransactions
+        })
+      )
   }
 
   public getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
-    console.log('by id')
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -104,10 +146,13 @@ export class ApiService {
           let finalTransactions: Transaction[] = []
           finalTransactions = transactions.slice(0, limit)
           const sources = []
+          const originatedAccounts = []
 
           finalTransactions.forEach(transaction => {
             if (transaction.kind === 'delegation') {
               sources.push(transaction.source)
+            } else if (transaction.kind === 'origination') {
+              originatedAccounts.push(transaction.originated_contracts)
             }
           })
 
@@ -118,6 +163,19 @@ export class ApiService {
                 delegators.forEach(delegator => {
                   if (transaction.source === delegator.account_id) {
                     transaction.delegatedBalance = delegator.balance
+                  }
+                })
+              })
+            })
+          }
+
+          if (originatedAccounts.length > 0) {
+            const originatedSources = this.getAccountsByIds(originatedAccounts)
+            originatedSources.subscribe(originators => {
+              finalTransactions.forEach(transaction => {
+                originators.forEach(originator => {
+                  if (transaction.originated_contracts === originator.account_id) {
+                    transaction.originatedBalance = originator.balance
                   }
                 })
               })
@@ -199,10 +257,13 @@ export class ApiService {
           let finalTransactions: Transaction[] = []
           finalTransactions = transactions.slice(0, limit)
           const sources = []
+          const originatedAccounts = []
 
           finalTransactions.forEach(transaction => {
             if (transaction.kind === 'delegation') {
               sources.push(transaction.source)
+            } else if (transaction.kind === 'origination') {
+              originatedAccounts.push(transaction.originated_contracts)
             }
           })
 
@@ -213,6 +274,18 @@ export class ApiService {
                 delegators.forEach(delegator => {
                   if (transaction.source === delegator.account_id) {
                     transaction.delegatedBalance = delegator.balance
+                  }
+                })
+              })
+            })
+          }
+          if (originatedAccounts.length > 0) {
+            const originatedSources = this.getAccountsByIds(originatedAccounts)
+            originatedSources.subscribe(originators => {
+              finalTransactions.forEach(transaction => {
+                originators.forEach(originator => {
+                  if (transaction.originated_contracts === originator.account_id) {
+                    transaction.originatedBalance = originator.balance
                   }
                 })
               })
@@ -382,28 +455,76 @@ export class ApiService {
       )
   }
 
-  public getDelegatedAccounts(tzAddress: string, limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'manager',
-            operation: 'eq',
-            set: [tzAddress],
-            inverse: false
-          }
-        ],
-        orderBy: [
-          {
-            field: 'balance',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+  public getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
+    if (address.startsWith('tz')) {
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'manager_pubkey',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'originated_contracts',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    } else {
+      return this.http.post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'originated_contracts',
+              operation: 'eq',
+              set: [address],
+              inverse: false
+            },
+            {
+              field: 'manager_pubkey',
+              operation: 'isnull',
+              set: [''],
+              inverse: true
+            },
+            {
+              field: 'status',
+              operation: 'eq',
+              set: ['applied'],
+              inverse: false
+            }
+          ],
+          orderBy: [
+            {
+              field: 'balance',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+    }
   }
 
   public getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
@@ -495,43 +616,76 @@ export class ApiService {
   }
 
   public getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<T[]>(
-          this.transactionsApiUrl,
+    let headers
+    if (field === 'operation_group_hash') {
+      // then we only care about spend transactions
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
           {
-            fields: [field, 'block_level'],
-            predicates: [
-              {
-                field,
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'block_level',
-                operation: 'in',
-                set: blockRange
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            aggregation: [
-              {
-                field,
-                function: operation
-              }
-            ],
-            limit
+            field,
+            operation: 'isnull',
+            inverse: true
           },
-          this.options
-        )
-        .subscribe((volumePerBlock: T[]) => {
-          resolve(volumePerBlock)
-        })
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          },
+          {
+            field: 'kind',
+            operation: 'in',
+            set: ['transaction']
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    } else {
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    }
+    return new Promise((resolve, reject) => {
+      this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
+        resolve(volumePerBlock)
+      })
     })
   }
 
@@ -539,25 +693,26 @@ export class ApiService {
     field: string,
     value: string
   ): Observable<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]> {
+    const body = {
+      fields: [field, 'kind'],
+      predicates: [
+        {
+          field,
+          operation: 'eq',
+          set: [value],
+          inverse: false
+        }
+      ],
+      aggregation: [
+        {
+          field,
+          function: 'count'
+        }
+      ]
+    }
     return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
       this.transactionsApiUrl,
-      {
-        fields: [field, 'operation_group_hash', 'kind'],
-        predicates: [
-          {
-            field,
-            operation: 'eq',
-            set: [value],
-            inverse: false
-          }
-        ],
-        aggregation: [
-          {
-            field: 'operation_group_hash',
-            function: 'count'
-          }
-        ]
-      },
+      body,
       this.options
     )
   }
@@ -596,6 +751,84 @@ export class ApiService {
       },
       this.options
     )
+  }
+
+  public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
+    return new Promise(async resolve => {
+      const protocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
+      const data = await protocol.getTezosVotingInfo(transaction.block_hash)
+      transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+      resolve(transaction)
+    })
+  }
+
+  public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
+    return this.http
+      .post<BakingRights[]>(
+        `${this.mainNetApiUrl}baking_rights`,
+        {
+          predicates: [
+            {
+              field: 'delegate',
+              operation: 'eq',
+              set: [address]
+            },
+            {
+              field: 'priority',
+              operation: 'eq',
+              set: ['0']
+            }
+          ],
+          orderBy: [
+            {
+              field: 'level',
+              direction: 'desc'
+            }
+          ],
+          limit: limit
+        },
+        this.options
+      )
+      .pipe(
+        map((rights: BakingRights[]) => {
+          rights.forEach(right => {
+            right.cycle = Math.floor(right.level / 4096)
+          })
+          return rights
+        })
+      )
+  }
+
+  public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
+    return this.http
+      .post<EndorsingRights[]>(
+        `${this.mainNetApiUrl}endorsing_rights`,
+        {
+          predicates: [
+            {
+              field: 'delegate',
+              operation: 'eq',
+              set: [address]
+            }
+          ],
+          orderBy: [
+            {
+              field: 'level',
+              direction: 'desc'
+            }
+          ],
+          limit: limit
+        },
+        this.options
+      )
+      .pipe(
+        map((rights: EndorsingRights[]) => {
+          rights.forEach(right => {
+            right.cycle = Math.floor(right.level / 4096)
+          })
+          return rights
+        })
+      )
   }
 
   public getEndorsements(blockHash: string): Promise<number> {
@@ -658,5 +891,30 @@ export class ApiService {
           resolve(result[0].frozen_balance)
         })
     })
+  }
+
+  public getDelegatedAccountsList(tzAddress: string): Observable<any> {
+    return this.http.post(
+      this.accountsApiUrl,
+      {
+        fields: ['account_id', 'manager', 'delegate_value', 'balance'],
+        predicates: [
+          {
+            field: 'delegate_value',
+            operation: 'eq',
+            set: [tzAddress],
+            inverse: false
+          }
+        ],
+        orderBy: [{ field: 'count_account_id', direction: 'desc' }],
+        aggregation: [
+          {
+            field: 'account_id',
+            function: 'count'
+          }
+        ]
+      },
+      this.options
+    )
   }
 }

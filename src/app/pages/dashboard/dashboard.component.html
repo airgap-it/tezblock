@@ -43,7 +43,7 @@
       <div class="container p-0">
         <div class="row justify-content-lg-between">
           <div class="col-md-6 col-lg-4">
-            <h5 class="card-title mb-3 ">
+            <h5 class="card-title__secondary mb-3 ">
               Current Cycle
             </h5>
             <div class="container p-0">
@@ -77,20 +77,20 @@
           </div>
           <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
             <div class="mb-3">
-              <h5 class="card-title mb-3 ">
+              <h5 class="card-title__secondary mb-3 ">
                 Circulating Supply
               </h5>
-              <h3>810,256,869 ꜩ</h3>
+              <h3>810,904,882 ꜩ</h3>
               <!--TODO-->
             </div>
 
-            <h5 class="card-title mb-3 ">
+            <h5 class="card-title__secondary mb-3 ">
               Market Cap
             </h5>
-            <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('810256869').toFormat(0) }}</h3>
+            <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('810904882').toFormat(0) }}</h3>
           </div>
           <div class=" col-md-6 col-lg-4">
-            <h5 class="card-title mb-3">
+            <h5 class="card-title__secondary mb-3">
               Tezos Price Last 24h
             </h5>
             <ng-container *ngIf="fiatInfo$">
@@ -120,7 +120,7 @@
       <div class=" col-lg-6 mb-4 mb-lg-0">
         <div class="card py-4 h-100">
           <div class="card-body p-4 ">
-            <h5 class="card-title mb-3 ">
+            <h5 class="card-title mb-4 ">
               Latest Blocks
             </h5>
             <block-item [blocks$]="blocks$"></block-item>
@@ -133,7 +133,7 @@
       <div class=" col-lg-6 mb-4 mb-lg-0">
         <div class="card py-4 h-100">
           <div class="card-body p-4">
-            <h5 class="card-title mb-3 ">
+            <h5 class="card-title mb-4 ">
               Latest Transactions
             </h5>
             <transaction-item [data]="transactions$"></transaction-item>

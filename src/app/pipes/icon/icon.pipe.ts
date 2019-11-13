@@ -3,6 +3,7 @@ import { findIconDefinition, IconDefinition, IconLookup, IconName, IconPrefix } 
 import { environment } from 'src/environments/environment'
 
 export type IconRef =
+  | 'bell'
   | 'copy'
   | 'levelDownAlt'
   | 'levelUpAlt'
@@ -20,7 +21,15 @@ export type IconRef =
   | 'medium'
   | 'telegram'
   | 'twitter'
-
+  | 'globe'
+  | 'apple'
+  | 'laptop'
+  | 'android'
+  | 'caretUp'
+  | 'caretDown'
+  | 'breadLoaf'
+  | 'coin'
+  | 'hatChef'
 @Pipe({
   name: 'iconPipe'
 })
@@ -32,13 +41,18 @@ export class IconPipe implements PipeTransform {
     let handReceiving: IconName = 'hand-receiving'
     let boxBallot: IconName = 'box-ballot'
     let handHoldingSeedling: IconName = 'hand-holding-seedling'
+    let coin: IconName = 'coin'
+    let hatChef: IconName = 'hat-chef'
     if (!environment.proFontAwesomeAvailable) {
       prefix = 'fas'
       handReceiving = 'handshake'
       boxBallot = 'vote-yea'
       handHoldingSeedling = 'seedling'
+      coin = 'coins'
+      hatChef = 'list-alt'
     }
     this.iconNameMap = {
+      bell: { prefix, iconName: 'bell' },
       copy: { prefix, iconName: 'copy' },
       levelDownAlt: { prefix, iconName: 'level-down-alt' },
       levelUpAlt: { prefix, iconName: 'level-up-alt' },
@@ -55,7 +69,16 @@ export class IconPipe implements PipeTransform {
       github: { prefix: 'fab', iconName: 'github' },
       medium: { prefix: 'fab', iconName: 'medium' },
       telegram: { prefix: 'fab', iconName: 'telegram' },
-      twitter: { prefix: 'fab', iconName: 'twitter' }
+      twitter: { prefix: 'fab', iconName: 'twitter' },
+      globe: { prefix, iconName: 'globe' },
+      laptop: { prefix, iconName: 'laptop' },
+      apple: { prefix: 'fab', iconName: 'apple' },
+      android: { prefix: 'fab', iconName: 'android' },
+      caretUp: { prefix, iconName: 'caret-up' },
+      caretDown: { prefix, iconName: 'caret-down' },
+      breadLoaf: { prefix, iconName: 'bread-loaf' },
+      coin: { prefix, iconName: coin },
+      hatChef: { prefix, iconName: hatChef }
     }
   }
 

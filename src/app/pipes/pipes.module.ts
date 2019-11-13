@@ -1,3 +1,4 @@
+import { PercentagePipe } from './percentage/percentage.pipe'
 import { NgModule } from '@angular/core'
 
 import { AliasPipe } from './alias/alias.pipe'
@@ -9,9 +10,36 @@ import { SafeHtmlPipe } from './safe-html/safe-html.pipe'
 import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
 
 @NgModule({
-  declarations: [ShortenStringPipe, AmountConverterPipe, CurrencyConverterPipe, CurrencySymbolPipe, AliasPipe, SafeHtmlPipe, IconPipe],
-  providers: [ShortenStringPipe, AmountConverterPipe, CurrencyConverterPipe, CurrencySymbolPipe, AliasPipe, SafeHtmlPipe, IconPipe],
+  declarations: [
+    ShortenStringPipe,
+    AmountConverterPipe,
+    CurrencyConverterPipe,
+    CurrencySymbolPipe,
+    AliasPipe,
+    SafeHtmlPipe,
+    IconPipe,
+    PercentagePipe
+  ],
+  providers: [
+    ShortenStringPipe,
+    AmountConverterPipe,
+    CurrencyConverterPipe,
+    CurrencySymbolPipe,
+    AliasPipe,
+    SafeHtmlPipe,
+    IconPipe,
+    PercentagePipe
+  ],
   imports: [],
-  exports: [ShortenStringPipe, AmountConverterPipe, CurrencyConverterPipe, CurrencySymbolPipe, AliasPipe, SafeHtmlPipe, IconPipe]
+  exports: [
+    ShortenStringPipe,
+    AmountConverterPipe,
+    CurrencyConverterPipe,
+    CurrencySymbolPipe,
+    AliasPipe,
+    SafeHtmlPipe,
+    IconPipe,
+    PercentagePipe
+  ]
 })
 export class PipesModule {}

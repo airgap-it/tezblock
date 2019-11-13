@@ -16,6 +16,11 @@ interface TransactionSingleServiceState {
   loading: boolean
 }
 
+export interface VotingInfo {
+  pkh: string
+  rolls: number
+}
+
 const initialState: TransactionSingleServiceState = {
   transactions: [],
   kind: 'transaction',
@@ -63,7 +68,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
+    this.subscription = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
       .pipe(
         switchMap(([pagination, hash, kind, address, block, _]) => {
           if (hash) {
@@ -101,56 +106,78 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     this.updateState({ ...this._state, kind, loading: true })
   }
 
+  private readonly kindToFieldsMap = {
+    transaction: ['source', 'destination'],
+    delegation: ['source', 'delegate'],
+    origination: ['source'],
+    endorsement: ['delegate'],
+    ballot: ['source'],
+    proposals: ['source']
+  }
+
   private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
-    let combinedSource = this.apiService.getTransactionsByField(address, 'source', kind, limit)
-    if (kind === 'ballot') {
-      combinedSource = forkJoin([
-        this.apiService.getTransactionsByField(address, 'source', kind, limit),
-        this.apiService.getTransactionsByField(address, 'source', 'proposals', limit)
-      ]).pipe(
-        map(([ballot, proposals]) => {
-          proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1).replace(']', '')))
-          let source: Transaction[] = []
-          source.push(...ballot, ...proposals)
-          source.sort((a, b) => {
-            return b.timestamp - a.timestamp
-          })
-          source = source.slice(0, limit)
-
-          return source
-        })
-      )
+    const fields = this.kindToFieldsMap[kind]
+    const operations: Observable<Transaction[]>[] = []
+    for (const field of fields) {
+      operations.push(this.apiService.getTransactionsByField(address, field, kind, limit))
     }
-    return forkJoin([
-      combinedSource,
-      this.apiService.getTransactionsByField(address, 'destination', kind, limit),
-      this.apiService.getTransactionsByField(address, 'delegate', kind, limit)
-    ]).pipe(
-      map(([from, to, delegate]) => {
-        let transactions: Transaction[] = []
-        transactions.push(...from, ...to, ...delegate)
-        transactions.sort((a, b) => {
-          return b.timestamp - a.timestamp
-        })
-        transactions = transactions.slice(0, limit)
-        const sources = []
+    if (kind === 'delegation') {
+      operations.push(this.apiService.getTransactionsByField(address, 'delegate', 'origination', limit))
+    }
+    if (kind === 'ballot') {
+      const fields = this.kindToFieldsMap.proposals
+      for (const field of fields) {
+        operations.push(
+          this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
+            map(proposals => {
+              proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
 
-        transactions.forEach(transaction => {
-          if (transaction.kind === 'delegation') {
-            sources.push(transaction.source)
-          }
-        })
-        if (Object.keys(sources).length) {
-          const delegateSources = this.apiService.getAccountsByIds(sources)
-          delegateSources.subscribe(delegators => {
-            transactions.forEach(transaction => {
+              return proposals
+            })
+          )
+        )
+      }
+    }
+
+    return forkJoin(operations).pipe(
+      map(operation => {
+        let transactions = operation.reduce((current, next) => current.concat(next))
+        transactions.sort((a, b) => b.timestamp - a.timestamp)
+
+        transactions = transactions.slice(0, limit)
+
+        if (kind === 'delegation') {
+          const sources: string[] = transactions.map(transaction => transaction.source)
+          if (sources.length > 0) {
+            const delegateSources = this.apiService.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
               delegators.forEach(delegator => {
-                if (transaction.source === delegator.account_id) {
+                const transaction = transactions.find(t => t.source === delegator.account_id)
+                if (transaction !== undefined) {
                   transaction.delegatedBalance = delegator.balance
                 }
               })
             })
-          })
+          }
+        }
+        if (kind === 'origination') {
+          const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
+
+          if (originatedSources.length > 0) {
+            const originatedAccounts = this.apiService.getAccountsByIds(originatedSources)
+            originatedAccounts.subscribe(originators => {
+              originators.forEach(originator => {
+                const transaction = transactions.find(t => t.originated_contracts === originator.account_id)
+                if (transaction !== undefined) {
+                  transaction.originatedBalance = originator.balance
+                }
+              })
+            })
+          }
+        }
+
+        if (kind === 'ballot') {
+          transactions.map(async transaction => this.apiService.addVotesForTransaction(transaction))
         }
 
         return transactions
