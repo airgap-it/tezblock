@@ -94,7 +94,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-            if (accounts[0].delegate) {
+            if (accounts[0].delegate_value) {
               delegatedAccounts.push(accounts[0])
             }
             this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
@@ -104,7 +104,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
             // since babylon, also tz addresses themselves can be delegated
 
             this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-              if (accounts[0].delegate) {
+              if (accounts[0].delegate_value) {
                 delegatedAccounts = accounts
               }
               this.updateState({ ...this._state, delegatedAccounts, relatedAccounts, loading: false })
@@ -113,7 +113,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
             const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
             this.apiService.getAccountsByIds(originatedContracts).subscribe((accounts: Account[]) => {
               accounts.forEach(account => {
-                if (account.delegate && !delegatedAccounts.includes(account)) {
+                if (account.delegate_value && !delegatedAccounts.includes(account)) {
                   delegatedAccounts.push(account)
                 }
               })
@@ -122,7 +122,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
             })
           } else {
             this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-              if (accounts[0].delegate) {
+              if (accounts[0].delegate_value) {
                 this.updateState({ ...this._state, delegatedAccounts: accounts, relatedAccounts, loading: false })
               }
             })
