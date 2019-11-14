@@ -19,7 +19,7 @@
         <div class="container p-0">
           <div class="row">
             <div class="col-md-6 col-lg-4">
-              <div class="mb-4">
+              <div class="mb-3">
                 <h5 class="card-title__secondary mb-3">
                   Full Balance
                 </h5>
@@ -96,11 +96,11 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="mb-4">
-                    <h5 class="card-title__secondary mb-3 ">
-                      Payout Address
+                    <h5 class="card-title__secondary mb-3">
+                      Payout Account
                     </h5>
                     <address-item *ngIf="payoutAddress; else noPayoutAddress" [address]="payoutAddress"></address-item>
-                    <ng-template #noPayoutAddress>No related payout account.</ng-template>
+                    <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
                   </div>
                 </div>
               </div>
