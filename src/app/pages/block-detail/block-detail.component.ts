@@ -67,7 +67,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
 
     this.block$ = this.blockSingleService.block$.pipe(map(blocks => blocks[0]))
 
-    this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsements(block.hash)))
+    this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
 
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
       switchMap(([latestBlock, block]) => {
