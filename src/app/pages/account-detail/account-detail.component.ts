@@ -142,7 +142,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
             this.delegatedAccountAddress = undefined
           } else if (delegatedAccounts.length > 0) {
             this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate
+            this.bakerAddress = delegatedAccounts[0].delegate_value
 
             this.delegatedAmount = delegatedAccounts[0].balance
           } else {
