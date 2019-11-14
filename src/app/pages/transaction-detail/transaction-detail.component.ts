@@ -33,7 +33,8 @@ export class TransactionDetailComponent implements OnInit {
     { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
     { title: 'Reveals', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') },
-    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') }
+    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') },
+    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
 
   private readonly kind = new BehaviorSubject(this.tabs[0].kind)

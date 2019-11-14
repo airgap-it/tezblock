@@ -90,6 +90,7 @@ interface Layout {
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
     [OperationTypes.BallotOverview]: Column[]
+    [OperationTypes.Ballot]: Column[]
   }
 }
 
@@ -510,6 +511,22 @@ const layouts: Layout = {
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
+    [OperationTypes.Ballot]: [
+      {
+        name: 'Baker',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Ballot', property: 'ballot', width: '' },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Kind', property: 'kind', width: '' },
+      { name: 'Voting Period', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ]
   }
 }
