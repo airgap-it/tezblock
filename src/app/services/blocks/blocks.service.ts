@@ -116,8 +116,8 @@ export class BlockService extends Facade<BlockServiceState> {
     return this.apiService.getBlockByHash(hash)
   }
 
-  public getEndorsements(blockHash: string): Promise<number> {
-    return this.apiService.getEndorsements(blockHash)
+  public getEndorsedSlotsCount(blockHash: string): Observable<number> {
+    return this.apiService.getEndorsedSlotsCount(blockHash)
   }
 
   public loadMore() {
