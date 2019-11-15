@@ -7,7 +7,6 @@ import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
-import { BakingService } from './../../services/baking/baking.service'
 import { RewardSingleService } from './../../services/reward-single/reward-single.service'
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 
@@ -34,6 +33,7 @@ export class BakerTableComponent implements OnInit {
   public tezosBakerRating: string | undefined
   public stakingBalance: number | undefined
   public numberOfRolls: number | undefined
+  public payoutAddress: string | undefined
 
   public bakingInfos: any
   public stakingCapacity: number | undefined
@@ -86,13 +86,16 @@ export class BakerTableComponent implements OnInit {
       this.stakingBond = bakerTableInfos.stakingBond
       this.frozenBalance = bakerTableInfos.frozenBalance
       this.numberOfRolls = bakerTableInfos.numberOfRolls
+      this.payoutAddress = bakerTableInfos.payoutAddress
     }
   }
 
   @Input()
   set ratings(bakerTableRatings: any) {
-    this.tezosBakerRating = bakerTableRatings.tezosBakerRating
-    this.bakingBadRating = bakerTableRatings.bakingBadRating
+    if (bakerTableRatings) {
+      this.tezosBakerRating = bakerTableRatings.tezosBakerRating
+      this.bakingBadRating = bakerTableRatings.bakingBadRating
+    }
   }
 
   @Output()

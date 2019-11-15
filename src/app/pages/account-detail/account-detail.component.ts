@@ -109,7 +109,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
-  public address: string
+  public readonly address: string
   public frozenBalance: number | undefined
   public rewardsTransaction: any
 
@@ -156,24 +156,23 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async ngOnInit() {
-    const address: string = this.route.snapshot.params.id
-    this.rightsSingleService.updateAddress(address)
+    this.rightsSingleService.updateAddress(this.address)
 
-    if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
+    if (accounts.hasOwnProperty(this.address) && !!this.aliasPipe.transform(this.address)) {
       this.hasAlias = true
-      this.hasLogo = accounts[address].hasLogo
+      this.hasLogo = accounts[this.address].hasLogo
     }
     this.transactions$ = this.transactionSingleService.transactions$
 
     this.rights$ = this.rightsSingleService.rights$
 
-    this.transactionSingleService.updateAddress(address)
+    this.transactionSingleService.updateAddress(this.address)
 
-    this.accountSingleService.setAddress(address)
+    this.accountSingleService.setAddress(this.address)
 
     this.account$ = this.accountSingleService.account$
 
-    this.revealed = await this.accountService.getAccountStatus(address)
+    this.revealed = await this.accountService.getAccountStatus(this.address)
   }
 
   public async getBakingInfos(address: string) {
@@ -183,18 +182,21 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     try {
       this.bakingInfos = await this.bakingService.getBakerInfos(address)
 
+      const payoutAddress = accounts.hasOwnProperty(this.address) ? accounts[this.address].hasPayoutAddress : null
       this.isValidBaker = true
-      if (this.bakingInfos) {
-        this.bakerTableInfos = {
-          stakingBalance: this.bakingInfos.stakingBalance,
-          numberOfRolls: Math.floor(this.bakingInfos.stakingBalance / (8000 * 1000000)),
-          stakingCapacity: this.bakingInfos.stakingCapacity,
-          stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
-          stakingBond: this.bakingInfos.selfBond,
-          frozenBalance: await this.accountService.getFrozen(address)
-        }
-      }
-
+      this.bakerTableInfos = this.bakingInfos
+        ? {
+            stakingBalance: this.bakingInfos.stakingBalance,
+            numberOfRolls: Math.floor(this.bakingInfos.stakingBalance / (8000 * 1000000)),
+            stakingCapacity: this.bakingInfos.stakingCapacity,
+            stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
+            stakingBond: this.bakingInfos.selfBond,
+            frozenBalance: await this.accountService.getFrozen(address),
+            payoutAddress
+          }
+        : {
+            payoutAddress
+          }
 
       // this.nextPayout = this.bakingInfos.nextPayout
       // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
@@ -271,15 +273,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public showQr() {
-    const initialState = { qrdata: this.route.snapshot.params.id, size: 200 }
+    const initialState = { qrdata: this.address, size: 200 }
     const modalRef = this.modalService.show(QrModalComponent, { initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 
   public showTelegramModal() {
     const initialState = {
-      botAddress: this.route.snapshot.params.id,
-      botName: this.aliasPipe.transform(this.route.snapshot.params.id)
+      botAddress: this.address,
+      botName: this.aliasPipe.transform(this.address)
     }
     const modalRef = this.modalService.show(TelegramModalComponent, { initialState })
     modalRef.content.closeBtnName = 'Close'
