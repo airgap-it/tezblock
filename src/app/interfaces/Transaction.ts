@@ -43,4 +43,5 @@ export interface Transaction {
   originated_contracts?: string
   // These are our own properties
   votes?: number
+  voting_period?: string
 }
