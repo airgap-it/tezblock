@@ -45,7 +45,7 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
   constructor(public readonly chainNetworkService: ChainNetworkService) {
     super(initialState)
     const environmentUrls = this.chainNetworkService.getEnvironment()
-    const protocol = new TezosProtocol(environmentUrls.rpc, environmentUrls.conseil)
+    const protocol = new TezosProtocol(environmentUrls.rpcUrl, environmentUrls.conseilUrl)
 
     this.subscription = combineLatest([this.pagination$, this.address$])
       .pipe(

@@ -82,6 +82,6 @@ export class HeaderItemComponent {
   public activeLinkResources: boolean = false
 
   public changeNetwork(name: string) {
-    this.selectedNetwork = name
+    this.chainNetworkService.changeEnvironment(name)
   }
 }

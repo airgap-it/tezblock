@@ -91,13 +91,13 @@ export class BakingService {
   }
 
   public async checkDelegated(address: string): Promise<DelegationInfo> {
-    const protocol = new TezosKtProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
+    const protocol = new TezosKtProtocol(this.environmentUrls.rpcUrl, this.environmentUrls.conseilUrl)
 
     return protocol.isAddressDelegated(address)
   }
 
   public async getBakerInfos(tzAddress: string) {
-    const tezosProtocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
+    const tezosProtocol = new TezosProtocol(this.environmentUrls.rpcUrl, this.environmentUrls.conseilUrl)
 
     this.bakerInfo = await tezosProtocol.bakerInfo(tzAddress)
 

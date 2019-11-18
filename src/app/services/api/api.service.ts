@@ -1,11 +1,11 @@
-import { EndorsingRights } from './../../interfaces/EndorsingRights'
-import { BakingRights } from './../../interfaces/BakingRights'
-import { environment } from './../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
+import * as _ from 'lodash'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
-import * as _ from 'lodash'
+import { environment } from './../../../environments/environment'
+import { BakingRights } from './../../interfaces/BakingRights'
+import { EndorsingRights } from './../../interfaces/EndorsingRights'
 
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
@@ -23,15 +23,15 @@ export class ApiService {
   public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
 
   private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/${this.environmentVariable}/`
-  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/blocks`
-  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/operations`
-  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/accounts`
-  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
+  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      apikey: environment.conseilApiKey
+      apikey: this.environmentUrls.conseilApiKey
     })
   }
 
@@ -779,7 +779,7 @@ export class ApiService {
 
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
-      const protocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
+      const protocol = new TezosProtocol(this.environmentUrls.rpcUrl, this.environmentUrls.conseilUrl)
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)

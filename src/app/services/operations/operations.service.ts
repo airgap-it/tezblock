@@ -12,14 +12,14 @@ export class OperationsService {
 
   public async checkDelegated(address: string): Promise<DelegationInfo> {
     const environmentUrls = this.chainNetworkService.getEnvironment()
-    const protocol = new TezosKtProtocol(environmentUrls.rpc, environmentUrls.conseil)
+    const protocol = new TezosKtProtocol(environmentUrls.rpcUrl, environmentUrls.conseilUrl)
 
     return protocol.isAddressDelegated(address)
   }
 
   public async getRewards(address: string, transaction: Transaction): Promise<TezosRewards> {
     const environmentUrls = this.chainNetworkService.getEnvironment()
-    const protocol = new TezosProtocol(environmentUrls.rpc, environmentUrls.conseil)
+    const protocol = new TezosProtocol(environmentUrls.rpcUrl, environmentUrls.conseilUrl)
 
     return protocol.calculateRewards(address, transaction.cycle)
   }

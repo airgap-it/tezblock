@@ -28,11 +28,11 @@ export class ChainNetworkService implements OnInit {
   }
 
   public getEnvironment() {
-    const envName = this.getEnvironmentFromUrl()
-    if (envName === 'babylonnet') {
+    // const envName = this.getEnvironmentFromUrl()
+    if (this.chainName === 'babylonnet') {
       console.log('babylonnet')
       return environment.babylonnet
-    } else if (envName === 'carthagenet') {
+    } else if (this.chainName === 'carthagenet') {
       console.log('carthagenet')
       return environment.carthagenet
     } else {
@@ -41,10 +41,22 @@ export class ChainNetworkService implements OnInit {
     }
   }
   public getEnvironmentVariable(): string {
-    if (this.chainName === 'carthagenet') {
+    const ChainName = this.getEnvironmentFromUrl()
+    if (ChainName === 'mainnet') {
       return 'mainnet'
     } else {
-      return this.chainName
+      return ChainName
+    }
+  }
+
+  public changeEnvironment(name: string) {
+    if (this.supportedChains.includes(name)) {
+      this.chainName = name
+
+      const currentEnvironment = this.getEnvironment()
+      window.open(currentEnvironment.targetUrl, '_self')
+    } else {
+      console.error('unsupported network: ', name)
     }
   }
 
