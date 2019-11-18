@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { select, Store } from '@ngrx/store'
 import { Observable, timer } from 'rxjs'
 
@@ -28,7 +28,8 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>,
-    private readonly copyService: CopyService
+    private readonly copyService: CopyService,
+    private readonly router: Router
   ) {
     super()
   }
@@ -38,8 +39,12 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
 
-    this.store$.dispatch(Actions.loadEndorsementDetails({ id: this.id }))
-    this.subscriptions.push(timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(Actions.loadEndorsements())))
+    this.subscriptions.push(
+      this.activatedRoute.params.subscribe(params => {
+        this.store$.dispatch(Actions.loadEndorsementDetails({ id: params.id }))
+      }),
+      timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(Actions.loadEndorsements()))
+    )
   }
 
   copyToClipboard() {
@@ -52,7 +57,7 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
 
   select(operation_group_hash: string) {
     if (operation_group_hash) {
-      this.store$.dispatch(Actions.slotSelected({ operation_group_hash }))
+      this.router.navigate(['/endorsement', operation_group_hash])
     }
   }
 }
