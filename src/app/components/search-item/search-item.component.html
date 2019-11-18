@@ -1,8 +1,8 @@
 <div class="input-group input-group-main">
   <input
-    [formControl]="control"
+    [(ngModel)]="searchTerm"
     [typeaheadAsync]="true"
-    [typeahead]="data"
+    [typeahead]="dataSource$"
     [adaptivePosition]="true"
     [typeaheadMinLength]="2"
     [typeaheadOptionsLimit]="7"
@@ -10,10 +10,14 @@
     typeaheadGroupField="type"
     placeholder="Search by Address / Alias / Tx Hash / Block Hash"
     class="form-control form-control--focus-white"
+    (keydown.enter)="onKeyEnter(searchTerm)"
   />
   <div class="input-group-append">
-    <button class="btn btn-primary" type="submit" (click)="ssearch()">
-      <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
+    <button class="btn btn-primary" type="submit" (click)="search()">
+      <fa-icon [icon]="'search' | iconPipe" class="text-white" [ngClass]="{ 'd-inline-block': !!buttonLabel, 'd-sm-none': !!buttonLabel }"></fa-icon>
+      <ng-container *ngIf="buttonLabel">
+          <span class="d-none d-sm-inline-block">{{ buttonLabel }}</span>
+      </ng-container>
     </button>
   </div>
 </div>

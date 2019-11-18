@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
+import { FormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { QRCodeModule } from 'angularx-qrcode'
@@ -80,7 +80,6 @@ import { SearchItemComponent } from './components/search-item/search-item.compon
     }),
     CollapseModule.forRoot(),
     FormsModule,
-    ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
     PipesModule,

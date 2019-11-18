@@ -1,8 +1,10 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core'
-import { FormControl } from '@angular/forms'
-import { debounceTime } from 'rxjs/operators'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { forkJoin, Observable } from 'rxjs'
+import { map, mergeMap } from 'rxjs/operators'
 
 import { BaseComponent } from '../base.component'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { TypeAheadObject } from '@tezblock/interfaces/TypeAheadObject'
 
 @Component({
   selector: 'app-search-item',
@@ -10,21 +12,44 @@ import { BaseComponent } from '../base.component'
   styleUrls: ['./search-item.component.scss']
 })
 export class SearchItemComponent extends BaseComponent implements OnInit {
-  control = new FormControl(null)
-
+  @Input() buttonLabel: string;
   @Output() onSearch = new EventEmitter<string>()
 
-  constructor() {
+  public dataSource$: Observable<any>
+  public searchTerm: string = ''
+
+  constructor(private readonly apiService: ApiService) {
     super()
   }
 
   ngOnInit() {
-    this.subscriptions.push(this.control.valueChanges.pipe(debounceTime(750)).subscribe(value => this.onSearch.emit(value)))
+    this.dataSource$ = new Observable<string>((observer: any) => {
+      observer.next(this.searchTerm)
+    }).pipe(
+      mergeMap(token =>
+        forkJoin(
+          this.apiService.getTransactionHashesStartingWith(token),
+          this.apiService.getAccountsStartingWith(token),
+          this.apiService.getBlockHashesStartingWith(token)
+        ).pipe(map(([transactionHashes, accounts, blockHashes]) => [...transactionHashes, ...accounts, ...blockHashes]))
+      )
+    )
+  }
+
+  public onKeyEnter(searchTerm: string) {
+    this.subscriptions.push(
+      this.dataSource$.subscribe((val: TypeAheadObject[]) => {
+        if (val.length > 0 && val[0].name !== searchTerm) {
+          // there are typeahead suggestions. upon hitting enter, we first autocomplete the suggestion
+          return
+        } else {
+          this.onSearch.emit(searchTerm)
+        }
+      })
+    )
   }
 
   search() {
-    this.onSearch.emit(this.control.value);
+    this.onSearch.emit(this.searchTerm)
   }
 }
-
-// in parent on noSearch (#)dp.hide() must be handled ...
