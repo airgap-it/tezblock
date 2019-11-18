@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { FormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { QRCodeModule } from 'angularx-qrcode'
@@ -61,7 +61,8 @@ import { StoreModule } from '@ngrx/store'
 import { ROOT_REDUCERS, metaReducers } from './reducers'
 import { EffectsModule } from '@ngrx/effects'
 import { AppEffects } from './app.effects'
-import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects';
+import { SearchItemComponent } from './components/search-item/search-item.component'
 
 @NgModule({
   imports: [
@@ -79,6 +80,7 @@ import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
     }),
     CollapseModule.forRoot(),
     FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
     PipesModule,
@@ -132,7 +134,8 @@ import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
     ExtendTableCellComponent,
     ResourcesWalletItemComponent,
     ModalCellComponent,
-    EndorsementDetailComponent
+    EndorsementDetailComponent,
+    SearchItemComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
