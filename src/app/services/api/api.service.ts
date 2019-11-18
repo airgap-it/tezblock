@@ -116,6 +116,7 @@ export class ApiService {
             let source: Transaction[] = []
             source.push(...finalTransactions)
             source.map(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
 
