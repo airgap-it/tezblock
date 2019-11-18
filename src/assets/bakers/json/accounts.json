@@ -33,7 +33,8 @@
   },
   "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC": {
     "alias": "PayTezos",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o"
   },
   "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
     "alias": "PayTezos Payouts",
@@ -65,7 +66,8 @@
   },
   "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ": {
     "alias": "AirGap",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9"
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
     "alias": "AirGap Payout KT",
@@ -105,7 +107,8 @@
   },
   "tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB": {
     "alias": "Bake'n'Rolls",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Zrqm4TkJwqTxm5TiyVFh6taXG4Wrq7tko"
   },
   "tz1NpWrAyDL9k2Lmnyxcgr9xuJakbBxdq7FB": {
     "alias": "Gate.io",
@@ -505,7 +508,8 @@
   },
   "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8": {
     "alias": "MyTezosBaking",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5"
   },
   "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5": {
     "alias": "MyTezosBaking Payouts",
@@ -557,7 +561,8 @@
   },
   "tz1go7f6mEQfT2xX2LuHAqgnRGN6c2zHPf5c": {
     "alias": "Stakery",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS"
   },
   "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS": {
     "alias": "Stakery Payouts",
@@ -657,7 +662,8 @@
   },
   "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194": {
     "alias": "StakeNow",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC"
   },
   "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC": {
     "alias": "StakeNow Payouts",
@@ -669,10 +675,15 @@
   },
   "tz1gg5bjopPcr9agjamyu9BbXKLibNc2rbAq": {
     "alias": "hodl.farm",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9"
   },
   "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9": {
     "alias": "hodl.farm Payouts",
     "hasLogo": true
+  },
+  "tz1RSWMYKGAykpizFteowByYMueCYv9TMn1L": {
+    "alias": "Tezos Alliance",
+    "hasLogo": false
   }
 }
