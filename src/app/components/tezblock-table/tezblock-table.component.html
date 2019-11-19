@@ -88,7 +88,7 @@
                               : {
                                   id: 'listing_pagination',
                                   itemsPerPage: 10,
-                                  currentPage: rewardspage,
+                                  currentPage: getPageNumber(transaction.cycle),
                                   totalItems: transaction.payouts.length
                                 }
                         "
@@ -110,7 +110,7 @@
                       <pagination-controls
                         id="listing_pagination"
                         directionLinks="true"
-                        (pageChange)="rewardspage = $event"
+                        (pageChange)="setPageNumber(transaction.cycle, $event)"
                       ></pagination-controls>
                     </div>
                   </div>
