@@ -28,6 +28,7 @@ build_serve:
     - docker
 
 test:
+  allow_failure: true
   stage: test
   script:
     - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test-ci
