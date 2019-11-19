@@ -81,7 +81,18 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody *ngFor="let payout of transaction.payouts">
+                      <tbody
+                        *ngFor="
+                          let payout of transaction.payouts
+                            | paginate
+                              : {
+                                  id: 'listing_pagination',
+                                  itemsPerPage: 10,
+                                  currentPage: rewardspage,
+                                  totalItems: transaction.payouts.length
+                                }
+                        "
+                      >
                         <tr>
                           <td>
                             <address-cell [data]="payout.delegator"></address-cell>
@@ -95,6 +106,13 @@
                         </tr>
                       </tbody>
                     </table>
+                    <div>
+                      <pagination-controls
+                        id="listing_pagination"
+                        directionLinks="true"
+                        (pageChange)="rewardspage = $event"
+                      ></pagination-controls>
+                    </div>
                   </div>
                 </td>
               </tr>

@@ -530,6 +530,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   private subscription: Subscription
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
+  public rewardspage: number = 1
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
