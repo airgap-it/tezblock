@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { forkJoin, Observable } from 'rxjs'
 import { map, mergeMap } from 'rxjs/operators'
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
 
 import { BaseComponent } from '../base.component'
 import { ApiService } from '@tezblock/services/api/api.service'
@@ -36,7 +37,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     )
   }
 
-  public onKeyEnter(searchTerm: string) {
+  onKeyEnter(searchTerm: string) {
     this.subscriptions.push(
       this.dataSource$.subscribe((val: TypeAheadObject[]) => {
         if (val.length > 0 && val[0].name !== searchTerm) {
@@ -51,5 +52,9 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
   search() {
     this.onSearch.emit(this.searchTerm)
+  }
+
+  onSelect(e: TypeaheadMatch) {
+    this.onSearch.emit(e.value)
   }
 }

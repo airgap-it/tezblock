@@ -11,6 +11,7 @@
     placeholder="Search by Address / Alias / Tx Hash / Block Hash"
     class="form-control form-control--focus-white"
     (keydown.enter)="onKeyEnter(searchTerm)"
+    (typeaheadOnSelect)="onSelect($event)"
   />
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit" (click)="search()">
