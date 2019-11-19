@@ -42,7 +42,10 @@
         <tbody>
           <ng-container *ngIf="transactions">
             <ng-container *ngFor="let transaction of transactions; let i = index">
-              <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
+              <tr
+                [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }"
+                (click)="expand(transaction); setPageNumber(transaction.cycle)"
+              >
                 <!--tx status is always 'null' for endorsements-->
                 <td *ngFor="let col of config; let j = index">
                   <ng-template #dynamic></ng-template>
@@ -86,8 +89,8 @@
                           let payout of transaction.payouts
                             | paginate
                               : {
-                                  id: 'listing_pagination',
-                                  itemsPerPage: 10,
+                                  id: getPageNumber(transaction.cycle),
+                                  itemsPerPage: 20,
                                   currentPage: getPageNumber(transaction.cycle),
                                   totalItems: transaction.payouts.length
                                 }
@@ -108,9 +111,11 @@
                     </table>
                     <div>
                       <pagination-controls
-                        id="listing_pagination"
+                        [id]="getPageNumber(transaction.cycle)"
                         directionLinks="true"
                         (pageChange)="setPageNumber(transaction.cycle, $event)"
+                        responsive="true"
+                        autoHide="true"
                       ></pagination-controls>
                     </div>
                   </div>
