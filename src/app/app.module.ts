@@ -61,7 +61,8 @@ import { StoreModule } from '@ngrx/store'
 import { ROOT_REDUCERS, metaReducers } from './reducers'
 import { EffectsModule } from '@ngrx/effects'
 import { AppEffects } from './app.effects'
-import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects';
+import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
 
 @NgModule({
@@ -133,7 +134,8 @@ import { ListEffects } from './pages/list/effects'
     ExtendTableCellComponent,
     ResourcesWalletItemComponent,
     ModalCellComponent,
-    EndorsementDetailComponent
+    EndorsementDetailComponent,
+    SearchItemComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
