@@ -89,7 +89,7 @@
                           let payout of transaction.payouts
                             | paginate
                               : {
-                                  id: getPageNumber(transaction.cycle),
+                                  id: getPageNumber(transaction.cycle).toString(),
                                   itemsPerPage: 20,
                                   currentPage: getPageNumber(transaction.cycle),
                                   totalItems: transaction.payouts.length
