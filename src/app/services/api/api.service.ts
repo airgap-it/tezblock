@@ -116,10 +116,13 @@ export class ApiService {
             let source: Transaction[] = []
             source.push(...finalTransactions)
             source.map(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
+
             return source
           }
+
           return finalTransactions
         })
       )
@@ -315,6 +318,7 @@ export class ApiService {
               })
             })
           }
+
           return finalTransactions
         })
       )
@@ -706,6 +710,7 @@ export class ApiService {
         limit
       }
     }
+
     return new Promise((resolve, reject) => {
       this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
         resolve(volumePerBlock)
@@ -734,6 +739,7 @@ export class ApiService {
         }
       ]
     }
+
     return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
       this.transactionsApiUrl,
       body,
@@ -818,6 +824,7 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
@@ -850,6 +857,7 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
@@ -936,5 +944,32 @@ export class ApiService {
       },
       this.options
     )
+  }
+  public getVotingPeriod(block_level: any): Observable<string> {
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          fields: ['level', 'period_kind'],
+          predicates: [
+            {
+              field: 'level',
+              operation: 'eq',
+              set: [block_level.toString()],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(results => {
+          results.map(item => {
+            return item.period_kind
+          })
+
+          return results[0].period_kind
+        })
+      )
   }
 }
