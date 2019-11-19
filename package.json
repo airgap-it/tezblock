@@ -72,6 +72,7 @@
     "ngx-bootstrap": "^4.3.0",
     "ngx-moment": "^3.4.0",
     "ngx-toastr": "^10.0.4",
+    "ngx-pagination": "^3.0.1",
     "rxjs": "^6.5.1",
     "zone.js": "~0.9.1"
   },
