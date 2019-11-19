@@ -22,7 +22,8 @@ export class ApiService {
   public environmentUrls = this.chainNetworkService.getEnvironment()
   public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
 
-  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/${this.environmentVariable}/`
+  private readonly bakingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/baking_rights`
+  private readonly endorsingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/endorsing_rights`
   private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
@@ -789,7 +790,7 @@ export class ApiService {
   public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
     return this.http
       .post<BakingRights[]>(
-        `${this.mainNetApiUrl}baking_rights`,
+        this.bakingRightsApiUrl,
         {
           predicates: [
             {
@@ -826,7 +827,7 @@ export class ApiService {
   public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
     return this.http
       .post<EndorsingRights[]>(
-        `${this.mainNetApiUrl}endorsing_rights`,
+        this.endorsingRightsApiUrl,
         {
           predicates: [
             {
