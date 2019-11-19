@@ -4,6 +4,8 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const featureName = 'Endorsement Details'
 
+export const reset = createAction(`[${featureName}] Reset`, props<{ id: string }>())
+
 export const loadEndorsements = createAction(`[${featureName}] Load Endorsements`)
 export const loadEndorsementsSucceeded = createAction(
   `[${featureName}] Load Endorsements Succeeded`,
