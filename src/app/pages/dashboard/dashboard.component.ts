@@ -1,4 +1,5 @@
 import { Component } from '@angular/core'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable, race, Subscription } from 'rxjs'
 import { mergeMap } from 'rxjs/operators'
 
@@ -46,7 +47,8 @@ export class DashboardComponent {
     private readonly transactionService: TransactionService,
     private readonly apiService: ApiService,
     private readonly cryptoPricesService: CryptoPricesService,
-    private readonly cycleService: CycleService
+    private readonly cycleService: CycleService,
+    private readonly chainNetworkService: ChainNetworkService
   ) {
     this.bakers = Object.keys(accounts)
     this.blocks$ = this.blocksService.list$
@@ -77,6 +79,7 @@ export class DashboardComponent {
         )
       )
     )
+    this.hideContent()
   }
 
   public onKeyEnter(searchTerm: string) {
@@ -93,6 +96,15 @@ export class DashboardComponent {
   public ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe()
+    }
+  }
+
+  public hideContent() {
+    const selectedNetwork = this.chainNetworkService.getEnvironmentVariable()
+    if (selectedNetwork === 'mainnet') {
+      return false
+    } else {
+      return true
     }
   }
 }

@@ -75,42 +75,44 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
-            <div class="mb-3">
-              <h5 class="card-title__secondary mb-3 ">
-                Circulating Supply
-              </h5>
-              <h3>810,904,882 ꜩ</h3>
-              <!--TODO-->
-            </div>
+          <ng-container *ngIf="!hideContent()">
+            <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
+              <div class="mb-3">
+                <h5 class="card-title__secondary mb-3 ">
+                  Circulating Supply
+                </h5>
+                <h3>810,904,882 ꜩ</h3>
+                <!--TODO-->
+              </div>
 
-            <h5 class="card-title__secondary mb-3 ">
-              Market Cap
-            </h5>
-            <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('810904882').toFormat(0) }}</h3>
-          </div>
-          <div class=" col-md-6 col-lg-4">
-            <h5 class="card-title__secondary mb-3">
-              Tezos Price Last 24h
-            </h5>
-            <ng-container *ngIf="fiatInfo$">
-              <ng-container *ngIf="cryptoInfo$">
-                <h3 class="mb-0 mr-1 d-inline-block">{{ (fiatInfo$ | async).symbol }}{{ (fiatInfo$ | async).price }}</h3>
-                <p class="text-secondary d-inline-block">
-                  at {{ (cryptoInfo$ | async).price }} {{ (cryptoInfo$ | async).symbol }}
-                  <ng-container *ngIf="percentage$ | async as percentage">
-                    <ng-container *ngIf="percentage >= 0">
-                      <span class="text-primary ml-1">(+{{ percentage | number: '1.0-3' }} %)</span>
+              <h5 class="card-title__secondary mb-3 ">
+                Market Cap
+              </h5>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('810904882').toFormat(0) }}</h3>
+            </div>
+            <div class=" col-md-6 col-lg-4">
+              <h5 class="card-title__secondary mb-3">
+                Tezos Price Last 24h
+              </h5>
+              <ng-container *ngIf="fiatInfo$">
+                <ng-container *ngIf="cryptoInfo$">
+                  <h3 class="mb-0 mr-1 d-inline-block">{{ (fiatInfo$ | async).symbol }}{{ (fiatInfo$ | async).price }}</h3>
+                  <p class="text-secondary d-inline-block">
+                    at {{ (cryptoInfo$ | async).price }} {{ (cryptoInfo$ | async).symbol }}
+                    <ng-container *ngIf="percentage$ | async as percentage">
+                      <ng-container *ngIf="percentage >= 0">
+                        <span class="text-primary ml-1">(+{{ percentage | number: '1.0-3' }} %)</span>
+                      </ng-container>
+                      <ng-container *ngIf="percentage < 0">
+                        <span class="text-danger ml-1">({{ percentage | number: '1.0-3' }} %)</span>
+                      </ng-container>
                     </ng-container>
-                    <ng-container *ngIf="percentage < 0">
-                      <span class="text-danger ml-1">({{ percentage | number: '1.0-3' }} %)</span>
-                    </ng-container>
-                  </ng-container>
-                </p>
+                  </p>
+                </ng-container>
               </ng-container>
-            </ng-container>
-            <pricechart-item></pricechart-item>
-          </div>
+              <pricechart-item></pricechart-item>
+            </div>
+          </ng-container>
         </div>
       </div>
     </div>
