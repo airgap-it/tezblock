@@ -42,7 +42,7 @@ enum LayoutPages {
   Transaction = 'transaction'
 }
 
-enum OperationTypes {
+export enum OperationTypes {
   Transaction = 'transaction',
   Delegation = 'delegation',
   Origination = 'origination',

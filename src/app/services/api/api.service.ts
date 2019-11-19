@@ -13,6 +13,12 @@ import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 
+export interface OperationCount {
+  [key: string]: string
+  count_operation_group_hash: string
+  kind: string
+}
+
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
@@ -712,10 +718,7 @@ export class ApiService {
     })
   }
 
-  public getOperationCount(
-    field: string,
-    value: string
-  ): Observable<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]> {
+  public getOperationCount(field: string, value: string): Observable<OperationCount[]> {
     const body = {
       fields: [field, 'kind'],
       predicates: [
@@ -733,7 +736,8 @@ export class ApiService {
         }
       ]
     }
-    return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
+    
+    return this.http.post<OperationCount[]>(
       this.transactionsApiUrl,
       body,
       this.options

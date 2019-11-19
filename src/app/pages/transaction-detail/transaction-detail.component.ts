@@ -3,14 +3,14 @@ import { ActivatedRoute } from '@angular/router'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject, combineLatest, Observable } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
-import { Tab } from '../../components/tabbed-table/tabbed-table.component'
-import { Transaction } from '../../interfaces/Transaction'
-import { BlockService } from '../../services/blocks/blocks.service'
-import { CopyService } from '../../services/copy/copy.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
+import { CopyService } from '@tezblock/services/copy/copy.service'
+import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -34,10 +34,10 @@ export class TransactionDetailComponent implements OnInit {
     { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
     { title: 'Reveals', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') },
     { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') },
-    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
+    { title: 'Votes', active: false, kind: ['ballot', 'proposals'], count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
 
-  private readonly kind = new BehaviorSubject(this.tabs[0].kind)
+  private readonly kind$ = new BehaviorSubject(this.tabs[0].kind)
   public transactionsLoading$: Observable<boolean> = new Observable()
   public transactions$: Observable<Transaction[]> = new Observable()
   public filteredTransactions$: Observable<Transaction[]> = new Observable()
@@ -74,12 +74,9 @@ export class TransactionDetailComponent implements OnInit {
     ) */
 
     // Update the active "tab" of the table
-    this.filteredTransactions$ = combineLatest([this.transactions$, this.kind]).pipe(
-      map(([transactions, kind]) => {
-        return transactions.filter(transaction => {
-          return transaction.kind === kind
-        })
-      })
+    this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
+      map(([transactions, kind]) => transactions.filter(transaction =>
+        Array.isArray(kind) ? kind.indexOf(transaction.kind) !== -1 : transaction.kind === kind))
     )
 
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.latestTx$]).pipe(
@@ -102,6 +99,6 @@ export class TransactionDetailComponent implements OnInit {
   }
 
   public tabSelected(tab: string) {
-    this.kind.next(tab)
+    this.kind$.next(tab)
   }
 }
