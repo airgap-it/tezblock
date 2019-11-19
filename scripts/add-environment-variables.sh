@@ -16,16 +16,19 @@ replace_main_conseil_api_pattern="s/'MAINNET_CONSEIL_API_KEY'\(,\)\{0,1\}/'${MAI
 replace_babylon_conseil_api_pattern="s/'BABYLONNET_CONSEIL_API_KEY'\(,\)\{0,1\}/'${BABYLONNET_CONSEIL_API_KEY}'\1/g"
 replace_carthage_conseil_api_pattern="s/'CARTHAGENET_CONSEIL_API_KEY'\(,\)\{0,1\}/'${CARTHAGENET_CONSEIL_API_KEY}'\1/g"
 
-replace_tezblock_domain_pattern="s~'TEZBLOCK_DOMAIN'\(,\)\{0,1\}~'${TEZBLOCK_DOMAIN}'\1~g"
+replace_main_target_url_pattern="s~'MAINNET_TARGET_URL'\(,\)\{0,1\}~'${MAINNET_TARGET_URL}'\1~g"
+replace_babylon_target_url_pattern="s~'BABYLONNET_TARGET_URL'\(,\)\{0,1\}~'${BABYLONNET_TARGET_URL}'\1~g"
+replace_carthage_target_url_pattern="s~'CARTHAGENET_TARGET_URL'\(,\)\{0,1\}~'${CARTHAGENET_TARGET_URL}'\1~g"
 
 free_fa_add_file="./src/app/fa-add.ts"
 pro_fa_add_file="./src/app/fa-add.excluded.ts"
 
-needs_backup () {
+needs_env_backup () {
 	[[ ! -z "${MAINNET_RPC_URL}" ]] || [[ ! -z "${BABYLONNET_RPC_URL}" ]] || [[ ! -z "${CARTHAGENET_RPC_URL}" ]] ||
 	[[ ! -z "${MAINNET_CONSEIL_URL}" ]] || [[ ! -z "${BABYLONNET_CONSEIL_URL}" ]] || [[ ! -z "${CARTHAGENET_CONSEIL_URL}" ]] ||
 	[[ ! -z "${MAINNET_CONSEIL_API_KEY}" ]] || [[ ! -z "${BABYLONNET_CONSEIL_API_KEY}" ]] || [[ ! -z "${CARTHAGENET_CONSEIL_API_KEY}" ]] ||
-	[[ ! -z "${TEZBLOCK_DOMAIN}" ]] || [[ ! -z "${FONTAWESOME_NPM_AUTH_TOKEN}" ]]
+	[[ ! -z "${MAINNET_TARGET_URL}" ]] || [[ ! -z "${BABYLONNET_TARGET_URL}" ]] || [[ ! -z "${CARTHAGENET_TARGET_URL}" ]] ||
+	[[ ! -z "${FONTAWESOME_NPM_AUTH_TOKEN}" ]]
 }
 
 replace_in_file () {
@@ -82,13 +85,19 @@ replace_conseil_api_key () {
 	fi
 }
 
-replace_tezblock_domain () {
-	if [[ ! -z "${TEZBLOCK_DOMAIN}" ]]; then
-		replace_in_env_files "${replace_tezblock_domain_pattern}"
+replace_target_url () {
+	if [[ ! -z "${MAINNET_TARGET_URL}" ]]; then
+		replace_in_env_files "${replace_main_target_url_pattern}"
+	fi
+	if [[ ! -z "${BABYLONNET_TARGET_URL}" ]]; then
+		replace_in_env_files "${replace_babylon_target_url_pattern}"
+	fi
+	if [[ ! -z "${CARTHAGENET_TARGET_URL}" ]]; then
+		replace_in_env_files "${replace_carthage_target_url_pattern}"
 	fi
 }
 
-if needs_backup; then
+if needs_env_backup; then
 	if [[ -f "$prod_env_file" ]] && [[ -f "$env_file" ]] && [[ ! -f "${prod_env_file}.tmp" ]] && [[ ! -f "${env_file}.tmp" ]]; then
 		cp "${prod_env_file}" "${prod_env_file}.tmp"
 		cp "${env_file}" "${env_file}.tmp"
@@ -111,4 +120,4 @@ fi
 replace_rpc_url
 replace_conseil_url
 replace_conseil_api_key
-replace_tezblock_domain
+replace_target_url
