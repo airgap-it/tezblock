@@ -63,6 +63,7 @@ import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { ListEffects } from './pages/list/effects'
 
 @NgModule({
   imports: [
@@ -97,7 +98,7 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects])
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
   ],
   declarations: [
     AppComponent,
