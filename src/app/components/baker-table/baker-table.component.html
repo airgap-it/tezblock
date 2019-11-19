@@ -241,6 +241,7 @@
 
     <ng-container *ngIf="tab.kind === 'rewards'">
       <tezblock-table
+        [enableSearch]="true"
         [showLoadMoreButton]="true"
         [loading]="rewardsLoading$"
         [data]="rewards$"

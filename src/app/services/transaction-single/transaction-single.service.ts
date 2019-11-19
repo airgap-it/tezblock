@@ -131,7 +131,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
             map(proposals => {
               proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
-
               return proposals
             })
           )
@@ -177,7 +176,10 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         }
 
         if (kind === 'ballot') {
-          transactions.map(async transaction => this.apiService.addVotesForTransaction(transaction))
+          transactions.map(async transaction => {
+            this.apiService.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
+            this.apiService.addVotesForTransaction(transaction)
+          })
         }
 
         return transactions

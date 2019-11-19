@@ -1,15 +1,11 @@
 import { Component } from '@angular/core'
-import { Observable, race, Subscription } from 'rxjs'
-import { mergeMap } from 'rxjs/operators'
+import { Observable, Subscription } from 'rxjs'
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '../../services/cycle/cycle.service'
 import { SearchService } from '../../services/search/search.service'
-
-import { TypeAheadObject } from './../../interfaces/TypeAheadObject'
-import { ApiService } from './../../services/api/api.service'
 import { TransactionService } from './../../services/transaction /transaction.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -20,9 +16,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  public dataSource: Observable<any> // TODO: any
-
-  public searchTerm: string = ''
 
   public blocks$: Observable<Object>
   public transactions$: Observable<Object>
@@ -44,7 +37,6 @@ export class DashboardComponent {
     public readonly searchService: SearchService,
     private readonly blocksService: BlockService,
     private readonly transactionService: TransactionService,
-    private readonly apiService: ApiService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly cycleService: CycleService
   ) {
@@ -66,28 +58,10 @@ export class DashboardComponent {
 
     this.transactionService.setPageSize(6)
     this.blocksService.setPageSize(6)
-    this.dataSource = new Observable<string>((observer: any) => {
-      observer.next(this.searchTerm)
-    }).pipe(
-      mergeMap(token =>
-        race(
-          this.apiService.getTransactionHashesStartingWith(token),
-          this.apiService.getAccountsStartingWith(token),
-          this.apiService.getBlockHashesStartingWith(token)
-        )
-      )
-    )
   }
 
-  public onKeyEnter(searchTerm: string) {
-    this.subscription = this.dataSource.subscribe((val: TypeAheadObject[]) => {
-      if (val.length > 0 && val[0].name !== searchTerm) {
-        // there are typeahead suggestions. upon hitting enter, we first autocomplete the suggestion
-        return
-      } else {
-        this.searchService.search(searchTerm)
-      }
-    })
+  public onSearch(e) {
+    this.searchService.search(e)
   }
 
   public ngOnDestroy() {
