@@ -9,6 +9,7 @@ export interface Transaction {
   nonce?: any
   block_level: number
   balance?: number
+  branch?: string
   operation_group_hash: string
   public_key?: any
   paid_storage_size_diff?: any
@@ -42,4 +43,5 @@ export interface Transaction {
   originated_contracts?: string
   // These are our own properties
   votes?: number
+  voting_period?: string
 }

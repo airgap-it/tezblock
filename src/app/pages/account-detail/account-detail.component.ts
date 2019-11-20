@@ -54,15 +54,25 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public delegatedAccounts: Observable<Account[]> = new Observable()
   public delegatedAccountAddress: string | undefined
   public relatedAccounts: Observable<Account[]> = new Observable()
-  public bakerAddress: string | undefined
   public delegatedAmount: number | undefined
+
+  public get bakerAddress(): string | undefined {
+    return this._bakerAddress
+  }
+  public set bakerAddress(value: string | undefined) {
+    if (value !== this._bakerAddress) {
+      this._bakerAddress = value
+      this.getTezosBakerInfos(value, true)
+    }
+  }
+  private _bakerAddress: string | undefined
 
   public bakingBadRating: string | undefined
   public tezosBakerRating: string | undefined
   public stakingBalance: number | undefined
   public bakingInfos: any
   public bakerTableInfos: any
-  public bakerTableRatings: any
+  public bakerTableRatings: any = {}
 
   public tezosBakerFee: string | undefined
   public stakingCapacity: number | undefined
@@ -111,7 +121,9 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
   public myTBUrl: string | undefined
-  public address: string
+  public get address(): string {
+    return this.route.snapshot.params.id
+  }
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>;
@@ -132,11 +144,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver
   ) {
-    this.address = this.route.snapshot.params.id
-    this.getBakingInfos(this.address)
-
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+
+    this.getBakingInfos(this.address)
 
     this.subscriptions.add(
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
@@ -145,7 +156,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
             this.delegatedAccountAddress = undefined
           } else if (delegatedAccounts.length > 0) {
             this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate
+            this.bakerAddress = delegatedAccounts[0].delegate_value
 
             this.delegatedAmount = delegatedAccounts[0].balance
           } else {
@@ -159,24 +170,23 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async ngOnInit() {
-    const address: string = this.route.snapshot.params.id
-    this.rightsSingleService.updateAddress(address)
+    this.rightsSingleService.updateAddress(this.address)
 
-    if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
+    if (accounts.hasOwnProperty(this.address) && !!this.aliasPipe.transform(this.address)) {
       this.hasAlias = true
-      this.hasLogo = accounts[address].hasLogo
+      this.hasLogo = accounts[this.address].hasLogo
     }
     this.transactions$ = this.transactionSingleService.transactions$
 
     this.rights$ = this.rightsSingleService.rights$
 
-    this.transactionSingleService.updateAddress(address)
+    this.transactionSingleService.updateAddress(this.address)
 
-    this.accountSingleService.setAddress(address)
+    this.accountSingleService.setAddress(this.address)
 
     this.account$ = this.accountSingleService.account$
 
-    this.revealed = await this.accountService.getAccountStatus(address)
+    this.revealed = await this.accountService.getAccountStatus(this.address)
 
     this.isMobile$ = this.breakpointObserver.observe([
       Breakpoints.HandsetLandscape,
@@ -187,85 +197,92 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public async getBakingInfos(address: string) {
-    if (address.startsWith('KT') || !this.isValidBaker) {
-      this.tezosBakerFee = 'not available'
-    }
-    try {
-      this.bakingInfos = await this.bakingService.getBakerInfos(address)
+    this.bakingService
+      .getBakerInfos(address)
+      .then(async result => {
+        this.isValidBaker = true
 
-      this.isValidBaker = true
-      if (this.bakingInfos) {
-        this.bakerTableInfos = {
-          stakingBalance: this.bakingInfos.stakingBalance,
-          numberOfRolls: Math.floor(this.bakingInfos.stakingBalance / (8000 * 1000000)),
-          stakingCapacity: this.bakingInfos.stakingCapacity,
-          stakingProgress: Math.min(100, this.bakingInfos.stakingProgress),
-          stakingBond: this.bakingInfos.selfBond,
-          frozenBalance: await this.accountService.getFrozen(address)
+        if (result) {
+          this.bakerTableInfos = {
+            stakingBalance: result.stakingBalance,
+            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
+            stakingCapacity: result.stakingCapacity,
+            stakingProgress: Math.min(100, result.stakingProgress),
+            stakingBond: result.selfBond,
+            frozenBalance: await this.accountService.getFrozen(address)
+          }
         }
-      }
+      })
+      .catch(error => {
+        this.isValidBaker = false
+      })
 
+    // this.nextPayout = this.bakingInfos.nextPayout
+    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
 
-      // this.nextPayout = this.bakingInfos.nextPayout
-      // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+    // TODO: Move to component
 
-      // TODO: Move to component
+    this.bakingService
+      .getBakingBadRatings(address)
+      .then(result => {
+        if (result.rating === 0 && result.status === 'success') {
+          this.bakingBadRating = 'awesome'
+        } else if (result.rating === 1 && result.status === 'success') {
+          this.bakingBadRating = 'so-so'
+        } else if (result.rating === 2 && result.status === 'success') {
+          this.bakingBadRating = 'dead'
+        } else if (result.rating === 3 && result.status === 'success') {
+          this.bakingBadRating = 'specific'
+        } else if (result.rating === 4 && result.status === 'success') {
+          this.bakingBadRating = 'hidden'
+        } else if (result.rating === 5 && result.status === 'success') {
+          this.bakingBadRating = 'new'
+        } else if (result.rating === 6 && result.status === 'success') {
+          this.bakingBadRating = 'closed'
+        } else if (result.rating === 9 && result.status === 'success') {
+          this.bakingBadRating = 'unknown'
+        } else {
+          this.bakingBadRating = 'not available'
+        }
 
-      this.bakingService
-        .getBakingBadRatings(address)
-        .then(result => {
-          if (result.rating === 0 && result.status === 'success') {
-            this.bakingBadRating = 'awesome'
-          } else if (result.rating === 1 && result.status === 'success') {
-            this.bakingBadRating = 'so-so'
-          } else if (result.rating === 2 && result.status === 'success') {
-            this.bakingBadRating = 'dead'
-          } else if (result.rating === 3 && result.status === 'success') {
-            this.bakingBadRating = 'specific'
-          } else if (result.rating === 4 && result.status === 'success') {
-            this.bakingBadRating = 'hidden'
-          } else if (result.rating === 5 && result.status === 'success') {
-            this.bakingBadRating = 'new'
-          } else if (result.rating === 6 && result.status === 'success') {
-            this.bakingBadRating = 'closed'
-          } else if (result.rating === 9 && result.status === 'success') {
-            this.bakingBadRating = 'unknown'
-          } else {
-            this.bakingBadRating = 'not available'
-          }
-        })
-        .catch(error => {
-          this.isValidBaker = false
-        })
+        this.bakerTableRatings.bakingBadRating = this.bakingBadRating
+      })
+      .catch(error => {
+        this.isValidBaker = false
+      })
 
-      // TODO: Move to component
-      await this.bakingService
-        .getTezosBakerInfos(address)
-        .then(result => {
-          if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-            this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-            this.tezosBakerFee = result.fee + ' %'
-            this.tezosBakerName = result.baker_name
-            this.tezosBakerAvailableCap = result.available_capacity
-            this.myTBUrl = result.myTB
-            this.tezosBakerAcceptingDelegation = result.accepting_delegation
-            this.tezosBakerNominalStakingYield = result.nominal_staking_yield
-          } else {
-            this.tezosBakerRating = 'not available'
-            this.tezosBakerFee = 'not available'
-          }
-        })
-        .catch(error => {
-          this.isValidBaker = false
-        })
+    this.getTezosBakerInfos(this.address)
+  }
 
-      this.bakerTableRatings = {
-        tezosBakerRating: this.tezosBakerRating,
-        bakingBadRating: this.bakingBadRating
-      }
-    } catch (error) {
-      // If non tz* address is supplied
-    }
+  // TODO: Move to component
+  /*  TODO: strange only tezosBakerFee & bakerTableRatings.tezosBakerRating seems to be consumed by anything,
+      what for are all other properties updated here */
+  /**
+   * @param {boolean} [updateFee] - this method was used only in getBakingInfos method ( from my reasoning only to
+   * update bakerTableRatings.tezosBakerRating ), now it's used also in bakerAddress's setter to update tezosBakerFee
+   * propery, thats why this flag was introduced )
+   */
+  private getTezosBakerInfos(address, updateFee = false) {
+    this.bakingService
+      .getTezosBakerInfos(address)
+      .then(result => {
+        if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
+          this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
+          this.tezosBakerFee = updateFee ? result.fee + ' %' : this.tezosBakerFee
+          this.tezosBakerName = result.baker_name
+          this.tezosBakerAvailableCap = result.available_capacity
+          this.myTBUrl = result.myTB
+          this.tezosBakerAcceptingDelegation = result.accepting_delegation
+          this.tezosBakerNominalStakingYield = result.nominal_staking_yield
+        } else {
+          this.tezosBakerRating = 'not available'
+          this.tezosBakerFee = updateFee ? 'not available' : this.tezosBakerFee
+        }
+        this.bakerTableRatings.tezosBakerRating = this.tezosBakerRating
+      })
+      .catch(error => {
+        this.isValidBaker = false
+      })
   }
 
   public tabSelected(tab: string) {
@@ -281,15 +298,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
 
   public showQr() {
-    const initialState = { qrdata: this.route.snapshot.params.id, size: 200 }
+    const initialState = { qrdata: this.address, size: 200 }
     const modalRef = this.modalService.show(QrModalComponent, { initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 
   public showTelegramModal() {
     const initialState = {
-      botAddress: this.route.snapshot.params.id,
-      botName: this.aliasPipe.transform(this.route.snapshot.params.id)
+      botAddress: this.address,
+      botName: this.aliasPipe.transform(this.address)
     }
     const modalRef = this.modalService.show(TelegramModalComponent, { initialState })
     modalRef.content.closeBtnName = 'Close'

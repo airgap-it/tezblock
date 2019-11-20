@@ -5,23 +5,28 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
+import * as _ from 'lodash'
 
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/`
-  private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
-  private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
-  private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
-  private readonly frozenBalanceApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/delegates`
+  public environmentUrls = this.chainNetworkService.getEnvironment()
+  public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+
+  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/${this.environmentVariable}/`
+  private readonly blocksApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/accounts`
+  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseil}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -40,7 +45,7 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -111,10 +116,13 @@ export class ApiService {
             let source: Transaction[] = []
             source.push(...finalTransactions)
             source.map(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
+
             return source
           }
+
           return finalTransactions
         })
       )
@@ -181,6 +189,29 @@ export class ApiService {
           return finalTransactions
         })
       )
+  }
+
+  public getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
+    return this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'operation_group_hash',
+            operation: 'eq',
+            set: [id],
+            inverse: false
+          },
+          {
+            field: 'kind',
+            operation: 'eq',
+            set: ['endorsement']
+          }
+        ],
+        limit
+      },
+      this.options
+    )
   }
 
   public getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
@@ -287,6 +318,7 @@ export class ApiService {
               })
             })
           }
+
           return finalTransactions
         })
       )
@@ -678,6 +710,7 @@ export class ApiService {
         limit
       }
     }
+
     return new Promise((resolve, reject) => {
       this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
         resolve(volumePerBlock)
@@ -706,6 +739,7 @@ export class ApiService {
         }
       ]
     }
+
     return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
       this.transactionsApiUrl,
       body,
@@ -751,7 +785,7 @@ export class ApiService {
 
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
-      const protocol = new TezosProtocol()
+      const protocol = new TezosProtocol(this.environmentUrls.rpc, this.environmentUrls.conseil)
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)
@@ -790,6 +824,7 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
@@ -822,48 +857,45 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
   }
 
-  public getEndorsements(blockHash: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<Transaction[]>(
-          this.transactionsApiUrl,
-          {
-            predicates: [
-              {
-                field: 'operation_group_hash',
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'block_hash',
-                operation: 'eq',
-                set: [blockHash]
-              },
-              {
-                field: 'kind',
-                operation: 'eq',
-                set: ['endorsement']
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: 32
-          },
-          this.options
-        )
-        .subscribe((transactions: Transaction[]) => {
-          resolve(transactions.length)
-        })
-    })
+  public getEndorsedSlotsCount(blockHash: string): Observable<number> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'block_hash',
+              operation: 'eq',
+              set: [blockHash]
+            },
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['endorsement']
+            }
+          ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'desc'
+            }
+          ],
+          limit: 32
+        },
+        this.options
+      )
+      .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
   public getFrozenBalance(tzAddress: string): Promise<number> {
@@ -887,5 +919,57 @@ export class ApiService {
           resolve(result[0].frozen_balance)
         })
     })
+  }
+
+  public getDelegatedAccountsList(tzAddress: string): Observable<any> {
+    return this.http.post(
+      this.accountsApiUrl,
+      {
+        fields: ['account_id', 'manager', 'delegate_value', 'balance'],
+        predicates: [
+          {
+            field: 'delegate_value',
+            operation: 'eq',
+            set: [tzAddress],
+            inverse: false
+          }
+        ],
+        orderBy: [{ field: 'count_account_id', direction: 'desc' }],
+        aggregation: [
+          {
+            field: 'account_id',
+            function: 'count'
+          }
+        ]
+      },
+      this.options
+    )
+  }
+  public getVotingPeriod(block_level: any): Observable<string> {
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          fields: ['level', 'period_kind'],
+          predicates: [
+            {
+              field: 'level',
+              operation: 'eq',
+              set: [block_level.toString()],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(results => {
+          results.map(item => {
+            return item.period_kind
+          })
+
+          return results[0].period_kind
+        })
+      )
   }
 }

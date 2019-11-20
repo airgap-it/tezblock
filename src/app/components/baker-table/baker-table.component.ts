@@ -7,7 +7,6 @@ import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
-import { BakingService } from './../../services/baking/baking.service'
 import { RewardSingleService } from './../../services/reward-single/reward-single.service'
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 
@@ -34,6 +33,7 @@ export class BakerTableComponent implements OnInit {
   public tezosBakerRating: string | undefined
   public stakingBalance: number | undefined
   public numberOfRolls: number | undefined
+  public payoutAddress: string | undefined
 
   public bakingInfos: any
   public stakingCapacity: number | undefined
@@ -43,12 +43,15 @@ export class BakerTableComponent implements OnInit {
   public isValidBaker: boolean | undefined
   public rewardsLoading$: Observable<boolean>
   public rightsLoading$: Observable<boolean>
+  public accountLoading$: Observable<boolean>
 
   public rewards$: Observable<TezosRewards[]> = new Observable()
   public rights$: Observable<Object> = new Observable()
 
   private readonly subscriptions: Subscription = new Subscription()
   public rewards: TezosRewards
+
+  public activeDelegations$: Observable<number>
 
   public myTBUrl: string | undefined
   public address: string
@@ -83,13 +86,16 @@ export class BakerTableComponent implements OnInit {
       this.stakingBond = bakerTableInfos.stakingBond
       this.frozenBalance = bakerTableInfos.frozenBalance
       this.numberOfRolls = bakerTableInfos.numberOfRolls
+      this.payoutAddress = bakerTableInfos.payoutAddress
     }
   }
 
   @Input()
   set ratings(bakerTableRatings: any) {
-    this.tezosBakerRating = bakerTableRatings.tezosBakerRating
-    this.bakingBadRating = bakerTableRatings.bakingBadRating
+    if (bakerTableRatings) {
+      this.tezosBakerRating = bakerTableRatings.tezosBakerRating
+      this.bakingBadRating = bakerTableRatings.bakingBadRating
+    }
   }
 
   @Output()
@@ -112,8 +118,9 @@ export class BakerTableComponent implements OnInit {
     this.rewards$ = this.rewardSingleService.rewards$
     this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
+    this.accountLoading$ = this.accountSingleService.loading$
 
-    // this.getBakingInfos(this.address)
+    this.activeDelegations$ = this.accountSingleService.activeDelegations$
   }
 
   public async ngOnInit() {

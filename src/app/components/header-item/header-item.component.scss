@@ -1,4 +1,9 @@
 ::ng-deep header-item {
+  @media (min-width: 576px) {
+    .navbar-nav {
+      align-items: center;
+    }
+  }
   .mega-dropdown {
     position: unset;
   }

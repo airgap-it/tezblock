@@ -49,10 +49,21 @@ import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { ChainNetworkService } from './services/chain-network/chain-network.service'
+import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
+import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
+import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { StoreModule } from '@ngrx/store'
+import { ROOT_REDUCERS, metaReducers } from './reducers'
+import { EffectsModule } from '@ngrx/effects'
+import { AppEffects } from './app.effects'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects';
+import { SearchItemComponent } from './components/search-item/search-item.component'
+import { ListEffects } from './pages/list/effects'
 
 @NgModule({
   imports: [
@@ -78,7 +89,15 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
     QRCodeModule,
     ModalModule.forRoot(),
     FontAwesomeModule,
-    ChartsModule
+    ChartsModule,
+    StoreModule.forRoot(ROOT_REDUCERS, {
+      metaReducers,
+      runtimeChecks: {
+        strictStateImmutability: true,
+        strictActionImmutability: true
+      }
+    }),
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
   ],
   declarations: [
     AppComponent,
@@ -112,10 +131,14 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
     TelegramModalComponent,
     BakerTableComponent,
     ResourcesWalletsComponent,
-    ExtendTableCellComponent
+    ExtendTableCellComponent,
+    ResourcesWalletItemComponent,
+    ModalCellComponent,
+    EndorsementDetailComponent,
+    SearchItemComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
+  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   entryComponents: [
     BlockItemComponent,
     IdenticonComponent,
@@ -134,7 +157,8 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
     HashCellComponent,
     SymbolCellComponent,
     PricechartItemComponent,
-    ExtendTableCellComponent
+    ExtendTableCellComponent,
+    ModalCellComponent
   ],
   bootstrap: [AppComponent]
 })
