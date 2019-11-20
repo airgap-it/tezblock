@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription, combineLatest } from 'rxjs'
+import { map } from "rxjs/operators";
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -124,6 +126,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
   public frozenBalance: number | undefined
   public rewardsTransaction: any
+  public isMobile$: Observable<boolean>;
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -138,7 +141,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
-    private readonly rightsSingleService: RightsSingleService
+    private readonly rightsSingleService: RightsSingleService,
+    private readonly breakpointObserver: BreakpointObserver
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
@@ -183,6 +187,13 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(this.address)
+
+    this.isMobile$ = this.breakpointObserver.observe([
+      Breakpoints.HandsetLandscape,
+      Breakpoints.HandsetPortrait
+    ]).pipe(
+      map(breakpointState => breakpointState.matches)
+    )
   }
 
   public async getBakingInfos(address: string) {
