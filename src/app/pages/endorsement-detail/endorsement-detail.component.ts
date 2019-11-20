@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { select, Store } from '@ngrx/store'
+import { Store } from '@ngrx/store'
 import { Observable, timer } from 'rxjs'
 
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -43,9 +43,9 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
 
     this.subscriptions.push(
       this.activatedRoute.params.subscribe(params => {
-        this.store$.dispatch(Actions.loadEndorsementDetails({ id: params.id }))
+        this.store$.dispatch(actions.loadEndorsementDetails({ id: params.id }))
       }),
-      timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(Actions.loadEndorsements()))
+      timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
     )
   }
 
