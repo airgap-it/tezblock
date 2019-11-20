@@ -92,7 +92,7 @@ export class AccountSingleService extends Facade<AccountSingleServiceState> impl
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           this.apiService.getAccountById(address).subscribe((accounts: Account[]) => {
-            const delegatedAccounts = accounts[0].delegate_value ? [accounts[0]] : []
+            const delegatedAccounts = (accounts.length > 0 && accounts[0].delegate_value) ? [accounts[0]] : []
 
             this.updateState({ ...this._state, delegatedAccounts, relatedAccounts: [], loading: false })
           })
