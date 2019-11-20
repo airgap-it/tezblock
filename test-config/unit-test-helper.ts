@@ -3,7 +3,9 @@ import { HttpClientModule } from '@angular/common/http'
 import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
+
 import { PipesModule } from '../src/app/pipes/pipes.module'
+import { ApiService } from '@tezblock/services/api/api.service'
 
 import {
   AlertControllerMock,
@@ -15,7 +17,8 @@ import {
   PlatformMock,
   SplashScreenMock,
   StatusBarMock,
-  ToastControllerMock
+  ToastControllerMock,
+  ApiServiceMock
 } from './mocks'
 
 export class UnitHelper {
@@ -34,6 +37,9 @@ export class UnitHelper {
   public testBed(testBed: TestModuleMetadata, useOnlyTestBed: boolean = false): TestModuleMetadata {
     const mandatoryDeclarations: any[] = []
     const mandatoryImports: any[] = [CommonModule, ReactiveFormsModule, FormsModule, RouterTestingModule, HttpClientModule]
+    const mandatoryProviders = [
+      // { provide: ApiService, useValue: ApiServiceMock }
+    ]
 
     if (!useOnlyTestBed) {
       mandatoryDeclarations.push()
@@ -42,7 +48,7 @@ export class UnitHelper {
 
     testBed.declarations = [...(testBed.declarations || []), ...mandatoryDeclarations]
     testBed.imports = [...(testBed.imports || []), ...mandatoryImports]
-    testBed.providers = [...(testBed.providers || [])]
+    testBed.providers = [...(testBed.providers || []), ...mandatoryProviders]
 
     return testBed
   }

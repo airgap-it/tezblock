@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 import * as _ from 'lodash'
 
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ApiService, OperationCount } from 'src/app/services/api/api.service'
 import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
@@ -59,12 +58,10 @@ export class TabbedTableComponent {
   @Output()
   public readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
 
-  constructor(private readonly apiService: ApiService, private readonly router: Router, private iconPipe: IconPipe) {}
+  constructor(private readonly apiService: ApiService, private readonly route: ActivatedRoute) {}
 
   public getTabCount(tabs: Tab[]) {
-    let ownId: string = this.router.url
-    const split = ownId.split('/')
-    ownId = split.slice(-1).pop()
+    const ownId: string = this.route.snapshot.params.id
 
     const aggregateFunction = (info: OperationCount, field) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>

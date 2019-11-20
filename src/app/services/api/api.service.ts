@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
+import * as _ from 'lodash'
 
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
@@ -121,10 +122,13 @@ export class ApiService {
             let source: Transaction[] = []
             source.push(...finalTransactions)
             source.map(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
+
             return source
           }
+
           return finalTransactions
         })
       )
@@ -320,6 +324,7 @@ export class ApiService {
               })
             })
           }
+
           return finalTransactions
         })
       )
@@ -711,6 +716,7 @@ export class ApiService {
         limit
       }
     }
+
     return new Promise((resolve, reject) => {
       this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
         resolve(volumePerBlock)
@@ -821,6 +827,7 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
@@ -853,48 +860,45 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
   }
 
-  public getEndorsements(blockHash: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<Transaction[]>(
-          this.transactionsApiUrl,
-          {
-            predicates: [
-              {
-                field: 'operation_group_hash',
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'block_hash',
-                operation: 'eq',
-                set: [blockHash]
-              },
-              {
-                field: 'kind',
-                operation: 'eq',
-                set: ['endorsement']
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: 32
-          },
-          this.options
-        )
-        .subscribe((transactions: Transaction[]) => {
-          resolve(transactions.length)
-        })
-    })
+  public getEndorsedSlotsCount(blockHash: string): Observable<number> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'block_hash',
+              operation: 'eq',
+              set: [blockHash]
+            },
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['endorsement']
+            }
+          ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'desc'
+            }
+          ],
+          limit: 32
+        },
+        this.options
+      )
+      .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
   public getFrozenBalance(tzAddress: string): Promise<number> {
@@ -943,5 +947,32 @@ export class ApiService {
       },
       this.options
     )
+  }
+  public getVotingPeriod(block_level: any): Observable<string> {
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          fields: ['level', 'period_kind'],
+          predicates: [
+            {
+              field: 'level',
+              operation: 'eq',
+              set: [block_level.toString()],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(results => {
+          results.map(item => {
+            return item.period_kind
+          })
+
+          return results[0].period_kind
+        })
+      )
   }
 }
