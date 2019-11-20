@@ -4,9 +4,11 @@ import { take } from 'rxjs/operators'
 
 import { environment } from '../../environments/environment'
 import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer'
+import * as fromList from '../pages/list/reducer'
 
 export interface State {
   endorsementDetails: fromEndorsementDetails.State
+  list: fromList.State
 }
 
 /**
@@ -16,7 +18,8 @@ export interface State {
  */
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
-    endorsementDetails: fromEndorsementDetails.reducer
+    endorsementDetails: fromEndorsementDetails.reducer,
+    list: fromList.reducer
   })
 })
 

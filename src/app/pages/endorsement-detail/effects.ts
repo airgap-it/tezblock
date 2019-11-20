@@ -42,7 +42,7 @@ export class EndorsementDetailEffects {
   onEndorsementTriggerGetEndorsements$ = createEffect(() =>
     this.actions$.pipe(
       ofType(EndorsementDetailActions.loadEndorsementDetailsSucceeded),
-      map(({ endorsement }) => EndorsementDetailActions.loadEndorsements())
+      map(() => EndorsementDetailActions.loadEndorsements())
     )
   )
 

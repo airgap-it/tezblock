@@ -6,7 +6,7 @@ import { Observable, timer } from 'rxjs'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { CopyService } from 'src/app/services/copy/copy.service'
-import * as Actions from './actions'
+import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Slot } from './reducer'
@@ -35,6 +35,8 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   }
 
   ngOnInit() {
+    this.store$.dispatch(actions.reset({ id: this.id }))
+
     this.endorsements$ = this.store$.select(state => state.endorsementDetails.endorsements)
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
