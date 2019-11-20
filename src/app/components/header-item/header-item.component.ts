@@ -3,9 +3,6 @@ import { Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
 import { ChainNetworkService } from 'src/app/services/chain-network/chain-network.service'
 import { CycleService } from 'src/app/services/cycle/cycle.service'
-import { SearchService } from 'src/app/services/search/search.service'
-
-import { ApiService } from './../../services/api/api.service'
 
 @Component({
   selector: 'header-item',
@@ -35,7 +32,6 @@ export class HeaderItemComponent {
 
   constructor(
     private readonly router: Router,
-    public readonly searchService: SearchService,
     private readonly cycleService: CycleService,
     private readonly chainNetworkService: ChainNetworkService
   ) {
@@ -57,9 +53,5 @@ export class HeaderItemComponent {
 
   public changeNetwork(name: string) {
     this.selectedNetwork = name
-  }
-
-  onSearch(e) {
-    this.searchService.search(e)
   }
 }

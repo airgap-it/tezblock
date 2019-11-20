@@ -5,7 +5,6 @@ import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '../../services/cycle/cycle.service'
-import { SearchService } from '../../services/search/search.service'
 import { TransactionService } from './../../services/transaction /transaction.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -34,7 +33,6 @@ export class DashboardComponent {
   public bakers: string[]
 
   constructor(
-    public readonly searchService: SearchService,
     private readonly blocksService: BlockService,
     private readonly transactionService: TransactionService,
     private readonly cryptoPricesService: CryptoPricesService,
@@ -58,10 +56,6 @@ export class DashboardComponent {
 
     this.transactionService.setPageSize(6)
     this.blocksService.setPageSize(6)
-  }
-
-  public onSearch(e) {
-    this.searchService.search(e)
   }
 
   public ngOnDestroy() {
