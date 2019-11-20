@@ -156,7 +156,7 @@ export class TabbedTableComponent {
     }
   }
 
-  public kindToOperationTypes([firstKind, secondKind]: [string, string | undefined]): OperationTypes {
-    return !secondKind ? OperationTypes[firstKind] : OperationTypes.Ballot
+  public kindToOperationTypes(kind: kindType): OperationTypes {
+    return Array.isArray(kind) ? OperationTypes.Ballot : OperationTypes[kind]
   }
 }
