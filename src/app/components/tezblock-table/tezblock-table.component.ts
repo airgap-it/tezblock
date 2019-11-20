@@ -584,9 +584,25 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   private subscription: Subscription
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
+  public rewardspage: number = 1
+  private pageArray: number[] = []
+
+  public getPageNumber(cycle: number) {
+    if (this.pageArray[cycle]) {
+      return this.pageArray[cycle]
+    } else {
+      this.setPageNumber(cycle, 1)
+      return 1
+    }
+  }
+
+  public setPageNumber(cycle: number, page: number) {
+    this.pageArray[cycle] = page
+  }
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
+    // this.pageArray[192]=1
     if (value) {
       if (this.subscription) {
         this.subscription.unsubscribe()
