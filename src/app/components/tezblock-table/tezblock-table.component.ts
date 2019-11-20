@@ -42,7 +42,7 @@ enum LayoutPages {
   Transaction = 'transaction'
 }
 
-enum OperationTypes {
+export enum OperationTypes {
   Transaction = 'transaction',
   Delegation = 'delegation',
   Origination = 'origination',
@@ -94,6 +94,7 @@ interface Layout {
     [OperationTypes.BallotOverview]: Column[]
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
+    [OperationTypes.Ballot]: Column[]
   }
 }
 
@@ -564,6 +565,22 @@ const layouts: Layout = {
       },
       { name: 'Level', property: 'block_level', width: '', component: BlockCellComponent },
       { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.Ballot]: [
+      {
+        name: 'Baker',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Ballot', property: 'ballot', width: '' },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Kind', property: 'kind', width: '' },
+      { name: 'Voting Period', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ]
   }
 }
