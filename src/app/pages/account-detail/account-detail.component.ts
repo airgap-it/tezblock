@@ -198,17 +198,21 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       .getBakerInfos(address)
       .then(async result => {
         this.isValidBaker = true
+        const payoutAddress = accounts.hasOwnProperty(this.address) ? accounts[this.address].hasPayoutAddress : null
 
-        if (result) {
-          this.bakerTableInfos = {
-            stakingBalance: result.stakingBalance,
-            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-            stakingCapacity: result.stakingCapacity,
-            stakingProgress: Math.min(100, result.stakingProgress),
-            stakingBond: result.selfBond,
-            frozenBalance: await this.accountService.getFrozen(address)
-          }
-        }
+        this.bakerTableInfos = result
+          ? {
+              stakingBalance: result.stakingBalance,
+              numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
+              stakingCapacity: result.stakingCapacity,
+              stakingProgress: Math.min(100, result.stakingProgress),
+              stakingBond: result.selfBond,
+              frozenBalance: await this.accountService.getFrozen(address),
+              payoutAddress
+            }
+          : {
+              payoutAddress
+            }
       })
       .catch(error => {
         this.isValidBaker = false
