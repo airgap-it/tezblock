@@ -36,7 +36,7 @@ interface Column {
   transform?(value: any): any
 }
 
-enum LayoutPages {
+export enum LayoutPages {
   Account = 'account',
   Block = 'block',
   Transaction = 'transaction'

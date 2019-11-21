@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
-import { combineLatest, forkJoin, Observable } from 'rxjs'
-import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import { combineLatest, forkJoin, merge, Observable } from 'rxjs'
+import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
-import { distinctPagination, distinctTransactionArray, Facade, Pagination } from '../facade/facade'
+import { distinctPagination, distinctTransactionArray, Facade, Pagination, refreshRate } from '../facade/facade'
+import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 interface TransactionSingleServiceState {
   transactions: Transaction[]
@@ -39,36 +40,45 @@ const initialState: TransactionSingleServiceState = {
   providedIn: 'root'
 })
 export class TransactionSingleService extends Facade<TransactionSingleServiceState> {
-  public transactions$ = this.state$.pipe(
+  transactions$ = this.state$.pipe(
     map(state => state.transactions),
     distinctUntilChanged(distinctTransactionArray)
   )
-  public kind$ = this.state$.pipe(
+  kind$ = this.state$.pipe(
     map(state => state.kind),
     distinctUntilChanged()
   )
-  public hash$ = this.state$.pipe(
+  hash$ = this.state$.pipe(
     map(state => state.hash),
     distinctUntilChanged()
   )
-  public address$ = this.state$.pipe(
+  address$ = this.state$.pipe(
     map(state => state.address),
     distinctUntilChanged()
   )
-  public block$ = this.state$.pipe(
+  block$ = this.state$.pipe(
     map(state => state.block),
     distinctUntilChanged()
   )
-  public pagination$ = this.state$.pipe(
+  pagination$ = this.state$.pipe(
     map(state => state.pagination),
     distinctUntilChanged(distinctPagination)
   )
-  public loading$ = this.state$.pipe(map(state => state.loading))
+  loading$ = this.state$.pipe(map(state => state.loading))
 
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    this.subscription = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
+    const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$];
+
+    this.timer$ = merge(actions$).pipe(
+      debounceTime(refreshRate),
+      map(() => 1)
+    )
+
+    const stream$ = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
+
+    this.subscription = stream$
       .pipe(
         switchMap(([pagination, hash, kind, address, block, _]) => {
           if (hash) {
@@ -90,19 +100,19 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
       })
   }
 
-  public updateAddress(address: string) {
+  updateAddress(address: string) {
     this.updateState({ ...this._state, address, hash: undefined, block: undefined, loading: true })
   }
 
-  public updateBlockHash(block: string) {
+  updateBlockHash(block: string) {
     this.updateState({ ...this._state, block, hash: undefined, address: undefined, loading: true })
   }
 
-  public updateTransactionHash(hash: string) {
+  updateTransactionHash(hash: string) {
     this.updateState({ ...this._state, hash, block: undefined, address: undefined, loading: true })
   }
 
-  public updateKind(kind: string) {
+  updateKind(kind: string) {
     this.updateState({ ...this._state, kind, loading: true })
   }
 
@@ -187,7 +197,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     )
   }
 
-  public loadMore() {
+  loadMore() {
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
