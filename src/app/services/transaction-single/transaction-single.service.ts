@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
-import { combineLatest, forkJoin, merge, Observable } from 'rxjs'
-import { debounceTime, distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import { combineLatest, forkJoin, merge, Observable, of, timer } from 'rxjs'
+import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
-import { distinctPagination, distinctTransactionArray, Facade, Pagination, refreshRate } from '../facade/facade'
+import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
 import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 interface TransactionSingleServiceState {
@@ -46,19 +46,19 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   )
   kind$ = this.state$.pipe(
     map(state => state.kind),
-    distinctUntilChanged()
+    distinctUntilChanged(distinctString)
   )
   hash$ = this.state$.pipe(
     map(state => state.hash),
-    distinctUntilChanged()
+    distinctUntilChanged(distinctString)
   )
   address$ = this.state$.pipe(
     map(state => state.address),
-    distinctUntilChanged()
+    distinctUntilChanged(distinctString)
   )
   block$ = this.state$.pipe(
     map(state => state.block),
-    distinctUntilChanged()
+    distinctUntilChanged(distinctString)
   )
   pagination$ = this.state$.pipe(
     map(state => state.pagination),
@@ -66,33 +66,51 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   )
   loading$ = this.state$.pipe(map(state => state.loading))
 
+  actionType$: Observable<LayoutPages>
+
   constructor(private readonly apiService: ApiService) {
     super(initialState)
 
-    const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$];
-
-    this.timer$ = merge(actions$).pipe(
-      debounceTime(refreshRate),
-      map(() => 1)
+    const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$]
+    const refreshAction$ = merge(of(-1), merge(...actions$).pipe(switchMap(() => timer(refreshRate, refreshRate))))
+    const stream$ = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, refreshAction$]).pipe(
+      filter(([pagination, hash, kind, address, block, _]) => !!hash || !!address || !!block)
     )
 
-    const stream$ = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, this.timer$])
+    this.actionType$ = stream$.pipe(
+      map(([pagination, hash, kind, address, block, _]) => {
+        if (hash) {
+          return LayoutPages.Transaction
+        }
+
+        if (address) {
+          return LayoutPages.Account
+        }
+
+        if (block) {
+          LayoutPages.Block
+        }
+
+        return undefined
+      })
+    )
 
     this.subscription = stream$
       .pipe(
         switchMap(([pagination, hash, kind, address, block, _]) => {
           if (hash) {
             return this.apiService.getTransactionsById(hash, pagination.selectedSize * pagination.currentPage)
-          } else if (address) {
-            return this.getAllTransactionsByAddress(address, kind, pagination.selectedSize * pagination.currentPage)
-          } else if (block) {
-            return this.apiService.getTransactionsByField(block, 'block_hash', kind, pagination.selectedSize * pagination.currentPage)
-          } else {
-            return new Observable<Transaction[]>(observer => {
-              observer.next([])
-              observer.complete()
-            })
           }
+
+          if (address) {
+            return this.getAllTransactionsByAddress(address, kind, pagination.selectedSize * pagination.currentPage)
+          }
+
+          if (block) {
+            return this.apiService.getTransactionsByField(block, 'block_hash', kind, pagination.selectedSize * pagination.currentPage)
+          }
+
+          return of([])
         })
       )
       .subscribe(transactions => {
@@ -101,19 +119,27 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   }
 
   updateAddress(address: string) {
-    this.updateState({ ...this._state, address, hash: undefined, block: undefined, loading: true })
+    if (address !== this._state.address) {
+      this.updateState({ ...this._state, address, hash: undefined, block: undefined, loading: true })
+    }
   }
 
   updateBlockHash(block: string) {
-    this.updateState({ ...this._state, block, hash: undefined, address: undefined, loading: true })
+    if (block !== this._state.block) {
+      this.updateState({ ...this._state, block, hash: undefined, address: undefined, loading: true })
+    }
   }
 
   updateTransactionHash(hash: string) {
-    this.updateState({ ...this._state, hash, block: undefined, address: undefined, loading: true })
+    if (hash !== this._state.hash) {
+      this.updateState({ ...this._state, hash, block: undefined, address: undefined, loading: true })
+    }
   }
 
   updateKind(kind: string) {
-    this.updateState({ ...this._state, kind, loading: true })
+    if (kind !== this._state.kind) {
+      this.updateState({ ...this._state, kind, loading: true })
+    }
   }
 
   private readonly kindToFieldsMap = {
