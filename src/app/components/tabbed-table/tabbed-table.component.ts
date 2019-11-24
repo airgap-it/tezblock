@@ -158,9 +158,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   private selectTab(selectedTab?: Tab) {
-    selectedTab.active = true
     this.selectedTab = selectedTab
-    this.tabs.filter(tab => tab !== selectedTab).forEach(tab => (tab.active = false))
+    this.tabs.forEach(tab => (tab.active = tab === selectedTab))
 
     if (selectedTab.count > 0) {
       this.tabClicked.emit(selectedTab.kind)
