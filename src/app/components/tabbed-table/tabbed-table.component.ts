@@ -23,16 +23,15 @@ const getUpdatedTabs$ = (tabs: Tab[], type: LayoutPages, id: string, api: ApiSer
   const result = tabs.map(tab => ({ ...tab, count: 0 }))
 
   // TODO: not pure, mutates result variable
-  const aggregateFunction = (info: OperationCount, field) => {
+  const aggregateFunction = (info: OperationCount, field: string) => {
     const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
       Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-    let tab = result.find(tabArgument =>
-      Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
-    )
-
-    if (info.kind === 'proposals') {
-      tab = result.find(isTabKindEqualTo('ballot'))
-    }
+    const tab =
+      info.kind === 'proposals'
+        ? result.find(isTabKindEqualTo('ballot'))
+        : result.find(tabArgument =>
+            Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
+          )
 
     if (tab) {
       const count = parseInt(info[`count_${field}`], 10)
@@ -46,8 +45,7 @@ const getUpdatedTabs$ = (tabs: Tab[], type: LayoutPages, id: string, api: ApiSer
         transactionCounts.forEach(info => aggregateFunction(info, 'operation_group_hash'))
 
         return result
-      }),
-      catchError(error => of(undefined))
+      })
     )
   }
 
@@ -65,8 +63,7 @@ const getUpdatedTabs$ = (tabs: Tab[], type: LayoutPages, id: string, api: ApiSer
         delegate.forEach(info => aggregateFunction(info, 'delegate'))
 
         return result
-      }),
-      catchError(error => of(undefined))
+      })
     )
   }
 
@@ -75,8 +72,7 @@ const getUpdatedTabs$ = (tabs: Tab[], type: LayoutPages, id: string, api: ApiSer
       blockCounts.forEach(info => aggregateFunction(info, 'block_level'))
 
       return result
-    }),
-    catchError(error => of(undefined))
+    })
   )
 }
 
@@ -125,7 +121,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       this.dataService.actionType$
         .pipe(
           switchMap(type => getUpdatedTabs$(this.tabs, type, this.route.snapshot.params.id, this.apiService)),
-          filter(tabs => Array.isArray(tabs))
+          filter(Array.isArray)
         )
         .subscribe(tabs => {
           this.tabs = tabs
