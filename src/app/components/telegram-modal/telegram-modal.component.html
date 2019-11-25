@@ -31,19 +31,17 @@
       <strong>Choose a corresponding name</strong>
     </div>
   </div>
-  <form>
+  <form [formGroup]="form">
     <div class="form-group">
       <input
+        formControlName="botName"
         class="form-control"
-        [(ngModel)]="botName"
-        name="first"
-        id="exampleInputEmail1"
-        value="{{ botName }}"
         placeholder="Enter a name for this address"
       />
+      <div *ngIf="botNameInvalid" class="text-danger">The name can have only 18 characters.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botName }">
+    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botName.value }">
       Start Notifications
     </button>
   </form>
