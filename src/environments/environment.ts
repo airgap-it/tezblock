@@ -5,20 +5,24 @@
 export const environment = {
   production: false,
   mainnet: {
-    rpc: 'https://tezos-node.prod.gke.papers.tech',
-    conseil: 'https://conseil-prod.cryptonomic-infra.tech'
+    rpcUrl: 'MAINNET_RPC_URL',
+    conseilUrl: 'MAINNET_CONSEIL_URL',
+    conseilApiKey: 'MAINNET_CONSEIL_API_KEY',
+    targetUrl: 'MAINNET_TARGET_URL'
   },
   carthagenet: {
-    rpc: 'https://tezos-carthagenet-node-1.kubernetes.papers.tech',
-    conseil: 'https://tezos-carthagenet-conseil-1.kubernetes.papers.tech'
+    rpcUrl: 'CARTHAGENET_RPC_URL',
+    conseilUrl: 'CARTHAGENET_CONSEIL_URL',
+    conseilApiKey: 'CARTHAGENET_CONSEIL_API_KEY',
+    targetUrl: 'CARTHAGENET_TARGET_URL'
   },
 
   babylonnet: {
-    rpc: 'https://tezos-dev.cryptonomic-infra.tech',
-    conseil: 'https://conseil-dev.cryptonomic-infra.tech'
+    rpcUrl: 'BABYLONNET_RPC_URL',
+    conseilUrl: 'BABYLONNET_CONSEIL_URL',
+    conseilApiKey: 'BABYLONNET_CONSEIL_API_KEY',
+    targetUrl: 'BABYLONNET_TARGET_URL'
   },
-  conseilBaseUrl: 'CONSEIL_BASE_URL',
-  conseilApiKey: 'CONSEIL_API_KEY',
   proFontAwesomeAvailable: false
 }
 

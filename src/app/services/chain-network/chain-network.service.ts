@@ -1,50 +1,64 @@
 import { Injectable, OnInit } from '@angular/core'
 import { environment } from 'src/environments/environment'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChainNetworkService implements OnInit {
-  private chainName: string
-  private defaultChain: string = 'mainnet'
-  private readonly supportedChains = ['mainnet', 'babylonnet', 'carthagenet']
-  constructor() {}
-
-  private getEnvironmentFromUrl(): string {
-    const hostname = window.location.hostname
-    const indexOfFirstDot = hostname.indexOf('.')
-    if (indexOfFirstDot !== -1) {
-      const name = hostname.substr(0, indexOfFirstDot).toLowerCase()
-      if (this.supportedChains.indexOf(name) !== -1) {
-        this.chainName = name
-      } else {
+  private chainName: TezosNetwork
+  private defaultChain: TezosNetwork = TezosNetwork.MAINNET
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.BABYLONNET, TezosNetwork.CARTHAGENET]
+  
+  constructor() {
+    const origin = new URL(location.href).origin
+    console.log(origin)
+    switch (origin) {
+      case environment.mainnet.targetUrl:
+        this.chainName = TezosNetwork.MAINNET
+        break;
+      case environment.babylonnet.targetUrl:
+        this.chainName = TezosNetwork.BABYLONNET
+        break;
+      case environment.carthagenet.targetUrl:
+        this.chainName = TezosNetwork.CARTHAGENET
+        break;
+      default:
         this.chainName = this.defaultChain
-      }
-    } else {
-      this.chainName = this.defaultChain
+        break;
     }
+  }
 
+  public getEnvironment(chainName: TezosNetwork = this.chainName) {
+    switch (chainName) {
+      case TezosNetwork.MAINNET:
+        return environment.mainnet
+      case TezosNetwork.BABYLONNET:
+        return environment.babylonnet
+      case TezosNetwork.CARTHAGENET:
+        return environment.carthagenet
+      default:
+        return environment.mainnet
+    }
+  }
+
+  public getEnvironmentVariable(): string {
+    if (this.chainName === TezosNetwork.CARTHAGENET) {
+      return TezosNetwork.MAINNET
+    }
     return this.chainName
   }
 
-  public getEnvironment() {
-    const envName = this.getEnvironmentFromUrl()
-    if (envName === 'babylonnet') {
-      console.log('babylonnet')
-      return environment.babylonnet
-    } else if (envName === 'carthagenet') {
-      console.log('carthagenet')
-      return environment.carthagenet
-    } else {
-      console.log('mainnet')
-      return environment.mainnet
-    }
+  public getNetwork(): TezosNetwork {
+    return this.chainName
   }
-  public getEnvironmentVariable(): string {
-    if (this.chainName === 'carthagenet') {
-      return 'mainnet'
+
+  public changeEnvironment(name: TezosNetwork) {
+    if (this.supportedChains.includes(name)) {
+      const currentEnvironment = this.getEnvironment(name)
+      window.open(currentEnvironment.targetUrl, '_self')
     } else {
-      return this.chainName
+      console.error('unsupported network: ', name)
     }
   }
 
