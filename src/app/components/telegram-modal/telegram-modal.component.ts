@@ -15,7 +15,7 @@ export class TelegramModalComponent {
   public createTelegramBot() {
     const botName = this.botName.split(' ').join('')
     if (botName) {
-      window.open(`https://t.me/TezosNotifierBot?start=${this.botAddress}_${botName}`, '_blank')
+      window.open(`https://t.me/TezosNotifierBot?start=tezblock_${this.botAddress}_${botName}`, '_blank')
     }
   }
 }
