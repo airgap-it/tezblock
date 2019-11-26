@@ -22,6 +22,7 @@ import { TransactionSingleService } from '../../services/transaction-single/tran
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -127,6 +128,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
+  public showCurrencyPipe: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -142,7 +144,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
     private readonly rightsSingleService: RightsSingleService,
-    private readonly breakpointObserver: BreakpointObserver
+    private readonly breakpointObserver: BreakpointObserver,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
@@ -167,6 +170,9 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     )
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
+    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
+      ? (this.showCurrencyPipe = true)
+      : (this.showCurrencyPipe = false)
   }
 
   public async ngOnInit() {
