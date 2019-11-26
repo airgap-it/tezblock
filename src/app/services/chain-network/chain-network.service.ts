@@ -12,7 +12,6 @@ export class ChainNetworkService implements OnInit {
   
   constructor() {
     const origin = new URL(location.href).origin
-    console.log(origin)
     switch (origin) {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET

@@ -12,7 +12,7 @@ spec:
         - tezblock.prod.gke.papers.tech
       secretName: tezblock-prod-tls
     - hosts:
-        - mvp.tezblock.io
+        - tezblock.io
       secretName: tezblock-mvp-prod-tls  
   rules:
     - host: tezblock.prod.gke.papers.tech
@@ -21,7 +21,7 @@ spec:
           - backend:
               serviceName: tezblock-frontend
               servicePort: 80
-    - host: mvp.tezblock.io
+    - host: tezblock.io
       http:
         paths:
           - backend:
