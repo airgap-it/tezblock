@@ -11,6 +11,7 @@ import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 @Component({
   selector: 'app-block-detail',
@@ -45,6 +46,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
   ]
 
   private readonly subscriptions: Subscription = new Subscription()
+  public showCurrencyPipe: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -52,11 +54,15 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly route: ActivatedRoute,
     private readonly blockService: BlockService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.blockLoading$ = this.blockSingleService.loading$
+    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
+      ? (this.showCurrencyPipe = true)
+      : (this.showCurrencyPipe = false)
   }
 
   public ngOnInit() {

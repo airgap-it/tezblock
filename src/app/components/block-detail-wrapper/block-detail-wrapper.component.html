@@ -55,11 +55,13 @@
             "
           ></span>
           ꜩ
-          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-            <span class="badge badge-pill badge-primary-light ml-1">
-              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-              {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-            </span>
+          <ng-container *ngIf="showCurrencyPipe">
+            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+              <span class="badge badge-pill badge-primary-light ml-1">
+                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
+              </span>
+            </ng-container>
           </ng-container>
         </p>
       </div>
@@ -85,11 +87,13 @@
             "
           ></span>
           ꜩ
-          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-            <span class="badge badge-pill badge-primary-light ml-1">
-              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-              {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
-            </span>
+          <ng-container *ngIf="showCurrencyPipe">
+            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+              <span class="badge badge-pill badge-primary-light ml-1">
+                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
+              </span>
+            </ng-container>
           </ng-container>
         </p>
       </div>
