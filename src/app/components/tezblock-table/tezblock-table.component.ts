@@ -603,8 +603,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
   public rewardspage: number = 1
-  private payoutsArray: any[] = []
-  private returnedArray: any[] = []
+  public payoutsArray: any[] = []
+  public returnedArray: any[] = []
 
   public pageChanged(event: PageChangedEvent, cycle: number): void {
     const startItem = (event.page - 1) * event.itemsPerPage
