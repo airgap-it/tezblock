@@ -47,6 +47,9 @@ export class TransactionDetailWrapperComponent {
   @Input()
   public fiatInfo$: Observable<CurrencyInfo> | undefined
 
+  @Input()
+  public showCurrencyPipe: boolean = true
+
   constructor(
     private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,

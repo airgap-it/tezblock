@@ -11,6 +11,7 @@ import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -41,15 +42,21 @@ export class TransactionDetailComponent implements OnInit {
   public transactionsLoading$: Observable<boolean> = new Observable()
   public transactions$: Observable<Transaction[]> = new Observable()
   public filteredTransactions$: Observable<Transaction[]> = new Observable()
+  public showCurrencyPipe: boolean
+
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
     private readonly route: ActivatedRoute,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly blockService: BlockService,
     private readonly copyService: CopyService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
+      ? (this.showCurrencyPipe = true)
+      : (this.showCurrencyPipe = false)
   }
 
   public ngOnInit() {
@@ -75,8 +82,9 @@ export class TransactionDetailComponent implements OnInit {
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
-      map(([transactions, kind]) => transactions.filter(transaction =>
-        Array.isArray(kind) ? kind.indexOf(transaction.kind) !== -1 : transaction.kind === kind))
+      map(([transactions, kind]) =>
+        transactions.filter(transaction => (Array.isArray(kind) ? kind.indexOf(transaction.kind) !== -1 : transaction.kind === kind))
+      )
     )
 
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.latestTx$]).pipe(
