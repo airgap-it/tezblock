@@ -79,7 +79,7 @@ export class DashboardComponent {
         )
       )
     )
-    this.hideContent()
+    this.isMainnet()
   }
 
   public onKeyEnter(searchTerm: string) {
@@ -99,7 +99,7 @@ export class DashboardComponent {
     }
   }
 
-  public hideContent() {
+  public isMainnet() {
     const selectedNetwork = this.chainNetworkService.getEnvironmentVariable()
     if (selectedNetwork === 'mainnet') {
       return false
