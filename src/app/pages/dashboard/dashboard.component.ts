@@ -68,7 +68,7 @@ export class DashboardComponent {
   }
 
   public isMainnet() {
-    const selectedNetwork = this.chainNetworkService.getEnvironmentVariable()
+    const selectedNetwork = this.chainNetworkService.getNetwork()
     if (selectedNetwork === 'mainnet') {
       return false
     } else {
