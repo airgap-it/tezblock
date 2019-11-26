@@ -15,7 +15,7 @@ stages:
 build:
   stage: build
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg CONSEIL_BASE_URL --build-arg CONSEIL_API_KEY --target angular-build -t $GOOGLE_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg BABYLONNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg BABYLONNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg BABYLONNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg BABYLONNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL --target angular-build -t $GOOGLE_TAG .
   tags:
     - docker
 
@@ -23,15 +23,16 @@ build_serve:
   stage: build_serve
   when: manual
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg CONSEIL_BASE_URL --build-arg CONSEIL_API_KEY -t $GOOGLE_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg BABYLONNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg BABYLONNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg BABYLONNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg BABYLONNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL -t $GOOGLE_TAG .
   tags:
     - docker
 
 test:
+  allow_failure: true
   stage: test
   script:
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test-ci
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name lint-$CI_COMMIT_SHA $GOOGLE_TAG npm run lint-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e BABYLONNET_RPC_URL -e CARTHAGENET_RPC_URL -e MAINNET_CONSEIL_URL -e BABYLONNET_CONSEIL_URL -e CARTHAGENET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e BABYLONNET_CONSEIL_API_KEY -e CARTHAGENET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e BABYLONNET_TARGET_URL -e CARTHAGENET_TARGET_URL --name unit-$CI_COMMIT_SHA $GOOGLE_TAG npm run test-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e BABYLONNET_RPC_URL -e CARTHAGENET_RPC_URL -e MAINNET_CONSEIL_URL -e BABYLONNET_CONSEIL_URL -e CARTHAGENET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e BABYLONNET_CONSEIL_API_KEY -e CARTHAGENET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e BABYLONNET_TARGET_URL -e CARTHAGENET_TARGET_URL --name lint-$CI_COMMIT_SHA $GOOGLE_TAG npm run lint-ci
     - docker cp unit-$CI_COMMIT_SHA:/app/coverage/tezblock/lcov.info lcov.info
     - docker cp lint-$CI_COMMIT_SHA:/app/lintReport.json lintReport.json
   after_script:
@@ -48,7 +49,7 @@ qa:
   allow_failure: true
   stage: qa
   script:
-    - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e CONSEIL_BASE_URL -e CONSEIL_API_KEY --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X
+    - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e BABYLONNET_RPC_URL -e CARTHAGENET_RPC_URL -e MAINNET_CONSEIL_URL -e BABYLONNET_CONSEIL_URL -e CARTHAGENET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e BABYLONNET_CONSEIL_API_KEY -e CARTHAGENET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e BABYLONNET_TARGET_URL -e CARTHAGENET_TARGET_URL --name qa-$CI_PIPELINE_ID $GOOGLE_TAG npm run sonar-scanner -- -X
       -Dsonar.typescript.lcov.reportPaths=lcov.info
       -Dsonar.typescript.tslint.reportPaths=lintReport.json
       -Dsonar.test.inclusions=**/*.spec.ts
@@ -107,7 +108,6 @@ k8s-deploy-development:
     - kubectl apply -f k8s/tezblock/development/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
   only:
-    - master
     - develop
   tags:
     - docker
@@ -128,6 +128,47 @@ k8s-deploy-production:
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/production/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
+  only:
+    - master
+  tags:
+    - docker
+
+k8s-deploy-babylonnet-prod:
+  stage: deploy
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud container clusters get-credentials papers-cluster-production
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/babylonnet/frontend/deployment.yaml
+    - kubectl apply -f k8s/tezblock/common/namespace.yaml
+    - kubectl apply -f k8s/tezblock/babylonnet/ --recursive
+  only:
+    - master
+    - develop
+  tags:
+    - docker
+
+k8s-deploy-carthagenet-prod:
+  stage: deploy
+  when: manual
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT
+    - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud container clusters get-credentials papers-cluster-production
+  script:
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/carthagenet/frontend/deployment.yaml
+    - kubectl apply -f k8s/tezblock/common/namespace.yaml
+    - kubectl apply -f k8s/tezblock/carthagenet/ --recursive
   only:
     - master
     - develop

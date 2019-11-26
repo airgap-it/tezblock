@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core'
 
 @Component({
-  selector: 'app-address-cell',
+  selector: 'address-cell',
   templateUrl: './address-cell.component.html',
   styleUrls: ['./address-cell.component.scss']
 })
