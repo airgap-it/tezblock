@@ -1,0 +1,50 @@
+<div class="mb-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3">
+      <div class="card-body p-4">
+        <div class="row">
+          <div class="col-sm-2 pb-4 pb-sm-0 d-flex align-items-center justify-content-center">
+            <img class="wallet__img" [src]="getLogo(wallet)" />
+          </div>
+          <div class="col-sm-10">
+            <h4 class="mb-2">
+              <strong>{{ wallet.title }}</strong>
+              <a
+                *ngFor="let social of wallet.socials"
+                class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                [href]="social.url"
+                target="_blank"
+              >
+                <fa-icon [icon]="social.type | iconPipe" class="text-secondary"></fa-icon>
+              </a>
+            </h4>
+
+            <p>
+              {{ wallet.description }}
+            </p>
+            <div class="d-block my-3">
+              <a *ngFor="let platform of wallet.platforms" class="badge badge-pill badge-primary-light mr-1" [href]="platform.url">
+                <fa-icon [icon]="platform.icon | iconPipe" class="mr-1"></fa-icon>
+                {{ platform.name }}
+              </a>
+            </div>
+            <div class="row mt-2">
+              <div class="col-12">
+                <strong>Features</strong>
+              </div>
+              <div class="col-12">
+                <p>
+                  <span *ngFor="let feature of wallet.features; index as i">
+                    {{ i > 0 ? ',' : '' }}
+                    {{ feature }}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <a role="button" class="btn btn-primary" [href]="wallet.downloadLink" target="_blank">Download</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

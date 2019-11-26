@@ -14,6 +14,8 @@ import { TransactionDetailWrapperComponent } from 'src/app/components/transactio
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
 import { TransactionDetailComponent } from './transaction-detail.component'
+import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
+import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -33,7 +35,9 @@ describe('TransactionDetailComponent', () => {
           TezblockTableComponent,
           TransactionItemComponent,
           AddressItemComponent,
+          AddressCellComponent,
           IdenticonComponent,
+          AmountCellComponent,
           TransactionDetailWrapperComponent,
           LoadingSkeletonComponent
         ]
