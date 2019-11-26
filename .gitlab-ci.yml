@@ -23,7 +23,7 @@ build_serve:
   stage: build_serve
   when: manual
   script:
-    - docker build --build-arg MAINNET_RPC_URL --build-arg BABYLONNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg BABYLONNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg BABYLONNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg BABYLONNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL -t $GOOGLE_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg BABYLONNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg BABYLONNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg BABYLONNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg BABYLONNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL -t $GOOGLE_TAG .
   tags:
     - docker
 
