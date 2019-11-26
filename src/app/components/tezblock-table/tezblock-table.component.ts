@@ -25,6 +25,7 @@ import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.com
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
 import { ModalCellComponent } from './modal-cell/modal-cell.component'
+import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
 interface Column {
   name: string
@@ -602,24 +603,18 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
   public rewardspage: number = 1
-  private pageArray: number[] = []
+  private payoutsArray: any[] = []
+  private returnedArray: any[] = []
 
-  public getPageNumber(cycle: number) {
-    if (this.pageArray[cycle]) {
-      return this.pageArray[cycle]
-    } else {
-      this.setPageNumber(cycle, 1)
-      return 1
-    }
-  }
+  public pageChanged(event: PageChangedEvent, cycle: number): void {
+    const startItem = (event.page - 1) * event.itemsPerPage
+    const endItem = event.page * event.itemsPerPage
 
-  public setPageNumber(cycle: number, page: number) {
-    this.pageArray[cycle] = page
+    this.returnedArray[cycle] = this.payoutsArray[cycle].slice(startItem, endItem)
   }
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
-    // this.pageArray[192]=1
     if (value) {
       if (this.subscription) {
         this.subscription.unsubscribe()
@@ -628,6 +623,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       this.subscription = this.transactions$.subscribe(transactions => {
         this.backupTransactions = transactions
         this.transactions = transactions
+        transactions.forEach(transaction => {
+          if (transaction.payouts) {
+            this.payoutsArray[transaction.cycle] = transaction.payouts
+            this.returnedArray[transaction.cycle] = transaction.payouts.slice(0, 10)
+          }
+        })
       })
     }
   }

@@ -9,6 +9,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
 import { IdenticonComponent } from '../identicon/identicon'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent
@@ -20,7 +21,7 @@ describe('TabbedTableComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [],
-        imports: [TabsModule, FontAwesomeModule],
+        imports: [TabsModule, FontAwesomeModule, PaginationModule],
         declarations: [
           TabbedTableComponent,
           TezblockTableComponent,

@@ -15,7 +15,6 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
-import { NgxPaginationModule } from 'ngx-pagination'
 import { ToastrModule } from 'ngx-toastr'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -91,7 +90,6 @@ import { ListEffects } from './pages/list/effects'
     ModalModule.forRoot(),
     FontAwesomeModule,
     ChartsModule,
-    NgxPaginationModule,
     StoreModule.forRoot(ROOT_REDUCERS, {
       metaReducers,
       runtimeChecks: {
