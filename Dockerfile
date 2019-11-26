@@ -25,12 +25,23 @@ RUN npm install -g npm@6.4.1
 # install dependencies
 ADD .npmrc /app/.npmrc
 ADD package.json /app/package.json
-ADD package-lock.json /app/package-lock.json
+# ADD package-lock.json /app/package-lock.json
 COPY ./scripts /app/scripts
 
 ARG FONTAWESOME_NPM_AUTH_TOKEN
-ARG CONSEIL_BASE_URL
-ARG CONSEIL_API_KEY
+
+ARG MAINNET_RPC_URL 
+ARG BABYLONNET_RPC_URL 
+ARG CARTHAGENET_RPC_URL 
+ARG MAINNET_CONSEIL_URL 
+ARG BABYLONNET_CONSEIL_URL 
+ARG CARTHAGENET_CONSEIL_URL 
+ARG MAINNET_CONSEIL_API_KEY 
+ARG BABYLONNET_CONSEIL_API_KEY 
+ARG CARTHAGENET_CONSEIL_API_KEY 
+ARG MAINNET_TARGET_URL 
+ARG BABYLONNET_TARGET_URL 
+ARG CARTHAGENET_TARGET_URL
 
 RUN npm config set unsafe-perm true
 RUN npm run set-env

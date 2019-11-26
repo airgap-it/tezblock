@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
 import { ChainNetworkService } from 'src/app/services/chain-network/chain-network.service'
 import { CycleService } from 'src/app/services/cycle/cycle.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Component({
   selector: 'header-item',
@@ -28,7 +29,8 @@ export class HeaderItemComponent {
   public title = 'tezblock'
   public isCollapsed = true
   public showDropdown = false
-  public selectedNetwork: string
+  public selectedNetwork: TezosNetwork
+  public networks = TezosNetwork
 
   constructor(
     private readonly router: Router,
@@ -38,7 +40,7 @@ export class HeaderItemComponent {
     this.currentCycle = this.cycleService.currentCycle$
     this.cycleProgress = this.cycleService.cycleProgress$
     this.remainingTime = this.cycleService.remainingTime$
-    this.selectedNetwork = this.chainNetworkService.getEnvironmentVariable()
+    this.selectedNetwork = this.chainNetworkService.getNetwork()
   }
 
   public navigate(entity: string) {
@@ -51,7 +53,7 @@ export class HeaderItemComponent {
     }
   }
 
-  public changeNetwork(name: string) {
-    this.selectedNetwork = name
+  public changeNetwork(name: TezosNetwork) {
+    this.chainNetworkService.changeEnvironment(name)
   }
 }
