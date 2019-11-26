@@ -24,6 +24,7 @@ export const environment = {
     targetUrl: 'BABYLONNET_TARGET_URL'
   },
   proFontAwesomeAvailable: false
+  
 }
 
 /*

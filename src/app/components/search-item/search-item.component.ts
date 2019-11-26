@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { forkJoin, Observable } from 'rxjs'
-import { map, mergeMap } from 'rxjs/operators'
+import { Observable, Subject } from 'rxjs'
+import { switchMap, take } from 'rxjs/operators'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
 
 import { BaseComponent } from '../base.component'
@@ -19,6 +19,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
   searchTerm: string
   dataSource$: Observable<any>
+  readonly typeaheadOptionsLimit = 7
 
   constructor(private readonly apiService: ApiService, private readonly searchService: SearchService) {
     super()
@@ -28,13 +29,22 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     this.dataSource$ = new Observable<string>((observer: any) => {
       observer.next(this.searchTerm)
     }).pipe(
-      mergeMap(token =>
-        forkJoin(
+      switchMap(token => {
+        const response = new Subject<Object[]>()
+        let data = []
+        const updateResponse = (apiResult: Object[]) => {
+          data = data.concat(apiResult)
+          response.next(data.slice(0, this.typeaheadOptionsLimit))
+        }
+
+        ;[
           this.apiService.getTransactionHashesStartingWith(token),
           this.apiService.getAccountsStartingWith(token),
           this.apiService.getBlockHashesStartingWith(token)
-        ).pipe(map(([transactionHashes, accounts, blockHashes]) => [...transactionHashes, ...accounts, ...blockHashes]))
-      )
+        ].forEach(api => api.pipe(take(1)).subscribe(updateResponse))
+
+        return response
+      })
     )
   }
 
