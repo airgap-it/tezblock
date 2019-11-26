@@ -25,7 +25,7 @@
     [loading]="loading"
     [data]="data"
     [page]="page"
-    [type]="selectedTab.kind"
+    [type]="kindToOperationTypes(selectedTab.kind)"
     [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
     (loadMoreClicked)="loadMore()"
   ></tezblock-table>

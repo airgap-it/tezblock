@@ -9,7 +9,7 @@
             </a>
             <a href="https://airgap.it" target="_blank" class="text-dark">
               <small>
-                MVP by AirGap
+                by AirGap
               </small>
             </a>
           </div>
@@ -33,26 +33,7 @@
           </span>
         </button>
         <div class="pt-3 w-100 d-block d-sm-none">
-          <div class="input-group input-group-main">
-            <input
-              [(ngModel)]="searchTerm"
-              [typeaheadAsync]="true"
-              [typeahead]="data"
-              [adaptivePosition]="true"
-              [typeaheadMinLength]="2"
-              [typeaheadOptionsLimit]="7"
-              typeaheadOptionField="name"
-              typeaheadGroupField="type"
-              placeholder="Search by Address / Alias / Tx Hash / Block Hash"
-              class="form-control form-control--focus-white"
-              (keydown.enter)="searchService.search(searchTerm); dp.hide()"
-            />
-            <div class="input-group-append">
-              <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-                <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
-              </button>
-            </div>
-          </div>
+          <app-search-item (onSearch)="dp.hide()"></app-search-item>
         </div>
         <div
           class="collapse navbar-collapse"
@@ -63,26 +44,7 @@
         >
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
-              <div class="input-group input-group-main">
-                <input
-                  [(ngModel)]="searchTerm"
-                  [typeaheadAsync]="true"
-                  [typeahead]="data"
-                  [adaptivePosition]="true"
-                  [typeaheadMinLength]="2"
-                  [typeaheadOptionsLimit]="7"
-                  typeaheadOptionField="name"
-                  typeaheadGroupField="type"
-                  placeholder="Search by Address / Alias / Tx Hash / Block Hash"
-                  class="form-control form-control--focus-white"
-                  (keydown.enter)="searchService.search(searchTerm); dp.hide()"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-                    <fa-icon [icon]="'search' | iconPipe" class="text-white"></fa-icon>
-                  </button>
-                </div>
-              </div>
+              <app-search-item (onSearch)="dp.hide()"></app-search-item>
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
@@ -156,6 +118,17 @@
                         <li role="menuitem">
                           <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/delegation/list']">
                             Delegations
+                          </a>
+                        </li>
+                        <hr />
+                        <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-baking/list']">
+                            Double Baking Evidence
+                          </a>
+                        </li>
+                        <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-endorsement/list']">
+                            Double Endorsement Evidence
                           </a>
                         </li>
                       </ul>
@@ -245,20 +218,20 @@
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <li role="menuitem">
-                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
+                      <a class="dropdown-item" [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''" (click)="changeNetwork(networks.MAINNET)">
                         mainnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'babylonnet' ? 'active' : ''"
-                        (click)="changeNetwork('babylonnet')"
+                        [ngClass]="selectedNetwork === networks.BABYLONNET ? 'active' : ''"
+                        (click)="changeNetwork(networks.BABYLONNET)"
                       >
                         babylonnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'carthagenet' ? 'active' : ''"
-                        (click)="changeNetwork('carthagenet')"
+                        [ngClass]="selectedNetwork === networks.CARTHAGENET ? 'active' : ''"
+                        (click)="changeNetwork(networks.CARTHAGENET)"
                       >
                         carthagenet
                       </a>

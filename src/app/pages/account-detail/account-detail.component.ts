@@ -6,6 +6,8 @@ import { ActivatedRoute, Router } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { Observable, Subscription, combineLatest } from 'rxjs'
+import { map } from 'rxjs/operators'
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -124,6 +126,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
   public frozenBalance: number | undefined
   public rewardsTransaction: any
+  public isMobile$: Observable<boolean>
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -138,7 +141,8 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
-    private readonly rightsSingleService: RightsSingleService
+    private readonly rightsSingleService: RightsSingleService,
+    private readonly breakpointObserver: BreakpointObserver
   ) {
     this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
@@ -183,6 +187,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     this.account$ = this.accountSingleService.account$
 
     this.revealed = await this.accountService.getAccountStatus(this.address)
+
+    this.isMobile$ = this.breakpointObserver
+      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+      .pipe(map(breakpointState => breakpointState.matches))
   }
 
   public async getBakingInfos(address: string) {
@@ -190,17 +198,21 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       .getBakerInfos(address)
       .then(async result => {
         this.isValidBaker = true
+        const payoutAddress = accounts.hasOwnProperty(this.address) ? accounts[this.address].hasPayoutAddress : null
 
-        if (result) {
-          this.bakerTableInfos = {
-            stakingBalance: result.stakingBalance,
-            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-            stakingCapacity: result.stakingCapacity,
-            stakingProgress: Math.min(100, result.stakingProgress),
-            stakingBond: result.selfBond,
-            frozenBalance: await this.accountService.getFrozen(address)
-          }
-        }
+        this.bakerTableInfos = result
+          ? {
+              stakingBalance: result.stakingBalance,
+              numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
+              stakingCapacity: result.stakingCapacity,
+              stakingProgress: Math.min(100, result.stakingProgress),
+              stakingBond: result.selfBond,
+              frozenBalance: await this.accountService.getFrozen(address),
+              payoutAddress
+            }
+          : {
+              payoutAddress
+            }
       })
       .catch(error => {
         this.isValidBaker = false
@@ -234,7 +246,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
           this.bakingBadRating = 'not available'
         }
 
-        this.bakerTableRatings.bakingBadRating = this.bakingBadRating
+        this.bakerTableRatings = {
+          ...this.bakerTableRatings,
+          bakingBadRating: this.bakingBadRating
+        }
       })
       .catch(error => {
         this.isValidBaker = false
@@ -267,7 +282,10 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
           this.tezosBakerRating = 'not available'
           this.tezosBakerFee = updateFee ? 'not available' : this.tezosBakerFee
         }
-        this.bakerTableRatings.tezosBakerRating = this.tezosBakerRating
+        this.bakerTableRatings = {
+          ...this.bakerTableRatings,
+          tezosBakerRating: this.tezosBakerRating
+        }
       })
       .catch(error => {
         this.isValidBaker = false

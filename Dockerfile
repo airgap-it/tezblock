@@ -25,7 +25,7 @@ RUN npm install -g npm@6.4.1
 # install dependencies
 ADD .npmrc /app/.npmrc
 ADD package.json /app/package.json
-ADD package-lock.json /app/package-lock.json
+# ADD package-lock.json /app/package-lock.json
 COPY ./scripts /app/scripts
 
 ARG FONTAWESOME_NPM_AUTH_TOKEN

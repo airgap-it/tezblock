@@ -34,6 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@angular/animations": "^8.0.0",
+    "@angular/cdk": "^8.2.3",
     "@angular/common": "^8.0.0",
     "@angular/compiler": "^8.0.0",
     "@angular/core": "^8.0.0",
@@ -53,7 +54,7 @@
     "@nguniversal/express-engine": "^8.0.0-rc.1",
     "@nguniversal/module-map-ngfactory-loader": "^8.0.0-rc.1",
     "@types/lodash": "^4.14.146",
-    "airgap-coin-lib": "0.5.14",
+    "airgap-coin-lib": "^0.5.17",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",
@@ -71,6 +72,7 @@
     "ng2-charts": "^2.3.0",
     "ngx-bootstrap": "^4.3.0",
     "ngx-moment": "^3.4.0",
+    "ngx-pagination": "^3.0.1",
     "ngx-toastr": "^10.0.4",
     "rxjs": "^6.5.1",
     "zone.js": "~0.9.1"
@@ -106,6 +108,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-config-valorsoft": "^2.2.1",
     "typescript": "~3.4.3",
+    "webpack": "^4.41.2",
     "webpack-cli": "^3.1.0"
   },
   "repository": {}

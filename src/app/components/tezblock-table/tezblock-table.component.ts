@@ -42,7 +42,7 @@ enum LayoutPages {
   Transaction = 'transaction'
 }
 
-enum OperationTypes {
+export enum OperationTypes {
   Transaction = 'transaction',
   Delegation = 'delegation',
   Origination = 'origination',
@@ -57,7 +57,9 @@ enum OperationTypes {
   OriginationOverview = 'origination_overview',
   DelegationOverview = 'delegation_overview',
   EndorsementOverview = 'endorsement_overview',
-  Rewards = 'rewards'
+  Rewards = 'rewards',
+  DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
+  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
 }
 
 interface Layout {
@@ -90,6 +92,9 @@ interface Layout {
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
     [OperationTypes.BallotOverview]: Column[]
+    [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
+    [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
+    [OperationTypes.Ballot]: Column[]
   }
 }
 
@@ -175,7 +180,7 @@ const layouts: Layout = {
       { name: 'Ballot', property: 'ballot', width: '' },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
-      { name: 'Voting Period', property: '', width: '' },
+      { name: 'Voting Period', property: 'voting_period', width: '' },
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
@@ -506,10 +511,76 @@ const layouts: Layout = {
       { name: 'Ballot', property: 'ballot', width: '' },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
-      { name: 'Voting Period', property: '', width: '' },
+      { name: 'Voting Period', property: 'voting_period', width: '' },
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       ...baseTx
+    ],
+    [OperationTypes.DoubleBakingEvidenceOverview]: [
+      {
+        name: 'Baker',
+        property: '',
+        width: '',
+        component: AddressCellComponent
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      {
+        name: 'Reward',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Offender', property: '', width: '', component: AddressCellComponent },
+      { name: 'Denounced Level', property: '', width: '', component: BlockCellComponent },
+      {
+        name: 'Lost Amount',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Level', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.DoubleEndorsementEvidenceOverview]: [
+      {
+        name: 'Baker',
+        property: '',
+        width: '',
+        component: AddressCellComponent
+      },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      {
+        name: 'Reward',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Offender', property: '', width: '', component: AddressCellComponent },
+      { name: 'Denounced Level', property: '', width: '', component: BlockCellComponent },
+      {
+        name: 'Lost Amount',
+        property: '',
+        width: '',
+        component: AmountCellComponent
+      },
+      { name: 'Level', property: 'block_level', width: '', component: BlockCellComponent },
+      { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.Ballot]: [
+      {
+        name: 'Baker',
+        property: 'source',
+        width: '1',
+        component: AddressCellComponent,
+        options: { showFullAddress: false, pageId: 'oo' }
+      },
+      { name: 'Ballot', property: 'ballot', width: '' },
+      { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
+      { name: 'Kind', property: 'kind', width: '' },
+      { name: 'Voting Period', property: '', width: '' },
+      { name: '# of Votes', property: 'votes', width: '' },
+      { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+      { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
     ]
   }
 }
@@ -528,15 +599,34 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public transactions: Transaction[] = []
   public loading$: Observable<boolean> = new Observable()
   private subscription: Subscription
+  public filterTerm: string | undefined
+  public backupTransactions: Transaction[] = []
+  public rewardspage: number = 1
+  private pageArray: number[] = []
+
+  public getPageNumber(cycle: number) {
+    if (this.pageArray[cycle]) {
+      return this.pageArray[cycle]
+    } else {
+      this.setPageNumber(cycle, 1)
+      return 1
+    }
+  }
+
+  public setPageNumber(cycle: number, page: number) {
+    this.pageArray[cycle] = page
+  }
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
+    // this.pageArray[192]=1
     if (value) {
       if (this.subscription) {
         this.subscription.unsubscribe()
       }
       this.transactions$ = value
       this.subscription = this.transactions$.subscribe(transactions => {
+        this.backupTransactions = transactions
         this.transactions = transactions
       })
     }
@@ -555,6 +645,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public page?: LayoutPages
   @Input()
   public type?: OperationTypes
+  @Input()
+  public enableSearch?: false
 
   @Input()
   public expandable?: boolean = false
@@ -579,6 +671,22 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public expand(transaction: any) {
     if (this.expandable) {
       transaction.expand = !transaction.expand
+    }
+  }
+
+  public filterTransactions(filterTerm: string) {
+    let copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
+
+    if (filterTerm) {
+      const filteredTransactions: any[] = copiedTransactions.map((transaction: any) => {
+        transaction.payouts = transaction.payouts.filter(payout => payout.delegator === filterTerm)
+
+        return transaction
+      })
+
+      this.transactions = filteredTransactions
+    } else {
+      this.transactions = copiedTransactions
     }
   }
 

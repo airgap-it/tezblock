@@ -133,6 +133,15 @@ typeahead-container {
   overflow: visible !important;
 }
 
+/* TODO: remove when refactored to ngx-boostrap component */
+.ngx-pagination .current {
+  background: map_get($theme-colors, 'primary') !important;
+}
+/* no breaks in table cell whith spaces */
+.table-responsive table td {
+  white-space: nowrap;
+}
+
 @media (max-width: 576px) {
   /* set fon-size on mobile devices to 16px to avoid zooming on input */
   .form-control {

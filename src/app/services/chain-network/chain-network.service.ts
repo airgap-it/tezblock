@@ -1,49 +1,59 @@
 import { Injectable, OnInit } from '@angular/core'
 import { environment } from 'src/environments/environment'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChainNetworkService implements OnInit {
-  private chainName: string
-  private defaultChain: string = 'mainnet'
-  private readonly supportedChains = ['mainnet', 'babylonnet', 'carthagenet']
-  
+  private chainName: TezosNetwork
+  private defaultChain: TezosNetwork = TezosNetwork.MAINNET
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.BABYLONNET, TezosNetwork.CARTHAGENET]
+
   constructor() {
     const origin = new URL(location.href).origin
     console.log(origin)
     switch (origin) {
       case environment.mainnet.targetUrl:
-        this.chainName = 'mainnet'
-        break;
+        this.chainName = TezosNetwork.MAINNET
+        break
       case environment.babylonnet.targetUrl:
-        this.chainName = 'babylonnet'
-        break;
+        this.chainName = TezosNetwork.BABYLONNET
+        break
       case environment.carthagenet.targetUrl:
-        this.chainName = 'carthagenet'
-        break;
+        this.chainName = TezosNetwork.CARTHAGENET
+        break
       default:
         this.chainName = this.defaultChain
-        break;
+        break
     }
   }
 
-  public getEnvironment(chainName: string = this.chainName) { 
-    if (chainName === 'babylonnet') {
-      return environment.babylonnet
-    } else if (chainName === 'carthagenet') {
-      return environment.carthagenet
-    } else {
-      return environment.mainnet
+  public getEnvironment(chainName: TezosNetwork = this.chainName) {
+    switch (chainName) {
+      case TezosNetwork.MAINNET:
+        return environment.mainnet
+      case TezosNetwork.BABYLONNET:
+        return environment.babylonnet
+      case TezosNetwork.CARTHAGENET:
+        return environment.carthagenet
+      default:
+        return environment.mainnet
     }
   }
 
   public getEnvironmentVariable(): string {
-    return "mainnet"
-    // return this.chainName
+    if (this.chainName === TezosNetwork.CARTHAGENET) {
+      return TezosNetwork.MAINNET
+    }
+    return this.chainName
   }
 
-  public changeEnvironment(name: string) {
+  public getNetwork(): TezosNetwork {
+    return this.chainName
+  }
+
+  public changeEnvironment(name: TezosNetwork) {
     if (this.supportedChains.includes(name)) {
       const currentEnvironment = this.getEnvironment(name)
       window.open(currentEnvironment.targetUrl, '_self')
