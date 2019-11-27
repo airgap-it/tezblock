@@ -41,7 +41,7 @@
       <div *ngIf="botNameInvalid" class="text-danger">The name can have only 18 characters.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botName.value }">
+    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botNameControl.value }">
       Start Notifications
     </button>
   </form>
