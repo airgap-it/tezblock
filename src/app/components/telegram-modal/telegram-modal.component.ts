@@ -34,7 +34,7 @@ export class TelegramModalComponent implements OnInit {
       const botName = this.botNameControl.value.split(' ').join('')
 
       if (botName) {
-        window.open(`https://t.me/TezosNotifierBot?start=${this.botAddress}_${botName}`, '_blank')
+        window.open(`https://t.me/TezosNotifierBot?start=tezblock_${this.botAddress}_${botName}`, '_blank')
       }
     }
   }
