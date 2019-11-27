@@ -39,7 +39,8 @@ interface Column {
 enum LayoutPages {
   Account = 'account',
   Block = 'block',
-  Transaction = 'transaction'
+  Transaction = 'transaction',
+  Baker = 'baker'
 }
 
 export enum OperationTypes {
@@ -95,6 +96,9 @@ interface Layout {
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
     [OperationTypes.Ballot]: Column[]
+  }
+  [LayoutPages.Baker]: {
+    [OperationTypes.Overview]: Column[]
   }
 }
 
@@ -581,6 +585,15 @@ const layouts: Layout = {
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
+    ]
+  },
+  [LayoutPages.Baker]: {
+    [OperationTypes.Overview]: [
+      { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
+      { name: 'Balance', property: 'balance', width: '' },
+      { name: '# of Votes', property: 'number_of_votes', width: '' },
+      { name: 'Staking Balance', property: 'staking_balance', width: '' },
+      { name: 'Number of Delegators', property: 'number_of_delegators', width: '' }
     ]
   }
 }

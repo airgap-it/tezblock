@@ -23,14 +23,25 @@
           </ng-container>
           <ng-container *ngIf="type === 'ballot_overview'">
             Votes
-		  </ng-container>
+          </ng-container>
           <ng-container *ngIf="type === 'double_baking_evidence_overview'">
             Double Baking Evidence
           </ng-container>
           <ng-container *ngIf="type === 'double_endorsement_evidence_overview'">
             Double Endorsement Evidence
           </ng-container>
+          <ng-container *ngIf="page === 'baker'">
+            Baker
+          </ng-container>
         </h5>
+        <div *ngIf="page === 'baker'" class="row">
+          <div class="col px-2 total">
+            <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
+            <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
+              {{ totalActiveBakers }} of total bakers at the latest block
+            </ng-container>
+          </div>
+        </div>
         <div class="row">
           <div class="col px-2">
             <tezblock-table
