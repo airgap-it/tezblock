@@ -743,12 +743,8 @@ export class ApiService {
         }
       ]
     }
-    
-    return this.http.post<OperationCount[]>(
-      this.transactionsApiUrl,
-      body,
-      this.options
-    )
+
+    return this.http.post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
   }
 
   public getBlockById(id: string): Observable<Block[]> {
@@ -790,7 +786,13 @@ export class ApiService {
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
       const network = this.chainNetworkService.getNetwork()
-      const protocol = new TezosProtocol(this.environmentUrls.rpcUrl, this.environmentUrls.conseilUrl, network, this.chainNetworkService.getEnvironmentVariable(), this.environmentUrls.conseilApiKey)
+      const protocol = new TezosProtocol(
+        this.environmentUrls.rpcUrl,
+        this.environmentUrls.conseilUrl,
+        network,
+        this.chainNetworkService.getEnvironmentVariable(),
+        this.environmentUrls.conseilApiKey
+      )
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)

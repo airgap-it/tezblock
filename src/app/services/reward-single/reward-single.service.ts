@@ -46,7 +46,13 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
     super(initialState)
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
-    const protocol = new TezosProtocol(environmentUrls.rpcUrl, environmentUrls.conseilUrl, network, this.chainNetworkService.getEnvironmentVariable(), environmentUrls.conseilApiKey)
+    const protocol = new TezosProtocol(
+      environmentUrls.rpcUrl,
+      environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      environmentUrls.conseilApiKey
+    )
 
     this.subscription = combineLatest([this.pagination$, this.address$])
       .pipe(
@@ -60,17 +66,16 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
             if (cycle < 7) {
               break
             }
-            rewardsResults.push(protocol.calculateRewards(address, cycle).then(async result => {
-              // TODO: payouts needs to be paginated instead of retrieving them all at once
-              (result as any).payouts = await protocol.calculatePayouts(result, 0, result.delegatedContracts.length)
-              return result
-            }))
+            rewardsResults.push(
+              protocol.calculateRewards(address, cycle).then(async result => {
+                // TODO: payouts needs to be paginated instead of retrieving them all at once
+                ;(result as any).payouts = await protocol.calculatePayouts(result, 0, result.delegatedContracts.length)
+                return result
+              })
+            )
           }
           const rewards = await Promise.all(rewardsResults)
-          return [
-            ...this._state.rewards,
-            ...rewards
-          ]
+          return [...this._state.rewards, ...rewards]
         })
       )
       .subscribe(rewards => {
