@@ -1,13 +1,13 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Observable, race, Subscription } from 'rxjs'
-import { mergeMap } from 'rxjs/operators'
+import { Observable, Subscription } from 'rxjs'
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '../../services/cycle/cycle.service'
 import { TransactionService } from './../../services/transaction /transaction.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -69,10 +69,6 @@ export class DashboardComponent {
 
   public isMainnet() {
     const selectedNetwork = this.chainNetworkService.getNetwork()
-    if (selectedNetwork === 'mainnet') {
-      return false
-    } else {
-      return true
-    }
+    return selectedNetwork === TezosNetwork.MAINNET
   }
 }
