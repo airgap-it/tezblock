@@ -34,9 +34,13 @@
   "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC": {
     "alias": "PayTezos",
     "hasLogo": true,
-    "hasPayoutAddress": "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o"
+    "hasPayoutAddress": "tz1c9HEyZdAWXZCLE7h3KcZCyykjZr7VY3QM"
   },
   "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
+    "alias": "PayTezos Payouts KT",
+    "hasLogo": true
+  },
+  "tz1c9HEyZdAWXZCLE7h3KcZCyykjZr7VY3QM": {
     "alias": "PayTezos Payouts",
     "hasLogo": true
   },
