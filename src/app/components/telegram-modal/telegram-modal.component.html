@@ -33,15 +33,16 @@
   </div>
   <form [formGroup]="form">
     <div class="form-group">
-      <input
-        formControlName="botName"
-        class="form-control"
-        placeholder="Enter a name for this address"
-      />
+      <input formControlName="botName" class="form-control" placeholder="Enter a name for this address" />
       <div *ngIf="botNameInvalid" class="text-danger">The name can have only 18 characters.</div>
     </div>
 
-    <button type="submit" class="btn btn-primary" (click)="createTelegramBot()" [ngClass]="{ disabled: !botNameControl.value }">
+    <button
+      type="submit"
+      class="btn btn-primary"
+      (click)="createTelegramBot()"
+      [ngClass]="{ disabled: !botNameControl.value || botNameInvalid }"
+    >
       Start Notifications
     </button>
   </form>
