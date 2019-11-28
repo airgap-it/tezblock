@@ -51,7 +51,7 @@ export class ApiService {
   private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
-  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -927,7 +927,7 @@ export class ApiService {
     return new Promise((resolve, reject) => {
       this.http
         .post(
-          this.frozenBalanceApiUrl,
+          this.delegatesApiUrl,
           {
             predicates: [
               {
@@ -1000,7 +1000,7 @@ export class ApiService {
 
   getActiveBakers(limit: number): Observable<Baker[]> {
     return this.http.post<Baker[]>(
-      this.frozenBalanceApiUrl,
+      this.delegatesApiUrl,
       {
         fields: [],
         predicates: [],
@@ -1014,7 +1014,7 @@ export class ApiService {
   getTotalBakersAtTheLatestBlock(): Observable<number> {
     return this.http
       .post<{ count_pkh: number }[]>(
-        this.frozenBalanceApiUrl,
+        this.delegatesApiUrl,
         {
           fields: ['pkh'],
           predicates: [],
@@ -1028,7 +1028,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(map(response => Array.isArray(response) && response.length > 0 ? response[0].count_pkh : null))
+      .pipe(map(response => (Array.isArray(response) && response.length > 0 ? response[0].count_pkh : null)))
   }
 
   getNumberOfDelegatorsByBakers(delegates: string[]): Observable<NumberOfDelegatorsByBakers[]> {
