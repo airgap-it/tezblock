@@ -201,7 +201,7 @@
                   </ul>
                 </span>
               </li>
-              <!-- TODO: unhide if switch works
+              <!-- TODO: unhide if switch works  -->
               <li class="nav-item dropdown pl-2 pl-sm-0">
                 <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
                   <a
@@ -218,20 +218,20 @@
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <li role="menuitem">
-                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
+                      <a class="dropdown-item" [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''" (click)="changeNetwork(networks.MAINNET)">
                         mainnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'babylonnet' ? 'active' : ''"
-                        (click)="changeNetwork('babylonnet')"
+                        [ngClass]="selectedNetwork === networks.BABYLONNET ? 'active' : ''"
+                        (click)="changeNetwork(networks.BABYLONNET)"
                       >
                         babylonnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'carthagenet' ? 'active' : ''"
-                        (click)="changeNetwork('carthagenet')"
+                        [ngClass]="selectedNetwork === networks.CARTHAGENET ? 'active' : ''"
+                        (click)="changeNetwork(networks.CARTHAGENET)"
                       >
                         carthagenet
                       </a>
@@ -239,7 +239,6 @@
                   </ul>
                 </span>
               </li>
-              -->
             </ul>
           </div>
         </div>
