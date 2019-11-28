@@ -20,6 +20,24 @@ export interface OperationCount {
   kind: string
 }
 
+export interface Baker {
+  pkh: string
+  block_level: number
+  delegated_balance: number
+  balance: number
+  deactivated: boolean
+  staking_balance: number
+  block_id: string
+  frozen_balance: number
+  grace_period: number
+  number_of_delegators?: number
+}
+
+export interface NumberOfDelegatorsByBakers {
+  delegate_value: string
+  number_of_delegators: number
+}
+
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
@@ -33,7 +51,7 @@ export class ApiService {
   private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
-  private readonly frozenBalanceApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -909,7 +927,7 @@ export class ApiService {
     return new Promise((resolve, reject) => {
       this.http
         .post(
-          this.frozenBalanceApiUrl,
+          this.delegatesApiUrl,
           {
             predicates: [
               {
@@ -977,6 +995,86 @@ export class ApiService {
 
           return results[0].period_kind
         })
+      )
+  }
+
+  getActiveBakers(limit: number): Observable<Baker[]> {
+    return this.http.post<Baker[]>(
+      this.delegatesApiUrl,
+      {
+        fields: [],
+        predicates: [
+          {
+            field: 'staking_balance',
+            operation: 'gt',
+            set: ['8000000000'],
+            inverse: false
+          }
+        ],
+        orderBy: [{ field: 'staking_balance', direction: 'desc' }],
+        limit
+      },
+      this.options
+    )
+  }
+
+  getTotalBakersAtTheLatestBlock(): Observable<number> {
+    return this.http
+      .post<{ count_pkh: number }[]>(
+        this.delegatesApiUrl,
+        {
+          fields: ['pkh'],
+          predicates: [
+            {
+              field: 'staking_balance',
+              operation: 'gt',
+              set: ['8000000000'],
+              inverse: false
+            }
+          ],
+          orderBy: [{ field: 'count_pkh', direction: 'desc' }],
+          aggregation: [
+            {
+              field: 'pkh',
+              function: 'count'
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(map(response => (Array.isArray(response) && response.length > 0 ? response[0].count_pkh : null)))
+  }
+
+  getNumberOfDelegatorsByBakers(delegates: string[]): Observable<NumberOfDelegatorsByBakers[]> {
+    return this.http
+      .post<any[]>(
+        this.accountsApiUrl,
+        {
+          fields: ['account_id', 'manager', 'delegate_value', 'balance'],
+          predicates: [
+            {
+              field: 'delegate_value',
+              operation: 'in',
+              set: delegates,
+              inverse: false
+            }
+          ],
+          aggregation: [
+            {
+              field: 'account_id',
+              function: 'count'
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(response =>
+          delegates.map(delegate => ({
+            delegate_value: delegate,
+            number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
+          }))
+        )
       )
   }
 }

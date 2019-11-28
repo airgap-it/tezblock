@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Observable, timer } from 'rxjs'
+import { merge, Observable, of, timer } from 'rxjs'
+import { debounceTime, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { Actions, ofType } from '@ngrx/effects'
 
 import { BaseComponent } from '@tezblock/components/base.component'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
@@ -27,11 +29,14 @@ export class ListComponent extends BaseComponent implements OnInit {
   public componentView: string | undefined
   public transactionsLoading$: Observable<boolean>
 
+  totalActiveBakers$: Observable<number>
+
   private get routeName(): string {
     return this.route.snapshot.paramMap.get('route')
   }
 
   constructor(
+    private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>
@@ -90,6 +95,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             break
           case 'double-baking':
           case 'double-endorsement':
+          case 'bakers':
             break
           default:
             throw new Error('unknown route')
@@ -105,20 +111,47 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.store$.dispatch(actions.reset())
+
+    const refresh$ = merge(
+      of(1),
+      merge(
+        this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
+        this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
+      ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
+    )
+
     switch (this.routeName) {
       case 'double-baking':
-        this.subscriptions.push(timer(0, refreshRate).subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
+        this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
         this.loading$ = this.store$.select(state => state.list.doubleBakings.loading)
         this.data$ = this.store$.select(state => state.list.doubleBakings.data)
         this.page = 'transaction'
         this.type = 'double_baking_evidence_overview'
         break
       case 'double-endorsement':
-        this.subscriptions.push(timer(0, refreshRate).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
+        this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
         this.loading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
         this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
         this.page = 'transaction'
         this.type = 'double_endorsement_evidence_overview'
+        break
+      case 'bakers':
+        this.subscriptions.push(
+          refresh$.subscribe(() => {
+            this.store$.dispatch(actions.loadActiveBakers())
+            this.store$.dispatch(actions.loadTotalActiveBakers())
+          })
+        )
+        this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
+        this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
+        this.page = 'account'
+        this.type = 'baker_overview'
+        this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
         break
     }
   }
@@ -130,6 +163,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'double-endorsement':
         this.store$.dispatch(actions.increasePageOfDoubleEndorsements())
+        break
+      case 'bakers':
+        this.store$.dispatch(actions.increasePageOfActiveBakers())
         break
       default:
         ;(this.dataService as any).loadMore()

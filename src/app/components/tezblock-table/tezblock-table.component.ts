@@ -59,7 +59,8 @@ export enum OperationTypes {
   EndorsementOverview = 'endorsement_overview',
   Rewards = 'rewards',
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
-  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
+  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview',
+  BakerOverview = 'baker_overview'
 }
 
 interface Layout {
@@ -72,6 +73,7 @@ interface Layout {
     [OperationTypes.Rewards]: Column[]
     [OperationTypes.BakingRights]: Column[]
     [OperationTypes.EndorsingRights]: Column[]
+    [OperationTypes.BakerOverview]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -217,6 +219,13 @@ const layouts: Layout = {
       { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
       { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+    ],
+    [OperationTypes.BakerOverview]: [
+      { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
+      { name: 'Balance', property: 'balance', width: '', component: AmountCellComponent },
+      { name: '# of Votes', property: 'number_of_votes', width: '' },
+      { name: 'Staking Balance', property: 'staking_balance', width: '', component: AmountCellComponent },
+      { name: '# of Delegators', property: 'number_of_delegators', width: '' }
     ]
   },
   [LayoutPages.Block]: {
