@@ -7,7 +7,7 @@ import { Baker } from '@tezblock/services/api/api.service'
 const preprocessBakersData = (bakerData: any[]) =>
   bakerData.map(bakerDataItem => ({
     ...bakerDataItem,
-    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / 8000) : null
+    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
   }))
 
 interface TableState<T> {

@@ -590,9 +590,9 @@ const layouts: Layout = {
   [LayoutPages.Baker]: {
     [OperationTypes.Overview]: [
       { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
-      { name: 'Balance', property: 'balance', width: '' },
+      { name: 'Balance', property: 'balance', width: '', component: AmountCellComponent },
       { name: '# of Votes', property: 'number_of_votes', width: '' },
-      { name: 'Staking Balance', property: 'staking_balance', width: '' },
+      { name: 'Staking Balance', property: 'staking_balance', width: '', component: AmountCellComponent },
       { name: 'Number of Delegators', property: 'number_of_delegators', width: '' }
     ]
   }
