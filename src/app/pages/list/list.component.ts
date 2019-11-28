@@ -113,10 +113,15 @@ export class ListComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     const refresh$ = merge(
       of(1),
-      this.actions$.pipe(ofType(actions.increasePageOfActiveBakers)),
-      this.actions$.pipe(ofType(actions.increasePageOfDoubleBakings)),
-      this.actions$.pipe(ofType(actions.increasePageOfDoubleEndorsements))
-    ).pipe(switchMap(() => timer(0, refreshRate)))
+      merge(
+        this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
+        this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
+      ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
+    )
 
     switch (this.routeName) {
       case 'double-baking':
