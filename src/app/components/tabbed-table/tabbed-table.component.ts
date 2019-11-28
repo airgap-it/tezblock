@@ -36,8 +36,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   set tabs(tabs: Tab[]) {
     this._tabs = tabs
 
-    this.selectedTab = tabs.find((tab, index) => tab.kind === OperationTypes.Transaction)
-    this.selectedTab.active = true
+    const selectedTab = tabs.find(tab => tab.kind === OperationTypes.Transaction)
+    this.updateSelectedTab(selectedTab)
   }
 
   get tabs() {
