@@ -30,7 +30,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   page: string = 'account'
 
-  selectedTab: Tab | undefined 
+  selectedTab: Tab | undefined
 
   @Input()
   set tabs(tabs: Tab[]) {
@@ -61,18 +61,19 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
 
   private _tabs: Tab[] | undefined = []
-  private isSelectionInitialized = false
 
   constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
     super()
   }
 
   ngOnInit() {
+    const isSet = (tab: Tab) => tab.count !== null
+
     this.subscriptions.push(
       this.dataService.actionType$
         .pipe(
           switchMap(type => this.updateTabsCounts$(type)),
-          filter(succeeded => succeeded && !this.isSelectionInitialized)
+          filter(succeeded => succeeded && !isSet(this.selectedTab))
         )
         .subscribe(() => {
           this.setInitTabSelection()
@@ -80,7 +81,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       this.activatedRoute.queryParamMap
         .pipe(
           filter(
-            queryParam => queryParam.has('tab') && this.isSelectionInitialized /* the case on page start is handled in setInitTabSelection method */
+            queryParam => queryParam.has('tab') && isSet(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
           )
         )
         .subscribe(queryParam => {
@@ -106,8 +107,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
         this.selectTab(selectedTab)
       }
-
-      this.isSelectionInitialized = true
   }
 
   onSelectTab(selectedTab: Tab) {
