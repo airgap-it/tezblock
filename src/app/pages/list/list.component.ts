@@ -95,7 +95,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             break
           case 'double-baking':
           case 'double-endorsement':
-          case 'baker':
+          case 'bakers':
             break
           default:
             throw new Error('unknown route')
@@ -140,7 +140,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.page = 'transaction'
         this.type = 'double_endorsement_evidence_overview'
         break
-      case 'baker':
+      case 'bakers':
         this.subscriptions.push(
           refresh$.subscribe(() => {
             this.store$.dispatch(actions.loadActiveBakers())
@@ -149,8 +149,8 @@ export class ListComponent extends BaseComponent implements OnInit {
         )
         this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
         this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
-        this.page = 'baker'
-        this.type = 'overview'
+        this.page = 'account'
+        this.type = 'baker_overview'
         this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
         break
     }
@@ -164,7 +164,7 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'double-endorsement':
         this.store$.dispatch(actions.increasePageOfDoubleEndorsements())
         break
-      case 'baker':
+      case 'bakers':
         this.store$.dispatch(actions.increasePageOfActiveBakers())
         break
       default:

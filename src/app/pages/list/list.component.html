@@ -30,15 +30,20 @@
           <ng-container *ngIf="type === 'double_endorsement_evidence_overview'">
             Double Endorsement Evidence
           </ng-container>
-          <ng-container *ngIf="page === 'baker'">
-            Baker
+          <ng-container *ngIf="type === 'baker_overview'">
+            Bakers
           </ng-container>
         </h5>
-        <div *ngIf="page === 'baker'" class="row">
-          <div class="col px-2 total">
-            <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
+        <div *ngIf="type === 'baker_overview'" class="row">
+          <div class="col py-3">
             <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
-              {{ totalActiveBakers }} of total bakers at the latest block
+              <h5 class="card-title__secondary mb-3 ">
+                Total Number of Bakers
+              </h5>
+              <h3>
+                {{ totalActiveBakers }}
+                <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
+              </h3>
             </ng-container>
           </div>
         </div>
