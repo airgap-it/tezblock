@@ -111,7 +111,6 @@ export class BakerTableComponent implements OnInit {
     private readonly apiService: ApiService
   ) {
     this.address = this.route.snapshot.params.id
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
     this.rightsSingleService.updateAddress(this.address)
 
     this.rights$ = this.rightsSingleService.rights$
