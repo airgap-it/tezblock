@@ -178,5 +178,6 @@ export const reducer = createReducer(
       ...state.activeBakers,
       total: null
     }
-  }))
+  })),
+  on(actions.reset, () => initialState)
 )

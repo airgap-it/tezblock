@@ -32,3 +32,5 @@ export const loadTotalActiveBakersSucceeded = createAction(
   props<{ totalActiveBakers: number }>()
 )
 export const loadTotalActiveBakersFailed = createAction(`[${featureName}] Load Total Active Bakers Failed`, props<{ error: any }>())
+
+export const reset = createAction(`[${featureName}] Reset`)

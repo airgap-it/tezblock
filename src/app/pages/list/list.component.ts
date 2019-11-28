@@ -111,6 +111,8 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.store$.dispatch(actions.reset())
+
     const refresh$ = merge(
       of(1),
       merge(
