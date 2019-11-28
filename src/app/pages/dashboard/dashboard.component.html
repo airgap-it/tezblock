@@ -58,7 +58,7 @@
               </div>
             </div>
           </div>
-          <ng-container *ngIf="!isMainnet()">
+          <ng-container *ngIf="isMainnet()">
             <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
               <div class="mb-3">
                 <h5 class="card-title__secondary mb-3 ">
@@ -103,7 +103,7 @@
   <div class="container p-0 my-5">
     <div class="row">
       <div class=" col-lg-6 mb-4 mb-lg-0">
-        <div class="card py-4 h-100">
+        <div class="card latest py-4 h-100">
           <div class="card-body p-4 ">
             <h5 class="card-title mb-4 ">
               Latest Blocks
@@ -116,7 +116,7 @@
         </div>
       </div>
       <div class=" col-lg-6 mb-4 mb-lg-0">
-        <div class="card py-4 h-100">
+        <div class="card latest py-4 h-100">
           <div class="card-body p-4">
             <h5 class="card-title mb-4 ">
               Latest Transactions
