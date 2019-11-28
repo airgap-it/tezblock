@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-import * as _ from 'lodash'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { ActivatedRoute, Router } from '@angular/router'
+import { forkJoin, Observable, of } from 'rxjs'
+import { map, switchMap, filter, catchError } from 'rxjs/operators'
 
-import { ApiService, OperationCount } from 'src/app/services/api/api.service'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
+import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
+import { BaseComponent } from '@tezblock/components/base.component'
 
 type kindType = string | string[]
 
@@ -17,146 +18,185 @@ export interface Tab {
   icon?: string[]
 }
 
+const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
+const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(tab.title) === toLowerCase(anotherTabTitle)
+
 @Component({
   selector: 'tabbed-table',
   templateUrl: './tabbed-table.component.html',
   styleUrls: ['./tabbed-table.component.scss']
 })
-export class TabbedTableComponent {
+export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
-  public page: string = 'account'
+  page: string = 'account'
 
-  private _tabs: Tab[] | undefined = []
-  public selectedTab: Tab | undefined = undefined
+  selectedTab: Tab | undefined = {
+    title: null,
+    kind: null,
+    count: 0,
+    active: false
+  }
 
   @Input()
   set tabs(tabs: Tab[]) {
     this._tabs = tabs
-    if (!this.selectedTab) {
-      this.selectedTab = tabs[0]
-    }
-    this.getTabCount(tabs)
   }
 
   get tabs() {
-    if (this._tabs) {
-      return this._tabs
-    } else {
-      return []
-    }
+    return this._tabs || []
+  }
+
+  get id(): string {
+    return this.activatedRoute.snapshot.paramMap.get('id')
   }
 
   @Input()
-  public dataService?: any // TODO: <any>
+  dataService?: TransactionSingleService // TODO: <any>
 
   @Input()
-  public data?: Observable<any> // TODO: <any>
+  data?: Observable<any> // TODO: <any>
 
   @Input()
-  public loading?: Observable<boolean>
+  loading?: Observable<boolean>
 
   @Output()
-  public readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
+  readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
 
-  constructor(private readonly apiService: ApiService, private readonly route: ActivatedRoute) {}
+  private _tabs: Tab[] | undefined = []
 
-  public getTabCount(tabs: Tab[]) {
-    const ownId: string = this.route.snapshot.params.id
+  constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
+    super()
+  }
 
-    const aggregateFunction = (info: OperationCount, field) => {
-      const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
-        Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-      let tab = tabs.find(tabArgument =>
-        Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
-      )
+  ngOnInit() {
+    const isEmpty = (tab: Tab) => !tab.title
 
-      if (info.kind === 'proposals') {
-        tab = tabs.find(isTabKindEqualTo('ballot'))
-      }
-
-      if (tab) {
-        const count = parseInt(info[`count_${field}`], 10)
-        tab.count = tab.count ? tab.count + count : count
-      }
-    }
-
-    const setFirstActiveTab = () => {
-      const firstActiveTab = this.tabs.find(tab => tab.count > 0)
-      if (firstActiveTab) {
-        this.selectTab(firstActiveTab)
-      }
-    }
-
-    if (this.page === 'transaction') {
-      const transactionPromise = this.apiService.getOperationCount('operation_group_hash', ownId).toPromise()
-
-      transactionPromise
-        .then(transactionCounts => {
-          transactionCounts.forEach(info => aggregateFunction(info, 'operation_group_hash'))
-
-          setFirstActiveTab()
-        })
-        .catch(console.error)
-    } else if (this.page === 'account') {
-      const fromPromise = this.apiService.getOperationCount('source', ownId).toPromise()
-      const toPromise = this.apiService.getOperationCount('destination', ownId).toPromise()
-      const delegatePromise = this.apiService
-        .getOperationCount('delegate', ownId)
+    this.subscriptions.push(
+      this.dataService.actionType$
         .pipe(
-          map(counts => {
-            counts.forEach(count => {
-              if (count.kind === 'origination') {
-                count.kind = 'delegation'
-              }
-            })
-
-            return counts
-          })
+          switchMap(type => this.updateTabsCounts$(type)),
+          filter(succeeded => succeeded && isEmpty(this.selectedTab))
         )
-        .toPromise()
-
-      Promise.all([fromPromise, toPromise, delegatePromise])
-        .then(([from, to, delegate]) => {
-          from.forEach(info => aggregateFunction(info, 'source'))
-          to.forEach(info => aggregateFunction(info, 'destination'))
-          delegate.forEach(info => aggregateFunction(info, 'delegate'))
-
-          setFirstActiveTab()
+        .subscribe(() => {
+          this.setInitTabSelection()
+        }),
+      this.activatedRoute.queryParamMap
+        .pipe(
+          filter(
+            queryParam => queryParam.has('tab') && !isEmpty(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
+          )
+        )
+        .subscribe(queryParam => {
+          const selectedTab = this.tabs.find(compareTabWith(queryParam.get('tab')))
+          this.selectTab(selectedTab)
         })
-        .catch(console.error)
-    } else {
-      const blockPromise = this.apiService.getOperationCount('block_level', ownId).toPromise()
-
-      blockPromise
-        .then(blockCounts => {
-          blockCounts.forEach(info => aggregateFunction(info, 'block_level'))
-
-          setFirstActiveTab()
-        })
-        .catch(console.error)
-    }
+    )
   }
 
-  public selectTab(selectedTab: Tab) {
-    const currentlySelectedTab = this.tabs.find(tab => tab.active)
-    // Don't change the tab if it's already selected
-    if (currentlySelectedTab && currentlySelectedTab.title === selectedTab.title) {
-      return
-    }
-    this.tabs.forEach(tab => (tab.active = false))
-    selectedTab.active = true
-    this.selectedTab = selectedTab
+  // on page start (after first api request)
+  setInitTabSelection() {
+      const hasData = (tab: Tab) => tab.count > 0
+      const tabNameFromQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
+      const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
+      const firstTabWithData = this.tabs.find(hasData)
+      const selectedTab = tabFromQuery || firstTabWithData
+      const defaultKind = OperationTypes.Transaction
 
-    this.tabClicked.emit(selectedTab.kind)
+      if (selectedTab) {
+        if (selectedTab.kind === defaultKind) {
+          this.updateSelectedTab(selectedTab)
+        }
+
+        this.selectTab(selectedTab)
+      }
   }
 
-  public loadMore() {
+  onSelectTab(selectedTab: Tab) {
+    this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { tab: selectedTab.title } })
+  }
+
+  loadMore() {
     if (this.dataService && this.dataService.loadMore) {
       this.dataService.loadMore()
     }
   }
 
-  public kindToOperationTypes(kind: kindType): string {
+  kindToOperationTypes(kind: kindType): string {
     return Array.isArray(kind) ? OperationTypes.Ballot : kind
+  }
+
+  private updateTabsCounts$ = (type: LayoutPages): Observable<boolean> => {
+    const resetTabsCount = () => this.tabs.forEach(tab => tab.count = 0)
+    const aggregateFunction = (info: OperationCount, field: string) => {
+      const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
+        Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
+      const tab =
+        info.kind === 'proposals'
+          ? this.tabs.find(isTabKindEqualTo('ballot'))
+          : this.tabs.find(tabArgument =>
+              Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
+            )
+  
+      if (tab) {
+        const count = parseInt(info[`count_${field}`], 10)
+        tab.count = tab.count ? tab.count + count : count
+      }
+    }
+  
+    if (type === LayoutPages.Transaction) {
+      return this.apiService.getOperationCount('operation_group_hash', this.id).pipe(
+        map(transactionCounts => {
+          resetTabsCount()
+          transactionCounts.forEach(info => aggregateFunction(info, 'operation_group_hash'))
+  
+          return true
+        }),
+        catchError(() => of(false))
+      )
+    }
+  
+    if (type === LayoutPages.Account) {
+      const from$ = this.apiService.getOperationCount('source', this.id)
+      const to$ = this.apiService.getOperationCount('destination', this.id)
+      const delegate$ = this.apiService
+        .getOperationCount('delegate', this.id)
+        .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
+  
+      return forkJoin(from$, to$, delegate$).pipe(
+        map(([from, to, delegate]) => {
+          resetTabsCount()
+          from.forEach(info => aggregateFunction(info, 'source'))
+          to.forEach(info => aggregateFunction(info, 'destination'))
+          delegate.forEach(info => aggregateFunction(info, 'delegate'))
+  
+          return true
+        }),
+        catchError(() => of(false))
+      )
+    }
+  
+    return this.apiService.getOperationCount('block_level', this.id).pipe(
+      map(blockCounts => {
+        resetTabsCount()
+        blockCounts.forEach(info => aggregateFunction(info, 'block_level'))
+  
+        return true
+      }),
+      catchError(() => of(false))
+    )
+  }
+
+  private selectTab(selectedTab: Tab) {
+    if (selectedTab.title === this.selectedTab.title) {
+      return
+    }
+
+    this.updateSelectedTab(selectedTab)
+    this.tabClicked.emit(selectedTab.kind)
+  }
+
+  private updateSelectedTab(selectedTab: Tab) {
+    this.tabs.forEach(tab => (tab.active = tab === selectedTab))
+    this.selectedTab = selectedTab
   }
 }

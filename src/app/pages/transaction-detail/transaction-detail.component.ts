@@ -11,6 +11,7 @@ import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
+import { BaseComponent } from '@tezblock/components/base.component'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -18,7 +19,7 @@ import { TransactionSingleService } from '@tezblock/services/transaction-single/
   styleUrls: ['./transaction-detail.component.scss'],
   providers: [TransactionSingleService]
 })
-export class TransactionDetailComponent implements OnInit {
+export class TransactionDetailComponent extends BaseComponent implements OnInit {
   public latestTx$: Observable<Transaction> = new Observable()
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
@@ -49,17 +50,16 @@ export class TransactionDetailComponent implements OnInit {
     private readonly copyService: CopyService,
     private readonly iconPipe: IconPipe
   ) {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    super()
   }
 
   public ngOnInit() {
-    const transactionHash = this.route.snapshot.params.id
-
-    this.transactionSingleService.updateTransactionHash(transactionHash)
-
+    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.transactions$ = this.transactionSingleService.transactions$
-    this.latestTx$ = this.transactions$.pipe(map(transactions => transactions[0]))
+    this.latestTx$ = this.transactions$.pipe(map(transactions => transactions.find((transaction, index) => index === 0)))
+    this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
+    this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
 
     /* this.totalAmount$ = this.transactions$.pipe(
       map(transactions => {
@@ -90,8 +90,10 @@ export class TransactionDetailComponent implements OnInit {
         })
       })
     )
-    this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
-    this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
+
+    this.subscriptions.push(
+      this.route.paramMap.subscribe(paramMap => this.transactionSingleService.updateTransactionHash(paramMap.get('id')))
+    )
   }
 
   public copyToClipboard(val: string) {

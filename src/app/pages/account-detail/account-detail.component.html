@@ -47,8 +47,8 @@
                 </a>
                 <div>
                   <address-item *ngIf="hasAlias" class="d-inline-flex" [address]="account.account_id" [hideIdenticon]="true"></address-item>
-                  <span *ngIf="revealed === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
-                  <span *ngIf="revealed === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">Not Revealed</span>
+                  <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
+                  <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">Not Revealed</span>
                 </div>
               </div>
             </div>
