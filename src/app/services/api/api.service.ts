@@ -1003,7 +1003,14 @@ export class ApiService {
       this.delegatesApiUrl,
       {
         fields: [],
-        predicates: [],
+        predicates: [
+          {
+            field: 'staking_balance',
+            operation: 'gt',
+            set: ['8000000000'],
+            inverse: false
+          }
+        ],
         orderBy: [{ field: 'staking_balance', direction: 'desc' }],
         limit
       },
@@ -1017,7 +1024,14 @@ export class ApiService {
         this.delegatesApiUrl,
         {
           fields: ['pkh'],
-          predicates: [],
+          predicates: [
+            {
+              field: 'staking_balance',
+              operation: 'gt',
+              set: ['8000000000'],
+              inverse: false
+            }
+          ],
           orderBy: [{ field: 'count_pkh', direction: 'desc' }],
           aggregation: [
             {
