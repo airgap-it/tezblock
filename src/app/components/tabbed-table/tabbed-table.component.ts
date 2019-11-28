@@ -18,6 +18,9 @@ export interface Tab {
   icon?: string[]
 }
 
+const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
+const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(tab.title) === toLowerCase(anotherTabTitle)
+
 @Component({
   selector: 'tabbed-table',
   templateUrl: './tabbed-table.component.html',
@@ -84,8 +87,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
           )
         )
         .subscribe(queryParam => {
-          const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
-          const selectedTab = this.tabs.find(tab => toLowerCase(tab.title) === toLowerCase(queryParam.get('tab')))
+          const selectedTab = this.tabs.find(compareTabWith(queryParam.get('tab')))
           this.selectTab(selectedTab)
         })
     )
@@ -95,7 +97,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   setInitTabSelection() {
       const hasData = (tab: Tab) => tab.count > 0
       const tabNameFromQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
-      const tabFromQuery = this.tabs.filter(hasData).find(tab => tab.title === tabNameFromQuery)
+      const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
       const firstTabWithData = this.tabs.find(hasData)
       const selectedTab = tabFromQuery || firstTabWithData
       const defaultKind = OperationTypes.Transaction
