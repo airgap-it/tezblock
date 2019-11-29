@@ -32,15 +32,15 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
     {
       title: 'Activations',
       active: false,
       kind: 'activate_account',
-      count: null,
+      count: 0,
       icon: this.iconPipe.transform('handHoldingSeedling')
     }
   ]
@@ -76,7 +76,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         })
       })
     )
-    
+
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => this.blockSingleService.updateId(paramMap.get('id'))),
 
