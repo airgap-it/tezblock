@@ -75,8 +75,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
-      map(([transactions, kind]) => transactions.filter(transaction =>
-        Array.isArray(kind) ? kind.indexOf(transaction.kind) !== -1 : transaction.kind === kind))
+      map(([transactions, kind]) =>
+        transactions.filter(transaction => (Array.isArray(kind) ? kind.indexOf(transaction.kind) !== -1 : transaction.kind === kind))
+      )
     )
 
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.latestTx$]).pipe(

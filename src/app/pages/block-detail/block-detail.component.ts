@@ -76,7 +76,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         })
       })
     )
-    
+
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => this.blockSingleService.updateId(paramMap.get('id'))),
 

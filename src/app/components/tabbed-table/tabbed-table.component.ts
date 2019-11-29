@@ -30,16 +30,14 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   page: string = 'account'
 
-  selectedTab: Tab | undefined = {
-    title: null,
-    kind: null,
-    count: 0,
-    active: false
-  }
+  selectedTab: Tab | undefined
 
   @Input()
   set tabs(tabs: Tab[]) {
     this._tabs = tabs
+
+    const selectedTab = tabs.find(tab => tab.kind === OperationTypes.Transaction)
+    this.updateSelectedTab(selectedTab)
   }
 
   get tabs() {
@@ -69,13 +67,13 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    const isEmpty = (tab: Tab) => !tab.title
+    const isSet = (tab: Tab) => tab.count !== null
 
     this.subscriptions.push(
       this.dataService.actionType$
         .pipe(
           switchMap(type => this.updateTabsCounts$(type)),
-          filter(succeeded => succeeded && isEmpty(this.selectedTab))
+          filter(succeeded => succeeded && !isSet(this.selectedTab))
         )
         .subscribe(() => {
           this.setInitTabSelection()
@@ -83,7 +81,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       this.activatedRoute.queryParamMap
         .pipe(
           filter(
-            queryParam => queryParam.has('tab') && !isEmpty(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
+            queryParam => queryParam.has('tab') && isSet(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
           )
         )
         .subscribe(queryParam => {

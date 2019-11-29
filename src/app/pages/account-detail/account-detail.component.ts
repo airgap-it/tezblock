@@ -112,10 +112,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
   ]
   public bakerTabs: Tab[] = [
-    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0, icon: this.iconPipe.transform('hatChef') },
-    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('breadLoaf') },
-    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Rewards', active: false, kind: 'rewards', count: 0, icon: this.iconPipe.transform('coin') }
+    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
+    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
+    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
   public nextPayout: Date | undefined
   public rewardAmount: number | undefined
