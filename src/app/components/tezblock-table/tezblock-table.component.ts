@@ -204,21 +204,21 @@ const layouts: Layout = {
     ],
     [OperationTypes.BakingRights]: [
       { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
       { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
       { name: 'Fees', property: '', width: '', component: AmountCellComponent },
-      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+      { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
     ],
     [OperationTypes.EndorsingRights]: [
       { name: 'Cycle', property: 'cycle', width: '' },
+      { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
       { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
       { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
       { name: 'Slot', property: 'slot', width: '' },
       { name: 'Rewards', property: '', width: '', component: AmountCellComponent },
-      { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-      { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+      { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
     ],
     [OperationTypes.BakerOverview]: [
       { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
