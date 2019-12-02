@@ -1,6 +1,6 @@
 import { isNotEmptyArray } from './fp'
 
-fdescribe('Functional Programming', () => {
+describe('Functional Programming', () => {
   it('isNotEmptyArray of null returns false', () => {
     expect(isNotEmptyArray(null)).not.toBeTruthy()
   })
