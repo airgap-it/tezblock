@@ -63,9 +63,11 @@ export class BakerTableComponent implements OnInit {
   @Input()
   set tabs(tabs: Tab[]) {
     this._tabs = tabs
+
     if (!this.selectedTab) {
-      this.selectedTab = tabs[0]
+      this.updateSelectedTab(tabs[0])
     }
+
     this.getTabCount(tabs)
   }
 
@@ -134,17 +136,16 @@ export class BakerTableComponent implements OnInit {
 
   public selectTab(selectedTab: Tab) {
     this.rightsSingleService.updateKind(selectedTab.kind)
-    this.tabs.forEach(tab => (tab.active = false))
-    selectedTab.active = true
-    this.selectedTab = selectedTab
-
+    this.updateSelectedTab(selectedTab)
     this.overviewTabClicked.emit(selectedTab.kind)
   }
+
   public goToMYTB() {
     if (this.myTBUrl) {
       window.open(this.myTBUrl, '_blank')
     }
   }
+
   public getTabCount(tabs: Tab[]) {
     let ownId: string = this.router.url
     const split = ownId.split('/')
@@ -180,11 +181,17 @@ export class BakerTableComponent implements OnInit {
         .catch(console.error)
     }
   }
+  
   public loadMoreRights(): void {
     this.rightsSingleService.loadMore()
   }
 
   public loadMoreRewards(): void {
     this.rewardSingleService.loadMore()
+  }
+
+  private updateSelectedTab(selectedTab: Tab) {
+    this.tabs.forEach(tab => (tab.active = tab === selectedTab))
+    this.selectedTab = selectedTab
   }
 }
