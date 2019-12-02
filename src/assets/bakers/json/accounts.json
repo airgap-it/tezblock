@@ -1,6 +1,11 @@
 {
   "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j": {
     "alias": "XTZ Master",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1XTZM55hF7g98CzY88MXWhmK8QioGXHtuY"
+  },
+  "tz1XTZM55hF7g98CzY88MXWhmK8QioGXHtuY": {
+    "alias": "XTZ Master Payout",
     "hasLogo": true
   },
   "tz1KtvGSYU5hdKD288a1koTBURWYuADJGrLE": {
@@ -276,6 +281,11 @@
   },
   "tz1VceyYUpq1gk5dtp6jXQRtCtY8hm5DKt72": {
     "alias": "Tezetetic",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1MR42UxXgFmxsP4iVEF8e8a7q17TPLicpt"
+  },
+  "tz1MR42UxXgFmxsP4iVEF8e8a7q17TPLicpt": {
+    "alias": "Tezetetic Payout",
     "hasLogo": true
   },
   "tz1Vd1rXpV8hTHbFXCXN3c3qzCsgcU5BZw1e": {
