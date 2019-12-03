@@ -137,7 +137,7 @@ export class ApiService {
             })
           }
 
-          // TODO: VERY BAD CODE: but hard to make better because of: addVotesForTransaction ..
+          // TODO: refactor addVotesForTransaction to accept list of transactions
           if (kindList.includes('ballot' || 'proposals')) {
             let source: Transaction[] = []
             source.push(...finalTransactions)
@@ -214,7 +214,7 @@ export class ApiService {
 
           const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
           if (votes) {
-            // TODO: VERY BAD CODE: but hard to make better because of: addVotesForTransaction ..
+            // TODO: refactor addVotesForTransaction to accept list of transactions
             finalTransactions.forEach(async transaction => {
               this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
