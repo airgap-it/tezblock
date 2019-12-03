@@ -71,7 +71,7 @@ export const reducer = createReducer(
   })),
   on(actions.slotSelected, (state, { operation_group_hash }) => ({
     ...state,
-    selectedEndorsement: _.find(state.endorsements, endorsement => endorsement.operation_group_hash === operation_group_hash),
+    selectedEndorsement: state.endorsements.find(endorsement => endorsement.operation_group_hash === operation_group_hash),
     slots: getSlots(state.endorsements, operation_group_hash)
   }))
 )

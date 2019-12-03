@@ -586,7 +586,7 @@ const layouts: Layout = {
       { name: 'Ballot', property: 'ballot', width: '' },
       { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
       { name: 'Kind', property: 'kind', width: '' },
-      { name: 'Voting Period', property: '', width: '' },
+      { name: 'Voting Period', property: 'voting_period', width: '' },
       { name: '# of Votes', property: 'votes', width: '' },
       { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
       { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
