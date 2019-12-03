@@ -8,6 +8,7 @@ import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
+import { Store } from '@ngrx/store'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -19,10 +20,14 @@ import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './actions'
+import { Busy } from './reducer'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -64,6 +69,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.getTezosBakerInfos(value, true)
+      this.setRewardAmont()
     }
   }
   private _bakerAddress: string | undefined
@@ -118,7 +124,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
   public nextPayout: Date | undefined
-  public rewardAmount: number | undefined
+  public rewardAmount$: Observable<string>
+  public remainingTime$: Observable<string>
   public myTBUrl: string | undefined
   public get address(): string {
     return this.route.snapshot.params.id
@@ -126,6 +133,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
+  public isBusy$: Observable<Busy>
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -140,7 +148,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
     private readonly rightsSingleService: RightsSingleService,
-    private readonly breakpointObserver: BreakpointObserver
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly store$: Store<fromRoot.State>,
+    private readonly cycleService: CycleService
   ) {
     super()
   }
@@ -155,6 +165,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .pipe(map(breakpointState => breakpointState.matches))
+    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
+    this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
+    this.remainingTime$ = this.cycleService.remainingTime$
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -286,6 +299,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       .catch(error => {
         this.isValidBaker = false
       })
+  }
+
+  private setRewardAmont() {
+    const delegatedAccountIsNotABaker = this.bakerAddress !== this.address
+
+    if (delegatedAccountIsNotABaker) {
+      this.store$.dispatch(actions.loadRewardAmont({ accountAddress: this.address, bakerAddress: this.bakerAddress }))
+      return
+    }
+
+    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
   }
 
   public tabSelected(tab: string) {
