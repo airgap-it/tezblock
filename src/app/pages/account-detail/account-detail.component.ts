@@ -170,9 +170,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     )
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
-    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
-      ? (this.showCurrencyPipe = true)
-      : (this.showCurrencyPipe = false)
+    this.chainNetworkService.getEnvironmentVariable() === 'mainnet' ? (this.showCurrencyPipe = true) : (this.showCurrencyPipe = false)
   }
 
   public async ngOnInit() {
