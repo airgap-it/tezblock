@@ -602,15 +602,24 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   private subscription: Subscription
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
-  public rewardspage: number = 1
+  public rewardspage: any[] = []
   public payoutsArray: any[] = []
   public returnedArray: any[] = []
+  public smallnumPages = 0
 
   public pageChanged(event: PageChangedEvent, cycle: number): void {
     const startItem = (event.page - 1) * event.itemsPerPage
     const endItem = event.page * event.itemsPerPage
 
     this.returnedArray[cycle] = this.payoutsArray[cycle].slice(startItem, endItem)
+    this.rewardspage[cycle] = event.page
+  }
+
+  public getCurrentPage(cycle: number) {
+    if (!this.rewardspage[cycle]) {
+      this.rewardspage[cycle] = 1
+    }
+    return this.rewardspage[cycle]
   }
 
   @Input()
