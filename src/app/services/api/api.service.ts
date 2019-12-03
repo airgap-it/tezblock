@@ -1,9 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
-import { Observable, of } from 'rxjs'
+import { Observable, of, pipe } from 'rxjs'
 import { map } from 'rxjs/operators'
-import { environment } from './../../../environments/environment'
 import { BakingRights } from './../../interfaces/BakingRights'
 import { EndorsingRights } from './../../interfaces/EndorsingRights'
 
@@ -13,6 +12,7 @@ import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
+import { first, get } from '@tezblock/services/fp'
 
 export interface OperationCount {
   [key: string]: string
@@ -137,6 +137,7 @@ export class ApiService {
             })
           }
 
+          // TODO: refactor addVotesForTransaction to accept list of transactions
           if (kindList.includes('ballot' || 'proposals')) {
             let source: Transaction[] = []
             source.push(...finalTransactions)
@@ -208,6 +209,15 @@ export class ApiService {
                   }
                 })
               })
+            })
+          }
+
+          const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
+          if (votes) {
+            // TODO: refactor addVotesForTransaction to accept list of transactions
+            finalTransactions.forEach(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
+              await this.addVotesForTransaction(transaction)
             })
           }
 
@@ -970,7 +980,7 @@ export class ApiService {
       this.options
     )
   }
-  public getVotingPeriod(block_level: any): Observable<string> {
+  public getVotingPeriod(block_level: number): Observable<string> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -988,13 +998,12 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(results => {
-          results.map(item => {
-            return item.period_kind
-          })
-
-          return results[0].period_kind
-        })
+        map(
+          pipe(
+            first,
+            get(_first => _first.period_kind)
+          )
+        )
       )
   }
 
