@@ -710,10 +710,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         const cellType = this.config[i % this.config.length]
 
-        // let ownId: string = this.router.url
-        // const split = ownId.split('/')
-        // ownId = split.slice(-1).pop()
-
         const data = (this.transactions[Math.floor(i / this.config.length)] as any)[cellType.property]
 
         const widgetComponent = this.componentFactoryResolver.resolveComponentFactory(
