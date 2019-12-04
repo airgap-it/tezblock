@@ -58,11 +58,11 @@
                       <input
                         class="form-control form-control--focus-white"
                         placeholder="Filter by Address"
-                        [(ngModel)]="filterTerm"
-                        (keydown.enter)="filterTransactions(filterTerm)"
+                        [formControl]="filterTerm"
+                        (keydown.enter)="filterTransactions()"
                       />
                       <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" (click)="filterTransactions(filterTerm)">
+                        <button class="btn btn-primary" type="submit" (click)="filterTransactions()">
                           <fa-icon [icon]="'search' | iconPipe" class="text-white d-inline-block d-sm-none"></fa-icon>
                           <span class="d-none d-sm-inline-block">Filter</span>
                         </button>

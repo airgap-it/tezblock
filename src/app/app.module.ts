@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { FormsModule /* TODO: remove (in search-item.component, tezblock-table.component) */, ReactiveFormsModule } from '@angular/forms'
+import { ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { EffectsModule } from '@ngrx/effects'
@@ -65,6 +65,7 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
+import { StorageModule } from '@ngx-pwa/local-storage';
 
 @NgModule({
   imports: [
@@ -81,7 +82,6 @@ import { ListEffects } from './pages/list/effects'
       preventDuplicates: true
     }),
     CollapseModule.forRoot(),
-    FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
@@ -100,7 +100,8 @@ import { ListEffects } from './pages/list/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects]),
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,
