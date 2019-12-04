@@ -102,6 +102,8 @@
                         [boundaryLinks]="true"
                         [rotate]="true"
                         [maxSize]="5"
+                        [nextText]="'>'"
+                        [previousText]="'<'"
                         [(ngModel)]="rewardspage[transaction.cycle]"
                         (numPages)="smallnumPages = $event"
                       ></pagination>
