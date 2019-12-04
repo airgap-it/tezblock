@@ -50,14 +50,14 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     })
   }
 
-  onKeyEnter(searchTerm: string) {
+  onKeyEnter() {
     this.subscriptions.push(
       this.dataSource$.subscribe((val: TypeAheadObject[]) => {
-        if (val.length > 0 && val[0].name !== searchTerm) {
+        if (val.length > 0 && val[0].name !== this.searchControl.value) {
           // there are typeahead suggestions. upon hitting enter, we first autocomplete the suggestion
           return
         } else {
-          this.search(searchTerm)
+          this.search(this.searchControl.value)
         }
       })
     )
