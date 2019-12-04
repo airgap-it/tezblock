@@ -101,14 +101,10 @@
                         (pageChanged)="pageChanged($event, transaction.cycle)"
                         [boundaryLinks]="true"
                         [rotate]="true"
-                        [maxSize]="0"
+                        [maxSize]="5"
                         [(ngModel)]="rewardspage[transaction.cycle]"
                         (numPages)="smallnumPages = $event"
                       ></pagination>
-                      <pre class="card card-block card-header ">
-                        Page {{ getCurrentPage(transaction.cycle) }} of {{ smallnumPages }} 
-                        </pre
-                      >
                     </div>
                   </div>
                 </td>
