@@ -11,7 +11,7 @@ import {
   ViewChildren,
   ViewContainerRef
 } from '@angular/core'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
 
 import { Transaction } from '../../interfaces/Transaction'
@@ -663,7 +663,11 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 
-  constructor(private readonly componentFactoryResolver: ComponentFactoryResolver, public readonly router: Router) {}
+  constructor(
+    private readonly componentFactoryResolver: ComponentFactoryResolver,
+    public readonly router: Router,
+    private readonly activatedRoute: ActivatedRoute
+  ) {}
 
   public ngAfterViewInit() {
     if (this.cells) {
@@ -706,10 +710,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         const cellType = this.config[i % this.config.length]
 
-        let ownId: string = this.router.url
-        const split = ownId.split('/')
-        ownId = split.slice(-1).pop()
-
         const data = (this.transactions[Math.floor(i / this.config.length)] as any)[cellType.property]
 
         const widgetComponent = this.componentFactoryResolver.resolveComponentFactory(
@@ -726,7 +726,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         if (options) {
           if (options.pageId) {
-            options.pageId = ownId
+            options.pageId = this.activatedRoute.snapshot.paramMap.get('id')
           }
           cmpRef.instance.options = options
           if (options.pageId) {
