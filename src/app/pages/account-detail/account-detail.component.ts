@@ -69,7 +69,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.getTezosBakerInfos(value, true)
-      this.setRewardAmont()
     }
   }
   private _bakerAddress: string | undefined
@@ -134,6 +133,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
   public isBusy$: Observable<Busy>
+  private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -192,8 +192,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           } else if (delegatedAccounts.length > 0) {
             this.delegatedAccountAddress = delegatedAccounts[0].account_id
             this.bakerAddress = delegatedAccounts[0].delegate_value
-
             this.delegatedAmount = delegatedAccounts[0].balance
+            this.setRewardAmont()
           } else {
             this.delegatedAccountAddress = ''
           }
@@ -305,7 +305,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     const delegatedAccountIsNotABaker = this.bakerAddress !== this.address
 
     if (delegatedAccountIsNotABaker) {
-      this.store$.dispatch(actions.loadRewardAmont({ accountAddress: this.address, bakerAddress: this.bakerAddress }))
+      const notHandled = this.rewardAmountSetFor.account !== this.address || this.rewardAmountSetFor.baker !== this.bakerAddress
+
+      if (notHandled) {
+        this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
+        this.store$.dispatch(actions.loadRewardAmont({ accountAddress: this.address, bakerAddress: this.bakerAddress }))
+      }
+      
       return
     }
 
