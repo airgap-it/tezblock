@@ -699,5 +699,9 @@
   "tz1RSWMYKGAykpizFteowByYMueCYv9TMn1L": {
     "alias": "Tezos Alliance",
     "hasLogo": true
+  },
+  "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2": {
+    "alias": "Binance",
+    "hasLogo": true
   }
 }
