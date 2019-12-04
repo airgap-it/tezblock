@@ -12,6 +12,7 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -54,9 +55,7 @@ export class TransactionDetailComponent implements OnInit {
     public readonly chainNetworkService: ChainNetworkService
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
-      ? (this.showCurrencyPipe = true)
-      : (this.showCurrencyPipe = false)
+    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {

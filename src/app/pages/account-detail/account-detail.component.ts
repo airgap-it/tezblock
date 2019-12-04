@@ -21,7 +21,7 @@ import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -170,7 +170,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     )
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
-    this.chainNetworkService.getEnvironmentVariable() === 'mainnet' ? (this.showCurrencyPipe = true) : (this.showCurrencyPipe = false)
+    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public async ngOnInit() {

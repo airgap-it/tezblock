@@ -12,6 +12,7 @@ import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Component({
   selector: 'app-block-detail',
@@ -60,9 +61,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.blockLoading$ = this.blockSingleService.loading$
-    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
-      ? (this.showCurrencyPipe = true)
-      : (this.showCurrencyPipe = false)
+    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {
