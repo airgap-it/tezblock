@@ -16,6 +16,7 @@ import { AmountConverterPipe } from './../../pipes/amount-converter/amount-conve
 import { TransactionDetailComponent } from './transaction-detail.component'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -28,7 +29,15 @@ describe('TransactionDetailComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [AmountConverterPipe, TabsetConfig, BsModalService, ToastrService],
-        imports: [MomentModule, FontAwesomeModule, TabsModule, TooltipModule, ModalModule.forRoot(), ToastrModule.forRoot()],
+        imports: [
+          MomentModule,
+          FontAwesomeModule,
+          TabsModule,
+          TooltipModule,
+          ModalModule.forRoot(),
+          ToastrModule.forRoot(),
+          PaginationModule
+        ],
         declarations: [
           TransactionDetailComponent,
           TabbedTableComponent,
