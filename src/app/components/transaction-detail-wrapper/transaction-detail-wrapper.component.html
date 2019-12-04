@@ -68,7 +68,7 @@
                 "
               ></span>
               ꜩ
-              <ng-container *ngIf="showCurrencyPipe">
+              <ng-container *ngIf="isMainnet">
                 <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
                   <span class="badge badge-pill badge-primary-light ml-1">
                     {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
@@ -107,7 +107,7 @@
                 "
               ></span>
               ꜩ
-              <ng-container *ngIf="showCurrencyPipe">
+              <ng-container *ngIf="isMainnet">
                 <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
                   <span class="badge badge-pill badge-primary-light ml-1">
                     {{ 1 | currencySymbol: { currInfo: fiatInfo } }}

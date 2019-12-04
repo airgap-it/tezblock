@@ -128,7 +128,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
-  public showCurrencyPipe: boolean
+  public isMainnet: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -170,7 +170,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     )
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
-    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public async ngOnInit() {

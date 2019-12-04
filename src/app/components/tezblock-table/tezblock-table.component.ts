@@ -26,6 +26,7 @@ import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
 import { ModalCellComponent } from './modal-cell/modal-cell.component'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 interface Column {
   name: string
@@ -664,7 +665,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public backupTransactions: Transaction[] = []
   public rewardspage: number = 1
   private pageArray: number[] = []
-  public showCurrencyPipe: boolean = false
+  public isMainnet: boolean = false
 
   public getPageNumber(cycle: number) {
     if (this.pageArray[cycle]) {
@@ -721,9 +722,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
     public readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService
   ) {
-    this.chainNetworkService.getEnvironment().targetUrl === 'https://tezblock.io'
-      ? (this.showCurrencyPipe = true)
-      : (this.showCurrencyPipe = false)
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngAfterViewInit() {
@@ -800,7 +799,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
   public ngOnChanges() {
     if (this.page && this.type) {
-      const layouts = getLayouts(this.showCurrencyPipe)
+      const layouts = getLayouts(this.isMainnet)
       if (layouts[this.page][this.type]) {
         this.config = layouts[this.page][this.type]
       } else {

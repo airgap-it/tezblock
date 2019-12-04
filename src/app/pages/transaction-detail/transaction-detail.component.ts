@@ -43,7 +43,7 @@ export class TransactionDetailComponent implements OnInit {
   public transactionsLoading$: Observable<boolean> = new Observable()
   public transactions$: Observable<Transaction[]> = new Observable()
   public filteredTransactions$: Observable<Transaction[]> = new Observable()
-  public showCurrencyPipe: boolean
+  public isMainnet: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -55,7 +55,7 @@ export class TransactionDetailComponent implements OnInit {
     public readonly chainNetworkService: ChainNetworkService
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {

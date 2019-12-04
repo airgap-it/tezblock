@@ -28,7 +28,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   public blockLoading$: Observable<boolean> | undefined
 
   @Input()
-  public showCurrencyPipe: boolean = true
+  public isMainnet: boolean = true
 
   constructor(private readonly route: ActivatedRoute) {}
 

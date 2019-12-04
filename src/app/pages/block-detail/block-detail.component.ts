@@ -47,7 +47,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
   ]
 
   private readonly subscriptions: Subscription = new Subscription()
-  public showCurrencyPipe: boolean
+  public isMainnet: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -61,7 +61,7 @@ export class BlockDetailComponent implements OnInit, OnDestroy {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.blockLoading$ = this.blockSingleService.loading$
-    this.showCurrencyPipe = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {

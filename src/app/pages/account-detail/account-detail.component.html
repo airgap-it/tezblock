@@ -79,7 +79,7 @@
             </div>
 
             <div class="row mb-3">
-              <ng-container *ngIf="showCurrencyPipe">
+              <ng-container *ngIf="isMainnet">
                 <div class=" col-md-2 pr-0">
                   <p class="text-secondary mb-0">Value</p>
                 </div>
@@ -192,7 +192,7 @@
                       "
                     ></span>
                     ꜩ
-                    <ng-container *ngIf="showCurrencyPipe">
+                    <ng-container *ngIf="isMainnet">
                       <span class="badge badge-pill badge-primary-light ml-1">
                         {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
                         }}{{
