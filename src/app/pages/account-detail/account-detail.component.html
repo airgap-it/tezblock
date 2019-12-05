@@ -207,13 +207,15 @@
                 </div>
                 <div class="col-md-7">
                   <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
                       <ng-container *ngIf="rewardAmount$ | async">
-                          {{ remainingTime$ | async }}
+                        {{ remainingTime$ | async }}
                       </ng-container>
                       <ng-container *ngIf="(rewardAmount$ | async) === null">
                         not available
                       </ng-container>
+                    </ng-container>
                   </p>
                 </div>
               </div>
@@ -224,9 +226,11 @@
                 <div class="col col-md-7">
                   <p class="mb-0">
                     <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                    <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
-                    <ng-container *ngIf="(rewardAmount$ | async) === null">
-                      not available
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                      <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
+                      <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        not available
+                      </ng-container>
                     </ng-container>
                   </p>
                 </div>
