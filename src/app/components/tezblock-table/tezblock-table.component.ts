@@ -11,7 +11,7 @@ import {
   ViewChildren,
   ViewContainerRef
 } from '@angular/core'
-import { Router } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
 
 import { Transaction } from '../../interfaces/Transaction'
@@ -27,6 +27,7 @@ import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.componen
 import { ModalCellComponent } from './modal-cell/modal-cell.component'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
 interface Column {
   name: string
@@ -38,7 +39,7 @@ interface Column {
   transform?(value: any): any
 }
 
-enum LayoutPages {
+export enum LayoutPages {
   Account = 'account',
   Block = 'block',
   Transaction = 'transaction'
@@ -61,7 +62,8 @@ export enum OperationTypes {
   EndorsementOverview = 'endorsement_overview',
   Rewards = 'rewards',
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
-  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview'
+  DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview',
+  BakerOverview = 'baker_overview'
 }
 
 interface Layout {
@@ -74,6 +76,7 @@ interface Layout {
     [OperationTypes.Rewards]: Column[]
     [OperationTypes.BakingRights]: Column[]
     [OperationTypes.EndorsingRights]: Column[]
+    [OperationTypes.BakerOverview]: Column[]
   }
   [LayoutPages.Block]: {
     [OperationTypes.Transaction]: Column[]
@@ -109,13 +112,7 @@ function getLayouts(showFiat: boolean = true): Layout {
   return {
     [LayoutPages.Account]: {
       [OperationTypes.Transaction]: [
-        {
-          name: 'From',
-          property: 'source',
-          width: '1',
-          component: AddressCellComponent,
-          options: { showFullAddress: false, pageId: 'oo' }
-        },
+        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -125,13 +122,7 @@ function getLayouts(showFiat: boolean = true): Layout {
           options: { showFullAddress: false, pageId: 'oo' }
         },
         { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
-        {
-          name: 'Amount',
-          property: 'amount',
-          width: '',
-          component: AmountCellComponent,
-          options: { showFiatValue: showFiat }
-        },
+        { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
         ...baseTx
       ],
@@ -209,58 +200,41 @@ function getLayouts(showFiat: boolean = true): Layout {
           component: PlainValueCellComponent,
           transform: (addresses: [string]): number => addresses.length
         },
-        {
-          name: 'Staking Balance',
-          property: 'stakingBalance',
-          width: '',
-          component: AmountCellComponent,
-          options: { showFiatValue: showFiat }
-        },
-        {
-          name: 'Block Rewards',
-          property: 'bakingRewards',
-          width: '',
-          component: AmountCellComponent,
-          options: { showFiatValue: showFiat }
-        },
-        {
-          name: 'Endorsement Rewards',
-          property: 'endorsingRewards',
-          width: '',
-          component: AmountCellComponent,
-          options: { showFiatValue: showFiat }
-        },
+        { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
       [OperationTypes.BakingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
+        { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
         { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
         { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
         { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fees', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-        { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+        { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
       ],
       [OperationTypes.EndorsingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
+        { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
         { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
         { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
         { name: 'Slot', property: 'slot', width: '' },
         { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Time', property: 'estimated_time', width: '', component: TimestampCellComponent },
-        { name: 'Block Hash', property: 'block_hash', width: '', component: HashCellComponent }
+        { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
+      ],
+      [OperationTypes.BakerOverview]: [
+        { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
+        { name: 'Balance', property: 'balance', width: '', component: AmountCellComponent },
+        { name: '# of Votes', property: 'number_of_votes', width: '' },
+        { name: 'Staking Balance', property: 'staking_balance', width: '', component: AmountCellComponent },
+        { name: '# of Delegators', property: 'number_of_delegators', width: '' }
       ]
     },
     [LayoutPages.Block]: {
       [OperationTypes.Transaction]: [
-        {
-          name: 'From',
-          property: 'source',
-          width: '1',
-          component: AddressCellComponent,
-          options: { showFullAddress: false, pageId: 'oo' }
-        },
+        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -275,13 +249,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
       ],
       [OperationTypes.Overview]: [
-        {
-          name: 'Baker',
-          property: 'baker',
-          width: '1',
-          component: AddressCellComponent,
-          options: { showFullAddress: false, pageId: 'oo' }
-        },
+        { name: 'Baker', property: 'baker', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
         { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
         { name: 'Transaction Volume', property: 'volume', width: '', component: AmountCellComponent },
         { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -366,13 +334,7 @@ function getLayouts(showFiat: boolean = true): Layout {
     },
     [LayoutPages.Transaction]: {
       [OperationTypes.Transaction]: [
-        {
-          name: 'From',
-          property: 'source',
-          width: '1',
-          component: AddressCellComponent,
-          options: { showFullAddress: false, pageId: 'oo' }
-        },
+        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -390,13 +352,7 @@ function getLayouts(showFiat: boolean = true): Layout {
       ],
 
       [OperationTypes.Overview]: [
-        {
-          name: 'From',
-          property: 'source',
-          width: '1',
-          component: AddressCellComponent,
-          options: { showFullAddress: false, pageId: 'oo' }
-        },
+        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -638,7 +594,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Ballot', property: 'ballot', width: '' },
         { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
         { name: 'Kind', property: 'kind', width: '' },
-        { name: 'Voting Period', property: '', width: '' },
+        { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
         { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
         { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
@@ -663,26 +619,29 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   private subscription: Subscription
   public filterTerm: string | undefined
   public backupTransactions: Transaction[] = []
-  public rewardspage: number = 1
-  private pageArray: number[] = []
+  public rewardspage: any[] = []
+  public payoutsArray: any[] = []
+  public returnedArray: any[] = []
+  public smallnumPages = 0
   public isMainnet: boolean = false
 
-  public getPageNumber(cycle: number) {
-    if (this.pageArray[cycle]) {
-      return this.pageArray[cycle]
-    } else {
-      this.setPageNumber(cycle, 1)
-      return 1
-    }
+  public pageChanged(event: PageChangedEvent, cycle: number): void {
+    const startItem = (event.page - 1) * event.itemsPerPage
+    const endItem = event.page * event.itemsPerPage
+
+    this.returnedArray[cycle] = this.payoutsArray[cycle].slice(startItem, endItem)
+    this.rewardspage[cycle] = event.page
   }
 
-  public setPageNumber(cycle: number, page: number) {
-    this.pageArray[cycle] = page
+  public getCurrentPage(cycle: number) {
+    if (!this.rewardspage[cycle]) {
+      this.rewardspage[cycle] = 1
+    }
+    return this.rewardspage[cycle]
   }
 
   @Input()
   set data(value: Observable<Transaction[]> | undefined) {
-    // this.pageArray[192]=1
     if (value) {
       if (this.subscription) {
         this.subscription.unsubscribe()
@@ -691,6 +650,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
       this.subscription = this.transactions$.subscribe(transactions => {
         this.backupTransactions = transactions
         this.transactions = transactions
+        transactions.forEach(transaction => {
+          if (transaction.payouts) {
+            this.payoutsArray[transaction.cycle] = transaction.payouts
+            this.returnedArray[transaction.cycle] = transaction.payouts.slice(0, 10)
+          }
+        })
       })
     }
   }
@@ -720,7 +685,8 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver,
     public readonly router: Router,
-    private readonly chainNetworkService: ChainNetworkService
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly activatedRoute: ActivatedRoute
   ) {
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
@@ -766,10 +732,6 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         const cellType = this.config[i % this.config.length]
 
-        let ownId: string = this.router.url
-        const split = ownId.split('/')
-        ownId = split.slice(-1).pop()
-
         const data = (this.transactions[Math.floor(i / this.config.length)] as any)[cellType.property]
 
         const widgetComponent = this.componentFactoryResolver.resolveComponentFactory(
@@ -786,7 +748,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
 
         if (options) {
           if (options.pageId) {
-            options.pageId = ownId
+            options.pageId = this.activatedRoute.snapshot.paramMap.get('id')
           }
           cmpRef.instance.options = options
           if (options.pageId) {

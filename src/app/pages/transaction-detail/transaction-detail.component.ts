@@ -13,6 +13,7 @@ import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-pri
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { BaseComponent } from '@tezblock/components/base.component'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -20,7 +21,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
   styleUrls: ['./transaction-detail.component.scss'],
   providers: [TransactionSingleService]
 })
-export class TransactionDetailComponent implements OnInit {
+export class TransactionDetailComponent extends BaseComponent implements OnInit {
   public latestTx$: Observable<Transaction> = new Observable()
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
@@ -31,12 +32,12 @@ export class TransactionDetailComponent implements OnInit {
   public totalFee$: Observable<BigNumber> = new Observable()
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Reveals', active: false, kind: 'reveal', count: 0, icon: this.iconPipe.transform('eye') },
-    { title: 'Activations', active: false, kind: 'activate_account', count: 0, icon: this.iconPipe.transform('handHoldingSeedling') },
-    { title: 'Votes', active: false, kind: ['ballot', 'proposals'], count: 0, icon: this.iconPipe.transform('boxBallot') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
+    { title: 'Reveals', active: false, kind: 'reveal', count: null, icon: this.iconPipe.transform('eye') },
+    { title: 'Activations', active: false, kind: 'activate_account', count: null, icon: this.iconPipe.transform('handHoldingSeedling') },
+    { title: 'Votes', active: false, kind: ['ballot', 'proposals'], count: null, icon: this.iconPipe.transform('boxBallot') }
   ]
 
   private readonly kind$ = new BehaviorSubject(this.tabs[0].kind)
@@ -54,18 +55,17 @@ export class TransactionDetailComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     public readonly chainNetworkService: ChainNetworkService
   ) {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    super()
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {
-    const transactionHash = this.route.snapshot.params.id
-
-    this.transactionSingleService.updateTransactionHash(transactionHash)
-
+    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.transactionSingleService.loading$
     this.transactions$ = this.transactionSingleService.transactions$
-    this.latestTx$ = this.transactions$.pipe(map(transactions => transactions[0]))
+    this.latestTx$ = this.transactions$.pipe(map(transactions => transactions.find((transaction, index) => index === 0)))
+    this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
+    this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
 
     /* this.totalAmount$ = this.transactions$.pipe(
       map(transactions => {
@@ -97,8 +97,10 @@ export class TransactionDetailComponent implements OnInit {
         })
       })
     )
-    this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
-    this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
+
+    this.subscriptions.push(
+      this.route.paramMap.subscribe(paramMap => this.transactionSingleService.updateTransactionHash(paramMap.get('id')))
+    )
   }
 
   public copyToClipboard(val: string) {

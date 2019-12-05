@@ -35,15 +35,16 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   }
 
   ngOnInit() {
-    this.store$.dispatch(actions.reset({ id: this.id }))
-
     this.endorsements$ = this.store$.select(state => state.endorsementDetails.endorsements)
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
 
     this.subscriptions.push(
-      this.activatedRoute.params.subscribe(params => {
-        this.store$.dispatch(actions.loadEndorsementDetails({ id: params.id }))
+      this.activatedRoute.paramMap.subscribe(paramMap => {
+        const id = paramMap.get('id')
+
+        this.store$.dispatch(actions.reset({ id }))
+        this.store$.dispatch(actions.loadEndorsementDetails({ id }))
       }),
       timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
     )

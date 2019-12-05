@@ -31,6 +31,10 @@
       box-shadow: none;
     }
   }
+  /* fixes css overwrite for adding "active" class with [ngClass] */
+  .dropdown-item.active {
+    color: #fff !important;
+  }
 
   /*!
    * Hamburgers
