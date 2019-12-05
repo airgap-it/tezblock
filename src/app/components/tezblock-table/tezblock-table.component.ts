@@ -112,7 +112,13 @@ function getLayouts(showFiat: boolean = true): Layout {
   return {
     [LayoutPages.Account]: {
       [OperationTypes.Transaction]: [
-        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+        {
+          name: 'From',
+          property: 'source',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -200,9 +206,27 @@ function getLayouts(showFiat: boolean = true): Layout {
           component: PlainValueCellComponent,
           transform: (addresses: [string]): number => addresses.length
         },
-        { name: 'Staking Balance', property: 'stakingBalance', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Block Rewards', property: 'bakingRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Endorsement Rewards', property: 'endorsingRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        {
+          name: 'Staking Balance',
+          property: 'stakingBalance',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
+        {
+          name: 'Block Rewards',
+          property: 'bakingRewards',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
+        {
+          name: 'Endorsement Rewards',
+          property: 'endorsingRewards',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
         { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
@@ -213,7 +237,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
         { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fees', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
+        { name: 'Deposits', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } }
       ],
       [OperationTypes.EndorsingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
@@ -222,7 +246,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
         { name: 'Slot', property: 'slot', width: '' },
         { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Deposits', property: '', width: '', component: AmountCellComponent }
+        { name: 'Deposits', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } }
       ],
       [OperationTypes.BakerOverview]: [
         { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },
@@ -234,7 +258,13 @@ function getLayouts(showFiat: boolean = true): Layout {
     },
     [LayoutPages.Block]: {
       [OperationTypes.Transaction]: [
-        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+        {
+          name: 'From',
+          property: 'source',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -249,7 +279,13 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
       ],
       [OperationTypes.Overview]: [
-        { name: 'Baker', property: 'baker', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+        {
+          name: 'Baker',
+          property: 'baker',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
         { name: 'Age', property: 'timestamp', width: '', component: TimestampCellComponent },
         { name: 'Transaction Volume', property: 'volume', width: '', component: AmountCellComponent },
         { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
@@ -334,7 +370,13 @@ function getLayouts(showFiat: boolean = true): Layout {
     },
     [LayoutPages.Transaction]: {
       [OperationTypes.Transaction]: [
-        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+        {
+          name: 'From',
+          property: 'source',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
@@ -352,7 +394,13 @@ function getLayouts(showFiat: boolean = true): Layout {
       ],
 
       [OperationTypes.Overview]: [
-        { name: 'From', property: 'source', width: '1', component: AddressCellComponent, options: { showFullAddress: false, pageId: 'oo' } },
+        {
+          name: 'From',
+          property: 'source',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
         { name: '', property: 'applied', width: '1', component: SymbolCellComponent },
         {
           name: 'To',
