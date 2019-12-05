@@ -315,6 +315,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       return
     }
 
+    this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
     this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
   }
 
