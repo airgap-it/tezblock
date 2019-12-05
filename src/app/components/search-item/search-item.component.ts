@@ -9,6 +9,8 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import { TypeAheadObject } from '@tezblock/interfaces/TypeAheadObject'
 import { SearchService } from 'src/app/services/search/search.service'
 
+const toPreviousOption = value => ({ name: value, type: 'Previous' })
+
 @Component({
   selector: 'app-search-item',
   templateUrl: './search-item.component.html',
@@ -22,7 +24,13 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   dataEmitter: EventEmitter<any[]> = new EventEmitter<any[]>()
   searchControl: FormControl
   dataSource$: Observable<any>
-  dataSourceSnapshot = []
+  get dataSourceSnapshot(): any[] {
+    return this._dataSourceSnapshot || []
+  }
+  set dataSourceSnapshot(value: any[]) {
+    this._dataSourceSnapshot = value
+  }
+  private _dataSourceSnapshot: any[]
   private isValueChangedBySelect = false
 
   constructor(private readonly apiService: ApiService, private readonly searchService: SearchService) {
@@ -30,10 +38,14 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    const initialSearchGreaterThanOneCharacter = value => (this._dataSourceSnapshot ? true : value && value.length > 1)
+    const takeFromArray = (count: number) => (data: any[]) => data.slice(0, count)
+
     this.searchControl = new FormControl('')
 
     this.dataSource$ = this.searchControl.valueChanges.pipe(
-      debounceTime(500),
+      debounceTime(500), // breaks typeahead somehow ... :/, thats why dataEmitter is introduced (handy for previous feature)
+      filter(initialSearchGreaterThanOneCharacter),
       filter(this.skipValueSetBySelects.bind(this)),
       switchMap(token =>
         race([
@@ -44,10 +56,27 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       )
     )
 
-    this.dataSource$.pipe(map((data: any[]) => data.slice(0, 5))).subscribe(data => {
-      this.dataEmitter.emit(data)
-      this.dataSourceSnapshot = data || []
-    })
+    this.dataSource$
+      .pipe(
+        map(takeFromArray(5)),
+        switchMap(data =>
+          this.searchService.getPreviousSearches().pipe(
+            map(previousSearches => {
+              const value = this.searchControl.value ? this.searchControl.value.toLowerCase() : null
+              const matches = previousSearches
+                .filter(previousItem => (value ? previousItem.toLowerCase().indexOf(value) !== -1 : false))
+                .filter(previousItem => !data.some(dataItem => dataItem.name === previousItem))
+                .map(toPreviousOption)
+
+              return data.concat(matches)
+            })
+          )
+        )
+      )
+      .subscribe(data => {
+        this.dataEmitter.emit(data)
+        this.dataSourceSnapshot = data || []
+      })
   }
 
   onKeyEnter(searchTerm: string) {
@@ -89,10 +118,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       .subscribe(previousSearches => {
         const previousSearchesOptions = previousSearches
           .filter(previousSearche => this.dataSourceSnapshot.map(optionToName).indexOf(previousSearche) === -1)
-          .map(previousSearche => ({
-            name: previousSearche,
-            type: 'Previous'
-          }))
+          .map(toPreviousOption)
 
         this.dataEmitter.emit(this.dataSourceSnapshot.concat(previousSearchesOptions))
       })
