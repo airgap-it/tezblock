@@ -1,4 +1,9 @@
 ::ng-deep header-item {
+  @media (min-width: 576px) {
+    .navbar-nav {
+      align-items: center;
+    }
+  }
   .mega-dropdown {
     position: unset;
   }
@@ -25,6 +30,10 @@
       border: none;
       box-shadow: none;
     }
+  }
+  /* fixes css overwrite for adding "active" class with [ngClass] */
+  .dropdown-item.active {
+    color: #fff !important;
   }
 
   /*!

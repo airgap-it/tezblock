@@ -1,9 +1,11 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { FormsModule } from '@angular/forms'
+import { FormsModule /* TODO: remove (in search-item.component, tezblock-table.component) */, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { EffectsModule } from '@ngrx/effects'
+import { StoreModule } from '@ngrx/store'
 import { QRCodeModule } from 'angularx-qrcode'
 import { ChartsModule } from 'ng2-charts'
 import { AlertModule, BsDropdownModule, BsModalService, CollapseModule, SortableModule, TooltipModule } from 'ngx-bootstrap'
@@ -16,8 +18,10 @@ import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
+import { AppEffects } from './app.effects'
 import { AccountItemComponent } from './components/account-item/account-item.component'
 import { AddressItemComponent } from './components/address-item/address-item.component'
+import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { BlockDetailWrapperComponent } from './components/block-detail-wrapper/block-detail-wrapper.component'
 import { BlockItemComponent } from './components/block-item/block-item.component'
 import { FooterComponent } from './components/footer/footer.component'
@@ -27,11 +31,15 @@ import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-
 import { PricechartItemComponent } from './components/pricechart-item/pricechart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
+import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
 import { TabbedTableComponent } from './components/tabbed-table/tabbed-table.component'
+import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
 import { AddressCellComponent } from './components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from './components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from './components/tezblock-table/block-cell/block-cell.component'
+import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
 import { HashCellComponent } from './components/tezblock-table/hash-cell/hash-cell.component'
+import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
@@ -42,18 +50,20 @@ import { addFontAwesome } from './fa-add'
 import { AccountDetailComponent } from './pages/account-detail/account-detail.component'
 import { BlockDetailComponent } from './pages/block-detail/block-detail.component'
 import { DashboardComponent } from './pages/dashboard/dashboard.component'
+import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
+import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
 import { ListComponent } from './pages/list/list.component'
+import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
+import { metaReducers, ROOT_REDUCERS } from './reducers'
 import { BakingService } from './services/baking/baking.service'
 import { BlockService } from './services/blocks/blocks.service'
+import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { BakerTableComponent } from './components/baker-table/baker-table.component'
-import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
-import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
-import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component';
-import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
+import { SearchItemComponent } from './components/search-item/search-item.component'
+import { ListEffects } from './pages/list/effects'
 
 @NgModule({
   imports: [
@@ -71,6 +81,7 @@ import { ResourcesWalletItemComponent } from './components/resources-wallet-item
     }),
     CollapseModule.forRoot(),
     FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
     PipesModule,
@@ -79,7 +90,15 @@ import { ResourcesWalletItemComponent } from './components/resources-wallet-item
     QRCodeModule,
     ModalModule.forRoot(),
     FontAwesomeModule,
-    ChartsModule
+    ChartsModule,
+    StoreModule.forRoot(ROOT_REDUCERS, {
+      metaReducers,
+      runtimeChecks: {
+        strictStateImmutability: true,
+        strictActionImmutability: true
+      }
+    }),
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
   ],
   declarations: [
     AppComponent,
@@ -114,10 +133,13 @@ import { ResourcesWalletItemComponent } from './components/resources-wallet-item
     BakerTableComponent,
     ResourcesWalletsComponent,
     ExtendTableCellComponent,
-    ResourcesWalletItemComponent
+    ResourcesWalletItemComponent,
+    ModalCellComponent,
+    EndorsementDetailComponent,
+    SearchItemComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService],
+  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   entryComponents: [
     BlockItemComponent,
     IdenticonComponent,
@@ -136,7 +158,8 @@ import { ResourcesWalletItemComponent } from './components/resources-wallet-item
     HashCellComponent,
     SymbolCellComponent,
     PricechartItemComponent,
-    ExtendTableCellComponent
+    ExtendTableCellComponent,
+    ModalCellComponent
   ],
   bootstrap: [AppComponent]
 })

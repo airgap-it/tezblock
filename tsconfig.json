@@ -30,7 +30,10 @@
     "noUnusedLocals": false /* OK Report errors on unused locals. */,
     "noUnusedParameters": false /* OK? Report errors on unused parameters. */,
     "noImplicitReturns": true /* OK Report error when not all code paths in function return a value. */,
-    "noFallthroughCasesInSwitch": true /* OK Report errors for fallthrough cases in switch statement. */
+    "noFallthroughCasesInSwitch": true /* OK Report errors for fallthrough cases in switch statement. */,
+    "paths": {
+      "@tezblock/*": ["./src/app/*"]
+    }
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

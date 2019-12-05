@@ -45,14 +45,27 @@
               <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
                 <!--tx status is always 'null' for endorsements-->
                 <td *ngFor="let col of config; let j = index">
-                  <!--<ng-container *ngTemplateOutlet="dynamic; context: transaction"></ng-container>-->
                   <ng-template #dynamic></ng-template>
                 </td>
               </tr>
-              <!-- TODO: only show in tables with extended-table-cell and row/extended-table-cell has been clicked  -->
               <tr class="table-extended__active" *ngIf="transaction.expand">
                 <td colspan="10" class="py-3 px-0">
-                  <!-- <div class="extended-table__header pl-sm-3"><p>Cycle 161</p></div> -->
+                  <ng-container *ngIf="enableSearch">
+                    <div class="input-group input-group-main">
+                      <input
+                        class="form-control form-control--focus-white"
+                        placeholder="Filter by Address"
+                        [(ngModel)]="filterTerm"
+                        (keydown.enter)="filterTransactions(filterTerm)"
+                      />
+                      <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit" (click)="filterTransactions(filterTerm)">
+                          <fa-icon [icon]="'search' | iconPipe" class="text-white d-inline-block d-sm-none"></fa-icon>
+                          <span class="d-none d-sm-inline-block">Filter</span>
+                        </button>
+                      </div>
+                    </div>
+                  </ng-container>
                   <div class="table-responsive">
                     <table class="table table-hover">
                       <thead>
@@ -68,7 +81,7 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody *ngFor="let payout of transaction.payouts">
+                      <tbody *ngFor="let payout of returnedArray[transaction.cycle]">
                         <tr>
                           <td>
                             <address-cell [data]="payout.delegator"></address-cell>
@@ -82,6 +95,19 @@
                         </tr>
                       </tbody>
                     </table>
+                    <div class="w-100 p-0 d-flex justify-content-sm-end">
+                      <pagination
+                        [totalItems]="transaction.payouts.length"
+                        (pageChanged)="pageChanged($event, transaction.cycle)"
+                        [boundaryLinks]="true"
+                        [rotate]="true"
+                        [maxSize]="5"
+                        [nextText]="'>'"
+                        [previousText]="'<'"
+                        [(ngModel)]="rewardspage[transaction.cycle]"
+                        (numPages)="smallnumPages = $event"
+                      ></pagination>
+                    </div>
                   </div>
                 </td>
               </tr>

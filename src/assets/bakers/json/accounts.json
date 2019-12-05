@@ -1,6 +1,11 @@
 {
   "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j": {
     "alias": "XTZ Master",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1XTZM55hF7g98CzY88MXWhmK8QioGXHtuY"
+  },
+  "tz1XTZM55hF7g98CzY88MXWhmK8QioGXHtuY": {
+    "alias": "XTZ Master Payout",
     "hasLogo": true
   },
   "tz1KtvGSYU5hdKD288a1koTBURWYuADJGrLE": {
@@ -9,7 +14,7 @@
   },
   "tz1KzSC1J9aBxKp7u8TUnpN8L7S65PBRkgdF": {
     "alias": "HashQuark",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i": {
     "alias": "Zednode",
@@ -33,9 +38,14 @@
   },
   "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC": {
     "alias": "PayTezos",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1c9HEyZdAWXZCLE7h3KcZCyykjZr7VY3QM"
   },
   "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
+    "alias": "PayTezos Payouts KT",
+    "hasLogo": true
+  },
+  "tz1c9HEyZdAWXZCLE7h3KcZCyykjZr7VY3QM": {
     "alias": "PayTezos Payouts",
     "hasLogo": true
   },
@@ -65,7 +75,8 @@
   },
   "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ": {
     "alias": "AirGap",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9"
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
     "alias": "AirGap Payout KT",
@@ -105,7 +116,8 @@
   },
   "tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB": {
     "alias": "Bake'n'Rolls",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Zrqm4TkJwqTxm5TiyVFh6taXG4Wrq7tko"
   },
   "tz1NpWrAyDL9k2Lmnyxcgr9xuJakbBxdq7FB": {
     "alias": "Gate.io",
@@ -269,6 +281,11 @@
   },
   "tz1VceyYUpq1gk5dtp6jXQRtCtY8hm5DKt72": {
     "alias": "Tezetetic",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1MR42UxXgFmxsP4iVEF8e8a7q17TPLicpt"
+  },
+  "tz1MR42UxXgFmxsP4iVEF8e8a7q17TPLicpt": {
+    "alias": "Tezetetic Payout",
     "hasLogo": true
   },
   "tz1Vd1rXpV8hTHbFXCXN3c3qzCsgcU5BZw1e": {
@@ -505,7 +522,8 @@
   },
   "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8": {
     "alias": "MyTezosBaking",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5"
   },
   "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5": {
     "alias": "MyTezosBaking Payouts",
@@ -557,7 +575,8 @@
   },
   "tz1go7f6mEQfT2xX2LuHAqgnRGN6c2zHPf5c": {
     "alias": "Stakery",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS"
   },
   "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS": {
     "alias": "Stakery Payouts",
@@ -611,28 +630,36 @@
     "alias": "Polychain Labs 2",
     "hasLogo": true
   },
-  "tz3NExpXn9aPNZPorRE4SdjJ2RGrfbJgMAaV": {
-    "alias": "Foundation Baker 5",
+  "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9": {
+    "alias": "Foundation Baker 1",
+    "hasLogo": true
+  },
+  "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5": {
+    "alias": "Foundation Baker 2",
     "hasLogo": true
   },
   "tz3RB4aoyjov4KEVRbuhvQ1CKJgBJMWhaeB8": {
     "alias": "Foundation Baker 3",
     "hasLogo": true
   },
-  "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9": {
-    "alias": "Foundation Baker 1",
+  "tz3bTdwZinP8U1JmSweNzVKhmwafqWmFWRfk": {
+    "alias": "Foundation Baker 4",
+    "hasLogo": true
+  },
+  "tz3NExpXn9aPNZPorRE4SdjJ2RGrfbJgMAaV": {
+    "alias": "Foundation Baker 5",
     "hasLogo": true
   },
   "tz3UoffC7FG7zfpmvmjUmUeAaHvzdcUvAj6r": {
     "alias": "Foundation Baker 6",
     "hasLogo": true
   },
-  "tz3VEZ4k6a4Wx42iyev6i2aVAptTRLEAivNN": {
-    "alias": "Foundation Baker 8",
-    "hasLogo": true
-  },
   "tz3WMqdzXqRWXwyvj5Hp2H7QEepaUuS7vd9K": {
     "alias": "Foundation Baker 7",
+    "hasLogo": true
+  },
+  "tz3VEZ4k6a4Wx42iyev6i2aVAptTRLEAivNN": {
+    "alias": "Foundation Baker 8",
     "hasLogo": true
   },
   "tz3adcvQaKXTCg12zbninqo3q8ptKKtDFTLv": {
@@ -643,21 +670,14 @@
     "alias": "Ceibo XTZ",
     "hasLogo": true
   },
-  "tz3bTdwZinP8U1JmSweNzVKhmwafqWmFWRfk": {
-    "alias": "Foundation Baker 4",
-    "hasLogo": true
-  },
-  "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5": {
-    "alias": "Foundation Baker 2",
-    "hasLogo": true
-  },
   "tz3e75hU4EhDU3ukyJueh5v6UvEHzGwkg3yC": {
     "alias": "At James",
     "hasLogo": true
   },
   "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194": {
     "alias": "StakeNow",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC"
   },
   "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC": {
     "alias": "StakeNow Payouts",
@@ -669,10 +689,55 @@
   },
   "tz1gg5bjopPcr9agjamyu9BbXKLibNc2rbAq": {
     "alias": "hodl.farm",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9"
   },
   "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9": {
     "alias": "hodl.farm Payouts",
+    "hasLogo": true
+  },
+  "tz1RSWMYKGAykpizFteowByYMueCYv9TMn1L": {
+    "alias": "Tezos Alliance",
+    "hasLogo": true
+  },
+  "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2": {
+    "alias": "Binance",
+    "hasLogo": true
+  },
+  "tz1PWCDnz783NNGGQjEFFsHtrcK5yBW4E2rm": {
+    "alias": "Melange",
+    "hasLogo": true
+  },
+  "tz1cb8xcmJWcdVU7cNAd93MfEReorvP52P8x": {
+    "alias": "Mint Capital",
+    "hasLogo": true
+  },
+  "tz1Z2jXfEXL7dXhs6bsLmyLFLfmAkXBzA9WE": {
+    "alias": "Tezos Boutique",
+    "hasLogo": true
+  },
+  "tz1WctSwL49BZtdWAQ75NY6vr4xsAx6oKdah": {
+    "alias": "Tezos Wake n'Bake",
+    "hasLogo": true
+  },
+  "tz1dhwJY5B1jKdkF7zcyu1v6EBEQjpGmAp1E": {
+    "alias": "Tezzz",
+    "hasLogo": true
+  },
+  "tz1XhnCdVENzgko5x1MMswLHSoQbJ5NPwLZ6": {
+    "alias": "Anonstake",
+    "hasLogo": true
+  },
+  "tz1YhNsiRRU8aHNGg7NK3uuP6UDAyacJernB": {
+    "alias": "TezBaguette",
+    "hasLogo": true
+  },
+  "tz1fvBC1cHJzPtUW3ZKd2GZDj7P4XVuLk9vW": {
+    "alias": "Steaker",
+    "hasLogo": true
+  },
+  "tz1egbN6RK2bM5vt4aAZw6r9j4nL8z49bPdS": {
+    "alias": "Money Every 3 Days",
     "hasLogo": true
   }
 }

@@ -16,6 +16,7 @@ import { BlockDetailComponent } from './block-detail.component'
 import { BlockDetailWrapperComponent } from 'src/app/components/block-detail-wrapper/block-detail-wrapper.component'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 describe('BlockDetailComponent', () => {
   let component: BlockDetailComponent
@@ -27,7 +28,7 @@ describe('BlockDetailComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [AmountConverterPipe, TabsetConfig],
-        imports: [FontAwesomeModule, MomentModule, CollapseModule, TabsModule, BrowserAnimationsModule],
+        imports: [FontAwesomeModule, MomentModule, CollapseModule, TabsModule, BrowserAnimationsModule, PaginationModule],
         declarations: [
           BlockDetailComponent,
           IdenticonComponent,

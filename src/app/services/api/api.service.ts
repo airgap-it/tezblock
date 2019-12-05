@@ -1,32 +1,62 @@
-import { EndorsingRights } from './../../interfaces/EndorsingRights'
-import { BakingRights } from './../../interfaces/BakingRights'
-import { environment } from './../../../environments/environment'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Observable, of } from 'rxjs'
+import * as _ from 'lodash'
+import { Observable, of, pipe } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { BakingRights } from './../../interfaces/BakingRights'
+import { EndorsingRights } from './../../interfaces/EndorsingRights'
 
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
+import { first, get } from '@tezblock/services/fp'
+
+export interface OperationCount {
+  [key: string]: string
+  count_operation_group_hash: string
+  kind: string
+}
+
+export interface Baker {
+  pkh: string
+  block_level: number
+  delegated_balance: number
+  balance: number
+  deactivated: boolean
+  staking_balance: number
+  block_id: string
+  frozen_balance: number
+  grace_period: number
+  number_of_delegators?: number
+}
+
+export interface NumberOfDelegatorsByBakers {
+  delegate_value: string
+  number_of_delegators: number
+}
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private readonly mainNetApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/`
-  private readonly blocksApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/blocks`
-  private readonly transactionsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/operations`
-  private readonly accountsApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/accounts`
-  private readonly frozenBalanceApiUrl = `${environment.conseilBaseUrl}/v2/data/tezos/mainnet/delegates`
+  public environmentUrls = this.chainNetworkService.getEnvironment()
+  public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+
+  private readonly bakingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/baking_rights`
+  private readonly endorsingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/endorsing_rights`
+  private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
+  private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
+  private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
+  private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
 
   private readonly options = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      apikey: environment.conseilApiKey
+      apikey: this.environmentUrls.conseilApiKey
     })
   }
 
@@ -40,7 +70,7 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -107,14 +137,18 @@ export class ApiService {
             })
           }
 
+          // TODO: refactor addVotesForTransaction to accept list of transactions
           if (kindList.includes('ballot' || 'proposals')) {
             let source: Transaction[] = []
             source.push(...finalTransactions)
             source.map(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
+
             return source
           }
+
           return finalTransactions
         })
       )
@@ -178,9 +212,41 @@ export class ApiService {
             })
           }
 
+          const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
+          if (votes) {
+            // TODO: refactor addVotesForTransaction to accept list of transactions
+            finalTransactions.forEach(async transaction => {
+              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
+              await this.addVotesForTransaction(transaction)
+            })
+          }
+
           return finalTransactions
         })
       )
+  }
+
+  public getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
+    return this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'operation_group_hash',
+            operation: 'eq',
+            set: [id],
+            inverse: false
+          },
+          {
+            field: 'kind',
+            operation: 'eq',
+            set: ['endorsement']
+          }
+        ],
+        limit
+      },
+      this.options
+    )
   }
 
   public getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
@@ -287,6 +353,7 @@ export class ApiService {
               })
             })
           }
+
           return finalTransactions
         })
       )
@@ -678,6 +745,7 @@ export class ApiService {
         limit
       }
     }
+
     return new Promise((resolve, reject) => {
       this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
         resolve(volumePerBlock)
@@ -685,10 +753,7 @@ export class ApiService {
     })
   }
 
-  public getOperationCount(
-    field: string,
-    value: string
-  ): Observable<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]> {
+  public getOperationCount(field: string, value: string): Observable<OperationCount[]> {
     const body = {
       fields: [field, 'kind'],
       predicates: [
@@ -706,11 +771,8 @@ export class ApiService {
         }
       ]
     }
-    return this.http.post<{ [key: string]: string; count_operation_group_hash: string; kind: string }[]>(
-      this.transactionsApiUrl,
-      body,
-      this.options
-    )
+
+    return this.http.post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
   }
 
   public getBlockById(id: string): Observable<Block[]> {
@@ -751,7 +813,14 @@ export class ApiService {
 
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
-      const protocol = new TezosProtocol()
+      const network = this.chainNetworkService.getNetwork()
+      const protocol = new TezosProtocol(
+        this.environmentUrls.rpcUrl,
+        this.environmentUrls.conseilUrl,
+        network,
+        this.chainNetworkService.getEnvironmentVariable(),
+        this.environmentUrls.conseilApiKey
+      )
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
       transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
       resolve(transaction)
@@ -761,7 +830,7 @@ export class ApiService {
   public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
     return this.http
       .post<BakingRights[]>(
-        `${this.mainNetApiUrl}baking_rights`,
+        this.bakingRightsApiUrl,
         {
           predicates: [
             {
@@ -790,6 +859,7 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
@@ -798,7 +868,7 @@ export class ApiService {
   public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
     return this.http
       .post<EndorsingRights[]>(
-        `${this.mainNetApiUrl}endorsing_rights`,
+        this.endorsingRightsApiUrl,
         {
           predicates: [
             {
@@ -822,55 +892,52 @@ export class ApiService {
           rights.forEach(right => {
             right.cycle = Math.floor(right.level / 4096)
           })
+
           return rights
         })
       )
   }
 
-  public getEndorsements(blockHash: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<Transaction[]>(
-          this.transactionsApiUrl,
-          {
-            predicates: [
-              {
-                field: 'operation_group_hash',
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'block_hash',
-                operation: 'eq',
-                set: [blockHash]
-              },
-              {
-                field: 'kind',
-                operation: 'eq',
-                set: ['endorsement']
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: 32
-          },
-          this.options
-        )
-        .subscribe((transactions: Transaction[]) => {
-          resolve(transactions.length)
-        })
-    })
+  public getEndorsedSlotsCount(blockHash: string): Observable<number> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'operation_group_hash',
+              operation: 'isnull',
+              inverse: true
+            },
+            {
+              field: 'block_hash',
+              operation: 'eq',
+              set: [blockHash]
+            },
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['endorsement']
+            }
+          ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'desc'
+            }
+          ],
+          limit: 32
+        },
+        this.options
+      )
+      .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
   public getFrozenBalance(tzAddress: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
         .post(
-          this.frozenBalanceApiUrl,
+          this.delegatesApiUrl,
           {
             predicates: [
               {
@@ -912,5 +979,111 @@ export class ApiService {
       },
       this.options
     )
+  }
+  public getVotingPeriod(block_level: number): Observable<string> {
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          fields: ['level', 'period_kind'],
+          predicates: [
+            {
+              field: 'level',
+              operation: 'eq',
+              set: [block_level.toString()],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(
+          pipe(
+            first,
+            get(_first => _first.period_kind)
+          )
+        )
+      )
+  }
+
+  getActiveBakers(limit: number): Observable<Baker[]> {
+    return this.http.post<Baker[]>(
+      this.delegatesApiUrl,
+      {
+        fields: [],
+        predicates: [
+          {
+            field: 'staking_balance',
+            operation: 'gt',
+            set: ['8000000000'],
+            inverse: false
+          }
+        ],
+        orderBy: [{ field: 'staking_balance', direction: 'desc' }],
+        limit
+      },
+      this.options
+    )
+  }
+
+  getTotalBakersAtTheLatestBlock(): Observable<number> {
+    return this.http
+      .post<{ count_pkh: number }[]>(
+        this.delegatesApiUrl,
+        {
+          fields: ['pkh'],
+          predicates: [
+            {
+              field: 'staking_balance',
+              operation: 'gt',
+              set: ['8000000000'],
+              inverse: false
+            }
+          ],
+          orderBy: [{ field: 'count_pkh', direction: 'desc' }],
+          aggregation: [
+            {
+              field: 'pkh',
+              function: 'count'
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(map(response => (Array.isArray(response) && response.length > 0 ? response[0].count_pkh : null)))
+  }
+
+  getNumberOfDelegatorsByBakers(delegates: string[]): Observable<NumberOfDelegatorsByBakers[]> {
+    return this.http
+      .post<any[]>(
+        this.accountsApiUrl,
+        {
+          fields: ['account_id', 'manager', 'delegate_value', 'balance'],
+          predicates: [
+            {
+              field: 'delegate_value',
+              operation: 'in',
+              set: delegates,
+              inverse: false
+            }
+          ],
+          aggregation: [
+            {
+              field: 'account_id',
+              function: 'count'
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(response =>
+          delegates.map(delegate => ({
+            delegate_value: delegate,
+            number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
+          }))
+        )
+      )
   }
 }

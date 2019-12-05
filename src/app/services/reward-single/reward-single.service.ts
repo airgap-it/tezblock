@@ -4,6 +4,7 @@ import { combineLatest, of } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 
 interface RewardSingleServiceState {
   rewards: any
@@ -16,7 +17,7 @@ const initialState: RewardSingleServiceState = {
   rewards: [],
   address: '',
   pagination: {
-    currentPage: 1,
+    currentPage: 0,
     selectedSize: 3,
     pageSizes: [5, 10, 20, 50]
   },
@@ -41,24 +42,40 @@ export class RewardSingleService extends Facade<RewardSingleServiceState> {
   )
   public loading$ = this.state$.pipe(map(state => state.loading))
 
-  constructor() {
+  constructor(public readonly chainNetworkService: ChainNetworkService) {
     super(initialState)
-    const protocol = new TezosProtocol()
+    const environmentUrls = this.chainNetworkService.getEnvironment()
+    const network = this.chainNetworkService.getNetwork()
+    const protocol = new TezosProtocol(
+      environmentUrls.rpcUrl,
+      environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      environmentUrls.conseilApiKey
+    )
 
     this.subscription = combineLatest([this.pagination$, this.address$])
       .pipe(
         switchMap(async ([pagination, address]) => {
           const currentCycle = await protocol.fetchCurrentCycle()
-          const rewards: TezosRewards[] = []
-          // TODO fetching rewards for the current cycle takes a long time, thus we start at i=0 for now
-
-          for (let i = 1; i < pagination.selectedSize * pagination.currentPage; i++) {
-            const cycleRewards: any = await protocol.calculateRewards(address, currentCycle - i)
-            cycleRewards.payouts = await protocol.calculatePayouts(cycleRewards, 0, cycleRewards.delegatedContracts.length)
-            rewards.push(cycleRewards)
+          const rewardsResults: Array<Promise<TezosRewards>> = []
+          const startIndex = pagination.currentPage * pagination.selectedSize
+          const endIndex = startIndex + pagination.selectedSize
+          for (let i = startIndex; i < endIndex; i++) {
+            const cycle = currentCycle - (i + 1)
+            if (cycle < 7) {
+              break
+            }
+            rewardsResults.push(
+              protocol.calculateRewards(address, cycle).then(async result => {
+                // TODO: payouts needs to be paginated instead of retrieving them all at once
+                ;(result as any).payouts = await protocol.calculatePayouts(result, 0, result.delegatedContracts.length)
+                return result
+              })
+            )
           }
-
-          return rewards
+          const rewards = await Promise.all(rewardsResults)
+          return [...this._state.rewards, ...rewards]
         })
       )
       .subscribe(rewards => {

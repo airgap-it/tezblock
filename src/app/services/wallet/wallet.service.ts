@@ -154,6 +154,52 @@ const initialState: Wallet[] = [
     downloadLink: 'https://galleon-wallet.tech'
   },
   {
+    title: 'Kukai',
+    description: `One of the first Tezos wallet with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in our wallet.`,
+    logo: 'kukai.png',
+    socials: [
+      {
+        type: SocialType.website,
+        url: 'https://kukai.app'
+      },
+      {
+        type: SocialType.twitter,
+        url: 'https://twitter.com/KukaiWallet'
+      },
+      {
+        type: SocialType.telegram,
+        url: 'https://riot.im/app/#/room/#kukai:matrix.org'
+      },
+      {
+        type: SocialType.medium,
+        url: 'https://medium.com/@KukaiWallet'
+      },
+      {
+        type: SocialType.github,
+        url: 'https://github.com/kukai-wallet/kukai'
+      }
+    ],
+    platforms: [
+      {
+        name: PlatformName.macOS,
+        icon: 'apple',
+        url: 'https://github.com/kukai-wallet/kukai/releases'
+      },
+      {
+        name: PlatformName.Windows,
+        icon: 'laptop',
+        url: 'https://github.com/kukai-wallet/kukai/releases'
+      },
+      {
+        name: PlatformName.Linux,
+        icon: 'laptop',
+        url: 'https://github.com/kukai-wallet/kukai/releases'
+      }
+    ],
+    features: ['Ledger Support', 'Delegation', 'offline-signing'],
+    downloadLink: 'https://kukai.app'
+  },
+  {
     title: 'Magnum Wallet',
     description: `Magnum Wallet is a multicurrency non-custodial wallet service. Designed for those who wish to manage their crypto portfolio in a secure and convenient interface, it also lets the user earn rewards through staking or by claiming forks and bounty airdrops. As part of their “Multiply Your Funds” paradigm, the team is always on the lookout for new ways to benefit the users.`,
     logo: 'magnum.png',
@@ -222,21 +268,21 @@ const initialState: Wallet[] = [
       {
         name: PlatformName.macOS,
         icon: 'apple',
-        url: 'https://simplestkaing.com'
+        url: 'https://simplestaking.com'
       },
       {
         name: PlatformName.Windows,
         icon: 'laptop',
-        url: 'https://simplestkaing.com'
+        url: 'https://simplestaking.com'
       },
       {
         name: PlatformName.Linux,
         icon: 'laptop',
-        url: 'https://simplestkaing.com'
+        url: 'https://simplestaking.com'
       }
     ],
     features: ['Trezor T', 'multiple wallets', 'wallet balance history'],
-    downloadLink: 'https://simplestkaing.com'
+    downloadLink: 'https://simplestaking.com'
   },
   {
     title: 'TezBox',

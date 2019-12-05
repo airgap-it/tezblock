@@ -11,6 +11,8 @@ import { TezblockTableComponent } from './../tezblock-table/tezblock-table.compo
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { AddressItemComponent } from '../address-item/address-item.component'
 import { IdenticonComponent } from '../identicon/identicon'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -20,8 +22,8 @@ describe('BakerTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [RightsSingleService, TabsetConfig],
-        imports: [ProgressbarModule, TabsModule, FontAwesomeModule],
+        providers: [RightsSingleService, TabsetConfig, IconPipe],
+        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule],
         declarations: [
           BakerTableComponent,
           TezblockTableComponent,
