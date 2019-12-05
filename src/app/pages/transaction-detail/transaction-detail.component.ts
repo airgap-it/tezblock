@@ -11,6 +11,8 @@ import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
 
 @Component({
@@ -42,15 +44,19 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   public transactionsLoading$: Observable<boolean> = new Observable()
   public transactions$: Observable<Transaction[]> = new Observable()
   public filteredTransactions$: Observable<Transaction[]> = new Observable()
+  public isMainnet: boolean
+
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
     private readonly route: ActivatedRoute,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly blockService: BlockService,
     private readonly copyService: CopyService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     super()
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {

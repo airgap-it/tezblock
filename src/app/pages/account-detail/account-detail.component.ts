@@ -21,7 +21,8 @@ import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -126,6 +127,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
+  public isMainnet: boolean
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
@@ -140,9 +142,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
     private readonly rightsSingleService: RightsSingleService,
-    private readonly breakpointObserver: BreakpointObserver
+    private readonly breakpointObserver: BreakpointObserver,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     super()
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public async ngOnInit() {
