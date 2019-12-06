@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { ReactiveFormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { EffectsModule } from '@ngrx/effects'
@@ -82,6 +82,7 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
       preventDuplicates: true
     }),
     CollapseModule.forRoot(),
+    FormsModule,
     ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
