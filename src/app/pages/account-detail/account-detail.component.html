@@ -1,292 +1,312 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
-    <div *ngIf="account$ | async as account" class="row">
-      <div class="col-lg-6 mb-4 mb-lg-0 card__top">
-        <div class="card h-100 pt-3 ">
-          <div class="card-body p-4 ">
-            <div class="row mb-4">
-              <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
-                <identicon [address]="account.account_id" [sizeLarge]="true"></identicon>
-                <a
-                  (click)="copyToClipboard(account.account_id); changeState(account.account_id)"
-                  value="click to copy"
-                  class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none"
-                >
-                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showQr()">
-                  <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showTelegramModal()">
-                  <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-              </div>
-              <div class="col-md-10 pl-sm-0 pr-0 address--item__container">
-                <address-item
-                  class="d-inline-flex"
-                  [address]="account.account_id"
-                  [showFull]="true"
-                  [clickableButton]="false"
-                  [forceIdenticon]="true"
-                  [hideIdenticon]="!hasLogo"
-                ></address-item>
+    <ng-container *ngIf="account$ | async as account; else noAccount">
+      <div class="row">
+        <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3 ">
+            <div class="card-body p-4 ">
+              <div class="row mb-4">
+                <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
+                  <identicon [address]="account.account_id" [sizeLarge]="true"></identicon>
+                  <a
+                    (click)="copyToClipboard(account.account_id); changeState(account.account_id)"
+                    value="click to copy"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none"
+                  >
+                    <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showQr()">
+                    <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showTelegramModal()">
+                    <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                </div>
+                <div class="col-md-10 pl-sm-0 pr-0 address--item__container">
+                  <address-item
+                    class="d-inline-flex"
+                    [address]="account.account_id"
+                    [showFull]="true"
+                    [clickableButton]="false"
+                    [forceIdenticon]="true"
+                    [hideIdenticon]="!hasLogo"
+                  ></address-item>
 
-                <a
-                  [@changeBtnColor]="current"
-                  (click)="copyToClipboard(account.account_id); changeState(account.account_id)"
-                  value="click to copy"
-                  class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block"
-                >
-                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showQr()">
-                  <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-                <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showTelegramModal()">
-                  <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
-                </a>
-                <div>
-                  <address-item *ngIf="hasAlias" class="d-inline-flex" [address]="account.account_id" [hideIdenticon]="true"></address-item>
-                  <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
-                  <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">Not Revealed</span>
+                  <a
+                    [@changeBtnColor]="current"
+                    (click)="copyToClipboard(account.account_id); changeState(account.account_id)"
+                    value="click to copy"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block"
+                  >
+                    <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showQr()">
+                    <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showTelegramModal()">
+                    <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <div>
+                    <address-item
+                      *ngIf="hasAlias"
+                      class="d-inline-flex"
+                      [address]="account.account_id"
+                      [hideIdenticon]="true"
+                    ></address-item>
+                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
+                    <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
+                      Not Revealed
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div class="row mb-3">
-              <div class=" col-md-2 pr-0">
-                <p class="text-secondary mb-0">Balance</p>
-              </div>
-              <div
-                class=" col-md-10 pl-sm-0"
-                *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
-              >
-                <h5 class="mb-0">
-                  <span
-                    class="d-inline-block"
-                    [innerHtml]="
-                      account.balance | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true } | safeHtml
-                    "
-                  ></span>
-                  ꜩ
-                </h5>
-              </div>
-              <ng-template #hideValue>
-                <div class=" col-md-10 pl-sm-0">
-                  <h5 class="mb-0">0</h5>
-                </div>
-              </ng-template>
-            </div>
-
-            <div class="row mb-3">
-              <ng-container *ngIf="isMainnet">
+              <div class="row mb-3">
                 <div class=" col-md-2 pr-0">
-                  <p class="text-secondary mb-0">Value</p>
+                  <p class="text-secondary mb-0">Balance</p>
                 </div>
                 <div
                   class=" col-md-10 pl-sm-0"
-                  *ngIf="
-                    (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
-                    else hideValue
-                  "
+                  *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
-                    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                    }}{{
-                      account.balance
-                        | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                        | number: '1.0-6'
-                    }}
-                  </h5>
-                </div>
-              </ng-container>
-            </div>
-            <h5 class="card-title__secondary mb-3 pt-3">
-              Related Accounts
-            </h5>
-            <ng-container *ngIf="relatedAccounts | async as relatedAccountsList">
-              <p *ngIf="relatedAccountsList.length === 0" class="text-secondary m-0">
-                This account has no related accounts.
-              </p>
-              <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts | async | slice: 0:paginationLimit" [@AnimateList]>
-                <address-item [address]="relatedAccount.account_id" *ngIf="relatedAccount" [showFull]="!(isMobile$ | async)"></address-item>
-              </div>
-              <div *ngIf="relatedAccounts | async as relatedAccountsList">
-                <button
-                  class="btn btn-link p-0 collapse--btn"
-                  *ngIf="paginationLimit < relatedAccountsList.length"
-                  (click)="showMoreItems()"
-                  [ngClass]="{ 'btn--rotated': !isCollapsed }"
-                >
-                  <span>Show All Accounts</span>
-                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
-                </button>
-
-                <button
-                  class="btn btn-link p-0 collapse--btn"
-                  *ngIf="paginationLimit > numberOfInitialRelatedAccounts"
-                  (click)="showLessItems()"
-                  [ngClass]="{ 'btn--rotated': isCollapsed }"
-                >
-                  <span>Minimize</span>
-                  <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
-                </button>
-              </div>
-            </ng-container>
-          </div>
-        </div>
-      </div>
-      <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
-        <div class="card h-100 pt-3 ">
-          <div class="card-body p-4">
-            <h5 class="card-title mb-4 ">
-              Delegation
-            </h5>
-
-            <ng-container *ngIf="delegatedAccountAddress === undefined">
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
-              </div>
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
-              </div>
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
-              </div>
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
-              </div>
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
-              </div>
-              <div class="pb-3">
-                <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-              </div>
-            </ng-container>
-
-            <ng-container *ngIf="delegatedAccountAddress === ''">
-              <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
-              <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
-            </ng-container>
-            <ng-container *ngIf="delegatedAccountAddress">
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Delegated Account</p>
-                </div>
-                <div class=" col-md-7">
-                  <address-item [address]="delegatedAccountAddress"></address-item>
-                </div>
-              </div>
-              <div class="row mb-3" *ngIf="delegatedAmount">
-                <div class="col-md-5">
-                  <p class="text-secondary mb-0">Amount</p>
-                </div>
-                <div class="col-md-7">
-                  <p class="mb-0">
                     <span
                       class="d-inline-block"
                       [innerHtml]="
-                        delegatedAmount
-                          | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true }
-                          | safeHtml
+                        account.balance | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true } | safeHtml
                       "
                     ></span>
                     ꜩ
-                    <ng-container *ngIf="isMainnet">
-                      <span class="badge badge-pill badge-primary-light ml-1">
-                        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                        }}{{
-                          delegatedAmount
-                            | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                            | number: '1.0-2'
-                        }}
-                      </span>
-                    </ng-container>
-                  </p>
+                  </h5>
                 </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-5">
-                  <p class="text-secondary mb-0">Next Reward Expected</p>
-                </div>
-                <div class="col-md-7">
-                  <p class="mb-0">
-                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                      <ng-container *ngIf="rewardAmount$ | async">
-                        {{ remainingTime$ | async }}
-                      </ng-container>
-                      <ng-container *ngIf="(rewardAmount$ | async) === null">
-                        not available
-                      </ng-container>
-                    </ng-container>
-                  </p>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-5">
-                  <p class="text-secondary mb-0">Reward Amount</p>
-                </div>
-                <div class="col col-md-7">
-                  <p class="mb-0">
-                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                      <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
-                      <ng-container *ngIf="(rewardAmount$ | async) === null">
-                        not available
-                      </ng-container>
-                    </ng-container>
-                  </p>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-5">
-                  <p class="text-secondary mb-0">Baker</p>
-                </div>
-                <div class="col-md-7">
-                  <address-item [address]="bakerAddress"></address-item>
-                </div>
-              </div>
-              <div class="row mb-3">
-                <div class="col-md-5">
-                  <p class="text-secondary mb-0">Baker Fee</p>
-                </div>
-                <div class=" col-md-7" *ngIf="tezosBakerFee; else loading">
-                  <p class="mb-0">{{ tezosBakerFee }}</p>
-                </div>
-                <ng-template #loading>
-                  <div class=" col-md-7">
-                    <loading-skeleton [loadingWidth]="'150px'"></loading-skeleton>
+                <ng-template #hideValue>
+                  <div class=" col-md-10 pl-sm-0">
+                    <h5 class="mb-0">0</h5>
                   </div>
                 </ng-template>
               </div>
-            </ng-container>
+
+              <div class="row mb-3">
+                <ng-container *ngIf="isMainnet">
+                  <div class=" col-md-2 pr-0">
+                    <p class="text-secondary mb-0">Value</p>
+                  </div>
+                  <div
+                    class=" col-md-10 pl-sm-0"
+                    *ngIf="
+                      (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
+                      else hideValue
+                    "
+                  >
+                    <h5 class="mb-0">
+                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
+                      }}{{
+                        account.balance
+                          | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
+                          | number: '1.0-6'
+                      }}
+                    </h5>
+                  </div>
+                </ng-container>
+              </div>
+              <h5 class="card-title__secondary mb-3 pt-3">
+                Related Accounts
+              </h5>
+              <ng-container *ngIf="relatedAccounts | async as relatedAccountsList">
+                <p *ngIf="relatedAccountsList.length === 0" class="text-secondary m-0">
+                  This account has no related accounts.
+                </p>
+                <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts | async | slice: 0:paginationLimit" [@AnimateList]>
+                  <address-item
+                    [address]="relatedAccount.account_id"
+                    *ngIf="relatedAccount"
+                    [showFull]="!(isMobile$ | async)"
+                  ></address-item>
+                </div>
+                <div *ngIf="relatedAccounts | async as relatedAccountsList">
+                  <button
+                    class="btn btn-link p-0 collapse--btn"
+                    *ngIf="paginationLimit < relatedAccountsList.length"
+                    (click)="showMoreItems()"
+                    [ngClass]="{ 'btn--rotated': !isCollapsed }"
+                  >
+                    <span>Show All Accounts</span>
+                    <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                  </button>
+
+                  <button
+                    class="btn btn-link p-0 collapse--btn"
+                    *ngIf="paginationLimit > numberOfInitialRelatedAccounts"
+                    (click)="showLessItems()"
+                    [ngClass]="{ 'btn--rotated': isCollapsed }"
+                  >
+                    <span>Minimize</span>
+                    <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                  </button>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+        <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3 ">
+            <div class="card-body p-4">
+              <h5 class="card-title mb-4 ">
+                Delegation
+              </h5>
+
+              <ng-container *ngIf="delegatedAccountAddress === undefined">
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+                </div>
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'70%'"></loading-skeleton>
+                </div>
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+                </div>
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+                </div>
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'60%'"></loading-skeleton>
+                </div>
+                <div class="pb-3">
+                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="delegatedAccountAddress === ''">
+                <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
+                <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
+              </ng-container>
+              <ng-container *ngIf="delegatedAccountAddress">
+                <div class="row mb-3">
+                  <div class=" col-md-5">
+                    <p class="text-secondary mb-0">Delegated Account</p>
+                  </div>
+                  <div class=" col-md-7">
+                    <address-item [address]="delegatedAccountAddress"></address-item>
+                  </div>
+                </div>
+                <div class="row mb-3" *ngIf="delegatedAmount">
+                  <div class="col-md-5">
+                    <p class="text-secondary mb-0">Amount</p>
+                  </div>
+                  <div class="col-md-7">
+                    <p class="mb-0">
+                      <span
+                        class="d-inline-block"
+                        [innerHtml]="
+                          delegatedAmount
+                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true }
+                            | safeHtml
+                        "
+                      ></span>
+                      ꜩ
+                      <ng-container *ngIf="isMainnet">
+                        <span class="badge badge-pill badge-primary-light ml-1">
+                          {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
+                          }}{{
+                            delegatedAmount
+                              | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
+                              | number: '1.0-2'
+                          }}
+                        </span>
+                      </ng-container>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-5">
+                    <p class="text-secondary mb-0">Next Reward Expected</p>
+                  </div>
+                  <div class="col-md-7">
+                    <p class="mb-0">
+                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                        <ng-container *ngIf="rewardAmount$ | async">
+                          {{ remainingTime$ | async }}
+                        </ng-container>
+                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                          not available
+                        </ng-container>
+                      </ng-container>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-5">
+                    <p class="text-secondary mb-0">Reward Amount</p>
+                  </div>
+                  <div class="col col-md-7">
+                    <p class="mb-0">
+                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                        <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
+                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                          not available
+                        </ng-container>
+                      </ng-container>
+                    </p>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-5">
+                    <p class="text-secondary mb-0">Baker</p>
+                  </div>
+                  <div class="col-md-7">
+                    <address-item [address]="bakerAddress"></address-item>
+                  </div>
+                </div>
+                <div class="row mb-3">
+                  <div class="col-md-5">
+                    <p class="text-secondary mb-0">Baker Fee</p>
+                  </div>
+                  <div class=" col-md-7" *ngIf="tezosBakerFee; else loading">
+                    <p class="mb-0">{{ tezosBakerFee }}</p>
+                  </div>
+                  <ng-template #loading>
+                    <div class=" col-md-7">
+                      <loading-skeleton [loadingWidth]="'150px'"></loading-skeleton>
+                    </div>
+                  </ng-template>
+                </div>
+              </ng-container>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="pt-5" *ngIf="isValidBaker">
-      <div class="card pt-3">
-        <div class="card-body px-3 py-0">
-          <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+      <div class="pt-5" *ngIf="isValidBaker">
+        <div class="card pt-3">
+          <div class="card-body px-3 py-0">
+            <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="pt-5">
-      <div class="card pt-3">
-        <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
-          <tabbed-table
-            [tabs]="tabs"
-            [page]="'account'"
-            [loading]="transactionsLoading$"
-            [data]="transactions$"
-            [dataService]="transactionSingleService"
-            (tabClicked)="tabSelected($event)"
-          ></tabbed-table>
+      <div class="pt-5">
+        <div class="card pt-3">
+          <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
+            <tabbed-table
+              [tabs]="tabs"
+              [page]="'account'"
+              [loading]="isDataLoading$"
+              [data]="data$"
+              [dataService]="transactionSingleService"
+              (tabClicked)="tabSelected($event)"
+              (loadMore)="onLoadMore()"
+            ></tabbed-table>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+
+    <ng-template #noAccount>
+      <div class="card pt-3 invalid">
+        Invalid Address
+      </div>
+    </ng-template>
   </div>
 </div>

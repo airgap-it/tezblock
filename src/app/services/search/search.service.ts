@@ -1,13 +1,14 @@
+import { Injectable } from '@angular/core'
+import { Router } from '@angular/router'
+import { Observable, Subject, Subscription } from 'rxjs'
+
 import { Block } from './../../interfaces/Block'
 import { TransactionSingleService } from './../transaction-single/transaction-single.service'
 import { ApiService } from './../api/api.service'
 import { AccountSingleService } from './../account-single/account-single.service'
-import { Injectable } from '@angular/core'
-import { Router } from '@angular/router'
-
 import { BlockService } from '../blocks/blocks.service'
 import { BlockSingleService } from '../block-single/block-single.service'
-import { Observable, Subject, Subscription } from 'rxjs'
+import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -15,7 +16,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router) {}
+  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router, private readonly transactionService: NewTransactionService) {}
 
   // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
   public search(searchTerm: string): Observable<boolean> {
@@ -63,7 +64,7 @@ export class SearchService {
     const account$ = accountSingleService.account$
     accountSingleService.setAddress(_searchTerm)
 
-    const transactionSingleService = new TransactionSingleService(this.apiService)
+    const transactionSingleService = new TransactionSingleService(this.apiService, this.transactionService)
     const transactions$ = transactionSingleService.transactions$
     transactionSingleService.updateTransactionHash(_searchTerm)
 

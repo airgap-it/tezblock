@@ -8,13 +8,13 @@ import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table
 import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 
-type kindType = string | string[]
+type KindType = string | string[]
 
 export interface Tab {
   title: string
   active: boolean
   count: number
-  kind: kindType
+  kind: KindType
   icon?: string[]
 }
 
@@ -52,13 +52,16 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   dataService?: TransactionSingleService // TODO: <any>
 
   @Input()
-  data?: Observable<any> // TODO: <any>
+  data?: Observable<any[]> // TODO: <any>
 
   @Input()
   loading?: Observable<boolean>
 
   @Output()
-  readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
+  tabClicked: EventEmitter<KindType> = new EventEmitter()
+
+  @Output()
+  loadMore: EventEmitter<boolean> = new EventEmitter()
 
   private _tabs: Tab[] | undefined = []
 
@@ -72,8 +75,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.dataService.actionType$
         .pipe(
-          map(type => <[LayoutPages, Tab]>[type, {...this.selectedTab}]),
-          switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab)))))
+          map(type => <[LayoutPages, Tab]>[type, { ...this.selectedTab }]),
+          switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab))))
+        )
         .subscribe(() => {
           this.setInitTabSelection()
         }),
@@ -113,13 +117,16 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { tab: selectedTab.title } })
   }
 
-  loadMore() {
+  onLoadMore() {
+    this.loadMore.emit(true)
+
+    // TODO: REMOVE !! whe  tabbed will be handled in new way in every place
     if (this.dataService && this.dataService.loadMore) {
       this.dataService.loadMore()
     }
   }
 
-  kindToOperationTypes(kind: kindType): string {
+  kindToOperationTypes(kind: KindType): string {
     return Array.isArray(kind) ? OperationTypes.Ballot : kind
   }
 

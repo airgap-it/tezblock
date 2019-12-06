@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core'
-import { combineLatest, forkJoin, merge, Observable, of, timer } from 'rxjs'
+import { combineLatest, merge, Observable, of, timer } from 'rxjs'
 import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
 import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
 import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { NewTransactionService } from '../transaction/new-transaction.service'
 
 interface TransactionSingleServiceState {
   transactions: Transaction[]
@@ -68,7 +69,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
 
   actionType$: Observable<LayoutPages>
 
-  constructor(private readonly apiService: ApiService) {
+  constructor(private readonly apiService: ApiService, private readonly transactionService: NewTransactionService) {
     super(initialState)
 
     const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$]
@@ -103,7 +104,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           }
 
           if (address) {
-            return this.getAllTransactionsByAddress(address, kind, pagination.selectedSize * pagination.currentPage)
+            return this.transactionService.getAllTransactionsByAddress(address, kind, pagination.selectedSize * pagination.currentPage)
           }
 
           if (block) {
@@ -140,87 +141,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     if (kind !== this._state.kind) {
       this.updateState({ ...this._state, kind, loading: true })
     }
-  }
-
-  private readonly kindToFieldsMap = {
-    transaction: ['source', 'destination'],
-    delegation: ['source', 'delegate'],
-    origination: ['source'],
-    endorsement: ['delegate'],
-    ballot: ['source'],
-    proposals: ['source']
-  }
-
-  private getAllTransactionsByAddress(address: string, kind: string, limit: number) {
-    const fields = this.kindToFieldsMap[kind]
-    const operations: Observable<Transaction[]>[] = []
-    for (const field of fields) {
-      operations.push(this.apiService.getTransactionsByField(address, field, kind, limit))
-    }
-    if (kind === 'delegation') {
-      operations.push(this.apiService.getTransactionsByField(address, 'delegate', 'origination', limit))
-    }
-    if (kind === 'ballot') {
-      const fields = this.kindToFieldsMap.proposals
-      for (const field of fields) {
-        operations.push(
-          this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
-            map(proposals => {
-              proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
-              return proposals
-            })
-          )
-        )
-      }
-    }
-
-    return forkJoin(operations).pipe(
-      map(operation => {
-        let transactions = operation.reduce((current, next) => current.concat(next))
-        transactions.sort((a, b) => b.timestamp - a.timestamp)
-
-        transactions = transactions.slice(0, limit)
-
-        if (kind === 'delegation') {
-          const sources: string[] = transactions.map(transaction => transaction.source)
-          if (sources.length > 0) {
-            const delegateSources = this.apiService.getAccountsByIds(sources)
-            delegateSources.subscribe(delegators => {
-              delegators.forEach(delegator => {
-                const transaction = transactions.find(t => t.source === delegator.account_id)
-                if (transaction !== undefined) {
-                  transaction.delegatedBalance = delegator.balance
-                }
-              })
-            })
-          }
-        }
-        if (kind === 'origination') {
-          const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
-
-          if (originatedSources.length > 0) {
-            const originatedAccounts = this.apiService.getAccountsByIds(originatedSources)
-            originatedAccounts.subscribe(originators => {
-              originators.forEach(originator => {
-                const transaction = transactions.find(t => t.originated_contracts === originator.account_id)
-                if (transaction !== undefined) {
-                  transaction.originatedBalance = originator.balance
-                }
-              })
-            })
-          }
-        }
-
-        if (kind === 'ballot') {
-          transactions.map(async transaction => {
-            this.apiService.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
-            this.apiService.addVotesForTransaction(transaction)
-          })
-        }
-
-        return transactions
-      })
-    )
   }
 
   loadMore() {

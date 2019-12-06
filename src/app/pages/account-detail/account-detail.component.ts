@@ -5,10 +5,12 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { from, Observable, combineLatest, merge, timer } from 'rxjs'
+import { delay, map, filter, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
+import { negate, isNil } from 'lodash'
+import { Actions, ofType } from '@ngrx/effects'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -29,6 +31,8 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
+import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component' //TODO create smaller in another place
+import { refreshRate } from '@tezblock/services/facade/facade'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -135,10 +139,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public isMobile$: Observable<boolean>
   public isBusy$: Observable<Busy>
   public isMainnet: boolean
+  data$: Observable<any[]>
+  isDataLoading$: Observable<boolean>
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
+    private readonly actions$: Actions,
     public readonly transactionSingleService: TransactionSingleService,
     public readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
@@ -161,6 +168,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   public async ngOnInit() {
+    const refresh$ = merge(
+      this.actions$.pipe(ofType(actions.loadDataByKindFailed)),
+      this.actions$.pipe(ofType(actions.loadDataByKindSucceeded))
+    ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
+
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.relatedAccounts = this.accountSingleService.relatedAccounts$
     this.transactionsLoading$ = this.transactionSingleService.loading$
@@ -173,11 +185,20 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
+    this.data$ = this.store$
+      .select(state => state.accountDetails.data)
+      .pipe(
+        filter(negate(isNil)),
+        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
+      )
+    this.isDataLoading$ = this.store$.select(state => state.accountDetails.busy.data)
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.store$.dispatch(actions.loadAccount({ address }))
+        this.store$.dispatch(actions.loadDataByKind({ kind: OperationTypes.Transaction, address }))
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -203,7 +224,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             this.delegatedAccountAddress = ''
           }
         }
-      )
+      ),
+      refresh$.subscribe(() => {
+        const { kind, address } = fromRoot.getState(this.store$).accountDetails
+
+        this.store$.dispatch(actions.loadDataByKind({ kind, address }))
+      })
     )
   }
 
@@ -324,12 +350,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
   }
 
-  public tabSelected(tab: string) {
-    this.transactionSingleService.updateKind(tab)
+  public tabSelected(kind: string) {
+    this.store$.dispatch(actions.loadDataByKind({ kind, address: this.route.snapshot.paramMap.get('id') }))
   }
 
-  public upperTabSelected(tab: string) {
-    this.rightsSingleService.updateKind(tab)
+  onLoadMore() {
+    this.store$.dispatch(actions.increasePageSize())
   }
 
   public copyToClipboard(val: string) {
@@ -366,9 +392,5 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
-  }
-
-  public loadMore(): void {
-    this.transactionSingleService.loadMore()
   }
 }
