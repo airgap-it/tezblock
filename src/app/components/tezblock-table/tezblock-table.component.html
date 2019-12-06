@@ -42,10 +42,7 @@
         <tbody>
           <ng-container *ngIf="transactions">
             <ng-container *ngFor="let transaction of transactions; let i = index">
-              <tr
-                [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }"
-                (click)="expand(transaction); setPageNumber(transaction.cycle, 1)"
-              >
+              <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
                 <!--tx status is always 'null' for endorsements-->
                 <td *ngFor="let col of config; let j = index">
                   <ng-template #dynamic></ng-template>
@@ -84,18 +81,7 @@
                           </th>
                         </tr>
                       </thead>
-                      <tbody
-                        *ngFor="
-                          let payout of transaction.payouts
-                            | paginate
-                              : {
-                                  id: getPageNumber(transaction.cycle).toString(),
-                                  itemsPerPage: 20,
-                                  currentPage: getPageNumber(transaction.cycle),
-                                  totalItems: transaction.payouts.length
-                                }
-                        "
-                      >
+                      <tbody *ngFor="let payout of returnedArray[transaction.cycle]">
                         <tr>
                           <td>
                             <address-cell [data]="payout.delegator"></address-cell>
@@ -110,13 +96,17 @@
                       </tbody>
                     </table>
                     <div class="w-100 p-0 d-flex justify-content-sm-end">
-                      <pagination-controls
-                        [id]="getPageNumber(transaction.cycle)"
-                        directionLinks="true"
-                        (pageChange)="setPageNumber(transaction.cycle, $event)"
-                        responsive="true"
-                        autoHide="true"
-                      ></pagination-controls>
+                      <pagination
+                        [totalItems]="transaction.payouts.length"
+                        (pageChanged)="pageChanged($event, transaction.cycle)"
+                        [boundaryLinks]="true"
+                        [rotate]="true"
+                        [maxSize]="5"
+                        [nextText]="'>'"
+                        [previousText]="'<'"
+                        [(ngModel)]="rewardspage[transaction.cycle]"
+                        (numPages)="smallnumPages = $event"
+                      ></pagination>
                     </div>
                   </div>
                 </td>

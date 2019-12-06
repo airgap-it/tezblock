@@ -15,7 +15,6 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
-import { NgxPaginationModule } from 'ngx-pagination'
 import { ToastrModule } from 'ngx-toastr'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -66,6 +65,7 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
 import { StorageModule } from '@ngx-pwa/local-storage';
+import { AccountDetailEffects } from './pages/account-detail/effects'
 
 @NgModule({
   imports: [
@@ -92,7 +92,6 @@ import { StorageModule } from '@ngx-pwa/local-storage';
     ModalModule.forRoot(),
     FontAwesomeModule,
     ChartsModule,
-    NgxPaginationModule,
     StoreModule.forRoot(ROOT_REDUCERS, {
       metaReducers,
       runtimeChecks: {
@@ -100,7 +99,7 @@ import { StorageModule } from '@ngx-pwa/local-storage';
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects]),
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
