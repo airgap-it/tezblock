@@ -9,7 +9,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import { TypeAheadObject } from '@tezblock/interfaces/TypeAheadObject'
 import { SearchService } from 'src/app/services/search/search.service'
 
-const toPreviousOption = value => ({ name: value, type: 'Previous' })
+const toPreviousOption = value => ({ name: value, type: 'Recent History' })
 
 @Component({
   selector: 'app-search-item',
