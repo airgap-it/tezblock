@@ -72,16 +72,16 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.dataService.actionType$
         .pipe(
-          switchMap(type => this.updateTabsCounts$(type)),
-          filter(succeeded => succeeded && !isSet(this.selectedTab))
-        )
+          map(type => <[LayoutPages, Tab]>[type, {...this.selectedTab}]),
+          switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab)))))
         .subscribe(() => {
           this.setInitTabSelection()
         }),
       this.activatedRoute.queryParamMap
         .pipe(
           filter(
-            queryParam => queryParam.has('tab') && isSet(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
+            queryParam =>
+              queryParam.has('tab') && isSet(this.selectedTab) /* the case on page start is handled in markTabAsSelected method */
           )
         )
         .subscribe(queryParam => {
@@ -93,20 +93,20 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   // on page start (after first api request)
   setInitTabSelection() {
-      const hasData = (tab: Tab) => tab.count > 0
-      const tabNameFromQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
-      const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
-      const firstTabWithData = this.tabs.find(hasData)
-      const selectedTab = tabFromQuery || firstTabWithData
-      const defaultKind = OperationTypes.Transaction
+    const hasData = (tab: Tab) => tab.count > 0
+    const tabNameFromQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
+    const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
+    const firstTabWithData = this.tabs.find(hasData)
+    const selectedTab = tabFromQuery || firstTabWithData
+    const defaultKind = OperationTypes.Transaction
 
-      if (selectedTab) {
-        if (selectedTab.kind === defaultKind) {
-          this.updateSelectedTab(selectedTab)
-        }
-
-        this.selectTab(selectedTab)
+    if (selectedTab) {
+      if (selectedTab.kind === defaultKind) {
+        this.updateSelectedTab(selectedTab)
       }
+
+      this.selectTab(selectedTab)
+    }
   }
 
   onSelectTab(selectedTab: Tab) {
@@ -124,7 +124,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   private updateTabsCounts$ = (type: LayoutPages): Observable<boolean> => {
-    const resetTabsCount = () => this.tabs.forEach(tab => tab.count = 0)
+    const resetTabsCount = () => this.tabs.forEach(tab => (tab.count = 0))
     const aggregateFunction = (info: OperationCount, field: string) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
         Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
@@ -134,50 +134,50 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
           : this.tabs.find(tabArgument =>
               Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
             )
-  
+
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)
         tab.count = tab.count ? tab.count + count : count
       }
     }
-  
+
     if (type === LayoutPages.Transaction) {
       return this.apiService.getOperationCount('operation_group_hash', this.id).pipe(
         map(transactionCounts => {
           resetTabsCount()
           transactionCounts.forEach(info => aggregateFunction(info, 'operation_group_hash'))
-  
+
           return true
         }),
         catchError(() => of(false))
       )
     }
-  
+
     if (type === LayoutPages.Account) {
       const from$ = this.apiService.getOperationCount('source', this.id)
       const to$ = this.apiService.getOperationCount('destination', this.id)
       const delegate$ = this.apiService
         .getOperationCount('delegate', this.id)
         .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
-  
+
       return forkJoin(from$, to$, delegate$).pipe(
         map(([from, to, delegate]) => {
           resetTabsCount()
           from.forEach(info => aggregateFunction(info, 'source'))
           to.forEach(info => aggregateFunction(info, 'destination'))
           delegate.forEach(info => aggregateFunction(info, 'delegate'))
-  
+
           return true
         }),
         catchError(() => of(false))
       )
     }
-  
+
     return this.apiService.getOperationCount('block_level', this.id).pipe(
       map(blockCounts => {
         resetTabsCount()
         blockCounts.forEach(info => aggregateFunction(info, 'block_level'))
-  
+
         return true
       }),
       catchError(() => of(false))

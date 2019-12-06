@@ -23,7 +23,8 @@ import { TransactionSingleService } from '../../services/transaction-single/tran
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
@@ -110,11 +111,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public current: string = 'copyGrey'
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
   ]
   public bakerTabs: Tab[] = [
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
@@ -133,10 +134,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
   public isBusy$: Observable<Busy>
+  public isMainnet: boolean
+
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
+    public readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
@@ -153,6 +157,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly cycleService: CycleService
   ) {
     super()
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public async ngOnInit() {
@@ -311,7 +316,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
         this.store$.dispatch(actions.loadRewardAmont({ accountAddress: this.address, bakerAddress: this.bakerAddress }))
       }
-      
+
       return
     }
 

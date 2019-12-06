@@ -11,6 +11,8 @@ import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
 
 @Component({
@@ -32,10 +34,10 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
+    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
     {
       title: 'Activations',
       active: false,
@@ -45,15 +47,19 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     }
   ]
 
+  public isMainnet: boolean
+
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
     private readonly blockSingleService: BlockSingleService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly route: ActivatedRoute,
     private readonly blockService: BlockService,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    public readonly chainNetworkService: ChainNetworkService
   ) {
     super()
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public ngOnInit() {

@@ -8,7 +8,6 @@ import { CurrencySymbolPipe } from './currency-symbol/currency-symbol.pipe'
 import { IconPipe } from './icon/icon.pipe'
 import { SafeHtmlPipe } from './safe-html/safe-html.pipe'
 import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
-import { NgxPaginationModule } from 'ngx-pagination'
 
 @NgModule({
   declarations: [
@@ -29,8 +28,7 @@ import { NgxPaginationModule } from 'ngx-pagination'
     AliasPipe,
     SafeHtmlPipe,
     IconPipe,
-    PercentagePipe,
-    NgxPaginationModule
+    PercentagePipe
   ],
   imports: [],
   exports: [
@@ -41,8 +39,7 @@ import { NgxPaginationModule } from 'ngx-pagination'
     AliasPipe,
     SafeHtmlPipe,
     IconPipe,
-    PercentagePipe,
-    NgxPaginationModule
+    PercentagePipe
   ]
 })
 export class PipesModule {}
