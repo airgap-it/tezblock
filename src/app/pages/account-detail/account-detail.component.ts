@@ -1,13 +1,14 @@
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { Component, OnDestroy, OnInit } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { Component, OnInit } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { Observable, Subscription, combineLatest } from 'rxjs'
+import { from, Observable, combineLatest } from 'rxjs'
 import { map } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
+import { Store } from '@ngrx/store'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -19,9 +20,15 @@ import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
+import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Transaction } from 'src/app/interfaces/Transaction'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { BaseComponent } from '@tezblock/components/base.component'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './actions'
+import { Busy } from './reducer'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -49,7 +56,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
     ])
   ]
 })
-export class AccountDetailComponent implements OnInit, OnDestroy {
+export class AccountDetailComponent extends BaseComponent implements OnInit {
   public account$: Observable<Account> = new Observable()
   public delegatedAccounts: Observable<Account[]> = new Observable()
   public delegatedAccountAddress: string | undefined
@@ -80,7 +87,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public stakingBond: number | undefined
 
   public isValidBaker: boolean | undefined
-  public revealed: string | undefined
+  public revealed$: Observable<string>
   public hasAlias: boolean | undefined
   public hasLogo: boolean | undefined
 
@@ -101,25 +108,24 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
 
   public rewards: TezosRewards
   public rights$: Observable<Object> = new Observable()
-
-  private readonly subscriptions: Subscription = new Subscription()
   public current: string = 'copyGrey'
 
   public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: 0, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: 0, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: 0, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Votes', active: false, kind: 'ballot', count: 0, icon: this.iconPipe.transform('boxBallot') }
+    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
   ]
   public bakerTabs: Tab[] = [
-    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: 0, icon: this.iconPipe.transform('hatChef') },
-    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: 0, icon: this.iconPipe.transform('breadLoaf') },
-    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: 0, icon: this.iconPipe.transform('stamp') },
-    { title: 'Rewards', active: false, kind: 'rewards', count: 0, icon: this.iconPipe.transform('coin') }
+    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
+    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
+    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
   public nextPayout: Date | undefined
-  public rewardAmount: number | undefined
+  public rewardAmount$: Observable<string>
+  public remainingTime$: Observable<string>
   public myTBUrl: string | undefined
   public get address(): string {
     return this.route.snapshot.params.id
@@ -127,11 +133,15 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   public frozenBalance: number | undefined
   public rewardsTransaction: any
   public isMobile$: Observable<boolean>
+  public isBusy$: Observable<Busy>
+  public isMainnet: boolean
+
+  private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     public readonly transactionSingleService: TransactionSingleService,
+    public readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
     private readonly cryptoPricesService: CryptoPricesService,
@@ -142,14 +152,44 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
     private readonly iconPipe: IconPipe,
     private readonly accountSingleService: AccountSingleService,
     private readonly rightsSingleService: RightsSingleService,
-    private readonly breakpointObserver: BreakpointObserver
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly store$: Store<fromRoot.State>,
+    private readonly cycleService: CycleService
   ) {
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
+    super()
+    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
+  public async ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.relatedAccounts = this.accountSingleService.relatedAccounts$
+    this.transactionsLoading$ = this.transactionSingleService.loading$
+    this.transactions$ = this.transactionSingleService.transactions$
+    this.rights$ = this.rightsSingleService.rights$
+    this.account$ = this.accountSingleService.account$
+    this.isMobile$ = this.breakpointObserver
+      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+      .pipe(map(breakpointState => breakpointState.matches))
+    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
+    this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
+    this.remainingTime$ = this.cycleService.remainingTime$
 
-    this.getBakingInfos(this.address)
+    this.subscriptions.push(
+      this.route.paramMap.subscribe(paramMap => {
+        const address = paramMap.get('id')
 
-    this.subscriptions.add(
+        this.getBakingInfos(address)
+        this.rightsSingleService.updateAddress(address)
+
+        if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
+          this.hasAlias = true
+          this.hasLogo = accounts[address].hasLogo
+        }
+
+        this.transactionSingleService.updateAddress(address)
+        this.accountSingleService.setAddress(address)
+        this.revealed$ = from(this.accountService.getAccountStatus(address))
+      }),
       combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
         ([address, delegatedAccounts]: [string, Account[]]) => {
           if (!delegatedAccounts) {
@@ -157,40 +197,14 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
           } else if (delegatedAccounts.length > 0) {
             this.delegatedAccountAddress = delegatedAccounts[0].account_id
             this.bakerAddress = delegatedAccounts[0].delegate_value
-
             this.delegatedAmount = delegatedAccounts[0].balance
+            this.setRewardAmont()
           } else {
             this.delegatedAccountAddress = ''
           }
         }
       )
     )
-    this.relatedAccounts = this.accountSingleService.relatedAccounts$
-    this.transactionsLoading$ = this.transactionSingleService.loading$
-  }
-
-  public async ngOnInit() {
-    this.rightsSingleService.updateAddress(this.address)
-
-    if (accounts.hasOwnProperty(this.address) && !!this.aliasPipe.transform(this.address)) {
-      this.hasAlias = true
-      this.hasLogo = accounts[this.address].hasLogo
-    }
-    this.transactions$ = this.transactionSingleService.transactions$
-
-    this.rights$ = this.rightsSingleService.rights$
-
-    this.transactionSingleService.updateAddress(this.address)
-
-    this.accountSingleService.setAddress(this.address)
-
-    this.account$ = this.accountSingleService.account$
-
-    this.revealed = await this.accountService.getAccountStatus(this.address)
-
-    this.isMobile$ = this.breakpointObserver
-      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
-      .pipe(map(breakpointState => breakpointState.matches))
   }
 
   public async getBakingInfos(address: string) {
@@ -198,7 +212,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       .getBakerInfos(address)
       .then(async result => {
         this.isValidBaker = true
-        const payoutAddress = accounts.hasOwnProperty(this.address) ? accounts[this.address].hasPayoutAddress : null
+        const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
         this.bakerTableInfos = result
           ? {
@@ -255,7 +269,7 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
         this.isValidBaker = false
       })
 
-    this.getTezosBakerInfos(this.address)
+    this.getTezosBakerInfos(address)
   }
 
   // TODO: Move to component
@@ -292,6 +306,24 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
       })
   }
 
+  private setRewardAmont() {
+    const delegatedAccountIsNotABaker = this.bakerAddress !== this.address
+
+    if (delegatedAccountIsNotABaker) {
+      const notHandled = this.rewardAmountSetFor.account !== this.address || this.rewardAmountSetFor.baker !== this.bakerAddress
+
+      if (notHandled) {
+        this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
+        this.store$.dispatch(actions.loadRewardAmont({ accountAddress: this.address, bakerAddress: this.bakerAddress }))
+      }
+
+      return
+    }
+
+    this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
+    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
+  }
+
   public tabSelected(tab: string) {
     this.transactionSingleService.updateKind(tab)
   }
@@ -324,10 +356,6 @@ export class AccountDetailComponent implements OnInit, OnDestroy {
   }
   public showLessItems() {
     this.paginationLimit = this.paginationLimit - 50 // TODO: set dynamic number
-  }
-
-  public ngOnDestroy() {
-    this.subscriptions.unsubscribe()
   }
   public replaceAll(string: string, find: string, replace: string) {
     return string.replace(new RegExp(find, 'g'), replace)

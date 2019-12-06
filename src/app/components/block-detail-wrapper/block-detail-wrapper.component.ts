@@ -27,6 +27,9 @@ export class BlockDetailWrapperComponent implements OnInit {
   @Input()
   public blockLoading$: Observable<boolean> | undefined
 
+  @Input()
+  public isMainnet: boolean = true
+
   constructor(private readonly route: ActivatedRoute) {}
 
   public ngOnInit() {}
