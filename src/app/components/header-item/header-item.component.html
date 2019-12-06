@@ -157,6 +157,11 @@
                           Statistics
                         </li>
                         <li>
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/bakers/list']">
+                            Bakers
+                          </a>
+                        </li>
+                        <li>
                           <a class="dropdown-item text-muted" disabled>
                             Roll Distribution
                           </a>
@@ -218,7 +223,11 @@
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
                     <li role="menuitem">
-                      <a class="dropdown-item" [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''" (click)="changeNetwork(networks.MAINNET)">
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''"
+                        (click)="changeNetwork(networks.MAINNET)"
+                      >
                         mainnet
                       </a>
                       <a

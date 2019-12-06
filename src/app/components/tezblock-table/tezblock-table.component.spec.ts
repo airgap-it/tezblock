@@ -9,7 +9,7 @@ import { IdenticonComponent } from '../identicon/identicon'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { TezblockTableComponent } from './tezblock-table.component'
-import { NgxPaginationModule } from 'ngx-pagination'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 describe('TezblockTableComponent', () => {
   let component: TezblockTableComponent
@@ -20,8 +20,8 @@ describe('TezblockTableComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [IconPipe, NgxPaginationModule],
-        imports: [FontAwesomeModule, NgxPaginationModule],
+        providers: [IconPipe],
+        imports: [FontAwesomeModule, PaginationModule],
         declarations: [
           TezblockTableComponent,
           LoadingSkeletonComponent,

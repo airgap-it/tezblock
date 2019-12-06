@@ -1,7 +1,7 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
-import { FormsModule } from '@angular/forms'
+import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { EffectsModule } from '@ngrx/effects'
@@ -15,7 +15,6 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
-import { NgxPaginationModule } from 'ngx-pagination'
 import { ToastrModule } from 'ngx-toastr'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -65,6 +64,8 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
+import { StorageModule } from '@ngx-pwa/local-storage';
+import { AccountDetailEffects } from './pages/account-detail/effects'
 
 @NgModule({
   imports: [
@@ -82,6 +83,7 @@ import { ListEffects } from './pages/list/effects'
     }),
     CollapseModule.forRoot(),
     FormsModule,
+    ReactiveFormsModule,
     AppRoutingModule,
     HttpClientModule,
     PipesModule,
@@ -91,7 +93,6 @@ import { ListEffects } from './pages/list/effects'
     ModalModule.forRoot(),
     FontAwesomeModule,
     ChartsModule,
-    NgxPaginationModule,
     StoreModule.forRoot(ROOT_REDUCERS, {
       metaReducers,
       runtimeChecks: {
@@ -99,7 +100,8 @@ import { ListEffects } from './pages/list/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects])
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects]),
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,

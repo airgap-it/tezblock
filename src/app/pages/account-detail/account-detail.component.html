@@ -47,8 +47,8 @@
                 </a>
                 <div>
                   <address-item *ngIf="hasAlias" class="d-inline-flex" [address]="account.account_id" [hideIdenticon]="true"></address-item>
-                  <span *ngIf="revealed === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
-                  <span *ngIf="revealed === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">Not Revealed</span>
+                  <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
+                  <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">Not Revealed</span>
                 </div>
               </div>
             </div>
@@ -79,25 +79,27 @@
             </div>
 
             <div class="row mb-3">
-              <div class=" col-md-2 pr-0">
-                <p class="text-secondary mb-0">Value</p>
-              </div>
-              <div
-                class=" col-md-10 pl-sm-0"
-                *ngIf="
-                  (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
-                  else hideValue
-                "
-              >
-                <h5 class="mb-0">
-                  {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                  }}{{
-                    account.balance
-                      | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                      | number: '1.0-6'
-                  }}
-                </h5>
-              </div>
+              <ng-container *ngIf="isMainnet">
+                <div class=" col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Value</p>
+                </div>
+                <div
+                  class=" col-md-10 pl-sm-0"
+                  *ngIf="
+                    (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
+                    else hideValue
+                  "
+                >
+                  <h5 class="mb-0">
+                    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
+                    }}{{
+                      account.balance
+                        | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
+                        | number: '1.0-6'
+                    }}
+                  </h5>
+                </div>
+              </ng-container>
             </div>
             <h5 class="card-title__secondary mb-3 pt-3">
               Related Accounts
@@ -190,14 +192,16 @@
                       "
                     ></span>
                     ꜩ
-                    <span class="badge badge-pill badge-primary-light ml-1">
-                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                      }}{{
-                        delegatedAmount
-                          | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                          | number: '1.0-2'
-                      }}
-                    </span>
+                    <ng-container *ngIf="isMainnet">
+                      <span class="badge badge-pill badge-primary-light ml-1">
+                        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
+                        }}{{
+                          delegatedAmount
+                            | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
+                            | number: '1.0-2'
+                        }}
+                      </span>
+                    </ng-container>
                   </p>
                 </div>
               </div>
@@ -205,18 +209,34 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">Next Reward Expected</p>
                 </div>
-                <!-- TODO: baker reward time -->
                 <div class="col-md-7">
-                  <p class="mb-0">not available</p>
+                  <p class="mb-0">
+                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                      <ng-container *ngIf="rewardAmount$ | async">
+                        {{ remainingTime$ | async }}
+                      </ng-container>
+                      <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        not available
+                      </ng-container>
+                    </ng-container>
+                  </p>
                 </div>
               </div>
               <div class="row mb-3">
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">Reward Amount</p>
                 </div>
-                <!-- TODO: baker reward amount -->
                 <div class="col col-md-7">
-                  <p class="mb-0">not available</p>
+                  <p class="mb-0">
+                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                      <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
+                      <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        not available
+                      </ng-container>
+                    </ng-container>
+                  </p>
                 </div>
               </div>
               <div class="row mb-3">
