@@ -228,3 +228,5 @@ export const ApiServiceMock = jasmine.createSpyObj('ApiService', {
   getFrozenBalance: of(null).toPromise(),
   getDelegatedAccountsList: of(null)
 })
+
+export const storeMock = jasmine.createSpyObj('Store', ['select', 'dispatch'])

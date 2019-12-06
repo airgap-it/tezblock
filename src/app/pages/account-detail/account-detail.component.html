@@ -209,18 +209,34 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">Next Reward Expected</p>
                 </div>
-                <!-- TODO: baker reward time -->
                 <div class="col-md-7">
-                  <p class="mb-0">not available</p>
+                  <p class="mb-0">
+                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                      <ng-container *ngIf="rewardAmount$ | async">
+                        {{ remainingTime$ | async }}
+                      </ng-container>
+                      <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        not available
+                      </ng-container>
+                    </ng-container>
+                  </p>
                 </div>
               </div>
               <div class="row mb-3">
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">Reward Amount</p>
                 </div>
-                <!-- TODO: baker reward amount -->
                 <div class="col col-md-7">
-                  <p class="mb-0">not available</p>
+                  <p class="mb-0">
+                    <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
+                    <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
+                      <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
+                      <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        not available
+                      </ng-container>
+                    </ng-container>
+                  </p>
                 </div>
               </div>
               <div class="row mb-3">
