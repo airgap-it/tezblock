@@ -427,8 +427,8 @@ export class ApiService {
     const result: Object[] = []
     Object.keys(accounts).forEach(baker => {
       if (
-        accounts.hasOwnProperty(baker) &&
-        accounts[baker].hasOwnProperty('alias') &&
+        accounts[baker] &&
+        accounts[baker].alias &&
         accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())
       ) {
         result.push({ name: accounts[baker].alias, type: 'Bakers' })
