@@ -52,6 +52,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadBlockFailed, state => ({
     ...state,
+    block: null,
     busy: {
       ...state.busy,
       block: false

@@ -46,6 +46,10 @@ export const reducer = createReducer(
     ...state,
     account
   })),
+  on(actions.loadAccountFailed, state => ({
+    ...state,
+    account: null
+  })),
   on(actions.loadDelegatedAccountsSucceeded, (state, { accounts }) => ({
     ...state,
     delegatedAccounts: accounts.delegated,

@@ -29,7 +29,7 @@
   </div>
 </div>
 <ng-template #noBlock>
-  <div class="card pt-3 invalid">
+  <div class="card pt-3 invalid" *ngIf="(block$ | async) === null">
     Invalid Address
   </div>
 </ng-template>
