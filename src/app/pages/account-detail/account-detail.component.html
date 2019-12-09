@@ -292,9 +292,9 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'account'"
-              [loading]="isDataLoading$"
-              [data]="data$"
-              [dataService]="transactionSingleService"
+              [loading]="areTransactionsLoading$"
+              [data]="transactions$"
+              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
             ></tabbed-table>

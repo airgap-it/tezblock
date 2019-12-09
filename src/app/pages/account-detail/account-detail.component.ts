@@ -5,8 +5,8 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge, timer } from 'rxjs'
-import { delay, map, filter, switchMap } from 'rxjs/operators'
+import { from, Observable, combineLatest } from 'rxjs'
+import { delay, map, filter } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -16,23 +16,19 @@ import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
 import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
-import { AccountSingleService } from '../../services/account-single/account-single.service'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { TransactionSingleService } from '../../services/transaction-single/transaction-single.service'
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Transaction } from 'src/app/interfaces/Transaction'
 import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component' //TODO create smaller in another place
-import { refreshRate } from '@tezblock/services/facade/facade'
+import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -40,7 +36,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
-  providers: [AccountSingleService, TransactionSingleService, RightsSingleService],
+  providers: [RightsSingleService], //TODO: refactor and remove this last single service
 
   animations: [
     trigger('changeBtnColor', [
@@ -61,10 +57,9 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   ]
 })
 export class AccountDetailComponent extends BaseComponent implements OnInit {
-  public account$: Observable<Account> = new Observable()
-  public delegatedAccounts: Observable<Account[]> = new Observable()
+  public account$: Observable<Account>
   public delegatedAccountAddress: string | undefined
-  public relatedAccounts: Observable<Account[]> = new Observable()
+  public relatedAccounts: Observable<Account[]>
   public delegatedAmount: number | undefined
 
   public get bakerAddress(): string | undefined {
@@ -95,8 +90,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public hasAlias: boolean | undefined
   public hasLogo: boolean | undefined
 
-  public transactions$: Observable<Transaction[]> = new Observable()
-
   public tezosBakerName: string | undefined
   public tezosBakerAvailableCap: string | undefined
   public tezosBakerAcceptingDelegation: string | undefined
@@ -104,7 +97,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  public transactionsLoading$: Observable<boolean>
   public paginationLimit: number = 2
   public numberOfInitialRelatedAccounts: number = 2
 
@@ -139,14 +131,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   public isMobile$: Observable<boolean>
   public isBusy$: Observable<Busy>
   public isMainnet: boolean
-  data$: Observable<any[]>
-  isDataLoading$: Observable<boolean>
+  transactions$: Observable<any[]>
+  areTransactionsLoading$: Observable<boolean>
+  actionType$: Observable<LayoutPages>
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     private readonly actions$: Actions,
-    public readonly transactionSingleService: TransactionSingleService,
     public readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
     private readonly accountService: AccountService,
@@ -157,7 +149,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly accountSingleService: AccountSingleService,
     private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
@@ -168,37 +159,33 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   public async ngOnInit() {
-    const refresh$ = merge(
-      this.actions$.pipe(ofType(actions.loadDataByKindFailed)),
-      this.actions$.pipe(ofType(actions.loadDataByKindSucceeded))
-    ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
+    this.store$.dispatch(actions.reset())
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.relatedAccounts = this.accountSingleService.relatedAccounts$
-    this.transactionsLoading$ = this.transactionSingleService.loading$
-    this.transactions$ = this.transactionSingleService.transactions$
+    this.relatedAccounts = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.rights$ = this.rightsSingleService.rights$
-    this.account$ = this.accountSingleService.account$
+    this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .pipe(map(breakpointState => breakpointState.matches))
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.data$ = this.store$
-      .select(state => state.accountDetails.data)
+    this.transactions$ = this.store$
+      .select(state => state.accountDetails.transactions)
       .pipe(
         filter(negate(isNil)),
         delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
       )
-    this.isDataLoading$ = this.store$.select(state => state.accountDetails.busy.data)
+    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
+    this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
         this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadDataByKind({ kind: OperationTypes.Transaction, address }))
+        this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -207,28 +194,22 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           this.hasLogo = accounts[address].hasLogo
         }
 
-        this.transactionSingleService.updateAddress(address)
-        this.accountSingleService.setAddress(address)
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       }),
-      combineLatest([this.accountSingleService.address$, this.accountSingleService.delegatedAccounts$]).subscribe(
-        ([address, delegatedAccounts]: [string, Account[]]) => {
-          if (!delegatedAccounts) {
-            this.delegatedAccountAddress = undefined
-          } else if (delegatedAccounts.length > 0) {
-            this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate_value
-            this.delegatedAmount = delegatedAccounts[0].balance
-            this.setRewardAmont()
-          } else {
-            this.delegatedAccountAddress = ''
-          }
+      combineLatest([
+        this.store$.select(state => state.accountDetails.address),
+        this.store$.select(state => state.accountDetails.delegatedAccounts)
+      ]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
+        if (!delegatedAccounts) {
+          this.delegatedAccountAddress = undefined
+        } else if (delegatedAccounts.length > 0) {
+          this.delegatedAccountAddress = delegatedAccounts[0].account_id
+          this.bakerAddress = delegatedAccounts[0].delegate_value
+          this.delegatedAmount = delegatedAccounts[0].balance
+          this.setRewardAmont()
+        } else {
+          this.delegatedAccountAddress = ''
         }
-      ),
-      refresh$.subscribe(() => {
-        const { kind, address } = fromRoot.getState(this.store$).accountDetails
-
-        this.store$.dispatch(actions.loadDataByKind({ kind, address }))
       })
     )
   }
@@ -351,7 +332,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   public tabSelected(kind: string) {
-    this.store$.dispatch(actions.loadDataByKind({ kind, address: this.route.snapshot.paramMap.get('id') }))
+    this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
   }
 
   onLoadMore() {

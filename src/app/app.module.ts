@@ -65,6 +65,7 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
 import { AccountDetailEffects } from './pages/account-detail/effects'
+import { BlockDetailEffects } from './pages/block-detail/effects'
 
 @NgModule({
   imports: [
@@ -99,7 +100,7 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects])
+    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects, BlockDetailEffects])
   ],
   declarations: [
     AppComponent,

@@ -6,9 +6,11 @@ import { environment } from '../../environments/environment'
 import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer'
 import * as fromList from '../pages/list/reducer'
 import * as accountDetails from '../pages/account-detail/reducer'
+import * as blockDetails from '../pages/block-detail/reducer'
 
 export interface State {
   accountDetails: accountDetails.State
+  blockDetails: blockDetails.State
   endorsementDetails: fromEndorsementDetails.State
   list: fromList.State
 }
@@ -21,6 +23,7 @@ export interface State {
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
     accountDetails: accountDetails.reducer,
+    blockDetails: blockDetails.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
     list: fromList.reducer
   })
@@ -48,4 +51,14 @@ export const getState = (store: Store<State>): State => {
   store.pipe(take(1)).subscribe(s => (state = s))
 
   return state
+}
+
+export const selectBlockDetails = (state: State) => state.blockDetails;
+
+// TODO: refactor, it's too long
+export const selector = {
+  blockDetails: {
+    id: createSelector(selectBlockDetails, state => state.id),
+    block: createSelector(selectBlockDetails, state => state.block)
+  }
 }

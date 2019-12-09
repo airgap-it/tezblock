@@ -19,8 +19,10 @@
             [page]="'transaction'"
             [loading]="transactionsLoading$"
             [data]="filteredTransactions$"
+            [actionType$]="transactionSingleService.actionType$"
             [dataService]="transactionSingleService"
             (tabClicked)="tabSelected($event)"
+            (loadMore)="onLoadMore()"
           ></tabbed-table>
         </div>
       </div>

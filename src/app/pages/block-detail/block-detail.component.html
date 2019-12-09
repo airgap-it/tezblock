@@ -1,4 +1,4 @@
-<div class="mb-5 pt-5">
+<div class="mb-5 pt-5" *ngIf="block$ | async; else noBlock">
   <div class="container p-0">
     <div class="card h-100 pt-3">
       <block-detail-wrapper
@@ -19,11 +19,17 @@
             [page]="'block'"
             [loading]="transactionsLoading$"
             [data]="transactions$"
-            [dataService]="transactionSingleService"
+            [actionType$]="actionType$"
             (tabClicked)="tabSelected($event)"
+            (loadMore)="onLoadMore()"
           ></tabbed-table>
         </div>
       </div>
     </div>
   </div>
 </div>
+<ng-template #noBlock>
+  <div class="card pt-3 invalid">
+    Invalid Address
+  </div>
+</ng-template>

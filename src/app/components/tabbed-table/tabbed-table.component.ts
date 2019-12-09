@@ -52,6 +52,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   dataService?: TransactionSingleService // TODO: <any>
 
   @Input()
+  actionType$: Observable<LayoutPages>
+
+  @Input()
   data?: Observable<any[]> // TODO: <any>
 
   @Input()
@@ -73,7 +76,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const isSet = (tab: Tab) => tab.count !== null
 
     this.subscriptions.push(
-      this.dataService.actionType$
+      this.actionType$
         .pipe(
           map(type => <[LayoutPages, Tab]>[type, { ...this.selectedTab }]),
           switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab))))
@@ -119,11 +122,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   onLoadMore() {
     this.loadMore.emit(true)
-
-    // TODO: REMOVE !! whe  tabbed will be handled in new way in every place
-    if (this.dataService && this.dataService.loadMore) {
-      this.dataService.loadMore()
-    }
   }
 
   kindToOperationTypes(kind: KindType): string {

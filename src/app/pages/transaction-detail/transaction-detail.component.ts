@@ -110,4 +110,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   public tabSelected(tab: string) {
     this.kind$.next(tab)
   }
+
+  onLoadMore() {
+    this.transactionSingleService.loadMore()
+  }
 }
