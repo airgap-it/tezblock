@@ -213,7 +213,7 @@ export class ApiService {
           }
 
           const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
-          if (votes) {
+          if (votes.length > 0) {
             // TODO: refactor addVotesForTransaction to accept list of transactions
             finalTransactions.forEach(async transaction => {
               this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
