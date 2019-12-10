@@ -12,23 +12,23 @@ import {
   ViewChildren,
   ViewContainerRef
 } from '@angular/core'
+import { FormControl } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
-import { FormControl } from '@angular/forms'
 
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 import { Transaction } from '../../interfaces/Transaction'
 import { AddressCellComponent } from './address-cell/address-cell.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { BlockCellComponent } from './block-cell/block-cell.component'
 import { ExtendTableCellComponent } from './extend-table-cell/extend-table-cell.component'
 import { HashCellComponent } from './hash-cell/hash-cell.component'
+import { ModalCellComponent } from './modal-cell/modal-cell.component'
 import { PlainValueCellComponent } from './plain-value-cell/plain-value-cell.component'
 import { SymbolCellComponent } from './symbol-cell/symbol-cell.component'
 import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.component'
-import { ModalCellComponent } from './modal-cell/modal-cell.component'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
 interface Column {
   name: string
@@ -686,6 +686,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     if (!this.rewardspage[cycle]) {
       this.rewardspage[cycle] = 1
     }
+
     return this.rewardspage[cycle]
   }
 
@@ -731,6 +732,9 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 
+  @Output()
+  public readonly downloadClicked: EventEmitter<void> = new EventEmitter()
+
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver,
     public readonly router: Router,
@@ -740,7 +744,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.filterTerm = new FormControl('')
   }
 
@@ -763,7 +767,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   }
 
   public filterTransactions() {
-    let copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
+    const copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
 
     if (this.filterTerm.value) {
       const filteredTransactions: any[] = copiedTransactions.map((transaction: any) => {
@@ -825,5 +829,9 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   public loadMore() {
     this.loadMoreClicked.emit()
+  }
+
+  public downloadCSV() {
+    this.downloadClicked.emit()
   }
 }

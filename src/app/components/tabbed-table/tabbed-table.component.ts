@@ -72,8 +72,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.dataService.actionType$
         .pipe(
-          map(type => <[LayoutPages, Tab]>[type, {...this.selectedTab}]),
-          switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab)))))
+          map(type => <[LayoutPages, Tab]>[type, { ...this.selectedTab }]),
+          switchMap(([type, selectedTab]) => this.updateTabsCounts$(type).pipe(filter(succeeded => succeeded && !isSet(selectedTab))))
+        )
         .subscribe(() => {
           this.setInitTabSelection()
         }),
@@ -196,5 +197,11 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+  }
+
+  private download() {
+    if (this.dataService && this.dataService.download) {
+      this.dataService.download(this.selectedTab.count)
+    }
   }
 }

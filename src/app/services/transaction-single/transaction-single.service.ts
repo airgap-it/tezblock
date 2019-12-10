@@ -227,4 +227,44 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
+  download(limit: number = 100) {
+    this.getAllTransactionsByAddress(this._state.address, this._state.kind, limit).subscribe(transactions => {
+      let data = transactions
+      let csvData = this.ConvertToCSV(data)
+      let a = document.createElement('a')
+      a.setAttribute('style', 'display:none;')
+      document.body.appendChild(a)
+      let blob = new Blob([csvData], { type: 'text/csv' })
+      let url = window.URL.createObjectURL(blob)
+      a.href = url
+      a.download = 'transactions.csv'
+      a.click()
+    })
+  }
+
+  private ConvertToCSV(objArray: any): string {
+    let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+    let str = ''
+    let row = ''
+
+    for (let index in objArray[0]) {
+      row += index + ','
+    }
+    row = row.slice(0, -1)
+    str += row + '\r\n'
+
+    for (let i = 0; i < array.length; i++) {
+      let line = ''
+      for (const index in array[i]) {
+        if (line != '') {
+          line += ','
+        }
+
+        line += array[i][index]
+      }
+      str += line + '\r\n'
+    }
+
+    return str
+  }
 }

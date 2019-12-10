@@ -28,5 +28,6 @@
     [type]="kindToOperationTypes(selectedTab.kind)"
     [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
     (loadMoreClicked)="loadMore()"
+    (downloadClicked)="download()"
   ></tezblock-table>
 </tabset>
