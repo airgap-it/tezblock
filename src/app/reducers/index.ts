@@ -7,11 +7,13 @@ import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer'
 import * as fromList from '../pages/list/reducer'
 import * as accountDetails from '../pages/account-detail/reducer'
 import * as blockDetails from '../pages/block-detail/reducer'
+import * as transactionDetails from '../pages/transaction-detail/reducer'
 
 export interface State {
   accountDetails: accountDetails.State
   blockDetails: blockDetails.State
   endorsementDetails: fromEndorsementDetails.State
+  transactionDetails: transactionDetails.State
   list: fromList.State
 }
 
@@ -25,6 +27,7 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     accountDetails: accountDetails.reducer,
     blockDetails: blockDetails.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
+    transactionDetails: transactionDetails.reducer,
     list: fromList.reducer
   })
 })

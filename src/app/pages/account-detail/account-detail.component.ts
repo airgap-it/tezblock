@@ -5,8 +5,8 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest } from 'rxjs'
-import { delay, map, filter } from 'rxjs/operators'
+import { from, Observable, combineLatest, merge, timer } from 'rxjs'
+import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -29,6 +29,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
 import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { refreshRate } from '@tezblock/services/facade/facade'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -210,7 +211,27 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         } else {
           this.delegatedAccountAddress = ''
         }
-      })
+      }),
+
+      // refresh account
+      merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed)))
+        .pipe(
+          delay(refreshRate),
+          withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+          map(([action, address]) => address)
+        )
+        .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
+
+      // refresh transactions
+      merge(
+        this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
+        this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
+      )
+        .pipe(
+          withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+          switchMap(([action, kind]) => timer(refreshRate, refreshRate).pipe(map(() => kind)))
+        )
+        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind })))
     )
   }
 

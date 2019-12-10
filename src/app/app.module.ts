@@ -66,6 +66,7 @@ import { SearchItemComponent } from './components/search-item/search-item.compon
 import { ListEffects } from './pages/list/effects'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
+import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 
 @NgModule({
   imports: [
@@ -100,7 +101,14 @@ import { BlockDetailEffects } from './pages/block-detail/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects, BlockDetailEffects])
+    EffectsModule.forRoot([
+      AppEffects,
+      EndorsementDetailEffects,
+      ListEffects,
+      AccountDetailEffects,
+      BlockDetailEffects,
+      TransactionDetailEffects
+    ])
   ],
   declarations: [
     AppComponent,

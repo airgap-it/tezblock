@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, merge, timer } from 'rxjs'
-import { map, catchError, delay, switchMap, withLatestFrom } from 'rxjs/operators'
+import { of } from 'rxjs'
+import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
@@ -11,18 +11,9 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import { NewAccountService } from '@tezblock/services/account/account.service'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { refreshRate } from '@tezblock/services/facade/facade'
 
 @Injectable()
 export class AccountDetailEffects {
-  getAccountRefresh$ = createEffect(() =>
-    merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed))).pipe(
-      delay(refreshRate),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-      map(([action, address]) => actions.loadAccount({ address }))
-    )
-  )
-
   getAccount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadAccount),
@@ -55,18 +46,6 @@ export class AccountDetailEffects {
           map(rewardAmont => actions.loadRewardAmontSucceeded({ rewardAmont })),
           catchError(error => of(actions.loadRewardAmontFailed({ error })))
         )
-      )
-    )
-  )
-
-  getTransactionsRefresh$ = createEffect(() =>
-    merge(
-      this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
-      this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-    ).pipe(
-      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
-      switchMap(([action, kind]) =>
-        timer(refreshRate, refreshRate).pipe(map(() => actions.loadTransactionsByKind({ kind })))
       )
     )
   )

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { BehaviorSubject, combineLatest, Observable } from 'rxjs'
-import { delay, map, switchMap, filter } from 'rxjs/operators'
+import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
+import { delay, map, switchMap, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { negate, isNil } from 'lodash'
@@ -18,6 +18,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { refreshRate } from '@tezblock/services/facade/facade'
 
 @Component({
   selector: 'app-block-detail',
@@ -60,23 +61,24 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly blockService: BlockService,
     private readonly iconPipe: IconPipe,
     public readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>,
+    private readonly store$: Store<fromRoot.State>
   ) {
     super()
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  public ngOnInit() {
+  ngOnInit() {
     this.store$.dispatch(actions.reset())
 
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
-    this.transactions$ = this.store$.select(state => state.blockDetails.transactions)
-    .pipe(
-      filter(negate(isNil)),
-      delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-    )
+    this.transactions$ = this.store$
+      .select(state => state.blockDetails.transactions)
+      .pipe(
+        filter(negate(isNil)),
+        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
+      )
     this.block$ = this.store$.select(state => state.blockDetails.block)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
@@ -86,11 +88,31 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Block))
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => this.store$.dispatch(actions.loadBlock({ id : paramMap.get('id')})))
+      this.route.paramMap.subscribe(paramMap => this.store$.dispatch(actions.loadBlock({ id: paramMap.get('id') }))),
+
+      // refresh block
+      merge(this.actions$.pipe(ofType(actions.loadBlockSucceeded)), this.actions$.pipe(ofType(actions.loadBlockFailed)))
+        .pipe(
+          delay(refreshRate),
+          withLatestFrom(this.store$.select(state => state.blockDetails.id)),
+          map(([action, id]) => id)
+        )
+        .subscribe(id => this.store$.dispatch(actions.loadBlock({ id }))),
+
+      // refresh transactions
+      merge(
+        this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
+        this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
+      )
+        .pipe(
+          withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+          switchMap(([action, block, kind]) => timer(refreshRate, refreshRate).pipe(map(() => [block.hash, kind])))
+        )
+        .subscribe(([blockHash, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind })))
     )
   }
 
-  public tabSelected(kind: string) {
+  tabSelected(kind: string) {
     const blockHash = fromRoot.getState(this.store$).blockDetails.block.hash
 
     this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind }))

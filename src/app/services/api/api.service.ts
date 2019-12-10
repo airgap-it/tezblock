@@ -822,7 +822,8 @@ export class ApiService {
         this.environmentUrls.conseilApiKey
       )
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
-      transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+      const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
+      transaction.votes = votingInfo ? votingInfo.rolls : null
       resolve(transaction)
     })
   }

@@ -1,26 +1,17 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, merge, timer } from 'rxjs'
-import { map, catchError, delay, switchMap, withLatestFrom, filter } from 'rxjs/operators'
+import { of } from 'rxjs'
+import { map, catchError, switchMap, withLatestFrom, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
-import { refreshRate } from '@tezblock/services/facade/facade'
 import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 @Injectable()
 export class BlockDetailEffects {
-  getBlobkRefresh$ = createEffect(() =>
-    merge(this.actions$.pipe(ofType(actions.loadBlockSucceeded)), this.actions$.pipe(ofType(actions.loadBlockFailed))).pipe(
-      delay(refreshRate),
-      withLatestFrom(this.store$.select(state => state.blockDetails.id)),
-      map(([action, id]) => actions.loadBlock({ id }))
-    )
-  )
-
   getBlock$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBlock),
@@ -29,18 +20,6 @@ export class BlockDetailEffects {
           map(block => actions.loadBlockSucceeded({ block })),
           catchError(error => of(actions.loadBlockFailed({ error })))
         )
-      )
-    )
-  )
-
-  getTransactionsRefresh$ = createEffect(() =>
-    merge(
-      this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
-      this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-    ).pipe(
-      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
-      switchMap(([action, block, kind]) =>
-        timer(refreshRate, refreshRate).pipe(map(() => actions.loadTransactionsByKind({ blockHash: block.hash, kind })))
       )
     )
   )

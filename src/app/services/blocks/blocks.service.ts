@@ -144,6 +144,12 @@ export class NewBlockService {
     return this.apiService.getBlockById(level).pipe(switchMap(blocks => from(this.getAdditionalBlockData(blocks, 1)).pipe(map(first))))
   }
 
+  getLatest(): Observable<Block> {
+    return this.apiService
+      .getLatestBlocks(1)
+      .pipe(switchMap((blocks: Block[]) => from(this.getAdditionalBlockData(blocks, 1)).pipe(map(first))))
+  }
+
   private async getAdditionalBlockData(blocks: Block[], limit: number): Promise<Block[]> {
     const blockRange = blocks.map(blocksList => blocksList.level)
     const amountPromise = this.getAdditionalBlockField<ConseilAmountSum>(blockRange, 'amount', 'sum', limit)
