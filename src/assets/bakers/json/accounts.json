@@ -758,5 +758,9 @@
   "tz1hxtCEcD7idQJEDiJEq37vBkoRcwF6KC2X": {
     "alias": "TezoShop Payout",
     "hasLogo": true
+  },
+  "tz1Q8QkSBS63ZQnH3fBTiAMPes9R666Rn6Sc": {
+    "alias": "YieldWallet",
+    "hasLogo": true
   }
 }
