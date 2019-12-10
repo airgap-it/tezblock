@@ -543,6 +543,11 @@
   },
   "tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8": {
     "alias": "Cryptium Labs",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1cNARmnRRrvZgspPr2rSTUWq5xtGTuKuHY"
+  },
+  "tz1cNARmnRRrvZgspPr2rSTUWq5xtGTuKuHY": {
+    "alias": "Cryptium Labs Payout",
     "hasLogo": true
   },
   "tz1eFXLaCUcKbhXkLBGUGMGNY9tKHjWGG25V": {

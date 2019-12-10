@@ -6,6 +6,8 @@ import { ProgressbarConfig, ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
+import { storeMock } from 'test-config/mocks'
+import { Store } from '@ngrx/store'
 
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
@@ -29,7 +31,15 @@ describe('AccountDetailComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe, BsModalService, TabsetConfig, ToastrService, IconPipe, ProgressbarConfig],
+        providers: [
+          AmountConverterPipe,
+          BsModalService,
+          TabsetConfig,
+          ToastrService,
+          IconPipe,
+          ProgressbarConfig,
+          { provide: Store, useValue: storeMock }
+        ],
         imports: [
           TooltipModule,
           ProgressbarModule,
