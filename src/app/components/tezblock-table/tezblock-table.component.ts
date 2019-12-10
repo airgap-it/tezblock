@@ -729,6 +729,9 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   @Input()
   public expandable?: boolean = false
 
+  @Input()
+  public downloadable?: boolean = false
+
   @Output()
   public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 

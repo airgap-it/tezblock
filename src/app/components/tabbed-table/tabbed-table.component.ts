@@ -57,6 +57,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   loading?: Observable<boolean>
 
+  @Input()
+  downloadable?: boolean = false
+
   @Output()
   readonly tabClicked: EventEmitter<kindType> = new EventEmitter()
 

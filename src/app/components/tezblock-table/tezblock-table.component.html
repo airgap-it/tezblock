@@ -123,5 +123,7 @@
     </table>
     <button *ngIf="showLoadMoreButton" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
   </div>
-  <button type="button" class="btn btn-sm" (click)="downloadCSV()">Download CSV Export</button>
+  <ng-container *ngIf="downloadable">
+    <button type="button" class="btn btn-sm" (click)="downloadCSV()">Download CSV Export</button>
+  </ng-container>
 </ng-template>
