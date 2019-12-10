@@ -49,9 +49,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   @Input()
-  dataService?: TransactionSingleService // TODO: <any>
-
-  @Input()
   actionType$: Observable<LayoutPages>
 
   @Input()

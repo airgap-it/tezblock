@@ -16,8 +16,6 @@ import { PaginationModule } from 'ngx-bootstrap/pagination'
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent
   let fixture: ComponentFixture<TabbedTableComponent>
-  let transactionSingleServiceMock = jasmine.createSpyObj('TransactionSingleService', ['loadMore'])
-  transactionSingleServiceMock.actionType$ = EMPTY
 
   let unitHelper: UnitHelper
   beforeEach(() => {
@@ -44,7 +42,7 @@ describe('TabbedTableComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TabbedTableComponent)
     component = fixture.componentInstance
-    component.dataService = transactionSingleServiceMock
+    component.actionType$ = EMPTY
     fixture.detectChanges()
   })
 
