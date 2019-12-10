@@ -6,6 +6,7 @@ import {
   EventEmitter,
   Input,
   OnChanges,
+  OnInit,
   Output,
   QueryList,
   ViewChildren,
@@ -13,9 +14,9 @@ import {
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Observable, Subscription } from 'rxjs'
+import { FormControl } from '@angular/forms'
 
 import { Transaction } from '../../interfaces/Transaction'
-
 import { AddressCellComponent } from './address-cell/address-cell.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { BlockCellComponent } from './block-cell/block-cell.component'
@@ -656,7 +657,7 @@ function getLayouts(showFiat: boolean = true): Layout {
   templateUrl: './tezblock-table.component.html',
   styleUrls: ['./tezblock-table.component.scss']
 })
-export class TezblockTableComponent implements OnChanges, AfterViewInit {
+export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit {
   @ViewChildren('dynamic', { read: ViewContainerRef }) public cells?: QueryList<ViewContainerRef>
 
   public config: Column[] = []
@@ -665,7 +666,7 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
   public transactions: Transaction[] = []
   public loading$: Observable<boolean> = new Observable()
   private subscription: Subscription
-  public filterTerm: string | undefined
+  public filterTerm: FormControl
   public backupTransactions: Transaction[] = []
   public rewardspage: any[] = []
   public payoutsArray: any[] = []
@@ -739,6 +740,10 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
+  ngOnInit() {
+    this.filterTerm = new FormControl('')
+  }
+
   public ngAfterViewInit() {
     if (this.cells) {
       this.cells.changes.subscribe(t => {
@@ -757,12 +762,12 @@ export class TezblockTableComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  public filterTransactions(filterTerm: string) {
+  public filterTransactions() {
     let copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
 
-    if (filterTerm) {
+    if (this.filterTerm.value) {
       const filteredTransactions: any[] = copiedTransactions.map((transaction: any) => {
-        transaction.payouts = transaction.payouts.filter(payout => payout.delegator === filterTerm)
+        transaction.payouts = transaction.payouts.filter(payout => payout.delegator === this.filterTerm.value)
 
         return transaction
       })

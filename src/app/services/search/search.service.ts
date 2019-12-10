@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { Observable, Subject, Subscription } from 'rxjs'
+import { map, switchMap } from 'rxjs/operators'
+import { StorageMap } from '@ngx-pwa/local-storage'
 
 import { Block } from './../../interfaces/Block'
 import { TransactionSingleService } from './../transaction-single/transaction-single.service'
@@ -11,12 +13,19 @@ import { BlockSingleService } from '../block-single/block-single.service'
 import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
+const previousSearchesKey = 'previousSearches'
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router, private readonly transactionService: NewTransactionService) {}
+  constructor(
+    private readonly blockService: BlockService,
+    private readonly apiService: ApiService,
+    private readonly router: Router,
+    private readonly storage: StorageMap,
+	private readonly transactionService: NewTransactionService
+  ) {}
 
   // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
   public search(searchTerm: string): Observable<boolean> {
@@ -97,5 +106,20 @@ export class SearchService {
     )
 
     return result
+  }
+
+  getPreviousSearches(): Observable<string[]> {
+    return this.storage.get(previousSearchesKey).pipe(map(previousSearches => previousSearches || [])) as Observable<string[]>
+  }
+
+  updatePreviousSearches(searchTerm) {
+    return this.getPreviousSearches()
+      .pipe(
+        map((previousSearches: string[]) =>
+          (previousSearches.indexOf(searchTerm) === -1 ? [searchTerm] : []).concat(previousSearches).slice(0, 5)
+        ),
+        switchMap((updatedPreviousSearches: string[]) => this.storage.set(previousSearchesKey, updatedPreviousSearches))
+      )
+      .subscribe(() => {})
   }
 }

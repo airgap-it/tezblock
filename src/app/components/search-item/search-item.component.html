@@ -1,17 +1,17 @@
 <div class="input-group input-group-main">
   <input
-    [(ngModel)]="searchTerm"
+    [formControl]="searchControl"
     [typeaheadAsync]="true"
-    [typeahead]="dataSource$"
+    [typeahead]="dataEmitter"
     [adaptivePosition]="true"
-    [typeaheadMinLength]="2"
-    [typeaheadOptionsLimit]="typeaheadOptionsLimit"
+    [typeaheadMinLength]="0"
     typeaheadOptionField="name"
     typeaheadGroupField="type"
     placeholder="Search by Address / Alias / Tx Hash / Block Hash"
     class="form-control form-control--focus-white"
-    (keydown.enter)="onKeyEnter(searchTerm)"
+    (keydown.enter)="onKeyEnter()"
     (typeaheadOnSelect)="onSelect($event)"
+    (mousedown)="onMouseDown()"
   />
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit" (click)="search()">
