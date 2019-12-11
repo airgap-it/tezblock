@@ -63,6 +63,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   }
 
   ngOnInit() {
+    this.store$.dispatch(actions.reset())
+      
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
     this.transactions$ = this.store$
