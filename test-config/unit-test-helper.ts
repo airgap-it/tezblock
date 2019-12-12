@@ -6,7 +6,6 @@ import { RouterTestingModule } from '@angular/router/testing'
 
 import { PipesModule } from '../src/app/pipes/pipes.module'
 import { ApiService } from '@tezblock/services/api/api.service'
-
 import {
   AlertControllerMock,
   AppVersionMock,
@@ -36,7 +35,13 @@ export class UnitHelper {
 
   public testBed(testBed: TestModuleMetadata, useOnlyTestBed: boolean = false): TestModuleMetadata {
     const mandatoryDeclarations: any[] = []
-    const mandatoryImports: any[] = [CommonModule, ReactiveFormsModule, FormsModule, RouterTestingModule, HttpClientModule]
+    const mandatoryImports: any[] = [
+      CommonModule,
+      ReactiveFormsModule,
+      FormsModule,
+      RouterTestingModule,
+      HttpClientModule
+    ]
     const mandatoryProviders = [
       // { provide: ApiService, useValue: ApiServiceMock }
     ]

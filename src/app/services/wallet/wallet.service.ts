@@ -102,7 +102,7 @@ const initialState: Wallet[] = [
     socials: [],
     platforms: [
       {
-        name: PlatformName.macOS,
+        name: PlatformName.Android,
         icon: 'android',
         url: 'https://play.google.com/store/apps/details?id=com.tezcore.cortez'
       },

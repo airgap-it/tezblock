@@ -1,14 +1,18 @@
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { CollapseModule } from 'ngx-bootstrap'
 import { TabsetConfig, TabsModule } from 'ngx-bootstrap/tabs'
 import { MomentModule } from 'ngx-moment'
+import { Store } from '@ngrx/store'
+import { Actions } from '@ngrx/effects'
+import { EMPTY } from 'rxjs'
+
+import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
+import { storeMock } from 'test-config/mocks'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
-
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
 import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
@@ -27,7 +31,7 @@ describe('BlockDetailComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe, TabsetConfig],
+        providers: [AmountConverterPipe, TabsetConfig, { provide: Store, useValue: storeMock }, { provide: Actions, useValue: EMPTY }],
         imports: [FontAwesomeModule, MomentModule, CollapseModule, TabsModule, BrowserAnimationsModule, PaginationModule],
         declarations: [
           BlockDetailComponent,
