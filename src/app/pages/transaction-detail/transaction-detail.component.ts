@@ -76,7 +76,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
     this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
-    this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByHashSucceeded)).pipe(map(() => LayoutPages.Transaction))
+    this.actionType$ = this.latestTx$.pipe(map(() => LayoutPages.Transaction))
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(

@@ -2,10 +2,10 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
+
 import { BakingRights } from './../../interfaces/BakingRights'
 import { EndorsingRights } from './../../interfaces/EndorsingRights'
-
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
@@ -114,42 +114,38 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(transactions => {
-          let finalTransactions: Transaction[] = []
-          finalTransactions = transactions.slice(0, limit)
-          const originatedAccounts = []
+        map(transactions => transactions.slice(0, limit)),
+        switchMap(transactions => {
+          const originatedAccounts = transactions
+            .filter(transaction => transaction.kind === 'origination')
+            .map(transaction => transaction.originated_contracts)
 
-          finalTransactions.forEach(transaction => {
-            if (transaction.kind === 'origination') {
-              originatedAccounts.push(transaction.originated_contracts)
-            }
-          })
           if (originatedAccounts.length > 0) {
-            const originatedSources = this.getAccountsByIds(originatedAccounts)
-            originatedSources.subscribe(originators => {
-              finalTransactions.forEach(transaction => {
-                originators.forEach(originator => {
-                  if (transaction.originated_contracts === originator.account_id) {
-                    transaction.originatedBalance = originator.balance
-                  }
+            return this.getAccountsByIds(originatedAccounts).pipe(
+              map(originators =>
+                transactions.map(transaction => {
+                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
+
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
                 })
-              })
-            })
+              )
+            )
           }
 
+          return of(transactions)
+        }),
+        switchMap(transactions => {
           // TODO: refactor addVotesForTransaction to accept list of transactions
           if (kindList.includes('ballot' || 'proposals')) {
-            let source: Transaction[] = []
-            source.push(...finalTransactions)
-            source.map(async transaction => {
+            transactions.map(async transaction => {
               this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
 
-            return source
+            return of(transactions)
           }
 
-          return finalTransactions
+          return of(transactions)
         })
       )
   }
@@ -172,56 +168,57 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => {
-          let finalTransactions: Transaction[] = []
-          finalTransactions = transactions.slice(0, limit)
-          const sources = []
-          const originatedAccounts = []
-
-          finalTransactions.forEach(transaction => {
-            if (transaction.kind === 'delegation') {
-              sources.push(transaction.source)
-            } else if (transaction.kind === 'origination') {
-              originatedAccounts.push(transaction.originated_contracts)
-            }
-          })
+        map(transactions => transactions.slice(0, limit)),
+        switchMap((transactions: Transaction[]) => {
+          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
 
           if (sources.length > 0) {
-            const delegateSources = this.getAccountsByIds(sources)
-            delegateSources.subscribe(delegators => {
-              finalTransactions.forEach(transaction => {
-                delegators.forEach(delegator => {
-                  if (transaction.source === delegator.account_id) {
-                    transaction.delegatedBalance = delegator.balance
-                  }
+            return this.getAccountsByIds(sources).pipe(
+              map(delegators =>
+                transactions.map(transaction => {
+                  const match = delegators.find(delegator => delegator.account_id === transaction.source)
+
+                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
                 })
-              })
-            })
+              )
+            )
           }
+
+          return of(transactions)
+        }),
+        switchMap((transactions: Transaction[]) => {
+          const originatedAccounts = transactions
+            .filter(transaction => transaction.kind === 'origination')
+            .map(transaction => transaction.originated_contracts)
 
           if (originatedAccounts.length > 0) {
-            const originatedSources = this.getAccountsByIds(originatedAccounts)
-            originatedSources.subscribe(originators => {
-              finalTransactions.forEach(transaction => {
-                originators.forEach(originator => {
-                  if (transaction.originated_contracts === originator.account_id) {
-                    transaction.originatedBalance = originator.balance
-                  }
+            return this.getAccountsByIds(originatedAccounts).pipe(
+              map(originators =>
+                transactions.map(transaction => {
+                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
+
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
                 })
-              })
-            })
+              )
+            )
           }
 
-          const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
+          return of(transactions)
+        }),
+        switchMap((transactions: Transaction[]) => {
+          const votes = transactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
+
           if (votes.length > 0) {
             // TODO: refactor addVotesForTransaction to accept list of transactions
-            finalTransactions.forEach(async transaction => {
+            transactions.forEach(async transaction => {
               this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
               await this.addVotesForTransaction(transaction)
             })
+
+            return of(transactions)
           }
 
-          return finalTransactions
+          return of(transactions)
         })
       )
   }
@@ -426,11 +423,7 @@ export class ApiService {
   public getAccountsStartingWith(id: string): Observable<Object[]> {
     const result: Object[] = []
     Object.keys(accounts).forEach(baker => {
-      if (
-        accounts[baker] &&
-        accounts[baker].alias &&
-        accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())
-      ) {
+      if (accounts[baker] && accounts[baker].alias && accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())) {
         result.push({ name: accounts[baker].alias, type: 'Bakers' })
       }
     })
