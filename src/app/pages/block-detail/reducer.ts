@@ -2,87 +2,70 @@ import { createReducer, on } from '@ngrx/store'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
 
 export interface Busy {
+  block: boolean
   transactions: boolean
-  rewardAmont: boolean
 }
 
 export interface State {
-  address: string
-  account: Account
-  delegatedAccounts: Account[],
-  relatedAccounts: Account[],
+  id: string
+  block: Block
   transactions: Transaction[]
+  transactionsLoadedByBlockHash: string
   kind: string
   pageSize: number // transactions
-  rewardAmont: string
   busy: Busy
 }
 
 const initialState: State = {
-  address: undefined,
-  account: undefined,
-  delegatedAccounts: undefined,
-  relatedAccounts: undefined,
+  id: undefined,
+  block: undefined,
   transactions: undefined,
+  transactionsLoadedByBlockHash: undefined,
   kind: undefined,
   pageSize: 10,
-  rewardAmont: undefined,
   busy: {
-    transactions: false,
-    rewardAmont: false
+    block: false,
+    transactions: false
   }
 }
 
 export const reducer = createReducer(
   initialState,
-  on(actions.loadAccount, (state, { address }) => ({
+  on(actions.loadBlock, (state, { id }) => ({
     ...state,
-    address
-  })),
-  on(actions.loadAccountSucceeded, (state, { account }) => ({
-    ...state,
-    account
-  })),
-  on(actions.loadAccountFailed, state => ({
-    ...state,
-    account: null
-  })),
-  on(actions.loadDelegatedAccountsSucceeded, (state, { accounts }) => ({
-    ...state,
-    delegatedAccounts: accounts.delegated,
-    relatedAccounts: accounts.related
-  })),
-  on(actions.loadRewardAmont, state => ({
-    ...state,
+    id,
     busy: {
       ...state.busy,
-      rewardAmont: true
+      block: true
     }
   })),
-  on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
+  on(actions.loadBlockSucceeded, (state, { block }) => ({
     ...state,
-    rewardAmont,
+    block,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      block: false
     }
   })),
-  on(actions.loadRewardAmontFailed, state => ({
+  on(actions.loadBlockFailed, state => ({
     ...state,
+    block: null,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      block: false
     }
   })),
-  on(actions.loadTransactionsByKind, (state, { kind }) => ({
+  on(actions.loadTransactionsByKind, (state, { blockHash, kind }) => ({
     ...state,
+    blockHash,
     kind,
+    transactionsLoadedByBlockHash: blockHash,
     busy: {
       ...state.busy,
-      data: true
+      transactions: true
     }
   })),
   on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
@@ -90,7 +73,7 @@ export const reducer = createReducer(
     transactions: data,
     busy: {
       ...state.busy,
-      data: false
+      transactions: false
     }
   })),
   on(actions.loadTransactionsByKindFailed, state => ({

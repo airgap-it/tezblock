@@ -213,7 +213,7 @@ export class ApiService {
           }
 
           const votes = finalTransactions.filter(transaction => ['ballot', 'proposals'].indexOf(transaction.kind) !== -1)
-          if (votes) {
+          if (votes.length > 0) {
             // TODO: refactor addVotesForTransaction to accept list of transactions
             finalTransactions.forEach(async transaction => {
               this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
@@ -822,7 +822,8 @@ export class ApiService {
         this.environmentUrls.conseilApiKey
       )
       const data = await protocol.getTezosVotingInfo(transaction.block_hash)
-      transaction.votes = data.find((element: VotingInfo) => element.pkh === transaction.source).rolls
+      const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
+      transaction.votes = votingInfo ? votingInfo.rolls : null
       resolve(transaction)
     })
   }

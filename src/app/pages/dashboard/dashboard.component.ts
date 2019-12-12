@@ -6,7 +6,7 @@ import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '../../services/cycle/cycle.service'
-import { TransactionService } from './../../services/transaction /transaction.service'
+import { TransactionService } from '../../services/transaction/transaction.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')

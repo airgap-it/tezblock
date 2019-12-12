@@ -7,7 +7,7 @@ import { Actions, ofType } from '@ngrx/effects'
 
 import { BaseComponent } from '@tezblock/components/base.component'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { TransactionService } from '@tezblock/services/transaction /transaction.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
