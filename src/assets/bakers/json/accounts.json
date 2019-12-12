@@ -482,7 +482,12 @@
   },
   "tz1bLwpPfr3xqy1gWBF4sGvv8bLJyPHR11kx": {
     "alias": "Tezos Hot Bakery",
-    "hasLogo": false
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1Kn5Dyir12f7NafEztgooypotBkE92mKDr"
+  },
+  "tz1Kn5Dyir12f7NafEztgooypotBkE92mKDr": {
+    "alias": "Tezos Hot Bakery Payout",
+    "hasLogo": true
   },
   "tz1bakeKFwqmtLBzghw8CFnqFvRxLj849Vfg": {
     "alias": "Tez Milk",
@@ -743,6 +748,19 @@
   },
   "tz1egbN6RK2bM5vt4aAZw6r9j4nL8z49bPdS": {
     "alias": "Money Every 3 Days",
+    "hasLogo": true
+  },
+  "tz1V3yg82mcrPJbegqVCPn6bC8w1CSTRp3f8": {
+    "alias": "TezoShop",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1hxtCEcD7idQJEDiJEq37vBkoRcwF6KC2X"
+  },
+  "tz1hxtCEcD7idQJEDiJEq37vBkoRcwF6KC2X": {
+    "alias": "TezoShop Payout",
+    "hasLogo": true
+  },
+  "tz1Q8QkSBS63ZQnH3fBTiAMPes9R666Rn6Sc": {
+    "alias": "YieldWallet",
     "hasLogo": true
   }
 }
