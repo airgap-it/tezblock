@@ -6,6 +6,11 @@ import { range } from 'lodash'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/services/facade/facade'
+import { Payout } from '@tezblock/interfaces/Payout'
+
+export interface ExpTezosRewards extends TezosRewards {
+  payouts: Payout[]
+}
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +31,7 @@ export class RewardService {
     )
   }
 
-  getRewards(address: string, pagination: Pagination): Observable<TezosRewards[]> {
+  getRewards(address: string, pagination: Pagination): Observable<ExpTezosRewards[]> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
       switchMap(currentCycle => {
         const startIndex = pagination.currentPage * pagination.selectedSize
