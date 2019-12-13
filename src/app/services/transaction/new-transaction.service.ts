@@ -50,6 +50,7 @@ export class NewTransactionService {
 
         transactions = transactions.slice(0, limit)
 
+        // TODO: refacor as api.service->getTransactionsById
         if (kind === 'delegation') {
           const sources: string[] = transactions.map(transaction => transaction.source)
           if (sources.length > 0) {
@@ -64,6 +65,7 @@ export class NewTransactionService {
             })
           }
         }
+
         if (kind === 'origination') {
           const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
 

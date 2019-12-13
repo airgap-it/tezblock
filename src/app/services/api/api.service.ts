@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
-import { Observable, of, pipe } from 'rxjs'
+import { Observable, of, pipe, from, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
 import { BakingRights } from './../../interfaces/BakingRights'
@@ -137,12 +137,18 @@ export class ApiService {
         switchMap(transactions => {
           // TODO: refactor addVotesForTransaction to accept list of transactions
           if (kindList.includes('ballot' || 'proposals')) {
-            transactions.map(async transaction => {
-              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
-              await this.addVotesForTransaction(transaction)
-            })
-
-            return of(transactions)
+            return forkJoin(
+              forkJoin(transactions.map(transaction => this.getVotingPeriod(transaction.block_level))),
+              forkJoin(transactions.map(transaction => this.getVotesForTransaction(transaction)))
+            ).pipe(
+              map(([votingPeriods, votes]) =>
+                transactions.map((transaction, index) => ({
+                  ...transaction,
+                  voting_period: votingPeriods[index],
+                  votes: votes[index]
+                }))
+              )
+            )
           }
 
           return of(transactions)
@@ -210,12 +216,18 @@ export class ApiService {
 
           if (votes.length > 0) {
             // TODO: refactor addVotesForTransaction to accept list of transactions
-            transactions.forEach(async transaction => {
-              this.getVotingPeriod(transaction.block_level).subscribe(period => (transaction.voting_period = period))
-              await this.addVotesForTransaction(transaction)
-            })
-
-            return of(transactions)
+            return forkJoin(
+              forkJoin(transactions.map(transaction => this.getVotingPeriod(transaction.block_level))),
+              forkJoin(transactions.map(transaction => this.getVotesForTransaction(transaction)))
+            ).pipe(
+              map(([votingPeriods, votes]) =>
+                transactions.map((transaction, index) => ({
+                  ...transaction,
+                  voting_period: votingPeriods[index],
+                  votes: votes[index]
+                }))
+              )
+            )
           }
 
           return of(transactions)
@@ -804,6 +816,7 @@ export class ApiService {
     )
   }
 
+  // TODO: remove (replace by getVotesForTransaction)
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
       const network = this.chainNetworkService.getNetwork()
@@ -819,6 +832,25 @@ export class ApiService {
       transaction.votes = votingInfo ? votingInfo.rolls : null
       resolve(transaction)
     })
+  }
+
+  public getVotesForTransaction(transaction: Transaction): Observable<number> {
+    const network = this.chainNetworkService.getNetwork()
+    const protocol = new TezosProtocol(
+      this.environmentUrls.rpcUrl,
+      this.environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      this.environmentUrls.conseilApiKey
+    )
+
+    return from(protocol.getTezosVotingInfo(transaction.block_hash)).pipe(
+      map(data => {
+        const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
+
+        return votingInfo ? votingInfo.rolls : null
+      })
+    )
   }
 
   public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
