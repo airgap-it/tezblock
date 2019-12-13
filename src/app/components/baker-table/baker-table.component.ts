@@ -61,7 +61,7 @@ export class BakerTableComponent implements OnInit {
   rewardsExpandedRow: ExpandedRow<ExpTezosRewards, Payout> = {
     columns: [
       { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
-      { name: 'Payout', property: 'payout', component: 'address-cell' },
+      { name: 'Payout', property: 'payout', component: 'amount-cell' },
       { name: 'Share', property: 'share', component: 'pipe:percentage' }
     ],
     key: 'cycle',

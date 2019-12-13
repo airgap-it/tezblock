@@ -687,7 +687,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
       }
 
       this.transactions$ = value
-      this.subscription = this.transactions$.subscribe(transactions => this.transactions = transactions)
+      this.subscription = this.transactions$.subscribe(transactions => (this.transactions = transactions))
     }
   }
 
@@ -772,9 +772,9 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   filterTransactions(transaction: Transaction) {
     const key = transaction[this.expandedRow.key]
-    const filteredData = this.expandedRow.dataSelector(transaction).filter(item =>
-      this.expandedRow.filterCondition(item, this.filterTerm.value)
-    )
+    const filteredData = this.expandedRow
+      .dataSelector(transaction)
+      .filter(item => this.expandedRow.filterCondition(item, this.filterTerm.value))
 
     this.expandedRowData[key.toString()] = filteredData.slice(0, 10)
     this.expandedRowsPage[key] = {
@@ -807,8 +807,8 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
         const target = this.cells.toArray()[i]
 
         const cellType = this.config[i % this.config.length]
-
-        const data = (this.transactions[Math.floor(i / this.config.length)] as any)[cellType.property]
+        const transaction = this.transactions[Math.floor(i / this.config.length)]
+        const data = transaction[cellType.property]
 
         const widgetComponent = this.componentFactoryResolver.resolveComponentFactory(
           cellType.component ? cellType.component : PlainValueCellComponent
@@ -818,7 +818,12 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
         const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent)
 
-        cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
+        cmpRef.instance.data =
+          cellType.component === ExtendTableCellComponent
+            ? this.isExpanded(transaction)
+            : cellType.transform
+            ? cellType.transform(data)
+            : data
 
         const options = cellType.optionsTransform ? cellType.optionsTransform(data, cellType.options) : cellType.options
 
