@@ -664,7 +664,6 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   public transactions$: Observable<Transaction[]> = new Observable()
   public transactions: Transaction[] = []
-  public loading$: Observable<boolean> = new Observable()
   private subscription: Subscription
   public filterTerm: FormControl
   public backupTransactions: Transaction[] = []
@@ -690,31 +689,21 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   }
 
   @Input()
-  set data(value: Observable<Transaction[]> | undefined) {
-    if (value) {
-      if (this.subscription) {
-        this.subscription.unsubscribe()
-      }
-      this.transactions$ = value
-      this.subscription = this.transactions$.subscribe(transactions => {
-        this.backupTransactions = transactions
-        this.transactions = transactions
-        transactions.forEach(transaction => {
-          if (transaction.payouts) {
-            this.payoutsArray[transaction.cycle] = transaction.payouts
-            this.returnedArray[transaction.cycle] = transaction.payouts.slice(0, 10)
-          }
-        })
+  set data(transactions: Transaction[] | undefined) {
+    if (transactions !== this.transactions) {
+      this.backupTransactions = transactions
+      this.transactions = transactions
+      transactions.forEach(transaction => {
+        if (transaction.payouts) {
+          this.payoutsArray[transaction.cycle] = transaction.payouts
+          this.returnedArray[transaction.cycle] = transaction.payouts.slice(0, 10)
+        }
       })
     }
   }
 
   @Input()
-  set loading(value: Observable<boolean> | undefined) {
-    if (value) {
-      this.loading$ = value
-    }
-  }
+  loading: boolean
 
   @Input()
   public showLoadMoreButton?: boolean = false
@@ -825,5 +814,14 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   public loadMore() {
     this.loadMoreClicked.emit()
+  }
+
+  trackByFn(index, item: Transaction) {
+    // transaction
+    if (['transaction', 'delegation', 'origination', 'endorsement', 'ballot'].includes(this.type)) {
+      return item.operation_group_hash + item.timestamp
+    }
+
+    return item
   }
 }
