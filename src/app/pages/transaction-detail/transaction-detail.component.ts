@@ -59,12 +59,11 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
+    this.store$.dispatch(actions.reset())
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  ngOnInit() {
-    this.store$.dispatch(actions.reset())
-      
+  ngOnInit() {  
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
     this.transactions$ = this.store$
