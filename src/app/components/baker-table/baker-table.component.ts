@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
@@ -12,6 +13,10 @@ import { RightsSingleService } from './../../services/rights-single/rights-singl
 import { ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Payout } from '@tezblock/interfaces/Payout'
 import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
+import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
+import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { groupBy } from '@tezblock/services/fp'
 
 export interface Tab {
   title: string
@@ -30,7 +35,7 @@ export interface Tab {
 export class BakerTableComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
   selectedTab: Tab | undefined = undefined
-  transactions$: Observable<Transaction[]> = new Observable()
+  transactions$: Observable<Transaction[]>
 
   bakingBadRating: string | undefined
   tezosBakerRating: string | undefined
@@ -48,8 +53,8 @@ export class BakerTableComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<TezosRewards[]> = new Observable()
-  rights$: Observable<Object> = new Observable()
+  rewards$: Observable<TezosRewards[]>
+  rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
 
   rewards: TezosRewards
 
@@ -67,6 +72,31 @@ export class BakerTableComponent implements OnInit {
     key: 'cycle',
     dataSelector: entity => entity.payouts,
     filterCondition: (detail, query) => detail.delegator === query
+  }
+  get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights, BakingRights> | ExpandedRow<AggregatedEndorsingRights, EndorsingRights> {
+    if (this.selectedTab.kind === OperationTypes.BakingRights) {
+      return {
+        columns: [
+          { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
+          { name: 'Payout', property: 'payout', component: 'address-cell' },
+          { name: 'Share', property: 'share', component: 'pipe:percentage' }
+        ],
+        key: 'block_hash',
+        dataSelector: entity => entity.items,
+        filterCondition: (detail, query) => detail.block_hash === query
+      }
+    }
+
+    return {
+      columns: [
+        { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
+        { name: 'Payout', property: 'payout', component: 'address-cell' },
+        { name: 'Share', property: 'share', component: 'pipe:percentage' }
+      ],
+      key: 'block_hash',
+      dataSelector: entity => entity.items,
+      filterCondition: (detail, query) => detail.block_hash === query
+    }
   }
 
   @Input()
@@ -127,7 +157,7 @@ export class BakerTableComponent implements OnInit {
     this.address = this.route.snapshot.params.id
     this.rightsSingleService.updateAddress(this.address)
 
-    this.rights$ = this.rightsSingleService.rights$
+    this.rights$ = this.rightsSingleService.rights$.pipe(map(this.aggregateRights.bind(this)))
     this.rewards$ = this.rewardSingleService.rewards$
     this.rightsLoading$ = this.rightsSingleService.loading$
     this.rewardsLoading$ = this.rewardSingleService.loading$
@@ -205,5 +235,38 @@ export class BakerTableComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+  }
+
+  private aggregateRights(rights: (BakingRights | EndorsingRights)[]): (AggregatedBakingRights | AggregatedEndorsingRights)[] {
+    const group = groupBy('cycle')
+
+    if (this.selectedTab.kind === OperationTypes.BakingRights) {
+      const bakingRights = <BakingRights[]>rights
+
+      return Object.entries(group(bakingRights)).map(
+        ([cycle, items]) =>
+          <AggregatedBakingRights>{
+            cycle: parseInt(cycle),
+            bakingsCount: (<any[]>items).length,
+            blockRewards: undefined,
+            deposits: undefined,
+            fees: undefined,
+            items
+          }
+      )
+    }
+
+    const endorsingRights = <EndorsingRights[]>rights
+
+    return Object.entries(group(endorsingRights)).map(
+      ([cycle, items]) =>
+        <AggregatedEndorsingRights>{
+          cycle: parseInt(cycle),
+          endorsementsCount: (<any[]>items).length,
+          endorsementRewards: undefined,
+          deposits: undefined,
+          items
+        }
+    )
   }
 }

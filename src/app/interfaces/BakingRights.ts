@@ -6,3 +6,12 @@ export interface BakingRights {
   level: number
   cycle: number
 }
+
+export interface AggregatedBakingRights {
+  cycle: number
+  bakingsCount: number
+  blockRewards: number // ?
+  deposits: number // ?
+  fees: number // ?
+  items: BakingRights[]
+}

@@ -426,11 +426,7 @@ export class ApiService {
   public getAccountsStartingWith(id: string): Observable<Object[]> {
     const result: Object[] = []
     Object.keys(accounts).forEach(baker => {
-      if (
-        accounts[baker] &&
-        accounts[baker].alias &&
-        accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())
-      ) {
+      if (accounts[baker] && accounts[baker].alias && accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())) {
         result.push({ name: accounts[baker].alias, type: 'Bakers' })
       }
     })
@@ -855,15 +851,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(
-        map((rights: BakingRights[]) => {
-          rights.forEach(right => {
-            right.cycle = Math.floor(right.level / 4096)
-          })
-
-          return rights
-        })
-      )
+      .pipe(map((rights: BakingRights[]) => rights.map(right => ({ ...right, cycle: Math.floor(right.level / 4096) }))))
   }
 
   public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
@@ -889,14 +877,7 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map((rights: EndorsingRights[]) => {
-          rights.forEach(right => {
-            right.cycle = Math.floor(right.level / 4096)
-          })
-
-          return rights
-        })
-      )
+        map((rights: EndorsingRights[]) => rights.map(right => ({ ...right, cycle: Math.floor(right.level / 4096) }))))
   }
 
   public getEndorsedSlotsCount(blockHash: string): Observable<number> {

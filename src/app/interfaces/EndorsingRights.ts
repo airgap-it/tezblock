@@ -6,3 +6,11 @@ export interface EndorsingRights {
   level: number
   cycle: number
 }
+
+export interface AggregatedEndorsingRights {
+  cycle: number
+  endorsementsCount: number
+  endorsementRewards: number // ?
+  deposits: number // ?
+  items: EndorsingRights[]
+}
