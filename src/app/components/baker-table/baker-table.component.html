@@ -245,7 +245,7 @@
         [data]="rewards$ | async"
         [page]="page"
         [type]="selectedTab.kind"
-        [expandable]="true"
+        [expandedRow]="rewardsExpandedRow"
         (loadMoreClicked)="loadMoreRewards()"
       ></tezblock-table>
     </ng-container>
