@@ -7,6 +7,7 @@ export interface Pagination {
   selectedSize: number
   currentPage: number
   pageSizes: number[]
+  total?: number
 }
 
 export const refreshRate = 30000;
