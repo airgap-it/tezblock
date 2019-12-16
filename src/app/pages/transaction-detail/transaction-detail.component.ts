@@ -45,6 +45,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   transactions$: Observable<Transaction[]>
   filteredTransactions$: Observable<Transaction[]>
   actionType$: Observable<LayoutPages>
+  isInvalidHash$: Observable<boolean>
   isMainnet: boolean
 
   private readonly kind$ = new BehaviorSubject(this.tabs[0].kind)
@@ -76,6 +77,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
     this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
     this.actionType$ = this.latestTx$.pipe(map(() => LayoutPages.Transaction))
+    this.isInvalidHash$ = this.store$.select(state => state.transactionDetails.transactions).pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(

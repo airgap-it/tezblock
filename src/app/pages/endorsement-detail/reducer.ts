@@ -67,7 +67,11 @@ export const reducer = createReducer(
   }),
   on(actions.loadEndorsementDetailsSucceeded, (state, { endorsement }) => ({
     ...state,
-    selectedEndorsement: endorsement
+    selectedEndorsement: endorsement || null
+  })),
+  on(actions.loadEndorsementDetailsFailed, state => ({
+    ...state,
+    selectedEndorsement: null
   })),
   on(actions.slotSelected, (state, { operation_group_hash }) => ({
     ...state,

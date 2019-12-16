@@ -138,7 +138,7 @@
   </div>
 </ng-container>
 <ng-template #noSelectedEndorsement>
-  <div class="mb-5 pt-5">
+  <div class="mb-5 pt-5" *ngIf="(selectedEndorsement$ | async) === null">
     <div class="container p-0">
       <div class="card p-3">
         <h5 class="card-title mb-4 ">

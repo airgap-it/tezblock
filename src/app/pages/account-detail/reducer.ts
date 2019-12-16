@@ -44,7 +44,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadAccountSucceeded, (state, { account }) => ({
     ...state,
-    account
+    account: account || null
   })),
   on(actions.loadAccountFailed, state => ({
     ...state,

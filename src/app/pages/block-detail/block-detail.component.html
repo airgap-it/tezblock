@@ -30,7 +30,7 @@
     </ng-container>
 
     <ng-template #noBlock>
-      <div class="card p-3">
+      <div class="card p-3" *ngIf="(block$ | async) === null">
         <h5 class="card-title mb-4">
           Invalid Block Level
         </h5>
