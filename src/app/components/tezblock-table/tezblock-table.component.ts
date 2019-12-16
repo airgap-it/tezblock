@@ -13,8 +13,9 @@ import {
   ViewContainerRef
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
 import { FormControl } from '@angular/forms'
+import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
 import { Transaction } from '../../interfaces/Transaction'
 import { AddressCellComponent } from './address-cell/address-cell.component'
@@ -28,14 +29,21 @@ import { TimestampCellComponent } from './timestamp-cell/timestamp-cell.componen
 import { ModalCellComponent } from './modal-cell/modal-cell.component'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { PageChangedEvent } from 'ngx-bootstrap/pagination'
+import { Pagination } from '@tezblock/services/facade/facade'
+
+export interface ExpandedRow<Entity, Detail> {
+  columns: Column[]
+  key: string
+  dataSelector: (entity: Entity) => Detail[]
+  filterCondition: (detail: Detail, query: string) => boolean
+}
 
 interface Column {
   name: string
   property: string
-  width: string
-  component?: any // TODO: any
-  options?: any // TODO: any, boolean?
+  width?: string
+  component?: any
+  options?: any
   optionsTransform?(value: any, options: any): any
   transform?(value: any): any
 }
@@ -658,82 +666,45 @@ function getLayouts(showFiat: boolean = true): Layout {
   styleUrls: ['./tezblock-table.component.scss']
 })
 export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit {
-  @ViewChildren('dynamic', { read: ViewContainerRef }) public cells?: QueryList<ViewContainerRef>
+  @ViewChildren('dynamic', { read: ViewContainerRef }) cells?: QueryList<ViewContainerRef>
 
-  public config: Column[] = []
-
-  public transactions$: Observable<Transaction[]> = new Observable()
-  public transactions: Transaction[] = []
-  public loading$: Observable<boolean> = new Observable()
-  private subscription: Subscription
-  public filterTerm: FormControl
-  public backupTransactions: Transaction[] = []
-  public rewardspage: any[] = []
-  public payoutsArray: any[] = []
-  public returnedArray: any[] = []
-  public smallnumPages = 0
-  public isMainnet: boolean = false
-
-  public pageChanged(event: PageChangedEvent, cycle: number): void {
-    const startItem = (event.page - 1) * event.itemsPerPage
-    const endItem = event.page * event.itemsPerPage
-
-    this.returnedArray[cycle] = this.payoutsArray[cycle].slice(startItem, endItem)
-    this.rewardspage[cycle] = event.page
-  }
-
-  public getCurrentPage(cycle: number) {
-    if (!this.rewardspage[cycle]) {
-      this.rewardspage[cycle] = 1
-    }
-    return this.rewardspage[cycle]
-  }
+  config: Column[] = []
+  transactions: Transaction[] = []
+  loading$: Observable<boolean>
+  filterTerm: FormControl
+  isMainnet: boolean = false
+  expandedRows: any[] = []
+  expandedRowData: { [key: string]: any[] } = {}
+  expandedRowsPage: Pagination[] = []
 
   @Input()
-  set data(value: Observable<Transaction[]> | undefined) {
-    if (value) {
-      if (this.subscription) {
-        this.subscription.unsubscribe()
-      }
-      this.transactions$ = value
-      this.subscription = this.transactions$.subscribe(transactions => {
-        this.backupTransactions = transactions
-        this.transactions = transactions
-        transactions.forEach(transaction => {
-          if (transaction.payouts) {
-            this.payoutsArray[transaction.cycle] = transaction.payouts
-            this.returnedArray[transaction.cycle] = transaction.payouts.slice(0, 10)
-          }
-        })
-      })
+  set data(transactions: Transaction[] | undefined) {
+    if (transactions !== this.transactions) {
+      this.transactions = transactions
     }
   }
 
   @Input()
-  set loading(value: Observable<boolean> | undefined) {
-    if (value) {
-      this.loading$ = value
-    }
-  }
+  loading: boolean
 
   @Input()
-  public showLoadMoreButton?: boolean = false
+  showLoadMoreButton?: boolean = false
   @Input()
-  public page?: LayoutPages
+  page?: LayoutPages
   @Input()
-  public type?: OperationTypes
+  type?: OperationTypes
   @Input()
-  public enableSearch?: false
+  enableSearch?: false
 
   @Input()
-  public expandable?: boolean = false
+  expandedRow?: ExpandedRow<any, any>
 
   @Output()
-  public readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
+  readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver,
-    public readonly router: Router,
+    readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly activatedRoute: ActivatedRoute
   ) {
@@ -744,7 +715,11 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     this.filterTerm = new FormControl('')
   }
 
-  public ngAfterViewInit() {
+  isExpanded(transaction: Transaction): boolean {
+    return this.expandedRow && this.expandedRows.includes(transaction[this.expandedRow.key])
+  }
+
+  ngAfterViewInit() {
     if (this.cells) {
       this.cells.changes.subscribe(t => {
         if (t.length > 0) {
@@ -756,36 +731,71 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     }
   }
 
-  public expand(transaction: any) {
-    if (this.expandable) {
-      transaction.expand = !transaction.expand
+  expand(transaction: Transaction) {
+    if (this.expandedRow) {
+      const key = transaction[this.expandedRow.key]
+      const isExpaned = this.expandedRows.includes(key)
+
+      // collapse
+      if (isExpaned) {
+        this.expandedRows = this.expandedRows.filter(expandedRow => expandedRow !== key)
+
+        return
+      }
+
+      // expane
+      const data = this.expandedRow.dataSelector(transaction)
+
+      this.expandedRows = this.expandedRows.concat(key)
+      this.expandedRowData[key.toString()] = data.slice(0, 10)
+      this.expandedRowsPage[key] = {
+        selectedSize: undefined,
+        currentPage: 1,
+        pageSizes: undefined,
+        total: data.length
+      }
     }
   }
 
-  public filterTransactions() {
-    let copiedTransactions = JSON.parse(JSON.stringify(this.backupTransactions))
+  filterTransactions(transaction: Transaction) {
+    const key = transaction[this.expandedRow.key]
+    const filteredData = this.expandedRow
+      .dataSelector(transaction)
+      .filter(item => this.expandedRow.filterCondition(item, this.filterTerm.value))
 
-    if (this.filterTerm.value) {
-      const filteredTransactions: any[] = copiedTransactions.map((transaction: any) => {
-        transaction.payouts = transaction.payouts.filter(payout => payout.delegator === this.filterTerm.value)
-
-        return transaction
-      })
-
-      this.transactions = filteredTransactions
-    } else {
-      this.transactions = copiedTransactions
+    this.expandedRowData[key.toString()] = filteredData.slice(0, 10)
+    this.expandedRowsPage[key] = {
+      selectedSize: undefined,
+      currentPage: 1,
+      pageSizes: undefined,
+      total: filteredData.length
     }
   }
 
-  public renderComponents() {
+  pageChanged(event: PageChangedEvent, transaction: Transaction): void {
+    const key = transaction[this.expandedRow.key]
+    const startItem = (event.page - 1) * event.itemsPerPage
+    const endItem = event.page * event.itemsPerPage
+    const data = this.expandedRow.dataSelector(transaction)
+
+    // QUESTION: should I take under account filtering here ?
+    this.expandedRowData[key.toString()] = data.slice(startItem, endItem)
+    this.expandedRowsPage[key] = {
+      selectedSize: undefined,
+      currentPage: event.page,
+      pageSizes: undefined,
+      total: data.length
+    }
+  }
+
+  renderComponents() {
     if (this.cells) {
       for (let i = 0; i < this.cells.toArray().length; i++) {
         const target = this.cells.toArray()[i]
 
         const cellType = this.config[i % this.config.length]
-
-        const data = (this.transactions[Math.floor(i / this.config.length)] as any)[cellType.property]
+        const transaction = this.transactions[Math.floor(i / this.config.length)]
+        const data = transaction[cellType.property]
 
         const widgetComponent = this.componentFactoryResolver.resolveComponentFactory(
           cellType.component ? cellType.component : PlainValueCellComponent
@@ -793,9 +803,14 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
         target.clear()
 
-        const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent) // TODO: <any>
+        const cmpRef: ComponentRef<any> = target.createComponent(widgetComponent)
 
-        cmpRef.instance.data = cellType.transform ? cellType.transform(data) : data
+        cmpRef.instance.data =
+          cellType.component === ExtendTableCellComponent
+            ? this.isExpanded(transaction)
+            : cellType.transform
+            ? cellType.transform(data)
+            : data
 
         const options = cellType.optionsTransform ? cellType.optionsTransform(data, cellType.options) : cellType.options
 
@@ -812,7 +827,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     }
   }
 
-  public ngOnChanges() {
+  ngOnChanges() {
     if (this.page && this.type) {
       const layouts = getLayouts(this.isMainnet)
       if (layouts[this.page][this.type]) {
@@ -823,7 +838,16 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
     }
   }
 
-  public loadMore() {
+  loadMore() {
     this.loadMoreClicked.emit()
+  }
+
+  trackByFn(index, item: Transaction) {
+    // transaction
+    if (['transaction', 'delegation', 'origination', 'endorsement', 'ballot'].includes(this.type)) {
+      return item.operation_group_hash + item.timestamp
+    }
+
+    return item
   }
 }

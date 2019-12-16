@@ -64,12 +64,11 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
+    this.store$.dispatch(actions.reset())
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   ngOnInit() {
-    this.store$.dispatch(actions.reset())
-
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)

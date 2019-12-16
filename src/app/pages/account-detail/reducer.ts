@@ -44,7 +44,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadAccountSucceeded, (state, { account }) => ({
     ...state,
-    account
+    account: account || null
   })),
   on(actions.loadAccountFailed, state => ({
     ...state,
@@ -82,7 +82,7 @@ export const reducer = createReducer(
     kind,
     busy: {
       ...state.busy,
-      data: true
+      transactions: true
     }
   })),
   on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
@@ -90,7 +90,7 @@ export const reducer = createReducer(
     transactions: data,
     busy: {
       ...state.busy,
-      data: false
+      transactions: false
     }
   })),
   on(actions.loadTransactionsByKindFailed, state => ({

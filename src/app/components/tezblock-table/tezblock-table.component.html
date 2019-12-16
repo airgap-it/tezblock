@@ -1,4 +1,4 @@
-<div class="container p-0" *ngIf="loading$ | async; else loaded">
+<div class="container p-0" *ngIf="loading; else loaded">
   <table class="table" style="border-collapse: initial">
     <thead>
       <tr>
@@ -44,11 +44,11 @@
             <ng-container *ngFor="let transaction of transactions; let i = index">
               <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
                 <!--tx status is always 'null' for endorsements-->
-                <td *ngFor="let col of config; let j = index">
+                <td *ngFor="let col of config; let j = index; trackBy: trackByFn.bind(this)">
                   <ng-template #dynamic></ng-template>
                 </td>
               </tr>
-              <tr class="table-extended__active" *ngIf="transaction.expand">
+              <tr class="table-extended__active" *ngIf="isExpanded(transaction)">
                 <td colspan="10" class="py-3 px-0">
                   <ng-container *ngIf="enableSearch">
                     <div class="input-group input-group-main">
@@ -56,10 +56,10 @@
                         class="form-control form-control--focus-white"
                         placeholder="Filter by Address"
                         [formControl]="filterTerm"
-                        (keydown.enter)="filterTransactions()"
+                        (keydown.enter)="filterTransactions(transaction)"
                       />
                       <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" (click)="filterTransactions()">
+                        <button class="btn btn-primary" type="submit" (click)="filterTransactions(transaction)">
                           <fa-icon [icon]="'search' | iconPipe" class="text-white d-inline-block d-sm-none"></fa-icon>
                           <span class="d-none d-sm-inline-block">Filter</span>
                         </button>
@@ -70,42 +70,36 @@
                     <table class="table table-hover">
                       <thead>
                         <tr>
-                          <th>
-                            Delegator Account
-                          </th>
-                          <th>
-                            Payout
-                          </th>
-                          <th>
-                            Share
+                          <th *ngFor="let column of expandedRow.columns">
+                            {{ column.name }}
                           </th>
                         </tr>
                       </thead>
-                      <tbody *ngFor="let payout of returnedArray[transaction.cycle]">
+                      <tbody *ngFor="let detail of expandedRowData[transaction[expandedRow.key]]">
                         <tr>
-                          <td>
-                            <address-cell [data]="payout.delegator"></address-cell>
-                          </td>
-                          <td>
-                            <amount-cell [data]="payout.payout"></amount-cell>
-                          </td>
-                          <td>
-                            {{ payout.share | percentage }}
+                          <td *ngFor="let column of expandedRow.columns" [ngSwitch]="column.component">
+                            <address-cell *ngSwitchCase="'address-cell'" [data]="detail[column.property]"></address-cell>
+                            <amount-cell *ngSwitchCase="'amount-cell'" [data]="detail[column.property]"></amount-cell>
+                            <ng-container *ngSwitchCase="'pipe:percentage'">
+                                {{ detail[column.property] | percentage }}
+                            </ng-container>
+                            <ng-container *ngSwitchDefault>
+                                {{ detail[column.property] }}
+                            </ng-container>
                           </td>
                         </tr>
                       </tbody>
                     </table>
                     <div class="w-100 p-0 d-flex justify-content-sm-end">
                       <pagination
-                        [totalItems]="transaction.payouts.length"
-                        (pageChanged)="pageChanged($event, transaction.cycle)"
+                        [totalItems]="expandedRowsPage[transaction[expandedRow.key]]?.total"
+                        (pageChanged)="pageChanged($event, transaction)"
                         [boundaryLinks]="true"
                         [rotate]="true"
                         [maxSize]="5"
                         [nextText]="'>'"
                         [previousText]="'<'"
-                        [(ngModel)]="rewardspage[transaction.cycle]"
-                        (numPages)="smallnumPages = $event"
+                        [(ngModel)]="expandedRowsPage[transaction[expandedRow.key]].currentPage"
                       ></pagination>
                     </div>
                   </div>
