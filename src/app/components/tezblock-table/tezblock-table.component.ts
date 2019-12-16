@@ -13,7 +13,7 @@ import {
   ViewContainerRef
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
 import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
@@ -669,8 +669,6 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   @ViewChildren('dynamic', { read: ViewContainerRef }) cells?: QueryList<ViewContainerRef>
 
   config: Column[] = []
-
-  transactions$: Observable<Transaction[]>
   transactions: Transaction[] = []
   loading$: Observable<boolean>
   filterTerm: FormControl
@@ -703,8 +701,6 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   @Output()
   readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
-
-  private subscription: Subscription
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver,
