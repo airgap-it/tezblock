@@ -46,6 +46,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsByHashFailed, state => ({
     ...state,
+    transactions: null,
     busy: {
       ...state.busy,
       transactions: false

@@ -42,11 +42,10 @@ export class ListComponent extends BaseComponent implements OnInit {
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
+    this.store$.dispatch(actions.reset())
   }
 
   ngOnInit() {
-    this.store$.dispatch(actions.reset())
-
     const refresh$ = merge(
       of(1),
       merge(
