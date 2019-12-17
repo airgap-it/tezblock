@@ -77,9 +77,13 @@ export class BakerTableComponent implements OnInit {
     if (this.selectedTab.kind === OperationTypes.BakingRights) {
       return {
         columns: [
-          { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
-          { name: 'Payout', property: 'payout', component: 'address-cell' },
-          { name: 'Share', property: 'share', component: 'pipe:percentage' }
+          { name: 'Cycle', property: null, component: null },
+          { name: 'Age', property: null, component: null },
+          { name: 'Level', property: null, component: null },
+          { name: 'Priority', property: null, component: null },
+          { name: 'Rewards', property: null, component: null },
+          { name: 'Fees', property: null, component: null },
+          { name: 'Deposits', property: null, component: null }
         ],
         key: 'block_hash',
         dataSelector: entity => entity.items,
@@ -89,9 +93,12 @@ export class BakerTableComponent implements OnInit {
 
     return {
       columns: [
-        { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
-        { name: 'Payout', property: 'payout', component: 'address-cell' },
-        { name: 'Share', property: 'share', component: 'pipe:percentage' }
+        { name: 'Cycle', property: null, component: null },
+        { name: 'Age', property: null, component: null },
+        { name: 'Level', property: null, component: null },
+        { name: 'Slot', property: null, component: null },
+        { name: 'Rewards', property: null, component: null },
+        { name: 'Deposits', property: null, component: null }
       ],
       key: 'block_hash',
       dataSelector: entity => entity.items,

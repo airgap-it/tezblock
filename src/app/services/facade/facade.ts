@@ -6,7 +6,7 @@ import { Account } from 'src/app/interfaces/Account'
 export interface Pagination {
   selectedSize: number
   currentPage: number
-  pageSizes: number[]
+  pageSizes?: number[]
   total?: number
 }
 

@@ -38,7 +38,16 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
+interface Predicate {
+  field: string
+  operation: string
+  set: any[]
+  inverse?: boolean
+}
+
 const accounts = require('../../../assets/bakers/json/accounts.json')
+export const addCycleFromLevel = right => ({ ...right, cycle: Math.floor(right.level / 4096) })
+
 @Injectable({
   providedIn: 'root'
 })
@@ -70,7 +79,10 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
+  constructor(
+    private readonly http: HttpClient,
+    public readonly chainNetworkService: ChainNetworkService
+  ) {}
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -824,23 +836,25 @@ export class ApiService {
     })
   }
 
-  public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
+  public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
+    const _predicates = [
+      {
+        field: 'delegate',
+        operation: 'eq',
+        set: [address]
+      },
+      {
+        field: 'priority',
+        operation: 'eq',
+        set: ['0']
+      }
+    ].concat(predicates || [])
+
     return this.http
       .post<BakingRights[]>(
         this.bakingRightsApiUrl,
         {
-          predicates: [
-            {
-              field: 'delegate',
-              operation: 'eq',
-              set: [address]
-            },
-            {
-              field: 'priority',
-              operation: 'eq',
-              set: ['0']
-            }
-          ],
+          predicates: _predicates,
           orderBy: [
             {
               field: 'level',
@@ -851,7 +865,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(map((rights: BakingRights[]) => rights.map(right => ({ ...right, cycle: Math.floor(right.level / 4096) }))))
+      .pipe(map((rights: BakingRights[]) => rights.map(addCycleFromLevel)))
   }
 
   public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
@@ -876,8 +890,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(
-        map((rights: EndorsingRights[]) => rights.map(right => ({ ...right, cycle: Math.floor(right.level / 4096) }))))
+      .pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)))
   }
 
   public getEndorsedSlotsCount(blockHash: string): Observable<number> {

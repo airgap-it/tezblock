@@ -5,6 +5,9 @@ export const filter = (condition: (entity) => boolean) => (array: any[]) => arra
 export function first<T>(array: T[]) {
   return isNotEmptyArray(array) ? array[0] : undefined
 }
+export function last<T>(array: T[]) {
+  return isNotEmptyArray(array) ? array[array.length - 1] : undefined
+}
 export function get<T>(accessor: (_entity: T) => any) {
   return (entity: T) => (entity ? accessor(entity) : undefined)
 }
