@@ -22,8 +22,8 @@
   </tab>
 
   <tezblock-table
-    [loading]="loading"
-    [data]="data"
+    [loading]="loading | async"
+    [data]="data | async"
     [page]="page"
     [type]="kindToOperationTypes(selectedTab.kind)"
     [showLoadMoreButton]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"

@@ -1,6 +1,6 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
-    <ng-container *ngIf="latestTx$ | async; else noBlock">
+    <ng-container *ngIf="latestTx$ | async">
       <div class="card h-100 pt-3 mb-">
         <transaction-detail-wrapper
           [latestTransaction$]="latestTx$"
@@ -28,7 +28,7 @@
         </div>
       </div>
     </ng-container>
-    <ng-template #noBlock>
+    <ng-container *ngIf="isInvalidHash$ | async">
       <div class="card p-3">
         <h5 class="card-title mb-4">
           Invalid Operation Hash
@@ -37,6 +37,6 @@
           This hash is invalid, it might not yet have been included in the blockchain.
         </p>
       </div>
-    </ng-template>
+    </ng-container>
   </div>
 </div>

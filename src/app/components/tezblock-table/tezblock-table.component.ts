@@ -13,7 +13,7 @@ import {
   ViewContainerRef
 } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
 import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
@@ -665,8 +665,6 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   @ViewChildren('dynamic', { read: ViewContainerRef }) cells?: QueryList<ViewContainerRef>
 
   config: Column[] = []
-
-  transactions$: Observable<Transaction[]>
   transactions: Transaction[] = []
   loading$: Observable<boolean>
   filterTerm: FormControl
@@ -676,23 +674,14 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   expandedRowsPage: Pagination[] = []
 
   @Input()
-  set data(value: Observable<Transaction[]> | undefined) {
-    if (value) {
-      if (this.subscription) {
-        this.subscription.unsubscribe()
-      }
-
-      this.transactions$ = value
-      this.subscription = this.transactions$.subscribe(transactions => (this.transactions = transactions))
+  set data(transactions: Transaction[] | undefined) {
+    if (transactions !== this.transactions) {
+      this.transactions = transactions
     }
   }
 
   @Input()
-  set loading(value: Observable<boolean> | undefined) {
-    if (value) {
-      this.loading$ = value
-    }
-  }
+  loading: boolean
 
   @Input()
   showLoadMoreButton?: boolean = false
@@ -708,8 +697,6 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   @Output()
   readonly loadMoreClicked: EventEmitter<void> = new EventEmitter()
-
-  private subscription: Subscription
 
   constructor(
     private readonly componentFactoryResolver: ComponentFactoryResolver,
@@ -849,5 +836,14 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   loadMore() {
     this.loadMoreClicked.emit()
+  }
+
+  trackByFn(index, item: Transaction) {
+    // transaction
+    if (['transaction', 'delegation', 'origination', 'endorsement', 'ballot'].includes(this.type)) {
+      return item.operation_group_hash + item.timestamp
+    }
+
+    return item
   }
 }

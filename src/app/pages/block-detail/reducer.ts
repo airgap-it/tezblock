@@ -44,7 +44,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadBlockSucceeded, (state, { block }) => ({
     ...state,
-    block,
+    block: block || null,
     busy: {
       ...state.busy,
       block: false

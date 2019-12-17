@@ -156,12 +156,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly cycleService: CycleService
   ) {
     super()
+    this.store$.dispatch(actions.reset())
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   public async ngOnInit() {
-    this.store$.dispatch(actions.reset())
-
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.relatedAccounts = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.rights$ = this.rightsSingleService.rights$
