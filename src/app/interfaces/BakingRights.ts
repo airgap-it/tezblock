@@ -5,6 +5,7 @@ export interface BakingRights {
   block_hash: string
   level: number
   cycle: number
+  rewards?: string
 }
 
 export interface AggregatedBakingRights {

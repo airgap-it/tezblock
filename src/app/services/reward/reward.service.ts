@@ -7,15 +7,10 @@ import { range } from 'lodash'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/services/facade/facade'
 import { Payout } from '@tezblock/interfaces/Payout'
-import { addCycleFromLevel, ApiService } from '@tezblock/services/api/api.service'
-import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
-import { last, groupBy } from '@tezblock/services/fp'
 
 export interface ExpTezosRewards extends TezosRewards {
   payouts: Payout[]
 }
-
-const cycleToLevel = (cycle: number): number => cycle * 4096
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +18,7 @@ const cycleToLevel = (cycle: number): number => cycle * 4096
 export class RewardService {
   protocol: TezosProtocol
 
-  constructor(private readonly apiService: ApiService, private readonly chainNetworkService: ChainNetworkService) {
+  constructor(private readonly chainNetworkService: ChainNetworkService) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
 
@@ -84,48 +79,6 @@ export class RewardService {
           )
         )
       )
-    )
-  }
-
-  getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
-    const group = groupBy('cycle')
-
-    return this.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
-      switchMap(cycles => {
-        const level = cycleToLevel(last(cycles)) - 1//-1 to hack operation: 'gt' into: operation: 'ge'/'gte'
-        const predicates = [
-          {
-            field: 'level',
-            operation: 'gt',
-            set: [level]
-          }
-        ]
-
-        return this.apiService.getBakingRights(address, null, predicates).pipe(
-          map((rights: BakingRights[]) => rights.map(addCycleFromLevel)),
-          map((rights: BakingRights[]) =>
-            Object.entries(group(rights)).map(
-              ([cycle, items]) =>
-                <AggregatedBakingRights>{
-                  cycle: parseInt(cycle),
-                  bakingsCount: (<any[]>items).length,
-                  blockRewards: undefined,
-                  deposits: undefined,
-                  fees: undefined,
-                  items
-                }
-            )
-          ),
-          switchMap((aggregatedRights: AggregatedBakingRights[]) => {
-            return forkJoin(aggregatedRights.map(aggregatedRight =>
-              from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
-                map(reward => {
-                  return aggregatedRight
-                })
-              )))
-          })
-        )
-      })
     )
   }
 }
