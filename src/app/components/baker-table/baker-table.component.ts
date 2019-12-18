@@ -128,7 +128,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     columns: [
       { name: 'Cycle', property: 'cycle', component: null },
       { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
-      { name: 'Level', property: 'level', component: null },
+      { name: 'Level', property: 'level', component: 'app-block-cell' },
       { name: 'Priority', property: 'priority', component: null },
       { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
       { name: 'Fees', property: null, component: 'amount-cell' },
@@ -142,8 +142,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     columns: [
       { name: 'Cycle', property: 'cycle', component: null },
       { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
-      { name: 'Level', property: 'level', component: null },
-      { name: 'Slot', property: null, component: null },
+      { name: 'Level', property: 'level', component: 'app-block-cell' },
+      { name: 'Slot', property: 'slot', component: null },
       { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
       { name: 'Deposits', property: null, component: 'amount-cell' }
     ],
