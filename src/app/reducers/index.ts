@@ -8,9 +8,11 @@ import * as fromList from '../pages/list/reducer'
 import * as accountDetails from '../pages/account-detail/reducer'
 import * as blockDetails from '../pages/block-detail/reducer'
 import * as transactionDetails from '../pages/transaction-detail/reducer'
+import * as bakerTable from '../components/baker-table/reducer'
 
 export interface State {
   accountDetails: accountDetails.State
+  bakerTable: bakerTable.State
   blockDetails: blockDetails.State
   endorsementDetails: fromEndorsementDetails.State
   transactionDetails: transactionDetails.State
@@ -25,6 +27,7 @@ export interface State {
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
     accountDetails: accountDetails.reducer,
+    bakerTable: bakerTable.reducer,
     blockDetails: blockDetails.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
     transactionDetails: transactionDetails.reducer,

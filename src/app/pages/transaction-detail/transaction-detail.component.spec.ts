@@ -1,14 +1,12 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { BsModalService, ModalModule, TabsetConfig, TabsModule, TooltipModule } from 'ngx-bootstrap'
 import { MomentModule } from 'ngx-moment'
-import { Store } from '@ngrx/store'
 import { Actions } from '@ngrx/effects'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { EMPTY } from 'rxjs'
 
-import { storeMock } from 'test-config/mocks'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TabbedTableComponent } from 'src/app/components/tabbed-table/tabbed-table.component'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
@@ -37,7 +35,6 @@ describe('TransactionDetailComponent', () => {
           TabsetConfig,
           BsModalService,
           ToastrService,
-          { provide: Store, useValue: storeMock },
           { provide: Actions, useValue: EMPTY }
         ],
         imports: [

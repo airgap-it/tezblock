@@ -10,7 +10,7 @@ export interface EndorsingRights {
 export interface AggregatedEndorsingRights {
   cycle: number
   endorsementsCount: number
-  endorsementRewards: number // ?
+  endorsementRewards: string
   deposits: number // ?
   items: EndorsingRights[]
 }

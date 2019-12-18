@@ -11,7 +11,7 @@ export interface BakingRights {
 export interface AggregatedBakingRights {
   cycle: number
   bakingsCount: number
-  blockRewards: number // ?
+  blockRewards: string
   deposits: number // ?
   fees: number // ?
   items: BakingRights[]

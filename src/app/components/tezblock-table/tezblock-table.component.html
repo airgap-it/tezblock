@@ -80,6 +80,7 @@
                           <td *ngFor="let column of expandedRow.columns" [ngSwitch]="column.component">
                             <address-cell *ngSwitchCase="'address-cell'" [data]="detail[column.property]"></address-cell>
                             <amount-cell *ngSwitchCase="'amount-cell'" [data]="detail[column.property]"></amount-cell>
+                            <app-timestamp-cell *ngSwitchCase="'app-timestamp-cell'" [data]="detail[column.property]"></app-timestamp-cell>
                             <ng-container *ngSwitchCase="'pipe:percentage'">
                                 {{ detail[column.property] | percentage }}
                             </ng-container>
