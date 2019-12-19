@@ -13,6 +13,7 @@ import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get } from '@tezblock/services/fp'
+import { ProposalListDto } from '@tezblock/interfaces/Proposal'
 
 export interface OperationCount {
   [key: string]: string
@@ -1111,5 +1112,27 @@ export class ApiService {
           }))
         )
       )
+  }
+
+  getProposals(limit: number): Observable<ProposalListDto[]> {
+    const noBraces = /[\[\]']/g
+    const toValidForm = (proposalListDto: ProposalListDto): ProposalListDto => ({
+      ...proposalListDto,
+      proposal: first(proposalListDto.proposal.replace(noBraces, '').split(','))
+    })
+
+    return this.http
+      .post<ProposalListDto[]>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'operation_group_hash'],
+          predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
+          orderBy: [{ field: 'proposal', direction: 'desc' }],
+          aggregation: [{ field: 'operation_group_hash', function: 'count' }],
+          limit
+        },
+        this.options
+      )
+      .pipe(map(proposals => proposals.map(toValidForm)))
   }
 }

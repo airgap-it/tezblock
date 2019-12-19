@@ -54,7 +54,7 @@
               [data]="data$ | async"
               [page]="page"
               [type]="type"
-              [showLoadMoreButton]="true"
+              [showLoadMoreButton]="showLoadMore$ | async"
               (loadMoreClicked)="loadMore()"
             ></tezblock-table>
           </div>

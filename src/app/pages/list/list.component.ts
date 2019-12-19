@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { merge, Observable, of, timer } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
@@ -20,20 +20,21 @@ import { refreshRate } from '@tezblock/services/facade/facade'
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent extends BaseComponent implements OnInit {
-  public tabs: Tab[]
-  public page: string
-  public loading$: Observable<boolean>
-  public type: string
-  private dataService
-  public data$: Observable<Object>
-  public componentView: string | undefined
-  public transactionsLoading$: Observable<boolean>
-
+  tabs: Tab[]
+  page: string
+  loading$: Observable<boolean>
+  type: string
+  data$: Observable<Object>
+  componentView: string | undefined
+  transactionsLoading$: Observable<boolean>
+  showLoadMore$: Observable<boolean>
   totalActiveBakers$: Observable<number>
 
   private get routeName(): string {
     return this.route.snapshot.paramMap.get('route')
   }
+
+  private dataService
 
   constructor(
     private readonly actions$: Actions,
@@ -57,6 +58,8 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
       ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
     )
+
+    this.showLoadMore$ = of(true)
 
     this.route.params.subscribe(params => {
       try {
@@ -129,11 +132,27 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.store$.dispatch(actions.loadTotalActiveBakers())
               })
             )
-            this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
-            this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
+            this.loading$ = this.store$.select(state => state.list.activeBakers.loading)
+            this.data$ = this.store$.select(state => state.list.activeBakers.data)
             this.page = 'account'
             this.type = 'baker_overview'
-            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
+            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
+            break
+          case 'proposal':
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadProposals())))
+            this.loading$ = this.store$.select(state => state.list.proposals.loading)
+            this.data$ = this.store$.select(state => state.list.proposals.data)
+            this.showLoadMore$ = this.store$
+              .select(state => state.list.proposals)
+              .pipe(
+                map(
+                  proposals =>
+                    Array.isArray(proposals.data) &&
+                    proposals.pagination.currentPage * proposals.pagination.selectedSize === proposals.data.length
+                )
+              )
+            this.page = 'transaction'
+            this.type = 'proposal'
             break
           default:
             throw new Error('unknown route')
@@ -155,6 +174,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'bakers':
         this.store$.dispatch(actions.increasePageOfActiveBakers())
+        break
+      case 'proposal':
+        this.store$.dispatch(actions.increasePageOfProposals())
         break
       default:
         ;(this.dataService as any).loadMore()

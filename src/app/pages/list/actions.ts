@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
+import { ProposalListDto } from '@tezblock/interfaces/Proposal'
 
 const featureName = 'List'
 
@@ -32,5 +33,13 @@ export const loadTotalActiveBakersSucceeded = createAction(
   props<{ totalActiveBakers: number }>()
 )
 export const loadTotalActiveBakersFailed = createAction(`[${featureName}] Load Total Active Bakers Failed`, props<{ error: any }>())
+
+export const loadProposals = createAction(`[${featureName}] Load Proposals`)
+export const loadProposalsSucceeded = createAction(
+  `[${featureName}] Load Proposals Succeeded`,
+  props<{ proposals: ProposalListDto[] }>()
+)
+export const loadProposalsFailed = createAction(`[${featureName}] Load Proposals Failed`, props<{ error: any }>())
+export const increasePageOfProposals = createAction(`[${featureName}] Increase Page Of Proposals`)
 
 export const reset = createAction(`[${featureName}] Reset`)
