@@ -249,7 +249,7 @@ function getLayouts(showFiat: boolean = true): Layout {
           component: AmountCellComponent,
           options: { showFiatValue: showFiat }
         },
-        { name: 'Deposits', property: 'deposit', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Deposits', property: 'bakingDeposits', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
@@ -263,7 +263,13 @@ function getLayouts(showFiat: boolean = true): Layout {
           component: AmountCellComponent,
           options: { showFiatValue: showFiat }
         },
-        { name: 'Deposits', property: 'deposit', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        {
+          name: 'Deposits',
+          property: 'endorsingDeposits',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
       [OperationTypes.BakerOverview]: [

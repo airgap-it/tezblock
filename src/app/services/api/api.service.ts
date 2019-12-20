@@ -1,3 +1,4 @@
+import { BigNumber } from 'bignumber.js'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
@@ -941,10 +942,14 @@ export class ApiService {
                     return {
                       ...aggregatedRight,
                       blockRewards: reward.totalRewards,
+                      bakingDeposits: reward.bakingDeposits,
+                      fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
                         ...item,
                         rewards: rewardByLabel[item.level],
-                        deposit: reward.bakingRewardsDetails.find(detail => detail.level === item.level).deposit,
+                        deposit: reward.bakingRewardsDetails.find(detail => detail.level === item.level)
+                          ? reward.bakingRewardsDetails.find(detail => detail.level === item.level).deposit
+                          : '0',
                         fees: reward.bakingRewardsDetails.find(detail => detail.level === item.level).fees
                       }))
                     }
@@ -1033,10 +1038,13 @@ export class ApiService {
                     return {
                       ...aggregatedRight,
                       endorsementRewards: reward.totalRewards,
+                      endorsingDeposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
                         rewards: rewardByLabel[item.level],
-                        deposit: reward.endorsingRewardsDetails.find(detail => detail.level === item.level).deposit
+                        deposit: reward.endorsingRewardsDetails.find(detail => detail.level === item.level)
+                          ? reward.endorsingRewardsDetails.find(detail => detail.level === item.level).deposit
+                          : '0'
                       }))
                     }
                   })
