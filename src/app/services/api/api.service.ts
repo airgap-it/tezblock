@@ -13,7 +13,7 @@ import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get } from '@tezblock/services/fp'
-import { ProposalListDto } from '@tezblock/interfaces/Proposal'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 export interface OperationCount {
   [key: string]: string
@@ -1112,6 +1112,21 @@ export class ApiService {
           }))
         )
       )
+  }
+
+  getProposal(id: string): Observable<any> {
+    return this.http
+      .post<any>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'period'],
+          predicates: [
+            { field: 'proposal', operation: 'eq', set: [id], inverse: false }
+          ],
+          limit: 1
+        },
+        this.options
+      ).pipe(map(first))
   }
 
   getProposals(limit: number): Observable<ProposalListDto[]> {

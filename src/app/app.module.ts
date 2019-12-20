@@ -67,8 +67,9 @@ import { ListEffects } from './pages/list/effects'
 import { StorageModule } from '@ngx-pwa/local-storage';
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
-import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-
+import { TransactionDetailEffects } from './pages/transaction-detail/effects';
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 @NgModule({
   imports: [
     AlertModule.forRoot(),
@@ -108,7 +109,8 @@ import { TransactionDetailEffects } from './pages/transaction-detail/effects'
       ListEffects,
       AccountDetailEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ProposalDetailEffects
     ]),
 	StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -148,7 +150,8 @@ import { TransactionDetailEffects } from './pages/transaction-detail/effects'
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
-    SearchItemComponent
+    SearchItemComponent,
+    ProposalDetailComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

@@ -593,13 +593,14 @@ function getLayouts(showFiat: boolean = true): Layout {
           name: 'Proposal Hash',
           property: 'proposal',
           width: '',
+          component: HashCellComponent,
+          options: { kind: 'proposal' }
         },
-        {
-          name: 'Period',
-          property: 'count_operation_group_hash',
-          width: '',
-          // component: AddressCellComponent
-        }
+        // {
+        //   name: 'Period',
+        //   property: 'count_operation_group_hash',
+        //   width: ''
+        // }
       ],
       [OperationTypes.DoubleBakingEvidenceOverview]: [
         {

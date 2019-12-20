@@ -4,7 +4,7 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { Pagination } from '@tezblock/services/facade/facade'
-import { ProposalListDto } from '@tezblock/interfaces/Proposal'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 const preprocessBakersData = (bakerData: any[]) =>
   bakerData.map(bakerDataItem => ({

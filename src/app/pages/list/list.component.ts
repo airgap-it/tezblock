@@ -59,8 +59,6 @@ export class ListComponent extends BaseComponent implements OnInit {
       ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
     )
 
-    this.showLoadMore$ = of(true)
-
     this.route.params.subscribe(params => {
       try {
         switch (params.route) {
@@ -69,12 +67,14 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'block'
             this.setupTable(params.route, 'overview')
+            this.showLoadMore$ = of(true)
             break
           case 'transaction':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'overview')
+            this.showLoadMore$ = of(true)
             break
           case 'activation':
             this.dataService = new TransactionService(this.apiService)
@@ -82,6 +82,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'activate_account')
+            this.showLoadMore$ = of(true)
             break
           case 'origination':
             this.dataService = new TransactionService(this.apiService)
@@ -89,6 +90,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'origination_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'delegation':
             this.dataService = new TransactionService(this.apiService)
@@ -96,6 +98,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'delegation_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'endorsement':
             this.dataService = new TransactionService(this.apiService)
@@ -103,6 +106,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'endorsement_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
@@ -110,6 +114,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'ballot_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'double-baking':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
@@ -117,6 +122,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.data$ = this.store$.select(state => state.list.doubleBakings.data)
             this.page = 'transaction'
             this.type = 'double_baking_evidence_overview'
+            this.showLoadMore$ = of(true)
             break
           case 'double-endorsement':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
@@ -124,6 +130,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
             this.page = 'transaction'
             this.type = 'double_endorsement_evidence_overview'
+            this.showLoadMore$ = of(true)
             break
           case 'bakers':
             this.subscriptions.push(
@@ -137,6 +144,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.page = 'account'
             this.type = 'baker_overview'
             this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
+            this.showLoadMore$ = of(true)
             break
           case 'proposal':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadProposals())))

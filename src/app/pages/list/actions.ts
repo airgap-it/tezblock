@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { ProposalListDto } from '@tezblock/interfaces/Proposal'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 const featureName = 'List'
 
