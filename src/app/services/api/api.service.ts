@@ -1,3 +1,4 @@
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
@@ -82,7 +83,11 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService, private readonly rewardService: RewardService) {
+  constructor(
+    private readonly http: HttpClient,
+    public readonly chainNetworkService: ChainNetworkService,
+    private readonly rewardService: RewardService
+  ) {
     const network = this.chainNetworkService.getNetwork()
     this.protocol = new TezosProtocol(
       this.environmentUrls.rpcUrl,
@@ -928,18 +933,19 @@ export class ApiService {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
                 from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
-                  map(reward => {
+                  map((reward: TezosRewards) => {
                     const rewardByLabel = reward.bakingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
                       {}
                     )
-
                     return {
                       ...aggregatedRight,
                       blockRewards: reward.totalRewards,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
-                        rewards: rewardByLabel[item.level]
+                        rewards: rewardByLabel[item.level],
+                        deposit: reward.bakingRewardsDetails.find(detail => detail.level === item.level).deposit,
+                        fees: reward.bakingRewardsDetails.find(detail => detail.level === item.level).fees
                       }))
                     }
                   })
@@ -1018,7 +1024,7 @@ export class ApiService {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
                 from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
-                  map(reward => {
+                  map((reward: TezosRewards) => {
                     const rewardByLabel = reward.endorsingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
                       {}
@@ -1029,7 +1035,8 @@ export class ApiService {
                       endorsementRewards: reward.totalRewards,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
-                        rewards: rewardByLabel[item.level]
+                        rewards: rewardByLabel[item.level],
+                        deposit: reward.endorsingRewardsDetails.find(detail => detail.level === item.level).deposit
                       }))
                     }
                   })

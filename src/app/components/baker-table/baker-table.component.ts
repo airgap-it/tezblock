@@ -131,8 +131,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       { name: 'Level', property: 'level', component: 'app-block-cell' },
       { name: 'Priority', property: 'priority', component: null },
       { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
-      { name: 'Fees', property: null, component: 'amount-cell' },
-      { name: 'Deposits', property: null, component: 'amount-cell' }
+      { name: 'Fees', property: 'fees', component: 'amount-cell' },
+      { name: 'Deposits', property: 'deposit', component: 'amount-cell' }
     ],
     key: 'cycle',
     dataSelector: entity => entity.items,
@@ -145,7 +145,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       { name: 'Level', property: 'level', component: 'app-block-cell' },
       { name: 'Slot', property: 'slot', component: null },
       { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
-      { name: 'Deposits', property: null, component: 'amount-cell' }
+      { name: 'Deposits', property: 'deposit', component: 'amount-cell' }
     ],
     key: 'cycle',
     dataSelector: entity => entity.items,
@@ -179,30 +179,26 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.rights$ = this.store$.select(state => state.bakerTable.kind).pipe(
-      switchMap(kind => {
-        if (kind === OperationTypes.BakingRights) {
-          return this.store$.select(state => state.bakerTable.bakingRights).pipe(
-            map(table => table.data)
-          )
-        }
+    this.rights$ = this.store$
+      .select(state => state.bakerTable.kind)
+      .pipe(
+        switchMap(kind => {
+          if (kind === OperationTypes.BakingRights) {
+            return this.store$.select(state => state.bakerTable.bakingRights).pipe(map(table => table.data))
+          }
 
-        if (kind === OperationTypes.EndorsingRights) {
-          return this.store$.select(state => state.bakerTable.endorsingRights).pipe(
-            map(table => table.data)
-          )
-        }
+          if (kind === OperationTypes.EndorsingRights) {
+            return this.store$.select(state => state.bakerTable.endorsingRights).pipe(map(table => table.data))
+          }
 
-        return EMPTY
-      })
-    )
+          return EMPTY
+        })
+      )
     this.rewards$ = this.rewardSingleService.rewards$
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
-    ).pipe(
-      map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading)
-    )
+    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
     this.rewardsLoading$ = this.rewardSingleService.loading$
     this.accountLoading$ = this.accountSingleService.loading$
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
@@ -268,5 +264,4 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
   }
-
 }
