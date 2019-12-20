@@ -73,7 +73,7 @@ export enum OperationTypes {
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
   DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview',
   BakerOverview = 'baker_overview',
-  Proposal = 'proposal'
+  ProposalOverview = 'proposal_overview'
 }
 
 interface Layout {
@@ -107,7 +107,7 @@ interface Layout {
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
     [OperationTypes.BallotOverview]: Column[]
-    [OperationTypes.Proposal]: Column[]
+    [OperationTypes.ProposalOverview]: Column[]
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
     [OperationTypes.Ballot]: Column[]
@@ -588,7 +588,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
         ...baseTx
       ],
-      [OperationTypes.Proposal]: [
+      [OperationTypes.ProposalOverview]: [
         {
           name: 'Proposal Hash',
           property: 'proposal',

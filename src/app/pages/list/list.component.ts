@@ -13,6 +13,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 @Component({
   selector: 'app-list',
@@ -159,8 +160,8 @@ export class ListComponent extends BaseComponent implements OnInit {
                     proposals.pagination.currentPage * proposals.pagination.selectedSize === proposals.data.length
                 )
               )
-            this.page = 'transaction'
-            this.type = 'proposal'
+            this.page = LayoutPages.Transaction
+            this.type = OperationTypes.ProposalOverview
             break
           default:
             throw new Error('unknown route')
