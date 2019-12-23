@@ -64,10 +64,11 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage';
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
+import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 
 @NgModule({
   imports: [
@@ -110,7 +111,7 @@ import { TransactionDetailEffects } from './pages/transaction-detail/effects'
       BlockDetailEffects,
       TransactionDetailEffects
     ]),
-	StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,
@@ -148,7 +149,8 @@ import { TransactionDetailEffects } from './pages/transaction-detail/effects'
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
-    SearchItemComponent
+    SearchItemComponent,
+    ProtocolConstantComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
