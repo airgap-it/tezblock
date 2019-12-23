@@ -184,6 +184,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.route.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.getBakingInfos(address)
