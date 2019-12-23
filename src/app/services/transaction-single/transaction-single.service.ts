@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core'
+import { Injectable, ComponentFactoryResolver } from '@angular/core'
 import { combineLatest, forkJoin, merge, Observable, of, timer } from 'rxjs'
 import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
 
@@ -6,6 +6,8 @@ import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
 import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
 import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { setTime } from 'ngx-bootstrap/chronos/utils/date-setters'
 
 interface TransactionSingleServiceState {
   transactions: Transaction[]
@@ -68,7 +70,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
 
   actionType$: Observable<LayoutPages>
 
-  constructor(private readonly apiService: ApiService) {
+  constructor(private readonly apiService: ApiService, private readonly amountConverterPipe?: AmountConverterPipe) {
     super(initialState)
 
     const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$]
@@ -227,20 +229,25 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
+
+  // TODO: getAllTransactionsByAddress needs to be redone. As of now, in case of delegations, the index value delegatedBalance
+  // is not assigned at runtime and therefore we need to make use of setTimeout
   download(layoutPage: string = 'account', limit: number = 100) {
     console.log('downloading')
     if (layoutPage === 'account') {
       this.getAllTransactionsByAddress(this._state.address, this._state.kind, limit).subscribe(transactions => {
-        let data = transactions
-        let csvData = this.ConvertToCSV(data)
-        let a = document.createElement('a')
-        a.setAttribute('style', 'display:none;')
-        document.body.appendChild(a)
-        let blob = new Blob([csvData], { type: 'text/csv' })
-        let url = window.URL.createObjectURL(blob)
-        a.href = url
-        a.download = this._state.kind + '.csv'
-        a.click()
+        setTimeout(() => {
+          let data = transactions
+          let csvData = this.ConvertToCSV(data)
+          let a = document.createElement('a')
+          a.setAttribute('style', 'display:none;')
+          document.body.appendChild(a)
+          let blob = new Blob([csvData], { type: 'text/csv' })
+          let url = window.URL.createObjectURL(blob)
+          a.href = url
+          a.download = this._state.kind + '.csv'
+          a.click()
+        }, 1000)
       })
     } else if (layoutPage === 'block') {
       this.apiService.getTransactionsByField(this._state.block, 'block_hash', this._state.kind, limit).subscribe(transactions => {
@@ -253,7 +260,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         let url = window.URL.createObjectURL(blob)
         a.href = url
         a.download = this._state.kind + '.csv'
-        a.click()
+        // a.click()
       })
     } else if (layoutPage === 'transaction') {
       this.apiService.getTransactionsById(this._state.hash, limit).subscribe(transactions => {
@@ -266,7 +273,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         let url = window.URL.createObjectURL(blob)
         a.href = url
         a.download = this._state.kind + '.csv'
-        a.click()
+        // a.click()
       })
     }
   }
@@ -275,22 +282,50 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
     let str = ''
     let row = ''
+    let indexTable: string[] = []
 
     for (let index in objArray[0]) {
-      row += index + ','
+      if (
+        index === 'source' ||
+        index === 'destination' ||
+        index === 'delegate' ||
+        index === 'timestamp' ||
+        index === 'amount' ||
+        index === 'delegatedBalance' ||
+        index === 'fee' ||
+        index === 'block_level' ||
+        index === 'operation_group_hash'
+      ) {
+        row += index + ','
+        indexTable.push(index)
+      }
     }
+    console.log('index table: ', indexTable)
     row = row.slice(0, -1)
     str += row + '\r\n'
 
     for (let i = 0; i < array.length; i++) {
       let line = ''
-      for (const index in array[i]) {
+      indexTable.forEach(index => {
         if (line != '') {
           line += ','
         }
 
-        line += array[i][index]
-      }
+        if (index === 'timestamp') {
+          array[i][index] = new Date(array[i][index])
+          line += array[i][index]
+        } else {
+          line += array[i][index]
+        }
+      })
+      // for (const index in indexTable) {
+      //   console.log('index: ', indexTable)
+      //   if (line != '') {
+      //     line += ','
+      //   }
+      //   console.log('array i index: ', array[i])
+      //   line += array[i][index]
+      // }
       str += line + '\r\n'
     }
 
