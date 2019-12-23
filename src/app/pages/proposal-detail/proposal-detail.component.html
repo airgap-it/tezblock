@@ -26,10 +26,10 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Proposal Alias</p>
+              <p class="text-secondary mb-0">Proposal Name</p>
             </div>
             <div class="col-md-9">
-              {{ proposal.proposal | alias : 'proposal' }}
+              {{ proposal.proposal | alias: 'proposal' }}
             </div>
           </div>
           <div class="row mb-3">
@@ -42,12 +42,22 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Agora</p>
+              <p class="text-secondary mb-0">More Information</p>
             </div>
             <div class="col-md-9">
-              <a [href]="'https://www.tezosagora.org/period/' + proposal.period">
-                Link to Tezos Agora
-              </a>
+              <div class="d-block">
+                <div>
+                  <img src="/assets/img/tezos-agora.svg" width="16px" />
+                  <a
+                    role="button"
+                    class="btn btn-link py-0 text-capitalize"
+                    [href]="'https://www.tezosagora.org/period/' + proposal.period"
+                    target="_blank"
+                  >
+                    Tezos Agora
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
