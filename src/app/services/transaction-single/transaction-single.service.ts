@@ -227,11 +227,9 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
-  download(limit: number = 100) {
-    const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage }
-    console.log('pagination: ', pagination)
+  download(layoutPage: string = 'account', limit: number = 100) {
     console.log('downloading')
-    if (LayoutPages.Account) {
+    if (layoutPage === 'account') {
       this.getAllTransactionsByAddress(this._state.address, this._state.kind, limit).subscribe(transactions => {
         let data = transactions
         let csvData = this.ConvertToCSV(data)
@@ -244,7 +242,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         a.download = this._state.kind + '.csv'
         a.click()
       })
-    } else if (LayoutPages.Block) {
+    } else if (layoutPage === 'block') {
       this.apiService.getTransactionsByField(this._state.block, 'block_hash', this._state.kind, limit).subscribe(transactions => {
         let data = transactions
         let csvData = this.ConvertToCSV(data)
@@ -257,7 +255,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         a.download = this._state.kind + '.csv'
         a.click()
       })
-    } else if (LayoutPages.Transaction) {
+    } else if (layoutPage === 'transaction') {
       this.apiService.getTransactionsById(this._state.hash, limit).subscribe(transactions => {
         let data = transactions
         let csvData = this.ConvertToCSV(data)

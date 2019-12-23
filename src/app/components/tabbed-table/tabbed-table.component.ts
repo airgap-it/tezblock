@@ -204,7 +204,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   public download() {
     if (this.dataService && this.dataService.download) {
-      this.dataService.download(this.selectedTab.count)
+      this.dataService.download(this.page, this.selectedTab.count)
     }
   }
 }
