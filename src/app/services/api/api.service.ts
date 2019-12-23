@@ -1120,13 +1120,12 @@ export class ApiService {
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'period'],
-          predicates: [
-            { field: 'proposal', operation: 'eq', set: [id], inverse: false }
-          ],
+          predicates: [{ field: 'proposal', operation: 'eq', set: [id], inverse: false }],
           limit: 1
         },
         this.options
-      ).pipe(map(first))
+      )
+      .pipe(map(first))
   }
 
   getProposals(limit: number): Observable<ProposalListDto[]> {
@@ -1134,9 +1133,9 @@ export class ApiService {
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,
         {
-          fields: ['proposal', 'operation_group_hash'],
+          fields: ['proposal', 'operation_group_hash', 'period'],
           predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
-          orderBy: [{ field: 'proposal', direction: 'desc' }],
+          orderBy: [{ field: 'period', direction: 'desc' }],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],
           limit
         },
