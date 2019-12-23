@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 
 import { toAlias } from '@tezblock/interfaces/proposal'
+import { withoutBraces } from '@tezblock/services/fp'
 
 interface Options {
   kind: 'transaction' | 'endorsement' | 'proposal',
@@ -52,7 +53,7 @@ export class HashCellComponent {
 
   private setAllias() {
     if (this.options && this.options.kind === 'proposal' && !this.options.skipAlias) {
-      const alias = toAlias(this._data)
+      const alias = toAlias(withoutBraces(this._data))
 
       this.alias = alias !== this._data ? alias : null
     }
