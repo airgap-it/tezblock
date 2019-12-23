@@ -673,6 +673,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
   public returnedArray: any[] = []
   public smallnumPages = 0
   public isMainnet: boolean = false
+  public enableDownload: boolean = false
 
   public pageChanged(event: PageChangedEvent, cycle: number): void {
     const startItem = (event.page - 1) * event.itemsPerPage
@@ -821,6 +822,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   public ngOnChanges() {
     if (this.page && this.type) {
+      this.enableDownload = this.type === 'transaction' || this.type === 'delegation'
       const layouts = getLayouts(this.isMainnet)
       if (layouts[this.page][this.type]) {
         this.config = layouts[this.page][this.type]
