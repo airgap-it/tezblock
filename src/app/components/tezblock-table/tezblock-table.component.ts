@@ -205,7 +205,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
       ],
       [OperationTypes.Rewards]: [
@@ -585,17 +585,22 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
       ],
       [OperationTypes.ProposalOverview]: [
         {
-          name: 'Proposal Hash',
+          name: 'Proposal',
           property: 'proposal',
           width: '',
           component: HashCellComponent,
           options: { kind: 'proposal' }
         },
+        {
+          name: 'Proposal Hash',
+          property: 'proposal',
+          width: ''
+        }
         // {
         //   name: 'Period',
         //   property: 'count_operation_group_hash',
@@ -669,7 +674,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
       ]
     }
