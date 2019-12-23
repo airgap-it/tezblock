@@ -35,6 +35,6 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   }
 
   copyToClipboard() {
-    this.copyService.copyToClipboard(fromRoot.getState(this.store$).endorsementDetails.selectedEndorsement.operation_group_hash)
+    this.copyService.copyToClipboard(fromRoot.getState(this.store$).proposalDetails.proposal.proposal)
   }
 }

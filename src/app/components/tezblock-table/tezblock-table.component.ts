@@ -205,7 +205,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
       ],
       [OperationTypes.Rewards]: [
@@ -585,7 +585,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
       ],
       [OperationTypes.ProposalOverview]: [
@@ -595,7 +595,7 @@ function getLayouts(showFiat: boolean = true): Layout {
           width: '',
           component: HashCellComponent,
           options: { kind: 'proposal' }
-        },
+        }
         // {
         //   name: 'Period',
         //   property: 'count_operation_group_hash',
@@ -669,7 +669,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
       ]
     }

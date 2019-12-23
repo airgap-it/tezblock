@@ -1130,12 +1130,6 @@ export class ApiService {
   }
 
   getProposals(limit: number): Observable<ProposalListDto[]> {
-    const noBraces = /[\[\]']/g
-    const toValidForm = (proposalListDto: ProposalListDto): ProposalListDto => ({
-      ...proposalListDto,
-      proposal: first(proposalListDto.proposal.replace(noBraces, '').split(','))
-    })
-
     return this.http
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,
@@ -1148,6 +1142,6 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(map(proposals => proposals.map(toValidForm)))
+      .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 }

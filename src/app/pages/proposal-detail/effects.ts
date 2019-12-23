@@ -7,13 +7,12 @@ import * as _ from 'lodash'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 
 @Injectable()
 export class ProposalDetailEffects {
 
-  getEndorsements$ = createEffect(() =>
+  getProposal$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadProposal),
       switchMap(({ id }) =>

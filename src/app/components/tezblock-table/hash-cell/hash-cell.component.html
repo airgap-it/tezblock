@@ -1,8 +1,8 @@
 <a *ngIf="data" ng-href="#here" [routerLink]="[linkPath, data]" class="btn btn-link p-0" role="button">
     <ng-container *ngIf="alias; else noAlias">
-        {{ alias || data }}
+        {{ alias || data | withoutBraces }}
     </ng-container>
     <ng-template #noAlias>
-        {{ (alias || data) | shortenString }}
+        {{ (alias || data) | withoutBraces | shortenString }}
     </ng-template>
 </a>
