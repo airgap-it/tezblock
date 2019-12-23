@@ -251,29 +251,33 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
       })
     } else if (layoutPage === 'block') {
       this.apiService.getTransactionsByField(this._state.block, 'block_hash', this._state.kind, limit).subscribe(transactions => {
-        let data = transactions
-        let csvData = this.ConvertToCSV(data)
-        let a = document.createElement('a')
-        a.setAttribute('style', 'display:none;')
-        document.body.appendChild(a)
-        let blob = new Blob([csvData], { type: 'text/csv' })
-        let url = window.URL.createObjectURL(blob)
-        a.href = url
-        a.download = this._state.kind + '.csv'
-        // a.click()
+        setTimeout(() => {
+          let data = transactions
+          let csvData = this.ConvertToCSV(data)
+          let a = document.createElement('a')
+          a.setAttribute('style', 'display:none;')
+          document.body.appendChild(a)
+          let blob = new Blob([csvData], { type: 'text/csv' })
+          let url = window.URL.createObjectURL(blob)
+          a.href = url
+          a.download = this._state.kind + '.csv'
+          a.click()
+        }, 1000)
       })
     } else if (layoutPage === 'transaction') {
       this.apiService.getTransactionsById(this._state.hash, limit).subscribe(transactions => {
-        let data = transactions
-        let csvData = this.ConvertToCSV(data)
-        let a = document.createElement('a')
-        a.setAttribute('style', 'display:none;')
-        document.body.appendChild(a)
-        let blob = new Blob([csvData], { type: 'text/csv' })
-        let url = window.URL.createObjectURL(blob)
-        a.href = url
-        a.download = this._state.kind + '.csv'
-        // a.click()
+        setTimeout(() => {
+          let data = transactions
+          let csvData = this.ConvertToCSV(data)
+          let a = document.createElement('a')
+          a.setAttribute('style', 'display:none;')
+          document.body.appendChild(a)
+          let blob = new Blob([csvData], { type: 'text/csv' })
+          let url = window.URL.createObjectURL(blob)
+          a.href = url
+          a.download = this._state.kind + '.csv'
+          a.click()
+        }, 1000)
       })
     }
   }
@@ -294,7 +298,10 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         index === 'delegatedBalance' ||
         index === 'fee' ||
         index === 'block_level' ||
-        index === 'operation_group_hash'
+        index === 'operation_group_hash' ||
+        index === 'gas_limit' ||
+        index === 'storage_limit' ||
+        index === 'parameters'
       ) {
         row += index + ','
         indexTable.push(index)
