@@ -5,4 +5,14 @@ export interface BakingRights {
   block_hash: string
   level: number
   cycle: number
+  rewards?: string
+}
+
+export interface AggregatedBakingRights {
+  cycle: number
+  bakingsCount: number
+  blockRewards: string
+  deposits: number // ?
+  fees: number // ?
+  items: BakingRights[]
 }
