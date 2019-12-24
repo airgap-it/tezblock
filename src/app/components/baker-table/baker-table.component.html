@@ -233,6 +233,7 @@
         [data]="rights$ | async"
         [page]="page"
         [type]="selectedTab.kind"
+        [expandedRow]="rightsExpandedRow"
         (loadMoreClicked)="loadMoreRights()"
       ></tezblock-table>
     </ng-container>
