@@ -52,6 +52,7 @@ export class ApiService {
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
   private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -1111,5 +1112,25 @@ export class ApiService {
           }))
         )
       )
+  }
+
+  public getDelegationsForLast30Days(accountId: string): Observable<any[]> {
+    const today = new Date()
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 30
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+
+    return this.http.post<any[]>(
+      this.accountHistoryApiUrl,
+      {
+        fields: ['account_id', 'balance', 'asof'],
+        predicates: [
+          { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+          { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+        ],
+        orderBy: [{ field: 'account_id', direction: 'desc' }],
+        limit: 1000
+      },
+      this.options
+    )
   }
 }
