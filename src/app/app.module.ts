@@ -68,6 +68,7 @@ import { StorageModule } from '@ngx-pwa/local-storage';
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
+import { BakerTableEffects } from './components/baker-table/effects'
 
 @NgModule({
   imports: [
@@ -107,6 +108,7 @@ import { TransactionDetailEffects } from './pages/transaction-detail/effects'
       EndorsementDetailEffects,
       ListEffects,
       AccountDetailEffects,
+      BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects
     ]),
