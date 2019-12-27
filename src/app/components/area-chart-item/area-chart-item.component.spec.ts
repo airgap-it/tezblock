@@ -4,7 +4,7 @@ import { AreaChartItemComponent } from './area-chart-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-describe('PricechartItemComponent', () => {
+describe('AreaChartItemComponent', () => {
   let component: AreaChartItemComponent
   let fixture: ComponentFixture<AreaChartItemComponent>
 
@@ -22,6 +22,7 @@ describe('PricechartItemComponent', () => {
       .catch(console.error)
     fixture = TestBed.createComponent(AreaChartItemComponent)
     component = fixture.componentInstance
+    component.datasets = [{ data: [], label: null }]
     fixture.detectChanges()
   })
 

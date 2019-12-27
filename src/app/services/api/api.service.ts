@@ -39,6 +39,11 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
+export interface Delegation {
+  balance: number
+  asof: number
+}
+
 interface Predicate {
   field: string
   operation: string
@@ -1239,23 +1244,48 @@ export class ApiService {
       )
   }
 
-  public getDelegationsForLast30Days(accountId: string): Observable<any[]> {
+  public getDelegationsForLast30Days(accountId: string): Observable<Delegation[]> {
     const today = new Date()
-    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 30
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const lastItemOfTheDay = (value: Delegation, index: number, array: Delegation[]) => {
+      if (index === 0) {
+        return true
+      }
 
-    return this.http.post<any[]>(
-      this.accountHistoryApiUrl,
-      {
-        fields: ['account_id', 'balance', 'asof'],
-        predicates: [
-          { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
-          { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
-        ],
-        orderBy: [{ field: 'account_id', direction: 'desc' }],
-        limit: 1000
-      },
-      this.options
-    )
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Delegation[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
+      )
   }
 }

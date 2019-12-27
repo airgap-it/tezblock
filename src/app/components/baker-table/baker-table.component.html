@@ -201,7 +201,7 @@
                   </button>
                 </div>
               </div>
-              <div>
+              <div class="mb-4">
                 <h5 class="card-title__secondary mb-3">
                   Baking Efficiency
                 </h5>
@@ -218,6 +218,18 @@
                       </ng-container>
                     </button>
                   </div>
+                </div>
+              </div>
+              <div>
+                <h5 class="card-title__secondary mb-3">
+                  Delegations last 30 days
+                </h5>
+                <div class="d-block">
+                  <area-chart-item
+                    *ngIf="delegationsChartDatasets$ | async"
+                    [datasets]="delegationsChartDatasets$ | async"
+                    [labels]="delegationsChartLabels$ | async"
+                  ></area-chart-item>
                 </div>
               </div>
             </div>

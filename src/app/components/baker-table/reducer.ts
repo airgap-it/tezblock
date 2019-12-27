@@ -6,6 +6,7 @@ import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { Delegation } from '@tezblock/services/api/api.service'
 
 interface TableState<T> {
   data: T[]
@@ -27,7 +28,8 @@ export interface State {
   currentCycle: number
   bakingRights: TableState<AggregatedBakingRights>
   endorsingRights: TableState<AggregatedEndorsingRights>
-  kind: string
+  kind: string,
+  delegationsFromLast30Days: Delegation[]
 }
 
 const initialState: State = {
@@ -35,7 +37,8 @@ const initialState: State = {
   currentCycle: undefined,
   bakingRights: getInitialTableState(),
   endorsingRights: getInitialTableState(),
-  kind: undefined
+  kind: undefined,
+  delegationsFromLast30Days: undefined
 }
 
 const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
@@ -147,6 +150,10 @@ export const reducer = createReducer(
   on(actions.kindChanged, (state, { kind }) => ({
     ...state,
     kind
+  })),
+  on(actions.loadDelegationsForLast30DaysSucceeded, (state, { delegationsFromLast30Days }) => ({
+    ...state,
+    delegationsFromLast30Days
   })),
   on(actions.reset, () => initialState)
 )

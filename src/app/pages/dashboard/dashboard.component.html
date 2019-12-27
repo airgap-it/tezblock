@@ -93,7 +93,11 @@
                   </p>
                 </ng-container>
               </ng-container>
-              <area-chart-item [datasets]="priceChartDatasets$ | async" [labels]="priceChartLabels$ | async"></area-chart-item>
+              <area-chart-item
+                *ngIf="priceChartDatasets$ | async"
+                [datasets]="priceChartDatasets$ | async"
+                [labels]="priceChartLabels$ | async"
+              ></area-chart-item>
             </div>
           </ng-container>
         </div>

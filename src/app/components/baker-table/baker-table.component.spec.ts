@@ -3,6 +3,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { ChartsModule } from 'ng2-charts'
 
 import { AmountCellComponent } from './../tezblock-table/amount-cell/amount-cell.component'
 import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
@@ -15,6 +16,7 @@ import { RightsSingleService } from './../../services/rights-single/rights-singl
 import { AddressItemComponent } from '../address-item/address-item.component'
 import { IdenticonComponent } from '../identicon/identicon'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { AreaChartItemComponent } from '../../components/area-chart-item/area-chart-item.component'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -25,8 +27,9 @@ describe('BakerTableComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [RightsSingleService, TabsetConfig, IconPipe],
-        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule],
+        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule, ChartsModule],
         declarations: [
+          AreaChartItemComponent,
           BakerTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent,

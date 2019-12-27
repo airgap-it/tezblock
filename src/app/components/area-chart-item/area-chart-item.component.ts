@@ -4,11 +4,10 @@ import { BaseChartDirective } from 'ng2-charts'
 @Component({
   selector: 'area-chart-item',
   templateUrl: './area-chart-item.component.html',
-  styleUrls: ['./area-chart-item.component.scss'],
-  exportAs: 'base-chart'
+  styleUrls: ['./area-chart-item.component.scss']
 })
 export class AreaChartItemComponent implements AfterViewInit {
-  @ViewChild('baseChart', { static: false }) chart?: BaseChartDirective
+  @ViewChild(BaseChartDirective, { static: true }) chart: BaseChartDirective;
 
   @Input() datasets: { data: number[]; label: string }[]
   @Input() labels: string[]

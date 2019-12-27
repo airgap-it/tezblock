@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -124,6 +124,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   @Output()
   readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
 
+  public delegationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  public delegationsChartLabels$: Observable<string[]>
+
   private bakingRightsExpandedRow: ExpandedRow<AggregatedBakingRights, BakingRights> = {
     columns: [
       { name: 'Cycle', property: 'cycle', component: null },
@@ -170,6 +173,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
+        this.store$.dispatch(actions.loadDelegationsForLast30Days())
         this.rewardSingleService.updateAddress(accountAddress)
         this.accountSingleService.setAddress(accountAddress)
         this.frozenBalance = await this.accountService.getFrozen(accountAddress)
@@ -205,6 +209,14 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.rewardsLoading$ = this.rewardSingleService.loading$
     this.accountLoading$ = this.accountSingleService.loading$
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
+    this.delegationsChartDatasets$ = this.store$.select(state => state.bakerTable.delegationsFromLast30Days).pipe(
+      filter(Array.isArray),
+      map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
+    )
+    this.delegationsChartLabels$ = this.store$.select(state => state.bakerTable.delegationsFromLast30Days).pipe(
+      filter(Array.isArray),
+      map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
+    )
   }
 
   selectTab(selectedTab: Tab) {
