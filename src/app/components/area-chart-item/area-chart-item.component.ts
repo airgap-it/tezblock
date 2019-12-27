@@ -1,17 +1,13 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
 import { BaseChartDirective } from 'ng2-charts'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
-
-import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 @Component({
   selector: 'area-chart-item',
-  templateUrl: './pricechart-item.component.html',
-  styleUrls: ['./pricechart-item.component.scss'],
+  templateUrl: './area-chart-item.component.html',
+  styleUrls: ['./area-chart-item.component.scss'],
   exportAs: 'base-chart'
 })
-export class PricechartItemComponent implements AfterViewInit {
+export class AreaChartItemComponent implements AfterViewInit {
   @ViewChild('baseChart', { static: false }) chart?: BaseChartDirective
 
   @Input() datasets: { data: number[]; label: string }[]
