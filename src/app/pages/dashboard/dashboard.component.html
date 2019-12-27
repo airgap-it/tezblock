@@ -93,7 +93,7 @@
                   </p>
                 </ng-container>
               </ng-container>
-              <pricechart-item></pricechart-item>
+              <area-chart-item [datasets]="priceChartDatasets$ | async" [labels]="priceChartLabels$ | async"></area-chart-item>
             </div>
           </ng-container>
         </div>

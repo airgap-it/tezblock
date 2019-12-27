@@ -1,6 +1,7 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable, Subscription } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
@@ -33,6 +34,9 @@ export class DashboardComponent {
 
   public bakers: string[]
 
+  public priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  public priceChartLabels$: Observable<string[]>
+
   constructor(
     private readonly blocksService: BlockService,
     private readonly transactionService: TransactionService,
@@ -59,6 +63,13 @@ export class DashboardComponent {
     this.transactionService.setPageSize(6)
     this.blocksService.setPageSize(6)
     this.isMainnet()
+
+    this.priceChartDatasets$ = this.cryptoPricesService.historicData$.pipe(
+      map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }])
+    )
+    this.priceChartLabels$ = this.cryptoPricesService.historicData$.pipe(
+      map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
+    )
   }
 
   public ngOnDestroy() {
