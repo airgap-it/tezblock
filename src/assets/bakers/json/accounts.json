@@ -330,7 +330,8 @@
   },
   "tz1WCd2jm4uSt4vntk4vSuUWoZQGhLcDuR9q": {
     "alias": "Happy Tezos",
-    "hasLogo": true
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW"
   },
   "tz1WJpSCYdQE9merfftanA8eFsqUPTpwAt8a": {
     "alias": "Tezos China",
