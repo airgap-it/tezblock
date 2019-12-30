@@ -68,7 +68,9 @@ import { StorageModule } from '@ngx-pwa/local-storage';
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-import { BakerTableEffects } from './components/baker-table/effects'
+import { BakerTableEffects } from './components/baker-table/effects';
+import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component';
+import { ContractDetailEffects } from './pages/contract-detail/effects';
 
 @NgModule({
   imports: [
@@ -110,7 +112,8 @@ import { BakerTableEffects } from './components/baker-table/effects'
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ContractDetailEffects
     ]),
 	StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -150,7 +153,8 @@ import { BakerTableEffects } from './components/baker-table/effects'
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
-    SearchItemComponent
+    SearchItemComponent,
+    ContractDetailComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

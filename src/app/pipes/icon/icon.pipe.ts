@@ -30,6 +30,7 @@ export type IconRef =
   | 'breadLoaf'
   | 'coin'
   | 'hatChef'
+  | 'website'
 @Pipe({
   name: 'iconPipe'
 })
@@ -78,7 +79,8 @@ export class IconPipe implements PipeTransform {
       caretDown: { prefix, iconName: 'caret-down' },
       breadLoaf: { prefix, iconName: 'bread-loaf' },
       coin: { prefix, iconName: coin },
-      hatChef: { prefix, iconName: hatChef }
+      hatChef: { prefix, iconName: hatChef },
+      website: { prefix, iconName: 'globe' },
     }
   }
 
