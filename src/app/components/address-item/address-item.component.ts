@@ -28,7 +28,7 @@ export class AddressItemComponent {
   constructor(private readonly router: Router) {}
 
   public inspectDetail() {
-    if (!this.isText) {
+    if (!this.isText && this.clickableButton) {
       this.router.navigate([`/account/${this.address}`])
     }
   }

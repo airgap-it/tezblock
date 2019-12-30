@@ -1,4 +1,5 @@
 import { createReducer, on } from '@ngrx/store'
+import { range } from 'lodash'
 
 import * as actions from './actions'
 import { Pagination } from '@tezblock/services/facade/facade'
@@ -23,6 +24,7 @@ const getInitialTableState = (): TableState<any> => ({
 
 export interface State {
   accountAddress: string
+  currentCycle: number
   bakingRights: TableState<AggregatedBakingRights>
   endorsingRights: TableState<AggregatedEndorsingRights>
   kind: string
@@ -30,9 +32,39 @@ export interface State {
 
 const initialState: State = {
   accountAddress: undefined,
+  currentCycle: undefined,
   bakingRights: getInitialTableState(),
   endorsingRights: getInitialTableState(),
   kind: undefined
+}
+
+const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
+  cycle: cycle,
+  bakingsCount: 0,
+  blockRewards: null,
+  deposits: null,
+  fees: null,
+  items: []
+})
+
+const endorsingRightsFactory = (cycle: number): AggregatedEndorsingRights => ({
+  cycle: cycle,
+  endorsementsCount: 0,
+  endorsementRewards: null,
+  deposits: null,
+  items: []
+})
+
+const fillMissingCycles = (currentCycle: number, rights: { cycle: number }[], paging: Pagination, rightFactory: (cycle: number) => any) => {
+  const count = paging.currentPage * paging.selectedSize
+
+  return range(currentCycle - count, currentCycle)
+    .map(cycle => {
+      const match = rights.find(right => right.cycle === cycle)
+
+      return match || rightFactory(cycle)
+    })
+    .sort((a, b) => b.cycle - a.cycle)
 }
 
 export const reducer = createReducer(
@@ -40,6 +72,10 @@ export const reducer = createReducer(
   on(actions.setAccountAddress, (state, { accountAddress }) => ({
     ...state,
     accountAddress
+  })),
+  on(actions.loadCurrentCycleThenRightsSucceeded, (state, { currentCycle }) => ({
+    ...state,
+    currentCycle
   })),
   on(actions.loadBakingRights, state => ({
     ...state,
@@ -52,7 +88,7 @@ export const reducer = createReducer(
     ...state,
     bakingRights: {
       ...state.bakingRights,
-      data: bakingRights,
+      data: fillMissingCycles(state.currentCycle, bakingRights, state.bakingRights.pagination, bakingRightsFactory),
       loading: false
     }
   })),
@@ -74,7 +110,7 @@ export const reducer = createReducer(
     ...state,
     endorsingRights: {
       ...state.endorsingRights,
-      data: endorsingRights,
+      data: fillMissingCycles(state.currentCycle, endorsingRights, state.endorsingRights.pagination, endorsingRightsFactory),
       loading: false
     }
   })),

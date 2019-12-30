@@ -10,6 +10,7 @@ import { IdenticonComponent } from '../identicon/identicon'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { AmountCellComponent } from './amount-cell/amount-cell.component'
 import { TezblockTableComponent } from './tezblock-table.component'
+import { BlockCellComponent } from './block-cell/block-cell.component'
 
 describe('TezblockTableComponent', () => {
   let component: TezblockTableComponent
@@ -23,6 +24,7 @@ describe('TezblockTableComponent', () => {
         providers: [IconPipe],
         imports: [FontAwesomeModule, PaginationModule],
         declarations: [
+          BlockCellComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent,
           AddressCellComponent,

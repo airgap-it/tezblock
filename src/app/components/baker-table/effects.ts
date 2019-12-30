@@ -51,6 +51,13 @@ export class BakerTableEffects {
     )
   )
 
+  onCurrentCycleLoadRights$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCurrentCycleThenRightsSucceeded, actions.loadCurrentCycleThenRightsFailed),
+      switchMap(() => [actions.loadBakingRights(), actions.loadEndorsingRights()])
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,

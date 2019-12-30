@@ -1017,7 +1017,7 @@ export class ApiService {
           }
         ]
 
-        return this.getEndorsingRights(address, null, predicates).pipe(
+        return this.getEndorsingRights(address, 30000, predicates).pipe(
           map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)),
           map((rights: EndorsingRights[]) =>
             Object.entries(group(rights)).map(

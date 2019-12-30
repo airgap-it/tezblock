@@ -21,6 +21,7 @@ import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/lo
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -57,6 +58,7 @@ describe('AccountDetailComponent', () => {
           AddressItemComponent,
           AddressCellComponent,
           AmountCellComponent,
+          BlockCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent
