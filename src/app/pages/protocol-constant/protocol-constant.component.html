@@ -5,37 +5,34 @@
     </h3>
     <p>Blocks per cycle: {{ blocksPerCyle }}</p>
 
-    <p>(Blocks per commitment)</p>
-    <p>
-      (Blocks per roll snapshot)
-    </p>
-    <p>
-      Time between blocks
-    </p>
-    <p>
-      (Time between priority)
-    </p>
+    <p>Blocks per commitment: {{ blocksPerCommitment }}</p>
+    <p>Blocks per roll snapshot: {{ blocksPerRollSnapshot }}</p>
+    <p>Time between blocks: {{ timeBetweenBlocks }}</p>
+    <p>Time between priority: {{ timeBetweenPriority }}</p>
   </div>
   <div>
     <h3>
       Rewards
     </h3>
-    <p>Block security deposit: 512 XTZ</p>
+    <p>
+      Block security deposit:
+      {{ blockSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }}
+      XZT
+    </p>
 
-    <p>Endorsement security deposit: 64 XTZ</p>
+    <p>
+      Endorsement security deposit:
+      {{ endorsementSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }} XZT
+    </p>
   </div>
   <div>
     <h3>
       Limtis
     </h3>
-    <p>Maximum revelations per block : {{ maximumRevelationsPerBlock }}</p>
+    <p>Maximum revelations per block: {{ maximumRevelationsPerBlock }}</p>
 
-    <p>(Maximum operation data length)</p>
-    <p>
-      (Hard gas limit per operation)
-    </p>
-    <p>
-      (Hard gas limit per block)
-    </p>
+    <p>Maximum operation data length: {{ maximumOperationDataLength }}</p>
+    <p>Hard gas limit per operation: {{ hardGasLimitPerOperation }}</p>
+    <p>Hard gas limit per block: {{ hardGasLimitPerBlock }}</p>
   </div>
 </div>
