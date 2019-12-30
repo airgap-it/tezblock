@@ -933,10 +933,18 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedBakingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                from(this.rewardService.calculateBakingRightsRewards(address, aggregatedRight.cycle)).pipe(
                   map((reward: TezosRewards) => {
                     const rewardByLabel = reward.bakingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
+                      {}
+                    )
+                    const depositByLabel = reward.bakingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.deposit), accumulator),
+                      {}
+                    )
+                    const feesByLabel = reward.bakingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.fees), accumulator),
                       {}
                     )
                     return {
@@ -947,10 +955,8 @@ export class ApiService {
                       items: aggregatedRight.items.map(item => ({
                         ...item,
                         rewards: rewardByLabel[item.level],
-                        deposit: reward.bakingRewardsDetails.find(detail => detail.level === item.level)
-                          ? reward.bakingRewardsDetails.find(detail => detail.level === item.level).deposit
-                          : '0',
-                        fees: reward.bakingRewardsDetails.find(detail => detail.level === item.level).fees
+                        deposit: depositByLabel[item.level] ? depositByLabel[item.level] : '0',
+                        fees: feesByLabel[item.level]
                       }))
                     }
                   })
@@ -1028,10 +1034,14 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedEndorsingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                from(this.rewardService.calculateEndorsingRightsRewards(address, aggregatedRight.cycle)).pipe(
                   map((reward: TezosRewards) => {
                     const rewardByLabel = reward.endorsingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
+                      {}
+                    )
+                    const depositByLabel = reward.endorsingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.deposit), accumulator),
                       {}
                     )
 
@@ -1042,9 +1052,7 @@ export class ApiService {
                       items: aggregatedRight.items.map(item => ({
                         ...item,
                         rewards: rewardByLabel[item.level],
-                        deposit: reward.endorsingRewardsDetails.find(detail => detail.level === item.level)
-                          ? reward.endorsingRewardsDetails.find(detail => detail.level === item.level).deposit
-                          : '0'
+                        deposit: depositByLabel[item.level] ? depositByLabel[item.level] : '0'
                       }))
                     }
                   })

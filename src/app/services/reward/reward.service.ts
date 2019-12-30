@@ -18,6 +18,9 @@ export interface ExpTezosRewards extends TezosRewards {
 export class RewardService {
   protocol: TezosProtocol
 
+  private calculatedBakingRewardsArray = []
+  private calculatedEndorsingRewardsArray = []
+
   constructor(private readonly chainNetworkService: ChainNetworkService) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
@@ -80,5 +83,24 @@ export class RewardService {
         )
       )
     )
+  }
+
+  public calculateBakingRightsRewards(address: string, cycle: number): Promise<TezosRewards> {
+    if (this.calculatedBakingRewardsArray.indexOf(cycle) !== -1) {
+      return this.calculatedBakingRewardsArray[cycle]
+    } else {
+      this.calculatedBakingRewardsArray[cycle] = this.protocol.calculateRewards(address, cycle)
+
+      return this.calculatedBakingRewardsArray[cycle]
+    }
+  }
+  public calculateEndorsingRightsRewards(address: string, cycle: number): Promise<TezosRewards> {
+    if (this.calculatedEndorsingRewardsArray.indexOf(cycle) !== -1) {
+      return this.calculatedEndorsingRewardsArray[cycle]
+    } else {
+      this.calculatedEndorsingRewardsArray[cycle] = this.protocol.calculateRewards(address, cycle)
+
+      return this.calculatedEndorsingRewardsArray[cycle]
+    }
   }
 }
