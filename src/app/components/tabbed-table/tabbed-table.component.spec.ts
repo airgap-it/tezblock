@@ -12,12 +12,11 @@ import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.c
 import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
 import { IdenticonComponent } from '../identicon/identicon'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent
   let fixture: ComponentFixture<TabbedTableComponent>
-  let transactionSingleServiceMock = jasmine.createSpyObj('TransactionSingleService', ['loadMore'])
-  transactionSingleServiceMock.actionType$ = EMPTY
 
   let unitHelper: UnitHelper
   beforeEach(() => {
@@ -33,6 +32,7 @@ describe('TabbedTableComponent', () => {
           LoadingSkeletonComponent,
           AddressCellComponent,
           AmountCellComponent,
+          BlockCellComponent,
           AddressItemComponent
         ]
       })
@@ -44,7 +44,7 @@ describe('TabbedTableComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TabbedTableComponent)
     component = fixture.componentInstance
-    component.dataService = transactionSingleServiceMock
+    component.actionType$ = EMPTY
     fixture.detectChanges()
   })
 

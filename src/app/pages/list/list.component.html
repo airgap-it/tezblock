@@ -50,8 +50,8 @@
         <div class="row">
           <div class="col px-2">
             <tezblock-table
-              [loading]="loading$"
-              [data]="data$"
+              [loading]="loading$ | async"
+              [data]="data$ | async"
               [page]="page"
               [type]="type"
               [showLoadMoreButton]="true"

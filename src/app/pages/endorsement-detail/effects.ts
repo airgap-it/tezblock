@@ -9,6 +9,7 @@ import * as EndorsementDetailActions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
+import { first } from '@tezblock/services/fp'
 
 const takeSecond = ([first, second]) => second
 const areSlots = (endorsements: Transaction[]) => endorsements !== undefined
@@ -23,7 +24,7 @@ export class EndorsementDetailEffects {
       map(([action, endorsements]) => action),
       switchMap(({ id }) =>
         this.apiService.getEndorsementsById(id, 1).pipe(
-          map((endorsements: Transaction[]) => EndorsementDetailActions.loadEndorsementDetailsSucceeded({ endorsement: endorsements[0] })),
+          map((endorsements: Transaction[]) => EndorsementDetailActions.loadEndorsementDetailsSucceeded({ endorsement: first(endorsements) })),
           catchError(error => of(EndorsementDetailActions.loadEndorsementDetailsFailed({ error })))
         )
       )

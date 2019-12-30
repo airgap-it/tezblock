@@ -3,24 +3,25 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { ModalModule, TabsetConfig, TabsModule, TooltipModule } from 'ngx-bootstrap'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ProgressbarConfig, ProgressbarModule } from 'ngx-bootstrap/progressbar'
+import { Actions } from '@ngrx/effects'
+import { EMPTY } from 'rxjs'
+import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { ToastrModule, ToastrService } from 'ngx-toastr'
+import { MomentModule } from 'ngx-moment'
+
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
-import { storeMock } from 'test-config/mocks'
-import { Store } from '@ngrx/store'
-
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
 import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
 import { AccountDetailComponent } from './account-detail.component'
 import { BakerTableComponent } from './../../components/baker-table/baker-table.component'
-import { ToastrModule, ToastrService } from 'ngx-toastr'
-import { MomentModule } from 'ngx-moment'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
-import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -38,7 +39,7 @@ describe('AccountDetailComponent', () => {
           ToastrService,
           IconPipe,
           ProgressbarConfig,
-          { provide: Store, useValue: storeMock }
+          { provide: Actions, useValue: EMPTY }
         ],
         imports: [
           TooltipModule,
@@ -57,6 +58,7 @@ describe('AccountDetailComponent', () => {
           AddressItemComponent,
           AddressCellComponent,
           AmountCellComponent,
+          BlockCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent

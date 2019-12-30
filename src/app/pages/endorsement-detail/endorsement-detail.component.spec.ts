@@ -1,11 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { MomentModule } from 'ngx-moment'
-import { Store } from '@ngrx/store'
+import { Actions } from '@ngrx/effects'
 import { TooltipModule } from 'ngx-bootstrap'
+import { EMPTY } from 'rxjs'
 
 import { UnitHelper } from 'test-config/unit-test-helper'
-import { storeMock } from 'test-config/mocks'
 import { EndorsementDetailComponent } from './endorsement-detail.component'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
@@ -22,7 +22,7 @@ describe('EndorsementDetailComponent', () => {
       unitHelper.testBed({
         imports: [FontAwesomeModule, MomentModule, TooltipModule.forRoot()],
         declarations: [AddressItemComponent, IdenticonComponent, LoadingSkeletonComponent, EndorsementDetailComponent],
-        providers: [{ provide: Store, useValue: storeMock }]
+        providers: [{ provide: Actions, useValue: EMPTY }]
       })
     ).compileComponents()
   }))

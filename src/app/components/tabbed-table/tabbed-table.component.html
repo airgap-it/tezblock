@@ -22,12 +22,12 @@
   </tab>
 
   <tezblock-table
-    [loading]="loading"
-    [data]="data"
+    [loading]="loading | async"
+    [data]="data | async"
     [page]="page"
     [type]="kindToOperationTypes(selectedTab.kind)"
-    [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
-    (loadMoreClicked)="loadMore()"
+    [showLoadMoreButton]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"
+    (loadMoreClicked)="onLoadMore()"
     (downloadClicked)="download()"
     [downloadable]="downloadable"
   ></tezblock-table>

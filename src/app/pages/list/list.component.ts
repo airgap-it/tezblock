@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { merge, Observable, of, timer } from 'rxjs'
-import { debounceTime, switchMap } from 'rxjs/operators'
+import { switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
 import { BaseComponent } from '@tezblock/components/base.component'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { TransactionService } from '@tezblock/services/transaction /transaction.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
@@ -42,6 +42,21 @@ export class ListComponent extends BaseComponent implements OnInit {
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
+    this.store$.dispatch(actions.reset())
+  }
+
+  ngOnInit() {
+    const refresh$ = merge(
+      of(1),
+      merge(
+        this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
+        this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
+        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
+      ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
+    )
 
     this.route.params.subscribe(params => {
       try {
@@ -94,8 +109,31 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(params.route, 'ballot_overview')
             break
           case 'double-baking':
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
+            this.loading$ = this.store$.select(state => state.list.doubleBakings.loading)
+            this.data$ = this.store$.select(state => state.list.doubleBakings.data)
+            this.page = 'transaction'
+            this.type = 'double_baking_evidence_overview'
+            break
           case 'double-endorsement':
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
+            this.loading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
+            this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
+            this.page = 'transaction'
+            this.type = 'double_endorsement_evidence_overview'
+            break
           case 'bakers':
+            this.subscriptions.push(
+              refresh$.subscribe(() => {
+                this.store$.dispatch(actions.loadActiveBakers())
+                this.store$.dispatch(actions.loadTotalActiveBakers())
+              })
+            )
+            this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
+            this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
+            this.page = 'account'
+            this.type = 'baker_overview'
+            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
             break
           default:
             throw new Error('unknown route')
@@ -105,55 +143,6 @@ export class ListComponent extends BaseComponent implements OnInit {
         console.warn(error)
       }
     })
-
-    // Why this line was needed ?
-    // this.dataService.setPageSize(10)
-  }
-
-  ngOnInit() {
-    this.store$.dispatch(actions.reset())
-
-    const refresh$ = merge(
-      of(1),
-      merge(
-        this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
-        this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
-        this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
-        this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded)),
-        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
-        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
-      ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
-    )
-
-    switch (this.routeName) {
-      case 'double-baking':
-        this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
-        this.loading$ = this.store$.select(state => state.list.doubleBakings.loading)
-        this.data$ = this.store$.select(state => state.list.doubleBakings.data)
-        this.page = 'transaction'
-        this.type = 'double_baking_evidence_overview'
-        break
-      case 'double-endorsement':
-        this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
-        this.loading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
-        this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
-        this.page = 'transaction'
-        this.type = 'double_endorsement_evidence_overview'
-        break
-      case 'bakers':
-        this.subscriptions.push(
-          refresh$.subscribe(() => {
-            this.store$.dispatch(actions.loadActiveBakers())
-            this.store$.dispatch(actions.loadTotalActiveBakers())
-          })
-        )
-        this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
-        this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
-        this.page = 'account'
-        this.type = 'baker_overview'
-        this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
-        break
-    }
   }
 
   loadMore() {

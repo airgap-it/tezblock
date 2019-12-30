@@ -1,5 +1,5 @@
 // tslint:disable:max-classes-per-file
-import { of } from 'rxjs'
+import { of, EMPTY } from 'rxjs'
 
 const newSpy = (name: string, returnValue: any): jasmine.Spy => jasmine.createSpy(name).and.returnValue(returnValue)
 
@@ -229,4 +229,12 @@ export const ApiServiceMock = jasmine.createSpyObj('ApiService', {
   getDelegatedAccountsList: of(null)
 })
 
-export const storeMock = jasmine.createSpyObj('Store', ['select', 'dispatch'])
+export const BlockServiceMock = jasmine.createSpyObj('BlockService', {
+  list$: EMPTY
+})
+
+export const storeMock = jasmine.createSpyObj('Store', {
+  select: EMPTY,
+  dispatch: jasmine.createSpy('store.dispatch')
+})
+

@@ -1,14 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { Observable, Subscription } from 'rxjs'
+import { combineLatest, Observable, EMPTY } from 'rxjs'
+import { map, switchMap } from 'rxjs/operators'
+import { Store } from '@ngrx/store'
 
+import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
 import { RewardSingleService } from './../../services/reward-single/reward-single.service'
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
+import { ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { Payout } from '@tezblock/interfaces/Payout'
+import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
+import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
+import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './actions'
 
 export interface Tab {
   title: string
@@ -22,43 +32,54 @@ export interface Tab {
   selector: 'baker-table',
   templateUrl: './baker-table.component.html',
   styleUrls: ['./baker-table.component.scss'],
-  providers: [AccountSingleService, RewardSingleService, RightsSingleService]
+  providers: [AccountSingleService, RewardSingleService]
 })
-export class BakerTableComponent implements OnInit {
+export class BakerTableComponent extends BaseComponent implements OnInit {
   private _tabs: Tab[] | undefined = []
-  public selectedTab: Tab | undefined = undefined
-  public transactions$: Observable<Transaction[]> = new Observable()
+  selectedTab: Tab | undefined = undefined
+  transactions$: Observable<Transaction[]>
 
-  public bakingBadRating: string | undefined
-  public tezosBakerRating: string | undefined
-  public stakingBalance: number | undefined
-  public numberOfRolls: number | undefined
-  public payoutAddress: string | undefined
+  bakingBadRating: string | undefined
+  tezosBakerRating: string | undefined
+  stakingBalance: number | undefined
+  numberOfRolls: number | undefined
+  payoutAddress: string | undefined
 
-  public bakingInfos: any
-  public stakingCapacity: number | undefined
-  public stakingProgress: number | undefined
-  public stakingBond: number | undefined
+  bakingInfos: any
+  stakingCapacity: number | undefined
+  stakingProgress: number | undefined
+  stakingBond: number | undefined
 
-  public isValidBaker: boolean | undefined
-  public rewardsLoading$: Observable<boolean>
-  public rightsLoading$: Observable<boolean>
-  public accountLoading$: Observable<boolean>
+  isValidBaker: boolean | undefined
+  rewardsLoading$: Observable<boolean>
+  rightsLoading$: Observable<boolean>
+  accountLoading$: Observable<boolean>
 
-  public rewards$: Observable<TezosRewards[]> = new Observable()
-  public rights$: Observable<Object> = new Observable()
+  rewards$: Observable<TezosRewards[]>
+  rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
 
-  private readonly subscriptions: Subscription = new Subscription()
-  public rewards: TezosRewards
+  rewards: TezosRewards
 
-  public activeDelegations$: Observable<number>
+  activeDelegations$: Observable<number>
 
-  public myTBUrl: string | undefined
-  public address: string
-  public frozenBalance: number | undefined
+  myTBUrl: string | undefined
+  frozenBalance: number | undefined
+  rewardsExpandedRow: ExpandedRow<ExpTezosRewards, Payout> = {
+    columns: [
+      { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
+      { name: 'Payout', property: 'payout', component: 'amount-cell' },
+      { name: 'Share', property: 'share', component: 'pipe:percentage' }
+    ],
+    key: 'cycle',
+    dataSelector: entity => entity.payouts,
+    filterCondition: (detail, query) => detail.delegator === query
+  }
+  get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights, BakingRights> | ExpandedRow<AggregatedEndorsingRights, EndorsingRights> {
+    return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
+  }
 
   @Input()
-  public page: string = 'account'
+  page: string = 'account'
 
   @Input()
   set tabs(tabs: Tab[]) {
@@ -101,52 +122,104 @@ export class BakerTableComponent implements OnInit {
   }
 
   @Output()
-  public readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
+  readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
+
+  private bakingRightsExpandedRow: ExpandedRow<AggregatedBakingRights, BakingRights> = {
+    columns: [
+      { name: 'Cycle', property: 'cycle', component: null },
+      { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
+      { name: 'Level', property: 'level', component: 'app-block-cell' },
+      { name: 'Priority', property: 'priority', component: null },
+      { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
+      { name: 'Fees', property: null, component: 'amount-cell' },
+      { name: 'Deposits', property: null, component: 'amount-cell' }
+    ],
+    key: 'cycle',
+    dataSelector: entity => entity.items,
+    filterCondition: (detail, query) => detail.block_hash === query
+  }
+  private endorsingRightsExpandedRow: ExpandedRow<AggregatedEndorsingRights, EndorsingRights> = {
+    columns: [
+      { name: 'Cycle', property: 'cycle', component: null },
+      { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
+      { name: 'Level', property: 'level', component: 'app-block-cell' },
+      { name: 'Slot', property: 'slot', component: null },
+      { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
+      { name: 'Deposits', property: null, component: 'amount-cell' }
+    ],
+    key: 'cycle',
+    dataSelector: entity => entity.items,
+    filterCondition: (detail, query) => detail.block_hash === query
+  }
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly accountService: AccountService,
-    private readonly rightsSingleService: RightsSingleService,
     private readonly accountSingleService: AccountSingleService,
     private readonly rewardSingleService: RewardSingleService,
-    private readonly apiService: ApiService
+    private readonly apiService: ApiService,
+    private readonly store$: Store<fromRoot.State>
   ) {
-    this.address = this.route.snapshot.params.id
-    this.rightsSingleService.updateAddress(this.address)
+    super()
 
-    this.rights$ = this.rightsSingleService.rights$
+    this.store$.dispatch(actions.reset())
+
+    this.subscriptions.push(
+      this.route.paramMap.subscribe(async paramMap => {
+        const accountAddress = paramMap.get('id')
+        this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
+        this.store$.dispatch(actions.loadCurrentCycleThenRights())
+        this.rewardSingleService.updateAddress(accountAddress)
+        this.accountSingleService.setAddress(accountAddress)
+        this.frozenBalance = await this.accountService.getFrozen(accountAddress)
+      })
+    )
+  }
+
+  async ngOnInit() {
+    this.rights$ = this.store$.select(state => state.bakerTable.kind).pipe(
+      switchMap(kind => {
+        if (kind === OperationTypes.BakingRights) {
+          return this.store$.select(state => state.bakerTable.bakingRights).pipe(
+            map(table => table.data)
+          )
+        }
+
+        if (kind === OperationTypes.EndorsingRights) {
+          return this.store$.select(state => state.bakerTable.endorsingRights).pipe(
+            map(table => table.data)
+          )
+        }
+
+        return EMPTY
+      })
+    )
     this.rewards$ = this.rewardSingleService.rewards$
-    this.rightsLoading$ = this.rightsSingleService.loading$
+    this.rightsLoading$ = combineLatest(
+      this.store$.select(state => state.bakerTable.bakingRights.loading),
+      this.store$.select(state => state.bakerTable.endorsingRights.loading)
+    ).pipe(
+      map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading)
+    )
     this.rewardsLoading$ = this.rewardSingleService.loading$
     this.accountLoading$ = this.accountSingleService.loading$
-
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
   }
 
-  public async ngOnInit() {
-    const address: string = this.route.snapshot.params.id
-
-    this.rewardSingleService.updateAddress(address)
-
-    this.accountSingleService.setAddress(address)
-
-    this.frozenBalance = await this.accountService.getFrozen(address)
-  }
-
-  public selectTab(selectedTab: Tab) {
-    this.rightsSingleService.updateKind(selectedTab.kind)
+  selectTab(selectedTab: Tab) {
+    this.store$.dispatch(actions.kindChanged({ kind: selectedTab.kind }))
     this.updateSelectedTab(selectedTab)
     this.overviewTabClicked.emit(selectedTab.kind)
   }
 
-  public goToMYTB() {
+  goToMYTB() {
     if (this.myTBUrl) {
       window.open(this.myTBUrl, '_blank')
     }
   }
 
-  public getTabCount(tabs: Tab[]) {
+  getTabCount(tabs: Tab[]) {
     let ownId: string = this.router.url
     const split = ownId.split('/')
     ownId = split.slice(-1).pop()
@@ -181,12 +254,12 @@ export class BakerTableComponent implements OnInit {
         .catch(console.error)
     }
   }
-  
-  public loadMoreRights(): void {
-    this.rightsSingleService.loadMore()
+
+  loadMoreRights(): void {
+    this.store$.dispatch(actions.increaseRightsPageSize())
   }
 
-  public loadMoreRewards(): void {
+  loadMoreRewards(): void {
     this.rewardSingleService.loadMore()
   }
 
@@ -194,4 +267,5 @@ export class BakerTableComponent implements OnInit {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
   }
+
 }

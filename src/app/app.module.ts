@@ -66,6 +66,9 @@ import { SearchItemComponent } from './components/search-item/search-item.compon
 import { ListEffects } from './pages/list/effects'
 import { StorageModule } from '@ngx-pwa/local-storage';
 import { AccountDetailEffects } from './pages/account-detail/effects'
+import { BlockDetailEffects } from './pages/block-detail/effects'
+import { TransactionDetailEffects } from './pages/transaction-detail/effects'
+import { BakerTableEffects } from './components/baker-table/effects'
 
 @NgModule({
   imports: [
@@ -100,8 +103,16 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
         strictActionImmutability: true
       }
     }),
-    EffectsModule.forRoot([AppEffects, EndorsementDetailEffects, ListEffects, AccountDetailEffects]),
-    StorageModule.forRoot({ IDBNoWrap: true })
+    EffectsModule.forRoot([
+      AppEffects,
+      EndorsementDetailEffects,
+      ListEffects,
+      AccountDetailEffects,
+      BakerTableEffects,
+      BlockDetailEffects,
+      TransactionDetailEffects
+    ]),
+	StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,

@@ -40,7 +40,7 @@
           id="navbar-classic"
           [collapse]="isCollapsed"
           [isAnimated]="true"
-          [ngClass]="{ 'display--inline-table': showDropdown && !isCollapsed }"
+          [ngClass]="{ 'display--inline-table': hideDropdown && !isCollapsed }"
         >
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
@@ -59,8 +59,8 @@
                 </button>
               </li>
 
-              <li class="nav-item dropdown mega-dropdown">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+              <div class="nav-item dropdown mega-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -70,17 +70,11 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkBlockchain }"
-                    (mouseleave)="dp.hide(); showDropdown = true"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    aria-controls="blockchain"
                   >
                     Blockchain
                   </a>
-                  <ul
-                    class="dropdown-menu mega-dropdown-menu pb-4 "
-                    *dropdownMenu
-                    role="menu"
-                    [ngClass]="{ 'display--none': !showDropdown }"
-                  >
+                  <ul class="dropdown-menu mega-dropdown-menu pb-4 " *dropdownMenu role="menu" id="blockchain">
                     <li class="row">
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -170,9 +164,9 @@
                     </li>
                   </ul>
                 </span>
-              </li>
+              </div>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -182,12 +176,11 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkResources }"
-                    (mouseleave)="dp.hide(); showDropdown = true"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    aria-controls="resources"
                   >
                     Resources
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources">
                     <li role="menuitem">
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
                         Wallets
@@ -208,7 +201,7 @@
               </li>
               <!-- TODO: unhide if switch works  -->
               <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -217,11 +210,11 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    (click)="hideDropdown ? dp.hide() : dp.show(); hideDropdown = !hideDropdown"
                   >
                     {{ selectedNetwork }}
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
                     <li role="menuitem">
                       <a
                         class="dropdown-item"
