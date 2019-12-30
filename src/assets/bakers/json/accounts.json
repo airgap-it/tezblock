@@ -333,6 +333,10 @@
     "hasLogo": true,
     "hasPayoutAddress": "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW"
   },
+  "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW": {
+    "alias": "Happy Tezos Payout",
+    "hasLogo": true
+  },
   "tz1WJpSCYdQE9merfftanA8eFsqUPTpwAt8a": {
     "alias": "Tezos China",
     "hasLogo": false
