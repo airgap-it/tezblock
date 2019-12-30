@@ -69,6 +69,7 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
+import { BakerTableEffects } from './components/baker-table/effects'
 
 @NgModule({
   imports: [
@@ -108,6 +109,7 @@ import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-co
       EndorsementDetailEffects,
       ListEffects,
       AccountDetailEffects,
+      BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects
     ]),

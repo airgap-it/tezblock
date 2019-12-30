@@ -213,7 +213,7 @@ function getLayouts(showFiat: boolean = true): Layout {
           property: 'delegatedContracts',
           width: '',
           component: PlainValueCellComponent,
-          transform: (addresses: [string]): number => addresses.length
+          transform: (addresses: [string]): number => addresses ? addresses.length : null
         },
         {
           name: 'Staking Balance',
@@ -241,21 +241,19 @@ function getLayouts(showFiat: boolean = true): Layout {
       ],
       [OperationTypes.BakingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
-        { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
-        { name: 'Level', property: 'level', width: '', component: BlockCellComponent },
-        { name: 'Priority', property: 'priority', width: '', component: PlainValueCellComponent },
-        { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Fees', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Deposits', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } }
+        { name: '# of Bakings', property: 'bakingsCount', width: '' },
+        { name: 'Block Rewards', property: 'blockRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Deposits', property: 'deposits', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
+        
       ],
       [OperationTypes.EndorsingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
-        { name: 'Age', property: 'estimated_time', width: '', component: TimestampCellComponent },
-        { name: 'For Level', property: 'level', width: '', component: BlockCellComponent },
-        { name: 'Included Level', property: '', width: '', component: BlockCellComponent },
-        { name: 'Slot', property: 'slot', width: '' },
-        { name: 'Rewards', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Deposits', property: '', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } }
+        { name: '# of Endorsements', property: 'endorsementsCount', width: '' },
+        { name: 'Endorsement Rewards', property: 'endorsementRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Deposits', property: 'deposits', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
       [OperationTypes.BakerOverview]: [
         { name: 'Baker', property: 'pkh', width: '', component: AddressCellComponent },

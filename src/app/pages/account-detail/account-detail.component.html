@@ -186,7 +186,7 @@
                     <p class="text-secondary mb-0">Delegated Account</p>
                   </div>
                   <div class=" col-md-7">
-                    <address-item [address]="delegatedAccountAddress"></address-item>
+                    <address-item [address]="delegatedAccountAddress" [clickableButton]="delegatedAccountAddress !== account.account_id"></address-item>
                   </div>
                 </div>
                 <div class="row mb-3" *ngIf="delegatedAmount">
@@ -256,7 +256,7 @@
                     <p class="text-secondary mb-0">Baker</p>
                   </div>
                   <div class="col-md-7">
-                    <address-item [address]="bakerAddress"></address-item>
+                    <address-item [address]="bakerAddress" [clickableButton]="bakerAddress !== account.account_id"></address-item>
                   </div>
                 </div>
                 <div class="row mb-3">

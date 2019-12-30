@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { TezosProtocol, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { forkJoin, from, Observable, throwError } from 'rxjs'
+import { forkJoin, from, Observable, of, throwError } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { range } from 'lodash'
 
@@ -31,16 +31,23 @@ export class RewardService {
     )
   }
 
-  getRewards(address: string, pagination: Pagination): Observable<ExpTezosRewards[]> {
+  getLastCycles(pagination: Pagination): Observable<number[]> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
-      switchMap(currentCycle => {
+      map(currentCycle => {
         const startIndex = pagination.currentPage * pagination.selectedSize
         const endIndex = startIndex + pagination.selectedSize
-        const cycles = range(startIndex, endIndex)
+
+        return range(startIndex, endIndex)
           .map(index => currentCycle - (index + 1))
           .filter(cycle => cycle >= 7)
+      })
+    )
+  }
 
-        return forkJoin(
+  getRewards(address: string, pagination: Pagination): Observable<ExpTezosRewards[]> {
+    return this.getLastCycles(pagination).pipe(
+      switchMap(cycles =>
+        forkJoin(
           cycles.map(cycle =>
             from(this.protocol.calculateRewards(address, cycle)).pipe(
               switchMap(rewards =>
@@ -51,7 +58,7 @@ export class RewardService {
             )
           )
         )
-      })
+      )
     )
   }
 

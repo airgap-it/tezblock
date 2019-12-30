@@ -9,18 +9,14 @@ import { EndorsementDetailEffects } from './effects'
 describe('AppEffects', () => {
   let actions$: Observable<any>
   let effects: EndorsementDetailEffects
-  let storeMock;
 
   beforeEach(() => {
     const unitHelper = new UnitHelper()
 
-    storeMock = jasmine.createSpyObj('Store', ['select', 'dispatch'])
-
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [
-          EndorsementDetailEffects, provideMockActions(() => actions$),
-          { provide: Store, useValue: storeMock }
+          EndorsementDetailEffects, provideMockActions(() => actions$)
         ]
       })
     )

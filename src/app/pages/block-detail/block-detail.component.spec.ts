@@ -4,12 +4,10 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { CollapseModule } from 'ngx-bootstrap'
 import { TabsetConfig, TabsModule } from 'ngx-bootstrap/tabs'
 import { MomentModule } from 'ngx-moment'
-import { Store } from '@ngrx/store'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
 
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
-import { storeMock } from 'test-config/mocks'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
@@ -21,6 +19,7 @@ import { BlockDetailWrapperComponent } from 'src/app/components/block-detail-wra
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 
 describe('BlockDetailComponent', () => {
   let component: BlockDetailComponent
@@ -31,7 +30,7 @@ describe('BlockDetailComponent', () => {
     unitHelper = new UnitHelper()
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [AmountConverterPipe, TabsetConfig, { provide: Store, useValue: storeMock }, { provide: Actions, useValue: EMPTY }],
+        providers: [AmountConverterPipe, TabsetConfig, { provide: Actions, useValue: EMPTY }],
         imports: [FontAwesomeModule, MomentModule, CollapseModule, TabsModule, BrowserAnimationsModule, PaginationModule],
         declarations: [
           BlockDetailComponent,
@@ -39,6 +38,7 @@ describe('BlockDetailComponent', () => {
           AddressItemComponent,
           AmountCellComponent,
           AddressCellComponent,
+          BlockCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,
           BlockDetailWrapperComponent,
