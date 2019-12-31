@@ -11,6 +11,7 @@ import { Contract, Social, SocialType } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 
 @Component({
   selector: 'app-contract-detail',
@@ -39,12 +40,14 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   github$: Observable<string>
   copyToClipboardState$: Observable<string>
   revealed$: Observable<string>
+  hasAlias$: Observable<boolean>
 
   current: string = 'copyGrey'
 
   constructor(
     private readonly accountService: AccountService,
     private readonly activatedRoute: ActivatedRoute,
+    private readonly aliasPipe: AliasPipe,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -70,6 +73,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.medium$ = this.getSocial(social => social.type === SocialType.medium)
     this.github$ = this.getSocial(social => social.type === SocialType.github)
     this.copyToClipboardState$ = this.store$.select(state => state.contractDetails.copyToClipboardState)
+    this.hasAlias$ = this.store$.select(state => state.contractDetails.address).pipe(
+      map(address => address && !!this.aliasPipe.transform(address))
+    )
   }
 
   showQr() {

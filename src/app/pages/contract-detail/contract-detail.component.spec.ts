@@ -6,6 +6,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { IdenticonComponent } from '@tezblock/components/identicon/identicon'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 
 describe('ContractDetailComponent', () => {
   let component: ContractDetailComponent
@@ -18,7 +19,7 @@ describe('ContractDetailComponent', () => {
       unitHelper.testBed({
         imports: [FontAwesomeModule],
         declarations: [ContractDetailComponent, AddressItemComponent, IdenticonComponent],
-        providers: [IconPipe]
+        providers: [IconPipe, AliasPipe]
       })
     ).compileComponents()
   }))
