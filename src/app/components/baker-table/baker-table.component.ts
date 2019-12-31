@@ -58,6 +58,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rewards$: Observable<TezosRewards[]>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
 
+  efficiencyLast10Cycles$: Observable<number>
+  efficiencyLast10CyclesLoading$: Observable<boolean>
+
   rewards: TezosRewards
 
   activeDelegations$: Observable<number>
@@ -76,6 +79,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights, BakingRights> | ExpandedRow<AggregatedEndorsingRights, EndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
+  }
+
+  get accountAddress(): string {
+    return this.route.snapshot.paramMap.get('id')
   }
 
   @Input()
@@ -170,6 +177,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
+        this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.rewardSingleService.updateAddress(accountAddress)
         this.accountSingleService.setAddress(accountAddress)
         this.frozenBalance = await this.accountService.getFrozen(accountAddress)
@@ -205,6 +213,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.rewardsLoading$ = this.rewardSingleService.loading$
     this.accountLoading$ = this.accountSingleService.loading$
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
+    this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
+    this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
   }
 
   selectTab(selectedTab: Tab) {

@@ -226,16 +226,19 @@
                 </h5>
                 <div class="d-block">
                   <div>
-                    <img src="/assets/img/tezosnodes.svg" width="24px" />
+                    <img *ngIf="(efficiencyLast10Cycles$ | async)" src="/assets/img/tezosnodes.svg" width="24px" />
 
-                    <a [href]="'https://www.tezos-nodes.com/baker/tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'" (click)="goToMYTB()">
-                      <ng-container *ngIf="!tezosBakerRating">
+                    <a [href]="'https://www.tezos-nodes.com/baker/' + accountAddress">
+                      <ng-container *ngIf="efficiencyLast10CyclesLoading$ | async">
                         <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
                       </ng-container>
-                      <ng-container *ngIf="tezosBakerRating">
-                        {{ tezosBakerRating }}
+                      <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
+                        {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}
                       </ng-container>
                     </a>
+                    <ng-container *ngIf="(efficiencyLast10Cycles$ | async) === null">
+                      not available
+                    </ng-container>
                   </div>
                 </div>
               </div>

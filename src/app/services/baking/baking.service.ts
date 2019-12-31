@@ -5,16 +5,18 @@ import { Router } from '@angular/router'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol, TezosProtocol } from 'airgap-coin-lib'
 import BigNumber from 'big-number'
 import * as moment from 'moment'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
-
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
 import { OperationsService } from '../operations/operations.service'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { Observable } from 'rxjs'
+import { get } from '@tezblock/services/fp'
 
-export interface Efficiency {
+interface Efficiency {
   [address: string]: number
 }
 
@@ -43,7 +45,7 @@ export class BakingService {
 
   private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
-  private readonly efficiencyLast10CyclesUrl = 'https://tezos-nodes.com/api/last10/tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'
+  private readonly efficiencyLast10CyclesUrl = 'https://tezos-nodes.com/api/last10/'
 
   constructor(
     private readonly http: HttpClient,
@@ -146,7 +148,9 @@ export class BakingService {
     return time.add(hoursPerCycle * 7 + 0, 'h')
   }
 
-  getEfficiencyLast10Cycles(): Observable<Efficiency> {
-    return this.http.get<Efficiency>(this.efficiencyLast10CyclesUrl)
+  getEfficiencyLast10Cycles(address: string): Observable<number> {
+    return this.http.get<Efficiency>(`${this.efficiencyLast10CyclesUrl}${address}`).pipe(
+      map(get(efficiency => efficiency[address]))
+    )
   }
 }
