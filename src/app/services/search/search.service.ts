@@ -11,6 +11,7 @@ import { AccountSingleService } from './../account-single/account-single.service
 import { BlockService } from '../blocks/blocks.service'
 import { BlockSingleService } from '../block-single/block-single.service'
 import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { getContractByAddress } from '@tezblock/domain/contract'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -24,7 +25,7 @@ export class SearchService {
     private readonly apiService: ApiService,
     private readonly router: Router,
     private readonly storage: StorageMap,
-	private readonly transactionService: NewTransactionService
+    private readonly transactionService: NewTransactionService
   ) {}
 
   // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
@@ -81,29 +82,37 @@ export class SearchService {
     const blocks$: Observable<Block[]> = blockSingleService.block$
     blockSingleService.updateHash(_searchTerm)
 
-    subscriptions.push(
-      account$.subscribe(account => {
-        if (account) {
-          processResult([account], () => {
-            this.router.navigateByUrl('/account/' + _searchTerm)
-          })
-        }
-      }),
-      transactions$.subscribe(transactions => {
-        if (transactions) {
-          processResult(transactions, () => {
-            this.router.navigateByUrl('/transaction/' + _searchTerm)
-          })
-        }
-      }),
-      blocks$.subscribe(blocks => {
-        if (blocks) {
-          processResult(blocks, () => {
-            this.router.navigateByUrl('/block/' + blocks[0].level)
-          })
-        }
+    // TODO: implement full search by contract
+    const contract = getContractByAddress(_searchTerm)
+    if (contract) {
+      processResult([contract], () => {
+        this.router.navigateByUrl('/contract/' + _searchTerm)
       })
-    )
+    } else {
+      subscriptions.push(
+        account$.subscribe(account => {
+          if (account) {
+            processResult([account], () => {
+              this.router.navigateByUrl('/account/' + _searchTerm)
+            })
+          }
+        }),
+        transactions$.subscribe(transactions => {
+          if (transactions) {
+            processResult(transactions, () => {
+              this.router.navigateByUrl('/transaction/' + _searchTerm)
+            })
+          }
+        }),
+        blocks$.subscribe(blocks => {
+          if (blocks) {
+            processResult(blocks, () => {
+              this.router.navigateByUrl('/block/' + blocks[0].level)
+            })
+          }
+        })
+      )
+    }
 
     return result
   }
