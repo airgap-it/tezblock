@@ -201,7 +201,7 @@
                   </button>
                 </div>
               </div>
-              <div>
+              <div class="mb-4">
                 <h5 class="card-title__secondary mb-3">
                   Baking Efficiency
                 </h5>
@@ -217,6 +217,25 @@
                         {{ tezosBakerRating }}
                       </ng-container>
                     </button>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h5 class="card-title__secondary mb-3">
+                  Efficiency Last 10 Cycles
+                </h5>
+                <div class="d-block">
+                  <div>
+                    <img src="/assets/img/tezosnodes.svg" width="24px" />
+
+                    <a [href]="'https://www.tezos-nodes.com/baker/tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ'" (click)="goToMYTB()">
+                      <ng-container *ngIf="!tezosBakerRating">
+                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="tezosBakerRating">
+                        {{ tezosBakerRating }}
+                      </ng-container>
+                    </a>
                   </div>
                 </div>
               </div>
