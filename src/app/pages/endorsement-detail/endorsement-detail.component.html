@@ -99,11 +99,11 @@
             <!-- <span
               class="d-inline-block"
               [innerHtml]="
-                64 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots)
+                64 * (endorsedSlotsCount$ | async)
                   | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true }
               "
             ></span> -->
-            {{ 64 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }} ꜩ
+            {{ 64 * (endorsedSlotsCount$ | async) }} ꜩ
           </div>
         </div>
         <div class="row mb-3">
@@ -111,7 +111,7 @@
             <p class="text-secondary mb-0">Reward</p>
           </div>
           <div class="col-md-9">
-            {{ 2 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }} ꜩ
+            {{ 2 * (endorsedSlotsCount$ | async) }} ꜩ
           </div>
         </div>
         <div class="row mb-3">
@@ -119,7 +119,7 @@
             <p class="text-secondary mb-0">Slots Endorsed</p>
           </div>
           <div class="col-md-9">
-            {{ getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }}
+            {{ endorsedSlotsCount$ | async }}
           </div>
         </div>
         <div class="row mx-1 mb-3">
