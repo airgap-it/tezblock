@@ -933,18 +933,10 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedBakingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.rewardService.calculateBakingRightsRewards(address, aggregatedRight.cycle)).pipe(
+                from(this.rewardService.calculateRewards(address, aggregatedRight.cycle)).pipe(
                   map((reward: TezosRewards) => {
-                    const rewardByLabel = reward.bakingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
-                      {}
-                    )
-                    const depositByLabel = reward.bakingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.deposit), accumulator),
-                      {}
-                    )
-                    const feesByLabel = reward.bakingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.fees), accumulator),
+                    const rewardByLevel = reward.bakingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
                       {}
                     )
                     return {
@@ -954,9 +946,9 @@ export class ApiService {
                       fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
                         ...item,
-                        rewards: rewardByLabel[item.level],
-                        deposit: depositByLabel[item.level] ? depositByLabel[item.level] : '0',
-                        fees: feesByLabel[item.level]
+                        rewards: rewardByLevel[item.level].amount,
+                        deposit: rewardByLevel[item.level] ? rewardByLevel[item.level].deposit : '0',
+                        fees: rewardByLevel[item.level].fees
                       }))
                     }
                   })
@@ -1034,14 +1026,10 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedEndorsingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.rewardService.calculateEndorsingRightsRewards(address, aggregatedRight.cycle)).pipe(
+                from(this.rewardService.calculateRewards(address, aggregatedRight.cycle)).pipe(
                   map((reward: TezosRewards) => {
-                    const rewardByLabel = reward.endorsingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
-                      {}
-                    )
-                    const depositByLabel = reward.endorsingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.deposit), accumulator),
+                    const rewardByLevel = reward.endorsingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
                       {}
                     )
 
@@ -1051,8 +1039,8 @@ export class ApiService {
                       endorsingDeposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
-                        rewards: rewardByLabel[item.level],
-                        deposit: depositByLabel[item.level] ? depositByLabel[item.level] : '0'
+                        rewards: rewardByLevel[item.level].amount,
+                        deposit: rewardByLevel[item.level] ? rewardByLevel[item.level].deposit : '0'
                       }))
                     }
                   })

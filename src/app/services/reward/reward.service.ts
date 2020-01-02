@@ -18,8 +18,7 @@ export interface ExpTezosRewards extends TezosRewards {
 export class RewardService {
   protocol: TezosProtocol
 
-  private calculatedBakingRewardsArray = []
-  private calculatedEndorsingRewardsArray = []
+  private calculatedRewardsMap = new Map<String, TezosRewards>()
 
   constructor(private readonly chainNetworkService: ChainNetworkService) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
@@ -52,7 +51,7 @@ export class RewardService {
       switchMap(cycles =>
         forkJoin(
           cycles.map(cycle =>
-            from(this.protocol.calculateRewards(address, cycle)).pipe(
+            from(this.calculateRewards(address, cycle)).pipe(
               switchMap(rewards =>
                 from(this.protocol.calculatePayouts(rewards, 0, rewards.delegatedContracts.length)).pipe(
                   map(payouts => ({ ...rewards, payouts }))
@@ -68,7 +67,7 @@ export class RewardService {
   getRewardAmont(accountAddress: string, bakerAddress: string): Observable<string> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
       switchMap(currentCycle =>
-        from(this.protocol.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
+        from(this.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
           switchMap(tezosRewards =>
             from(this.protocol.calculatePayouts(tezosRewards, 0, tezosRewards.delegatedContracts.length)).pipe(
               map(payouts => {
@@ -85,22 +84,18 @@ export class RewardService {
     )
   }
 
-  public calculateBakingRightsRewards(address: string, cycle: number): Promise<TezosRewards> {
-    if (this.calculatedBakingRewardsArray.indexOf(cycle) !== -1) {
-      return this.calculatedBakingRewardsArray[cycle]
-    } else {
-      this.calculatedBakingRewardsArray[cycle] = this.protocol.calculateRewards(address, cycle)
+  public async calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
+    const key = `${address}${cycle}`
 
-      return this.calculatedBakingRewardsArray[cycle]
+    if (this.calculatedRewardsMap.has(key)) {
+      return this.calculatedRewardsMap.get(key)
     }
-  }
-  public calculateEndorsingRightsRewards(address: string, cycle: number): Promise<TezosRewards> {
-    if (this.calculatedEndorsingRewardsArray.indexOf(cycle) !== -1) {
-      return this.calculatedEndorsingRewardsArray[cycle]
-    } else {
-      this.calculatedEndorsingRewardsArray[cycle] = this.protocol.calculateRewards(address, cycle)
 
-      return this.calculatedEndorsingRewardsArray[cycle]
+    const rewards = await this.protocol.calculateRewards(address, cycle)
+    const currentCycle = await this.protocol.fetchCurrentCycle()
+    if (cycle < currentCycle) {
+      this.calculatedRewardsMap.set(key, rewards)
     }
+    return rewards
   }
 }
