@@ -96,8 +96,14 @@
             <p class="text-secondary mb-0">Deposit</p>
           </div>
           <div class=" col-md-9">
-            <!-- TODO -->
-            not available
+            <!-- <span
+              class="d-inline-block"
+              [innerHtml]="
+                64 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots)
+                  | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true }
+              "
+            ></span> -->
+            {{ 64 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }} ꜩ
           </div>
         </div>
         <div class="row mb-3">
@@ -105,8 +111,7 @@
             <p class="text-secondary mb-0">Reward</p>
           </div>
           <div class="col-md-9">
-            <!-- TODO -->
-            not available
+            {{ 2 * getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }} ꜩ
           </div>
         </div>
         <div class="row mb-3">
