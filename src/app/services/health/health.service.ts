@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Observable } from 'rxjs'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { Resources } from '../../../environments/environment'
 import { first } from '@tezblock/services/fp'
 import { map } from 'rxjs/operators'
 
@@ -16,7 +15,12 @@ export interface BlockStatus {
   providedIn: 'root'
 })
 export class HealthService {
-  private environmentUrls: Resources
+  private environmentUrls: {
+    rpcUrl: string
+    conseilUrl: string
+    conseilApiKey: string
+    targetUrl: string
+  }
 
   get options() {
     return {

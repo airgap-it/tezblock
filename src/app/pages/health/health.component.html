@@ -11,8 +11,7 @@
                 </h5>
               </div>
               <div class="col-2 d-flex justify-content-end">
-                <!--TODO: set class set class bg-danger and remove bg-success if time is bigger than 4mins-->
-                <div class="health--indicator bg-success rounded"></div>
+                <div class="health--indicator  rounded" [ngClass]="{'bg-success': isNodeUp$ | async, 'bg-danger': !(isNodeUp$ | async)}"></div>
               </div>
             </div>
             <div class="row mb-3">
@@ -20,8 +19,10 @@
                 <p class="text-secondary mb-0">Status</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
-                <!--TODO: status Up/Down-->
-                <p class="m-0">Up</p>
+                <p class="m-0" [ngSwitch]="isNodeUp$ | async">
+                  <ng-container *ngSwitchCase="true">Up</ng-container>
+                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                </p>
               </div>
             </div>
             <div class="row mb-3">
@@ -47,8 +48,7 @@
                 </h5>
               </div>
               <div class="col-2 d-flex justify-content-end">
-                <!--TODO: set class set class bg-danger and remove bg-success if time is bigger than 4mins-->
-                <div class="health--indicator bg-success rounded"></div>
+                <div class="health--indicator bg-success rounded" [ngClass]="{'bg-success': isConseilUp$ | async, 'bg-danger': !(isConseilUp$ | async)}"></div>
               </div>
             </div>
             <div class="row mb-3">
@@ -56,8 +56,10 @@
                 <p class="text-secondary mb-0">Status</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
-                <!--TODO: status Up/Down-->
-                <p class="m-0">Up</p>
+                <p class="m-0" [ngSwitch]="isConseilUp$ | async">
+                  <ng-container *ngSwitchCase="true">Up</ng-container>
+                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                </p>
               </div>
             </div>
             <div class="row mb-3">
