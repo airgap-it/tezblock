@@ -2,17 +2,21 @@ import { createReducer, on } from '@ngrx/store'
 
 import * as actions from './actions'
 import { Contract } from '@tezblock/domain/contract'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
 
 export interface State {
   address: string
   contract: Contract
   copyToClipboardState: string
+  transferOperations: TableState<Transaction>
 }
 
 const initialState: State = {
   address: undefined,
   contract: undefined,
-  copyToClipboardState: 'copyGrey'
+  copyToClipboardState: 'copyGrey',
+  transferOperations: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -36,6 +40,28 @@ export const reducer = createReducer(
   on(actions.resetCopyToClipboardState, state => ({
     ...state,
     copyToClipboardState: 'copyGrey'
+  })),
+  on(actions.loadTransferOperations, state => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      loading: true
+    }
+  })),
+  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      data: transferOperations,
+      loading: false
+    }
+  })),
+  on(actions.loadTransferOperationsFailed, state => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      loading: false
+    }
   })),
   on(actions.reset, () => initialState)
 )

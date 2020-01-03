@@ -1237,4 +1237,30 @@ export class ApiService {
         )
       )
   }
+
+  getTransferOperationsForContract(contractAddress: string, limit?: number): Observable<Transaction[]> {
+    
+    // Sort by block_level
+    return this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [
+          {
+            field: 'parameters',
+            operation: 'like',
+            set: ['transfer'],
+            inverse: false
+          },
+          {
+            field: 'destination',
+            operation: 'eq',
+            set: [contractAddress],
+            inverse: false
+          }
+        ],
+        limit
+      },
+      this.options
+    )
+  }
 }

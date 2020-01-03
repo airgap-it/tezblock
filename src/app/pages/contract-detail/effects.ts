@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { delay, map, tap, withLatestFrom } from 'rxjs/operators'
+import { of } from 'rxjs'
+import { catchError, delay, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
@@ -12,6 +13,7 @@ import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.compone
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { getContractByAddress } from '@tezblock/domain/contract'
+import { ApiService } from '@tezblock/services/api/api.service'
 
 @Injectable()
 export class ContractDetailEffects {
@@ -80,9 +82,22 @@ export class ContractDetailEffects {
     { dispatch: false }
   )
 
+  loadTransferOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransferOperations),
+      switchMap(({ address }) =>
+        this.apiService.getTransferOperationsForContract(address).pipe(
+          map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
+          catchError(error => of(actions.loadTransferOperationsFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly aliasPipe: AliasPipe,
+    private readonly apiService: ApiService,
     private readonly copyService: CopyService,
     private readonly modalService: BsModalService,
     private readonly store$: Store<fromRoot.State>,

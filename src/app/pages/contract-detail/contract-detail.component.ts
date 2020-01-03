@@ -58,6 +58,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
+        this.store$.dispatch(actions.loadTransferOperations({ address }))
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       })
