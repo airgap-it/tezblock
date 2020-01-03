@@ -65,11 +65,12 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { HealthComponent } from './pages/health/health.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage';
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects'
+import { HealthEffects } from './pages/health/effects'
 
 @NgModule({
   imports: [
@@ -111,9 +112,10 @@ import { BakerTableEffects } from './components/baker-table/effects'
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      HealthEffects
     ]),
-	StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,

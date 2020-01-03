@@ -29,8 +29,9 @@
                 <p class="text-secondary mb-0">Latest Block Seen</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
-                <!--TODO: add latest block time from node-->
-                <p class="m-0">12minutes ago</p>
+                <p class="m-0">
+                  <app-timestamp-cell [data]="(latestNodeBlock$ | async)?.header.timestamp"></app-timestamp-cell>
+                </p>
               </div>
             </div>
           </div>
@@ -64,8 +65,9 @@
                 <p class="text-secondary mb-0">Latest Block Seen</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
-                <!--TODO: add latest block time from Conseil-->
-                <p class="m-0">12minutes ago</p>
+                <p class="m-0">
+                  <app-timestamp-cell [data]="(latestConseilBlock$ | async)?.timestamp"></app-timestamp-cell>
+                </p>
               </div>
             </div>
           </div>
