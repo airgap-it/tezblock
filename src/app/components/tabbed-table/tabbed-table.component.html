@@ -1,5 +1,5 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs; let i = index" [disabled]="tab.count === 0" (selectTab)="selectTab(tab)">
+  <tab *ngFor="let tab of tabs; let i = index" [active]="tab.active" [disabled]="tab.count === 0" (selectTab)="onSelectTab(tab)">
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -8,7 +8,7 @@
         <fa-icon [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
       </button>
       <span class="badge badge-pill d-none d-sm-inline-block" [ngClass]="tab.active ? 'badge-primary' : 'badge-primary-light'">
-        {{ tab.count }}
+        {{ tab.count || 0 }}
       </span>
     </ng-template>
     <h6 class="pt-3 mr-1 d-sm-none">
@@ -16,17 +16,17 @@
         {{ tab.title }}
       </span>
       <span class="badge badge-pill badge-primary">
-        {{ tab.count }}
+        {{ tab.count || 0 }}
       </span>
     </h6>
   </tab>
 
   <tezblock-table
-    [loading]="loading"
-    [data]="data"
+    [loading]="loading | async"
+    [data]="data | async"
     [page]="page"
-    [type]="selectedTab.kind"
-    [showLoadMoreButton]="!(loading | async) && ((data | async) && (data | async).length !== selectedTab.count)"
-    (loadMoreClicked)="loadMore()"
+    [type]="kindToOperationTypes(selectedTab.kind)"
+    [showLoadMoreButton]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"
+    (loadMoreClicked)="onLoadMore()"
   ></tezblock-table>
 </tabset>

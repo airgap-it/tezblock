@@ -1,4 +1,7 @@
 ::ng-deep app-account-detail {
+  .card__top {
+    min-height: 328px;
+  }
   .btn--rotated fa-icon svg {
     transform: rotate(-180deg);
   }

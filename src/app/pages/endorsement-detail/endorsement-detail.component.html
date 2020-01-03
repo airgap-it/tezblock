@@ -1,0 +1,153 @@
+<ng-container *ngIf="selectedEndorsement$ | async; else noSelectedEndorsement">
+  <div class="mb-5 pt-5">
+    <div class="container p-0">
+      <div class="card h-100 pt-3 ">
+        <div class="card-body p-4">
+          <h5 class="card-title mb-4 ">
+            Endorsement
+          </h5>
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <p class="text-secondary mb-0">Transaction Hash</p>
+            </div>
+            <div class="col-md-9">
+              <p class="mb-0">
+                {{ (selectedEndorsement$ | async)?.operation_group_hash }}
+                <a
+                  (click)="copyToClipboard()"
+                  value="click to copy"
+                  class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                  tooltip="Copy to clipboard"
+                >
+                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                </a>
+              </p>
+            </div>
+          </div>
+          <ng-template #loadingTemplate>
+            <div class="col-md-9">
+              <loading-skeleton [loadingWidth]="'400px'"></loading-skeleton>
+            </div>
+          </ng-template>
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <p class="text-secondary mb-0">Endorser</p>
+            </div>
+            <div class="col-md-9">
+              <address-item [address]="(selectedEndorsement$ | async)?.delegate"></address-item>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <p class="text-secondary mb-0">Block</p>
+            </div>
+            <div class="col-md-9">
+              <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.block_level]">
+                {{ (selectedEndorsement$ | async)?.block_level }}
+                <!-- <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
+                {{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}
+              </span> -->
+              </button>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <p class="text-secondary mb-0">Cycle</p>
+            </div>
+            <div class="col-md-9">
+              {{ (selectedEndorsement$ | async)?.cycle }}
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-3">
+              <p class="text-secondary mb-0">Timestamp</p>
+            </div>
+            <div class="col-md-9">
+              <p *ngIf="selectedEndorsement$ | async">
+                {{ (selectedEndorsement$ | async)?.timestamp | amTimeAgo }} ({{
+                  (selectedEndorsement$ | async)?.timestamp | date: 'MMMM-d-y h:mm:ss a z'
+                }})
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container p-0">
+    <div class="card h-100 pt-3 mb-">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4 ">
+          Endorsement Details
+        </h5>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Endorsed Block</p>
+          </div>
+          <div class="col-md-9">
+            <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.level]">
+              {{ (selectedEndorsement$ | async)?.level }}
+            </button>
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Deposit</p>
+          </div>
+          <div class=" col-md-9">
+            <!-- TODO -->
+            not available
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Reward</p>
+          </div>
+          <div class="col-md-9">
+            <!-- TODO -->
+            not available
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Slots Endorsed</p>
+          </div>
+          <div class="col-md-9">
+            {{ getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }}
+          </div>
+        </div>
+        <div class="row mx-1 mb-3">
+          <div
+            *ngFor="let slot of slots$ | async"
+            (click)="select(slot.operation_group_hash)"
+            class="col-2 col-md-1 border text-center p-2 endorsement__container"
+            [class.bg-primary]="slot.state === 'selected'"
+            [class.bg-primary-light]="slot.state === 'not_selected'"
+            [class.bg-primary-white]="slot.state === 'empty'"
+          >
+            <identicon [address]="slot.endorser" class="d-none d-sm-inline-block"></identicon>
+            <p [class.text-dark]="slot.state === 'not_selected'" [class.text-white]="slot.state === 'selected'" class="m-0 pt-1">
+              <span class="d-none d-sm-inline-block">Slot</span>
+              {{ slot.index }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-container>
+<ng-template #noSelectedEndorsement>
+  <div class="mb-5 pt-5" *ngIf="(selectedEndorsement$ | async) === null">
+    <div class="container p-0">
+      <div class="card p-3">
+        <h5 class="card-title mb-4 ">
+          Invalid Endorsement Operation hash
+        </h5>
+        <p>
+          This operation hash is invalid.
+        </p>
+      </div>
+    </div>
+  </div>
+</ng-template>

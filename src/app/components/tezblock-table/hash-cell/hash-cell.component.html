@@ -1,1 +1,1 @@
-<a *ngIf="data" ng-href="#here" [routerLink]="['/transaction', data]" class="btn btn-link p-0" role="button">{{ data | shortenString }}</a>
+<a *ngIf="data" ng-href="#here" [routerLink]="[linkPath, data]" class="btn btn-link p-0" role="button">{{ data | shortenString }}</a>

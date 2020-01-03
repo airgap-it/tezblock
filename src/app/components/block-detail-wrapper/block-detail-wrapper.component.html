@@ -55,11 +55,13 @@
             "
           ></span>
           ꜩ
-          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-            <span class="badge badge-pill badge-primary-light ml-1">
-              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-              {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-            </span>
+          <ng-container *ngIf="isMainnet">
+            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+              <span class="badge badge-pill badge-primary-light ml-1">
+                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
+              </span>
+            </ng-container>
           </ng-container>
         </p>
       </div>
@@ -85,11 +87,13 @@
             "
           ></span>
           ꜩ
-          <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-            <span class="badge badge-pill badge-primary-light ml-1">
-              {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-              {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
-            </span>
+          <ng-container *ngIf="isMainnet">
+            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+              <span class="badge badge-pill badge-primary-light ml-1">
+                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
+                {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
+              </span>
+            </ng-container>
           </ng-container>
         </p>
       </div>
@@ -115,7 +119,7 @@
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
     <div class="row mt-3 mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Endorsements</p>
+        <p class="text-secondary mb-0">Endorsed Slots</p>
       </div>
       <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
       <ng-template #loaded>
