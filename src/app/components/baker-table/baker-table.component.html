@@ -220,18 +220,6 @@
                   </div>
                 </div>
               </div>
-              <div>
-                <h5 class="card-title__secondary mb-3">
-                  Delegations last 30 days
-                </h5>
-                <div class="d-block">
-                  <area-chart-item
-                    *ngIf="delegationsChartDatasets$ | async"
-                    [datasets]="delegationsChartDatasets$ | async"
-                    [labels]="delegationsChartLabels$ | async"
-                  ></area-chart-item>
-                </div>
-              </div>
             </div>
           </div>
         </div>

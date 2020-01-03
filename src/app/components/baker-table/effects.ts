@@ -70,21 +70,6 @@ export class BakerTableEffects {
     )
   )
 
-  getDelegationsFromLast30Days$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadDelegationsForLast30Days),
-      withLatestFrom(
-        this.store$.select(state => state.bakerTable.accountAddress)
-      ),
-      switchMap(([action, accountAddress]) =>
-        this.apiService.getDelegationsForLast30Days(accountAddress).pipe(
-          map(delegationsFromLast30Days => actions.loadDelegationsForLast30DaysSucceeded({ delegationsFromLast30Days })),
-          catchError(error => of(actions.loadDelegationsForLast30DaysFailed({ error })))
-        )
-      )
-    )
-  )
-
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,

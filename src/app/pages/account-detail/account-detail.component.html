@@ -186,7 +186,10 @@
                     <p class="text-secondary mb-0">Delegated Account</p>
                   </div>
                   <div class=" col-md-7">
-                    <address-item [address]="delegatedAccountAddress" [clickableButton]="delegatedAccountAddress !== account.account_id"></address-item>
+                    <address-item
+                      [address]="delegatedAccountAddress"
+                      [clickableButton]="delegatedAccountAddress !== account.account_id"
+                    ></address-item>
                   </div>
                 </div>
                 <div class="row mb-3" *ngIf="delegatedAmount">
@@ -278,10 +281,25 @@
         </div>
       </div>
 
-      <div class="pt-5" *ngIf="isValidBaker">
+      <div class="pt-5" *ngIf="isValidBaker || (delegationsChartDatasets$ | async)">
         <div class="card pt-3">
           <div class="card-body px-3 py-0">
-            <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+            <ng-container *ngIf="!isValidBaker && (delegationsChartDatasets$ | async)">
+              <div>
+                <h5 class="card-title__secondary mb-3">
+                  Delegations last 30 days
+                </h5>
+                <div class="d-block">
+                  <area-chart-item
+                    [datasets]="delegationsChartDatasets$ | async"
+                    [labels]="delegationsChartLabels$ | async"
+                  ></area-chart-item>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="isValidBaker">
+              <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+            </ng-container>
           </div>
         </div>
       </div>

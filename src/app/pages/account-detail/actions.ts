@@ -3,6 +3,7 @@ import { createAction, props } from '@ngrx/store'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
 import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/account.service'
+import { Delegation } from '@tezblock/services/api/api.service'
 
 const featureName = 'Account Detail'
 
@@ -20,6 +21,13 @@ export const loadAccountFailed = createAction(`[${featureName}] Load Account Fai
 
 export const loadDelegatedAccountsSucceeded = createAction(`[${featureName}] Load Delegated Accounts Succeeded`, props<{ accounts: GetDelegatedAccountsResponseDto }>())
 export const loadDelegatedAccountsFailed = createAction(`[${featureName}] Load Delegated Accounts Failed`, props<{ error: any }>())
+
+export const loadDelegationsForLast30Days = createAction(`[${featureName}] Load Delegations For Last 30 Days`)
+export const loadDelegationsForLast30DaysSucceeded = createAction(
+  `[${featureName}] Load Delegations For Last 30 Days Succeeded`,
+  props<{ delegationsFromLast30Days: Delegation[] }>()
+)
+export const loadDelegationsForLast30DaysFailed = createAction(`[${featureName}] Load Delegations For Last 30 Days Failed`, props<{ error: any }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

@@ -16,7 +16,6 @@ import { RightsSingleService } from './../../services/rights-single/rights-singl
 import { AddressItemComponent } from '../address-item/address-item.component'
 import { IdenticonComponent } from '../identicon/identicon'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { AreaChartItemComponent } from '../../components/area-chart-item/area-chart-item.component'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -29,7 +28,6 @@ describe('BakerTableComponent', () => {
         providers: [RightsSingleService, TabsetConfig, IconPipe],
         imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule, ChartsModule],
         declarations: [
-          AreaChartItemComponent,
           BakerTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent,

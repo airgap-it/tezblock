@@ -2,7 +2,6 @@ import { createAction, props } from '@ngrx/store'
 
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
-import { Delegation } from '@tezblock/services/api/api.service'
 
 const featureName = 'Account Detail - Baker Table'
 
@@ -31,13 +30,6 @@ export const loadEndorsingRightsSucceeded = createAction(
   props<{ endorsingRights: AggregatedEndorsingRights[] }>()
 )
 export const loadEndorsingRightsFailed = createAction(`[${featureName}] Load Endorsing Rights Failed`, props<{ error: any }>())
-
-export const loadDelegationsForLast30Days = createAction(`[${featureName}] Load Delegations For Last 30 Days`)
-export const loadDelegationsForLast30DaysSucceeded = createAction(
-  `[${featureName}] Load Delegations For Last 30 Days Succeeded`,
-  props<{ delegationsFromLast30Days: Delegation[] }>()
-)
-export const loadDelegationsForLast30DaysFailed = createAction(`[${featureName}] Load Delegations For Last 30 Days Failed`, props<{ error: any }>())
 
 export const increaseRightsPageSize = createAction(`[${featureName}] Change Rights Page Size`)
 
