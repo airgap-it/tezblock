@@ -281,18 +281,18 @@
         </div>
       </div>
 
-      <div class="pt-5" *ngIf="isValidBaker || (delegationsChartDatasets$ | async)">
+      <div class="pt-5" *ngIf="isValidBaker || (balanceChartDatasets$ | async)">
         <div class="card pt-3">
           <div class="card-body px-3 py-0">
-            <ng-container *ngIf="!isValidBaker && (delegationsChartDatasets$ | async)">
+            <ng-container *ngIf="!isValidBaker && (balanceChartDatasets$ | async)">
               <div>
                 <h5 class="card-title__secondary mb-3">
                   Delegations last 30 days
                 </h5>
                 <div class="d-block">
                   <area-chart-item
-                    [datasets]="delegationsChartDatasets$ | async"
-                    [labels]="delegationsChartLabels$ | async"
+                    [datasets]="balanceChartDatasets$ | async"
+                    [labels]="balanceChartLabels$ | async"
                   ></area-chart-item>
                 </div>
               </div>

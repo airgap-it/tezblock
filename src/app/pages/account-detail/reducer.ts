@@ -3,7 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
-import { Delegation } from '@tezblock/services/api/api.service'
+import { Balance } from '@tezblock/services/api/api.service'
 
 export interface Busy {
   transactions: boolean
@@ -20,7 +20,7 @@ export interface State {
   pageSize: number // transactions
   rewardAmont: string
   busy: Busy,
-  delegationsFromLast30Days: Delegation[]
+  balanceFromLast30Days: Balance[]
 }
 
 const initialState: State = {
@@ -36,7 +36,7 @@ const initialState: State = {
     transactions: false,
     rewardAmont: false
   },
-  delegationsFromLast30Days: undefined
+  balanceFromLast30Days: undefined
 }
 
 export const reducer = createReducer(
@@ -107,9 +107,9 @@ export const reducer = createReducer(
     ...state,
     pageSize: state.pageSize + 10
   })),
-  on(actions.loadDelegationsForLast30DaysSucceeded, (state, { delegationsFromLast30Days }) => ({
+  on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
-    delegationsFromLast30Days
+    balanceFromLast30Days
   })),
   on(actions.reset, () => initialState)
 )

@@ -39,7 +39,7 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
-export interface Delegation {
+export interface Balance {
   balance: number
   asof: number
 }
@@ -1244,11 +1244,11 @@ export class ApiService {
       )
   }
 
-  public getDelegationsForLast30Days(accountId: string): Observable<Delegation[]> {
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
-    const lastItemOfTheDay = (value: Delegation, index: number, array: Delegation[]) => {
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
       if (index === 0) {
         return true
       }
@@ -1264,7 +1264,7 @@ export class ApiService {
     }
 
     return this.http
-      .post<Delegation[]>(
+      .post<Balance[]>(
         this.accountHistoryApiUrl,
         {
           fields: ['balance', 'asof'],

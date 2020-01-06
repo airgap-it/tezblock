@@ -73,16 +73,16 @@ export class AccountDetailEffects {
     )
   )
 
-  getDelegationsFromLast30Days$ = createEffect(() =>
+  loadBalanceForLast30Days$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadDelegationsForLast30Days),
+      ofType(actions.loadBalanceForLast30Days),
       withLatestFrom(
         this.store$.select(state => state.accountDetails.address)
       ),
       switchMap(([action, accountAddress]) =>
-        this.apiService.getDelegationsForLast30Days(accountAddress).pipe(
-          map(delegationsFromLast30Days => actions.loadDelegationsForLast30DaysSucceeded({ delegationsFromLast30Days })),
-          catchError(error => of(actions.loadDelegationsForLast30DaysFailed({ error })))
+        this.apiService.getBalanceForLast30Days(accountAddress).pipe(
+          map(balanceFromLast30Days => actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })),
+          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
         )
       )
     )

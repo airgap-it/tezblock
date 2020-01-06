@@ -135,8 +135,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   actionType$: Observable<LayoutPages>
-  delegationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
-  delegationsChartLabels$: Observable<string[]>
+  balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  balanceChartLabels$: Observable<string[]>
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
@@ -181,11 +181,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
-    this.delegationsChartDatasets$ = this.store$.select(state => state.accountDetails.delegationsFromLast30Days).pipe(
+    this.balanceChartDatasets$ = this.store$.select(state => state.accountDetails.balanceFromLast30Days).pipe(
       filter(Array.isArray),
       map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
     )
-    this.delegationsChartLabels$ = this.store$.select(state => state.accountDetails.delegationsFromLast30Days).pipe(
+    this.balanceChartLabels$ = this.store$.select(state => state.accountDetails.balanceFromLast30Days).pipe(
       filter(Array.isArray),
       map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
     )
@@ -197,7 +197,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
-        this.store$.dispatch(actions.loadDelegationsForLast30Days())
+        this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
