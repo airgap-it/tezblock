@@ -169,6 +169,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.route.paramMap.subscribe(async paramMap => {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
+        this.store$.dispatch(actions.loadBakingRights())
+        this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.rewardSingleService.updateAddress(accountAddress)
         this.accountSingleService.setAddress(accountAddress)

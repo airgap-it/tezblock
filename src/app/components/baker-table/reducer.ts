@@ -88,7 +88,7 @@ export const reducer = createReducer(
     ...state,
     bakingRights: {
       ...state.bakingRights,
-      data: fillMissingCycles(state.currentCycle, bakingRights, state.bakingRights.pagination, bakingRightsFactory),
+      data: bakingRights,
       loading: false
     }
   })),
@@ -110,7 +110,7 @@ export const reducer = createReducer(
     ...state,
     endorsingRights: {
       ...state.endorsingRights,
-      data: fillMissingCycles(state.currentCycle, endorsingRights, state.endorsingRights.pagination, endorsingRightsFactory),
+      data: endorsingRights,
       loading: false
     }
   })),
