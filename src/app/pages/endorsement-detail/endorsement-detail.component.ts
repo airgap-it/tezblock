@@ -26,6 +26,7 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   endorsements$: Observable<Transaction[]>
   selectedEndorsement$: Observable<Transaction>
   slots$: Observable<Slot[]>
+  endorsedSlots$: Observable<string>
   endorsedSlotsCount$: Observable<number>
 
   constructor(
@@ -41,10 +42,14 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.endorsements$ = this.store$.select(state => state.endorsementDetails.endorsements)
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
+    this.endorsedSlots$ = this.selectedEndorsement$.pipe(
+      map(get(selectedEndorsement => selectedEndorsement.slots)),
+      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots)
+    )
     this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
       map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots),
-      map(slots => slots ? parseInt(slots) : null)
+      map((slots: string) => slots.split(',').length)
     )
 
     this.subscriptions.push(
