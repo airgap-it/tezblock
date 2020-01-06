@@ -845,7 +845,7 @@ export class TezblockTableComponent implements OnChanges, OnInit, AfterViewInit 
 
   ngOnChanges() {
     if (this.page && this.type) {
-      this.enableDownload = this.type === 'transaction' || this.type === 'delegation'
+      this.enableDownload = this.type === 'transaction' || this.type === 'delegation' || this.type === 'origination'
       const layouts = getLayouts(this.isMainnet)
       if (layouts[this.page][this.type]) {
         this.config = layouts[this.page][this.type]
