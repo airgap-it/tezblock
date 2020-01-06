@@ -58,11 +58,13 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rewards$: Observable<TezosRewards[]>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
 
+  efficiencyLast10Cycles$: Observable<number>
+  efficiencyLast10CyclesLoading$: Observable<boolean>
+
   rewards: TezosRewards
 
   activeDelegations$: Observable<number>
 
-  myTBUrl: string | undefined
   frozenBalance: number | undefined
   rewardsExpandedRow: ExpandedRow<ExpTezosRewards, Payout> = {
     columns: [
@@ -76,6 +78,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights, BakingRights> | ExpandedRow<AggregatedEndorsingRights, EndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
+  }
+
+  get accountAddress(): string {
+    return this.route.snapshot.paramMap.get('id')
   }
 
   @Input()
@@ -170,6 +176,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
+        this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.rewardSingleService.updateAddress(accountAddress)
         this.accountSingleService.setAddress(accountAddress)
         this.frozenBalance = await this.accountService.getFrozen(accountAddress)
@@ -178,45 +185,37 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.rights$ = this.store$.select(state => state.bakerTable.kind).pipe(
-      switchMap(kind => {
-        if (kind === OperationTypes.BakingRights) {
-          return this.store$.select(state => state.bakerTable.bakingRights).pipe(
-            map(table => table.data)
-          )
-        }
+    this.rights$ = this.store$
+      .select(state => state.bakerTable.kind)
+      .pipe(
+        switchMap(kind => {
+          if (kind === OperationTypes.BakingRights) {
+            return this.store$.select(state => state.bakerTable.bakingRights).pipe(map(table => table.data))
+          }
 
-        if (kind === OperationTypes.EndorsingRights) {
-          return this.store$.select(state => state.bakerTable.endorsingRights).pipe(
-            map(table => table.data)
-          )
-        }
+          if (kind === OperationTypes.EndorsingRights) {
+            return this.store$.select(state => state.bakerTable.endorsingRights).pipe(map(table => table.data))
+          }
 
-        return EMPTY
-      })
-    )
+          return EMPTY
+        })
+      )
     this.rewards$ = this.rewardSingleService.rewards$
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
-    ).pipe(
-      map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading)
-    )
+    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
     this.rewardsLoading$ = this.rewardSingleService.loading$
     this.accountLoading$ = this.accountSingleService.loading$
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
+    this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
+    this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
   }
 
   selectTab(selectedTab: Tab) {
     this.store$.dispatch(actions.kindChanged({ kind: selectedTab.kind }))
     this.updateSelectedTab(selectedTab)
     this.overviewTabClicked.emit(selectedTab.kind)
-  }
-
-  goToMYTB() {
-    if (this.myTBUrl) {
-      window.open(this.myTBUrl, '_blank')
-    }
   }
 
   getTabCount(tabs: Tab[]) {
@@ -267,5 +266,4 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
   }
-
 }

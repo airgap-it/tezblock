@@ -22,12 +22,18 @@ const getInitialTableState = (): TableState<any> => ({
   loading: false
 })
 
+interface Busy {
+  efficiencyLast10Cycles: boolean
+}
+
 export interface State {
   accountAddress: string
   currentCycle: number
   bakingRights: TableState<AggregatedBakingRights>
   endorsingRights: TableState<AggregatedEndorsingRights>
-  kind: string
+  kind: string,
+  efficiencyLast10Cycles: number,
+  busy: Busy
 }
 
 const initialState: State = {
@@ -35,7 +41,11 @@ const initialState: State = {
   currentCycle: undefined,
   bakingRights: getInitialTableState(),
   endorsingRights: getInitialTableState(),
-  kind: undefined
+  kind: undefined,
+  efficiencyLast10Cycles: undefined,
+  busy: {
+    efficiencyLast10Cycles: false
+  }
 }
 
 const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
@@ -148,5 +158,27 @@ export const reducer = createReducer(
     ...state,
     kind
   })),
+
+  on(actions.loadEfficiencyLast10Cycles, state => ({
+    ...state,
+    busy: {
+      efficiencyLast10Cycles: true
+    }
+  })),
+  on(actions.loadEfficiencyLast10CyclesSucceeded, (state, { efficiencyLast10Cycles }) => ({
+    ...state,
+    efficiencyLast10Cycles,
+    busy: {
+      efficiencyLast10Cycles: false
+    }
+  })),
+  on(actions.loadEfficiencyLast10CyclesFailed, state => ({
+    ...state,
+    efficiencyLast10Cycles: null,
+    busy: {
+      efficiencyLast10Cycles: false
+    }
+  })),
+
   on(actions.reset, () => initialState)
 )
