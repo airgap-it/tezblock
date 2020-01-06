@@ -85,12 +85,21 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      switchMap(({ address }) =>
-        this.apiService.getTransferOperationsForContract(address).pipe(
+      withLatestFrom(this.store$.select(state => state.contractDetails.transferOperations.pagination)),
+      switchMap(([{ address }, pagination]) =>
+        this.apiService.getTransferOperationsForContract(address, pagination.currentPage * pagination.selectedSize).pipe(
           map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
+    )
+  )
+
+  onPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadMoreTransferOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.address)),
+      map(([action, address]) => actions.loadTransferOperations({ address }))
     )
   )
 

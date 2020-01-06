@@ -91,6 +91,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.copyAddressToClipboard({ address }))
   }
 
+  loadMore() {
+    this.store$.dispatch(actions.loadMoreTransferOperations())
+  }
+
   private getSocial(condition: (social: Social) => boolean): Observable<string> {
     return this.store$
       .select(state => state.contractDetails.contract)

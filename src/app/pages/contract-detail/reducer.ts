@@ -63,5 +63,15 @@ export const reducer = createReducer(
       loading: false
     }
   })),
+  on(actions.loadMoreTransferOperations, state => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      pagination: {
+        ...state.transferOperations.pagination,
+        currentPage: state.transferOperations.pagination.currentPage + 1
+      }
+    }
+  })),
   on(actions.reset, () => initialState)
 )

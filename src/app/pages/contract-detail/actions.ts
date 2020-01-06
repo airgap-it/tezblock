@@ -16,6 +16,7 @@ export const resetCopyToClipboardState = createAction(`[${featureName}] Reset Co
 export const loadTransferOperations = createAction(`[${featureName}] Load Transfer Operations`, props<{ address: string }>())
 export const loadTransferOperationsSucceeded = createAction(`[${featureName}] Load Transfer Operations Succeeded`, props<{ transferOperations: Transaction[] }>())
 export const loadTransferOperationsFailed = createAction(`[${featureName}] Load Transfer Operations Failed`, props<{ error: any }>())
+export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
 
 export const showQr = createAction(`[${featureName}] Show Qr`)
 
