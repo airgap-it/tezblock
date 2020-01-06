@@ -12,6 +12,7 @@ import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 @Component({
   selector: 'app-contract-detail',
@@ -41,6 +42,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   copyToClipboardState$: Observable<string>
   revealed$: Observable<string>
   hasAlias$: Observable<boolean>
+  loading$: Observable<boolean>
+  transferOperations$: Observable<Transaction[]>
 
   current: string = 'copyGrey'
 
@@ -77,6 +80,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias$ = this.store$.select(state => state.contractDetails.address).pipe(
       map(address => address && !!this.aliasPipe.transform(address))
     )
+    this.transferOperations$ = this.store$.select(state => state.contractDetails.transferOperations.data)
+    this.loading$ = this.store$.select(state => state.contractDetails.transferOperations.loading)
   }
 
   showQr() {

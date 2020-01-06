@@ -1,7 +1,7 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
     <ng-container *ngIf="contract$ | async as contract; else noContract">
-      <div class="row">
+      <div class="row mb-4">
         <!-- TODO: create component ( the same as in account-detail ) -->
         <div class="col-lg-6 mb-4 mb-lg-0 card__top">
           <div class="card h-100 pt-3 ">
@@ -158,7 +158,6 @@
         </div>
       </div>
 
-      <!--
       <div class="card h-100 pt-3">
         <div class="card-body p-4 ">
           <h5 class="card-title mb-3 ">
@@ -168,18 +167,16 @@
             <div class="col px-2">
               <tezblock-table
                 [loading]="loading$ | async"
-                [data]="data$ | async"
-                [page]="page"
-                [type]="type"
+                [data]="transferOperations$ | async"
+                [page]="'contract'"
+                [type]="'transaction'"
                 [showLoadMoreButton]="true"
                 (loadMoreClicked)="loadMore()"
               ></tezblock-table>
             </div>
           </div>
-          <ng-template list></ng-template>
         </div>
       </div>
-      -->
 
     </ng-container>
 

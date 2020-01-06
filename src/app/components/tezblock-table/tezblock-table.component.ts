@@ -51,7 +51,8 @@ interface Column {
 export enum LayoutPages {
   Account = 'account',
   Block = 'block',
-  Transaction = 'transaction'
+  Transaction = 'transaction',
+  Contract = 'contract'
 }
 
 export enum OperationTypes {
@@ -109,6 +110,9 @@ interface Layout {
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
     [OperationTypes.Ballot]: Column[]
+  }
+  [LayoutPages.Contract]: {
+    [OperationTypes.Transaction]: Column[]
   }
 }
 
@@ -213,7 +217,7 @@ function getLayouts(showFiat: boolean = true): Layout {
           property: 'delegatedContracts',
           width: '',
           component: PlainValueCellComponent,
-          transform: (addresses: [string]): number => addresses ? addresses.length : null
+          transform: (addresses: [string]): number => (addresses ? addresses.length : null)
         },
         {
           name: 'Staking Balance',
@@ -242,16 +246,27 @@ function getLayouts(showFiat: boolean = true): Layout {
       [OperationTypes.BakingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
         { name: '# of Bakings', property: 'bakingsCount', width: '' },
-        { name: 'Block Rewards', property: 'blockRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        {
+          name: 'Block Rewards',
+          property: 'blockRewards',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
         { name: 'Deposits', property: 'deposits', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: 'Fees', property: 'fees', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
-        
       ],
       [OperationTypes.EndorsingRights]: [
         { name: 'Cycle', property: 'cycle', width: '' },
         { name: '# of Endorsements', property: 'endorsementsCount', width: '' },
-        { name: 'Endorsement Rewards', property: 'endorsementRewards', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        {
+          name: 'Endorsement Rewards',
+          property: 'endorsementRewards',
+          width: '',
+          component: AmountCellComponent,
+          options: { showFiatValue: showFiat }
+        },
         { name: 'Deposits', property: 'deposits', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
         { name: '', property: 'expand', width: '', component: ExtendTableCellComponent }
       ],
@@ -653,6 +668,26 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: '# of Votes', property: 'votes', width: '' },
         { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
         { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
+      ]
+    },
+    [LayoutPages.Contract]: {
+      [OperationTypes.Transaction]: [
+        {
+          name: 'Contract',
+          property: 'source',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
+        {
+          name: 'To',
+          property: 'destination',
+          width: '1',
+          component: AddressCellComponent,
+          options: { showFullAddress: false, pageId: 'oo' }
+        },
+        { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
+        { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } }
       ]
     }
   }
