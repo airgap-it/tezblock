@@ -151,10 +151,12 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
 
   // TODO: getAllTransactionsByAddress needs to be redone. As of now, in case of delegations, the index value delegatedBalance
   // is not assigned at runtime and therefore we need to make use of setTimeout
-  download(layoutPage: string = 'account', limit: number = 100) {
+  public download(layoutPage: string = 'account', limit: number = 100) {
     console.log('downloading')
+    console.log('this address: ', this._state.address) // is undefined
     if (layoutPage === 'account') {
       this.transactionService.getAllTransactionsByAddress(this._state.address, this._state.kind, limit).subscribe(transactions => {
+        console.log('transactions: ', transactions)
         setTimeout(() => {
           let data = transactions
           let csvData = this.ConvertToCSV(data)
@@ -165,7 +167,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           let url = window.URL.createObjectURL(blob)
           a.href = url
           a.download = this._state.kind + '.csv'
-          a.click()
+          // a.click()
         }, 1000)
       })
     } else if (layoutPage === 'block') {
