@@ -31,6 +31,16 @@ export const loadEndorsingRightsSucceeded = createAction(
 )
 export const loadEndorsingRightsFailed = createAction(`[${featureName}] Load Endorsing Rights Failed`, props<{ error: any }>())
 
+export const loadEfficiencyLast10Cycles = createAction(`[${featureName}] Load Efficiency Last 10 Cycles`)
+export const loadEfficiencyLast10CyclesSucceeded = createAction(
+  `[${featureName}] Load Efficiency Last 10 Cycles Succeeded`,
+  props<{ efficiencyLast10Cycles: number }>()
+)
+export const loadEfficiencyLast10CyclesFailed = createAction(
+  `[${featureName}] Load Efficiency Last 10 Cycles Failed`,
+  props<{ error: any }>()
+)
+
 export const increaseRightsPageSize = createAction(`[${featureName}] Change Rights Page Size`)
 
 export const kindChanged = createAction(`[${featureName}] Kind Changed`, props<{ kind: string }>())

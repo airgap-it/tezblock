@@ -8,6 +8,7 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { BakingService } from '@tezblock/services/baking/baking.service'
 
 @Injectable()
 export class BakerTableEffects {
@@ -70,9 +71,25 @@ export class BakerTableEffects {
     )
   )
 
+  loadEfficiencyLast10Cycles$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadEfficiencyLast10Cycles),
+      withLatestFrom(
+        this.store$.select(state => state.bakerTable.accountAddress)
+      ),
+      switchMap(([action, accountAddress]) =>
+        this.bakingService.getEfficiencyLast10Cycles(accountAddress).pipe(
+          map(efficiencyLast10Cycles => actions.loadEfficiencyLast10CyclesSucceeded({ efficiencyLast10Cycles })),
+          catchError(error => of(actions.loadEfficiencyLast10CyclesFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
+    private readonly bakingService: BakingService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }
