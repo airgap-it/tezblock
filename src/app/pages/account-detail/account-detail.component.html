@@ -287,7 +287,7 @@
             <ng-container *ngIf="isValidBaker">
               <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
             </ng-container>
-            <div class="container px-3 chart__container">
+            <div *ngIf="!isValidBaker || (bakerTabs[0].active)" class="container px-3 chart__container">
               <div class="row">
                 <div class="col-md-6 col-lg-4 px-0 px-sm-3">
                   <h5 class="card-title__secondary mb-3">
