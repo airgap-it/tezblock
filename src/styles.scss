@@ -133,11 +133,7 @@ typeahead-container {
   overflow: visible !important;
 }
 
-/* TODO: remove when refactored to ngx-boostrap component */
-.ngx-pagination .current {
-  background: map_get($theme-colors, 'primary') !important;
-}
-/* no breaks in table cell whith spaces */
+/* no breaks in table cell with spaces */
 .table-responsive table td {
   white-space: nowrap;
 }
@@ -147,12 +143,9 @@ typeahead-container {
   .form-control {
     font-size: 16px !important;
   }
-  .tooltip--icon {
-    opacity: 0.32;
-  }
-
-  .width--fit-content {
-    width: fit-content;
-  }
+}
+/* width only encloses conent, used for ion-tooltip positioning */
+.width--fit-content {
+  width: fit-content;
 }
 @import '../node_modules/bootstrap/scss/bootstrap';
