@@ -1,8 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -10,7 +9,7 @@ import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
-import { RewardSingleService } from './../../services/reward-single/reward-single.service'
+import { RewardSingleService, Reward } from './../../services/reward-single/reward-single.service'
 import { ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Payout } from '@tezblock/interfaces/Payout'
 import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
@@ -27,6 +26,20 @@ export interface Tab {
   icon?: string[]
   count: number
 }
+
+const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
+  rewards.map(reward => ({
+    ...reward,
+    payouts: reward.payouts.map(payout => {
+      const payoutValue = parseFloat(payout.payout)
+      const payoutMinusFee = payoutValue > 0 && bakerFee ? payoutValue - payoutValue * (bakerFee / 100) : payoutValue
+
+      return {
+        ...payout,
+        payout: payoutMinusFee.toString()
+      }
+    })
+  }))
 
 @Component({
   selector: 'baker-table',
@@ -55,13 +68,11 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<TezosRewards[]>
+  rewards$: Observable<Reward[]>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
-
-  rewards: TezosRewards
 
   activeDelegations$: Observable<number>
 
@@ -126,6 +137,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.bakingBadRating = bakerTableRatings.bakingBadRating
     }
   }
+
+  @Input() bakerFee$: Observable<number>
 
   @Output()
   readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
@@ -200,7 +213,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           return EMPTY
         })
       )
-    this.rewards$ = this.rewardSingleService.rewards$
+    this.rewards$ = combineLatest(this.rewardSingleService.rewards$, this.bakerFee$).pipe(
+      filter(([rewards, bakerFee]) => bakerFee !== undefined),
+      map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
+    )
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
