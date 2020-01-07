@@ -1,28 +1,42 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
-    <div class="card h-100 pt-3 mb-">
-      <transaction-detail-wrapper
-        [latestTransaction$]="latestTx$"
-        [blockConfirmations$]="numberOfConfirmations$"
-        [amount$]="totalAmount$"
-        [fee$]="totalFee$"
-        [fiatInfo$]="fiatCurrencyInfo$"
-      ></transaction-detail-wrapper>
-    </div>
+    <ng-container *ngIf="latestTx$ | async">
+      <div class="card h-100 pt-3 mb-">
+        <transaction-detail-wrapper
+          [latestTransaction$]="latestTx$"
+          [blockConfirmations$]="numberOfConfirmations$"
+          [amount$]="totalAmount$"
+          [fee$]="totalFee$"
+          [fiatInfo$]="fiatCurrencyInfo$"
+          [isMainnet]="isMainnet"
+        ></transaction-detail-wrapper>
+      </div>
 
-    <div class="pt-5">
-      <div class="card pt-3">
-        <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
-          <tabbed-table
-            [tabs]="tabs"
-            [page]="'transaction'"
-            [loading]="transactionsLoading$"
-            [data]="filteredTransactions$"
-            [dataService]="transactionSingleService"
-            (tabClicked)="tabSelected($event)"
-          ></tabbed-table>
+      <div class="pt-5">
+        <div class="card pt-3">
+          <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
+            <tabbed-table
+              [tabs]="tabs"
+              [page]="'transaction'"
+              [loading]="transactionsLoading$"
+              [data]="filteredTransactions$"
+              [actionType$]="actionType$"
+              (tabClicked)="tabSelected($event)"
+              (loadMore)="onLoadMore()"
+            ></tabbed-table>
+          </div>
         </div>
       </div>
-    </div>
+    </ng-container>
+    <ng-container *ngIf="isInvalidHash$ | async">
+      <div class="card p-3">
+        <h5 class="card-title mb-4">
+          Invalid Operation Hash
+        </h5>
+        <p>
+          This hash is invalid, it might not yet have been included in the blockchain.
+        </p>
+      </div>
+    </ng-container>
   </div>
 </div>

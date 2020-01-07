@@ -1,87 +1,128 @@
-import { Block } from './../../interfaces/Block'
-import { TransactionSingleService } from './../transaction-single/transaction-single.service'
-import { ApiService } from './../api/api.service'
-import { AccountSingleService } from './../account-single/account-single.service'
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
+import { Observable, Subject, Subscription, from } from 'rxjs'
+import { filter, map, switchMap } from 'rxjs/operators'
+import { StorageMap } from '@ngx-pwa/local-storage'
+import { negate, isNil } from 'lodash'
 
+import { ApiService } from './../api/api.service'
 import { BlockService } from '../blocks/blocks.service'
-import { BlockSingleService } from '../block-single/block-single.service'
-import { Observable } from 'rxjs'
+import { first } from '@tezblock/services/fp'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
+const previousSearchesKey = 'previousSearches'
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private readonly blockService: BlockService, private readonly apiService: ApiService, private readonly router: Router) {
-    this.router.routeReuseStrategy.shouldReuseRoute = () => false
-  }
+  constructor(
+    private readonly blockService: BlockService,
+    private readonly apiService: ApiService,
+    private readonly router: Router,
+    private readonly storage: StorageMap
+  ) {}
 
-  public search(searchTerm: string) {
-    // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
-    let trimmedSearchTerm = searchTerm.trim()
+  // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
+  public search(searchTerm: string): Observable<boolean> {
+    const subscriptions: Subscription[] = []
+    const unsubscribe = () => subscriptions.forEach(subscription => subscription.unsubscribe())
+    const trimmedSearchTerm = searchTerm.trim()
+    const result = new Subject<boolean>()
 
     // if we typed in an alias, we should convert this into an address
-    Object.keys(accounts).forEach(address => {
-      if (accounts[address].alias === trimmedSearchTerm) {
-        trimmedSearchTerm = address
-      }
-    })
+    const getAllies = (term: string) => Object.keys(accounts).find(account => accounts[account].alias === term)
+
+    const _searchTerm = getAllies(trimmedSearchTerm) || trimmedSearchTerm
 
     let found = false
     let counter = 0
-    const max = 7
 
-    const processResult = (result, callback: any) => {
-      // TODO: any
+    const processResult = (data: any, callback: Function): boolean => {
       if (found) {
-        return
+        return false
       }
+
       counter++
-      if (result.length > 0) {
+
+      if (data) {
         found = true
-        callback(result)
-      } else if (counter === max) {
+        callback(data)
+        result.next(true)
+        result.complete()
+        unsubscribe()
+
+        return true
+      }
+
+      if (counter === 7) {
+        result.next(false)
+        result.complete()
+        unsubscribe()
         alert('No results found!')
       }
+
+      return false
     }
 
-    const accountSingleService = new AccountSingleService(this.apiService)
-    const account$ = accountSingleService.account$
-    accountSingleService.setAddress(trimmedSearchTerm)
+    subscriptions.push(
+      this.apiService
+        .getAccountById(_searchTerm)
+        .pipe(
+          map(first),
+          filter(negate(isNil))
+        )
+        .subscribe(account =>
+          processResult(account, () => {
+            this.router.navigateByUrl('/account/' + _searchTerm)
+          })
+        ),
+      this.apiService
+        .getTransactionsById(_searchTerm, 1)
+        .pipe(
+          map(first),
+          filter(negate(isNil))
+        )
+        .subscribe(transaction =>
+          processResult(transaction, (transaction: Transaction) => {
+            if (transaction.kind === 'endorsement') {
+              this.router.navigateByUrl('/endorsement/' + _searchTerm)
 
-    account$.subscribe(account => {
-      if (account) {
-        processResult([account], () => {
-          this.router.navigateByUrl('/account/' + trimmedSearchTerm)
-        })
-      }
-    })
+              return
+            }
 
-    const transactionSingleService = new TransactionSingleService(this.apiService)
-    const transactions$ = transactionSingleService.transactions$
-    transactionSingleService.updateTransactionHash(trimmedSearchTerm)
+            this.router.navigateByUrl('/transaction/' + _searchTerm)
+          })
+        ),
+      this.blockService
+        .getByHash(_searchTerm)
+        .pipe(
+          map(first),
+          filter(negate(isNil))
+        )
+        .subscribe(block =>
+          processResult(block, () => {
+            this.router.navigateByUrl('/block/' + block.level)
+          })
+        )
+    )
 
-    transactions$.subscribe(transactions => {
-      if (transactions) {
-        processResult(transactions, () => {
-          this.router.navigateByUrl('/transaction/' + trimmedSearchTerm)
-        })
-      }
-    })
+    return result
+  }
 
-    const blockSingleService = new BlockSingleService(this.blockService)
-    const blocks$: Observable<Block[]> = blockSingleService.block$
-    blockSingleService.updateHash(trimmedSearchTerm)
+  getPreviousSearches(): Observable<string[]> {
+    return this.storage.get(previousSearchesKey).pipe(map(previousSearches => previousSearches || [])) as Observable<string[]>
+  }
 
-    blocks$.subscribe(blocks => {
-      if (blocks) {
-        processResult(blocks, () => {
-          this.router.navigateByUrl('/block/' + blocks[0].level)
-        })
-      }
-    })
+  updatePreviousSearches(searchTerm) {
+    return this.getPreviousSearches()
+      .pipe(
+        map((previousSearches: string[]) =>
+          (previousSearches.indexOf(searchTerm) === -1 ? [searchTerm] : []).concat(previousSearches).slice(0, 5)
+        ),
+        switchMap((updatedPreviousSearches: string[]) => this.storage.set(previousSearchesKey, updatedPreviousSearches))
+      )
+      .subscribe(() => {})
   }
 }

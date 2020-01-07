@@ -41,6 +41,8 @@ export interface Transaction {
   fees: string
   totalRewards: string
   originated_contracts?: string
+  payouts?: any
   // These are our own properties
   votes?: number
+  voting_period?: string
 }

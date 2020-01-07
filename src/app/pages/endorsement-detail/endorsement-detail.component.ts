@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import { select, Store } from '@ngrx/store'
+import { ActivatedRoute, Router } from '@angular/router'
+import { Store } from '@ngrx/store'
 import { Observable, timer } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { BaseComponent } from '@tezblock/components/base.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { CopyService } from 'src/app/services/copy/copy.service'
-import * as Actions from './actions'
+import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Slot } from './reducer'
+import { get } from '@tezblock/services/fp'
 
 @Component({
   selector: 'app-endorsement-detail',
@@ -24,11 +26,14 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   endorsements$: Observable<Transaction[]>
   selectedEndorsement$: Observable<Transaction>
   slots$: Observable<Slot[]>
+  endorsedSlots$: Observable<string>
+  endorsedSlotsCount$: Observable<number>
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>,
-    private readonly copyService: CopyService
+    private readonly copyService: CopyService,
+    private readonly router: Router
   ) {
     super()
   }
@@ -37,22 +42,34 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.endorsements$ = this.store$.select(state => state.endorsementDetails.endorsements)
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
+    this.endorsedSlots$ = this.selectedEndorsement$.pipe(
+      map(get(selectedEndorsement => selectedEndorsement.slots)),
+      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots)
+    )
+    this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
+      map(get(selectedEndorsement => selectedEndorsement.slots)),
+      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots),
+      map((slots: string) => slots.split(',').length)
+    )
 
-    this.store$.dispatch(Actions.loadEndorsementDetails({ id: this.id }))
-    this.subscriptions.push(timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(Actions.loadEndorsements())))
+    this.subscriptions.push(
+      this.activatedRoute.paramMap.subscribe(paramMap => {
+        const id = paramMap.get('id')
+
+        this.store$.dispatch(actions.reset({ id }))
+        this.store$.dispatch(actions.loadEndorsementDetails({ id }))
+      }),
+      timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
+    )
   }
 
   copyToClipboard() {
     this.copyService.copyToClipboard(fromRoot.getState(this.store$).endorsementDetails.selectedEndorsement.operation_group_hash)
   }
 
-  getSlotsEndorsed(value: string): string {
-    return value ? value.replace(/[\[\]']/g, '') : value
-  }
-
   select(operation_group_hash: string) {
     if (operation_group_hash) {
-      this.store$.dispatch(Actions.slotSelected({ operation_group_hash }))
+      this.router.navigate(['/endorsement', operation_group_hash])
     }
   }
 }

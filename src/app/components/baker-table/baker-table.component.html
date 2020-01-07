@@ -1,5 +1,5 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs" (selectTab)="selectTab(tab)">
+  <tab *ngFor="let tab of tabs" [active]="tab.active" (selectTab)="selectTab(tab)">
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -18,8 +18,8 @@
       <div class="card-body px-0 px-sm-3 pt-4 pb-3">
         <div class="container p-0">
           <div class="row">
-            <div class=" col-md-6 col-lg-4">
-              <div class="mb-4">
+            <div class="col-md-6 col-lg-4">
+              <div class="mb-3">
                 <h5 class="card-title__secondary mb-3">
                   Full Balance
                 </h5>
@@ -37,47 +37,33 @@
               </div>
 
               <ng-container *ngIf="stakingBalance; else loadingGraph">
-                <div class="container p-0">
-                  <div class="row mb-2">
-                    <div class="col">
-                      <p class="text-secondary m-0">Staking Balance</p>
-                    </div>
-                    <div class="col">
-                      <p class="text-right text-secondary m-0">
-                        Staking Capactiy
-                      </p>
+                <div class="mb-4">
+                  <div class="container p-0">
+                    <div class="row mb-2">
+                      <div class="col">
+                        <p class="text-secondary m-0">Staking Balance</p>
+                      </div>
+                      <div class="col">
+                        <p class="text-right text-secondary m-0">
+                          Staking Capactiy
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div *ngIf="stakingBalance > stakingCapacity">
-                  <progressbar [animate]="true" [value]="stakingProgress" style="height:6px" type="danger"></progressbar>
-                </div>
-                <div *ngIf="stakingBalance <= stakingCapacity">
-                  <progressbar [animate]="true" [value]="stakingProgress" style="height:6px"></progressbar>
-                </div>
-                <div class="mt-2 container">
-                  <div class="row">
-                    <div class="col p-0">
-                      <p class="m-0">
-                        <span
-                          class="d-inline-block"
-                          [innerHtml]="
-                            stakingBalance
-                              | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
-                              | safeHtml
-                          "
-                        ></span>
-
-                        ꜩ
-                      </p>
-                    </div>
-                    <div class="col p-0">
-                      <div class="float-right">
-                        <p class="m-0 ">
+                  <div *ngIf="stakingBalance > stakingCapacity">
+                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px" type="danger"></progressbar>
+                  </div>
+                  <div *ngIf="stakingBalance <= stakingCapacity">
+                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px"></progressbar>
+                  </div>
+                  <div class="mt-2 container">
+                    <div class="row">
+                      <div class="col p-0">
+                        <p class="m-0">
                           <span
                             class="d-inline-block"
                             [innerHtml]="
-                              stakingCapacity
+                              stakingBalance
                                 | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                                 | safeHtml
                             "
@@ -86,10 +72,38 @@
                           ꜩ
                         </p>
                       </div>
+                      <div class="col p-0">
+                        <div class="float-right">
+                          <p class="m-0 ">
+                            <span
+                              class="d-inline-block"
+                              [innerHtml]="
+                                stakingCapacity
+                                  | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
+                                  | safeHtml
+                              "
+                            ></span>
+
+                            ꜩ
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </ng-container>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="mb-4">
+                    <h5 class="card-title__secondary mb-3">
+                      Payout Account
+                    </h5>
+                    <address-item *ngIf="payoutAddress; else noPayoutAddress" [address]="payoutAddress"></address-item>
+                    <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
+                  </div>
+                </div>
+              </div>
 
               <ng-template #loadingGraph>
                 <div class="container p-0">
@@ -170,39 +184,72 @@
               </div>
             </div>
             <div class=" col-md-6 col-lg-4">
-              <div class="mb-4">
-                <h5 class="card-title__secondary mb-3">
+              <div class="mb-3">
+                <h5 class="card-title__secondary mb-2">
                   Payout Accuracy
                 </h5>
                 <div class="d-block">
-                  <img src="/assets/img/bakingbad_logo.png" width="24px" />
+                  <div
+                    class="width--fit-content"
+                    tooltip="Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
+                  >
+                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
 
-                  <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                    <ng-container *ngIf="!bakingBadRating">
-                      <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                    </ng-container>
-                    <ng-container *ngIf="bakingBadRating">
-                      {{ bakingBadRating }}
-                    </ng-container>
-                  </button>
+                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://https://baking-bad.org/'">
+                      <ng-container *ngIf="!bakingBadRating">
+                        <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="bakingBadRating">
+                        {{ bakingBadRating }}
+                      </ng-container>
+                    </a>
+                  </div>
                 </div>
               </div>
-              <div>
-                <h5 class="card-title__secondary mb-3">
+              <div class="mb-3">
+                <h5 class="card-title__secondary mb-2">
                   Baking Efficiency
                 </h5>
                 <div class="d-block">
-                  <div>
+                  <div
+                    class="width--fit-content"
+                    tooltip="MyTezosBaker is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker."
+                  >
                     <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
 
-                    <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here" (click)="goToMYTB()">
+                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://mytezosbaker.com/'">
                       <ng-container *ngIf="!tezosBakerRating">
                         <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="tezosBakerRating">
                         {{ tezosBakerRating }}
                       </ng-container>
-                    </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h5 class="card-title__secondary mb-2">
+                  Efficiency Last 10 Cycles
+                </h5>
+                <div class="d-block">
+                  <div
+                    class="width--fit-content"
+                    tooltip="Tezos Nodes is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker over the last 10 cycles."
+                  >
+                    <img src="/assets/img/tezosnodes.svg" width="24px" />
+
+                    <a class="btn btn-link" type="button" target="_blank" [href]="'https://www.tezos-nodes.com/baker/' + accountAddress">
+                      <ng-container *ngIf="efficiencyLast10CyclesLoading$ | async">
+                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
+                        {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}
+                      </ng-container>
+                    </a>
+                    <ng-container *ngIf="(efficiencyLast10Cycles$ | async) === null">
+                      not available
+                    </ng-container>
                   </div>
                 </div>
               </div>
@@ -215,28 +262,26 @@
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
       <tezblock-table
         [showLoadMoreButton]="true"
-        [loading]="rightsLoading$"
-        [data]="rights$"
+        [loading]="rightsLoading$ | async"
+        [data]="rights$ | async"
         [page]="page"
         [type]="selectedTab.kind"
+        [expandedRow]="rightsExpandedRow"
         (loadMoreClicked)="loadMoreRights()"
       ></tezblock-table>
-      <!-- <tezblock-table [showLoadMoreButton]="!(rightsLoading$ | async) && ((rights$ | async))" [loading]="rightsLoading$"
-          [data]="rights$" [page]="page" [type]="selectedTab.kind" (loadMoreClicked)="loadMoreRights()"></tezblock-table> -->
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">
       <tezblock-table
+        [enableSearch]="true"
         [showLoadMoreButton]="true"
-        [loading]="rewardsLoading$"
-        [data]="rewards$"
+        [loading]="rewardsLoading$ | async"
+        [data]="rewards$ | async"
         [page]="page"
         [type]="selectedTab.kind"
-        [expandable]="true"
+        [expandedRow]="rewardsExpandedRow"
         (loadMoreClicked)="loadMoreRewards()"
       ></tezblock-table>
-      <!-- <tezblock-table [showLoadMoreButton]="!(rewardsLoading$ | async) && ((rewards$ | async))" [loading]="rewardsLoading$"
-          [data]="rewards$" [page]="page" [type]="selectedTab.kind" (loadMoreClicked)="loadMoreRewards()"></tezblock-table> -->
     </ng-container>
 
     <div ng-bind-html="tabDynamicContent"></div>

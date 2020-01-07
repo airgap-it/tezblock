@@ -1,7 +1,7 @@
 import { createReducer, on } from '@ngrx/store'
 import * as _ from 'lodash'
 
-import * as Actions from './actions'
+import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface ParsedTransaction extends Transaction {
@@ -49,7 +49,14 @@ const initialState: State = {
 
 export const reducer = createReducer(
   initialState,
-  on(Actions.loadEndorsementsSucceeded, (state, { endorsements }) => {
+  on(actions.reset, (state, { id }) => ({
+    ...state,
+    ...(state.selectedEndorsement && state.selectedEndorsement.operation_group_hash === id
+      ? null
+      : initialState
+    )
+  })),
+  on(actions.loadEndorsementsSucceeded, (state, { endorsements }) => {
     const newEndorsements = endorsements.map(toParsedEndorsement)
 
     return {
@@ -58,13 +65,17 @@ export const reducer = createReducer(
       slots: getSlots(newEndorsements, state.selectedEndorsement.operation_group_hash)
     }
   }),
-  on(Actions.loadEndorsementDetailsSucceeded, (state, { endorsement }) => ({
+  on(actions.loadEndorsementDetailsSucceeded, (state, { endorsement }) => ({
     ...state,
-    selectedEndorsement: endorsement
+    selectedEndorsement: endorsement || null
   })),
-  on(Actions.slotSelected, (state, { operation_group_hash }) => ({
+  on(actions.loadEndorsementDetailsFailed, state => ({
     ...state,
-    selectedEndorsement: _.find(state.endorsements, endorsement => endorsement.operation_group_hash === operation_group_hash),
+    selectedEndorsement: null
+  })),
+  on(actions.slotSelected, (state, { operation_group_hash }) => ({
+    ...state,
+    selectedEndorsement: state.endorsements.find(endorsement => endorsement.operation_group_hash === operation_group_hash),
     slots: getSlots(state.endorsements, operation_group_hash)
   }))
 )

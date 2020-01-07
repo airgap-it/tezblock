@@ -9,7 +9,7 @@
             </a>
             <a href="https://airgap.it" target="_blank" class="text-dark">
               <small>
-                MVP by AirGap
+                by AirGap
               </small>
             </a>
           </div>
@@ -33,56 +33,18 @@
           </span>
         </button>
         <div class="pt-3 w-100 d-block d-sm-none">
-          <div class="input-group input-group-main">
-            <input
-              [(ngModel)]="searchTerm"
-              [typeaheadAsync]="true"
-              [typeahead]="data"
-              [adaptivePosition]="true"
-              [typeaheadMinLength]="2"
-              [typeaheadOptionsLimit]="7"
-              typeaheadOptionField="name"
-              typeaheadGroupField="type"
-              placeholder="Search by Address / Alias / Tx Hash / Block Hash"
-              class="form-control form-control--focus-white"
-              (keydown.enter)="searchService.search(searchTerm); dp.hide()"
-            />
-            <div class="input-group-append">
-              <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-                <fa-icon [icon]="'search' | iconPipe" class="text-white  d-inline-block d-sm-none"></fa-icon>
-              </button>
-            </div>
-          </div>
+          <app-search-item (onSearch)="dp.hide()"></app-search-item>
         </div>
         <div
           class="collapse navbar-collapse"
           id="navbar-classic"
           [collapse]="isCollapsed"
           [isAnimated]="true"
-          [ngClass]="{ 'display--inline-table': showDropdown && !isCollapsed }"
+          [ngClass]="{ 'display--inline-table': hideDropdown && !isCollapsed }"
         >
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
-              <div class="input-group input-group-main">
-                <input
-                  [(ngModel)]="searchTerm"
-                  [typeaheadAsync]="true"
-                  [typeahead]="data"
-                  [adaptivePosition]="true"
-                  [typeaheadMinLength]="2"
-                  [typeaheadOptionsLimit]="7"
-                  typeaheadOptionField="name"
-                  typeaheadGroupField="type"
-                  placeholder="Search by Address / Alias / Tx Hash / Block Hash"
-                  class="form-control form-control--focus-white"
-                  (keydown.enter)="searchService.search(searchTerm); dp.hide()"
-                />
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit" (click)="searchService.search(searchTerm); dp.hide()">
-                    <fa-icon [icon]="'search' | iconPipe" class="text-white"></fa-icon>
-                  </button>
-                </div>
-              </div>
+              <app-search-item (onSearch)="dp.hide()"></app-search-item>
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
@@ -97,8 +59,8 @@
                 </button>
               </li>
 
-              <li class="nav-item dropdown mega-dropdown">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+              <div class="nav-item dropdown mega-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -108,17 +70,11 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkBlockchain }"
-                    (mouseleave)="dp.hide(); showDropdown = true"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    aria-controls="blockchain"
                   >
                     Blockchain
                   </a>
-                  <ul
-                    class="dropdown-menu mega-dropdown-menu pb-4 "
-                    *dropdownMenu
-                    role="menu"
-                    [ngClass]="{ 'display--none': !showDropdown }"
-                  >
+                  <ul class="dropdown-menu mega-dropdown-menu pb-4 " *dropdownMenu role="menu" id="blockchain">
                     <li class="row">
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -158,6 +114,17 @@
                             Delegations
                           </a>
                         </li>
+                        <hr />
+                        <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-baking/list']">
+                            Double Baking Evidence
+                          </a>
+                        </li>
+                        <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-endorsement/list']">
+                            Double Endorsement Evidence
+                          </a>
+                        </li>
                       </ul>
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -184,6 +151,11 @@
                           Statistics
                         </li>
                         <li>
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/bakers/list']">
+                            Bakers
+                          </a>
+                        </li>
+                        <li>
                           <a class="dropdown-item text-muted" disabled>
                             Roll Distribution
                           </a>
@@ -192,9 +164,9 @@
                     </li>
                   </ul>
                 </span>
-              </li>
+              </div>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -204,12 +176,11 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkResources }"
-                    (mouseleave)="dp.hide(); showDropdown = true"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    aria-controls="resources"
                   >
                     Resources
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources">
                     <li role="menuitem">
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
                         Wallets
@@ -228,9 +199,9 @@
                   </ul>
                 </span>
               </li>
-              <!-- TODO: unhide if switch works
+              <!-- TODO: unhide if switch works  -->
               <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown triggers="hover" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -239,26 +210,30 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (click)="showDropdown ? dp.hide() : dp.show(); showDropdown = !showDropdown"
+                    (click)="hideDropdown ? dp.hide() : dp.show(); hideDropdown = !hideDropdown"
                   >
                     {{ selectedNetwork }}
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !showDropdown }">
+                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
                     <li role="menuitem">
-                      <a class="dropdown-item" [ngClass]="selectedNetwork == 'mainnet' ? 'active' : ''" (click)="changeNetwork('mainnet')">
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''"
+                        (click)="changeNetwork(networks.MAINNET)"
+                      >
                         mainnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'babylonnet' ? 'active' : ''"
-                        (click)="changeNetwork('babylonnet')"
+                        [ngClass]="selectedNetwork === networks.BABYLONNET ? 'active' : ''"
+                        (click)="changeNetwork(networks.BABYLONNET)"
                       >
                         babylonnet
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork == 'carthagenet' ? 'active' : ''"
-                        (click)="changeNetwork('carthagenet')"
+                        [ngClass]="selectedNetwork === networks.CARTHAGENET ? 'active' : ''"
+                        (click)="changeNetwork(networks.CARTHAGENET)"
                       >
                         carthagenet
                       </a>
@@ -266,7 +241,6 @@
                   </ul>
                 </span>
               </li>
-              -->
             </ul>
           </div>
         </div>

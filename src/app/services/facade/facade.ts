@@ -6,7 +6,8 @@ import { Account } from 'src/app/interfaces/Account'
 export interface Pagination {
   selectedSize: number
   currentPage: number
-  pageSizes: number[]
+  pageSizes?: number[]
+  total?: number
 }
 
 export const refreshRate = 30000;
@@ -68,3 +69,6 @@ export function distinctAccounts(previous: Account[], current: Account[]): boole
   // If both are undefined, return true. Otherwise check length
   return previous === undefined || current === undefined ? previous === current : previous.length === current.length
 }
+
+export const distinctString = (previous: string, current: string): boolean =>
+  previous === current || (!previous && !current)
