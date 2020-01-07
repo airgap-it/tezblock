@@ -20,6 +20,7 @@ import { TransactionDetailComponent } from './transaction-detail.component'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -31,13 +32,7 @@ describe('TransactionDetailComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [
-          AmountConverterPipe,
-          TabsetConfig,
-          BsModalService,
-          ToastrService,
-          { provide: Actions, useValue: EMPTY }
-        ],
+        providers: [AmountConverterPipe, TabsetConfig, BsModalService, ToastrService, { provide: Actions, useValue: EMPTY }],
         imports: [
           MomentModule,
           FontAwesomeModule,
@@ -58,7 +53,8 @@ describe('TransactionDetailComponent', () => {
           AmountCellComponent,
           BlockCellComponent,
           TransactionDetailWrapperComponent,
-          LoadingSkeletonComponent
+          LoadingSkeletonComponent,
+          TooltipItemComponent
         ]
       })
     )

@@ -41,9 +41,11 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
 import { HashCellComponent } from './components/tezblock-table/hash-cell/hash-cell.component'
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
+import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
+import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
 import { TransactionItemComponent } from './components/transaction-item/transaction-item.component'
 import { addFontAwesome } from './fa-add'
@@ -62,9 +64,8 @@ import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage';
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
@@ -112,7 +113,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
       BlockDetailEffects,
       TransactionDetailEffects
     ]),
-	StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,
@@ -150,6 +151,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    TooltipItemComponent,
     SearchItemComponent
   ],
 

@@ -20,6 +20,7 @@ import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/lo
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('BlockDetailComponent', () => {
   let component: BlockDetailComponent
@@ -42,7 +43,8 @@ describe('BlockDetailComponent', () => {
           TabbedTableComponent,
           TezblockTableComponent,
           BlockDetailWrapperComponent,
-          LoadingSkeletonComponent
+          LoadingSkeletonComponent,
+          TooltipItemComponent
         ]
       })
     )
