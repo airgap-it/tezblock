@@ -241,10 +241,10 @@
                   </div>
                   <div class="col col-md-7">
                     <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                        <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
-                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                      <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
+                        <amount-cell *ngIf="(rewardAmountMinusFee$ | async) as rewardAmountMinusFee" [data]="rewardAmountMinusFee"></amount-cell>
+                        <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
                       </ng-container>
@@ -263,8 +263,8 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">Baker Split</p>
                   </div>
-                  <div class=" col-md-7" *ngIf="tezosBakerFee; else loading">
-                    <p class="mb-0">{{ tezosBakerFee }}</p>
+                  <div class=" col-md-7" *ngIf="(tezosBakerFeeLabel$ | async) as tezosBakerFeeLabel; else loading">
+                    <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
                     <div class=" col-md-7">
@@ -277,7 +277,7 @@
           </div>
         </div>
       </div>
-
+      
       <div class="pt-5" *ngIf="isValidBaker">
         <div class="card pt-3">
           <div class="card-body px-3 py-0">
