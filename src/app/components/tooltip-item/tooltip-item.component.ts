@@ -11,4 +11,7 @@ export class TooltipItemComponent {
 
   @Input()
   public tooltip: string
+
+  @Input()
+  public hasNoIcon: boolean = false
 }
