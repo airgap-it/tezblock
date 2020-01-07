@@ -10,6 +10,7 @@ import { EndorsementDetailComponent } from './endorsement-detail.component'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('EndorsementDetailComponent', () => {
   let component: EndorsementDetailComponent
@@ -21,7 +22,13 @@ describe('EndorsementDetailComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         imports: [FontAwesomeModule, MomentModule, TooltipModule.forRoot()],
-        declarations: [AddressItemComponent, IdenticonComponent, LoadingSkeletonComponent, EndorsementDetailComponent],
+        declarations: [
+          AddressItemComponent,
+          IdenticonComponent,
+          LoadingSkeletonComponent,
+          EndorsementDetailComponent,
+          TooltipItemComponent
+        ],
         providers: [{ provide: Actions, useValue: EMPTY }]
       })
     ).compileComponents()
