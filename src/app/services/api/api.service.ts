@@ -39,6 +39,11 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
+export interface Balance {
+  balance: number
+  asof: number
+}
+
 interface Predicate {
   field: string
   operation: string
@@ -64,6 +69,7 @@ export class ApiService {
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
   private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -1235,6 +1241,51 @@ export class ApiService {
             number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
           }))
         )
+      )
+  }
+
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+    const today = new Date()
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
   }
 }
