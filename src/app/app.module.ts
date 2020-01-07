@@ -28,7 +28,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { PricechartItemComponent } from './components/pricechart-item/pricechart-item.component'
+import { AreaChartItemComponent } from './components/area-chart-item/area-chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -138,7 +138,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    AreaChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -171,7 +171,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    AreaChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],
