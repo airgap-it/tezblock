@@ -184,39 +184,72 @@
               </div>
             </div>
             <div class=" col-md-6 col-lg-4">
-              <div class="mb-4">
-                <h5 class="card-title__secondary mb-3">
+              <div class="mb-3">
+                <h5 class="card-title__secondary mb-2">
                   Payout Accuracy
                 </h5>
                 <div class="d-block">
-                  <img src="/assets/img/bakingbad_logo.png" width="24px" />
+                  <div
+                    class="width--fit-content"
+                    tooltip="Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
+                  >
+                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
 
-                  <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here">
-                    <ng-container *ngIf="!bakingBadRating">
-                      <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                    </ng-container>
-                    <ng-container *ngIf="bakingBadRating">
-                      {{ bakingBadRating }}
-                    </ng-container>
-                  </button>
+                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://https://baking-bad.org/'">
+                      <ng-container *ngIf="!bakingBadRating">
+                        <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="bakingBadRating">
+                        {{ bakingBadRating }}
+                      </ng-container>
+                    </a>
+                  </div>
                 </div>
               </div>
-              <div class="mb-4">
-                <h5 class="card-title__secondary mb-3">
+              <div class="mb-3">
+                <h5 class="card-title__secondary mb-2">
                   Baking Efficiency
                 </h5>
                 <div class="d-block">
-                  <div>
+                  <div
+                    class="width--fit-content"
+                    tooltip="MyTezosBaker is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker."
+                  >
                     <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
 
-                    <button type="button" class="btn btn-link py-0 text-capitalize" ng-href="#here" (click)="goToMYTB()">
+                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://mytezosbaker.com/'">
                       <ng-container *ngIf="!tezosBakerRating">
                         <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="tezosBakerRating">
                         {{ tezosBakerRating }}
                       </ng-container>
-                    </button>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <h5 class="card-title__secondary mb-2">
+                  Efficiency Last 10 Cycles
+                </h5>
+                <div class="d-block">
+                  <div
+                    class="width--fit-content"
+                    tooltip="Tezos Nodes is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker over the last 10 cycles."
+                  >
+                    <img src="/assets/img/tezosnodes.svg" width="24px" />
+
+                    <a class="btn btn-link" type="button" target="_blank" [href]="'https://www.tezos-nodes.com/baker/' + accountAddress">
+                      <ng-container *ngIf="efficiencyLast10CyclesLoading$ | async">
+                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
+                      </ng-container>
+                      <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
+                        {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}
+                      </ng-container>
+                    </a>
+                    <ng-container *ngIf="(efficiencyLast10Cycles$ | async) === null">
+                      not available
+                    </ng-container>
                   </div>
                 </div>
               </div>
