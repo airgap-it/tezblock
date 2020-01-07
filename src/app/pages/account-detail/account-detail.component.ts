@@ -181,14 +181,18 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
-    this.balanceChartDatasets$ = this.store$.select(state => state.accountDetails.balanceFromLast30Days).pipe(
-      filter(Array.isArray),
-      map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
-    )
-    this.balanceChartLabels$ = this.store$.select(state => state.accountDetails.balanceFromLast30Days).pipe(
-      filter(Array.isArray),
-      map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
-    )
+    this.balanceChartDatasets$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
+      )
+    this.balanceChartLabels$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
+      )
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -376,8 +380,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   showQr() {
-    const initialState = { qrdata: this.address, size: 200 }
-    const modalRef = this.modalService.show(QrModalComponent, { initialState })
+    const initialState = { qrdata: this.address, size: 260 }
+    const modalRef = this.modalService.show(QrModalComponent, { class: 'modal-sm', initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 
