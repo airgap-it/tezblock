@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { BaseComponent } from '@tezblock/components/base.component'

@@ -3,6 +3,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { ChartsModule } from 'ng2-charts'
 
 import { AmountCellComponent } from './../tezblock-table/amount-cell/amount-cell.component'
 import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
@@ -25,7 +26,7 @@ describe('BakerTableComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [RightsSingleService, TabsetConfig, IconPipe],
-        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule],
+        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule, ChartsModule],
         declarations: [
           BakerTableComponent,
           TezblockTableComponent,

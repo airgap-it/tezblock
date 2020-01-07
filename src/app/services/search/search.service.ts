@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, Subject, Subscription, from } from 'rxjs'
+import { merge, Observable, Subject, Subscription } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { negate, isNil } from 'lodash'
@@ -95,8 +95,7 @@ export class SearchService {
             this.router.navigateByUrl('/transaction/' + _searchTerm)
           })
         ),
-      this.blockService
-        .getByHash(_searchTerm)
+      merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
         .pipe(
           map(first),
           filter(negate(isNil))

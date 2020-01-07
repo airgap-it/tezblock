@@ -11,7 +11,7 @@ import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { BlockItemComponent } from './../../components/block-item/block-item.component'
-import { PricechartItemComponent } from './../../components/pricechart-item/pricechart-item.component'
+import { AreaChartItemComponent } from '../../components/area-chart-item/area-chart-item.component'
 import { TransactionItemComponent } from './../../components/transaction-item/transaction-item.component'
 import { DashboardComponent } from './dashboard.component'
 import { SearchItemComponent } from '@tezblock/components/search-item/search-item.component'
@@ -38,7 +38,7 @@ describe('DashboardComponent', () => {
         ],
         imports: [FontAwesomeModule, ProgressbarModule, MomentModule, TooltipModule, AlertModule, TypeaheadModule, ModalModule.forRoot()],
         declarations: [
-          PricechartItemComponent,
+          AreaChartItemComponent,
           BlockItemComponent,
           TransactionItemComponent,
           IdenticonComponent,
