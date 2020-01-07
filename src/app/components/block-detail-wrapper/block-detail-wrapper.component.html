@@ -41,7 +41,10 @@
       </p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <p class="mb-0">{{ block.timestamp | amTimeAgo }} ({{ block.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+      <p class="mb-0">
+        {{ block.timestamp | amTimeAgo }}
+        <span class="text-secondary">({{ block.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
+      </p>
     </div>
   </div>
   <div class="row mb-3">
