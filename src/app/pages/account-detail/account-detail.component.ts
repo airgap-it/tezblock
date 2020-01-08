@@ -5,12 +5,13 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge, timer, BehaviorSubject } from 'rxjs'
+import { from, Observable, combineLatest, merge, timer, BehaviorSubject, pipe } from 'rxjs'
 import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
-import { negate, isNil, toString } from 'lodash'
+import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
+import { first, get } from '@tezblock/services/fp'
 
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -18,11 +19,12 @@ import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
+import { FeeByCycle } from 'src/app/interfaces/BakingBadResponse'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
@@ -74,37 +76,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  bakingBadRating: string | undefined
-  tezosBakerRating: string | undefined
-  stakingBalance: number | undefined
-  bakingInfos: any
   bakerTableInfos: any
   bakerTableRatings: any = {}
 
-  public tezosBakerFee$: BehaviorSubject<number | undefined> = new BehaviorSubject(undefined)
-  public tezosBakerFeeLabel$: Observable<string | undefined>
-  public stakingCapacity: number | undefined
-  public stakingProgress: number | undefined
-  public stakingBond: number | undefined
+  tezosBakerFee$: BehaviorSubject<number | undefined> = new BehaviorSubject(undefined)
+  tezosBakerFeeLabel$: Observable<string | undefined>
 
   isValidBaker: boolean | undefined
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
 
-  tezosBakerName: string | undefined
-  tezosBakerAvailableCap: string | undefined
-  tezosBakerAcceptingDelegation: string | undefined
-  tezosBakerNominalStakingYield: string | undefined
-
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  paginationLimit: number = 2
-  numberOfInitialRelatedAccounts: number = 2
+  paginationLimit = 2
+  numberOfInitialRelatedAccounts = 2
 
   isCollapsed: boolean = true
 
-  rewards: TezosRewards
   rights$: Observable<Object> = new Observable()
   current: string = 'copyGrey'
 
@@ -121,17 +110,16 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
     { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
-  public nextPayout: Date | undefined
-  public rewardAmount$: Observable<string>
-  public rewardAmountMinusFee$: Observable<number>
-  public isRewardAmountMinusFeeBusy$: Observable<boolean>
-  public remainingTime$: Observable<string>
-  public myTBUrl: string | undefined
-  public get address(): string {
+  nextPayout: Date | undefined
+  rewardAmount$: Observable<string>
+  rewardAmountMinusFee$: Observable<number>
+  isRewardAmountMinusFeeBusy$: Observable<boolean>
+  remainingTime$: Observable<string>
+
+  get address(): string {
     return this.route.snapshot.params.id
   }
-  frozenBalance: number | undefined
-  rewardsTransaction: any
+
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
   isMainnet: boolean
@@ -182,7 +170,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.store$.select(state => state.accountDetails.busy.rewardAmont),
       this.store$.select(state => state.accountDetails.rewardAmont),
       this.tezosBakerFee$
-    ).pipe(map(([isRewardAmontBusy, rewardAmont, tezosBakerFee]) => !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)))
+    ).pipe(
+      map(
+        ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) => !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+      )
+    )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
     this.transactions$ = this.store$
@@ -296,49 +288,43 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.isValidBaker = false
       })
 
-    // this.nextPayout = this.bakingInfos.nextPayout
-    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
-
-    // TODO: Move to component
-
-    this.bakingService
-      .getBakingBadRatings(address)
-      .then(result => {
-        if (result.rating === 0 && result.status === 'success') {
-          this.bakingBadRating = 'awesome'
-        } else if (result.rating === 1 && result.status === 'success') {
-          this.bakingBadRating = 'so-so'
-        } else if (result.rating === 2 && result.status === 'success') {
-          this.bakingBadRating = 'dead'
-        } else if (result.rating === 3 && result.status === 'success') {
-          this.bakingBadRating = 'specific'
-        } else if (result.rating === 4 && result.status === 'success') {
-          this.bakingBadRating = 'hidden'
-        } else if (result.rating === 5 && result.status === 'success') {
-          this.bakingBadRating = 'new'
-        } else if (result.rating === 6 && result.status === 'success') {
-          this.bakingBadRating = 'closed'
-        } else if (result.rating === 9 && result.status === 'success') {
-          this.bakingBadRating = 'unknown'
-        } else {
-          this.bakingBadRating = 'not available'
-        }
+    this.bakingService.getBakingBadRatings(address).subscribe(
+      response => {
+        const ratingNumberToLabel = [
+          /* 0 */ 'awesome',
+          /* 1 */ 'so-so',
+          /* 2 */ 'dead',
+          /* 3 */ 'specific',
+          /* 4 */ 'hidden',
+          /* 5 */ 'new',
+          /* 6 */ undefined,
+          /* 7 */ undefined,
+          /* 8 */ undefined,
+          /* 9 */ 'unknown'
+        ]
+        const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
+          first,
+          get(feeByCycle => feeByCycle.value)
+        )
 
         this.bakerTableRatings = {
           ...this.bakerTableRatings,
-          bakingBadRating: this.bakingBadRating
+          bakingBadRating:
+            response.status === 'success' && ratingNumberToLabel[response.rating.status]
+              ? ratingNumberToLabel[response.rating.status]
+              : 'not available'
         }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
+
+        if (response.status === 'success') {
+          this.tezosBakerFee$.next(extractFee(response.config.fee))
+        }
+      },
+      (/* error */) => (this.isValidBaker = false)
+    )
 
     this.getTezosBakerInfos(address)
   }
 
-  // TODO: Move to component
-  /*  TODO: strange only tezosBakerFee & bakerTableRatings.tezosBakerRating seems to be consumed by anything,
-      what for are all other properties updated here */
   /**
    * @param {boolean} [updateFee] - this method was used only in getBakingInfos method ( from my reasoning only to
    * update bakerTableRatings.tezosBakerRating ), now it's used also in bakerAddress's setter to update tezosBakerFee
@@ -348,31 +334,27 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.bakingService
       .getTezosBakerInfos(address)
       .then(result => {
-        if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-          this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-          this.tezosBakerName = result.baker_name
-          this.tezosBakerAvailableCap = result.available_capacity
-          this.myTBUrl = result.myTB
-          this.tezosBakerAcceptingDelegation = result.accepting_delegation
-          this.tezosBakerNominalStakingYield = result.nominal_staking_yield
+        if (result.status === 'success' && result.rating && result.fee) {
+          this.bakerTableRatings = {
+            ...this.bakerTableRatings,
+            tezosBakerRating: (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
+          }
 
           if (updateFee) {
             this.tezosBakerFee$.next(parseFloat(result.fee))
           }
         } else {
-          this.tezosBakerRating = 'not available'
+          this.bakerTableRatings = {
+            ...this.bakerTableRatings,
+            tezosBakerRating: 'not available'
+          }
 
           if (updateFee) {
             this.tezosBakerFee$.next(null)
           }
         }
-
-        this.bakerTableRatings = {
-          ...this.bakerTableRatings,
-          tezosBakerRating: this.tezosBakerRating
-        }
       })
-      .catch(error => {
+      .catch(() => {
         this.isValidBaker = false
         this.tezosBakerFee$.next(null)
       })
