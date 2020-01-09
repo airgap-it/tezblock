@@ -5,18 +5,15 @@
         <h5 class="card-title mb-3 ">
           <ng-container *ngIf="page === 'transaction' && type === 'overview'">
             Transactions
-            <app-occurrence-statistics label="Transactions Last 24 Hrs" [count]="transactionsCountLast24h$ | async"></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="page === 'block'">
             Blocks
           </ng-container>
           <ng-container *ngIf="type === 'activate_account'">
             Activations
-            <app-occurrence-statistics label="Activations Last 24 Hrs" [count]="activationsCountLast24h$ | async"></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="type === 'origination_overview'">
             Originations
-            <app-occurrence-statistics label="Originations Last 24 Hrs" [count]="originationsCountLast24h$ | async"></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="type === 'delegation_overview'">
             Delegations
@@ -37,6 +34,21 @@
             Bakers
           </ng-container>
         </h5>
+        <app-occurrence-statistics
+          *ngIf="page === 'transaction' && type === 'overview'"
+          label="Transactions Last 24 Hrs"
+          [count]="transactionsCountLast24h$ | async"
+        ></app-occurrence-statistics>
+        <app-occurrence-statistics
+          *ngIf="type === 'activate_account'"
+          label="Activations Last 24 Hrs"
+          [count]="activationsCountLast24h$ | async"
+        ></app-occurrence-statistics>
+        <app-occurrence-statistics
+          *ngIf="type === 'origination_overview'"
+          label="Originations Last 24 Hrs"
+          [count]="originationsCountLast24h$ | async"
+        ></app-occurrence-statistics>
         <div *ngIf="type === 'baker_overview'" class="row">
           <div class="col py-3">
             <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
