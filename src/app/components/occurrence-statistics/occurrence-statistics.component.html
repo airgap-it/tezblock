@@ -9,3 +9,15 @@
     </h3>
   </div>
 </div>
+<div class="row">
+  <div class="col py-3">
+    <chart-item
+      *ngIf="chartDatasets"
+      [datasets]="chartDatasets"
+      [labels]="chartLabels"
+      [options]="chartOptions"
+      chartType="bar"
+      gradientFrom="rgba(46,91,255,0.09)"
+    ></chart-item>
+  </div>
+</div>

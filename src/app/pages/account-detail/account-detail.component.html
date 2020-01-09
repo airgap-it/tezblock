@@ -334,7 +334,7 @@
                     <small>last 30 days</small>
                   </h5>
                   <ng-container *ngIf="balanceChartDatasets$ | async">
-                    <area-chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></area-chart-item>
+                    <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
                   </ng-container>
                 </div>
               </div>

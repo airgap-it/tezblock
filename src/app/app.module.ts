@@ -28,7 +28,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { AreaChartItemComponent } from './components/area-chart-item/area-chart-item.component'
+import { ChartItemComponent } from './components/chart-item/chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -140,7 +140,7 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -175,7 +175,7 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],
