@@ -33,4 +33,16 @@ export const loadTotalActiveBakersSucceeded = createAction(
 )
 export const loadTotalActiveBakersFailed = createAction(`[${featureName}] Load Total Active Bakers Failed`, props<{ error: any }>())
 
+export const loadTransactionsCountLast24h = createAction(`[${featureName}] Load Transactions Count Last 24h`)
+export const loadTransactionsCountLast24hSucceeded = createAction(`[${featureName}] Load Transactions Count Last 24h Succeeded`, props<{ transactionsCountLast24h: number }>())
+export const loadTransactionsCountLast24hFailed = createAction(`[${featureName}] Load Transactions Count Last 24h Failed`, props<{ error: any }>())
+
+export const loadActivationsCountLast24h = createAction(`[${featureName}] Load Activations Count Last 24h`)
+export const loadActivationsCountLast24hSucceeded = createAction(`[${featureName}] Load Activations Count Last 24h Succeeded`, props<{ activationsCountLast24h: number }>())
+export const loadActivationsCountLast24hFailed = createAction(`[${featureName}] Load Activations Count Last 24h Failed`, props<{ error: any }>())
+
+export const loadOriginationsCountLast24h = createAction(`[${featureName}] Load Originations Count Last 24h`)
+export const loadOriginationsCountLast24hSucceeded = createAction(`[${featureName}] Load Originations Count Last 24h Succeeded`, props<{ originationsCountLast24h: number }>())
+export const loadOriginationsCountLast24hFailed = createAction(`[${featureName}] Load Originations Count Last 24h Failed`, props<{ error: any }>())
+
 export const reset = createAction(`[${featureName}] Reset`)

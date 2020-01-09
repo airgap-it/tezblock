@@ -69,7 +69,8 @@ import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-import { BakerTableEffects } from './components/baker-table/effects'
+import { BakerTableEffects } from './components/baker-table/effects';
+import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 
 @NgModule({
   imports: [
@@ -152,7 +153,8 @@ import { BakerTableEffects } from './components/baker-table/effects'
     ModalCellComponent,
     EndorsementDetailComponent,
     TooltipItemComponent,
-    SearchItemComponent
+    SearchItemComponent,
+    OccurrenceStatisticsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

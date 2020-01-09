@@ -14,6 +14,7 @@ import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Predicate } from '../base.service'
 
 export interface OperationCount {
   [key: string]: string
@@ -42,13 +43,6 @@ export interface NumberOfDelegatorsByBakers {
 export interface Balance {
   balance: number
   asof: number
-}
-
-interface Predicate {
-  field: string
-  operation: string
-  set: any[]
-  inverse?: boolean
 }
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -872,7 +866,7 @@ export class ApiService {
   }
 
   public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
@@ -883,7 +877,7 @@ export class ApiService {
         operation: 'eq',
         set: ['0']
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<BakingRights[]>(
@@ -967,13 +961,13 @@ export class ApiService {
   }
 
   public getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
         set: [address]
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<EndorsingRights[]>(

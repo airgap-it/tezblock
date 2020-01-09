@@ -1,0 +1,11 @@
+<div class="row">
+  <div class="col py-3">
+    <h5 class="card-title__secondary mb-3 ">
+      {{ label }}
+    </h5>
+    <h3>
+      {{ count }}
+      <loading-skeleton *ngIf="count === undefined" [loadingWidth]="'150px'"></loading-skeleton>
+    </h3>
+  </div>
+</div>
