@@ -1,3 +1,5 @@
+import { IAirGapTransaction } from 'airgap-coin-lib'
+
 const contracts = require('../../assets/contracts/json/contracts.json')
 
 export enum SocialType {
@@ -20,6 +22,11 @@ export interface Contract {
   website: string
   description: string
   socials: Social[]
+}
+
+export interface ContractOperation extends IAirGapTransaction {
+  singleFrom: string
+  singleTo: string
 }
 
 export const getContractByAddress = (address: string): Contract => contracts[address]

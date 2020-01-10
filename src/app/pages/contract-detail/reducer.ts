@@ -1,22 +1,31 @@
 import { createReducer, on } from '@ngrx/store'
+import { TezosTransactionCursor, IAirGapTransaction } from 'airgap-coin-lib'
 
 import * as actions from './actions'
-import { Contract } from '@tezblock/domain/contract'
-import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Contract, ContractOperation } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { first } from '@tezblock/services/fp'
+
+const airGapTransactionToContractOperation = (airGapTransaction: IAirGapTransaction): ContractOperation => ({
+  ...airGapTransaction,
+  singleFrom: first(airGapTransaction.from),
+  singleTo: first(airGapTransaction.to)
+})
 
 export interface State {
   address: string
   contract: Contract
   copyToClipboardState: string
-  transferOperations: TableState<Transaction>
+  transferOperations: TableState<ContractOperation>
+  cursor: TezosTransactionCursor
 }
 
 const initialState: State = {
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
-  transferOperations: getInitialTableState()
+  transferOperations: getInitialTableState(),
+  cursor: undefined
 }
 
 export const reducer = createReducer(
@@ -48,14 +57,19 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => ({
-    ...state,
-    transferOperations: {
-      ...state.transferOperations,
-      data: transferOperations,
-      loading: false
+  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
+    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation)
+
+    return {
+      ...state,
+      transferOperations: {
+        ...state.transferOperations,
+        data: state.cursor ? state.transferOperations.data.concat(newData) : newData,
+        loading: false
+      },
+      cursor: transferOperations.cursor
     }
-  })),
+  }),
   on(actions.loadTransferOperationsFailed, state => ({
     ...state,
     transferOperations: {

@@ -32,6 +32,13 @@ export class ContractDetailEffects {
     )
   )
 
+  onContractGetOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractSucceeded),
+      map(({ contract }) => actions.loadTransferOperations({ contract }))
+    )
+  )
+
   copyAddressToClipboard$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.copyAddressToClipboard),
@@ -85,9 +92,9 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.transferOperations.pagination)),
-      switchMap(([{ address }, pagination]) =>
-        this.apiService.getTransferOperationsForContract(address, pagination.currentPage * pagination.selectedSize).pipe(
+      withLatestFrom(this.store$.select(state => state.contractDetails.cursor)),
+      switchMap(([{ contract }, cursor]) =>
+        this.apiService.getTransferOperationsForContract(contract, cursor).pipe(
           map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
@@ -98,8 +105,8 @@ export class ContractDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMoreTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.address)),
-      map(([action, address]) => actions.loadTransferOperations({ address }))
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadTransferOperations({ contract }))
     )
   )
 

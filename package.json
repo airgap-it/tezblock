@@ -55,7 +55,7 @@
     "@nguniversal/module-map-ngfactory-loader": "^8.0.0-rc.1",
     "@ngx-pwa/local-storage": "^8.2.3",
     "@types/lodash": "^4.14.146",
-    "airgap-coin-lib": "^0.6.5-beta.1",
+    "airgap-coin-lib": "^0.6.5-beta.2",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",

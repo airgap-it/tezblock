@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
 import { AggregatedBakingRights, BakingRights } from './../../interfaces/BakingRights'
 import { EndorsingRights, AggregatedEndorsingRights } from './../../interfaces/EndorsingRights'
@@ -10,10 +11,10 @@ import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo } from '../transaction-single/transaction-single.service'
-import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Contract } from '@tezblock/domain/contract'
 
 export interface OperationCount {
   [key: string]: string
@@ -1238,29 +1239,20 @@ export class ApiService {
       )
   }
 
-  getTransferOperationsForContract(contractAddress: string, limit?: number): Observable<Transaction[]> {
-    
-    // Sort by block_level
-    return this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'parameters',
-            operation: 'like',
-            set: ['transfer'],
-            inverse: false
-          },
-          {
-            field: 'destination',
-            operation: 'eq',
-            set: [contractAddress],
-            inverse: false
-          }
-        ],
-        limit
-      },
-      this.options
-    )
+  getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
+    const protocol = new TezosFAProtocol({
+      symbol: contract.symbol,
+      name: contract.name,
+      marketSymbol: contract.symbol,
+      identifier: '', // not important in this context can be empty string
+      contractAddress: contract.id,
+      jsonRPCAPI: this.environmentUrls.rpcUrl,
+      baseApiUrl: this.environmentUrls.conseilUrl,
+      baseApiKey: this.environmentUrls.conseilApiKey,
+      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
+      network: this.chainNetworkService.getNetwork()
+    })
+
+    return from(protocol.getTransactions(10, cursor))
   }
 }

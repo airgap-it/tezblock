@@ -7,12 +7,11 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { Contract, Social, SocialType } from '@tezblock/domain/contract'
+import { Contract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 
 @Component({
   selector: 'app-contract-detail',
@@ -43,7 +42,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias$: Observable<boolean>
   loading$: Observable<boolean>
-  transferOperations$: Observable<Transaction[]>
+  transferOperations$: Observable<ContractOperation[]>
 
   current: string = 'copyGrey'
 
@@ -61,7 +60,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
-        this.store$.dispatch(actions.loadTransferOperations({ address }))
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       })

@@ -26,33 +26,5 @@
         "url": "https://github.com/airgap-it"
       }
     ]
-  },
-  "KT1LH2o12xVRwTpJMZ6QJG74Fox8gE9QieFd": {
-    "symbol": "TEST",
-    "name": "TEST",
-    "website": "https://tzbtc.io",
-    "description": "TEST",
-    "socials": [
-      {
-        "type": "website",
-        "url": "https://airgap.it"
-      },
-      {
-        "type": "twitter",
-        "url": "https://twitter.com/AirGap_it"
-      },
-      {
-        "type": "telegram",
-        "url": "https://t.me/AirGap"
-      },
-      {
-        "type": "medium",
-        "url": "https://medium.com/airgap-it"
-      },
-      {
-        "type": "github",
-        "url": "https://github.com/airgap-it"
-      }
-    ]
   }
 }

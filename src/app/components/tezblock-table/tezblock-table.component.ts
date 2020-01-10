@@ -674,14 +674,14 @@ function getLayouts(showFiat: boolean = true): Layout {
       [OperationTypes.Transaction]: [
         {
           name: 'Contract',
-          property: 'source',
+          property: 'singleFrom',
           width: '1',
           component: AddressCellComponent,
           options: { showFullAddress: false, pageId: 'oo' }
         },
         {
           name: 'To',
-          property: 'destination',
+          property: 'singleTo',
           width: '1',
           component: AddressCellComponent,
           options: { showFullAddress: false, pageId: 'oo' }
