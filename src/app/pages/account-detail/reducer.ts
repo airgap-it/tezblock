@@ -3,6 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
+import { Balance } from '@tezblock/services/api/api.service'
 
 export interface Busy {
   transactions: boolean
@@ -18,7 +19,8 @@ export interface State {
   kind: string
   pageSize: number // transactions
   rewardAmont: string
-  busy: Busy
+  busy: Busy,
+  balanceFromLast30Days: Balance[]
 }
 
 const initialState: State = {
@@ -33,7 +35,8 @@ const initialState: State = {
   busy: {
     transactions: false,
     rewardAmont: false
-  }
+  },
+  balanceFromLast30Days: undefined
 }
 
 export const reducer = createReducer(
@@ -103,6 +106,10 @@ export const reducer = createReducer(
   on(actions.increasePageSize, state => ({
     ...state,
     pageSize: state.pageSize + 10
+  })),
+  on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
+    ...state,
+    balanceFromLast30Days
   })),
   on(actions.reset, () => initialState)
 )

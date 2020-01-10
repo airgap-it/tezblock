@@ -1,0 +1,6 @@
+::ng-deep app-block-detail {
+  /* TODO: find better fix so that tooltips are not cut off when collapse is shown */
+  .collapse.show {
+    overflow: visible !important;
+  }
+}

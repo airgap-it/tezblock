@@ -16,8 +16,11 @@ export interface State {
   doubleEndorsements: TableState<Transaction>
   activeBakers: {
     table: TableState<Baker>
-    total: number
+    total: number //TODO: move to pagination ?
   }
+  activationsCountLast24h: number
+  originationsCountLast24h: number
+  transactionsCountLast24h: number
 }
 
 const initialState: State = {
@@ -26,7 +29,10 @@ const initialState: State = {
   activeBakers: {
     table: getInitialTableState(),
     total: undefined
-  }
+  },
+  activationsCountLast24h: undefined,
+  originationsCountLast24h: undefined,
+  transactionsCountLast24h: undefined
 }
 
 export const reducer = createReducer(
@@ -159,6 +165,18 @@ export const reducer = createReducer(
       ...state.activeBakers,
       total: null
     }
+  })),
+  on(actions.loadActivationsCountLast24hSucceeded, (state, { activationsCountLast24h }) => ({
+    ...state,
+    activationsCountLast24h
+  })),
+  on(actions.loadOriginationsCountLast24hSucceeded, (state, { originationsCountLast24h }) => ({
+    ...state,
+    originationsCountLast24h
+  })),
+  on(actions.loadTransactionsCountLast24hSucceeded, (state, { transactionsCountLast24h }) => ({
+    ...state,
+    transactionsCountLast24h
   })),
   on(actions.reset, () => initialState)
 )

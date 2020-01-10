@@ -14,6 +14,7 @@ import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Predicate } from '../base.service'
 import { Contract } from '@tezblock/domain/contract'
 
 export interface OperationCount {
@@ -40,11 +41,9 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
-interface Predicate {
-  field: string
-  operation: string
-  set: any[]
-  inverse?: boolean
+export interface Balance {
+  balance: number
+  asof: number
 }
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -65,6 +64,7 @@ export class ApiService {
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
   private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -867,7 +867,7 @@ export class ApiService {
   }
 
   public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
@@ -878,7 +878,7 @@ export class ApiService {
         operation: 'eq',
         set: ['0']
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<BakingRights[]>(
@@ -962,13 +962,13 @@ export class ApiService {
   }
 
   public getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
         set: [address]
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<EndorsingRights[]>(
@@ -1254,5 +1254,50 @@ export class ApiService {
     })
 
     return from(protocol.getTransactions(10, cursor))
+  }
+
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+    const today = new Date()
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
+      )
   }
 }
