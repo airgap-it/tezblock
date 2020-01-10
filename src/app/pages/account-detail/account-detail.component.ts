@@ -315,14 +315,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               : 'not available'
         }
 
-        if (response.status === 'success') {
-          this.tezosBakerFee$.next(extractFee(response.config.fee))
-        }
+        // Pascal reported that this returns wrong value: https://gitlab.papers.tech/papers/tezblock/tezblock-frontend/merge_requests/364#note_44981
+        // if (response.status === 'success') {
+        //   this.tezosBakerFee$.next(extractFee(response.config.fee))
+        // }
       },
       (/* error */) => (this.isValidBaker = false)
     )
 
-    this.getTezosBakerInfos(address)
+    this.getTezosBakerInfos(address, true)
   }
 
   /**
