@@ -90,11 +90,13 @@ export class ChartItemComponent implements AfterViewInit {
   constructor() {}
 
   ngAfterViewInit() {
+    const navyBlue = '#2E5BFF'
+
     if (this.chart) {
       const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
 
       const gradientStroke1: CanvasGradient = ctx.createLinearGradient(0, 10, 0, 0)
-      gradientStroke1.addColorStop(0, `#2E5BFF`) // rgb(122, 141, 169)
+      gradientStroke1.addColorStop(0, navyBlue) // rgb(122, 141, 169)
 
       const gradientFill1: CanvasGradient = ctx.createLinearGradient(0, 100, 0, 0)
       gradientFill1.addColorStop(0, this.gradientFrom)
@@ -106,7 +108,10 @@ export class ChartItemComponent implements AfterViewInit {
         pointBackgroundColor: gradientStroke1,
         pointBorderColor: gradientStroke1,
         pointHoverBackgroundColor: gradientStroke1,
-        pointHoverBorderColor: gradientStroke1
+        pointHoverBorderColor: gradientStroke1,
+        hoverBackgroundColor: navyBlue,
+        hoverBorderColor: navyBlue,
+        borderWidth: 1
       }
     }
   }
