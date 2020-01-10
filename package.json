@@ -54,7 +54,6 @@
     "@nguniversal/express-engine": "^8.0.0-rc.1",
     "@nguniversal/module-map-ngfactory-loader": "^8.0.0-rc.1",
     "@ngx-pwa/local-storage": "^8.2.3",
-    "@types/lodash": "^4.14.146",
     "airgap-coin-lib": "^0.6.5-beta.2",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
@@ -64,8 +63,8 @@
     "bootstrap-sass": "^3.4.1",
     "browserify": "^16.2.3",
     "canvas": "^2.5.0",
-    "chart.js": "^2.8.0",
-    "core-js": "^2.5.4",
+    "chart.js": "^2.9.3",
+    "core-js": "^2.6.11",
     "cryptocompare": "^1.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
@@ -82,7 +81,7 @@
     "@fortawesome/pro-light-svg-icons": "5.10.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "0.800.0",
+    "@angular-devkit/build-angular": "^0.803.22",
     "@angular/cli": "^8.0.2",
     "@angular/compiler-cli": "^8.0.0",
     "@angular/platform-server": "^8.0.0",
