@@ -2,6 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { OccurrenceStatisticsComponent } from './occurrence-statistics.component'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 
 describe('OccurrenceStatisticsComponent', () => {
   let component: OccurrenceStatisticsComponent
@@ -12,7 +13,7 @@ describe('OccurrenceStatisticsComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        declarations: [OccurrenceStatisticsComponent]
+        declarations: [OccurrenceStatisticsComponent, LoadingSkeletonComponent]
       })
     ).compileComponents()
   }))
