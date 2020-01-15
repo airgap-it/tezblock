@@ -1,14 +1,12 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { BsModalService, ModalModule, TabsetConfig, TabsModule, TooltipModule } from 'ngx-bootstrap'
 import { MomentModule } from 'ngx-moment'
-import { Store } from '@ngrx/store'
 import { Actions } from '@ngrx/effects'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { EMPTY } from 'rxjs'
 
-import { storeMock } from 'test-config/mocks'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TabbedTableComponent } from 'src/app/components/tabbed-table/tabbed-table.component'
 import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
@@ -21,6 +19,8 @@ import { AmountConverterPipe } from './../../pipes/amount-converter/amount-conve
 import { TransactionDetailComponent } from './transaction-detail.component'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -32,14 +32,7 @@ describe('TransactionDetailComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [
-          AmountConverterPipe,
-          TabsetConfig,
-          BsModalService,
-          ToastrService,
-          { provide: Store, useValue: storeMock },
-          { provide: Actions, useValue: EMPTY }
-        ],
+        providers: [AmountConverterPipe, TabsetConfig, BsModalService, ToastrService, { provide: Actions, useValue: EMPTY }],
         imports: [
           MomentModule,
           FontAwesomeModule,
@@ -58,8 +51,10 @@ describe('TransactionDetailComponent', () => {
           AddressCellComponent,
           IdenticonComponent,
           AmountCellComponent,
+          BlockCellComponent,
           TransactionDetailWrapperComponent,
-          LoadingSkeletonComponent
+          LoadingSkeletonComponent,
+          TooltipItemComponent
         ]
       })
     )

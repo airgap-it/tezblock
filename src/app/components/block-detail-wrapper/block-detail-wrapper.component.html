@@ -4,7 +4,12 @@
   </h5>
   <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary mb-0">Block Height</p>
+      <p class="text-secondary mb-0">
+        <tooltip-item
+          [title]="'Block Height'"
+          [tooltip]="'The block height, which indicates the length of the blockchain, increases after the addition of the new block.'"
+        ></tooltip-item>
+      </p>
     </div>
 
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
@@ -21,7 +26,9 @@
   </div>
   <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary mb-0">Baker</p>
+      <p class="text-secondary mb-0">
+        <tooltip-item [title]="'Baker'" [tooltip]="'A Baker takes part in the validation of the network.'"></tooltip-item>
+      </p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <address-item [address]="block.baker" ng-href="#here"></address-item>
@@ -29,15 +36,22 @@
   </div>
   <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary mb-0">Timestamp</p>
+      <p class="text-secondary mb-0">
+        <tooltip-item [title]="'Timestamp'" [tooltip]="'The date an time at which a block was created.'"></tooltip-item>
+      </p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <p class="mb-0">{{ block.timestamp | amTimeAgo }} ({{ block.timestamp | date: 'MMMM-d-y h:mm:ss a z' }})</p>
+      <p class="mb-0">
+        {{ block.timestamp | amTimeAgo }}
+        <span class="text-secondary">({{ block.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
+      </p>
     </div>
   </div>
   <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary mb-0">Value</p>
+      <p class="text-secondary mb-0">
+        <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in transactions for this block.'"></tooltip-item>
+      </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <div
@@ -69,7 +83,12 @@
   </div>
   <div class="row mb-3">
     <div class="col-md-3">
-      <p class="text-secondary mb-0">Transaction Fees</p>
+      <p class="text-secondary mb-0">
+        <tooltip-item
+          [title]="'Transaction Fees'"
+          [tooltip]="'The total amount of fees spent for transactions in this block.'"
+        ></tooltip-item>
+      </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       <div
@@ -119,7 +138,12 @@
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
     <div class="row mt-3 mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Endorsed Slots</p>
+        <p class="text-secondary mb-0">
+          <tooltip-item
+            [title]="'Endorsed Slots'"
+            [tooltip]="'A block has to be enndorsed by other bakers, up to 32 bakers confirm that this block is valid.'"
+          ></tooltip-item>
+        </p>
       </div>
       <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
       <ng-template #loaded>
@@ -130,7 +154,14 @@
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Cycle</p>
+        <p class="text-secondary mb-0">
+          <tooltip-item
+            [title]="'Cycle'"
+            [tooltip]="
+              'A Cycle is a set of consecutive blocks consisting out of 4095 blocks. Cycles are used as a unit of “time” in the block chain. For example, the different phases in the amendment voting procedures are defined based on cycles.'
+            "
+          ></tooltip-item>
+        </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
         <p class="mb-0">{{ block.meta_cycle }}</p>
@@ -138,7 +169,9 @@
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Cycle Position</p>
+        <p class="text-secondary mb-0">
+          <tooltip-item [title]="'Cycle Position'" [tooltip]="'The position in number of blocks out of 4095 blocks.'"></tooltip-item>
+        </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
         <p class="mb-0">{{ block.meta_cycle_position }} of 4095</p>
@@ -162,7 +195,14 @@
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Fitness</p>
+        <p class="text-secondary mb-0">
+          <tooltip-item
+            [title]="'Fitness'"
+            [tooltip]="
+              'Fitness is a metric used to compare contexts. For example, when several blocks claim to be heads of the chain, their context’s fitness are compared. The block with the highest fitness is selected as the head of the chain.'
+            "
+          ></tooltip-item>
+        </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
         <p class="mb-0">{{ block.fitness }}</p>
@@ -170,7 +210,12 @@
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Protocol</p>
+        <p class="text-secondary mb-0">
+          <tooltip-item
+            [title]="'Protocol'"
+            [tooltip]="'The active protcol of this block. The protocol can be changed through the protocol amendment proccess.'"
+          ></tooltip-item>
+        </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
         <p class="mb-0">{{ block.protocol }}</p>

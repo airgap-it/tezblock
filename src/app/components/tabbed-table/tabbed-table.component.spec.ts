@@ -12,6 +12,7 @@ import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.c
 import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
 import { IdenticonComponent } from '../identicon/identicon'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent
@@ -31,6 +32,7 @@ describe('TabbedTableComponent', () => {
           LoadingSkeletonComponent,
           AddressCellComponent,
           AmountCellComponent,
+          BlockCellComponent,
           AddressItemComponent
         ]
       })

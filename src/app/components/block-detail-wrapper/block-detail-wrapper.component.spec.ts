@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { TooltipModule } from 'ngx-bootstrap'
 
 import { BlockDetailWrapperComponent } from './block-detail-wrapper.component'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
@@ -11,6 +12,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { IdenticonComponent } from '../identicon/identicon'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('BlockDetailWrapperComponent', () => {
   let component: BlockDetailWrapperComponent
@@ -22,8 +24,14 @@ describe('BlockDetailWrapperComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [AmountConverterPipe, IconPipe],
-        imports: [FontAwesomeModule, MomentModule, CollapseModule, BrowserAnimationsModule],
-        declarations: [IdenticonComponent, AddressItemComponent, BlockDetailWrapperComponent, LoadingSkeletonComponent]
+        imports: [FontAwesomeModule, MomentModule, CollapseModule, BrowserAnimationsModule, TooltipModule.forRoot()],
+        declarations: [
+          IdenticonComponent,
+          AddressItemComponent,
+          BlockDetailWrapperComponent,
+          LoadingSkeletonComponent,
+          TooltipItemComponent
+        ]
       })
     )
       .compileComponents()

@@ -1,4 +1,7 @@
 ::ng-deep app-account-detail {
+  .chart__container {
+    min-height: 125px;
+  }
   .card__top {
     min-height: 328px;
   }
