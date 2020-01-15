@@ -673,7 +673,7 @@ function getLayouts(showFiat: boolean = true): Layout {
     [LayoutPages.Contract]: {
       [OperationTypes.Transaction]: [
         {
-          name: 'Contract',
+          name: 'From',
           property: 'singleFrom',
           width: '1',
           component: AddressCellComponent,
