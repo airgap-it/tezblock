@@ -320,12 +320,13 @@
         </div>
       </div>
 
-      <div class="pt-5">
+      <div class="pt-5" *ngIf="isValidBaker">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <ng-container *ngIf="isValidBaker">
               <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
             </ng-container>
+            <!--
             <div *ngIf="!isValidBaker || (bakerTabs[0].active)" class="container px-3 chart__container">
               <div class="row">
                 <div class="col-md-6 col-lg-4 px-0 px-sm-3">
@@ -339,6 +340,7 @@
                 </div>
               </div>
             </div>
+            -->
           </div>
         </div>
       </div>
