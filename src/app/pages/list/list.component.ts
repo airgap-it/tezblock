@@ -14,22 +14,29 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
 
+//TODO: create some shared file for it
+const getRefresh = (streams: Observable<any>[]): Observable<number> =>
+  merge(of(-1), merge(streams).pipe(switchMap(() => timer(refreshRate, refreshRate))))
+
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent extends BaseComponent implements OnInit {
-  public tabs: Tab[]
-  public page: string
-  public loading$: Observable<boolean>
-  public type: string
-  private dataService
-  public data$: Observable<Object>
-  public componentView: string | undefined
-  public transactionsLoading$: Observable<boolean>
-
+  tabs: Tab[]
+  page: string
+  loading$: Observable<boolean>
+  type: string
+  data$: Observable<Object>
+  componentView: string | undefined
+  transactionsLoading$: Observable<boolean>
   totalActiveBakers$: Observable<number>
+  activationsCountLast24h$: Observable<number>
+  originationsCountLast24h$: Observable<number>
+  transactionsCountLast24h$: Observable<number>
+
+  private dataService
 
   private get routeName(): string {
     return this.route.snapshot.paramMap.get('route')
@@ -46,6 +53,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
+    // is this refresh rly good .. ?
     const refresh$ = merge(
       of(1),
       merge(
@@ -68,12 +76,26 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(params.route, 'overview')
             break
           case 'transaction':
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hSucceeded)),
+                this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsCountLast24h()))
+            )
+            this.transactionsCountLast24h$ = this.store$.select(state => state.list.transactionsCountLast24h)
             this.dataService = new TransactionService(this.apiService)
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'overview')
             break
           case 'activation':
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadActivationsCountLast24hSucceeded)),
+                this.actions$.pipe(ofType(actions.loadActivationsCountLast24hFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadActivationsCountLast24h()))
+            )
+            this.activationsCountLast24h$ = this.store$.select(state => state.list.activationsCountLast24h)
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['activate_account'])
             this.dataService.setPageSize(10)
@@ -81,6 +103,13 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(params.route, 'activate_account')
             break
           case 'origination':
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadOriginationsCountLast24hSucceeded)),
+                this.actions$.pipe(ofType(actions.loadOriginationsCountLast24hFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadOriginationsCountLast24h()))
+            )
+            this.originationsCountLast24h$ = this.store$.select(state => state.list.originationsCountLast24h)
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['origination'])
             this.dataService.setPageSize(10)

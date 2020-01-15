@@ -73,6 +73,21 @@ export class AccountDetailEffects {
     )
   )
 
+  loadBalanceForLast30Days$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBalanceForLast30Days),
+      withLatestFrom(
+        this.store$.select(state => state.accountDetails.address)
+      ),
+      switchMap(([action, accountAddress]) =>
+        this.apiService.getBalanceForLast30Days(accountAddress).pipe(
+          map(balanceFromLast30Days => actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })),
+          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly accountService: NewAccountService,
     private readonly actions$: Actions,

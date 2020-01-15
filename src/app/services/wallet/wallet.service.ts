@@ -60,6 +60,62 @@ const initialState: Wallet[] = [
     downloadLink: 'https://airgap.it#download'
   },
   {
+    title: 'Atomic Wallet',
+    description: `Atomic is a decentralized wallet that supports 300+ cryptocurrency assets. Strong encryption and custody-free solution guarantee their users the highest level of security. Atomic Wallet provides instant exchange and "buy crypto with a credit card" feature.`,
+    logo: 'atomic_wallet.png',
+    socials: [
+      {
+        type: SocialType.website,
+        url: 'https://atomicwallet.io/'
+      },
+      {
+        type: SocialType.twitter,
+        url: 'https://twitter.com/atomicwallet'
+      },
+      {
+        type: SocialType.telegram,
+        url: 'https://t.me/atomicwalletchat'
+      },
+      {
+        type: SocialType.medium,
+        url: 'https://medium.com/atomic-wallet'
+      },
+      {
+        type: SocialType.github,
+        url: 'https://github.com/Atomicwallet'
+      }
+    ],
+    platforms: [
+      {
+        name: PlatformName.iOS,
+        icon: 'apple',
+        url: 'https://apps.apple.com/us/app/atomic-wallet/id1478257827'
+      },
+      {
+        name: PlatformName.Android,
+        icon: 'android',
+        url: 'https://play.google.com/store/apps/details?id=io.atomicwallet'
+      },
+      {
+        name: PlatformName.LinuxDistribution,
+        icon: 'laptop',
+        url: 'https://atomicwallet.io/downloads'
+      },
+      {
+        name: PlatformName.macOS,
+        icon: 'laptop',
+        url: 'https://atomicwallet.io/downloads'
+      },
+      {
+        name: PlatformName.Windows,
+        icon: 'laptop',
+        url: 'https://atomicwallet.io/downloads'
+      }
+    ],
+    features: ['Buy Cryptocurrency (Visa, Master card)', 'Exchange option', 'XTZ delegation'],
+    downloadLink: 'https://atomicwallet.io/downloads'
+  },
+  {
     title: 'Atomex',
     description: `Multicurrency HD wallet with built-in hybrid atomic swap exchange.`,
     logo: 'atomex.png',

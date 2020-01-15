@@ -4,15 +4,17 @@ import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
-import { BakingRights } from './../../interfaces/BakingRights'
-import { EndorsingRights } from './../../interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights } from './../../interfaces/BakingRights'
+import { EndorsingRights, AggregatedEndorsingRights } from './../../interfaces/EndorsingRights'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo } from '../transaction-single/transaction-single.service'
 import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { first, get } from '@tezblock/services/fp'
+import { first, get, groupBy, last } from '@tezblock/services/fp'
+import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Predicate } from '../base.service'
 
 export interface OperationCount {
   [key: string]: string
@@ -38,13 +40,22 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
+export interface Balance {
+  balance: number
+  asof: number
+}
+
 const accounts = require('../../../assets/bakers/json/accounts.json')
+const cycleToLevel = (cycle: number): number => cycle * 4096
+export const addCycleFromLevel = right => ({ ...right, cycle: Math.floor(right.level / 4096) })
+
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
   public environmentUrls = this.chainNetworkService.getEnvironment()
   public environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+  public protocol: TezosProtocol
 
   private readonly bakingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/baking_rights`
   private readonly endorsingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/endorsing_rights`
@@ -52,6 +63,7 @@ export class ApiService {
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
   private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -70,7 +82,20 @@ export class ApiService {
     direction: 'desc'
   }
 
-  constructor(private readonly http: HttpClient, public readonly chainNetworkService: ChainNetworkService) {}
+  constructor(
+    private readonly http: HttpClient,
+    public readonly chainNetworkService: ChainNetworkService,
+    private readonly rewardService: RewardService
+  ) {
+    const network = this.chainNetworkService.getNetwork()
+    this.protocol = new TezosProtocol(
+      this.environmentUrls.rpcUrl,
+      this.environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      this.environmentUrls.conseilApiKey
+    )
+  }
 
   public getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
     return this.http.post<Block[]>(
@@ -819,15 +844,7 @@ export class ApiService {
   // TODO: remove (replace by getVotesForTransaction)
   public async addVotesForTransaction(transaction: Transaction): Promise<Transaction> {
     return new Promise(async resolve => {
-      const network = this.chainNetworkService.getNetwork()
-      const protocol = new TezosProtocol(
-        this.environmentUrls.rpcUrl,
-        this.environmentUrls.conseilUrl,
-        network,
-        this.chainNetworkService.getEnvironmentVariable(),
-        this.environmentUrls.conseilApiKey
-      )
-      const data = await protocol.getTezosVotingInfo(transaction.block_hash)
+      const data = await this.protocol.getTezosVotingInfo(transaction.block_hash)
       const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
       transaction.votes = votingInfo ? votingInfo.rolls : null
       resolve(transaction)
@@ -835,16 +852,7 @@ export class ApiService {
   }
 
   public getVotesForTransaction(transaction: Transaction): Observable<number> {
-    const network = this.chainNetworkService.getNetwork()
-    const protocol = new TezosProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      this.environmentUrls.conseilApiKey
-    )
-
-    return from(protocol.getTezosVotingInfo(transaction.block_hash)).pipe(
+    return from(this.protocol.getTezosVotingInfo(transaction.block_hash)).pipe(
       map(data => {
         const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
 
@@ -853,23 +861,29 @@ export class ApiService {
     )
   }
 
-  public getBakingRights(address: string, limit: number): Observable<BakingRights[]> {
+  public getCurrentCycle(): Observable<number> {
+    return from(this.protocol.fetchCurrentCycle())
+  }
+
+  public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
+    const _predicates = (<Predicate[]>[
+      {
+        field: 'delegate',
+        operation: 'eq',
+        set: [address]
+      },
+      {
+        field: 'priority',
+        operation: 'eq',
+        set: ['0']
+      }
+    ]).concat(predicates || [])
+
     return this.http
       .post<BakingRights[]>(
         this.bakingRightsApiUrl,
         {
-          predicates: [
-            {
-              field: 'delegate',
-              operation: 'eq',
-              set: [address]
-            },
-            {
-              field: 'priority',
-              operation: 'eq',
-              set: ['0']
-            }
-          ],
+          predicates: _predicates,
           orderBy: [
             {
               field: 'level',
@@ -880,29 +894,86 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(
-        map((rights: BakingRights[]) => {
-          rights.forEach(right => {
-            right.cycle = Math.floor(right.level / 4096)
-          })
-
-          return rights
-        })
-      )
+      .pipe(map((rights: BakingRights[]) => rights.map(addCycleFromLevel)))
   }
 
-  public getEndorsingRights(address: string, limit: number): Observable<EndorsingRights[]> {
+  getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
+    const group = groupBy('cycle')
+
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+      switchMap(cycles => {
+        const minLevel = cycleToLevel(last(cycles))
+        const maxLevel = cycleToLevel(first(cycles) + 1)
+        const predicates = [
+          {
+            field: 'level',
+            operation: 'gt',
+            set: [minLevel]
+          },
+          {
+            field: 'level',
+            operation: 'lt',
+            set: [maxLevel]
+          }
+        ]
+
+        return this.getBakingRights(address, null, predicates).pipe(
+          map((rights: BakingRights[]) => rights.map(addCycleFromLevel)),
+          map((rights: BakingRights[]) =>
+            Object.entries(group(rights)).map(
+              ([cycle, items]) =>
+                <AggregatedBakingRights>{
+                  cycle: parseInt(cycle),
+                  bakingsCount: (<any[]>items).length,
+                  blockRewards: undefined,
+                  deposits: undefined,
+                  fees: undefined,
+                  items
+                }
+            )
+          ),
+          switchMap((aggregatedRights: AggregatedBakingRights[]) => {
+            return forkJoin(
+              aggregatedRights.map(aggregatedRight =>
+                from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                  map(reward => {
+                    const rewardByLabel = reward.bakingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
+                      {}
+                    )
+
+                    return {
+                      ...aggregatedRight,
+                      blockRewards: reward.totalRewards,
+                      items: aggregatedRight.items.map(item => ({
+                        ...item,
+                        rewards: rewardByLabel[item.level]
+                      }))
+                    }
+                  })
+                )
+              )
+            )
+          })
+        )
+      })
+    )
+  }
+
+  public getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
+    const _predicates = (<Predicate[]>[
+      {
+        field: 'delegate',
+        operation: 'eq',
+        set: [address]
+      }
+    ]).concat(predicates || [])
+
     return this.http
       .post<EndorsingRights[]>(
         this.endorsingRightsApiUrl,
         {
-          predicates: [
-            {
-              field: 'delegate',
-              operation: 'eq',
-              set: [address]
-            }
-          ],
+          predicates: _predicates,
           orderBy: [
             {
               field: 'level',
@@ -913,15 +984,69 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(
-        map((rights: EndorsingRights[]) => {
-          rights.forEach(right => {
-            right.cycle = Math.floor(right.level / 4096)
-          })
+      .pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)))
+  }
 
-          return rights
-        })
-      )
+  getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
+    const group = groupBy('cycle')
+
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+      switchMap(cycles => {
+        const minLevel = cycleToLevel(last(cycles))
+        const maxLevel = cycleToLevel(first(cycles) + 1)
+        const predicates = [
+          {
+            field: 'level',
+            operation: 'gt',
+            set: [minLevel]
+          },
+          {
+            field: 'level',
+            operation: 'lt',
+            set: [maxLevel]
+          }
+        ]
+
+        return this.getEndorsingRights(address, 30000, predicates).pipe(
+          map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)),
+          map((rights: EndorsingRights[]) =>
+            Object.entries(group(rights)).map(
+              ([cycle, items]) =>
+                <AggregatedEndorsingRights>{
+                  cycle: parseInt(cycle),
+                  endorsementsCount: (<any[]>items).length,
+                  endorsementRewards: undefined,
+                  deposits: undefined,
+                  items
+                }
+            )
+          ),
+          switchMap((aggregatedRights: AggregatedEndorsingRights[]) => {
+            return forkJoin(
+              aggregatedRights.map(aggregatedRight =>
+                from(this.protocol.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                  map(reward => {
+                    const rewardByLabel = reward.endorsingRewardsDetails.reduce(
+                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue.amount), accumulator),
+                      {}
+                    )
+
+                    return {
+                      ...aggregatedRight,
+                      endorsementRewards: reward.totalRewards,
+                      items: aggregatedRight.items.map(item => ({
+                        ...item,
+                        rewards: rewardByLabel[item.level]
+                      }))
+                    }
+                  })
+                )
+              )
+            )
+          })
+        )
+      })
+    )
   }
 
   public getEndorsedSlotsCount(blockHash: string): Observable<number> {
@@ -1110,6 +1235,51 @@ export class ApiService {
             number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
           }))
         )
+      )
+  }
+
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+    const today = new Date()
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
   }
 }
