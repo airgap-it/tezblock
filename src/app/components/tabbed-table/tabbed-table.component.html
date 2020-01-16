@@ -21,17 +21,8 @@
     </h6>
   </tab>
 
-  <tezblock-table
-    [loading]="loading | async"
-    [data]="data | async"
-    [page]="page"
-    [type]="kindToOperationTypes(selectedTab.kind)"
-    [showLoadMoreButton]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"
-    (loadMoreClicked)="onLoadMore()"
-  ></tezblock-table>
-
   <tezblock-table2
-    [columns]=""
+    [columns]="selectedTab.columns"
     [data]="data | async"
     [loading]="loading | async"
     [pagination]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"

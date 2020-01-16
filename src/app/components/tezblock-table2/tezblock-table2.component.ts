@@ -5,7 +5,9 @@ export enum Template {
   amount,
   basic,
   block,
+  hash,
   percentage,
+  symbol,
   timestamp
 }
 
@@ -24,7 +26,7 @@ export interface ExpandedRow<Entity> {
 }
 
 const satisfyData = (column: Column): Column =>
-  column.data ? column : { ...column, data: (item: any) => column.field ? item[column.field] : null }
+  column.data ? column : { ...column, data: (item: any) => (column.field ? item[column.field] : null) }
 
 @Component({
   selector: 'tezblock-table2',
@@ -38,6 +40,8 @@ export class TezblockTable2Component implements OnInit {
   @ViewChild('percentageTemplate', { static: true }) percentageTemplate: TemplateRef<any>
   @ViewChild('timestampTemplate', { static: true }) timestampTemplate: TemplateRef<any>
   @ViewChild('blockTemplate', { static: true }) blockTemplate: TemplateRef<any>
+  @ViewChild('symbolTemplate', { static: true }) symbolTemplate: TemplateRef<any>
+  @ViewChild('hashTemplate', { static: true }) hashTemplate: TemplateRef<any>
 
   @Input() data: any[]
 
@@ -106,8 +110,12 @@ export class TezblockTable2Component implements OnInit {
         return this.amountTemplate
       case Template.address:
         return this.addressTemplate
+      case Template.hash:
+        return this.hashTemplate
       case Template.percentage:
         return this.percentageTemplate
+      case Template.symbol:
+        return this.symbolTemplate
       case Template.timestamp:
         return this.timestampTemplate
       default:

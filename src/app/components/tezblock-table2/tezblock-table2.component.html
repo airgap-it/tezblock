@@ -16,6 +16,12 @@
 <ng-template #blockTemplate let-context>
   <app-block-cell [data]="context"></app-block-cell>
 </ng-template>
+<ng-template #symbolTemplate>
+  <app-symbol-cell></app-symbol-cell>
+</ng-template>
+<ng-template #hashTemplate let-context>
+  <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
+</ng-template>
 
 <div class="container p-0" *ngIf="loading; else loaded">
   <table class="table" style="border-collapse: initial">

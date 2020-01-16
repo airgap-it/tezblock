@@ -6,12 +6,11 @@ import { Component, Input } from '@angular/core'
   styleUrls: ['./hash-cell.component.scss']
 })
 export class HashCellComponent {
-  @Input()
-  public data: any // TODO: any
+  @Input() data: any
+
+  @Input() options: { kind: 'transaction' | 'endorsement' }
 
   get linkPath(): string {
     return `/${this.options && this.options.kind || 'transaction'}`;
   }
-
-  public options: { kind: 'transaction' | 'endorsement' }
 }
