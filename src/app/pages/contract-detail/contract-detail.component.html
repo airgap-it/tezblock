@@ -170,7 +170,7 @@
                 [data]="transferOperations$ | async"
                 [page]="'contract'"
                 [type]="'transaction'"
-                [showLoadMoreButton]="true"
+                [showLoadMoreButton]="showLoadMore$ | async"
                 (loadMoreClicked)="loadMore()"
               ></tezblock-table>
             </div>

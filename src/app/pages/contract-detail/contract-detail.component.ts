@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
-import { from, Observable } from 'rxjs'
+import { from, Observable, combineLatest } from 'rxjs'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -43,6 +43,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   hasAlias$: Observable<boolean>
   loading$: Observable<boolean>
   transferOperations$: Observable<ContractOperation[]>
+  showLoadMore$: Observable<boolean>
 
   current: string = 'copyGrey'
 
@@ -75,11 +76,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.medium$ = this.getSocial(social => social.type === SocialType.medium)
     this.github$ = this.getSocial(social => social.type === SocialType.github)
     this.copyToClipboardState$ = this.store$.select(state => state.contractDetails.copyToClipboardState)
-    this.hasAlias$ = this.store$.select(state => state.contractDetails.address).pipe(
-      map(address => address && !!this.aliasPipe.transform(address))
-    )
+    this.hasAlias$ = this.store$
+      .select(state => state.contractDetails.address)
+      .pipe(map(address => address && !!this.aliasPipe.transform(address)))
     this.transferOperations$ = this.store$.select(state => state.contractDetails.transferOperations.data)
     this.loading$ = this.store$.select(state => state.contractDetails.transferOperations.loading)
+    this.showLoadMore$ = combineLatest(
+      this.transferOperations$,
+      this.store$.select(state => state.contractDetails.transferOperations.pagination)
+    ).pipe(
+      map(([transferOperations, pagination]) =>
+        transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
+      )
+    )
   }
 
   showQr() {

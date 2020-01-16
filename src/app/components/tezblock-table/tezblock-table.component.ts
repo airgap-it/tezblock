@@ -687,7 +687,8 @@ function getLayouts(showFiat: boolean = true): Layout {
           options: { showFullAddress: false, pageId: 'oo' }
         },
         { name: 'Amount', property: 'amount', width: '', component: AmountCellComponent, options: { showFiatValue: showFiat } },
-        { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } }
+        { name: 'Fee', property: 'fee', width: '', component: AmountCellComponent, options: { showFiatValue: false } },
+        { name: 'Tx Hash', property: 'operation_group_hash', width: '', component: HashCellComponent }
       ]
     }
   }
