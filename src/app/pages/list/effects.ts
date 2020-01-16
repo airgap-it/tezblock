@@ -13,7 +13,12 @@ import * as fromRoot from '@tezblock/reducers'
 
 const getTimestamp24hAgo = (): number =>
   moment()
-    .add(-24, 'hours')
+    .add(-1, 'days')
+    .valueOf()
+
+const getTimestamp7dAgo = (): number =>
+  moment()
+    .add(-7, 'days')
     .valueOf()
 
 @Injectable()
@@ -145,6 +150,45 @@ export class ListEffects {
     )
   )
 
+  loadActivationsCountLastXd$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadActivationsCountLastXd),
+      switchMap(() =>
+        this.getEntitiesSince(getTimestamp7dAgo(), 'activate_account').pipe(
+          map(activations => activations.map(activation => activation.timestamp)),
+          map(activationsCountLastXd => listActions.loadActivationsCountLastXdSucceeded({ activationsCountLastXd })),
+          catchError(error => of(listActions.loadActivationsCountLastXdFailed({ error })))
+        )
+      )
+    )
+  )
+
+  loadOriginationsCountLastXd$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadOriginationsCountLastXd),
+      switchMap(() =>
+        this.getEntitiesSince(getTimestamp7dAgo(), 'origination').pipe(
+          map(originations => originations.map(origination => origination.timestamp)),
+          map(originationsCountLastXd => listActions.loadOriginationsCountLastXdSucceeded({ originationsCountLastXd })),
+          catchError(error => of(listActions.loadOriginationsCountLastXdFailed({ error })))
+        )
+      )
+    )
+  )
+
+  loadTransactionsCountLastXd$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactionsCountLastXd),
+      switchMap(() =>
+        this.getEntitiesSince(getTimestamp7dAgo(), 'transaction').pipe(
+          map(transactions => transactions.map(transaction => transaction.timestamp)),
+          map(transactionsCountLastXd => listActions.loadTransactionsCountLastXdSucceeded({ transactionsCountLastXd })),
+          catchError(error => of(listActions.loadTransactionsCountLastXdFailed({ error })))
+        )
+      )
+    )
+  )
+
   private getEntitiesSince(since: number, kind: string): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
       fields: ['timestamp'],
@@ -153,7 +197,7 @@ export class ListEffects {
         { field: 'kind', operation: 'in', set: [kind] },
         { field: 'timestamp', operation: 'gt', set: [since] }
       ],
-      orderBy: [{ field: 'timestamp', direction: 'asc' }],
+      orderBy: [{ field: 'timestamp', direction: 'desc' }],
       limit: 100000
     })
   }

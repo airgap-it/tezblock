@@ -16,3 +16,4 @@ export const groupBy = (key: string) => (array: any[]) =>
     ;(accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
     return accumulator
   }, {})
+export const toArray = (value: any) => [value]

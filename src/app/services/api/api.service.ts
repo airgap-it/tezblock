@@ -1087,7 +1087,7 @@ export class ApiService {
   public getFrozenBalance(tzAddress: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
-        .post(
+        .post<any[]>(
           this.delegatesApiUrl,
           {
             predicates: [
@@ -1102,7 +1102,7 @@ export class ApiService {
           this.options
         )
         .subscribe(result => {
-          resolve(result[0].frozen_balance)
+          resolve(pipe<any[], any, number>(first, get(_first => _first.frozen_balance))(result))
         })
     })
   }
