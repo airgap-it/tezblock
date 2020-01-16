@@ -48,12 +48,33 @@
                     <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
                   </a>
                   <div>
-                    <address-item *ngIf="hasAlias$ | async" class="d-inline-flex" [address]="contract.id" [hideIdenticon]="true"></address-item>
+                    <address-item
+                      *ngIf="hasAlias$ | async"
+                      class="d-inline-flex"
+                      [address]="contract.id"
+                      [hideIdenticon]="true"
+                    ></address-item>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
                       Not Revealed
                     </span>
                   </div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Name</p>
+                </div>
+                <div class="col-md-10 pl-sm-0">
+                  <p class="mb-0">{{ contract.name }}</p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Symbol</p>
+                </div>
+                <div class="col-md-10 pl-sm-0">
+                  <p class="mb-0">{{ contract.symbol }}</p>
                 </div>
               </div>
             </div>
@@ -62,27 +83,9 @@
         <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
           <div class="card h-100 pt-3 ">
             <div class="card-body right p-4">
-              <!-- <h5 class="card-title mb-4 ">
-                Delegation
-              </h5> -->
-
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Symbol</p>
-                </div>
-                <div class=" col-md-7">
-                  <p class="mb-0">{{ contract.symbol }}</p>
-                </div>
-              </div>
-
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Name</p>
-                </div>
-                <div class=" col-md-7">
-                  <p class="mb-0">{{ contract.name }}</p>
-                </div>
-              </div>
+              <h5 class="card-title mb-4 ">
+                Contract Overview
+              </h5>
 
               <div class="row mb-3">
                 <div class=" col-md-5">
@@ -99,7 +102,6 @@
                 </div>
                 <div class=" col-md-7">
                   <a [href]="website$ | async" target="_blank">
-                    <fa-icon [icon]="'website' | iconPipe" class="mr-1"></fa-icon>
                     {{ website$ | async }}
                   </a>
                 </div>
@@ -107,52 +109,19 @@
 
               <div class="row mb-3">
                 <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Twitter</p>
+                  <p class="text-secondary mb-0">Social Profiles</p>
                 </div>
                 <div class=" col-md-7">
-                  <a [href]="twitter$ | async" target="_blank">
-                    <fa-icon [icon]="'twitter' | iconPipe" class="mr-1"></fa-icon>
-                    {{ twitter$ | async }}
+                  <a
+                    *ngFor="let social of contract.socials"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                    [href]="social.url"
+                    target="_blank"
+                  >
+                    <fa-icon [icon]="social.type | iconPipe" class="text-secondary"></fa-icon>
                   </a>
                 </div>
               </div>
-
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Telegram</p>
-                </div>
-                <div class=" col-md-7">
-                  <a [href]="telegram$ | async" target="_blank">
-                    <fa-icon [icon]="'telegram' | iconPipe" class="mr-1"></fa-icon>
-                    {{ telegram$ | async }}
-                  </a>
-                </div>
-              </div>
-
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Medium</p>
-                </div>
-                <div class=" col-md-7">
-                  <a [href]="medium$ | async" target="_blank">
-                    <fa-icon [icon]="'medium' | iconPipe" class="mr-1"></fa-icon>
-                    {{ medium$ | async }}
-                  </a>
-                </div>
-              </div>
-
-              <div class="row mb-3">
-                <div class=" col-md-5">
-                  <p class="text-secondary mb-0">Github</p>
-                </div>
-                <div class=" col-md-7">
-                  <a [href]="github$ | async" target="_blank">
-                    <fa-icon [icon]="'github' | iconPipe" class="mr-1"></fa-icon>
-                    {{ github$ | async }}
-                  </a>
-                </div>
-              </div>
-
             </div>
           </div>
         </div>
@@ -161,7 +130,7 @@
       <div class="card h-100 pt-3">
         <div class="card-body p-4 ">
           <h5 class="card-title mb-3 ">
-            Transfer operations
+            Transfers
           </h5>
           <div class="row">
             <div class="col px-2">
@@ -177,7 +146,6 @@
           </div>
         </div>
       </div>
-
     </ng-container>
 
     <ng-template #noContract>
