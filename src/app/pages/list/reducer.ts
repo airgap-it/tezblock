@@ -40,6 +40,10 @@ export interface State {
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
+
+  activationsCountLastXd: number[]
+  originationsCountLastXd: number[]
+  transactionsCountLastXd: number[]
 }
 
 const initialState: State = {
@@ -51,7 +55,10 @@ const initialState: State = {
   },
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
-  transactionsCountLast24h: undefined
+  transactionsCountLast24h: undefined,
+  activationsCountLastXd: undefined,
+  originationsCountLastXd: undefined,
+  transactionsCountLastXd: undefined
 }
 
 export const reducer = createReducer(
@@ -196,6 +203,18 @@ export const reducer = createReducer(
   on(actions.loadTransactionsCountLast24hSucceeded, (state, { transactionsCountLast24h }) => ({
     ...state,
     transactionsCountLast24h
+  })),
+  on(actions.loadActivationsCountLastXdSucceeded, (state, { activationsCountLastXd }) => ({
+    ...state,
+    activationsCountLastXd
+  })),
+  on(actions.loadOriginationsCountLastXdSucceeded, (state, { originationsCountLastXd }) => ({
+    ...state,
+    originationsCountLastXd
+  })),
+  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+    ...state,
+    transactionsCountLastXd
   })),
   on(actions.reset, () => initialState)
 )
