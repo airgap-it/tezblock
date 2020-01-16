@@ -32,15 +32,28 @@ const getInitialTableState = (): TableState<any> => ({
 export interface State {
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
-  activeBakers: TableState<Baker>
   proposals: TableState<ProposalListDto>
+  activeBakers: TableState<Baker>
+  activationsCountLast24h: number
+  originationsCountLast24h: number
+  transactionsCountLast24h: number
+
+  activationsCountLastXd: number[]
+  originationsCountLastXd: number[]
+  transactionsCountLastXd: number[]
 }
 
 const initialState: State = {
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
+  proposals: getInitialTableState(),
   activeBakers: getInitialTableState(),
-  proposals: getInitialTableState()
+  activationsCountLast24h: undefined,
+  originationsCountLast24h: undefined,
+  transactionsCountLast24h: undefined,
+  activationsCountLastXd: undefined,
+  originationsCountLastXd: undefined,
+  transactionsCountLastXd: undefined
 }
 
 export const reducer = createReducer(
@@ -202,6 +215,30 @@ export const reducer = createReducer(
         currentPage: state.proposals.pagination.currentPage + 1
       }
     }
+  })),
+  on(actions.loadActivationsCountLast24hSucceeded, (state, { activationsCountLast24h }) => ({
+    ...state,
+    activationsCountLast24h
+  })),
+  on(actions.loadOriginationsCountLast24hSucceeded, (state, { originationsCountLast24h }) => ({
+    ...state,
+    originationsCountLast24h
+  })),
+  on(actions.loadTransactionsCountLast24hSucceeded, (state, { transactionsCountLast24h }) => ({
+    ...state,
+    transactionsCountLast24h
+  })),
+  on(actions.loadActivationsCountLastXdSucceeded, (state, { activationsCountLastXd }) => ({
+    ...state,
+    activationsCountLastXd
+  })),
+  on(actions.loadOriginationsCountLastXdSucceeded, (state, { originationsCountLastXd }) => ({
+    ...state,
+    originationsCountLastXd
+  })),
+  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+    ...state,
+    transactionsCountLastXd
   })),
   on(actions.reset, () => initialState)
 )

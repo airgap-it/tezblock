@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { Observable, timer } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { BaseComponent } from '@tezblock/components/base.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
@@ -10,6 +11,7 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Slot } from './reducer'
+import { get } from '@tezblock/services/fp'
 
 @Component({
   selector: 'app-endorsement-detail',
@@ -24,6 +26,8 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   endorsements$: Observable<Transaction[]>
   selectedEndorsement$: Observable<Transaction>
   slots$: Observable<Slot[]>
+  endorsedSlots$: Observable<string>
+  endorsedSlotsCount$: Observable<number>
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
@@ -38,6 +42,15 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.endorsements$ = this.store$.select(state => state.endorsementDetails.endorsements)
     this.selectedEndorsement$ = this.store$.select(state => state.endorsementDetails.selectedEndorsement)
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
+    this.endorsedSlots$ = this.selectedEndorsement$.pipe(
+      map(get(selectedEndorsement => selectedEndorsement.slots)),
+      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots)
+    )
+    this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
+      map(get(selectedEndorsement => selectedEndorsement.slots)),
+      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots),
+      map((slots: string) => slots.split(',').length)
+    )
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -52,10 +65,6 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
 
   copyToClipboard() {
     this.copyService.copyToClipboard(fromRoot.getState(this.store$).endorsementDetails.selectedEndorsement.operation_group_hash)
-  }
-
-  getSlotsEndorsed(value: string): string {
-    return value ? value.replace(/[\[\]']/g, '') : value
   }
 
   select(operation_group_hash: string) {

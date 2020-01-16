@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, Input } from '@angular/core'
 
 @Component({
   selector: 'app-timestamp-cell',
@@ -6,5 +6,5 @@ import { Component } from '@angular/core'
   styleUrls: ['./timestamp-cell.component.scss']
 })
 export class TimestampCellComponent {
-  public data: any // TODO: any
+  @Input() data: any // TODO: any
 }

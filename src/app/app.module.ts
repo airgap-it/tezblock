@@ -28,7 +28,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { PricechartItemComponent } from './components/pricechart-item/pricechart-item.component'
+import { ChartItemComponent } from './components/chart-item/chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -41,9 +41,11 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
 import { HashCellComponent } from './components/tezblock-table/hash-cell/hash-cell.component'
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
+import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
+import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
 import { TransactionItemComponent } from './components/transaction-item/transaction-item.component'
 import { addFontAwesome } from './fa-add'
@@ -62,14 +64,16 @@ import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage';
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
-import { TransactionDetailEffects } from './pages/transaction-detail/effects';
+import { TransactionDetailEffects } from './pages/transaction-detail/effects'
+import { BakerTableEffects } from './components/baker-table/effects';
+import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
+
 @NgModule({
   imports: [
     AlertModule.forRoot(),
@@ -108,11 +112,12 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
       EndorsementDetailEffects,
       ListEffects,
       AccountDetailEffects,
+      BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects,
       ProposalDetailEffects
     ]),
-	StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true })
   ],
   declarations: [
     AppComponent,
@@ -138,7 +143,7 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    ChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -151,7 +156,10 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
-    ProposalDetailComponent
+    ProposalDetailComponent,
+    TooltipItemComponent,
+    SearchItemComponent,
+    OccurrenceStatisticsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
@@ -172,7 +180,7 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    ChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],

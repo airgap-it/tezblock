@@ -58,15 +58,15 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   ]
 })
 export class AccountDetailComponent extends BaseComponent implements OnInit {
-  public account$: Observable<Account>
-  public delegatedAccountAddress: string | undefined
-  public relatedAccounts: Observable<Account[]>
-  public delegatedAmount: number | undefined
+  account$: Observable<Account>
+  delegatedAccountAddress: string | undefined
+  relatedAccounts: Observable<Account[]>
+  delegatedAmount: number | undefined
 
-  public get bakerAddress(): string | undefined {
+  get bakerAddress(): string | undefined {
     return this._bakerAddress
   }
-  public set bakerAddress(value: string | undefined) {
+  set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.getTezosBakerInfos(value, true)
@@ -74,73 +74,75 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  public bakingBadRating: string | undefined
-  public tezosBakerRating: string | undefined
-  public stakingBalance: number | undefined
-  public bakingInfos: any
-  public bakerTableInfos: any
-  public bakerTableRatings: any = {}
+  bakingBadRating: string | undefined
+  tezosBakerRating: string | undefined
+  stakingBalance: number | undefined
+  bakingInfos: any
+  bakerTableInfos: any
+  bakerTableRatings: any = {}
 
-  public tezosBakerFee: string | undefined
-  public stakingCapacity: number | undefined
-  public stakingProgress: number | undefined
-  public stakingBond: number | undefined
+  tezosBakerFee: string | undefined
+  stakingCapacity: number | undefined
+  stakingProgress: number | undefined
+  stakingBond: number | undefined
 
-  public isValidBaker: boolean | undefined
-  public revealed$: Observable<string>
-  public hasAlias: boolean | undefined
-  public hasLogo: boolean | undefined
+  isValidBaker: boolean | undefined
+  revealed$: Observable<string>
+  hasAlias: boolean | undefined
+  hasLogo: boolean | undefined
 
-  public tezosBakerName: string | undefined
-  public tezosBakerAvailableCap: string | undefined
-  public tezosBakerAcceptingDelegation: string | undefined
-  public tezosBakerNominalStakingYield: string | undefined
+  tezosBakerName: string | undefined
+  tezosBakerAvailableCap: string | undefined
+  tezosBakerAcceptingDelegation: string | undefined
+  tezosBakerNominalStakingYield: string | undefined
 
-  public fiatCurrencyInfo$: Observable<CurrencyInfo>
+  fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  public paginationLimit: number = 2
-  public numberOfInitialRelatedAccounts: number = 2
+  paginationLimit: number = 2
+  numberOfInitialRelatedAccounts: number = 2
 
-  public isCollapsed: boolean = true
+  isCollapsed: boolean = true
 
-  public rewards: TezosRewards
-  public rights$: Observable<Object> = new Observable()
-  public current: string = 'copyGrey'
+  rewards: TezosRewards
+  rights$: Observable<Object> = new Observable()
+  current: string = 'copyGrey'
 
-  public tabs: Tab[] = [
+  tabs: Tab[] = [
     { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
     { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
     { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
     { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
     { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
   ]
-  public bakerTabs: Tab[] = [
+  bakerTabs: Tab[] = [
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
     { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
     { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
     { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
-  public nextPayout: Date | undefined
-  public rewardAmount$: Observable<string>
-  public remainingTime$: Observable<string>
-  public myTBUrl: string | undefined
-  public get address(): string {
+  nextPayout: Date | undefined
+  rewardAmount$: Observable<string>
+  remainingTime$: Observable<string>
+  myTBUrl: string | undefined
+  get address(): string {
     return this.route.snapshot.params.id
   }
-  public frozenBalance: number | undefined
-  public rewardsTransaction: any
-  public isMobile$: Observable<boolean>
-  public isBusy$: Observable<Busy>
-  public isMainnet: boolean
+  frozenBalance: number | undefined
+  rewardsTransaction: any
+  isMobile$: Observable<boolean>
+  isBusy$: Observable<Busy>
+  isMainnet: boolean
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   actionType$: Observable<LayoutPages>
+  balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  balanceChartLabels$: Observable<string[]>
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     private readonly actions$: Actions,
-    public readonly chainNetworkService: ChainNetworkService,
+    readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
@@ -160,7 +162,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  public async ngOnInit() {
+  async ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.relatedAccounts = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.rights$ = this.rightsSingleService.rights$
@@ -179,13 +181,27 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
+    this.balanceChartDatasets$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
+      )
+    this.balanceChartLabels$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
+      )
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
+        this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -234,7 +250,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
   }
 
-  public async getBakingInfos(address: string) {
+  async getBakingInfos(address: string) {
     this.bakingService
       .getBakerInfos(address)
       .then(async result => {
@@ -351,7 +367,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
   }
 
-  public tabSelected(kind: string) {
+  tabSelected(kind: string) {
     this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
   }
 
@@ -359,17 +375,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  public copyToClipboard(val: string) {
+  copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
   }
 
-  public showQr() {
-    const initialState = { qrdata: this.address, size: 200 }
-    const modalRef = this.modalService.show(QrModalComponent, { initialState })
+  showQr() {
+    const initialState = { qrdata: this.address, size: 260 }
+    const modalRef = this.modalService.show(QrModalComponent, { class: 'modal-sm', initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 
-  public showTelegramModal() {
+  showTelegramModal() {
     const initialState = {
       botAddress: this.address,
       botName: this.aliasPipe.transform(this.address)
@@ -378,16 +394,16 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     modalRef.content.closeBtnName = 'Close'
   }
 
-  public showMoreItems() {
+  showMoreItems() {
     this.paginationLimit = this.paginationLimit + 50 // TODO: set dynamic number
   }
-  public showLessItems() {
+  showLessItems() {
     this.paginationLimit = this.paginationLimit - 50 // TODO: set dynamic number
   }
-  public replaceAll(string: string, find: string, replace: string) {
+  replaceAll(string: string, find: string, replace: string) {
     return string.replace(new RegExp(find, 'g'), replace)
   }
-  public changeState(address: string) {
+  changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {
       this.current = 'copyGrey'

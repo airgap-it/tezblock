@@ -5,13 +5,20 @@ import { Router } from '@angular/router'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol, TezosProtocol } from 'airgap-coin-lib'
 import BigNumber from 'big-number'
 import * as moment from 'moment'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
-
 import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
 import { OperationsService } from '../operations/operations.service'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
+import { get } from '@tezblock/services/fp'
+
+interface Efficiency {
+  [address: string]: number
+}
 
 type Moment = moment.Moment
 const hoursPerCycle = 68
@@ -20,36 +27,37 @@ const hoursPerCycle = 68
   providedIn: 'root'
 })
 export class BakingService {
-  public bakerInfo?: BakerInfo
+  bakerInfo?: BakerInfo
+
+  bakerConfigError: string | undefined
+
+  wallet: AirGapMarketWallet
+
+  delegationRewards: DelegationRewardInfo[]
+
+  avgRoIPerCyclePercentage: BigNumber
+  avgRoIPerCycle: BigNumber
+
+  isDelegated: boolean
+  nextPayout: Date
+
+  delegationInfo: DelegationInfo
 
   private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
-
-  public bakerConfigError: string | undefined
-
-  public wallet: AirGapMarketWallet
-
-  public delegationRewards: DelegationRewardInfo[]
-
-  public avgRoIPerCyclePercentage: BigNumber
-  public avgRoIPerCycle: BigNumber
-
-  public isDelegated: boolean
-  public nextPayout: Date
-
-  public delegationInfo: DelegationInfo
+  private readonly efficiencyLast10CyclesUrl = 'https://tezos-nodes.com/api/last10/'
 
   constructor(
     private readonly http: HttpClient,
-    public location: Location,
+    location: Location,
     private readonly router: Router,
-    public operationsService: OperationsService,
-    public readonly chainNetworkService: ChainNetworkService
+    operationsService: OperationsService,
+    readonly chainNetworkService: ChainNetworkService
   ) {}
 
-  public environmentUrls = this.chainNetworkService.getEnvironment()
+  environmentUrls = this.chainNetworkService.getEnvironment()
 
-  public getBakingBadRatings(address: string): Promise<ApiErrorObject> {
+  getBakingBadRatings(address: string): Promise<ApiErrorObject> {
     return new Promise(resolve => {
       this.http
         .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
@@ -65,7 +73,7 @@ export class BakingService {
     })
   }
 
-  public async getTezosBakerInfos(address: string): Promise<MyTezosBakerResponse> {
+  async getTezosBakerInfos(address: string): Promise<MyTezosBakerResponse> {
     return new Promise(resolve => {
       this.http.get<TezosBakerResponse>(this.tezosBakerUrl).subscribe(
         (response: TezosBakerResponse) => {
@@ -90,7 +98,7 @@ export class BakingService {
     })
   }
 
-  public async checkDelegated(address: string): Promise<DelegationInfo> {
+  async checkDelegated(address: string): Promise<DelegationInfo> {
     const network = this.chainNetworkService.getNetwork()
     const protocol = new TezosKtProtocol(
       this.environmentUrls.rpcUrl,
@@ -103,7 +111,7 @@ export class BakingService {
     return protocol.isAddressDelegated(address)
   }
 
-  public async getBakerInfos(tzAddress: string) {
+  async getBakerInfos(tzAddress: string) {
     const network = this.chainNetworkService.getNetwork()
     const tezosProtocol = new TezosProtocol(
       this.environmentUrls.rpcUrl,
@@ -136,7 +144,13 @@ export class BakingService {
     }
   }
 
-  public addPayoutDelayToMoment(time: Moment): Moment {
+  addPayoutDelayToMoment(time: Moment): Moment {
     return time.add(hoursPerCycle * 7 + 0, 'h')
+  }
+
+  getEfficiencyLast10Cycles(address: string): Observable<number> {
+    return this.http.get<Efficiency>(`${this.efficiencyLast10CyclesUrl}${address}`).pipe(
+      map(get(efficiency => efficiency[address]))
+    )
   }
 }

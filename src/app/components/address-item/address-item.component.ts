@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core'
-import { Router } from '@angular/router'
 
 @Component({
   selector: 'address-item',
@@ -25,11 +24,5 @@ export class AddressItemComponent {
   @Input()
   public isText: boolean
 
-  constructor(private readonly router: Router) {}
-
-  public inspectDetail() {
-    if (!this.isText) {
-      this.router.navigate([`/account/${this.address}`])
-    }
-  }
+  constructor() {}
 }
