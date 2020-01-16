@@ -50,6 +50,11 @@ export const defaultOptions: ChartOptions = {
   }
 }
 
+export interface ColorOptions {
+  gradientFrom: string
+  borderWidth?: number
+}
+
 @Component({
   selector: 'chart-item',
   templateUrl: './chart-item.component.html',
@@ -59,6 +64,7 @@ export class ChartItemComponent implements AfterViewInit {
   @ViewChild(BaseChartDirective, { static: true }) chart: BaseChartDirective
 
   @Input() datasets: { data: number[]; label: string }[]
+
   @Input() labels: string[]
 
   @Input()
@@ -83,7 +89,7 @@ export class ChartItemComponent implements AfterViewInit {
   }
   private _chartType: string
 
-  @Input() gradientFrom = 'rgba(46,91,255,0.00)'
+  @Input() colorOptions: ColorOptions = { gradientFrom: 'rgba(46,91,255,0.00)' }
 
   chartColors: {}[] = []
 
@@ -99,7 +105,7 @@ export class ChartItemComponent implements AfterViewInit {
       gradientStroke1.addColorStop(0, navyBlue) // rgb(122, 141, 169)
 
       const gradientFill1: CanvasGradient = ctx.createLinearGradient(0, 100, 0, 0)
-      gradientFill1.addColorStop(0, this.gradientFrom)
+      gradientFill1.addColorStop(0, this.colorOptions.gradientFrom)
       gradientFill1.addColorStop(1, 'rgba(46,91,255,0.24)')
 
       this.chartColors[0] = {
@@ -111,7 +117,7 @@ export class ChartItemComponent implements AfterViewInit {
         pointHoverBorderColor: gradientStroke1,
         hoverBackgroundColor: navyBlue,
         hoverBorderColor: navyBlue,
-        borderWidth: 1
+        borderWidth: this.colorOptions.borderWidth
       }
     }
   }
