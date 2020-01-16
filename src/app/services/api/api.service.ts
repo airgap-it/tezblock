@@ -1263,9 +1263,9 @@ export class ApiService {
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,
         {
-          fields: ['proposal', 'operation_group_hash'],
+          fields: ['proposal', 'operation_group_hash', 'period'],
           predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
-          orderBy: [{ field: 'proposal', direction: 'desc' }],
+          orderBy: [{ field: 'period', direction: 'desc' }],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],
           limit
         },

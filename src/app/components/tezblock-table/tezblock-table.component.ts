@@ -598,12 +598,12 @@ function getLayouts(showFiat: boolean = true): Layout {
           name: 'Proposal Hash',
           property: 'proposal',
           width: ''
+        },
+        {
+          name: 'Period',
+          property: 'period',
+          width: ''
         }
-        // {
-        //   name: 'Period',
-        //   property: 'count_operation_group_hash',
-        //   width: ''
-        // }
       ],
       [OperationTypes.DoubleBakingEvidenceOverview]: [
         {
