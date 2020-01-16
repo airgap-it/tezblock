@@ -1,17 +1,18 @@
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
-import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge, timer } from 'rxjs'
-import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, switchMap, withLatestFrom, pairwise } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
+import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
 import { Account } from '../../interfaces/Account'
@@ -22,7 +23,6 @@ import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
@@ -73,6 +73,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     }
   }
   private _bakerAddress: string | undefined
+
+  @ViewChild('transactions', { static: false }) transactions: ElementRef
 
   bakingBadRating: string | undefined
   tezosBakerRating: string | undefined
@@ -125,7 +127,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   remainingTime$: Observable<string>
   myTBUrl: string | undefined
   get address(): string {
-    return this.route.snapshot.params.id
+    return this.activatedRoute.snapshot.params.id
   }
   frozenBalance: number | undefined
   rewardsTransaction: any
@@ -143,7 +145,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly route: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
     private readonly cryptoPricesService: CryptoPricesService,
@@ -195,7 +197,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
         this.store$.dispatch(actions.reset())
@@ -246,7 +248,16 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
           switchMap(([action, kind]) => timer(refreshRate, refreshRate).pipe(map(() => kind)))
         )
-        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind })))
+        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+      this.account$
+        .pipe(
+          withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
+          filter(([account, navigationHistory]) => account && navigationHistory.length === 1),
+          delay(500)
+        )
+        .subscribe(() => {
+          this.transactions.nativeElement.scrollIntoView({ behavior: 'smooth' })
+        })
     )
   }
 
