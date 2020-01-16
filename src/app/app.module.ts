@@ -16,6 +16,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
+import { StorageModule } from '@ngx-pwa/local-storage'
+
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
@@ -65,12 +67,13 @@ import { ChainNetworkService } from './services/chain-network/chain-network.serv
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects';
-import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component';
+import { TezblockTable2Component } from './components/tezblock-table2/tezblock-table2.component';
+import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
   imports: [
@@ -154,7 +157,9 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     EndorsementDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
-    OccurrenceStatisticsComponent
+    OccurrenceStatisticsComponent,
+    TezblockTable2Component,
+    ClientSideTableComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

@@ -1,0 +1,90 @@
+<ng-template #basicTemplate let-context>
+  {{ context }}
+</ng-template>
+<ng-template #amountTemplate let-context>
+  <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
+</ng-template>
+<ng-template #addressTemplate let-context>
+  <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
+</ng-template>
+<ng-template #percentageTemplate let-context>
+  {{ context | percentage }}
+</ng-template>
+<ng-template #timestampTemplate let-context>
+  <app-timestamp-cell [data]="context"></app-timestamp-cell>
+</ng-template>
+<ng-template #blockTemplate let-context>
+  <app-block-cell [data]="context"></app-block-cell>
+</ng-template>
+
+<div class="container p-0" *ngIf="loading; else loaded">
+  <table class="table" style="border-collapse: initial">
+    <thead>
+      <tr>
+        <loading-skeleton [class]="'ph'"></loading-skeleton>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="p-0">
+          <loading-skeleton [class]="'ph'"></loading-skeleton>
+        </td>
+      </tr>
+      <tr>
+        <td class="p-0">
+          <loading-skeleton [class]="'ph'"></loading-skeleton>
+        </td>
+      </tr>
+      <tr>
+        <td class="p-0">
+          <loading-skeleton [class]="'ph'"></loading-skeleton>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #loaded>
+  <div class="table-responsive mb-3">
+    <table class="table table-hover">
+      <ng-container *ngIf="data">
+        <ng-container *ngIf="data.length > 0; then thenTemplate; else elseTemplate"></ng-container>
+      </ng-container>
+      <ng-template #thenTemplate>
+        <thead>
+          <tr>
+            <th *ngFor="let column of columns" [width]="column.width">
+              {{ column.name }}
+            </th>
+            <th *ngIf="expandedRow"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="data">
+            <ng-container *ngFor="let item of data; let i = index">
+              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
+                <td *ngFor="let column of columns; trackBy: trackByFn">
+                  <ng-container *ngTemplateOutlet="template(column.template);context:{ $implicit: column.data(item) }"></ng-container>
+                </td>
+                <td *ngIf="expandedRow">
+                  <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
+                </td>
+              </tr>
+              <tr *ngIf="isExpanded(item)" class="table-extended__active">
+                <td colspan="10" class="py-3 px-0">
+                  <ng-container *ngTemplateOutlet="expandedRow.template;context:{ $implicit: expandedRow.getContext(item) }"></ng-container>
+                </td>
+              </tr>
+            </ng-container>
+          </ng-container>
+        </tbody>
+      </ng-template>
+      <ng-template #elseTemplate>
+        <thead width="180">
+          <tr><th>No Transactions</th></tr>
+        </thead>
+      </ng-template>
+    </table>
+    <button *ngIf="pagination" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
+  </div>
+</ng-template>

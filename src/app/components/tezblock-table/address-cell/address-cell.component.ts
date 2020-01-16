@@ -14,7 +14,7 @@ export class AddressCellComponent {
     this.checkId()
   }
 
-  public options: any = { pageId: undefined, showFullAddress: false }
+  @Input() options: any = { pageId: undefined, showFullAddress: false }
 
   public checkId() {
     let check: boolean
