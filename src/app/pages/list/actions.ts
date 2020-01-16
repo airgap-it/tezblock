@@ -45,4 +45,16 @@ export const loadOriginationsCountLast24h = createAction(`[${featureName}] Load 
 export const loadOriginationsCountLast24hSucceeded = createAction(`[${featureName}] Load Originations Count Last 24h Succeeded`, props<{ originationsCountLast24h: number }>())
 export const loadOriginationsCountLast24hFailed = createAction(`[${featureName}] Load Originations Count Last 24h Failed`, props<{ error: any }>())
 
+export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
+export const loadTransactionsCountLastXdSucceeded = createAction(`[${featureName}] Load Transactions Count Last 30d Succeeded`, props<{ transactionsCountLastXd: number[] }>())
+export const loadTransactionsCountLastXdFailed = createAction(`[${featureName}] Load Transactions Count Last 30d Failed`, props<{ error: any }>())
+
+export const loadActivationsCountLastXd = createAction(`[${featureName}] Load Activations Count Last 30d`)
+export const loadActivationsCountLastXdSucceeded = createAction(`[${featureName}] Load Activations Count Last 30d Succeeded`, props<{ activationsCountLastXd: number[] }>())
+export const loadActivationsCountLastXdFailed = createAction(`[${featureName}] Load Activations Count Last 30d Failed`, props<{ error: any }>())
+
+export const loadOriginationsCountLastXd = createAction(`[${featureName}] Load Originations Count Last 30d`)
+export const loadOriginationsCountLastXdSucceeded = createAction(`[${featureName}] Load Originations Count Last 30d Succeeded`, props<{ originationsCountLastXd: number[] }>())
+export const loadOriginationsCountLastXdFailed = createAction(`[${featureName}] Load Originations Count Last 30d Failed`, props<{ error: any }>())
+
 export const reset = createAction(`[${featureName}] Reset`)
