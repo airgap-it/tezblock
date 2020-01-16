@@ -10,7 +10,7 @@ import { defaultOptions } from '@tezblock/components/chart-item/chart-item.compo
 })
 export class OccurrenceStatisticsComponent implements OnInit {
   @Input() count: number
-  @Input() label: string
+  @Input() kind: string
   @Input() chartDatasets: { data: number[]; label: string }[]
   @Input() chartLabels: string[]
 
