@@ -372,7 +372,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         ],
         data: item.payouts,
         filterCondition: (detail, query) => detail.delegator === query
-      })
+      }),
+      primaryKey: 'cycle'
     }
 
     this.bakingRightsExpandedRow = {
@@ -389,7 +390,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query
-      })
+      }),
+      primaryKey: 'cycle'
     }
 
     this.endorsingRightsExpandedRow = {
@@ -410,7 +412,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query
-      })
+      }),
+      primaryKey: 'cycle'
     }
   }
 }

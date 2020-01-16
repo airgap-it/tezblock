@@ -30,6 +30,7 @@ import * as actions from './actions'
 import { Busy } from './reducer'
 import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { Column, Template } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -409,5 +410,35 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
+  }
+
+  private getTransactionColumns(): Column[] {
+    return [
+      {
+        name: 'From',
+        field: 'source',
+        width: '1',
+        template: Template.address,
+        data: () => ({ options: { showFullAddress: false, pageId: this.route.snapshot.paramMap.get('id') } })
+      },
+      {
+        name: 'Fees',
+        field: 'fees',
+        data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+        template: Template.amount
+      },
+      {
+        name: 'Fees',
+        field: 'fees',
+        data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+        template: Template.amount
+      },
+      {
+        name: 'Fees',
+        field: 'fees',
+        data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+        template: Template.amount
+      }
+    ]
   }
 }

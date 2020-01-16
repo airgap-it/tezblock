@@ -20,6 +20,7 @@ export interface Column {
 export interface ExpandedRow<Entity> {
   template: TemplateRef<any>
   getContext: (entity: Entity) => any
+  primaryKey: string
 }
 
 const satisfyData = (column: Column): Column =>
@@ -39,8 +40,6 @@ export class TezblockTable2Component implements OnInit {
   @ViewChild('blockTemplate', { static: true }) blockTemplate: TemplateRef<any>
 
   @Input() data: any[]
-
-  @Input() primaryKey: string
 
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
@@ -69,12 +68,12 @@ export class TezblockTable2Component implements OnInit {
   ngOnInit() {}
 
   isExpanded(row: any): boolean {
-    return this.expandedRow && this.expandedRows.includes(row[this.primaryKey])
+    return this.expandedRow && this.expandedRows.includes(row[this.expandedRow.primaryKey])
   }
 
   expand(row: any) {
     if (this.expandedRow) {
-      const key = row[this.primaryKey]
+      const key = row[this.expandedRow.primaryKey]
       const isExpaned = this.expandedRows.includes(key)
 
       // collapse
