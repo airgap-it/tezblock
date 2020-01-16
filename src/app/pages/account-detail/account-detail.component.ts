@@ -82,7 +82,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   tezosBakerFee$: BehaviorSubject<number | undefined> = new BehaviorSubject(undefined)
   tezosBakerFeeLabel$: Observable<string | undefined>
 
-  isValidBaker: boolean | undefined
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
@@ -118,6 +117,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   get address(): string {
     return this.route.snapshot.params.id
+  }
+
+  get account(): Account {
+    return fromRoot.getState(this.store$).accountDetails.account
   }
 
   isMobile$: Observable<boolean>
@@ -267,7 +270,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.bakingService
       .getBakerInfos(address)
       .then(async result => {
-        this.isValidBaker = true
         const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
         this.bakerTableInfos = result
@@ -283,9 +285,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           : {
               payoutAddress
             }
-      })
-      .catch(error => {
-        this.isValidBaker = false
       })
 
     this.bakingService.getBakingBadRatings(address).subscribe(
@@ -304,7 +303,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         ]
         const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
           first,
-          get(feeByCycle => feeByCycle.value)
+          get(feeByCycle => feeByCycle.value * 100)
         )
 
         this.bakerTableRatings = {
@@ -315,15 +314,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               : 'not available'
         }
 
-        // Pascal reported that this returns wrong value: https://gitlab.papers.tech/papers/tezblock/tezblock-frontend/merge_requests/364#note_44981
-        // if (response.status === 'success') {
-        //   this.tezosBakerFee$.next(extractFee(response.config.fee))
-        // }
-      },
-      (/* error */) => (this.isValidBaker = false)
+        // is account always available @ this point ?
+        if (response.status === 'success' && this.account.is_baker) {
+          this.tezosBakerFee$.next(extractFee(response.config.fee))
+        }
+      }
     )
 
-    this.getTezosBakerInfos(address, true)
+    this.getTezosBakerInfos(address, false)
   }
 
   /**
@@ -356,7 +354,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       })
       .catch(() => {
-        this.isValidBaker = false
         this.tezosBakerFee$.next(null)
       })
   }

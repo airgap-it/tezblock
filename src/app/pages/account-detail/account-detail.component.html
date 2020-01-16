@@ -323,10 +323,10 @@
       <div class="pt-5">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
-            <ng-container *ngIf="isValidBaker">
+            <ng-container *ngIf="account.is_baker">
               <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings" [bakerFee$]="tezosBakerFee$"></baker-table>
             </ng-container>
-            <div *ngIf="!isValidBaker || (bakerTabs[0].active)" class="container px-3 chart__container">
+            <div *ngIf="!account.is_baker || (bakerTabs[0].active)" class="container px-3 chart__container">
               <div class="row">
                 <div class="col-md-6 col-lg-4 px-0 px-sm-3">
                   <h5 class="card-title__secondary mb-3">
