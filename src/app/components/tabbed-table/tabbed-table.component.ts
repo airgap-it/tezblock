@@ -5,7 +5,6 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Column } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 import { BaseComponent } from '@tezblock/components/base.component'
 
 type KindType = string | string[]
@@ -16,7 +15,6 @@ export interface Tab {
   count: number
   kind: KindType
   icon?: string[]
-  columns?: Column[]
 }
 
 const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
@@ -28,7 +26,8 @@ const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(ta
   styleUrls: ['./tabbed-table.component.scss']
 })
 export class TabbedTableComponent extends BaseComponent implements OnInit {
-  @Input() page: string = 'account'
+  @Input()
+  page: string = 'account'
 
   selectedTab: Tab | undefined
 
@@ -57,9 +56,11 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   loading?: Observable<boolean>
 
-  @Output() tabClicked: EventEmitter<KindType> = new EventEmitter()
+  @Output()
+  tabClicked: EventEmitter<KindType> = new EventEmitter()
 
-  @Output() loadMore: EventEmitter<boolean> = new EventEmitter()
+  @Output()
+  loadMore: EventEmitter<boolean> = new EventEmitter()
 
   private _tabs: Tab[] | undefined = []
 

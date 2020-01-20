@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge, timer } from 'rxjs'
-import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, switchMap, withLatestFrom, pairwise } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -30,8 +30,6 @@ import * as actions from './actions'
 import { Busy } from './reducer'
 import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
-import { Column, Template } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -112,64 +110,25 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   current: string = 'copyGrey'
 
   tabs: Tab[] = [
-    {
-      title: 'Transactions',
-      active: true,
-      kind: 'transaction',
-      count: null,
-      icon: this.iconPipe.transform('exchangeAlt'),
-      columns: this.getTransactionColumns()
-    },
-    {
-      title: 'Delegations',
-      active: false,
-      kind: 'delegation',
-      count: null,
-      icon: this.iconPipe.transform('handReceiving'),
-      columns: this.getDelegationColumns()
-    },
-    {
-      title: 'Originations',
-      active: false,
-      kind: 'origination',
-      count: null,
-      icon: this.iconPipe.transform('link'),
-      columns: this.getOriginationColumns()
-    },
-    {
-      title: 'Endorsements',
-      active: false,
-      kind: 'endorsement',
-      count: null,
-      icon: this.iconPipe.transform('stamp'),
-      columns: this.getEndorsementColumns()
-    },
-    {
-      title: 'Votes',
-      active: false,
-      kind: 'ballot',
-      count: null,
-      icon: this.iconPipe.transform('boxBallot'),
-      columns: this.getVoteColumns()
-    }
+    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
+    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
+    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
+    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
+    { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
   ]
-
   bakerTabs: Tab[] = [
     { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
     { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
     { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
     { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
   ]
-
   nextPayout: Date | undefined
   rewardAmount$: Observable<string>
   remainingTime$: Observable<string>
   myTBUrl: string | undefined
-
   get address(): string {
     return this.activatedRoute.snapshot.params.id
   }
-
   frozenBalance: number | undefined
   rewardsTransaction: any
   isMobile$: Observable<boolean>
@@ -461,240 +420,5 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
-  }
-
-  private getTransactionColumns(): Column[] {
-    const pageId: string = this.activatedRoute.snapshot.paramMap.get('id')
-
-    return [
-      {
-        name: 'From',
-        field: 'source',
-        width: '1',
-        template: Template.address,
-        data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
-      },
-      {
-        field: 'applied',
-        width: '1',
-        template: Template.symbol
-      },
-      {
-        name: 'To',
-        field: 'destination',
-        width: '1',
-        data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId } }),
-        template: Template.address
-      },
-      {
-        name: 'Age',
-        field: 'timestamp',
-        template: Template.timestamp
-      },
-      {
-        name: 'Amount',
-        field: 'amount',
-        data: (item: Transaction) => ({ data: item.amount, options: { showFiatValue: true } }),
-        template: Template.amount
-      },
-      {
-        name: 'Fee',
-        field: 'fee',
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
-        template: Template.amount
-      },
-
-      // strange typescript errors doesn't allow remove this repetition
-      {
-        name: 'Block',
-        field: 'block_level',
-        template: Template.block
-      },
-      {
-        name: 'Tx Hash',
-        field: 'operation_group_hash',
-        template: Template.hash,
-        data: (item: any) => ({ data: item.operation_group_hash })
-      }
-    ]
-  }
-
-  private getDelegationColumns(): Column[] {
-    const pageId: string = this.activatedRoute.snapshot.paramMap.get('id')
-
-    return [
-      {
-        name: 'Delegator',
-        field: 'source',
-        width: '1',
-        template: Template.address,
-        data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
-      },
-      {
-        field: 'applied',
-        width: '1',
-        template: Template.symbol
-      },
-      {
-        name: 'Baker',
-        field: 'delegate',
-        width: '1',
-        template: Template.address,
-        data: (item: Transaction) => ({
-          data: item.delegate || 'undelegate',
-          options: { showFullAddress: false, pageId, isText: !item.delegate ? true : undefined }
-        })
-      },
-      {
-        name: 'Age',
-        field: 'timestamp',
-        template: Template.timestamp
-      },
-      {
-        name: 'Amount',
-        field: 'delegatedBalance',
-        template: Template.amount,
-        data: (item: Transaction) => ({ data: item.delegatedBalance, options: { showFiatValue: true } })
-      },
-      {
-        name: 'Block',
-        field: 'block_level',
-        template: Template.block
-      },
-      {
-        name: 'Tx Hash',
-        field: 'operation_group_hash',
-        template: Template.hash,
-        data: (item: any) => ({ data: item.operation_group_hash })
-      }
-    ]
-  }
-
-  private getOriginationColumns(): Column[] {
-    const pageId: string = this.activatedRoute.snapshot.paramMap.get('id')
-
-    return [
-      {
-        name: 'New Account',
-        field: 'originated_contracts',
-        template: Template.address,
-        data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId } })
-      },
-      {
-        name: 'Balance',
-        field: 'originatedBalance',
-        template: Template.amount,
-        data: (item: Transaction) => ({ data: item.originatedBalance, options: { showFiatValue: true } })
-      },
-      {
-        name: 'Age',
-        field: 'timestamp',
-        template: Template.timestamp
-      },
-      {
-        name: 'Originator',
-        field: 'source',
-        width: '1',
-        template: Template.address,
-        data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
-      },
-      {
-        name: 'Baker',
-        field: 'delegate',
-        width: '1',
-        template: Template.address,
-        data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId } })
-      },
-      {
-        name: 'Fee',
-        field: 'fee',
-        template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
-      },
-      {
-        name: 'Block',
-        field: 'block_level',
-        template: Template.block
-      },
-      {
-        name: 'Tx Hash',
-        field: 'operation_group_hash',
-        template: Template.hash,
-        data: (item: any) => ({ data: item.operation_group_hash })
-      }
-    ]
-  }
-
-  private getEndorsementColumns(): Column[] {
-    return [
-      {
-        name: 'Age',
-        field: 'timestamp',
-        template: Template.timestamp
-      },
-      {
-        name: 'Slots',
-        field: 'slots'
-      },
-      {
-        name: 'Endorsed Level',
-        field: 'level',
-        template: Template.block
-      },
-      {
-        name: 'Block',
-        field: 'block_level',
-        template: Template.block
-      },
-      {
-        name: 'Tx Hash',
-        field: 'operation_group_hash',
-        template: Template.hash,
-        data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } })
-      }
-    ]
-  }
-
-  private getVoteColumns(): Column[] {
-    return [
-      {
-        name: 'Ballot',
-        field: 'ballot'
-      },
-      {
-        name: 'Age',
-        field: 'timestamp',
-        template: Template.timestamp
-      },
-      {
-        name: 'Kind',
-        field: 'kind'
-      },
-      {
-        name: 'Voting Period',
-        field: 'voting_period'
-      },
-      {
-        name: '# of Votes',
-        field: 'votes'
-      },
-      {
-        name: 'Proposal Hash',
-        field: 'proposal',
-        template: Template.hash,
-        data: (item: Transaction) => ({ data: item.proposal })
-      },
-      {
-        name: 'Block',
-        field: 'block_level',
-        template: Template.block
-      },
-      {
-        name: 'Tx Hash',
-        field: 'operation_group_hash',
-        template: Template.hash,
-        data: (item: any) => ({ data: item.operation_group_hash })
-      }
-    ]
   }
 }

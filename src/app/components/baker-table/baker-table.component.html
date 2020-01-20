@@ -1,7 +1,3 @@
-<ng-template #expandedRowTemplate let-context>
-  <app-client-side-table [data]="context.data" [columns]="context.columns" [filterCondition]="context.filterCondition"></app-client-side-table>
-</ng-template>
-
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
   <tab *ngFor="let tab of tabs" [active]="tab.active" (selectTab)="selectTab(tab)">
     <ng-template tabHeading>
@@ -265,25 +261,28 @@
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
-      <tezblock-table2
-        [columns]="rightsColumns"
-        [data]="rights$ | async"
+      <tezblock-table
+        [showLoadMoreButton]="true"
         [loading]="rightsLoading$ | async"
+        [data]="rights$ | async"
+        [page]="page"
+        [type]="selectedTab.kind"
         [expandedRow]="rightsExpandedRow"
-        [pagination]="true"
-        (onLoadMore)="loadMoreRights()"
-      ></tezblock-table2>
+        (loadMoreClicked)="loadMoreRights()"
+      ></tezblock-table>
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">
-      <tezblock-table2
-        [columns]="rewardsColumns"
-        [data]="rewards$ | async"
+      <tezblock-table
+        [enableSearch]="true"
+        [showLoadMoreButton]="true"
         [loading]="rewardsLoading$ | async"
+        [data]="rewards$ | async"
+        [page]="page"
+        [type]="selectedTab.kind"
         [expandedRow]="rewardsExpandedRow"
-        [pagination]="true"
-        (onLoadMore)="loadMoreRewards()"
-      ></tezblock-table2>
+        (loadMoreClicked)="loadMoreRewards()"
+      ></tezblock-table>
     </ng-container>
 
     <div ng-bind-html="tabDynamicContent"></div>

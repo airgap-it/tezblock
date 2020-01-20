@@ -5,7 +5,6 @@ export interface EndorsingRights {
   slot: number
   level: number
   cycle: number
-  rewards?: string
 }
 
 export interface AggregatedEndorsingRights {
