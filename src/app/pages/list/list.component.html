@@ -67,17 +67,15 @@
         </div>
         <div class="row">
           <div class="col px-2">
-            <tezblock-table
-              [loading]="loading$ | async"
+            <tezblock-table2
+              [columns]="columns"
               [data]="data$ | async"
-              [page]="page"
-              [type]="type"
-              [showLoadMoreButton]="showLoadMore$ | async"
-              (loadMoreClicked)="loadMore()"
-            ></tezblock-table>
+              [loading]="loading$ | async"
+              [pagination]="showLoadMore$ | async"
+              (onLoadMore)="loadMore()"
+            ></tezblock-table2>
           </div>
         </div>
-        <ng-template list></ng-template>
       </div>
     </div>
   </div>

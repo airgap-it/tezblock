@@ -6,6 +6,7 @@ export enum Template {
   basic,
   block,
   hash,
+  modal,
   percentage,
   symbol,
   timestamp
@@ -25,6 +26,20 @@ export interface ExpandedRow<Entity> {
   primaryKey: string
 }
 
+export const blockAndTxHashColumns: Column[] = [
+  {
+    name: 'Block',
+    field: 'block_level',
+    template: Template.block
+  },
+  {
+    name: 'Tx Hash',
+    field: 'operation_group_hash',
+    template: Template.hash,
+    data: (item: any) => ({ data: item.operation_group_hash })
+  }
+]
+
 const satisfyData = (column: Column): Column =>
   column.data ? column : { ...column, data: (item: any) => (column.field ? item[column.field] : null) }
 
@@ -42,6 +57,7 @@ export class TezblockTable2Component implements OnInit {
   @ViewChild('blockTemplate', { static: true }) blockTemplate: TemplateRef<any>
   @ViewChild('symbolTemplate', { static: true }) symbolTemplate: TemplateRef<any>
   @ViewChild('hashTemplate', { static: true }) hashTemplate: TemplateRef<any>
+  @ViewChild('modalTemplate', { static: true }) modalTemplate: TemplateRef<any>
 
   @Input() data: any[]
 
@@ -112,6 +128,8 @@ export class TezblockTable2Component implements OnInit {
         return this.addressTemplate
       case Template.hash:
         return this.hashTemplate
+      case Template.modal:
+        return this.modalTemplate
       case Template.percentage:
         return this.percentageTemplate
       case Template.symbol:

@@ -22,6 +22,9 @@
 <ng-template #hashTemplate let-context>
   <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
 </ng-template>
+<ng-template #modalTemplate let-context>
+  <app-modal-cell [data="context" ]></app-modal-cell>
+</ng-template>
 
 <div class="container p-0" *ngIf="loading; else loaded">
   <table class="table" style="border-collapse: initial">
@@ -70,7 +73,7 @@
             <ng-container *ngFor="let item of data; let i = index">
               <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
                 <td *ngFor="let column of columns; trackBy: trackByFn">
-                  <ng-container *ngTemplateOutlet="template(column.template);context:{ $implicit: column.data(item) }"></ng-container>
+                  <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
                 </td>
                 <td *ngIf="expandedRow">
                   <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
@@ -78,7 +81,9 @@
               </tr>
               <tr *ngIf="isExpanded(item)" class="table-extended__active">
                 <td colspan="10" class="py-3 px-0">
-                  <ng-container *ngTemplateOutlet="expandedRow.template;context:{ $implicit: expandedRow.getContext(item) }"></ng-container>
+                  <ng-container
+                    *ngTemplateOutlet="expandedRow.template; context: { $implicit: expandedRow.getContext(item) }"
+                  ></ng-container>
                 </td>
               </tr>
             </ng-container>
