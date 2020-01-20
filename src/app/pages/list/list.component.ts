@@ -15,6 +15,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { toArray } from '@tezblock/services/fp'
 
 const noOfDays = 7
@@ -47,6 +48,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   data$: Observable<Object>
   componentView: string | undefined
   transactionsLoading$: Observable<boolean>
+  showLoadMore$: Observable<boolean>
   totalActiveBakers$: Observable<number>
   activationsCountLast24h$: Observable<number>
   originationsCountLast24h$: Observable<number>
@@ -54,7 +56,11 @@ export class ListComponent extends BaseComponent implements OnInit {
   activationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   originationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   transactionsChartDatasets$: Observable<{ data: number[]; label: string }[]>
-  readonly chartLabels: string[] = range(0, noOfDays).map(index => moment().add(-index, 'days').format('DD.MM.YYYY'))
+  readonly chartLabels: string[] = range(0, noOfDays).map(index =>
+    moment()
+      .add(-index, 'days')
+      .format('DD.MM.YYYY')
+  )
 
   private dataService
 
@@ -94,6 +100,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'block'
             this.setupTable(params.route, 'overview')
+            this.showLoadMore$ = of(true)
             break
           case 'transaction':
             this.subscriptions.push(
@@ -118,6 +125,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'overview')
+            this.showLoadMore$ = of(true)
             break
           case 'activation':
             this.subscriptions.push(
@@ -143,6 +151,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'activate_account')
+            this.showLoadMore$ = of(true)
             break
           case 'origination':
             this.subscriptions.push(
@@ -168,6 +177,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'origination_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'delegation':
             this.dataService = new TransactionService(this.apiService)
@@ -175,6 +185,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'delegation_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'endorsement':
             this.dataService = new TransactionService(this.apiService)
@@ -182,6 +193,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'endorsement_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
@@ -189,6 +201,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.setPageSize(10)
             this.page = 'transaction'
             this.setupTable(params.route, 'ballot_overview')
+            this.showLoadMore$ = of(true)
             break
           case 'double-baking':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
@@ -196,6 +209,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.data$ = this.store$.select(state => state.list.doubleBakings.data)
             this.page = 'transaction'
             this.type = 'double_baking_evidence_overview'
+            this.showLoadMore$ = of(true)
             break
           case 'double-endorsement':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
@@ -203,6 +217,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
             this.page = 'transaction'
             this.type = 'double_endorsement_evidence_overview'
+            this.showLoadMore$ = of(true)
             break
           case 'bakers':
             this.subscriptions.push(
@@ -211,11 +226,28 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.store$.dispatch(actions.loadTotalActiveBakers())
               })
             )
-            this.loading$ = this.store$.select(state => state.list.activeBakers.table.loading)
-            this.data$ = this.store$.select(state => state.list.activeBakers.table.data)
+            this.loading$ = this.store$.select(state => state.list.activeBakers.loading)
+            this.data$ = this.store$.select(state => state.list.activeBakers.data)
             this.page = 'account'
             this.type = 'baker_overview'
-            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.total)
+            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
+            this.showLoadMore$ = of(true)
+            break
+          case 'proposal':
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadProposals())))
+            this.loading$ = this.store$.select(state => state.list.proposals.loading)
+            this.data$ = this.store$.select(state => state.list.proposals.data)
+            this.showLoadMore$ = this.store$
+              .select(state => state.list.proposals)
+              .pipe(
+                map(
+                  proposals =>
+                    Array.isArray(proposals.data) &&
+                    proposals.pagination.currentPage * proposals.pagination.selectedSize === proposals.data.length
+                )
+              )
+            this.page = LayoutPages.Transaction
+            this.type = OperationTypes.ProposalOverview
             break
           default:
             throw new Error('unknown route')
@@ -237,6 +269,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'bakers':
         this.store$.dispatch(actions.increasePageOfActiveBakers())
+        break
+      case 'proposal':
+        this.store$.dispatch(actions.increasePageOfProposals())
         break
       default:
         ;(this.dataService as any).loadMore()

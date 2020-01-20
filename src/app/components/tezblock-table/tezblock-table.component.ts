@@ -72,7 +72,8 @@ export enum OperationTypes {
   Rewards = 'rewards',
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
   DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview',
-  BakerOverview = 'baker_overview'
+  BakerOverview = 'baker_overview',
+  ProposalOverview = 'proposal_overview'
 }
 
 interface Layout {
@@ -106,6 +107,7 @@ interface Layout {
     [OperationTypes.Activation]: Column[]
     [OperationTypes.EndorsementOverview]: Column[]
     [OperationTypes.BallotOverview]: Column[]
+    [OperationTypes.ProposalOverview]: Column[]
     [OperationTypes.DoubleBakingEvidenceOverview]: Column[]
     [OperationTypes.DoubleEndorsementEvidenceOverview]: Column[]
     [OperationTypes.Ballot]: Column[]
@@ -203,7 +205,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
       ],
       [OperationTypes.Rewards]: [
@@ -581,8 +583,27 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         ...baseTx
+      ],
+      [OperationTypes.ProposalOverview]: [
+        {
+          name: 'Proposal',
+          property: 'proposal',
+          width: '',
+          component: HashCellComponent,
+          options: { kind: 'proposal' }
+        },
+        {
+          name: 'Proposal Hash',
+          property: 'proposal',
+          width: ''
+        },
+        {
+          name: 'Period',
+          property: 'period',
+          width: ''
+        }
       ],
       [OperationTypes.DoubleBakingEvidenceOverview]: [
         {
@@ -651,7 +672,7 @@ function getLayouts(showFiat: boolean = true): Layout {
         { name: 'Kind', property: 'kind', width: '' },
         { name: 'Voting Period', property: 'voting_period', width: '' },
         { name: '# of Votes', property: 'votes', width: '' },
-        { name: 'Proposal Hash', property: 'proposal', width: '', component: HashCellComponent },
+        { name: 'Proposal', property: 'proposal', width: '', component: HashCellComponent, options: { kind: 'proposal' } },
         { name: 'Block', property: 'block_level', width: '', component: BlockCellComponent }
       ]
     }

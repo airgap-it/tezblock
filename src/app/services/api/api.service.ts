@@ -15,6 +15,7 @@ import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate } from '../base.service'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 export interface OperationCount {
   [key: string]: string
@@ -1102,7 +1103,12 @@ export class ApiService {
           this.options
         )
         .subscribe(result => {
-          resolve(pipe<any[], any, number>(first, get(_first => _first.frozen_balance))(result))
+          resolve(
+            pipe<any[], any, number>(
+              first,
+              get(_first => _first.frozen_balance)
+            )(result)
+          )
         })
     })
   }
@@ -1236,6 +1242,36 @@ export class ApiService {
           }))
         )
       )
+  }
+
+  getProposal(id: string): Observable<any> {
+    return this.http
+      .post<any>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'period'],
+          predicates: [{ field: 'proposal', operation: 'eq', set: [id], inverse: false }],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(map(first))
+  }
+
+  getProposals(limit: number): Observable<ProposalListDto[]> {
+    return this.http
+      .post<ProposalListDto[]>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'operation_group_hash', 'period'],
+          predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
+          orderBy: [{ field: 'period', direction: 'desc' }],
+          aggregation: [{ field: 'operation_group_hash', function: 'count' }],
+          limit
+        },
+        this.options
+      )
+      .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
   public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {

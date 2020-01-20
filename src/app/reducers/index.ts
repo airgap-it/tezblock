@@ -8,6 +8,7 @@ import * as fromList from '../pages/list/reducer'
 import * as accountDetails from '../pages/account-detail/reducer'
 import * as blockDetails from '../pages/block-detail/reducer'
 import * as transactionDetails from '../pages/transaction-detail/reducer'
+import * as proposalDetails from '../pages//proposal-detail/reducer'
 import * as bakerTable from '../components/baker-table/reducer'
 import * as app from '../app.reducer'
 
@@ -18,6 +19,7 @@ export interface State {
   blockDetails: blockDetails.State
   endorsementDetails: fromEndorsementDetails.State
   transactionDetails: transactionDetails.State
+  proposalDetails: proposalDetails.State
   list: fromList.State
 }
 
@@ -34,6 +36,7 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     blockDetails: blockDetails.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
     transactionDetails: transactionDetails.reducer,
+    proposalDetails: proposalDetails.reducer,
     list: fromList.reducer
   })
 })

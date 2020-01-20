@@ -71,6 +71,8 @@ import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects';
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 
 @NgModule({
   imports: [
@@ -112,7 +114,8 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ProposalDetailEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -152,6 +155,8 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    SearchItemComponent,
+    ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
     OccurrenceStatisticsComponent
