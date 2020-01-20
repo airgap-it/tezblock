@@ -27,6 +27,7 @@ export class HashCellComponent {
     return `/${(this.options && this.options.kind) || 'transaction'}`
   }
 
+  @Input()
   set options(value: Options) {
     this.setOptions(value)
   }
