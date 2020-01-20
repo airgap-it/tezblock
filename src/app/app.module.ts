@@ -73,6 +73,8 @@ import { BakerTableEffects } from './components/baker-table/effects'
 import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
 import { ContractDetailEffects } from './pages/contract-detail/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 
 @NgModule({
   imports: [
@@ -115,6 +117,7 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
       BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects,
+      ProposalDetailEffects,
       ContractDetailEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
@@ -155,6 +158,8 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    SearchItemComponent,
+    ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
     OccurrenceStatisticsComponent,

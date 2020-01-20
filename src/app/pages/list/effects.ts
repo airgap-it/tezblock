@@ -73,7 +73,7 @@ export class ListEffects {
   getActiveBakers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadActiveBakers),
-      withLatestFrom(this.store$.select(state => state.list.activeBakers.table.pagination)),
+      withLatestFrom(this.store$.select(state => state.list.activeBakers.pagination)),
       switchMap(([action, pagination]) =>
         this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage).pipe(
           switchMap(activeBakers =>
@@ -106,6 +106,26 @@ export class ListEffects {
         this.apiService.getTotalBakersAtTheLatestBlock().pipe(
           map(totalActiveBakers => listActions.loadTotalActiveBakersSucceeded({ totalActiveBakers })),
           catchError(error => of(listActions.loadTotalActiveBakersFailed({ error })))
+        )
+      )
+    )
+  )
+
+  proposalsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfProposals),
+      map(() => listActions.loadProposals())
+    )
+  )
+
+  getProposals$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadProposals),
+      withLatestFrom(this.store$.select(state => state.list.proposals.pagination)),
+      switchMap(([action, pagination]) =>
+        this.apiService.getProposals(pagination.selectedSize * pagination.currentPage).pipe(
+          map(proposals => listActions.loadProposalsSucceeded({ proposals })),
+          catchError(error => of(listActions.loadProposalsFailed({ error })))
         )
       )
     )
