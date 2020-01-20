@@ -6,11 +6,19 @@ import { Component, Input } from '@angular/core'
   styleUrls: ['./address-cell.component.scss']
 })
 export class AddressCellComponent {
-  @Input() data
+  public clickable: boolean = true
+  public address: string
 
-  @Input() options: any = { pageId: undefined, showFullAddress: false }
+  @Input() set data(value: string) {
+    this.address = value
+    this.checkId()
+  }
 
-  get clickable(): boolean {
-    return this.options && this.options.pageId ? this.options.pageId !== this.data : true
+  public options: any = { pageId: undefined, showFullAddress: false }
+
+  public checkId() {
+    let check: boolean
+    check = this.options.pageId !== this.address
+    this.clickable = check
   }
 }

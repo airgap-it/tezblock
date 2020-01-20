@@ -45,5 +45,4 @@ export interface Transaction {
   // These are our own properties
   votes?: number
   voting_period?: string
-  burn?: string
 }
