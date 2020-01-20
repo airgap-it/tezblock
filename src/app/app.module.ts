@@ -71,6 +71,8 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects';
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component';
 import { TezblockTable2Component } from './components/tezblock-table2/tezblock-table2.component';
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
@@ -115,7 +117,8 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ProposalDetailEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -155,6 +158,8 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    SearchItemComponent,
+    ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
     OccurrenceStatisticsComponent,
