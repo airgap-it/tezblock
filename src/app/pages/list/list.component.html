@@ -5,15 +5,33 @@
         <h5 class="card-title mb-3 ">
           <ng-container *ngIf="page === 'transaction' && type === 'overview'">
             Transactions
+            <app-occurrence-statistics
+              kind="Transactions"
+              [count]="transactionsCountLast24h$ | async"
+              [chartDatasets]="transactionsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="page === 'block'">
             Blocks
           </ng-container>
           <ng-container *ngIf="type === 'activate_account'">
             Activations
+            <app-occurrence-statistics
+              kind="Activations"
+              [count]="activationsCountLast24h$ | async"
+              [chartDatasets]="activationsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="type === 'origination_overview'">
             Originations
+            <app-occurrence-statistics
+              kind="Originations"
+              [count]="originationsCountLast24h$ | async"
+              [chartDatasets]="originationsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngIf="type === 'delegation_overview'">
             Delegations
@@ -54,7 +72,7 @@
               [data]="data$ | async"
               [page]="page"
               [type]="type"
-              [showLoadMoreButton]="true"
+              [showLoadMoreButton]="showLoadMore$ | async"
               (loadMoreClicked)="loadMore()"
             ></tezblock-table>
           </div>

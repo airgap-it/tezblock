@@ -320,7 +320,7 @@
         </div>
       </div>
 
-      <div class="pt-5">
+      <div class="pt-5" *ngIf="isValidBaker">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <ng-container *ngIf="account.is_baker">
@@ -334,7 +334,7 @@
                     <small>last 30 days</small>
                   </h5>
                   <ng-container *ngIf="balanceChartDatasets$ | async">
-                    <area-chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></area-chart-item>
+                    <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
                   </ng-container>
                 </div>
               </div>
@@ -343,7 +343,7 @@
         </div>
       </div>
 
-      <div class="pt-5">
+      <div #transactions class="pt-5">
         <div class="card pt-3">
           <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
             <tabbed-table

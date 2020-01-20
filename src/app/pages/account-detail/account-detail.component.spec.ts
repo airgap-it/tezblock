@@ -24,7 +24,7 @@ import { AddressCellComponent } from 'src/app/components/tezblock-table/address-
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
-import { AreaChartItemComponent } from '@tezblock/components/area-chart-item/area-chart-item.component'
+import { ChartItemComponent } from '@tezblock/components/chart-item/chart-item.component'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -67,7 +67,7 @@ describe('AccountDetailComponent', () => {
           TezblockTableComponent,
           LoadingSkeletonComponent,
           TooltipItemComponent,
-          AreaChartItemComponent
+          ChartItemComponent
         ]
       })
     )

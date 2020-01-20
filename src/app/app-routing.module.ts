@@ -8,6 +8,7 @@ import { EndorsementDetailComponent } from './pages/endorsement-detail/endorseme
 import { ListComponent } from './pages/list/list.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -16,7 +17,8 @@ const routes: Routes = [
   { path: 'block/:id', component: BlockDetailComponent },
   { path: 'account/:id', component: AccountDetailComponent },
   { path: 'transaction/:id', component: TransactionDetailComponent },
-  { path: 'endorsement/:id', component: EndorsementDetailComponent }
+  { path: 'endorsement/:id', component: EndorsementDetailComponent },
+  { path: 'proposal/:id', component: ProposalDetailComponent }
 ]
 
 @NgModule({

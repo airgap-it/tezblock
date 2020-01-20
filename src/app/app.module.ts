@@ -28,7 +28,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { AreaChartItemComponent } from './components/area-chart-item/area-chart-item.component'
+import { ChartItemComponent } from './components/chart-item/chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -69,7 +69,10 @@ import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-import { BakerTableEffects } from './components/baker-table/effects'
+import { BakerTableEffects } from './components/baker-table/effects';
+import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 
 @NgModule({
   imports: [
@@ -111,7 +114,8 @@ import { BakerTableEffects } from './components/baker-table/effects'
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ProposalDetailEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -139,7 +143,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -151,8 +155,11 @@ import { BakerTableEffects } from './components/baker-table/effects'
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    SearchItemComponent,
+    ProposalDetailComponent,
     TooltipItemComponent,
-    SearchItemComponent
+    SearchItemComponent,
+    OccurrenceStatisticsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
@@ -173,7 +180,7 @@ import { BakerTableEffects } from './components/baker-table/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],

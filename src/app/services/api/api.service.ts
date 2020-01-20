@@ -14,6 +14,8 @@ import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Predicate } from '../base.service'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 export interface OperationCount {
   [key: string]: string
@@ -42,13 +44,6 @@ export interface NumberOfDelegatorsByBakers {
 export interface Balance {
   balance: number
   asof: number
-}
-
-interface Predicate {
-  field: string
-  operation: string
-  set: any[]
-  inverse?: boolean
 }
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -872,7 +867,7 @@ export class ApiService {
   }
 
   public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
@@ -883,7 +878,7 @@ export class ApiService {
         operation: 'eq',
         set: ['0']
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<BakingRights[]>(
@@ -967,13 +962,13 @@ export class ApiService {
   }
 
   public getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
         set: [address]
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<EndorsingRights[]>(
@@ -1093,7 +1088,7 @@ export class ApiService {
   public getFrozenBalance(tzAddress: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
-        .post(
+        .post<any[]>(
           this.delegatesApiUrl,
           {
             predicates: [
@@ -1108,7 +1103,12 @@ export class ApiService {
           this.options
         )
         .subscribe(result => {
-          resolve(result[0].frozen_balance)
+          resolve(
+            pipe<any[], any, number>(
+              first,
+              get(_first => _first.frozen_balance)
+            )(result)
+          )
         })
     })
   }
@@ -1242,6 +1242,36 @@ export class ApiService {
           }))
         )
       )
+  }
+
+  getProposal(id: string): Observable<any> {
+    return this.http
+      .post<any>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'period'],
+          predicates: [{ field: 'proposal', operation: 'eq', set: [id], inverse: false }],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(map(first))
+  }
+
+  getProposals(limit: number): Observable<ProposalListDto[]> {
+    return this.http
+      .post<ProposalListDto[]>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'operation_group_hash', 'period'],
+          predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
+          orderBy: [{ field: 'period', direction: 'desc' }],
+          aggregation: [{ field: 'operation_group_hash', function: 'count' }],
+          limit
+        },
+        this.options
+      )
+      .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
   public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
