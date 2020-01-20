@@ -4,6 +4,7 @@ export interface TableState<T> {
       currentPage: number
       selectedSize: number
       pageSizes: [number, number, number, number]
+      total?: number
     }
     loading: boolean
   }
@@ -13,7 +14,8 @@ export interface TableState<T> {
     pagination: {
       currentPage: 1,
       selectedSize: 10,
-      pageSizes: [5, 10, 20, 50]
+      pageSizes: [5, 10, 20, 50],
+      total: undefined
     },
     loading: false
   })
