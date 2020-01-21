@@ -350,42 +350,46 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+        map((transactions: Transaction[]) => {
+          let finalTransactions: Transaction[] = []
+          finalTransactions = transactions.slice(0, limit)
+          const sources = []
+          const originatedAccounts = []
+
+          finalTransactions.forEach(transaction => {
+            if (transaction.kind === 'delegation') {
+              sources.push(transaction.source)
+            } else if (transaction.kind === 'origination') {
+              originatedAccounts.push(transaction.originated_contracts)
+            }
+          })
 
           if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+            const delegateSources = this.getAccountsByIds(sources)
+            delegateSources.subscribe(delegators => {
+              finalTransactions.forEach(transaction => {
+                delegators.forEach(delegator => {
+                  if (transaction.source === delegator.account_id) {
+                    transaction.delegatedBalance = delegator.balance
+                  }
                 })
-              )
-            )
+              })
+            })
           }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
           if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
+            const originatedSources = this.getAccountsByIds(originatedAccounts)
+            originatedSources.subscribe(originators => {
+              finalTransactions.forEach(transaction => {
+                originators.forEach(originator => {
+                  if (transaction.originated_contracts === originator.account_id) {
+                    transaction.originatedBalance = originator.balance
+                  }
                 })
-              )
-            )
+              })
+            })
           }
 
-          return of(transactions)
+          return finalTransactions
         })
       )
   }

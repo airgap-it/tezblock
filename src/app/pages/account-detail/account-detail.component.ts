@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge, timer } from 'rxjs'
-import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, switchMap, withLatestFrom, pairwise } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -117,11 +117,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   rewardAmount$: Observable<string>
   remainingTime$: Observable<string>
   myTBUrl: string | undefined
-
   get address(): string {
     return this.activatedRoute.snapshot.params.id
   }
-
   frozenBalance: number | undefined
   rewardsTransaction: any
   isMobile$: Observable<boolean>
