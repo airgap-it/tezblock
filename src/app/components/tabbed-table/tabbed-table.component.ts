@@ -6,6 +6,7 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { BaseComponent } from '@tezblock/components/base.component'
+import { Column } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 
 type KindType = string | string[]
 
@@ -15,6 +16,7 @@ export interface Tab {
   count: number
   kind: KindType
   icon?: string[]
+  columns?: Column[]
 }
 
 const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)

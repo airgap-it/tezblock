@@ -3,7 +3,7 @@ import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/te
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 
-export const columns: { [key: string]: (pageId?: string) => Column[] } = {
+export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) => Column[] } = {
   /* BLOCK */
   [OperationTypes.Block]: () => [
     {
@@ -44,7 +44,7 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
   ],
 
   /* TANSACTION */
-  [OperationTypes.Transaction]: () =>
+  [OperationTypes.Transaction]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
     [
       {
         name: 'From',
@@ -72,7 +72,7 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
         name: 'Amount',
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.amount, options: { showFiatValue: true } })
+        data: (item: Transaction) => ({ data: item.amount, options })
       },
       {
         name: 'Fees',
@@ -109,7 +109,7 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
     ].concat(<any>blockAndTxHashColumns),
 
   /* ORIGINATION */
-  [OperationTypes.Origination]: () =>
+  [OperationTypes.Origination]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
     [
       {
         name: 'New Account',
@@ -126,7 +126,7 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
         name: 'Balance',
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.originatedBalance, options: { showFiatValue: true } })
+        data: (item: Transaction) => ({ data: item.originatedBalance, options })
       },
       {
         name: 'Originator',
@@ -153,7 +153,7 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
     ].concat(<any>blockAndTxHashColumns),
 
   /* DELEGATION */
-  [OperationTypes.Delegation]: () =>
+  [OperationTypes.Delegation]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
     [
       {
         name: 'Delegator',
@@ -184,7 +184,8 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
       {
         name: 'Value',
         field: 'amount',
-        template: Template.amount
+        template: Template.amount,
+        data: (item: Transaction) => ({ data: item.fee, options })
       },
       {
         name: 'Fee',
@@ -228,41 +229,151 @@ export const columns: { [key: string]: (pageId?: string) => Column[] } = {
   ],
 
   /* BALLOUT */
-  [OperationTypes.Ballot]: () => [
+  [OperationTypes.Ballot]: () =>
+    [
+      {
+        name: 'Baker',
+        field: 'source',
+        width: '1',
+        template: Template.address
+      },
+      {
+        name: 'Ballot',
+        field: 'ballot'
+      },
+      {
+        name: 'Age',
+        field: 'timestamp',
+        template: Template.timestamp
+      },
+      {
+        name: 'Kind',
+        field: 'kind'
+      },
+      {
+        name: 'Voting Period',
+        field: 'voting_period'
+      },
+      {
+        name: '# of Votes',
+        field: 'votes'
+      },
+      {
+        name: 'Proposal',
+        field: 'proposal',
+        template: Template.hash,
+        data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
+      }
+    ].concat(<any>blockAndTxHashColumns),
+
+  /* DOUBE BAKING */
+  [OperationTypes.DoubleBakingEvidenceOverview]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
+    [
+      // strange no properties given ...
+      {
+        name: 'Baker',
+        template: Template.address
+      },
+      {
+        name: 'Age',
+        field: 'timestamp',
+        template: Template.timestamp
+      },
+      {
+        name: 'Reward',
+        template: Template.amount,
+        data: (item: Transaction) => ({ data: null, options })
+      },
+      {
+        name: 'Offender',
+        template: Template.address
+      },
+      {
+        name: 'Denounced Level',
+        template: Template.block
+      },
+      {
+        name: 'Lost Amount',
+        template: Template.amount,
+        data: (item: Transaction) => ({ data: null, options })
+      }
+    ].concat(<any>blockAndTxHashColumns),
+
+  /* DOUBLE ENDORSEMENT */
+  [OperationTypes.DoubleEndorsementEvidenceOverview]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
+    [
+      // strange no properties given ...
+      {
+        name: 'Baker',
+        template: Template.address
+      },
+      {
+        name: 'Age',
+        field: 'timestamp',
+        template: Template.timestamp
+      },
+      {
+        name: 'Reward',
+        template: Template.amount,
+        data: (item: Transaction) => ({ data: null, options })
+      },
+      {
+        name: 'Offender',
+        template: Template.address
+      },
+      {
+        name: 'Denounced Level',
+        template: Template.block
+      },
+      {
+        name: 'Lost Amount',
+        template: Template.amount,
+        data: (item: Transaction) => ({ data: null, options })
+      }
+    ].concat(<any>blockAndTxHashColumns),
+
+  /* BAKER */
+  [OperationTypes.BakerOverview]: () => [
     {
       name: 'Baker',
-      field: 'source',
-      width: '1',
+      field: 'pkh',
       template: Template.address
     },
     {
-      name: 'Ballot',
-      field: 'ballot'
-    },
-    {
-      name: 'Age',
-      field: 'timestamp',
-      template: Template.timestamp
-    },
-    {
-      name: 'Kind',
-      field: 'kind'
-    },
-    {
-      name: 'Voting Period',
-      field: 'voting_period'
+      name: 'Balance',
+      field: 'balance',
+      template: Template.amount
     },
     {
       name: '# of Votes',
-      field: 'votes'
+      field: 'number_of_votes'
     },
+    {
+      name: 'Staking Balance',
+      field: 'staking_balance',
+      template: Template.amount
+    },
+    {
+      name: '# of Delegators',
+      field: 'number_of_delegators'
+    }
+  ],
+
+  /* PROPOSAL */
+  [OperationTypes.ProposalOverview]: () => [
     {
       name: 'Proposal',
       field: 'proposal',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
+    },
+    {
+      name: 'Proposal Hash',
+      field: 'proposal'
+    },
+    {
+      name: 'Period',
+      field: 'period'
     }
-  ].concat(<any>blockAndTxHashColumns),
-
-  
+  ]
 }

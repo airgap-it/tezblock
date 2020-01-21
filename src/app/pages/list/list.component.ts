@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { merge, Observable, of, timer } from 'rxjs'
-import { filter, map, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap, pairwise } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range } from 'lodash'
 import * as moment from 'moment'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { TransactionService } from '@tezblock/services/transaction/transaction.service'
@@ -56,6 +58,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   activationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   originationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   transactionsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  routeName$: Observable<string>
 
   readonly chartLabels: string[] = range(0, noOfDays).map(index =>
     moment()
@@ -69,9 +72,14 @@ export class ListComponent extends BaseComponent implements OnInit {
     return this.route.snapshot.paramMap.get('route')
   }
 
+  private get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -93,13 +101,15 @@ export class ListComponent extends BaseComponent implements OnInit {
       ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
     )
 
-    this.route.params.subscribe(params => {
+    this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
+
+    this.routeName$.subscribe(routeName => {
       try {
-        switch (params.route) {
+        switch (routeName) {
           case 'block':
             this.dataService = new BlockService(this.apiService)
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Block]())
+            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
             break
           case 'transaction':
             this.subscriptions.push(
@@ -122,7 +132,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               )
             this.dataService = new TransactionService(this.apiService)
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Transaction]())
+            this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
             break
           case 'activation':
             this.subscriptions.push(
@@ -146,7 +156,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['activate_account'])
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Activation]())
+            this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
             break
           case 'origination':
             this.subscriptions.push(
@@ -170,52 +180,52 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['origination'])
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Origination]())
+            this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
             break
           case 'delegation':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['delegation'])
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Delegation]())
+            this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
             break
           case 'endorsement':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['endorsement'])
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Endorsement]())
+            this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['ballot', 'proposals'])
             this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Ballot]())
+            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
             break
           case 'double-baking':
+            const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
+            const dbData$ = this.store$.select(state => state.list.doubleBakings.data)
+
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
-            this.loading$ = this.store$.select(state => state.list.doubleBakings.loading)
-            this.data$ = this.store$.select(state => state.list.doubleBakings.data)
-            this.page = 'transaction'
-            this.type = 'double_baking_evidence_overview'
+            this.setupTable(columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }), dbData$, dbLoading$)
             break
           case 'double-endorsement':
+            const deLoading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
+            const deData$ = this.store$.select(state => state.list.doubleEndorsements.data)
+
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
-            this.loading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
-            this.data$ = this.store$.select(state => state.list.doubleEndorsements.data)
-            this.page = 'transaction'
-            this.type = 'double_endorsement_evidence_overview'
+            this.setupTable(columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }), deData$, deLoading$)
             break
           case 'bakers':
+            const bakersLoading$ = this.store$.select(state => state.list.activeBakers.loading)
+            const bakersData$ = this.store$.select(state => state.list.activeBakers.data)
+
+            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
             this.subscriptions.push(
               refresh$.subscribe(() => {
                 this.store$.dispatch(actions.loadActiveBakers())
                 this.store$.dispatch(actions.loadTotalActiveBakers())
               })
             )
-            this.loading$ = this.store$.select(state => state.list.activeBakers.loading)
-            this.data$ = this.store$.select(state => state.list.activeBakers.data)
-            this.page = 'account'
-            this.type = 'baker_overview'
-            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
+            this.setupTable(columns[OperationTypes.BakerOverview]({ showFiatValue: this.isMainnet }), bakersData$, bakersLoading$)
             break
           case 'proposal':
             const showLoadMore$ = this.store$
@@ -231,10 +241,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             const data$ = this.store$.select(state => state.list.proposals.data)
 
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadProposals())))
-            this.setupTable(params.route, 'ballot_overview')
-
-            this.page = LayoutPages.Transaction
-            this.type = OperationTypes.ProposalOverview
+            this.setupTable(columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }), data$, loading$, showLoadMore$)
             break
           default:
             throw new Error('unknown route')

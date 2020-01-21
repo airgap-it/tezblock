@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
-import { map, switchMap, filter } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -11,7 +11,6 @@ import { AccountSingleService } from './../../services/account-single/account-si
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
 import { RewardSingleService } from './../../services/reward-single/reward-single.service'
-import { ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Payout } from '@tezblock/interfaces/Payout'
 import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
@@ -19,8 +18,8 @@ import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/Bakin
 import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { Payout } from '@tezblock/interfaces/Payout'
 import { columns } from './table-definitions'
+import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 
 export interface Tab {
   title: string
@@ -37,6 +36,7 @@ export interface Tab {
   providers: [AccountSingleService, RewardSingleService]
 })
 export class BakerTableComponent extends BaseComponent implements OnInit {
+  @ViewChild('expandedRowTemplate', { static: true }) expandedRowTemplate: TemplateRef<any>
   private _tabs: Tab[] | undefined = []
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
@@ -68,17 +68,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   activeDelegations$: Observable<number>
 
   frozenBalance: number | undefined
-  rewardsExpandedRow: ExpandedRow<ExpTezosRewards, Payout> = {
-    columns: [
-      { name: 'Delegator Account', property: 'delegator', component: 'address-cell' },
-      { name: 'Payout', property: 'payout', component: 'amount-cell' },
-      { name: 'Share', property: 'share', component: 'pipe:percentage' }
-    ],
-    key: 'cycle',
-    dataSelector: entity => entity.payouts,
-    filterCondition: (detail, query) => detail.delegator === query
-  }
-  get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights, BakingRights> | ExpandedRow<AggregatedEndorsingRights, EndorsingRights> {
+  rewardsExpandedRow: ExpandedRow<ExpTezosRewards>
+
+  get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
   }
 
@@ -132,33 +124,23 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   @Output()
   readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
 
-  private bakingRightsExpandedRow: ExpandedRow<AggregatedBakingRights, BakingRights> = {
-    columns: [
-      { name: 'Cycle', property: 'cycle', component: null },
-      { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
-      { name: 'Level', property: 'level', component: 'app-block-cell' },
-      { name: 'Priority', property: 'priority', component: null },
-      { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
-      { name: 'Fees', property: null, component: 'amount-cell' },
-      { name: 'Deposits', property: null, component: 'amount-cell' }
-    ],
-    key: 'cycle',
-    dataSelector: entity => entity.items,
-    filterCondition: (detail, query) => detail.block_hash === query
+  rewardsColumns: Column[]
+  rewardsFields: string[]
+
+  get rightsColumns(): Column[] {
+    return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsColumns : this.endorsingRightsColumns
   }
-  private endorsingRightsExpandedRow: ExpandedRow<AggregatedEndorsingRights, EndorsingRights> = {
-    columns: [
-      { name: 'Cycle', property: 'cycle', component: null },
-      { name: 'Age', property: 'estimated_time', component: 'app-timestamp-cell' },
-      { name: 'Level', property: 'level', component: 'app-block-cell' },
-      { name: 'Slot', property: 'slot', component: null },
-      { name: 'Rewards', property: 'rewards', component: 'amount-cell' },
-      { name: 'Deposits', property: null, component: 'amount-cell' }
-    ],
-    key: 'cycle',
-    dataSelector: entity => entity.items,
-    filterCondition: (detail, query) => detail.block_hash === query
+
+  get rightsFields(): string[] {
+    return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsFields : this.endorsingRightsFields
   }
+
+  private bakingRightsColumns: Column[]
+  private bakingRightsFields: string[]
+  private endorsingRightsColumns: Column[]
+  private endorsingRightsFields: string[]
+  private bakingRightsExpandedRow: ExpandedRow<AggregatedBakingRights>
+  private endorsingRightsExpandedRow: ExpandedRow<AggregatedEndorsingRights>
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -212,6 +194,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
     this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
     this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
+
+    this.setupExpandedRows()
+    this.setupTables()
   }
 
   selectTab(selectedTab: Tab) {

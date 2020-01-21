@@ -23,7 +23,7 @@
   <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
 </ng-template>
 <ng-template #modalTemplate let-context>
-  <app-modal-cell [data="context" ]></app-modal-cell>
+  <app-modal-cell [data]="context"></app-modal-cell>
 </ng-template>
 
 <div class="container p-0" *ngIf="loading; else loaded">
