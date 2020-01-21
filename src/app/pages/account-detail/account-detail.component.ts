@@ -278,59 +278,55 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   async getBakingInfos(address: string) {
-    this.bakingService
-      .getBakerInfos(address)
-      .then(async result => {
-        const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
+    this.bakingService.getBakerInfos(address).then(async result => {
+      const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
-        this.bakerTableInfos = result
-          ? {
-              stakingBalance: result.stakingBalance,
-              numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-              stakingCapacity: result.stakingCapacity,
-              stakingProgress: Math.min(100, result.stakingProgress),
-              stakingBond: result.selfBond,
-              frozenBalance: await this.accountService.getFrozen(address),
-              payoutAddress
-            }
-          : {
-              payoutAddress
-            }
-      })
+      this.bakerTableInfos = result
+        ? {
+            stakingBalance: result.stakingBalance,
+            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
+            stakingCapacity: result.stakingCapacity,
+            stakingProgress: Math.min(100, result.stakingProgress),
+            stakingBond: result.selfBond,
+            frozenBalance: await this.accountService.getFrozen(address),
+            payoutAddress
+          }
+        : {
+            payoutAddress
+          }
+    })
 
-    this.bakingService.getBakingBadRatings(address).subscribe(
-      response => {
-        const ratingNumberToLabel = [
-          /* 0 */ 'awesome',
-          /* 1 */ 'so-so',
-          /* 2 */ 'dead',
-          /* 3 */ 'specific',
-          /* 4 */ 'hidden',
-          /* 5 */ 'new',
-          /* 6 */ undefined,
-          /* 7 */ undefined,
-          /* 8 */ undefined,
-          /* 9 */ 'unknown'
-        ]
-        const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
-          first,
-          get(feeByCycle => feeByCycle.value * 100)
-        )
+    this.bakingService.getBakingBadRatings(address).subscribe(response => {
+      const ratingNumberToLabel = [
+        /* 0 */ 'awesome',
+        /* 1 */ 'so-so',
+        /* 2 */ 'dead',
+        /* 3 */ 'specific',
+        /* 4 */ 'hidden',
+        /* 5 */ 'new',
+        /* 6 */ undefined,
+        /* 7 */ undefined,
+        /* 8 */ undefined,
+        /* 9 */ 'unknown'
+      ]
+      const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
+        first,
+        get(feeByCycle => feeByCycle.value * 100)
+      )
 
-        this.bakerTableRatings = {
-          ...this.bakerTableRatings,
-          bakingBadRating:
-            response.status === 'success' && ratingNumberToLabel[response.rating.status]
-              ? ratingNumberToLabel[response.rating.status]
-              : 'not available'
-        }
-
-        // is account always available @ this point ?
-        if (response.status === 'success' && this.account.is_baker) {
-          this.tezosBakerFee$.next(extractFee(response.config.fee))
-        }
+      this.bakerTableRatings = {
+        ...this.bakerTableRatings,
+        bakingBadRating:
+          response.status === 'success' && ratingNumberToLabel[response.rating.status]
+            ? ratingNumberToLabel[response.rating.status]
+            : 'not available'
       }
-    )
+
+      // is account always available @ this point ?
+      if (response.status === 'success' && this.account.is_baker) {
+        this.tezosBakerFee$.next(extractFee(response.config.fee))
+      }
+    })
 
     this.getTezosBakerInfos(address, false)
   }
@@ -353,15 +349,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           if (updateFee) {
             this.tezosBakerFee$.next(parseFloat(result.fee))
           }
-        } else {
-          this.bakerTableRatings = {
-            ...this.bakerTableRatings,
-            tezosBakerRating: 'not available'
-          }
 
-          if (updateFee) {
-            this.tezosBakerFee$.next(null)
-          }
+          return
+        }
+
+        this.bakerTableRatings = {
+          ...this.bakerTableRatings,
+          tezosBakerRating: 'not available'
+        }
+
+        if (updateFee) {
+          this.tezosBakerFee$.next(null)
         }
       })
       .catch(() => {
