@@ -176,22 +176,19 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['delegation'])
             this.dataService.setPageSize(10)
-            this.page = 'transaction'
-            this.setupTable(params.route, 'delegation_overview')
+            this.setupTable(columns[OperationTypes.Delegation]())
             break
           case 'endorsement':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['endorsement'])
             this.dataService.setPageSize(10)
-            this.page = 'transaction'
-            this.setupTable(params.route, 'endorsement_overview')
+            this.setupTable(columns[OperationTypes.Endorsement]())
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
             this.dataService.updateKind(['ballot', 'proposals'])
             this.dataService.setPageSize(10)
-            this.page = 'transaction'
-            this.setupTable(params.route, 'ballot_overview')
+            this.setupTable(columns[OperationTypes.Ballot]())
             break
           case 'double-baking':
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
