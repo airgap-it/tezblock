@@ -54,14 +54,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   bakingBadRating: string | undefined
   tezosBakerRating: string | undefined
-  stakingBalance: number | undefined
-  numberOfRolls: number | undefined
-  payoutAddress: string | undefined
 
   bakingInfos: any
-  stakingCapacity: number | undefined
-  stakingProgress: number | undefined
-  stakingBond: number | undefined
 
   isValidBaker: boolean | undefined
   rewardsLoading$: Observable<boolean>
@@ -117,18 +111,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  @Input()
-  set data(bakerTableInfos: any) {
-    if (bakerTableInfos) {
-      this.stakingBalance = bakerTableInfos.stakingBalance
-      this.stakingCapacity = bakerTableInfos.stakingCapacity
-      this.stakingProgress = bakerTableInfos.stakingProgress
-      this.stakingBond = bakerTableInfos.stakingBond
-      this.frozenBalance = bakerTableInfos.frozenBalance
-      this.numberOfRolls = bakerTableInfos.numberOfRolls
-      this.payoutAddress = bakerTableInfos.payoutAddress
-    }
-  }
+  @Input() data: any
 
   @Input()
   set ratings(bakerTableRatings: any) {
@@ -197,7 +180,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     )
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.rights$ = this.store$
       .select(state => state.bakerTable.kind)
       .pipe(

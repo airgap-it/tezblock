@@ -273,7 +273,10 @@
                     <p class="mb-0">
                       <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
                       <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
-                        <amount-cell *ngIf="(rewardAmountMinusFee$ | async) as rewardAmountMinusFee" [data]="rewardAmountMinusFee"></amount-cell>
+                        <amount-cell
+                          *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
+                          [data]="rewardAmountMinusFee"
+                        ></amount-cell>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
@@ -305,7 +308,7 @@
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7" *ngIf="(tezosBakerFeeLabel$ | async) as tezosBakerFeeLabel; else loading">
+                  <div class=" col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
                     <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
@@ -320,13 +323,25 @@
         </div>
       </div>
 
-      <div class="pt-5" *ngIf="account.is_baker">
+      <ng-container *ngIf="account.is_baker">
+        <div class="pt-5">
+          <div class="card">
+            <div class="card-body px-3 px-sm-3 pt-4 pb-3">
+              <baker-table
+                [tabs]="bakerTabs"
+                [page]="'account'"
+                [data]="bakerTableInfos"
+                [ratings]="bakerTableRatings"
+                [bakerFee$]="tezosBakerFee$"
+              ></baker-table>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+      <div class="pt-5" *ngIf="!account.is_baker || bakerTabs[0].active">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
-            <ng-container *ngIf="account.is_baker">
-              <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings" [bakerFee$]="tezosBakerFee$"></baker-table>
-            </ng-container>
-            <div *ngIf="!account.is_baker || (bakerTabs[0].active)" class="container px-3 chart__container">
+            <div class="container px-3 chart__container">
               <div class="row">
                 <div class="col-md-6 col-lg-4 px-0 px-sm-3">
                   <h5 class="card-title__secondary mb-3">

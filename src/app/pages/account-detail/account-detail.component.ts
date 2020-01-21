@@ -277,8 +277,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
   }
 
-  async getBakingInfos(address: string) {
-    this.bakingService.getBakerInfos(address).then(async result => {
+  getBakingInfos(address: string) {
+    this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
       this.bakerTableInfos = result
@@ -288,7 +288,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             stakingCapacity: result.stakingCapacity,
             stakingProgress: Math.min(100, result.stakingProgress),
             stakingBond: result.selfBond,
-            frozenBalance: await this.accountService.getFrozen(address),
             payoutAddress
           }
         : {
@@ -322,8 +321,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             : 'not available'
       }
 
-      // is account always available @ this point ?
-      if (response.status === 'success' && this.account.is_baker) {
+      if (response.status === 'success') {
         this.tezosBakerFee$.next(extractFee(response.config.fee))
       }
     })
