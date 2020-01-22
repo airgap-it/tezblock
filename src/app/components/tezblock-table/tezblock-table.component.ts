@@ -44,11 +44,11 @@ const satisfyData = (column: Column): Column =>
   column.data ? column : { ...column, data: (item: any) => ({ data: column.field ? item[column.field] : null}) }
 
 @Component({
-  selector: 'tezblock-table2',
-  templateUrl: './tezblock-table2.component.html',
-  styleUrls: ['./tezblock-table2.component.scss']
+  selector: 'tezblock-table',
+  templateUrl: './tezblock-table.component.html',
+  styleUrls: ['./tezblock-table.component.scss']
 })
-export class TezblockTable2Component implements OnInit {
+export class TezblockTableComponent implements OnInit {
   @ViewChild('basicTemplate', { static: true }) basicTemplate: TemplateRef<any>
   @ViewChild('amountTemplate', { static: true }) amountTemplate: TemplateRef<any>
   @ViewChild('addressTemplate', { static: true }) addressTemplate: TemplateRef<any>

@@ -20,7 +20,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
-import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 export interface Tab {
   title: string

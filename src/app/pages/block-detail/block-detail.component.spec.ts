@@ -9,7 +9,7 @@ import { EMPTY } from 'rxjs'
 
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { TezblockTable2Component } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
@@ -45,7 +45,7 @@ describe('BlockDetailComponent', () => {
           AddressCellComponent,
           BlockCellComponent,
           TabbedTableComponent,
-          TezblockTable2Component,
+          TezblockTableComponent,
           BlockDetailWrapperComponent,
           LoadingSkeletonComponent,
           TooltipItemComponent,

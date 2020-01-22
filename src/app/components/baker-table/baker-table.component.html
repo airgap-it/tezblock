@@ -299,25 +299,25 @@
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
-      <tezblock-table2
+      <tezblock-table
         [columns]="rightsColumns"
         [data]="rights$ | async"
         [loading]="rightsLoading$ | async"
         [expandedRow]="rightsExpandedRow"
         [pagination]="true"
         (onLoadMore)="loadMoreRights()"
-      ></tezblock-table2>
+      ></tezblock-table>
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">
-      <tezblock-table2
+      <tezblock-table
         [columns]="rewardsColumns"
         [data]="rewards$ | async"
         [loading]="rewardsLoading$ | async"
         [expandedRow]="rewardsExpandedRow"
         [pagination]="true"
         (onLoadMore)="loadMoreRewards()"
-      ></tezblock-table2>
+      ></tezblock-table>
     </ng-container>
 
     <div ng-bind-html="tabDynamicContent"></div>

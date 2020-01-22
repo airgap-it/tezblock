@@ -9,7 +9,7 @@ import { EMPTY } from 'rxjs'
 
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TabbedTableComponent } from 'src/app/components/tabbed-table/tabbed-table.component'
-import { TezblockTable2Component } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { TransactionItemComponent } from 'src/app/components/transaction-item/transaction-item.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
@@ -49,7 +49,7 @@ describe('TransactionDetailComponent', () => {
         declarations: [
           TransactionDetailComponent,
           TabbedTableComponent,
-          TezblockTable2Component,
+          TezblockTableComponent,
           TransactionItemComponent,
           AddressItemComponent,
           AddressCellComponent,

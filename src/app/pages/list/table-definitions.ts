@@ -1,5 +1,5 @@
 import { OperationTypes } from '@tezblock/domain/operations'
-import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 

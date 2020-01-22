@@ -4,7 +4,7 @@ import { PaginationModule } from 'ngx-bootstrap/pagination'
 
 import { ClientSideTableComponent } from './client-side-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
-import { TezblockTable2Component } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { AmountCellComponent } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { AddressCellComponent } from '@tezblock/components/tezblock-table/address-cell/address-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
@@ -29,7 +29,7 @@ describe('ClientSideTableComponent', () => {
         imports: [FontAwesomeModule, PaginationModule.forRoot()],
         declarations: [
           ClientSideTableComponent,
-          TezblockTable2Component,
+          TezblockTableComponent,
           LoadingSkeletonComponent,
           AmountCellComponent,
           AddressCellComponent,

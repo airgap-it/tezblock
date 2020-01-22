@@ -11,7 +11,7 @@ import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-ce
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { BakerTableComponent } from './baker-table.component'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
-import { TezblockTable2Component } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { AddressItemComponent } from '../address-item/address-item.component'
 import { IdenticonComponent } from '../identicon/identicon'
@@ -34,7 +34,7 @@ describe('BakerTableComponent', () => {
         imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule, ChartsModule],
         declarations: [
           BakerTableComponent,
-          TezblockTable2Component,
+          TezblockTableComponent,
           LoadingSkeletonComponent,
           AddressCellComponent,
           IdenticonComponent,

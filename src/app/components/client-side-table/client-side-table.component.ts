@@ -3,7 +3,7 @@ import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
 import { Pagination } from '@tezblock/services/facade/facade'
-import { Column } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 @Component({
   selector: 'app-client-side-table',

@@ -6,7 +6,7 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
-import { Column } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
+import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 type KindType = string | string[]
 

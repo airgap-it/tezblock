@@ -21,11 +21,11 @@
     </h6>
   </tab>
 
-  <tezblock-table2
+  <tezblock-table
     [columns]="selectedTab.columns"
     [data]="data | async"
     [loading]="loading | async"
     [pagination]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"
     (onLoadMore)="onLoadMore()"
-  ></tezblock-table2>
+  ></tezblock-table>
 </tabset>

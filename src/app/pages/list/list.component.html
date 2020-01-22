@@ -70,13 +70,13 @@
         </div>
         <div class="row">
           <div class="col px-2">
-            <tezblock-table2
+            <tezblock-table
               [columns]="columns"
               [data]="data$ | async"
               [loading]="loading$ | async"
               [pagination]="showLoadMore$ | async"
               (onLoadMore)="loadMore()"
-            ></tezblock-table2>
+            ></tezblock-table>
           </div>
         </div>
       </div>

@@ -73,7 +73,7 @@ import { BakerTableEffects } from './components/baker-table/effects';
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
-import { TezblockTable2Component } from './components/tezblock-table2/tezblock-table2.component';
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
@@ -161,7 +161,7 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     TooltipItemComponent,
     SearchItemComponent,
     OccurrenceStatisticsComponent,
-    TezblockTable2Component,
+    TezblockTableComponent,
     ClientSideTableComponent
   ],
 
