@@ -5,7 +5,7 @@ import { EMPTY } from 'rxjs'
 
 import { AddressItemComponent } from 'src/app/components/address-item/address-item.component'
 import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
-import { TezblockTableComponent } from './../tezblock-table/tezblock-table.component'
+import { TezblockTable2Component } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 import { TabbedTableComponent } from './tabbed-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
@@ -13,6 +13,10 @@ import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.c
 import { IdenticonComponent } from '../identicon/identicon'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
+import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
+import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
+import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
+import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent
@@ -27,13 +31,17 @@ describe('TabbedTableComponent', () => {
         imports: [TabsModule, FontAwesomeModule, PaginationModule],
         declarations: [
           TabbedTableComponent,
-          TezblockTableComponent,
+          TezblockTable2Component,
           IdenticonComponent,
           LoadingSkeletonComponent,
           AddressCellComponent,
           AmountCellComponent,
           BlockCellComponent,
-          AddressItemComponent
+          AddressItemComponent,
+          SymbolCellComponent,
+          HashCellComponent,
+          ModalCellComponent,
+          ExtendTableCellComponent
         ]
       })
     )
