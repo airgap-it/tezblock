@@ -75,6 +75,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
+    rewardAmont: null,
     busy: {
       ...state.busy,
       rewardAmont: false

@@ -27,7 +27,7 @@
                   <span
                     class="d-inline-block"
                     [innerHtml]="
-                      stakingBond
+                      data?.stakingBond
                         | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                         | safeHtml
                     "
@@ -36,7 +36,7 @@
                 </h3>
               </div>
 
-              <ng-container *ngIf="stakingBalance; else loadingGraph">
+              <ng-container *ngIf="data?.stakingBalance; else loadingGraph">
                 <div class="mb-4">
                   <div class="container p-0">
                     <div class="row mb-2">
@@ -50,11 +50,11 @@
                       </div>
                     </div>
                   </div>
-                  <div *ngIf="stakingBalance > stakingCapacity">
-                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px" type="danger"></progressbar>
+                  <div *ngIf="data?.stakingBalance > data?.stakingCapacity">
+                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height:6px" type="danger"></progressbar>
                   </div>
-                  <div *ngIf="stakingBalance <= stakingCapacity">
-                    <progressbar [animate]="true" [value]="stakingProgress" style="height:6px"></progressbar>
+                  <div *ngIf="data?.stakingBalance <= data?.stakingCapacity">
+                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height:6px"></progressbar>
                   </div>
                   <div class="mt-2 container">
                     <div class="row">
@@ -63,7 +63,7 @@
                           <span
                             class="d-inline-block"
                             [innerHtml]="
-                              stakingBalance
+                              data?.stakingBalance
                                 | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                                 | safeHtml
                             "
@@ -78,7 +78,7 @@
                             <span
                               class="d-inline-block"
                               [innerHtml]="
-                                stakingCapacity
+                                data?.stakingCapacity
                                   | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
                                   | safeHtml
                               "
@@ -99,7 +99,7 @@
                     <h5 class="card-title__secondary mb-3">
                       Payout Account
                     </h5>
-                    <address-item *ngIf="payoutAddress; else noPayoutAddress" [address]="payoutAddress"></address-item>
+                    <address-item *ngIf="data?.payoutAddress; else noPayoutAddress" [address]="data?.payoutAddress"></address-item>
                     <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
                   </div>
                 </div>
@@ -174,11 +174,11 @@
                   Number of Rolls
                 </h5>
                 <h5>
-                  <ng-container *ngIf="!numberOfRolls; else rolls">
+                  <ng-container *ngIf="!data?.numberOfRolls; else rolls">
                     <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
                   </ng-container>
                   <ng-template #rolls>
-                    <span class="d-inline-block">{{ numberOfRolls }}</span>
+                    <span class="d-inline-block">{{ data?.numberOfRolls }}</span>
                   </ng-template>
                 </h5>
               </div>

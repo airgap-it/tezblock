@@ -1,12 +1,23 @@
 import { Injectable } from '@angular/core'
 import { combineLatest } from 'rxjs'
 import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
 import { RewardService } from '../reward/reward.service'
 
+export interface Payout {
+  delegator: string
+  share: string
+  payout: string
+}
+
+export interface Reward extends TezosRewards {
+  payouts: Payout[]
+}
+
 interface RewardSingleServiceState {
-  rewards: any
+  rewards: Reward[]
   address: string | undefined
   pagination: Pagination
   loading: boolean
