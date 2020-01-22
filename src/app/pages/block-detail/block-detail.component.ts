@@ -5,6 +5,7 @@ import { delay, map, switchMap, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { negate, isNil } from 'lodash'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -13,14 +14,12 @@ import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
-import { OperationTypes } from '@tezblock/domain/operations'
+import { OperationTypes, LayoutPages } from '@tezblock/domain/operations'
 
 @Component({
   selector: 'app-block-detail',
@@ -41,8 +40,11 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   public tabs: Tab[]
 
-  public isMainnet: boolean
   actionType$: Observable<LayoutPages>
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   constructor(
     private readonly actions$: Actions,
@@ -55,7 +57,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   ngOnInit() {
@@ -116,7 +117,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  private setTabs(id: string) {
+  private setTabs(pageId: string) {
     this.tabs = [
       {
         title: 'Transactions',
@@ -124,7 +125,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'transaction',
         count: null,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction](id)
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Delegations',
@@ -132,7 +133,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'delegation',
         count: null,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation](id)
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Originations',
@@ -140,7 +141,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'origination',
         count: null,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination](id)
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Endorsements',
@@ -148,7 +149,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsement',
         count: null,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement](id)
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Activations',
@@ -156,7 +157,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'activate_account',
         count: 0,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation](id)
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet })
       }
     ]
   }

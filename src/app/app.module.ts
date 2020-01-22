@@ -45,7 +45,6 @@ import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
 import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
@@ -138,7 +137,6 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     HeaderItemComponent,
     QrItemComponent,
     QrModalComponent,
-    TezblockTableComponent,
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,

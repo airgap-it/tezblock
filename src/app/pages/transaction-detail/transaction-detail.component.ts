@@ -17,7 +17,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { first } from '@tezblock/services/fp'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { negate, isNil } from 'lodash'
 

@@ -23,3 +23,10 @@ export enum OperationTypes {
     Block = 'block'
   }
   
+  // TODO: more to more proper place ( separate file )
+  export enum LayoutPages {
+    Account = 'account',
+    Block = 'block',
+    Transaction = 'transaction'
+  }
+  

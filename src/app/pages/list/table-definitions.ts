@@ -269,7 +269,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
   /* DOUBE BAKING */
   [OperationTypes.DoubleBakingEvidenceOverview]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
     [
-      // strange no properties given ...
       {
         name: 'Baker',
         template: Template.address
@@ -302,7 +301,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
   /* DOUBLE ENDORSEMENT */
   [OperationTypes.DoubleEndorsementEvidenceOverview]: (options: { showFiatValue?: boolean } = { showFiatValue: true }) =>
     [
-      // strange no properties given ...
       {
         name: 'Baker',
         template: Template.address

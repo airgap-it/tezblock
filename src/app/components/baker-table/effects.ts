@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 
 @Injectable()

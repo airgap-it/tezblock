@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { merge, Observable, of, timer } from 'rxjs'
-import { filter, map, switchMap, pairwise } from 'rxjs/operators'
+import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range } from 'lodash'

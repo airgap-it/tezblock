@@ -1,10 +1,11 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
@@ -15,7 +16,7 @@ import { Payout } from '@tezblock/interfaces/Payout'
 import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
@@ -135,6 +136,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsFields : this.endorsingRightsFields
   }
 
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
   private bakingRightsColumns: Column[]
   private bakingRightsFields: string[]
   private endorsingRightsColumns: Column[]
@@ -147,6 +152,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     private readonly router: Router,
     private readonly accountService: AccountService,
     private readonly accountSingleService: AccountSingleService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardSingleService: RewardSingleService,
     private readonly apiService: ApiService,
     private readonly store$: Store<fromRoot.State>
@@ -255,13 +261,13 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   private setupTables() {
-    this.bakingRightsColumns = columns[OperationTypes.BakingRights]()
+    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet })
     this.bakingRightsFields = this.bakingRightsColumns.map(column => column.field)
 
-    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights]()
+    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights]({ showFiatValue: this.isMainnet })
     this.endorsingRightsFields = this.endorsingRightsColumns.map(column => column.field)
 
-    this.rewardsColumns = columns[OperationTypes.Rewards]()
+    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet })
     this.rewardsFields = this.rewardsColumns.map(column => column.field)
   }
 

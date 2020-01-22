@@ -41,7 +41,7 @@ export const blockAndTxHashColumns: Column[] = [
 ]
 
 const satisfyData = (column: Column): Column =>
-  column.data ? column : { ...column, data: (item: any) => (column.field ? item[column.field] : null) }
+  column.data ? column : { ...column, data: (item: any) => ({ data: column.field ? item[column.field] : null}) }
 
 @Component({
   selector: 'tezblock-table2',

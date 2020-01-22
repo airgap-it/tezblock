@@ -2,14 +2,14 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table2/tezblock-table2.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
-export const columns: { [key: string]: (pageId: string) => Column[] } = {
-  [OperationTypes.Transaction]: (pageId: string) => [
+export const columns: { [key: string]: (options: { pageId: string, showFiatValue: boolean }) => Column[] } = {
+  [OperationTypes.Transaction]: (options: { pageId: string, showFiatValue: boolean }) => [
     {
       name: 'From',
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
+      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: 'applied',
@@ -20,13 +20,13 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
       name: 'To',
       field: 'destination',
       width: '1',
-      data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId } }),
+      data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } }),
       template: Template.address
     },
     {
       name: 'Amount',
       field: 'amount',
-      data: (item: Transaction) => ({ data: item.amount, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.amount, options }),
       template: Template.amount
     },
     {
@@ -47,13 +47,13 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
     }
   ],
 
-  [OperationTypes.Delegation]: (pageId: string) => [
+  [OperationTypes.Delegation]: (options: { pageId: string, showFiatValue: boolean }) => [
     {
       name: 'Delegator',
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
+      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: 'applied',
@@ -67,14 +67,14 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
       template: Template.address,
       data: (item: Transaction) => ({
         data: item.delegate || 'undelegate',
-        options: { showFullAddress: false, pageId, isText: !item.delegate ? true : undefined }
+        options: { showFullAddress: false, pageId: options.pageId, isText: !item.delegate ? true : undefined }
       })
     },
     {
       name: 'Amount',
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.delegatedBalance, options: { showFiatValue: true } })
+      data: (item: Transaction) => ({ data: item.delegatedBalance, options })
     },
     {
       name: 'Fee',
@@ -94,39 +94,39 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
     }
   ],
 
-  [OperationTypes.Origination]: (pageId: string) => [
+  [OperationTypes.Origination]: (options: { pageId: string, showFiatValue: boolean }) => [
     {
         name: 'New Account',
         field: 'originated_contracts',
         width: '1',
         template: Template.address,
-        data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId } })
+        data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
         name: 'Balance',
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.originatedBalance, options: { showFiatValue: true } })
+        data: (item: Transaction) => ({ data: item.originatedBalance, options })
       },
       {
         name: 'Originator',
         field: 'source',
         width: '1',
         template: Template.address,
-        data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId } })
+        data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
         name: 'Baker',
         field: 'delegate',
         width: '1',
         template: Template.address,
-        data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId } })
+        data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+        data: (item: Transaction) => ({ data: item.fee, options })
       },
       {
         name: 'Burn',
@@ -146,12 +146,12 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
       }
   ],
 
-  [OperationTypes.Endorsement]: (pageId: string) => [
+  [OperationTypes.Endorsement]: (options: { pageId: string, showFiatValue: boolean }) => [
     {
         name: 'Endorser',
         field: 'delegate',
         template: Template.address,
-        data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId } })
+        data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
         name: 'Age',
@@ -170,12 +170,12 @@ export const columns: { [key: string]: (pageId: string) => Column[] } = {
       }
   ],
 
-  [OperationTypes.Activation]: (pageId: string) => [
+  [OperationTypes.Activation]: (options: { pageId: string, showFiatValue: boolean }) => [
     {
         name: 'Account',
         field: 'pkh',
         template: Template.address,
-        data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true, pageId} })
+        data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true, pageId: options.pageId } })
       },
       {
         name: 'Secret',

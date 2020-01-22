@@ -1,5 +1,5 @@
 <ng-template #basicTemplate let-context>
-  {{ context }}
+  {{ context?.data }}
 </ng-template>
 <ng-template #amountTemplate let-context>
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
@@ -8,13 +8,13 @@
   <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
 </ng-template>
 <ng-template #percentageTemplate let-context>
-  {{ context | percentage }}
+  {{ context?.data | percentage }}
 </ng-template>
 <ng-template #timestampTemplate let-context>
-  <app-timestamp-cell [data]="context"></app-timestamp-cell>
+  <app-timestamp-cell [data]="context?.data"></app-timestamp-cell>
 </ng-template>
 <ng-template #blockTemplate let-context>
-  <app-block-cell [data]="context"></app-block-cell>
+  <app-block-cell [data]="context?.data"></app-block-cell>
 </ng-template>
 <ng-template #symbolTemplate>
   <app-symbol-cell></app-symbol-cell>
@@ -23,7 +23,7 @@
   <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
 </ng-template>
 <ng-template #modalTemplate let-context>
-  <app-modal-cell [data]="context"></app-modal-cell>
+  <app-modal-cell [data]="context?.data"></app-modal-cell>
 </ng-template>
 
 <div class="container p-0" *ngIf="loading; else loaded">

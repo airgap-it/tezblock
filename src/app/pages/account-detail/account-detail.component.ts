@@ -28,7 +28,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
-import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 
@@ -117,19 +117,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   rewardAmount$: Observable<string>
   remainingTime$: Observable<string>
   myTBUrl: string | undefined
+
   get address(): string {
     return this.activatedRoute.snapshot.params.id
   }
+
   frozenBalance: number | undefined
   rewardsTransaction: any
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  isMainnet: boolean
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   actionType$: Observable<LayoutPages>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
@@ -152,7 +157,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   async ngOnInit() {
@@ -414,7 +418,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
-  private setTabs(id: string) {
+  private setTabs(pageId: string) {
     this.tabs = [
       {
         title: 'Transactions',
@@ -422,7 +426,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'transaction',
         count: null,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction](id)
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Delegations',
@@ -430,7 +434,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'delegation',
         count: null,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation](id)
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Originations',
@@ -438,7 +442,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'origination',
         count: null,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination](id)
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Endorsements',
@@ -446,7 +450,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsement',
         count: null,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement](id)
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
       },
       {
         title: 'Votes',
@@ -454,7 +458,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'ballot',
         count: null,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot](id)
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
       }
     ]
   
