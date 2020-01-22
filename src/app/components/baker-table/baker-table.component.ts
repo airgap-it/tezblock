@@ -39,8 +39,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
 
-  bakingBadRating: string | undefined
-  tezosBakerRating: string | undefined
   stakingBalance: number | undefined
   numberOfRolls: number | undefined
   payoutAddress: string | undefined
@@ -121,13 +119,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  @Input()
-  set ratings(bakerTableRatings: any) {
-    if (bakerTableRatings) {
-      this.tezosBakerRating = bakerTableRatings.tezosBakerRating
-      this.bakingBadRating = bakerTableRatings.bakingBadRating
-    }
-  }
+  @Input() ratings: any
 
   @Output()
   readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()

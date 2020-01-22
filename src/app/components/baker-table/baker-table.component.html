@@ -210,16 +210,22 @@
                     class="width--fit-content"
                     tooltip="Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
                   >
-                    <img src="/assets/img/bakingbad_logo.png" width="24px" />
-
-                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://https://baking-bad.org/'">
-                      <ng-container *ngIf="!bakingBadRating">
-                        <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
-                      </ng-container>
-                      <ng-container *ngIf="bakingBadRating">
-                        {{ bakingBadRating }}
-                      </ng-container>
+                    <a
+                      *ngIf="ratings?.bakingBadRating"
+                      class="btn btn-link text-capitalize"
+                      type="button"
+                      target="_blank"
+                      [href]="'https://https://baking-bad.org/'"
+                    >
+                      <img src="/assets/img/bakingbad_logo.png" width="24px" />
+                      {{ ratings.bakingBadRating }}
                     </a>
+                    <ng-container *ngIf="ratings?.bakingBadRating === undefined">
+                      <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
+                    </ng-container>
+                    <ng-container *ngIf="ratings?.bakingBadRating === null">
+                      not available
+                    </ng-container>
                   </div>
                 </div>
               </div>
@@ -232,16 +238,22 @@
                     class="width--fit-content"
                     tooltip="MyTezosBaker is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker."
                   >
-                    <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
-
-                    <a class="btn btn-link text-capitalize" type="button" target="_blank" [href]="'https://mytezosbaker.com/'">
-                      <ng-container *ngIf="!tezosBakerRating">
-                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
-                      </ng-container>
-                      <ng-container *ngIf="tezosBakerRating">
-                        {{ tezosBakerRating }}
-                      </ng-container>
+                    <a
+                      *ngIf="ratings?.tezosBakerRating"
+                      class="btn btn-link text-capitalize"
+                      type="button"
+                      target="_blank"
+                      [href]="'https://mytezosbaker.com/'"
+                    >
+                      <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
+                      {{ ratings.tezosBakerRating }}
                     </a>
+                    <ng-container *ngIf="ratings?.tezosBakerRating === undefined">
+                      <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
+                    </ng-container>
+                    <ng-container *ngIf="ratings?.tezosBakerRating === null">
+                      not available
+                    </ng-container>
                   </div>
                 </div>
               </div>
@@ -255,16 +267,19 @@
                     class="width--fit-content"
                     tooltip="Tezos Nodes is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker over the last 10 cycles."
                   >
-                    <img src="/assets/img/tezosnodes.svg" width="24px" />
-
-                    <a class="btn btn-link" type="button" target="_blank" [href]="'https://www.tezos-nodes.com/baker/' + accountAddress">
-                      <ng-container *ngIf="efficiencyLast10CyclesLoading$ | async">
-                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
-                      </ng-container>
-                      <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
-                        {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}
-                      </ng-container>
+                    <a
+                      *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null"
+                      class="btn btn-link"
+                      type="button"
+                      target="_blank"
+                      [href]="'https://www.tezos-nodes.com/baker/' + accountAddress"
+                    >
+                      <img src="/assets/img/tezosnodes.svg" width="24px" />
+                      {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}
                     </a>
+                    <ng-container *ngIf="efficiencyLast10CyclesLoading$ | async">
+                      <span><loading-skeleton [loadingWidth]="'65px'"></loading-skeleton></span>
+                    </ng-container>
                     <ng-container *ngIf="(efficiencyLast10Cycles$ | async) === null">
                       not available
                     </ng-container>

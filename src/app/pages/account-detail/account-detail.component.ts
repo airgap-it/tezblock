@@ -140,6 +140,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartLabels$: Observable<string[]>
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
+  private scrolledToTransactions = false
 
   constructor(
     private readonly actions$: Actions,
@@ -251,11 +252,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.account$
         .pipe(
           withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
-          filter(([account, navigationHistory]) => account && navigationHistory.length === 1),
+          filter(([account, navigationHistory]) => !this.scrolledToTransactions && account && navigationHistory.length === 1),
           delay(500)
         )
         .subscribe(() => {
           this.transactions.nativeElement.scrollIntoView({ behavior: 'smooth' })
+          this.scrolledToTransactions = true
         })
     )
   }
@@ -310,7 +312,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         } else if (result.rating === 9 && result.status === 'success') {
           this.bakingBadRating = 'unknown'
         } else {
-          this.bakingBadRating = 'not available'
+          this.bakingBadRating = null
         }
 
         this.bakerTableRatings = {
@@ -346,7 +348,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           this.tezosBakerAcceptingDelegation = result.accepting_delegation
           this.tezosBakerNominalStakingYield = result.nominal_staking_yield
         } else {
-          this.tezosBakerRating = 'not available'
+          this.tezosBakerRating = null
           this.tezosBakerFee = updateFee ? 'not available' : this.tezosBakerFee
         }
         this.bakerTableRatings = {
