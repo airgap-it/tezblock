@@ -23,9 +23,9 @@
 
   <tezblock-table
     [columns]="selectedTab.columns"
-    [data]="data | async"
+    [data]="data"
     [loading]="loading | async"
-    [pagination]="(data | async) && selectedTab && (data | async)?.length < selectedTab.count"
+    [pagination]="data && selectedTab && data.length < selectedTab.count"
     (onLoadMore)="onLoadMore()"
   ></tezblock-table>
 </tabset>

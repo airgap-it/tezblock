@@ -352,7 +352,7 @@
               [tabs]="tabs"
               [page]="'account'"
               [loading]="areTransactionsLoading$"
-              [data]="transactions$"
+              [data]="transactions$ | async"
               [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"

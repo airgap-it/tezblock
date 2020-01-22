@@ -169,12 +169,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$
-      .select(state => state.accountDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.balanceChartDatasets$ = this.store$
@@ -463,7 +458,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
       }
     ]
-  
+
     this.bakerTabs = [
       { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
       { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },

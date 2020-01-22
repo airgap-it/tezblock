@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import BigNumber from 'bignumber.js'
 import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
-import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
@@ -20,6 +20,8 @@ import { first } from '@tezblock/services/fp'
 import { LayoutPages } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { negate, isNil } from 'lodash'
+import { columns } from './table-definitions'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -27,15 +29,11 @@ import { negate, isNil } from 'lodash'
   styleUrls: ['./transaction-detail.component.scss']
 })
 export class TransactionDetailComponent extends BaseComponent implements OnInit {
-  tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
-    { title: 'Reveals', active: false, kind: 'reveal', count: null, icon: this.iconPipe.transform('eye') },
-    { title: 'Activations', active: false, kind: 'activate_account', count: null, icon: this.iconPipe.transform('handHoldingSeedling') },
-    { title: 'Votes', active: false, kind: ['ballot', 'proposals'], count: null, icon: this.iconPipe.transform('boxBallot') }
-  ]
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
+  tabs: Tab[]
   latestTx$: Observable<Transaction>
   fiatCurrencyInfo$: Observable<CurrencyInfo>
   numberOfConfirmations$: Observable<number>
@@ -46,9 +44,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   filteredTransactions$: Observable<Transaction[]>
   actionType$: Observable<LayoutPages>
   isInvalidHash$: Observable<boolean>
-  isMainnet: boolean
 
-  private readonly kind$ = new BehaviorSubject(this.tabs[0].kind)
+  private kind$ = new BehaviorSubject('transaction')
 
   constructor(
     private readonly actions$: Actions,
@@ -61,23 +58,19 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  ngOnInit() {  
+  ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
-    this.transactions$ = this.store$
-      .select(state => state.transactionDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.transactionDetails.transactions).pipe(filter(negate(isNil)))
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
     this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
     this.actionType$ = this.latestTx$.pipe(map(() => LayoutPages.Transaction))
-    this.isInvalidHash$ = this.store$.select(state => state.transactionDetails.transactions).pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
+    this.isInvalidHash$ = this.store$
+      .select(state => state.transactionDetails.transactions)
+      .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
@@ -93,9 +86,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     )
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap =>
+      this.route.paramMap.subscribe(paramMap => {
         this.store$.dispatch(actions.loadTransactionsByHash({ transactionHash: paramMap.get('id') }))
-      ),
+        this.setTabs(paramMap.get('id'))
+      }),
 
       // refresh latest block
       timer(0, refreshRate).subscribe(() => this.store$.dispatch(actions.loadLatestBlock())),
@@ -123,5 +117,60 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
   onLoadMore() {
     this.store$.dispatch(actions.increasePageSize())
+  }
+
+  private setTabs(pageId: string) {
+    const showFiatValue = this.isMainnet
+
+    this.tabs = [
+      {
+        title: 'Transactions',
+        active: true,
+        kind: 'transaction',
+        count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue })
+      },
+      {
+        title: 'Delegations',
+        active: false,
+        kind: 'delegation',
+        count: null,
+        icon: this.iconPipe.transform('handReceiving'),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue })
+      },
+      {
+        title: 'Originations',
+        active: false,
+        kind: 'origination',
+        count: null,
+        icon: this.iconPipe.transform('link'),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue })
+      },
+      {
+        title: 'Reveals',
+        active: false,
+        kind: 'reveal',
+        count: null,
+        icon: this.iconPipe.transform('eye'),
+        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue })
+      },
+      {
+        title: 'Activations',
+        active: false,
+        kind: 'activate_account',
+        count: null,
+        icon: this.iconPipe.transform('handHoldingSeedling'),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue })
+      },
+      {
+        title: 'Votes',
+        active: false,
+        kind: ['ballot', 'proposals'],
+        count: null,
+        icon: this.iconPipe.transform('boxBallot'),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue })
+      }
+    ]
   }
 }

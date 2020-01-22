@@ -63,12 +63,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
-    this.transactions$ = this.store$
-      .select(state => state.blockDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(

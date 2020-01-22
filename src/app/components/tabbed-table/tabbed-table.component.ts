@@ -34,11 +34,13 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   selectedTab: Tab | undefined
 
   @Input()
-  set tabs(tabs: Tab[]) {
-    this._tabs = tabs
+  set tabs(value: Tab[]) {
+    if (value !== this._tabs) {
+      this._tabs = value
 
-    const selectedTab = tabs.find(tab => tab.kind === OperationTypes.Transaction)
-    this.updateSelectedTab(selectedTab)
+      const selectedTab = value.find(tab => tab.kind === OperationTypes.Transaction)
+      this.updateSelectedTab(selectedTab)
+    }
   }
 
   get tabs() {
@@ -52,8 +54,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   actionType$: Observable<LayoutPages>
 
-  @Input()
-  data?: Observable<any[]> // TODO: <any>
+  @Input() data?: any[]
 
   @Input()
   loading?: Observable<boolean>
@@ -64,7 +65,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
-  private _tabs: Tab[] | undefined = []
+  private _tabs: Tab[] | undefined
 
   constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
     super()
