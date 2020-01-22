@@ -186,6 +186,23 @@
                   </ng-template>
                 </h5>
               </div>
+
+              <div>
+                <h5 class="card-title__secondary mb-3">
+                  Next Baking Right
+                </h5>
+                <h5>
+                  <ng-container *ngIf="upcomingRightsLoading$ | async; else nextBakingRight">
+                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                  </ng-container>
+                  <ng-template #nextBakingRight>
+                    <div *ngIf="upcomingRights$ | async as upcomingRights">
+                      {{ upcomingRights.baking.level }}
+                      <app-timestamp-cell [data]="upcomingRights.baking.estimated_time"></app-timestamp-cell>
+                    </div>
+                  </ng-template>
+                </h5>
+              </div>
             </div>
             <div class=" col-md-6 col-lg-4">
               <div class="mb-3">
@@ -232,7 +249,7 @@
                   </div>
                 </div>
               </div>
-              <div>
+              <div class="mb-4">
                 <h5 class="card-title__secondary mb-2">
                   Efficiency
                   <small>Last 10 Cycles</small>
@@ -257,6 +274,23 @@
                     </ng-container>
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <h5 class="card-title__secondary mb-3">
+                  Next Endorsing Right
+                </h5>
+                <h5>
+                  <ng-container *ngIf="upcomingRightsLoading$ | async; else nextEndorsingRight">
+                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                  </ng-container>
+                  <ng-template #nextEndorsingRight>
+                    <div *ngIf="upcomingRights$ | async as upcomingRights">
+                      {{ upcomingRights.endorsing.level }}
+                      <app-timestamp-cell [data]="upcomingRights.endorsing.estimated_time"></app-timestamp-cell>
+                    </div>
+                  </ng-template>
+                </h5>
               </div>
             </div>
           </div>

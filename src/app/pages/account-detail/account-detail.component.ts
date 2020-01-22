@@ -39,7 +39,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
   providers: [RightsSingleService], //TODO: refactor and remove this last single service
-
   animations: [
     trigger('changeBtnColor', [
       state(
@@ -404,12 +403,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   showMoreItems() {
     this.paginationLimit = this.paginationLimit + 50 // TODO: set dynamic number
   }
+
   showLessItems() {
     this.paginationLimit = this.paginationLimit - 50 // TODO: set dynamic number
   }
+
   replaceAll(string: string, find: string, replace: string) {
     return string.replace(new RegExp(find, 'g'), replace)
   }
+
   changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {

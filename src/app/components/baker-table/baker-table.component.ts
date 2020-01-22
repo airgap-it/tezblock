@@ -60,6 +60,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   rewards$: Observable<TezosRewards[]>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
+  upcomingRights$: Observable<actions.UpcomingRights>
+  upcomingRightsLoading$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
@@ -167,6 +169,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
+        this.store$.dispatch(actions.loadUpcomingRights())
         this.rewardSingleService.updateAddress(accountAddress)
         this.accountSingleService.setAddress(accountAddress)
         this.frozenBalance = await this.accountService.getFrozen(accountAddress)
@@ -200,6 +203,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.activeDelegations$ = this.accountSingleService.activeDelegations$
     this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
     this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
+    this.upcomingRights$ = this.store$.select(state => state.bakerTable.upcomingRights)
+    this.upcomingRightsLoading$ = this.store$.select(state => state.bakerTable.busy.upcomingRights)
 
     this.setupExpandedRows()
     this.setupTables()
