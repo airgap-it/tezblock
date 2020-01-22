@@ -323,7 +323,8 @@
         </div>
       </div>
 
-      <ng-container *ngIf="account.is_baker">
+      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
+      <ng-container *ngIf="is_baker">
         <div class="pt-5">
           <div class="card">
             <div class="card-body px-3 px-sm-3 pt-4 pb-3">
@@ -338,7 +339,8 @@
           </div>
         </div>
       </ng-container>
-      <div class="pt-5" *ngIf="!account.is_baker || bakerTabs[0].active">
+      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
+      <div class="pt-5" *ngIf="!is_baker || bakerTabs[0].active">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <div class="container px-3 chart__container">

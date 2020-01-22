@@ -134,6 +134,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
 
+  // TODO: remove when api will work correctly
+  is_baker: boolean = false
+
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
@@ -293,6 +296,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         : {
             payoutAddress
           }
+
+      this.is_baker = true
     })
 
     this.bakingService.getBakingBadRatings(address).subscribe(response => {
