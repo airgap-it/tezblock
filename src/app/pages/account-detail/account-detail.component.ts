@@ -217,6 +217,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.store$.dispatch(actions.loadBalanceForLast30Days())
+        this.is_baker = false
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
