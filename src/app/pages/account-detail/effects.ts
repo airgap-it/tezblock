@@ -5,6 +5,7 @@ import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { BakingService } from '@tezblock/services/baking/baking.service'
 import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
@@ -88,6 +89,7 @@ export class AccountDetailEffects {
     private readonly accountService: NewAccountService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
+    private readonly bakingService: BakingService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
     private readonly transactionService: NewTransactionService
