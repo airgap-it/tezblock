@@ -1,8 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -11,7 +11,7 @@ import { Transaction } from './../../interfaces/Transaction'
 import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
-import { RewardSingleService } from './../../services/reward-single/reward-single.service'
+import { RewardSingleService, Reward } from './../../services/reward-single/reward-single.service'
 import { Payout } from '@tezblock/interfaces/Payout'
 import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
@@ -30,6 +30,20 @@ export interface Tab {
   count: number
 }
 
+const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
+  rewards.map(reward => ({
+    ...reward,
+    payouts: reward.payouts.map(payout => {
+      const payoutValue = parseFloat(payout.payout)
+      const payoutMinusFee = payoutValue > 0 && bakerFee ? payoutValue - payoutValue * (bakerFee / 100) : payoutValue
+
+      return {
+        ...payout,
+        payout: payoutMinusFee.toString()
+      }
+    })
+  }))
+
 @Component({
   selector: 'baker-table',
   templateUrl: './baker-table.component.html',
@@ -44,29 +58,21 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   bakingBadRating: string | undefined
   tezosBakerRating: string | undefined
-  stakingBalance: number | undefined
-  numberOfRolls: number | undefined
-  payoutAddress: string | undefined
 
   bakingInfos: any
-  stakingCapacity: number | undefined
-  stakingProgress: number | undefined
-  stakingBond: number | undefined
 
   isValidBaker: boolean | undefined
   rewardsLoading$: Observable<boolean>
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<TezosRewards[]>
+  rewards$: Observable<Reward[]>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
   upcomingRights$: Observable<actions.UpcomingRights>
   upcomingRightsLoading$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
-
-  rewards: TezosRewards
 
   activeDelegations$: Observable<number>
 
@@ -103,18 +109,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  @Input()
-  set data(bakerTableInfos: any) {
-    if (bakerTableInfos) {
-      this.stakingBalance = bakerTableInfos.stakingBalance
-      this.stakingCapacity = bakerTableInfos.stakingCapacity
-      this.stakingProgress = bakerTableInfos.stakingProgress
-      this.stakingBond = bakerTableInfos.stakingBond
-      this.frozenBalance = bakerTableInfos.frozenBalance
-      this.numberOfRolls = bakerTableInfos.numberOfRolls
-      this.payoutAddress = bakerTableInfos.payoutAddress
-    }
-  }
+  @Input() data: any
 
   @Input()
   set ratings(bakerTableRatings: any) {
@@ -123,6 +118,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.bakingBadRating = bakerTableRatings.bakingBadRating
     }
   }
+
+  @Input() bakerFee$: Observable<number>
 
   @Output()
   readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
@@ -177,7 +174,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     )
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     this.rights$ = this.store$
       .select(state => state.bakerTable.kind)
       .pipe(
@@ -193,7 +190,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           return EMPTY
         })
       )
-    this.rewards$ = this.rewardSingleService.rewards$
+    this.rewards$ = combineLatest(this.rewardSingleService.rewards$, this.bakerFee$).pipe(
+      filter(([rewards, bakerFee]) => bakerFee !== undefined),
+      map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
+    )
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
