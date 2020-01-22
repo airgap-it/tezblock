@@ -324,10 +324,10 @@
       </div>
 
       <!-- TODO: replace is_baker with: account.is_baker when api will work -->
-      <ng-container *ngIf="is_baker">
-        <div class="pt-5">
-          <div class="card">
-            <div class="card-body px-3 px-sm-3 pt-4 pb-3">
+      <div class="pt-5">
+        <div class="card">
+          <div class="card-body px-3 px-sm-3 pt-4 pb-3">
+            <ng-container *ngIf="is_baker">
               <baker-table
                 [tabs]="bakerTabs"
                 [page]="'account'"
@@ -335,27 +335,22 @@
                 [ratings]="bakerTableRatings"
                 [bakerFee$]="tezosBakerFee$"
               ></baker-table>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
-      <div class="pt-5" *ngIf="!is_baker || bakerTabs[0].active">
-        <div class="card">
-          <div class="card-body px-3 px-sm-3 pt-4 pb-3">
-            <div class="container px-3 chart__container">
-              <div class="row">
-                <div class="col-md-6 col-lg-4 px-0 px-sm-3">
-                  <h5 class="card-title__secondary mb-3">
-                    Balance
-                    <small>last 30 days</small>
-                  </h5>
-                  <ng-container *ngIf="balanceChartDatasets$ | async">
-                    <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
-                  </ng-container>
+            </ng-container>
+            <ng-container *ngIf="!is_baker || bakerTabs[0].active">
+              <div class="container px-3 chart__container">
+                <div class="row">
+                  <div class="col-md-6 col-lg-4 px-0 px-sm-3">
+                    <h5 class="card-title__secondary mb-3">
+                      Balance
+                      <small>last 30 days</small>
+                    </h5>
+                    <ng-container *ngIf="balanceChartDatasets$ | async">
+                      <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
+                    </ng-container>
+                  </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
           </div>
         </div>
       </div>
