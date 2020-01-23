@@ -1,7 +1,5 @@
-import { Location } from '@angular/common'
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { Router } from '@angular/router'
 import { AirGapMarketWallet, BakerInfo, DelegationInfo, DelegationRewardInfo, TezosKtProtocol, TezosProtocol } from 'airgap-coin-lib'
 import BigNumber from 'big-number'
 import * as moment from 'moment'
@@ -11,8 +9,6 @@ import { map } from 'rxjs/operators'
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse } from 'src/app/interfaces/TezosBakerResponse'
-import { ApiErrorObject } from '../../interfaces/ApiErrorObject'
-import { OperationsService } from '../operations/operations.service'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { get } from '@tezblock/services/fp'
 
@@ -49,28 +45,22 @@ export class BakingService {
 
   constructor(
     private readonly http: HttpClient,
-    location: Location,
-    private readonly router: Router,
-    operationsService: OperationsService,
     readonly chainNetworkService: ChainNetworkService
   ) {}
 
   environmentUrls = this.chainNetworkService.getEnvironment()
 
-  getBakingBadRatings(address: string): Promise<ApiErrorObject> {
-    return new Promise(resolve => {
-      this.http
-        .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
-          params: { ['rating']: 'true', ['configs']: 'true', ['insurance']: 'true' }
-        })
-        .subscribe((response: BakingBadResponse) => {
-          if (response !== null) {
-            resolve({ status: 'success', rating: response.rating.status })
-          } else {
-            resolve({ status: 'error' })
-          }
-        })
-    })
+  getBakingBadRatings(address: string): Observable<BakingBadResponse> {
+    return this.http
+      .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
+        params: { rating: 'true', configs: 'true', insurance: 'true' }
+      })
+      .pipe(
+        map(response => ({
+          ...response,
+          status: response ? 'success' : 'error'
+        }))
+      )
   }
 
   async getTezosBakerInfos(address: string): Promise<MyTezosBakerResponse> {
@@ -149,8 +139,6 @@ export class BakingService {
   }
 
   getEfficiencyLast10Cycles(address: string): Observable<number> {
-    return this.http.get<Efficiency>(`${this.efficiencyLast10CyclesUrl}${address}`).pipe(
-      map(get(efficiency => efficiency[address]))
-    )
+    return this.http.get<Efficiency>(`${this.efficiencyLast10CyclesUrl}${address}`).pipe(map(get(efficiency => efficiency[address])))
   }
 }

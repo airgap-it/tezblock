@@ -45,7 +45,6 @@ import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
 import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
@@ -74,6 +73,8 @@ import { BakerTableEffects } from './components/baker-table/effects';
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
+import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
   imports: [
@@ -136,7 +137,6 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
     HeaderItemComponent,
     QrItemComponent,
     QrModalComponent,
-    TezblockTableComponent,
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,
@@ -160,7 +160,9 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
     ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
-    OccurrenceStatisticsComponent
+    OccurrenceStatisticsComponent,
+    TezblockTableComponent,
+    ClientSideTableComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

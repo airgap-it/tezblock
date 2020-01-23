@@ -4,8 +4,9 @@ import { forkJoin, Observable, of } from 'rxjs'
 import { map, switchMap, filter, catchError } from 'rxjs/operators'
 
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
-import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
+import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 type KindType = string | string[]
 
@@ -15,10 +16,13 @@ export interface Tab {
   count: number
   kind: KindType
   icon?: string[]
+  columns?: Column[]
 }
 
 const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
 const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(tab.title) === toLowerCase(anotherTabTitle)
+
+export const kindToOperationTypes = (kind: KindType): string => (Array.isArray(kind) ? OperationTypes.Ballot : kind)
 
 @Component({
   selector: 'tabbed-table',
@@ -32,11 +36,13 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   selectedTab: Tab | undefined
 
   @Input()
-  set tabs(tabs: Tab[]) {
-    this._tabs = tabs
+  set tabs(value: Tab[]) {
+    if (value !== this._tabs) {
+      this._tabs = value
 
-    const selectedTab = tabs.find(tab => tab.kind === OperationTypes.Transaction)
-    this.updateSelectedTab(selectedTab)
+      const selectedTab = value.find(tab => tab.kind === OperationTypes.Transaction)
+      this.updateSelectedTab(selectedTab)
+    }
   }
 
   get tabs() {
@@ -50,8 +56,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   actionType$: Observable<LayoutPages>
 
-  @Input()
-  data?: Observable<any[]> // TODO: <any>
+  @Input() data?: any[]
 
   @Input()
   loading?: Observable<boolean>
@@ -62,7 +67,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
-  private _tabs: Tab[] | undefined = []
+  private _tabs: Tab[] | undefined
 
   constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
     super()
@@ -118,10 +123,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   onLoadMore() {
     this.loadMore.emit(true)
-  }
-
-  kindToOperationTypes(kind: KindType): string {
-    return Array.isArray(kind) ? OperationTypes.Ballot : kind
   }
 
   private updateTabsCounts$ = (type: LayoutPages): Observable<boolean> => {
