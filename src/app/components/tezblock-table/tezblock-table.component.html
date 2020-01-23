@@ -1,3 +1,31 @@
+<ng-template #basicTemplate let-context>
+  {{ context?.data }}
+</ng-template>
+<ng-template #amountTemplate let-context>
+  <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
+</ng-template>
+<ng-template #addressTemplate let-context>
+  <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
+</ng-template>
+<ng-template #percentageTemplate let-context>
+  {{ context?.data | percentage }}
+</ng-template>
+<ng-template #timestampTemplate let-context>
+  <app-timestamp-cell [data]="context?.data"></app-timestamp-cell>
+</ng-template>
+<ng-template #blockTemplate let-context>
+  <app-block-cell [data]="context?.data"></app-block-cell>
+</ng-template>
+<ng-template #symbolTemplate>
+  <app-symbol-cell></app-symbol-cell>
+</ng-template>
+<ng-template #hashTemplate let-context>
+  <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
+</ng-template>
+<ng-template #modalTemplate let-context>
+  <app-modal-cell [data]="context?.data"></app-modal-cell>
+</ng-template>
+
 <div class="container p-0" *ngIf="loading; else loaded">
   <table class="table" style="border-collapse: initial">
     <thead>
@@ -28,83 +56,34 @@
 <ng-template #loaded>
   <div class="table-responsive mb-3">
     <table class="table table-hover">
-      <ng-container *ngIf="transactions">
-        <ng-container *ngIf="transactions.length > 0; then thenTemplate; else elseTemplate"></ng-container>
+      <ng-container *ngIf="data">
+        <ng-container *ngIf="data.length > 0; then thenTemplate; else elseTemplate"></ng-container>
       </ng-container>
       <ng-template #thenTemplate>
         <thead>
           <tr>
-            <th *ngFor="let col of config" scope="col" [width]="col.width">
-              {{ col.name }}
+            <th *ngFor="let column of columns" [width]="column.width">
+              {{ column.name }}
             </th>
+            <th *ngIf="expandedRow"></th>
           </tr>
         </thead>
         <tbody>
-          <ng-container *ngIf="transactions">
-            <ng-container *ngFor="let transaction of transactions; let i = index">
-              <tr [ngClass]="{ 'table-danger': transaction.status && transaction.status !== 'applied' }" (click)="expand(transaction)">
-                <!--tx status is always 'null' for endorsements-->
-                <td *ngFor="let col of config; let j = index; trackBy: trackByFn.bind(this)">
-                  <ng-template #dynamic></ng-template>
+          <ng-container *ngIf="data">
+            <ng-container *ngFor="let item of data; let i = index">
+              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
+                <td *ngFor="let column of columns; trackBy: trackByFn">
+                  <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
+                </td>
+                <td *ngIf="expandedRow">
+                  <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
                 </td>
               </tr>
-              <tr class="table-extended__active" *ngIf="isExpanded(transaction)">
+              <tr *ngIf="isExpanded(item)" class="table-extended__active">
                 <td colspan="10" class="py-3 px-0">
-                  <ng-container *ngIf="enableSearch">
-                    <div class="input-group input-group-main">
-                      <input
-                        class="form-control form-control--focus-white"
-                        placeholder="Filter by Address"
-                        [formControl]="filterTerm"
-                        (keydown.enter)="filterTransactions(transaction)"
-                      />
-                      <div class="input-group-append">
-                        <button class="btn btn-primary" type="submit" (click)="filterTransactions(transaction)">
-                          <fa-icon [icon]="'search' | iconPipe" class="text-white d-inline-block d-sm-none"></fa-icon>
-                          <span class="d-none d-sm-inline-block">Filter</span>
-                        </button>
-                      </div>
-                    </div>
-                  </ng-container>
-                  <div class="table-responsive">
-                    <table class="table table-hover">
-                      <thead>
-                        <tr>
-                          <th *ngFor="let column of expandedRow.columns">
-                            {{ column.name }}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody *ngFor="let detail of expandedRowData[transaction[expandedRow.key]]">
-                        <tr>
-                          <td *ngFor="let column of expandedRow.columns" [ngSwitch]="column.component">
-                            <address-cell *ngSwitchCase="'address-cell'" [data]="detail[column.property]"></address-cell>
-                            <amount-cell *ngSwitchCase="'amount-cell'" [data]="detail[column.property]"></amount-cell>
-                            <app-timestamp-cell *ngSwitchCase="'app-timestamp-cell'" [data]="detail[column.property]"></app-timestamp-cell>
-                            <app-block-cell *ngSwitchCase="'app-block-cell'" [data]="detail[column.property]"></app-block-cell>
-                            <ng-container *ngSwitchCase="'pipe:percentage'">
-                                {{ detail[column.property] | percentage }}
-                            </ng-container>
-                            <ng-container *ngSwitchDefault>
-                                {{ detail[column.property] }}
-                            </ng-container>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="w-100 p-0 d-flex justify-content-sm-end">
-                      <pagination
-                        [totalItems]="expandedRowsPage[transaction[expandedRow.key]]?.total"
-                        (pageChanged)="pageChanged($event, transaction)"
-                        [boundaryLinks]="true"
-                        [rotate]="true"
-                        [maxSize]="5"
-                        [nextText]="'>'"
-                        [previousText]="'<'"
-                        [(ngModel)]="expandedRowsPage[transaction[expandedRow.key]].currentPage"
-                      ></pagination>
-                    </div>
-                  </div>
+                  <ng-container
+                    *ngTemplateOutlet="expandedRow.template; context: { $implicit: expandedRow.getContext(item) }"
+                  ></ng-container>
                 </td>
               </tr>
             </ng-container>
@@ -117,6 +96,6 @@
         </thead>
       </ng-template>
     </table>
-    <button *ngIf="showLoadMoreButton" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
+    <button *ngIf="pagination" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
   </div>
 </ng-template>

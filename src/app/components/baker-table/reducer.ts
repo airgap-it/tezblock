@@ -5,7 +5,7 @@ import * as actions from './actions'
 import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 interface TableState<T> {
   data: T[]

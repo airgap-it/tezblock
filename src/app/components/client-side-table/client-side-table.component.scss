@@ -1,0 +1,15 @@
+::ng-deep app-client-side-table {
+  .table-hover tbody tr.table-extended__active:hover {
+    background-color: transparent;
+  }
+  tr td:first-of-type,
+  tr th:first-of-type {
+    padding-left: 16px;
+  }
+  @media (max-width: 576px) {
+    tr td:first-of-type,
+    tr th:first-of-type {
+      padding-left: 0;
+    }
+  }
+}

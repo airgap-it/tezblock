@@ -5,7 +5,7 @@ import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
 import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages } from '@tezblock/domain/operations'
 import { NewTransactionService } from '../transaction/new-transaction.service'
 
 interface TransactionSingleServiceState {

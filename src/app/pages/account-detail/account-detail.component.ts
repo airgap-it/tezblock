@@ -30,8 +30,9 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
-import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { columns } from './table-definitions'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -61,7 +62,7 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
 export class AccountDetailComponent extends BaseComponent implements OnInit {
   account$: Observable<Account>
   delegatedAccountAddress: string | undefined
-  relatedAccounts: Observable<Account[]>
+  relatedAccounts$: Observable<Account[]>
   delegatedAmount: number | undefined
 
   get bakerAddress(): string | undefined {
@@ -97,20 +98,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   rights$: Observable<Object> = new Observable()
   current: string = 'copyGrey'
 
-  tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
-    { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
-  ]
-  bakerTabs: Tab[] = [
-    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
-    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
-    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
-    { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
-  ]
-  nextPayout: Date | undefined
+  tabs: Tab[]
+  bakerTabs: Tab[]
+
   rewardAmount$: Observable<string>
   rewardAmountMinusFee$: Observable<number>
   isRewardAmountMinusFeeBusy$: Observable<boolean>
@@ -120,21 +110,20 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     return this.activatedRoute.snapshot.params.id
   }
 
-  get account(): Account {
-    return fromRoot.getState(this.store$).accountDetails.account
-  }
-
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  isMainnet: boolean
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   actionType$: Observable<LayoutPages>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
 
-  // TODO: remove when api will work correctly
-  is_baker: boolean = false
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
+  //TODO: remove when api will be fixed
+  is_baker = false
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
@@ -157,12 +146,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   async ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.relatedAccounts = this.store$.select(state => state.accountDetails.relatedAccounts)
+    this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
@@ -184,12 +172,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$
-      .select(state => state.accountDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
@@ -212,11 +195,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.setTabs(address)
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.store$.dispatch(actions.loadBalanceForLast30Days())
-        this.is_baker = false
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -281,6 +264,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   getBakingInfos(address: string) {
+    this.is_baker = false
+
     this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
@@ -433,5 +418,57 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
+  }
+
+  private setTabs(pageId: string) {
+    this.tabs = [
+      {
+        title: 'Transactions',
+        active: true,
+        kind: 'transaction',
+        count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Delegations',
+        active: false,
+        kind: 'delegation',
+        count: null,
+        icon: this.iconPipe.transform('handReceiving'),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Originations',
+        active: false,
+        kind: 'origination',
+        count: null,
+        icon: this.iconPipe.transform('link'),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Endorsements',
+        active: false,
+        kind: 'endorsement',
+        count: null,
+        icon: this.iconPipe.transform('stamp'),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Votes',
+        active: false,
+        kind: 'ballot',
+        count: null,
+        icon: this.iconPipe.transform('boxBallot'),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
+      }
+    ]
+
+    this.bakerTabs = [
+      { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
+      { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
+      { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
+      { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
+    ]
   }
 }
