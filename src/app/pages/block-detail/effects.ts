@@ -8,7 +8,7 @@ import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 @Injectable()
 export class BlockDetailEffects {

@@ -13,13 +13,13 @@ export interface Busy {
 export interface State {
   address: string
   account: Account
-  delegatedAccounts: Account[],
-  relatedAccounts: Account[],
+  delegatedAccounts: Account[]
+  relatedAccounts: Account[]
   transactions: Transaction[]
   kind: string
   pageSize: number // transactions
   rewardAmont: string
-  busy: Busy,
+  busy: Busy
   balanceFromLast30Days: Balance[]
 }
 
@@ -75,6 +75,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
+    rewardAmont: null,
     busy: {
       ...state.busy,
       rewardAmont: false

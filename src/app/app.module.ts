@@ -16,6 +16,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
+import { StorageModule } from '@ngx-pwa/local-storage'
+
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
@@ -28,7 +30,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { AreaChartItemComponent } from './components/area-chart-item/area-chart-item.component'
+import { ChartItemComponent } from './components/chart-item/chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -43,7 +45,6 @@ import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
 import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
@@ -65,12 +66,15 @@ import { ChainNetworkService } from './services/chain-network/chain-network.serv
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects';
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
+import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
   imports: [
@@ -112,7 +116,8 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
       AccountDetailEffects,
       BakerTableEffects,
       BlockDetailEffects,
-      TransactionDetailEffects
+      TransactionDetailEffects,
+      ProposalDetailEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -132,7 +137,6 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     HeaderItemComponent,
     QrItemComponent,
     QrModalComponent,
-    TezblockTableComponent,
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,
@@ -140,7 +144,7 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -152,9 +156,13 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     ResourcesWalletItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
+    SearchItemComponent,
+    ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
-    OccurrenceStatisticsComponent
+    OccurrenceStatisticsComponent,
+    TezblockTableComponent,
+    ClientSideTableComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
@@ -175,7 +183,7 @@ import { OccurrenceStatisticsComponent } from './components/occurrence-statistic
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    AreaChartItemComponent,
+    ChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],

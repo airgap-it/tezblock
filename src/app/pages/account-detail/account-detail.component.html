@@ -115,18 +115,18 @@
                   [tooltip]="'Accounts that are either managed by this account or are the manager of this account.'"
                 ></tooltip-item>
               </h5>
-              <ng-container *ngIf="relatedAccounts | async as relatedAccountsList">
+              <ng-container *ngIf="relatedAccounts$ | async as relatedAccountsList">
                 <p *ngIf="relatedAccountsList.length === 0" class="text-secondary m-0">
                   This account has no related accounts.
                 </p>
-                <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts | async | slice: 0:paginationLimit" [@AnimateList]>
+                <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts$ | async | slice: 0:paginationLimit" [@AnimateList]>
                   <address-item
                     [address]="relatedAccount.account_id"
                     *ngIf="relatedAccount"
                     [showFull]="!(isMobile$ | async)"
                   ></address-item>
                 </div>
-                <div *ngIf="relatedAccounts | async as relatedAccountsList">
+                <div *ngIf="relatedAccounts$ | async as relatedAccountsList">
                   <button
                     class="btn btn-link p-0 collapse--btn"
                     *ngIf="paginationLimit < relatedAccountsList.length"
@@ -271,10 +271,13 @@
                   </div>
                   <div class="col col-md-7">
                     <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                        <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
-                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                      <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
+                        <amount-cell
+                          *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
+                          [data]="rewardAmountMinusFee"
+                        ></amount-cell>
+                        <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
                       </ng-container>
@@ -305,8 +308,8 @@
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7" *ngIf="tezosBakerFee; else loading">
-                    <p class="mb-0">{{ tezosBakerFee }}</p>
+                  <div class=" col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
+                    <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
                     <div class=" col-md-7">
@@ -320,39 +323,46 @@
         </div>
       </div>
 
-      <div class="pt-5" *ngIf="isValidBaker">
+      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
+      <div class="pt-5">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
-            <ng-container *ngIf="isValidBaker">
-              <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+            <ng-container *ngIf="is_baker">
+              <baker-table
+                [tabs]="bakerTabs"
+                [page]="'account'"
+                [data]="bakerTableInfos"
+                [ratings]="bakerTableRatings"
+                [bakerFee$]="tezosBakerFee$"
+              ></baker-table>
             </ng-container>
-            <!--
-            <div *ngIf="!isValidBaker || (bakerTabs[0].active)" class="container px-3 chart__container">
-              <div class="row">
-                <div class="col-md-6 col-lg-4 px-0 px-sm-3">
-                  <h5 class="card-title__secondary mb-3">
-                    Balance
-                    <small>last 30 days</small>
-                  </h5>
-                  <ng-container *ngIf="balanceChartDatasets$ | async">
-                    <area-chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></area-chart-item>
-                  </ng-container>
+            <ng-container *ngIf="!is_baker || bakerTabs[0].active">
+              <div class="container px-3 chart__container">
+                <div class="row">
+                  <div class="col-md-6 col-lg-4 px-0 px-sm-3">
+                    <h5 class="card-title__secondary mb-3">
+                      Balance
+                      <small>last 30 days</small>
+                    </h5>
+                    <ng-container *ngIf="balanceChartDatasets$ | async">
+                      <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
+                    </ng-container>
+                  </div>
                 </div>
               </div>
-            </div>
-            -->
+            </ng-container>
           </div>
         </div>
       </div>
 
-      <div class="pt-5">
+      <div #transactions class="pt-5">
         <div class="card pt-3">
           <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
             <tabbed-table
               [tabs]="tabs"
               [page]="'account'"
               [loading]="areTransactionsLoading$"
-              [data]="transactions$"
+              [data]="transactions$ | async"
               [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
