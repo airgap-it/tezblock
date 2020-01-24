@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
+import { of, combineLatest } from 'rxjs'
 import { catchError, map, switchMap, tap, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { isNil, negate } from 'lodash'
@@ -47,9 +47,11 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      this.store$.select(fromRoot.app.currentCycle).pipe(
-        filter(negate(isNil)),
-        tap(currentCycle => this.cacheService.set(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle }))
+      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get(CacheKeys.fromCurrentCycle)).pipe(
+        filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
+        tap(([currentCycle, cycleCache]) => {
+          this.cacheService.set(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle }).subscribe(() => {})
+        })
       ),
     { dispatch: false }
   )
