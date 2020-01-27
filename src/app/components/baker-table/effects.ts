@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { forkJoin, of } from 'rxjs'
-import { map, catchError, switchMap, tap, withLatestFrom, delay } from 'rxjs/operators'
+import { map, catchError, switchMap, tap, withLatestFrom, delay, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
 
@@ -158,6 +158,7 @@ export class BakerTableEffects {
   loadUpcomingRightsRefresh$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadUpcomingRightsSucceeded),
+      filter(({ upcomingRights }) => !!upcomingRights.baking && !!upcomingRights.endorsing),
       switchMap(({ upcomingRights }) => {
         const nextChange = Math.min(upcomingRights.baking.estimated_time, upcomingRights.endorsing.estimated_time)
         const changeInMilliseconds = moment.utc(nextChange).diff(moment.utc(), 'milliseconds')
