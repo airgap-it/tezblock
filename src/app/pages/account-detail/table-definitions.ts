@@ -172,7 +172,7 @@ export const columns: { [key: string]: (options: { pageId: string, showFiatValue
             name: 'Proposal Hash',
             field: 'proposal',
             template: Template.hash,
-            data: (item: Transaction) => ({ data: item.proposal })
+            data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
           }
     ].concat(<any>blockAndTxHashColumns)
 }
