@@ -28,6 +28,8 @@ export class NewTransactionService {
       operation: Operation.isnull,
       inverse: true
     }
+
+    // it was applied to transactions with kind ballot ...
     const preprocess = (transactions: Transaction[]) =>
         transactions.map(transaction => ({
           ...transaction,
@@ -60,7 +62,7 @@ export class NewTransactionService {
     }
 
     return this.apiService.getTransactionsByPredicates(predicates, limit).pipe(
-      map(preprocess),
+      // map(preprocess),
       switchMap(operation => {
         const transactions = operation
           .sort((a, b) => b.timestamp - a.timestamp)
