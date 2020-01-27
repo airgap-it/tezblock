@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
-import { Observable } from 'rxjs'
+import { from, Observable } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
+import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle'
@@ -14,7 +15,8 @@ export interface BakerData extends BakerTableRatings {
 }
 
 export interface ByCycleState {
-  cycleNumber: number
+  cycleNumber: number,
+  myTezosBaker?: TezosBakerResponse,
   fromAddress?: {
     [address: string]: {
       bakerData: BakerData
@@ -51,7 +53,7 @@ export class CacheService {
       this.executeUpdate(key, change).subscribe(() => {
         this.isBusy[key] = false
 
-        if (this.updateQueue[key].length > 0) {
+        if (this.updateQueue[key] && this.updateQueue[key].length > 0) {
           this.update(key, this.updateQueue[key].shift())
         }
       })
@@ -68,5 +70,7 @@ export class CacheService {
     return this.get(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
   }
 
-  constructor(private readonly storage: StorageMap) {}
+  constructor(private readonly storage: StorageMap) {
+    // from(navigator.storage.estimate()).subscribe(x => console.log(`>>>> IndexedDB storage: ${JSON.stringify(x)}`))
+  }
 }
