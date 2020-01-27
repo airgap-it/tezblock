@@ -14,7 +14,7 @@ import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate } from '../base.service'
+import { Predicate, Operation } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 export interface OperationCount {
@@ -339,6 +339,63 @@ export class ApiService {
               set: [kind]
             }
           ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'desc'
+            }
+          ],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        map((transactions: Transaction[]) => transactions.slice(0, limit)),
+        switchMap((transactions: Transaction[]) => {
+          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+
+          if (sources.length > 0) {
+            return this.getAccountsByIds(sources).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.source)
+
+                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+                })
+              )
+            )
+          }
+
+          return of(transactions)
+        }),
+        switchMap((transactions: Transaction[]) => {
+          const originatedAccounts = transactions
+            .filter(transaction => transaction.kind === 'origination')
+            .map(transaction => transaction.originated_contracts)
+
+          if (originatedAccounts.length > 0) {
+            return this.getAccountsByIds(originatedAccounts).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
+                })
+              )
+            )
+          }
+
+          return of(transactions)
+        })
+      )
+  }
+
+  public getTransactionsByPredicates(predicates: Predicate[], limit: number): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
+        this.transactionsApiUrl,
+        {
+          predicates: [...predicates],
           orderBy: [
             {
               field: 'block_level',
@@ -904,12 +961,12 @@ export class ApiService {
         const predicates = [
           {
             field: 'level',
-            operation: 'gt',
+            operation: Operation.gt,
             set: [minLevel]
           },
           {
             field: 'level',
-            operation: 'lt',
+            operation: Operation.lt,
             set: [maxLevel]
           }
         ]
@@ -961,7 +1018,7 @@ export class ApiService {
     const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
-        operation: 'eq',
+        operation: Operation.eq,
         set: [address]
       }
     ]).concat(predicates || [])
@@ -994,12 +1051,12 @@ export class ApiService {
         const predicates = [
           {
             field: 'level',
-            operation: 'gt',
+            operation: Operation.gt,
             set: [minLevel]
           },
           {
             field: 'level',
-            operation: 'lt',
+            operation: Operation.lt,
             set: [maxLevel]
           }
         ]
