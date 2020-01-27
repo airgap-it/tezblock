@@ -21,6 +21,7 @@ const kindToFieldsMap = {
 export class NewTransactionService {
   constructor(private readonly apiService: ApiService) {}
 
+  /*
   getAllTransactionsByAddress(address: string, kind: string, limit: number) {
     const fields = kindToFieldsMap[kind]
     const operations: Observable<Transaction[]>[] = []
@@ -106,9 +107,9 @@ export class NewTransactionService {
       })
     )
   }
+  */
 
-  /* ############## NEW ONE ################# */
-  getAllTransactionsByAddress2(address: string, kind: string, limit: number) {
+  getAllTransactionsByAddress(address: string, kind: string, limit: number) {
     const fields = kindToFieldsMap[kind]
     const idNotNullPredicate = {
       field: 'operation_group_hash',
