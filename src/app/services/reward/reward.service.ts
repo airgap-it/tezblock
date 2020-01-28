@@ -91,30 +91,25 @@ export class RewardService {
     if (this.calculatedRewardsMap.has(key)) {
       return this.calculatedRewardsMap.get(key)
     }
-    // else {
-    //   if (this.pendingPromise.has(key)) {
-    //     console.log('in if')
-    //     const rewardsPromise: Promise<TezosRewards> = this.pendingPromise[key]
-    //     const currentCycle = this.protocol.fetchCurrentCycle()
+    if (this.pendingPromise.has(key)) {
+      const currentCycle = await this.protocol.fetchCurrentCycle()
 
-    //     await Promise.all([rewardsPromise, currentCycle]).then(values => {
-    //       console.log('our values: ', values)
-    //       if (cycle < values[1]) {
-    //         console.log('rewards ', values[0])
-    //         this.calculatedRewardsMap.set(key, values[0])
-    //         return values[0]
-    //       }
-    //     })
-    //   } else {
-    //     this.pendingPromise.set(key, this.protocol.calculateRewards(address, cycle))
-    //   }
-    // }
+      const rewards = await this.pendingPromise.get(key)
 
-    const rewards = await this.protocol.calculateRewards(address, cycle)
-    const currentCycle = await this.protocol.fetchCurrentCycle()
-    if (cycle < currentCycle) {
-      this.calculatedRewardsMap.set(key, rewards)
+      if (cycle < currentCycle) {
+        this.calculatedRewardsMap.set(key, rewards)
+      }
+      return rewards
+    } else {
+      this.pendingPromise.set(key, this.protocol.calculateRewards(address, cycle))
+      return this.calculateRewards(address, cycle)
     }
-    return rewards
+
+    // const rewards = await this.protocol.calculateRewards(address, cycle)
+    // const currentCycle = await this.protocol.fetchCurrentCycle()
+    // if (cycle < currentCycle) {
+    //   this.calculatedRewardsMap.set(key, rewards)
+    // }
+    // return rewards
   }
 }
