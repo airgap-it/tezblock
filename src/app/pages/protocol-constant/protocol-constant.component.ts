@@ -100,8 +100,8 @@ export class ProtocolConstantComponent implements OnInit {
               let timestampString = response
               timestampString = new Date(timestampString)
               const now = new Date()
+              // TODO: most likely wrong value, deactivated for now
               this.timeBetweenPriority = (timestampString.getTime() - now.getTime()) / 1000
-              console.log('responsee: ', this.timeBetweenPriority)
             } else {
               resolve({ status: 'error' })
             }
