@@ -135,13 +135,12 @@
           <div class="row">
             <div class="col px-2">
               <tezblock-table
-                [loading]="loading$ | async"
-                [data]="transferOperations$ | async"
-                [page]="'contract'"
-                [type]="'transaction'"
-                [showLoadMoreButton]="showLoadMore$ | async"
-                (loadMoreClicked)="loadMore()"
-              ></tezblock-table>
+              [columns]="columns"
+              [data]="transferOperations$ | async"
+              [loading]="loading$ | async"
+              [pagination]="showLoadMore$ | async"
+              (onLoadMore)="loadMore()"
+            ></tezblock-table>
             </div>
           </div>
         </div>

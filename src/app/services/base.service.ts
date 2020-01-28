@@ -11,10 +11,17 @@ export interface Predicate {
   inverse?: boolean
 }
 
+export interface Aggregation
+{
+  field: string,
+  function: 'count' | 'sum'
+}
+
 export interface Body {
   fields?: string[]
   predicates: Predicate[]
   orderBy?: { field: string; direction: string }[]
+  aggregation?: Aggregation[]
   limit?: number
 }
 

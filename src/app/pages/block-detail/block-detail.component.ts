@@ -5,6 +5,7 @@ import { delay, map, switchMap, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { negate, isNil } from 'lodash'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
@@ -13,12 +14,12 @@ import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { columns } from './table-definitions'
+import { OperationTypes, LayoutPages } from '@tezblock/domain/operations'
 
 @Component({
   selector: 'app-block-detail',
@@ -37,22 +38,13 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
-  public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
-    {
-      title: 'Activations',
-      active: false,
-      kind: 'activate_account',
-      count: 0,
-      icon: this.iconPipe.transform('handHoldingSeedling')
-    }
-  ]
+  public tabs: Tab[]
 
-  public isMainnet: boolean
   actionType$: Observable<LayoutPages>
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   constructor(
     private readonly actions$: Actions,
@@ -65,19 +57,13 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
   ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
-    this.transactions$ = this.store$
-      .select(state => state.blockDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
@@ -87,7 +73,12 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Block))
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => this.store$.dispatch(actions.loadBlock({ id: paramMap.get('id') }))),
+      this.route.paramMap.subscribe(paramMap => {
+        const id: string = paramMap.get('id')
+
+        this.store$.dispatch(actions.loadBlock({ id }))
+        this.setTabs(id)
+      }),
 
       // refresh block
       merge(this.actions$.pipe(ofType(actions.loadBlockSucceeded)), this.actions$.pipe(ofType(actions.loadBlockFailed)))
@@ -119,5 +110,50 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   onLoadMore() {
     this.store$.dispatch(actions.increasePageSize())
+  }
+
+  private setTabs(pageId: string) {
+    this.tabs = [
+      {
+        title: 'Transactions',
+        active: true,
+        kind: 'transaction',
+        count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Delegations',
+        active: false,
+        kind: 'delegation',
+        count: null,
+        icon: this.iconPipe.transform('handReceiving'),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Originations',
+        active: false,
+        kind: 'origination',
+        count: null,
+        icon: this.iconPipe.transform('link'),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Endorsements',
+        active: false,
+        kind: 'endorsement',
+        count: null,
+        icon: this.iconPipe.transform('stamp'),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Activations',
+        active: false,
+        kind: 'activate_account',
+        count: 0,
+        icon: this.iconPipe.transform('handHoldingSeedling'),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet })
+      }
+    ]
   }
 }

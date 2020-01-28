@@ -5,11 +5,12 @@ import * as actions from './actions'
 import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
-import { OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
+  upcomingRights: boolean
 }
 
 export interface State {
@@ -19,7 +20,8 @@ export interface State {
   endorsingRights: TableState<AggregatedEndorsingRights>
   kind: string,
   efficiencyLast10Cycles: number,
-  busy: Busy
+  busy: Busy,
+  upcomingRights: actions.UpcomingRights
 }
 
 const initialState: State = {
@@ -30,8 +32,10 @@ const initialState: State = {
   kind: undefined,
   efficiencyLast10Cycles: undefined,
   busy: {
-    efficiencyLast10Cycles: false
-  }
+    efficiencyLast10Cycles: false,
+    upcomingRights: false
+  },
+  upcomingRights: undefined
 }
 
 const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
@@ -148,6 +152,7 @@ export const reducer = createReducer(
   on(actions.loadEfficiencyLast10Cycles, state => ({
     ...state,
     busy: {
+      ...state.busy,
       efficiencyLast10Cycles: true
     }
   })),
@@ -155,6 +160,7 @@ export const reducer = createReducer(
     ...state,
     efficiencyLast10Cycles,
     busy: {
+      ...state.busy,
       efficiencyLast10Cycles: false
     }
   })),
@@ -162,9 +168,31 @@ export const reducer = createReducer(
     ...state,
     efficiencyLast10Cycles: null,
     busy: {
+      ...state.busy,
       efficiencyLast10Cycles: false
     }
   })),
-
+  on(actions.loadUpcomingRights, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      upcomingRights: true
+    }
+  })),
+  on(actions.loadUpcomingRightsSucceeded, (state, { upcomingRights }) => ({
+    ...state,
+    upcomingRights,
+    busy: {
+      ...state.busy,
+      upcomingRights: false
+    }
+  })),
+  on(actions.loadUpcomingRightsFailed, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      upcomingRights: false
+    }
+  })),
   on(actions.reset, () => initialState)
 )

@@ -10,22 +10,30 @@ import { getContractByAddress } from '@tezblock/domain/contract'
 })
 export class AddressItemComponent {
   @Input()
-  public address?: string
+  set address(value: string) {
+    if (value !== this._address) {
+      this._address = value
+    }
+  }
+  get address(): string {
+    return this._address || ''
+  }
+  private _address: string
 
   @Input()
-  public clickableButton: boolean = true
+  clickableButton: boolean = true
 
   @Input()
-  public hideIdenticon: boolean = false
+  hideIdenticon: boolean = false
 
   @Input()
-  public forceIdenticon: boolean = false
+  forceIdenticon: boolean = false
 
   @Input()
-  public showFull: boolean = false
+  showFull: boolean = false
 
   @Input()
-  public isText: boolean
+  isText: boolean
 
   constructor(private readonly router: Router) {}
 

@@ -3,7 +3,9 @@ import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { from, Observable, combineLatest } from 'rxjs'
 import { animate, state, style, transition, trigger } from '@angular/animations'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
@@ -12,6 +14,9 @@ import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { columns } from './table-definitions'
 
 @Component({
   selector: 'app-contract-detail',
@@ -44,13 +49,18 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   loading$: Observable<boolean>
   transferOperations$: Observable<ContractOperation[]>
   showLoadMore$: Observable<boolean>
-
+  columns: Column[]
   current: string = 'copyGrey'
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   constructor(
     private readonly accountService: AccountService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly aliasPipe: AliasPipe,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -59,6 +69,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.columns = columns[OperationTypes.Transaction]({ pageId: address, showFiatValue: this.isMainnet })
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
 
