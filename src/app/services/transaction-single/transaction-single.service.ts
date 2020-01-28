@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core'
 import { combineLatest, merge, Observable, of, timer } from 'rxjs'
-import { distinctUntilChanged, map, switchMap, filter } from 'rxjs/operators'
+import { distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators'
 
+import * as store from '@ngrx/store'
+import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import * as fromRoot from '@tezblock/reducers'
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
-import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { distinctPagination, distinctString, distinctTransactionArray, Facade, Pagination, refreshRate } from '../facade/facade'
 import { NewTransactionService } from '../transaction/new-transaction.service'
-import { setTime } from 'ngx-bootstrap/chronos/utils/date-setters'
 
 interface TransactionSingleServiceState {
   transactions: Transaction[]
@@ -42,45 +43,49 @@ const initialState: TransactionSingleServiceState = {
   providedIn: 'root'
 })
 export class TransactionSingleService extends Facade<TransactionSingleServiceState> {
-  transactions$ = this.state$.pipe(
+  public transactions$ = this.state$.pipe(
     map(state => state.transactions),
     distinctUntilChanged(distinctTransactionArray)
   )
-  kind$ = this.state$.pipe(
+  public kind$ = this.state$.pipe(
     map(state => state.kind),
     distinctUntilChanged(distinctString)
   )
-  hash$ = this.state$.pipe(
+  public hash$ = this.state$.pipe(
     map(state => state.hash),
     distinctUntilChanged(distinctString)
   )
-  address$ = this.state$.pipe(
+  public address$ = this.state$.pipe(
     map(state => state.address),
     distinctUntilChanged(distinctString)
   )
-  block$ = this.state$.pipe(
+  public block$ = this.state$.pipe(
     map(state => state.block),
     distinctUntilChanged(distinctString)
   )
-  pagination$ = this.state$.pipe(
+  public pagination$ = this.state$.pipe(
     map(state => state.pagination),
     distinctUntilChanged(distinctPagination)
   )
-  loading$ = this.state$.pipe(map(state => state.loading))
+  public loading$ = this.state$.pipe(map(state => state.loading))
 
-  actionType$: Observable<LayoutPages>
+  public actionType$: Observable<LayoutPages>
 
-  constructor(private readonly apiService: ApiService, private readonly transactionService: NewTransactionService) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly transactionService: NewTransactionService,
+    private readonly store$: store.Store<fromRoot.State>
+  ) {
     super(initialState)
 
     const actions$ = [this.pagination$, this.hash$, this.kind$, this.address$, this.block$]
     const refreshAction$ = merge(of(-1), merge(...actions$).pipe(switchMap(() => timer(refreshRate, refreshRate))))
     const stream$ = combineLatest([this.pagination$, this.hash$, this.kind$, this.address$, this.block$, refreshAction$]).pipe(
-      filter(([pagination, hash, kind, address, block, _]) => !!hash || !!address || !!block)
+      filter(([, hash, , address, block, _]) => !!hash || !!address || !!block)
     )
 
     this.actionType$ = stream$.pipe(
-      map(([pagination, hash, kind, address, block, _]) => {
+      map(([, hash, , address, block, _]) => {
         if (hash) {
           return LayoutPages.Transaction
         }
@@ -120,31 +125,31 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
       })
   }
 
-  updateAddress(address: string) {
+  public updateAddress(address: string) {
     if (address !== this._state.address) {
       this.updateState({ ...this._state, address, hash: undefined, block: undefined, loading: true })
     }
   }
 
-  updateBlockHash(block: string) {
+  public updateBlockHash(block: string) {
     if (block !== this._state.block) {
       this.updateState({ ...this._state, block, hash: undefined, address: undefined, loading: true })
     }
   }
 
-  updateTransactionHash(hash: string) {
+  public updateTransactionHash(hash: string) {
     if (hash !== this._state.hash) {
       this.updateState({ ...this._state, hash, block: undefined, address: undefined, loading: true })
     }
   }
 
-  updateKind(kind: string) {
+  public updateKind(kind: string) {
     if (kind !== this._state.kind) {
       this.updateState({ ...this._state, kind, loading: true })
     }
   }
 
-  loadMore() {
+  public loadMore() {
     const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
     this.updateState({ ...this._state, pagination, loading: true })
   }
@@ -152,64 +157,72 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
   // TODO: getAllTransactionsByAddress needs to be redone. As of now, in case of delegations, the index value delegatedBalance
   // is not assigned at runtime and therefore we need to make use of setTimeout
   public download(layoutPage: string = 'account', limit: number = 100) {
+    const account$ = this.store$.select(state => state.accountDetails.account.account_id)
+    const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
+    const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
+
     console.log('downloading')
-    console.log('this address: ', this._state.address) // is undefined
     if (layoutPage === 'account') {
-      this.transactionService.getAllTransactionsByAddress(this._state.address, this._state.kind, limit).subscribe(transactions => {
-        console.log('transactions: ', transactions)
-        setTimeout(() => {
-          let data = transactions
-          let csvData = this.ConvertToCSV(data)
-          let a = document.createElement('a')
-          a.setAttribute('style', 'display:none;')
-          document.body.appendChild(a)
-          let blob = new Blob([csvData], { type: 'text/csv' })
-          let url = window.URL.createObjectURL(blob)
-          a.href = url
-          a.download = this._state.kind + '.csv'
-          // a.click()
-        }, 1000)
+      account$.subscribe(account => {
+        this.transactionService.getAllTransactionsByAddress(account, this._state.kind, limit).subscribe(transactions => {
+          setTimeout(() => {
+            const data = transactions
+            const csvData = this.ConvertToCSV(data)
+            const a = document.createElement('a')
+            a.setAttribute('style', 'display:none;')
+            document.body.appendChild(a)
+            const blob = new Blob([csvData], { type: 'text/csv' })
+            const url = window.URL.createObjectURL(blob)
+            a.href = url
+            a.download = this._state.kind + '.csv'
+            a.click()
+          }, 1000)
+        })
       })
     } else if (layoutPage === 'block') {
-      this.apiService.getTransactionsByField(this._state.block, 'block_hash', this._state.kind, limit).subscribe(transactions => {
-        setTimeout(() => {
-          let data = transactions
-          let csvData = this.ConvertToCSV(data)
-          let a = document.createElement('a')
-          a.setAttribute('style', 'display:none;')
-          document.body.appendChild(a)
-          let blob = new Blob([csvData], { type: 'text/csv' })
-          let url = window.URL.createObjectURL(blob)
-          a.href = url
-          a.download = this._state.kind + '.csv'
-          a.click()
-        }, 1000)
+      block$.subscribe(block => {
+        this.apiService.getTransactionsByField(block, 'block_hash', this._state.kind, limit).subscribe(transactions => {
+          setTimeout(() => {
+            const data = transactions
+            const csvData = this.ConvertToCSV(data)
+            const a = document.createElement('a')
+            a.setAttribute('style', 'display:none;')
+            document.body.appendChild(a)
+            const blob = new Blob([csvData], { type: 'text/csv' })
+            const url = window.URL.createObjectURL(blob)
+            a.href = url
+            a.download = this._state.kind + '.csv'
+            a.click()
+          }, 1000)
+        })
       })
     } else if (layoutPage === 'transaction') {
-      this.apiService.getTransactionsById(this._state.hash, limit).subscribe(transactions => {
-        setTimeout(() => {
-          let data = transactions
-          let csvData = this.ConvertToCSV(data)
-          let a = document.createElement('a')
-          a.setAttribute('style', 'display:none;')
-          document.body.appendChild(a)
-          let blob = new Blob([csvData], { type: 'text/csv' })
-          let url = window.URL.createObjectURL(blob)
-          a.href = url
-          a.download = this._state.kind + '.csv'
-          a.click()
-        }, 1000)
+      hash$.subscribe(hash => {
+        this.apiService.getTransactionsById(hash, limit).subscribe(transactions => {
+          setTimeout(() => {
+            const data = transactions
+            const csvData = this.ConvertToCSV(data)
+            const a = document.createElement('a')
+            a.setAttribute('style', 'display:none;')
+            document.body.appendChild(a)
+            const blob = new Blob([csvData], { type: 'text/csv' })
+            const url = window.URL.createObjectURL(blob)
+            a.href = url
+            a.download = this._state.kind + '.csv'
+            a.click()
+          }, 1000)
+        })
       })
     }
   }
 
   private ConvertToCSV(objArray: any): string {
-    let array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+    const array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
     let str = ''
     let row = ''
-    let indexTable: string[] = []
+    const indexTable: string[] = []
 
-    for (let index in objArray[0]) {
+    for (const index in objArray[0]) {
       if (
         index === 'source' ||
         index === 'destination' ||
@@ -228,7 +241,6 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
         indexTable.push(index)
       }
     }
-    console.log('index table: ', indexTable)
     row = row.slice(0, -1)
     str += row + '\r\n'
 
@@ -246,14 +258,7 @@ export class TransactionSingleService extends Facade<TransactionSingleServiceSta
           line += array[i][index]
         }
       })
-      // for (const index in indexTable) {
-      //   console.log('index: ', indexTable)
-      //   if (line != '') {
-      //     line += ','
-      //   }
-      //   console.log('array i index: ', array[i])
-      //   line += array[i][index]
-      // }
+
       str += line + '\r\n'
     }
 
