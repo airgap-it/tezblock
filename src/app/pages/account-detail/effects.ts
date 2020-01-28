@@ -53,9 +53,7 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(
-        this.store$.select(state => state.accountDetails.pageSize),
-        this.store$.select(state => state.accountDetails.address)),
+      withLatestFrom(this.store$.select(state => state.accountDetails.pageSize), this.store$.select(state => state.accountDetails.address)),
       switchMap(([{ kind }, pageSize, address]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
@@ -70,6 +68,19 @@ export class AccountDetailEffects {
       ofType(actions.increasePageSize),
       withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
+  loadBalanceForLast30Days$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBalanceForLast30Days),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, accountAddress]) =>
+        this.apiService.getBalanceForLast30Days(accountAddress).pipe(
+          map(balanceFromLast30Days => actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })),
+          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
+        )
+      )
     )
   )
 

@@ -1,12 +1,12 @@
 import { BaseChartDirective } from 'ng2-charts'
-import { CryptoPricesService } from './../../services/crypto-prices/crypto-prices.service'
-import { PricechartItemComponent } from './pricechart-item.component'
+import { CryptoPricesService } from '../../services/crypto-prices/crypto-prices.service'
+import { ChartItemComponent } from './chart-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-describe('PricechartItemComponent', () => {
-  let component: PricechartItemComponent
-  let fixture: ComponentFixture<PricechartItemComponent>
+describe('AreaChartItemComponent', () => {
+  let component: ChartItemComponent
+  let fixture: ComponentFixture<ChartItemComponent>
 
   let unitHelper: UnitHelper
   beforeEach(() => {
@@ -15,13 +15,14 @@ describe('PricechartItemComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [CryptoPricesService],
-        declarations: [PricechartItemComponent, BaseChartDirective]
+        declarations: [ChartItemComponent, BaseChartDirective]
       })
     )
       .compileComponents()
       .catch(console.error)
-    fixture = TestBed.createComponent(PricechartItemComponent)
+    fixture = TestBed.createComponent(ChartItemComponent)
     component = fixture.componentInstance
+    component.datasets = [{ data: [], label: null }]
     fixture.detectChanges()
   })
 

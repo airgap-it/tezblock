@@ -1,3 +1,5 @@
+const noBraces: RegExp = /[\[\]']/g
+
 const hasLengthGreaterThanZero = (array: any[]) => array.length > 0
 export const isNotEmptyArray = (array: any) => Array.isArray(array) && hasLengthGreaterThanZero(array)
 export const filter = (condition: (entity) => boolean) => (array: any[]) => array.filter(condition)
@@ -16,3 +18,7 @@ export const groupBy = (key: string) => (array: any[]) =>
     ;(accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
     return accumulator
   }, {})
+export const toArray = (value: any) => [value]
+
+export const withoutBraces = (value: string): string => value ? value.replace(noBraces, '') : value
+

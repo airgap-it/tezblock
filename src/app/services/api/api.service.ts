@@ -14,6 +14,8 @@ import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { Predicate } from '../base.service'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 export interface OperationCount {
   [key: string]: string
@@ -39,11 +41,9 @@ export interface NumberOfDelegatorsByBakers {
   number_of_delegators: number
 }
 
-interface Predicate {
-  field: string
-  operation: string
-  set: any[]
-  inverse?: boolean
+export interface Balance {
+  balance: number
+  asof: number
 }
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -64,6 +64,7 @@ export class ApiService {
   private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
   private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
   private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
+  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
 
   private readonly options = {
     headers: new HttpHeaders({
@@ -349,46 +350,42 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => {
-          let finalTransactions: Transaction[] = []
-          finalTransactions = transactions.slice(0, limit)
-          const sources = []
-          const originatedAccounts = []
-
-          finalTransactions.forEach(transaction => {
-            if (transaction.kind === 'delegation') {
-              sources.push(transaction.source)
-            } else if (transaction.kind === 'origination') {
-              originatedAccounts.push(transaction.originated_contracts)
-            }
-          })
+        map((transactions: Transaction[]) => transactions.slice(0, limit)),
+        switchMap((transactions: Transaction[]) => {
+          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
 
           if (sources.length > 0) {
-            const delegateSources = this.getAccountsByIds(sources)
-            delegateSources.subscribe(delegators => {
-              finalTransactions.forEach(transaction => {
-                delegators.forEach(delegator => {
-                  if (transaction.source === delegator.account_id) {
-                    transaction.delegatedBalance = delegator.balance
-                  }
+            return this.getAccountsByIds(sources).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.source)
+
+                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
                 })
-              })
-            })
-          }
-          if (originatedAccounts.length > 0) {
-            const originatedSources = this.getAccountsByIds(originatedAccounts)
-            originatedSources.subscribe(originators => {
-              finalTransactions.forEach(transaction => {
-                originators.forEach(originator => {
-                  if (transaction.originated_contracts === originator.account_id) {
-                    transaction.originatedBalance = originator.balance
-                  }
-                })
-              })
-            })
+              )
+            )
           }
 
-          return finalTransactions
+          return of(transactions)
+        }),
+        switchMap((transactions: Transaction[]) => {
+          const originatedAccounts = transactions
+            .filter(transaction => transaction.kind === 'origination')
+            .map(transaction => transaction.originated_contracts)
+
+          if (originatedAccounts.length > 0) {
+            return this.getAccountsByIds(originatedAccounts).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
+                })
+              )
+            )
+          }
+
+          return of(transactions)
         })
       )
   }
@@ -866,7 +863,7 @@ export class ApiService {
   }
 
   public getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
@@ -877,7 +874,7 @@ export class ApiService {
         operation: 'eq',
         set: ['0']
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<BakingRights[]>(
@@ -961,13 +958,13 @@ export class ApiService {
   }
 
   public getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
-    const _predicates = [
+    const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
         set: [address]
       }
-    ].concat(predicates || [])
+    ]).concat(predicates || [])
 
     return this.http
       .post<EndorsingRights[]>(
@@ -1087,7 +1084,7 @@ export class ApiService {
   public getFrozenBalance(tzAddress: string): Promise<number> {
     return new Promise((resolve, reject) => {
       this.http
-        .post(
+        .post<any[]>(
           this.delegatesApiUrl,
           {
             predicates: [
@@ -1102,7 +1099,12 @@ export class ApiService {
           this.options
         )
         .subscribe(result => {
-          resolve(result[0].frozen_balance)
+          resolve(
+            pipe<any[], any, number>(
+              first,
+              get(_first => _first.frozen_balance)
+            )(result)
+          )
         })
     })
   }
@@ -1235,6 +1237,81 @@ export class ApiService {
             number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
           }))
         )
+      )
+  }
+
+  getProposal(id: string): Observable<any> {
+    return this.http
+      .post<any>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'period'],
+          predicates: [{ field: 'proposal', operation: 'eq', set: [id], inverse: false }],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(map(first))
+  }
+
+  getProposals(limit: number): Observable<ProposalListDto[]> {
+    return this.http
+      .post<ProposalListDto[]>(
+        this.transactionsApiUrl,
+        {
+          fields: ['proposal', 'operation_group_hash', 'period'],
+          predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
+          orderBy: [{ field: 'period', direction: 'desc' }],
+          aggregation: [{ field: 'operation_group_hash', function: 'count' }],
+          limit
+        },
+        this.options
+      )
+      .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
+  }
+
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+    const today = new Date()
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
   }
 }

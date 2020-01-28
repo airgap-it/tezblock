@@ -19,7 +19,7 @@
               [tabs]="tabs"
               [page]="'transaction'"
               [loading]="transactionsLoading$"
-              [data]="filteredTransactions$"
+              [data]="filteredTransactions$ | async"
               [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"

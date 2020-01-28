@@ -3,11 +3,11 @@ import { combineLatest, merge, Observable, of, timer } from 'rxjs'
 import { distinctUntilChanged, filter, map, switchMap } from 'rxjs/operators'
 
 import * as store from '@ngrx/store'
-import { LayoutPages } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import * as fromRoot from '@tezblock/reducers'
 import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
-import { distinctPagination, distinctString, distinctTransactionArray, Facade, Pagination, refreshRate } from '../facade/facade'
+import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
+import { LayoutPages } from '@tezblock/domain/operations'
 import { NewTransactionService } from '../transaction/new-transaction.service'
 
 interface TransactionSingleServiceState {

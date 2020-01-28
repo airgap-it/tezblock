@@ -7,7 +7,7 @@
     [typeaheadMinLength]="0"
     typeaheadOptionField="name"
     typeaheadGroupField="type"
-    placeholder="Search by Address / Alias / Tx Hash / Block Hash"
+    placeholder="Search by Address / Alias / Transaction / Block"
     class="form-control form-control--focus-white"
     (keydown.enter)="onKeyEnter()"
     (typeaheadOnSelect)="onSelect($event)"
@@ -15,9 +15,13 @@
   />
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit" (click)="search()">
-      <fa-icon [icon]="'search' | iconPipe" class="text-white" [ngClass]="{ 'd-inline-block': !!buttonLabel, 'd-sm-none': !!buttonLabel }"></fa-icon>
+      <fa-icon
+        [icon]="'search' | iconPipe"
+        class="text-white"
+        [ngClass]="{ 'd-inline-block': !!buttonLabel, 'd-sm-none': !!buttonLabel }"
+      ></fa-icon>
       <ng-container *ngIf="buttonLabel">
-          <span class="d-none d-sm-inline-block">{{ buttonLabel }}</span>
+        <span class="d-none d-sm-inline-block">{{ buttonLabel }}</span>
       </ng-container>
     </button>
   </div>
