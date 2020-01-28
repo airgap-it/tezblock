@@ -9,7 +9,7 @@ import { EMPTY } from 'rxjs'
 
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TabbedTableComponent } from 'src/app/components/tabbed-table/tabbed-table.component'
-import { TezblockTableComponent } from 'src/app/components/tezblock-table/tezblock-table.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { TransactionItemComponent } from 'src/app/components/transaction-item/transaction-item.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
@@ -20,6 +20,11 @@ import { TransactionDetailComponent } from './transaction-detail.component'
 import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
+import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
+import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
+import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
+import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -31,13 +36,7 @@ describe('TransactionDetailComponent', () => {
 
     TestBed.configureTestingModule(
       unitHelper.testBed({
-        providers: [
-          AmountConverterPipe,
-          TabsetConfig,
-          BsModalService,
-          ToastrService,
-          { provide: Actions, useValue: EMPTY }
-        ],
+        providers: [AmountConverterPipe, TabsetConfig, BsModalService, ToastrService, { provide: Actions, useValue: EMPTY }],
         imports: [
           MomentModule,
           FontAwesomeModule,
@@ -58,7 +57,12 @@ describe('TransactionDetailComponent', () => {
           AmountCellComponent,
           BlockCellComponent,
           TransactionDetailWrapperComponent,
-          LoadingSkeletonComponent
+          LoadingSkeletonComponent,
+          TooltipItemComponent,
+          SymbolCellComponent,
+          HashCellComponent,
+          ModalCellComponent,
+          ExtendTableCellComponent
         ]
       })
     )

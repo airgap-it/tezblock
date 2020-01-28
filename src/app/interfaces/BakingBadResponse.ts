@@ -9,11 +9,12 @@ export interface BakingBadResponse {
   site?: string
   stakingBalance?: number
   stakingCapacity?: number
+  status?: string
 }
 
 export interface Config {
   address: string
-  fee: number
+  fee: FeeByCycle[]
   minBalance: number
   minPayout: number
   payoutDelay: number
@@ -33,4 +34,9 @@ export interface Rating {
   sharedConfig: string
   status: number
   toCycle: number
+}
+
+export interface FeeByCycle {
+  cycle: number
+  value: number
 }

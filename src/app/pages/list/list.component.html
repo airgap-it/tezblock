@@ -1,40 +1,61 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
     <div class="card h-100 pt-3">
-      <div class="card-body p-4 ">
-        <h5 class="card-title mb-3 ">
-          <ng-container *ngIf="page === 'transaction' && type === 'overview'">
+      <div class="card-body p-4">
+        <h5 [ngSwitch]="routeName$ | async" class="card-title mb-3">
+          <ng-container *ngSwitchCase="'transaction'">
             Transactions
+            <app-occurrence-statistics
+              kind="Transactions"
+              [count]="transactionsCountLast24h$ | async"
+              [chartDatasets]="transactionsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
-          <ng-container *ngIf="page === 'block'">
+          <ng-container *ngSwitchCase="'block'">
             Blocks
           </ng-container>
-          <ng-container *ngIf="type === 'activate_account'">
+          <ng-container *ngSwitchCase="'activation'">
             Activations
+            <app-occurrence-statistics
+              kind="Activations"
+              [count]="activationsCountLast24h$ | async"
+              [chartDatasets]="activationsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
-          <ng-container *ngIf="type === 'origination_overview'">
+          <ng-container *ngSwitchCase="'origination'">
             Originations
+            <app-occurrence-statistics
+              kind="Originations"
+              [count]="originationsCountLast24h$ | async"
+              [chartDatasets]="originationsChartDatasets$ | async"
+              [chartLabels]="chartLabels"
+            ></app-occurrence-statistics>
           </ng-container>
-          <ng-container *ngIf="type === 'delegation_overview'">
+          <ng-container *ngSwitchCase="'delegation'">
             Delegations
           </ng-container>
-          <ng-container *ngIf="type === 'endorsement_overview'">
+          <ng-container *ngSwitchCase="'endorsement'">
             Endorsements
           </ng-container>
-          <ng-container *ngIf="type === 'ballot_overview'">
+          <ng-container *ngSwitchCase="'vote'">
             Votes
           </ng-container>
-          <ng-container *ngIf="type === 'double_baking_evidence_overview'">
+          <ng-container *ngSwitchCase="'proposal'">
+            Proposals
+          </ng-container>
+          <ng-container *ngSwitchCase="'double-baking'">
             Double Baking Evidence
           </ng-container>
-          <ng-container *ngIf="type === 'double_endorsement_evidence_overview'">
+          <ng-container *ngSwitchCase="'double-endorsement'">
             Double Endorsement Evidence
           </ng-container>
-          <ng-container *ngIf="type === 'baker_overview'">
+          <ng-container *ngSwitchCase="'bakers'">
             Bakers
           </ng-container>
         </h5>
-        <div *ngIf="type === 'baker_overview'" class="row">
+        <div *ngIf="(routeName$ | async) === 'bakers'" class="row">
           <div class="col py-3">
             <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
               <h5 class="card-title__secondary mb-3 ">
@@ -50,16 +71,14 @@
         <div class="row">
           <div class="col px-2">
             <tezblock-table
-              [loading]="loading$ | async"
+              [columns]="columns"
               [data]="data$ | async"
-              [page]="page"
-              [type]="type"
-              [showLoadMoreButton]="true"
-              (loadMoreClicked)="loadMore()"
+              [loading]="loading$ | async"
+              [pagination]="showLoadMore$ | async"
+              (onLoadMore)="loadMore()"
             ></tezblock-table>
           </div>
         </div>
-        <ng-template list></ng-template>
       </div>
     </div>
   </div>

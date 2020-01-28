@@ -3,6 +3,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
+import { ChartsModule } from 'ng2-charts'
 
 import { AmountCellComponent } from './../tezblock-table/amount-cell/amount-cell.component'
 import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
@@ -10,11 +11,16 @@ import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-ce
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { BakerTableComponent } from './baker-table.component'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
-import { TezblockTableComponent } from './../tezblock-table/tezblock-table.component'
+import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { AddressItemComponent } from '../address-item/address-item.component'
 import { IdenticonComponent } from '../identicon/identicon'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { ClientSideTableComponent } from '@tezblock/components/client-side-table/client-side-table.component'
+import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
+import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
+import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
+import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -25,7 +31,7 @@ describe('BakerTableComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [RightsSingleService, TabsetConfig, IconPipe],
-        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule],
+        imports: [ProgressbarModule, TabsModule, FontAwesomeModule, PaginationModule, ChartsModule],
         declarations: [
           BakerTableComponent,
           TezblockTableComponent,
@@ -34,7 +40,12 @@ describe('BakerTableComponent', () => {
           IdenticonComponent,
           AmountCellComponent,
           BlockCellComponent,
-          AddressItemComponent
+          AddressItemComponent,
+          ClientSideTableComponent,
+          SymbolCellComponent,
+          HashCellComponent,
+          ModalCellComponent,
+          ExtendTableCellComponent
         ]
       })
     )
