@@ -1,9 +1,19 @@
 import { Injectable } from '@angular/core'
-import { forkJoin, Observable, of } from 'rxjs'
+import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
 import { ApiService } from '../api/api.service'
-import { Transaction } from '../../interfaces/Transaction'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { andGroup, Operation, Predicate } from '@tezblock/services/base.service'
+
+const kindToFieldsMap = {
+  transaction: ['source', 'destination'],
+  delegation: ['source', 'delegate'],
+  origination: ['source'],
+  endorsement: ['delegate'],
+  ballot: ['source'],
+  proposals: ['source']
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,41 +22,49 @@ export class NewTransactionService {
   constructor(private readonly apiService: ApiService) {}
 
   getAllTransactionsByAddress(address: string, kind: string, limit: number) {
-    const kindToFieldsMap = {
-      transaction: ['source', 'destination'],
-      delegation: ['source', 'delegate'],
-      origination: ['source'],
-      endorsement: ['delegate'],
-      ballot: ['source'],
-      proposals: ['source']
-    }
     const fields = kindToFieldsMap[kind]
-    const operations: Observable<Transaction[]>[] = []
+    const idNotNullPredicate = {
+      field: 'operation_group_hash',
+      operation: Operation.isnull,
+      inverse: true
+    }
 
-    operations.push(...fields.map(field => this.apiService.getTransactionsByField(address, field, kind, limit)))
+    // it was applied to transactions with kind ballot ...
+    const preprocess = (transactions: Transaction[]) =>
+        transactions.map(transaction => ({
+          ...transaction,
+          proposal: transaction.proposal ? transaction.proposal.slice(1, transaction.proposal.length - 1) : transaction.proposal
+        }))
+    const predicates: Predicate[] = []
+
+    predicates.push(
+      ...[].concat(
+        ...fields.map((field, index) =>
+          andGroup([{ field, set: [address] }, { field: 'kind', set: [kind] }, idNotNullPredicate], `A${index}`)
+        )
+      )
+    )
 
     if (kind === 'delegation') {
-      operations.push(this.apiService.getTransactionsByField(address, 'delegate', 'origination', limit))
+      predicates.push(
+        ...andGroup([{ field: 'delegate', set: [address] }, { field: 'kind', set: ['origination'] }, idNotNullPredicate], 'B')
+      )
     }
 
     if (kind === 'ballot') {
-      const fields = kindToFieldsMap.proposals
-      for (const field of fields) {
-        operations.push(
-          this.apiService.getTransactionsByField(address, field, 'proposals', limit).pipe(
-            map(proposals => {
-              proposals.forEach(proposal => (proposal.proposal = proposal.proposal.slice(1, proposal.proposal.length - 1)))
-              return proposals
-            })
+      predicates.push(
+        ...[].concat(
+          ...kindToFieldsMap.proposals.map((field, index) =>
+            andGroup([{ field, set: [address] }, { field: 'kind', set: ['proposals'] }, idNotNullPredicate], `C${index}`)
           )
         )
-      }
+      )
     }
 
-    return forkJoin(operations).pipe(
+    return this.apiService.getTransactionsByPredicates(predicates, limit).pipe(
+      // map(preprocess),
       switchMap(operation => {
         const transactions = operation
-          .reduce((current, next) => current.concat(next))
           .sort((a, b) => b.timestamp - a.timestamp)
           .slice(0, limit)
         const sources: string[] = transactions.map(transaction => transaction.source)
@@ -84,24 +102,7 @@ export class NewTransactionService {
 
         return of(transactions)
       }),
-      switchMap(transactions => {
-        if (kind === 'ballot') {
-          return forkJoin(
-            forkJoin(transactions.map(transaction => this.apiService.getVotingPeriod(transaction.block_level))),
-            forkJoin(transactions.map(transaction => this.apiService.getVotesForTransaction(transaction)))
-          ).pipe(
-            map(([votingPeriods, votes]) =>
-              transactions.map((transaction, index) => ({
-                ...transaction,
-                voting_period: votingPeriods[index],
-                votes: votes[index]
-              }))
-            )
-          )
-        }
-
-        return of(transactions)
-      })
+      switchMap(transactions => this.apiService.addVoteData(transactions))
     )
   }
 }
