@@ -82,6 +82,9 @@ export class TezblockTableComponent implements OnInit {
   @Input()
   public downloadable?: boolean = false
 
+  @Input()
+  public enableDownload?: boolean = false
+
   @Output()
   public readonly downloadClicked: EventEmitter<void> = new EventEmitter()
 

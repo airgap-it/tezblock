@@ -98,7 +98,7 @@
     </table>
     <button *ngIf="pagination" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
   </div>
-  <ng-container *ngIf="downloadable">
+  <ng-container *ngIf="downloadable && enableDownload">
     <button type="button" class="btn btn-sm" (click)="downloadCSV()">Download CSV Export</button>
   </ng-container>
 </ng-template>

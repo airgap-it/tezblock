@@ -70,6 +70,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
   private _tabs: Tab[] | undefined
+  public enableDownload: boolean = false
 
   constructor(
     private readonly apiService: ApiService,
@@ -209,6 +210,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+    this.enableDownload = selectedTab.kind === 'transaction' || selectedTab.kind === 'delegation' || selectedTab.kind === 'origination'
   }
 
   public download() {
