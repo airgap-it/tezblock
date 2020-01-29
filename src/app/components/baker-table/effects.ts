@@ -10,7 +10,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { BakingService } from '@tezblock/services/baking/baking.service'
-import { BaseService, Body } from '@tezblock/services/base.service'
+import { BaseService, Body, Operation } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 
@@ -92,10 +92,10 @@ export class BakerTableEffects {
     const body = (address: string, /*blockLevel: number,*/ endorsing?: boolean): Body => ({
       fields: ['estimated_time', 'level'],
       predicates: [
-        { field: 'estimated_time', operation: 'after', set: [moment.utc().valueOf()], inverse: false },
+        { field: 'estimated_time', operation: Operation.after, set: [moment.utc().valueOf()], inverse: false },
         //{ field: 'level', operation: 'gt', set: [blockLevel], inverse: false },
-        { field: 'delegate', operation: 'eq', set: [address], inverse: false }
-      ].concat(endorsing ? [] : { field: 'priority', operation: 'eq', set: ['0'], inverse: false }),
+        { field: 'delegate', operation: Operation.eq, set: [address], inverse: false }
+      ].concat(endorsing ? [] : { field: 'priority', operation: Operation.eq, set: ['0'], inverse: false }),
       orderBy: [{ field: 'estimated_time', direction: 'asc' }],
       limit: 1
     })

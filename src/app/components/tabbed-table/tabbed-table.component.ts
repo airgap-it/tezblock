@@ -135,9 +135,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       const tab =
         info.kind === 'proposals'
           ? this.tabs.find(isTabKindEqualTo('ballot'))
-          : this.tabs.find(tabArgument =>
-              Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
-            )
+          : this.tabs.find(isTabKindEqualTo(info.kind))
 
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)
@@ -177,6 +175,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       )
     }
 
+    // type === LayoutPages.Block
     return this.apiService.getOperationCount('block_level', this.id).pipe(
       map(blockCounts => {
         resetTabsCount()
