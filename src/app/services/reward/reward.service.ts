@@ -19,7 +19,7 @@ export class RewardService {
   protocol: TezosProtocol
 
   private calculatedRewardsMap = new Map<String, TezosRewards>()
-  private pendingPromise = new Map<String, Promise<TezosRewards>>()
+  private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
   constructor(private readonly chainNetworkService: ChainNetworkService) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
@@ -91,18 +91,17 @@ export class RewardService {
     if (this.calculatedRewardsMap.has(key)) {
       return this.calculatedRewardsMap.get(key)
     }
-    if (this.pendingPromise.has(key)) {
-      const currentCycle = await this.protocol.fetchCurrentCycle()
 
-      const rewards = await this.pendingPromise.get(key)
-
-      if (cycle < currentCycle) {
-        this.calculatedRewardsMap.set(key, rewards)
-      }
-      return rewards
+    if (this.pendingPromises.has(key)) {
+      return this.pendingPromises.get(key)
     } else {
-      this.pendingPromise.set(key, this.protocol.calculateRewards(address, cycle))
-      return this.calculateRewards(address, cycle)
+      const promise = this.protocol.calculateRewards(address, cycle).then(result => {
+        this.calculatedRewardsMap.set(key, result) 
+        this.pendingPromises.delete(key)
+        return result
+      })
+      this.pendingPromises.set(key, promise)
+      return promise
     }
 
     // const rewards = await this.protocol.calculateRewards(address, cycle)
