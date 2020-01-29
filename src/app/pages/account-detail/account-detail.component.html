@@ -332,7 +332,7 @@
                 [tabs]="bakerTabs"
                 [page]="'account'"
                 [data]="bakerTableInfos"
-                [ratings]="bakerTableRatings"
+                [ratings]="bakerTableRatings$ | async"
                 [bakerFee$]="tezosBakerFee$"
               ></baker-table>
             </ng-container>

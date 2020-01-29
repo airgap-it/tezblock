@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { forkJoin, of } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom, delay } from 'rxjs/operators'
+import { map, catchError, switchMap, tap, withLatestFrom, delay, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
 
@@ -11,8 +11,9 @@ import * as fromRoot from '@tezblock/reducers'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { BaseService, Body, Operation } from '@tezblock/services/base.service'
-import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
+import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { get } from 'lodash'
 
 @Injectable()
 export class BakerTableEffects {
@@ -58,7 +59,7 @@ export class BakerTableEffects {
 
   loadCurrentCycleThenRights$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadCurrentCycleThenRights),
+      ofType(actions.loadCurrentCycleThenRights), //TODO: I have current cycle in store
       switchMap(() =>
         this.apiService.getCurrentCycle().pipe(
           map(currentCycle => actions.loadCurrentCycleThenRightsSucceeded({ currentCycle })),
@@ -80,12 +81,45 @@ export class BakerTableEffects {
       ofType(actions.loadEfficiencyLast10Cycles),
       withLatestFrom(this.store$.select(state => state.bakerTable.accountAddress)),
       switchMap(([action, accountAddress]) =>
-        this.bakingService.getEfficiencyLast10Cycles(accountAddress).pipe(
+        this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
+          switchMap(currentCycleCache => {
+            const efficiencyLast10Cycles = get(currentCycleCache, `fromAddress[${accountAddress}].bakerData.efficiencyLast10Cycles`)
+
+            if (efficiencyLast10Cycles !== undefined) {
+              return of(efficiencyLast10Cycles)
+            }
+
+            return this.bakingService.getEfficiencyLast10Cycles(accountAddress)
+          }),
           map(efficiencyLast10Cycles => actions.loadEfficiencyLast10CyclesSucceeded({ efficiencyLast10Cycles })),
           catchError(error => of(actions.loadEfficiencyLast10CyclesFailed({ error })))
         )
       )
     )
+  )
+
+  cachEfficiencyLast10Cycles$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(actions.loadEfficiencyLast10CyclesSucceeded),
+        withLatestFrom(this.store$.select(state => state.bakerTable.accountAddress)),
+        tap(([{ efficiencyLast10Cycles }, accountAddress]) =>
+          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+            ...currentCycleCache,
+            fromAddress: {
+              ...get(currentCycleCache, 'fromAddress'),
+              [accountAddress]: {
+                ...get(currentCycleCache, `fromAddress[${accountAddress}]`),
+                bakerData: {
+                  ...get(currentCycleCache, `fromAddress[${accountAddress}].bakerData`),
+                  efficiencyLast10Cycles: efficiencyLast10Cycles
+                }
+              }
+            }
+          }))
+        )
+      ),
+    { dispatch: false }
   )
 
   loadUpcomingRights$ = createEffect(() => {
@@ -111,16 +145,10 @@ export class BakerTableEffects {
       // ),
       switchMap(([action, accountAddress]) =>
         forkJoin(
-          this.baseService.post<any>('baking_rights', body(accountAddress)).pipe(
-            map(first)
-          ),
-          this.baseService.post<any>('endorsing_rights', body(accountAddress, true)).pipe(
-            map(first)
-          )
+          this.baseService.post<any>('baking_rights', body(accountAddress)).pipe(map(first)),
+          this.baseService.post<any>('endorsing_rights', body(accountAddress, true)).pipe(map(first))
         ).pipe(
-          map(([baking, endorsing]: [any, any]) =>
-            actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking, endorsing } })
-          ),
+          map(([baking, endorsing]: [any, any]) => actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking, endorsing } })),
           catchError(error => of(actions.loadUpcomingRightsFailed({ error })))
         )
       )
@@ -130,6 +158,7 @@ export class BakerTableEffects {
   loadUpcomingRightsRefresh$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadUpcomingRightsSucceeded),
+      filter(({ upcomingRights }) => !!upcomingRights.baking && !!upcomingRights.endorsing),
       switchMap(({ upcomingRights }) => {
         const nextChange = Math.min(upcomingRights.baking.estimated_time, upcomingRights.endorsing.estimated_time)
         const changeInMilliseconds = moment.utc(nextChange).diff(moment.utc(), 'milliseconds')
@@ -147,6 +176,7 @@ export class BakerTableEffects {
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly bakingService: BakingService,
+    private readonly cacheService: CacheService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

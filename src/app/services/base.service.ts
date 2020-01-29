@@ -31,7 +31,7 @@ export interface Aggregation
 
 export interface Body {
   fields?: string[]
-  predicates: Predicate[]
+  predicates?: Predicate[]
   orderBy?: { field: string; direction: string }[]
   aggregation?: Aggregation[]
   limit?: number

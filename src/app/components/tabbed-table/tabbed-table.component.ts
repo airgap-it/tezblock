@@ -22,6 +22,8 @@ export interface Tab {
 const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
 const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(tab.title) === toLowerCase(anotherTabTitle)
 
+export const kindToOperationTypes = (kind: KindType): string => (Array.isArray(kind) ? OperationTypes.Ballot : kind)
+
 @Component({
   selector: 'tabbed-table',
   templateUrl: './tabbed-table.component.html',
@@ -121,10 +123,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   onLoadMore() {
     this.loadMore.emit(true)
-  }
-
-  kindToOperationTypes(kind: KindType): string {
-    return Array.isArray(kind) ? OperationTypes.Ballot : kind
   }
 
   private updateTabsCounts$ = (type: LayoutPages): Observable<boolean> => {

@@ -21,14 +21,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
-
-export interface Tab {
-  title: string
-  active: boolean
-  kind: string
-  icon?: string[]
-  count: number
-}
+import { kindToOperationTypes, Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -56,12 +49,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
 
-  bakingBadRating: string | undefined
-  tezosBakerRating: string | undefined
-
-  bakingInfos: any
-
-  isValidBaker: boolean | undefined
   rewardsLoading$: Observable<boolean>
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
@@ -111,13 +98,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   @Input() data: any
 
-  @Input()
-  set ratings(bakerTableRatings: any) {
-    if (bakerTableRatings) {
-      this.tezosBakerRating = bakerTableRatings.tezosBakerRating
-      this.bakingBadRating = bakerTableRatings.bakingBadRating
-    }
-  }
+  @Input() ratings: any
 
   @Input() bakerFee$: Observable<number>
 
@@ -211,9 +192,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   selectTab(selectedTab: Tab) {
-    this.store$.dispatch(actions.kindChanged({ kind: selectedTab.kind }))
+    this.store$.dispatch(actions.kindChanged({ kind: kindToOperationTypes(selectedTab.kind) }))
     this.updateSelectedTab(selectedTab)
-    this.overviewTabClicked.emit(selectedTab.kind)
+    this.overviewTabClicked.emit(kindToOperationTypes(selectedTab.kind))
   }
 
   getTabCount(tabs: Tab[]) {
