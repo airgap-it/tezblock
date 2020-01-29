@@ -182,7 +182,7 @@
                   >
                     Resources
                   </a>
-                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources">
+                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources" (mouseleave)="dp2.hide()">
                     <li role="menuitem">
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
                         Wallets
@@ -216,7 +216,13 @@
                   >
                     {{ selectedNetwork }}
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
+                  <ul
+                    class="dropdown-menu"
+                    *dropdownMenu
+                    role="menu"
+                    [ngClass]="{ 'display--none': !hideDropdown }"
+                    (mouseleave)="dp3.hide()"
+                  >
                     <li role="menuitem">
                       <a
                         class="dropdown-item"
