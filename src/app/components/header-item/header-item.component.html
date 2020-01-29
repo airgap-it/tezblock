@@ -23,7 +23,7 @@
         <button
           class="hamburger hamburger--spring navbar-toggler p-0"
           type="button"
-          (click)="isCollapsed = !isCollapsed; dp.hide()"
+          (click)="isCollapsed = !isCollapsed; dp1.hide(); dp2.hide(); dp3.hide()"
           [attr.aria-expanded]="!isCollapsed"
           aria-controls="collapseBasic"
           [class.is-active]="!isCollapsed"
@@ -33,7 +33,7 @@
           </span>
         </button>
         <div class="pt-3 w-100 d-block d-sm-none">
-          <app-search-item (onSearch)="dp.hide()"></app-search-item>
+          <app-search-item (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"></app-search-item>
         </div>
         <div
           class="collapse navbar-collapse"
@@ -44,7 +44,7 @@
         >
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
-              <app-search-item (onSearch)="dp.hide()"></app-search-item>
+              <app-search-item (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"></app-search-item>
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
