@@ -1,38 +1,116 @@
-<div>
-  <div>
-    <h3>
-      Periods
-    </h3>
-    <p>Blocks per cycle: {{ blocksPerCyle }}</p>
-
-    <p>Blocks per commitment: {{ blocksPerCommitment }}</p>
-    <p>Blocks per roll snapshot: {{ blocksPerRollSnapshot }}</p>
-    <p>Time between blocks: {{ timeBetweenBlocks }}</p>
-    <p>Time between priority: not available</p>
+<div class="pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3 ">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4 ">
+          Periods
+        </h5>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Blocks per cycle</p>
+          </div>
+          <div class="col-md-9">
+            {{ blocksPerCyle }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Blocks per commitment</p>
+          </div>
+          <div class="col-md-9">
+            {{ blocksPerCommitment }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Blocks per roll snapshot</p>
+          </div>
+          <div class="col-md-9">
+            {{ blocksPerRollSnapshot }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Time between blocks</p>
+          </div>
+          <div class="col-md-9">
+            {{ timeBetweenBlocks }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div>
-    <h3>
-      Rewards
-    </h3>
-    <p>
-      Block security deposit:
-      {{ blockSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }}
-      XZT
-    </p>
-
-    <p>
-      Endorsement security deposit:
-      {{ endorsementSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }} XZT
-    </p>
+</div>
+<div class="pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3 ">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4 ">
+          Rewards
+        </h5>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Block security deposit</p>
+          </div>
+          <div class="col-md-9">
+            {{ blockSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } }} ꜩ
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Endorsement security deposit</p>
+          </div>
+          <div class="col-md-9">
+            {{
+              endorsementSecurityDeposit | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }
+            }}
+            ꜩ
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div>
-    <h3>
-      Limtis
-    </h3>
-    <p>Maximum revelations per block: {{ maximumRevelationsPerBlock }}</p>
-
-    <p>Maximum operation data length: {{ maximumOperationDataLength }}</p>
-    <p>Hard gas limit per operation: {{ hardGasLimitPerOperation }}</p>
-    <p>Hard gas limit per block: {{ hardGasLimitPerBlock }}</p>
+</div>
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3 ">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-4 ">
+          Limtis
+        </h5>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Maximum revelations per block</p>
+          </div>
+          <div class="col-md-9">
+            {{ maximumRevelationsPerBlock }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Maximum operation data length</p>
+          </div>
+          <div class="col-md-9">
+            {{ maximumRevelationsPerBlock }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Hard gas limit per operation</p>
+          </div>
+          <div class="col-md-9">
+            {{ hardGasLimitPerOperation }}
+          </div>
+        </div>
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <p class="text-secondary mb-0">Hard gas limit per block</p>
+          </div>
+          <div class="col-md-9">
+            {{ hardGasLimitPerBlock }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
