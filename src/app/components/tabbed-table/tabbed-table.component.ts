@@ -6,7 +6,7 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
-import { TransactionSingleService } from '@tezblock/services/transaction-single/transaction-single.service'
+import { DownloadService } from '@tezblock/services/download/download.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 type KindType = string | string[]
@@ -76,7 +76,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     private readonly apiService: ApiService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
-    private readonly transactionSingleService: TransactionSingleService
+    private readonly downloadService: DownloadService
   ) {
     super()
   }
@@ -142,10 +142,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const aggregateFunction = (info: OperationCount, field: string) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
         Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-      const tab =
-        info.kind === 'proposals'
-          ? this.tabs.find(isTabKindEqualTo('ballot'))
-          : this.tabs.find(isTabKindEqualTo(info.kind))
+      const tab = info.kind === 'proposals' ? this.tabs.find(isTabKindEqualTo('ballot')) : this.tabs.find(isTabKindEqualTo(info.kind))
 
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)
@@ -214,7 +211,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   public download() {
     if (this.downloadable) {
-      this.transactionSingleService.download(this.page, this.selectedTab.count)
+      this.downloadService.download(this.page, this.selectedTab.count, this.selectedTab.kind)
     }
   }
 }
