@@ -98,7 +98,7 @@ export class AccountDetailEffects {
             const bakingBadRating = get(currentCycleCache, `fromAddress[${state.address}].bakerData.bakingBadRating`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${state.address}].tezosBakerFee`)
 
-            if (bakingBadRating !== undefined) {
+            if (bakingBadRating !== undefined && tezosBakerFee !== undefined) {
               return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
             }
 
@@ -148,7 +148,7 @@ export class AccountDetailEffects {
             const tezosBakerRating = get(currentCycleCache, `fromAddress[${state.address}].bakerData.tezosBakerRating`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${state.address}].tezosBakerFee`)
 
-            if (tezosBakerRating !== undefined) {
+            if (tezosBakerRating !== undefined && tezosBakerFee !== undefined) {
               return of(<actions.BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
             }
 

@@ -176,7 +176,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
-      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : null))
+      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
     this.balanceChartDatasets$ = this.store$
       .select(state => state.accountDetails.balanceFromLast30Days)

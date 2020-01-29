@@ -29,7 +29,7 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
 
 export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
   bakingRating: response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : state.tezosBakerFee,
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
 })
 
 export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): actions.BakingRatingResponse => ({
