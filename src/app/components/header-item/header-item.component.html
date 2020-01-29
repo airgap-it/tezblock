@@ -60,7 +60,7 @@
               </li>
 
               <div class="nav-item dropdown mega-dropdown">
-                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp1="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -71,10 +71,11 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkBlockchain }"
                     aria-controls="blockchain"
+                    (mouseover)="dp2.hide(); dp3.hide()"
                   >
                     Blockchain
                   </a>
-                  <ul class="dropdown-menu mega-dropdown-menu pb-4 " *dropdownMenu role="menu" id="blockchain">
+                  <ul class="dropdown-menu mega-dropdown-menu pb-4 " *dropdownMenu role="menu" id="blockchain" (mouseleave)="dp1.hide()">
                     <li class="row">
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -166,7 +167,7 @@
                 </span>
               </div>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp2="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -177,6 +178,7 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkResources }"
                     aria-controls="resources"
+                    (mouseover)="dp1.hide(); dp3.hide()"
                   >
                     Resources
                   </a>
@@ -201,7 +203,7 @@
               </li>
               <!-- TODO: unhide if switch works  -->
               <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown [triggers]="triggers" #dp="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers" #dp3="bs-dropdown">
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -210,7 +212,7 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (click)="hideDropdown ? dp.hide() : dp.show(); hideDropdown = !hideDropdown"
+                    (mouseover)="dp1.hide(); dp2.hide()"
                   >
                     {{ selectedNetwork }}
                   </a>
@@ -219,21 +221,21 @@
                       <a
                         class="dropdown-item"
                         [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''"
-                        (click)="changeNetwork(networks.MAINNET)"
+                        (click)="changeNetwork(networks.MAINNET); dp3.hide()"
                       >
                         mainnet
                       </a>
                       <a
                         class="dropdown-item"
                         [ngClass]="selectedNetwork === networks.BABYLONNET ? 'active' : ''"
-                        (click)="changeNetwork(networks.BABYLONNET)"
+                        (click)="changeNetwork(networks.BABYLONNET); dp3.hide()"
                       >
                         babylonnet
                       </a>
                       <a
                         class="dropdown-item"
                         [ngClass]="selectedNetwork === networks.CARTHAGENET ? 'active' : ''"
-                        (click)="changeNetwork(networks.CARTHAGENET)"
+                        (click)="changeNetwork(networks.CARTHAGENET); dp3.hide()"
                       >
                         carthagenet
                       </a>
