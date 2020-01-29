@@ -133,6 +133,11 @@ typeahead-container {
   overflow: visible !important;
 }
 
+tezblock-table {
+  table {
+    margin-bottom: 0 !important;
+  }
+}
 /* no breaks in table cell with spaces */
 .table-responsive table td {
   white-space: nowrap;
