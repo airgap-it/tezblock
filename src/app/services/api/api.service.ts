@@ -988,13 +988,13 @@ export class ApiService {
                     return {
                       ...aggregatedRight,
                       blockRewards: reward.totalRewards,
-                      bakingDeposits: reward.bakingDeposits,
+                      deposits: reward.bakingDeposits,
                       fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
                         ...item,
-                        rewards: rewardByLevel[item.level].amount,
+                        rewards: rewardByLevel[item.level] ? rewardByLevel[item.level].amount : '0',
                         deposit: rewardByLevel[item.level] ? rewardByLevel[item.level].deposit : '0',
-                        fees: rewardByLevel[item.level].fees
+                        fees: rewardByLevel[item.level] ? rewardByLevel[item.level].fees : '0'
                       }))
                     }
                   })
@@ -1082,7 +1082,7 @@ export class ApiService {
                     return {
                       ...aggregatedRight,
                       endorsementRewards: reward.totalRewards,
-                      endorsingDeposits: reward.endorsingDeposits,
+                      deposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
                         rewards: rewardByLevel[item.level] ? rewardByLevel[item.level].amount : '0',
