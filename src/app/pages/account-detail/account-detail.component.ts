@@ -1,35 +1,38 @@
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
-import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge, timer } from 'rxjs'
+import { from, Observable, combineLatest, merge, timer, BehaviorSubject, pipe } from 'rxjs'
 import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
+import { first, get } from '@tezblock/services/fp'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
+import { RightsSingleService } from './../../services/rights-single/rights-single.service'
+import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab } from '../../components/tabbed-table/tabbed-table.component'
 import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
+import { FeeByCycle } from 'src/app/interfaces/BakingBadResponse'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { TezosRewards, TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy } from './reducer'
-import { LayoutPages, OperationTypes } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
+import { columns } from './table-definitions'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -38,7 +41,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
   providers: [RightsSingleService], //TODO: refactor and remove this last single service
-
   animations: [
     trigger('changeBtnColor', [
       state(
@@ -58,15 +60,15 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   ]
 })
 export class AccountDetailComponent extends BaseComponent implements OnInit {
-  public account$: Observable<Account>
-  public delegatedAccountAddress: string | undefined
-  public relatedAccounts: Observable<Account[]>
-  public delegatedAmount: number | undefined
+  account$: Observable<Account>
+  delegatedAccountAddress: string | undefined
+  relatedAccounts$: Observable<Account[]>
+  delegatedAmount: number | undefined
 
-  public get bakerAddress(): string | undefined {
+  get bakerAddress(): string | undefined {
     return this._bakerAddress
   }
-  public set bakerAddress(value: string | undefined) {
+  set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.getTezosBakerInfos(value, true)
@@ -74,74 +76,61 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  public bakingBadRating: string | undefined
-  public tezosBakerRating: string | undefined
-  public stakingBalance: number | undefined
-  public bakingInfos: any
-  public bakerTableInfos: any
-  public bakerTableRatings: any = {}
+  @ViewChild('transactions', { static: false }) transactions: ElementRef
 
-  public tezosBakerFee: string | undefined
-  public stakingCapacity: number | undefined
-  public stakingProgress: number | undefined
-  public stakingBond: number | undefined
+  bakerTableInfos: any
+  bakerTableRatings: any = {}
 
-  public isValidBaker: boolean | undefined
-  public revealed$: Observable<string>
-  public hasAlias: boolean | undefined
-  public hasLogo: boolean | undefined
+  tezosBakerFee$: BehaviorSubject<number | undefined> = new BehaviorSubject(undefined)
+  tezosBakerFeeLabel$: Observable<string | undefined>
 
-  public tezosBakerName: string | undefined
-  public tezosBakerAvailableCap: string | undefined
-  public tezosBakerAcceptingDelegation: string | undefined
-  public tezosBakerNominalStakingYield: string | undefined
+  revealed$: Observable<string>
+  hasAlias: boolean | undefined
+  hasLogo: boolean | undefined
 
-  public fiatCurrencyInfo$: Observable<CurrencyInfo>
+  fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  public paginationLimit: number = 2
-  public numberOfInitialRelatedAccounts: number = 2
+  paginationLimit = 2
+  numberOfInitialRelatedAccounts = 2
 
-  public isCollapsed: boolean = true
+  isCollapsed: boolean = true
 
-  public rewards: TezosRewards
-  public rights$: Observable<Object> = new Observable()
-  public current: string = 'copyGrey'
+  rights$: Observable<Object> = new Observable()
+  current: string = 'copyGrey'
 
-  public tabs: Tab[] = [
-    { title: 'Transactions', active: true, kind: 'transaction', count: null, icon: this.iconPipe.transform('exchangeAlt') },
-    { title: 'Delegations', active: false, kind: 'delegation', count: null, icon: this.iconPipe.transform('handReceiving') },
-    { title: 'Originations', active: false, kind: 'origination', count: null, icon: this.iconPipe.transform('link') },
-    { title: 'Endorsements', active: false, kind: 'endorsement', count: null, icon: this.iconPipe.transform('stamp') },
-    { title: 'Votes', active: false, kind: 'ballot', count: null, icon: this.iconPipe.transform('boxBallot') }
-  ]
-  public bakerTabs: Tab[] = [
-    { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
-    { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
-    { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
-    { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
-  ]
-  public nextPayout: Date | undefined
-  public rewardAmount$: Observable<string>
-  public remainingTime$: Observable<string>
-  public myTBUrl: string | undefined
-  public get address(): string {
-    return this.route.snapshot.params.id
+  tabs: Tab[]
+  bakerTabs: Tab[]
+
+  rewardAmount$: Observable<string>
+  rewardAmountMinusFee$: Observable<number>
+  isRewardAmountMinusFeeBusy$: Observable<boolean>
+  remainingTime$: Observable<string>
+
+  get address(): string {
+    return this.activatedRoute.snapshot.params.id
   }
-  public frozenBalance: number | undefined
-  public rewardsTransaction: any
-  public isMobile$: Observable<boolean>
-  public isBusy$: Observable<Busy>
-  public isMainnet: boolean
+
+  isMobile$: Observable<boolean>
+  isBusy$: Observable<Busy>
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   actionType$: Observable<LayoutPages>
+  balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  balanceChartLabels$: Observable<string[]>
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
+  //TODO: remove when api will be fixed
+  is_baker = false
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
 
   constructor(
     private readonly actions$: Actions,
-    public readonly chainNetworkService: ChainNetworkService,
-    private readonly route: ActivatedRoute,
+    readonly chainNetworkService: ChainNetworkService,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
     private readonly cryptoPricesService: CryptoPricesService,
@@ -157,36 +146,60 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
-    this.isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  public async ngOnInit() {
+  async ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.relatedAccounts = this.store$.select(state => state.accountDetails.relatedAccounts)
+    this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .pipe(map(breakpointState => breakpointState.matches))
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
+    this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
+      map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
+      // map(toString)
+    )
+    this.isRewardAmountMinusFeeBusy$ = combineLatest(
+      this.store$.select(state => state.accountDetails.busy.rewardAmont),
+      this.store$.select(state => state.accountDetails.rewardAmont),
+      this.tezosBakerFee$
+    ).pipe(
+      map(
+        ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) => !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+      )
+    )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$
-      .select(state => state.accountDetails.transactions)
-      .pipe(
-        filter(negate(isNil)),
-        delay(100) // walkaround issue with tezblock-table(*ngIf) not binding data
-      )
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
+    this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
+      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : null))
+    )
+    this.balanceChartDatasets$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
+      )
+    this.balanceChartLabels$ = this.store$
+      .select(state => state.accountDetails.balanceFromLast30Days)
+      .pipe(
+        filter(Array.isArray),
+        map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
+      )
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.setTabs(address)
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
+        this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -203,14 +216,20 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       ]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
         if (!delegatedAccounts) {
           this.delegatedAccountAddress = undefined
-        } else if (delegatedAccounts.length > 0) {
+
+          return
+        }
+
+        if (delegatedAccounts.length > 0) {
           this.delegatedAccountAddress = delegatedAccounts[0].account_id
           this.bakerAddress = delegatedAccounts[0].delegate_value
           this.delegatedAmount = delegatedAccounts[0].balance
           this.setRewardAmont()
-        } else {
-          this.delegatedAccountAddress = ''
+
+          return
         }
+
+        this.delegatedAccountAddress = ''
       }),
 
       // refresh account
@@ -231,78 +250,75 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
           switchMap(([action, kind]) => timer(refreshRate, refreshRate).pipe(map(() => kind)))
         )
-        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind })))
+        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+      this.account$
+        .pipe(
+          withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
+          filter(([account, navigationHistory]) => account && navigationHistory.length === 1),
+          delay(500)
+        )
+        .subscribe(() => {
+          this.transactions.nativeElement.scrollIntoView({ behavior: 'smooth' })
+        })
     )
   }
 
-  public async getBakingInfos(address: string) {
-    this.bakingService
-      .getBakerInfos(address)
-      .then(async result => {
-        this.isValidBaker = true
-        const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
+  getBakingInfos(address: string) {
+    this.is_baker = false
 
-        this.bakerTableInfos = result
-          ? {
-              stakingBalance: result.stakingBalance,
-              numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-              stakingCapacity: result.stakingCapacity,
-              stakingProgress: Math.min(100, result.stakingProgress),
-              stakingBond: result.selfBond,
-              frozenBalance: await this.accountService.getFrozen(address),
-              payoutAddress
-            }
-          : {
-              payoutAddress
-            }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
+    this.bakingService.getBakerInfos(address).then(result => {
+      const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
-    // this.nextPayout = this.bakingInfos.nextPayout
-    // this.rewardAmount = this.bakingInfos.avgRoI.dividedBy(1000000).toNumber()
+      this.bakerTableInfos = result
+        ? {
+            stakingBalance: result.stakingBalance,
+            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
+            stakingCapacity: result.stakingCapacity,
+            stakingProgress: Math.min(100, result.stakingProgress),
+            stakingBond: result.selfBond,
+            payoutAddress
+          }
+        : {
+            payoutAddress
+          }
 
-    // TODO: Move to component
+      this.is_baker = true
+    })
 
-    this.bakingService
-      .getBakingBadRatings(address)
-      .then(result => {
-        if (result.rating === 0 && result.status === 'success') {
-          this.bakingBadRating = 'awesome'
-        } else if (result.rating === 1 && result.status === 'success') {
-          this.bakingBadRating = 'so-so'
-        } else if (result.rating === 2 && result.status === 'success') {
-          this.bakingBadRating = 'dead'
-        } else if (result.rating === 3 && result.status === 'success') {
-          this.bakingBadRating = 'specific'
-        } else if (result.rating === 4 && result.status === 'success') {
-          this.bakingBadRating = 'hidden'
-        } else if (result.rating === 5 && result.status === 'success') {
-          this.bakingBadRating = 'new'
-        } else if (result.rating === 6 && result.status === 'success') {
-          this.bakingBadRating = 'closed'
-        } else if (result.rating === 9 && result.status === 'success') {
-          this.bakingBadRating = 'unknown'
-        } else {
-          this.bakingBadRating = 'not available'
-        }
+    this.bakingService.getBakingBadRatings(address).subscribe(response => {
+      const ratingNumberToLabel = [
+        /* 0 */ 'awesome',
+        /* 1 */ 'so-so',
+        /* 2 */ 'dead',
+        /* 3 */ 'specific',
+        /* 4 */ 'hidden',
+        /* 5 */ 'new',
+        /* 6 */ undefined,
+        /* 7 */ undefined,
+        /* 8 */ undefined,
+        /* 9 */ 'unknown'
+      ]
+      const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
+        first,
+        get(feeByCycle => feeByCycle.value * 100)
+      )
 
-        this.bakerTableRatings = {
-          ...this.bakerTableRatings,
-          bakingBadRating: this.bakingBadRating
-        }
-      })
-      .catch(error => {
-        this.isValidBaker = false
-      })
+      this.bakerTableRatings = {
+        ...this.bakerTableRatings,
+        bakingBadRating:
+          response.status === 'success' && ratingNumberToLabel[response.rating.status]
+            ? ratingNumberToLabel[response.rating.status]
+            : 'not available'
+      }
 
-    this.getTezosBakerInfos(address)
+      if (response.status === 'success') {
+        this.tezosBakerFee$.next(extractFee(response.config.fee))
+      }
+    })
+
+    this.getTezosBakerInfos(address, false)
   }
 
-  // TODO: Move to component
-  /*  TODO: strange only tezosBakerFee & bakerTableRatings.tezosBakerRating seems to be consumed by anything,
-      what for are all other properties updated here */
   /**
    * @param {boolean} [updateFee] - this method was used only in getBakingInfos method ( from my reasoning only to
    * update bakerTableRatings.tezosBakerRating ), now it's used also in bakerAddress's setter to update tezosBakerFee
@@ -312,25 +328,30 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.bakingService
       .getTezosBakerInfos(address)
       .then(result => {
-        if (result.status === 'success' && result.rating && result.fee && result.baker_name) {
-          this.tezosBakerRating = (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-          this.tezosBakerFee = updateFee ? result.fee + ' %' : this.tezosBakerFee
-          this.tezosBakerName = result.baker_name
-          this.tezosBakerAvailableCap = result.available_capacity
-          this.myTBUrl = result.myTB
-          this.tezosBakerAcceptingDelegation = result.accepting_delegation
-          this.tezosBakerNominalStakingYield = result.nominal_staking_yield
-        } else {
-          this.tezosBakerRating = 'not available'
-          this.tezosBakerFee = updateFee ? 'not available' : this.tezosBakerFee
+        if (result.status === 'success' && result.rating && result.fee) {
+          this.bakerTableRatings = {
+            ...this.bakerTableRatings,
+            tezosBakerRating: (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
+          }
+
+          if (updateFee) {
+            this.tezosBakerFee$.next(parseFloat(result.fee))
+          }
+
+          return
         }
+
         this.bakerTableRatings = {
           ...this.bakerTableRatings,
-          tezosBakerRating: this.tezosBakerRating
+          tezosBakerRating: 'not available'
+        }
+
+        if (updateFee) {
+          this.tezosBakerFee$.next(null)
         }
       })
-      .catch(error => {
-        this.isValidBaker = false
+      .catch(() => {
+        this.tezosBakerFee$.next(null)
       })
   }
 
@@ -352,7 +373,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
   }
 
-  public tabSelected(kind: string) {
+  tabSelected(kind: string) {
     this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
   }
 
@@ -360,17 +381,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  public copyToClipboard(val: string) {
+  copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
   }
 
-  public showQr() {
-    const initialState = { qrdata: this.address, size: 200 }
-    const modalRef = this.modalService.show(QrModalComponent, { initialState })
+  showQr() {
+    const initialState = { qrdata: this.address, size: 260 }
+    const modalRef = this.modalService.show(QrModalComponent, { class: 'modal-sm', initialState })
     modalRef.content.closeBtnName = 'Close'
   }
 
-  public showTelegramModal() {
+  showTelegramModal() {
     const initialState = {
       botAddress: this.address,
       botName: this.aliasPipe.transform(this.address)
@@ -379,20 +400,75 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     modalRef.content.closeBtnName = 'Close'
   }
 
-  public showMoreItems() {
+  showMoreItems() {
     this.paginationLimit = this.paginationLimit + 50 // TODO: set dynamic number
   }
-  public showLessItems() {
+
+  showLessItems() {
     this.paginationLimit = this.paginationLimit - 50 // TODO: set dynamic number
   }
-  public replaceAll(string: string, find: string, replace: string) {
+
+  replaceAll(string: string, find: string, replace: string) {
     return string.replace(new RegExp(find, 'g'), replace)
   }
-  public changeState(address: string) {
+
+  changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
+  }
+
+  private setTabs(pageId: string) {
+    this.tabs = [
+      {
+        title: 'Transactions',
+        active: true,
+        kind: 'transaction',
+        count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Delegations',
+        active: false,
+        kind: 'delegation',
+        count: null,
+        icon: this.iconPipe.transform('handReceiving'),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Originations',
+        active: false,
+        kind: 'origination',
+        count: null,
+        icon: this.iconPipe.transform('link'),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Endorsements',
+        active: false,
+        kind: 'endorsement',
+        count: null,
+        icon: this.iconPipe.transform('stamp'),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+      },
+      {
+        title: 'Votes',
+        active: false,
+        kind: 'ballot',
+        count: null,
+        icon: this.iconPipe.transform('boxBallot'),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
+      }
+    ]
+
+    this.bakerTabs = [
+      { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
+      { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
+      { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
+      { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
+    ]
   }
 }

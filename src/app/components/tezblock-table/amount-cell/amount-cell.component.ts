@@ -9,11 +9,19 @@ import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-pric
   styleUrls: ['./amount-cell.component.scss']
 })
 export class AmountCellComponent {
-  @Input() data: any // TODO: any
-  @Input() options: any = {
-    // TODO: any
-    showFiatValue: true
+  @Input() data: any
+
+  @Input()
+  set options(value: any) {
+    if (value !== this._options) {
+      this._options = value
+    }
   }
+  get options() {
+    return this._options === undefined ? { showFiatValue: true } : this._options
+  }
+
+  private _options = undefined
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
 

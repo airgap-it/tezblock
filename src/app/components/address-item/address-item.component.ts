@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core'
-import { Router } from '@angular/router'
 
 @Component({
   selector: 'address-item',
@@ -8,28 +7,30 @@ import { Router } from '@angular/router'
 })
 export class AddressItemComponent {
   @Input()
-  public address?: string
-
-  @Input()
-  public clickableButton: boolean = true
-
-  @Input()
-  public hideIdenticon: boolean = false
-
-  @Input()
-  public forceIdenticon: boolean = false
-
-  @Input()
-  public showFull: boolean = false
-
-  @Input()
-  public isText: boolean
-
-  constructor(private readonly router: Router) {}
-
-  public inspectDetail() {
-    if (!this.isText && this.clickableButton) {
-      this.router.navigate([`/account/${this.address}`])
+  set address(value: string) {
+    if (value !== this._address) {
+      this._address = value
     }
   }
+  get address(): string {
+    return this._address || ''
+  }
+  private _address: string
+
+  @Input()
+  clickableButton: boolean = true
+
+  @Input()
+  hideIdenticon: boolean = false
+
+  @Input()
+  forceIdenticon: boolean = false
+
+  @Input()
+  showFull: boolean = false
+
+  @Input()
+  isText: boolean
+
+  constructor() {}
 }

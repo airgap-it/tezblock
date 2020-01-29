@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { UnitHelper } from 'test-config/unit-test-helper'
+import { TooltipModule } from 'ngx-bootstrap'
 
 import { TransactionDetailWrapperComponent } from './transaction-detail-wrapper.component'
 import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-converter.pipe'
@@ -9,6 +10,7 @@ import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.c
 import { ModalModule, BsModalService } from 'ngx-bootstrap'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
 describe('TransactionDetailWrapperComponent', () => {
   let component: TransactionDetailWrapperComponent
@@ -21,8 +23,8 @@ describe('TransactionDetailWrapperComponent', () => {
     TestBed.configureTestingModule(
       unitHelper.testBed({
         providers: [AmountConverterPipe, BsModalService, ToastrService, IconPipe],
-        imports: [FontAwesomeModule, MomentModule, ModalModule.forRoot(), ToastrModule.forRoot()],
-        declarations: [TransactionDetailWrapperComponent, LoadingSkeletonComponent]
+        imports: [FontAwesomeModule, MomentModule, ModalModule.forRoot(), ToastrModule.forRoot(), TooltipModule.forRoot()],
+        declarations: [TransactionDetailWrapperComponent, LoadingSkeletonComponent, TooltipItemComponent]
       })
     )
       .compileComponents()

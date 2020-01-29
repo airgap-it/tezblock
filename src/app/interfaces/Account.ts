@@ -9,4 +9,5 @@ export interface Account {
   block_id: string
   script?: any
   proposal: string
+  is_baker?: boolean
 }
