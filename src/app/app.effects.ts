@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store'
 import { isNil, negate } from 'lodash'
 
 import * as actions from './app.actions'
-import { BaseService } from '@tezblock/services/base.service'
+import { BaseService, Operation } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
@@ -66,7 +66,7 @@ export class AppEffects {
             predicates: [
               {
                 field: 'meta_cycle',
-                operation: 'eq',
+                operation: Operation.eq,
                 set: [cycle],
                 inverse: false
               }
