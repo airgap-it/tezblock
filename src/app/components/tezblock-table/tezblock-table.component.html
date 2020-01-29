@@ -98,7 +98,7 @@
     </table>
     <div class="w-100" [ngClass]="downloadable && enableDownload ? 'pb-2' : 'pb-3'">
       <ng-container *ngIf="downloadable && enableDownload">
-        <button type="button" class="btn btn-sm pl-3" (click)="downloadCSV()">
+        <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
           <small>
             <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>
             Download CSV Export
@@ -106,7 +106,6 @@
         </button>
       </ng-container>
     </div>
-
     <button *ngIf="pagination" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
   </div>
 </ng-template>

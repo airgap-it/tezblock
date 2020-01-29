@@ -84,7 +84,7 @@ export class IconPipe implements PipeTransform {
       coin: { prefix, iconName: coin },
       hatChef: { prefix, iconName: hatChef },
       infoCircle: { prefix, iconName: infoCircle },
-      download: { prefix, iconName: download }
+      download: { prefix, iconName: 'download' }
     }
   }
 
