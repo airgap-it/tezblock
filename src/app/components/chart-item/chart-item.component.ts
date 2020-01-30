@@ -15,7 +15,9 @@ export const defaultOptions: ChartOptions = {
     duration: 1250 // general animation time
   },
   hover: {
-    animationDuration: 250 // duration of animations when hovering an item
+    animationDuration: 250, // duration of animations when hovering an item
+    intersect: false,
+    mode: 'x-axis'
   },
   responsiveAnimationDuration: 0, // animation duration after a resize
   legend: {
@@ -47,6 +49,10 @@ export const defaultOptions: ChartOptions = {
     line: {
       tension: 0 // disables bezier curves
     }
+  },
+  tooltips: {
+    mode: 'x-axis',
+    intersect: false
   }
 }
 
