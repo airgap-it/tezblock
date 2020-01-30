@@ -57,10 +57,21 @@ export const defaultOptions: ChartOptions = {
     displayColors: false, // removes color box and label
 
     callbacks: {
-      label: function(data): string {
+      title: function(data) {
+        if (data[0].label.includes(':')) {
+          return data[0].label.slice(0, -3)
+        } else {
+          return data[0].label
+        }
+      },
+      label: function(data, labels): string {
         if (Number(data.value) % 1 !== 0) {
           let value = parseFloat(data.value).toFixed(2)
-          return value + ' ꜩ'
+          if (labels.datasets[0].label === 'Balance') {
+            return value + ' ꜩ'
+          } else {
+            return '$' + value
+          }
         } else {
           return data.value
         }
