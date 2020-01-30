@@ -58,9 +58,12 @@ export const defaultOptions: ChartOptions = {
 
     callbacks: {
       label: function(data): string {
-        const value: string = parseFloat(data.value).toFixed(2)
-
-        return value + ' ꜩ'
+        if (Number(data.value) % 1 !== 0) {
+          let value = parseFloat(data.value).toFixed(2)
+          return value + ' ꜩ'
+        } else {
+          return data.value
+        }
       }
     }
   }
