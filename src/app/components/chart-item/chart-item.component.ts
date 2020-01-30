@@ -50,9 +50,22 @@ export const defaultOptions: ChartOptions = {
       tension: 0 // disables bezier curves
     }
   },
+
   tooltips: {
     mode: 'x-axis',
-    intersect: false
+    intersect: false,
+    custom: function(tooltip) {
+      if (!tooltip) return
+      // disable displaying the color box
+      tooltip.displayColors = false
+    },
+    callbacks: {
+      label: function(data) {
+        const value: string = parseFloat(data.value).toFixed(2)
+
+        return value + ' ꜩ'
+      }
+    }
   }
 }
 
