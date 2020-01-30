@@ -57,7 +57,7 @@ export const defaultOptions: ChartOptions = {
     displayColors: false, // removes color box and label
 
     callbacks: {
-      label: function(data) {
+      label: function(data): string {
         const value: string = parseFloat(data.value).toFixed(2)
 
         return value + ' ꜩ'
