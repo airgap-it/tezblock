@@ -24,7 +24,8 @@ import {
   faCoins,
   faHatChef,
   faListAlt,
-  faInfoCircle
+  faInfoCircle,
+  faDownload
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -58,6 +59,7 @@ export const addFontAwesome = () => {
     faCoins,
     faHatChef,
     faListAlt,
-    faInfoCircle
+    faInfoCircle,
+    faDownload
   )
 }

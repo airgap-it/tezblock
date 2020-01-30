@@ -69,11 +69,12 @@ import { ListEffects } from './pages/list/effects'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-import { BakerTableEffects } from './components/baker-table/effects';
+import { BakerTableEffects } from './components/baker-table/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
@@ -157,6 +158,7 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
+    ProtocolConstantComponent,
     ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,

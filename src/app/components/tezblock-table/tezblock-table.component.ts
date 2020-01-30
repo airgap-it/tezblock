@@ -79,6 +79,15 @@ export class TezblockTableComponent implements OnInit {
 
   @Input() expandedRow?: ExpandedRow<any>
 
+  @Input()
+  public downloadable?: boolean = false
+
+  @Input()
+  public enableDownload?: boolean = false
+
+  @Output()
+  public readonly downloadClicked: EventEmitter<void> = new EventEmitter()
+
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
 
   private expandedRows: any[] = []
@@ -110,6 +119,10 @@ export class TezblockTableComponent implements OnInit {
 
   loadMore() {
     this.onLoadMore.emit()
+  }
+
+  public downloadCSV() {
+    this.downloadClicked.emit()
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {

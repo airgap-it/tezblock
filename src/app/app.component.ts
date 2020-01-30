@@ -16,6 +16,7 @@ export class AppComponent {
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
+    this.store$.dispatch(actions.loadLatestBlock())
   }
 
   public navigate(entity: string) {
