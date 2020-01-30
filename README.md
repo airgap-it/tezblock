@@ -8,48 +8,7 @@ tezblock is a block explorer for [Tezos](https://tezos.com) an open-source platf
 
 ## Local Deployment
 
-tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protocol indexer. It is possible to deploy Conseil locally, [Nautilus](https://github.com/airgap-it/Nautilus) allows to do that easily.
-
-### Prerequisites
-
-- Linux or macOS.
-- Java SE Development Kit 8 (JDK 8).
-- Docker.
-- Node.js 10 or above.
-
-### Build and deploy Conseil
-
-Install `sbt`, the Scala build tool:
-
-On Linux:
-
-    sudo apt-get install -y sbt
-
-On macOS:
-
-    brew install sbt
-
-Clone Nautilus:
-
-    git clone https://github.com/airgap-it/Nautilus.git
-
-If there is no Tezos node running in archive mode available, then Nautilus can be used to deploy one locally. From the Nautilus folder cloned in step 2, execute:
-
-    bash ./docker/nautilus.sh -t
-
-The above command will create and start a docker container with a Tezos node running in archive mode. The docker image name is `tezos-node-local`.
-
-If a Tezos node running in archive mode is available, configure Conseil to point to that node in `Nautilus/docker/config/local/conseil/conseil.conf`.
-Conseil needs access to a Postgres database. From the Nautilus folder, execute:
-
-    bash ./docker/nautilus.sh -d
-
-The above command will create and start a docker container with the Postgres database. The docker image name is `postgres-local`.
-Build and deploy Conseil. From the Nautilus folder, execute:
-
-    bash ./docker/nautilus.sh -c
-
-The above command will create and start a docker container with Conseil running and listening on port 1337. The docker image name is `conseil-local`. The API key need to send requests to the Conseil REST interface can be found in `Nautilus/docker/config/local/conseil/conseil.conf`. The default value is `aminal`.
+tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protocol indexer. It is possible to deploy Conseil locally, simply follow the [README](https://github.com/Cryptonomic/Conseil/blob/master/README.md) on the Conseil github repository.
 
 ### Build and deploy tezblock
 
@@ -57,7 +16,14 @@ Clone the tezblock repository.
 
     git clone https://github.com/airgap-it/tezblock
 
-Change the value of `conseilBaseUrl` in `src/environments/environment.ts` to point to the locally deployed instance of Conseil, http://localhost:1337. Also change the `conseilApiKey` value to the API key of your local Conseil instance.
+Edit the `src/environments/environment.ts` and `src/environments/environment.prod.ts` files and change:
+
+* `MAINNET_RPC_URL` to a URL to the JSON RPC interface of a Tezos node.
+* `MAINNET_CONSEIL_URL` to a URL of a running Conseil service.
+* `MAINNET_CONSEIL_API_KEY` to the API key for the Conseil service.
+* `MAINNET_TARGET_URL` this value can be set to the URL tezblock will be accessible from. This is only needed if switching between the different networks is need. otherwise it can be ignored.
+
+If support for multiple networks is needed, similarly edit the `BABYLONNET_` and `CARTHAGENET_` values, or ignore them otherwise.
 
 From the root of the tezblock folder, execute the following command to build tezblock:
 
