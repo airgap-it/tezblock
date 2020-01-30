@@ -103,12 +103,5 @@ export class RewardService {
       this.pendingPromises.set(key, promise)
       return promise
     }
-
-    // const rewards = await this.protocol.calculateRewards(address, cycle)
-    // const currentCycle = await this.protocol.fetchCurrentCycle()
-    // if (cycle < currentCycle) {
-    //   this.calculatedRewardsMap.set(key, rewards)
-    // }
-    // return rewards
   }
 }
