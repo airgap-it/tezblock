@@ -293,7 +293,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Age', field: 'estimated_time', template: Template.timestamp },
           { name: 'Level', field: 'level', template: Template.block },
           { name: 'Priority', field: 'priority' },
-          { name: 'Rewards', field: 'rewards' },
+          { name: 'Rewards', field: 'rewards', template: Template.amount },
           { name: 'Fees', field: 'fees', template: Template.amount },
           { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
