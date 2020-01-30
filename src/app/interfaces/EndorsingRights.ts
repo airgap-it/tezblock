@@ -6,12 +6,13 @@ export interface EndorsingRights {
   level: number
   cycle: number
   rewards?: string
+  deposit?: string
 }
 
 export interface AggregatedEndorsingRights {
   cycle: number
   endorsementsCount: number
   endorsementRewards: string
-  deposits: number // ?
+  deposits: string
   items: EndorsingRights[]
 }
