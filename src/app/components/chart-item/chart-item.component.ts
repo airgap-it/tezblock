@@ -54,11 +54,8 @@ export const defaultOptions: ChartOptions = {
   tooltips: {
     mode: 'x-axis',
     intersect: false,
-    custom: function(tooltip) {
-      if (!tooltip) return
-      // disable displaying the color box
-      tooltip.displayColors = false
-    },
+    displayColors: false, // removes color box and label
+
     callbacks: {
       label: function(data) {
         const value: string = parseFloat(data.value).toFixed(2)
