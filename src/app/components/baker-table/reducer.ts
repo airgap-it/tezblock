@@ -6,21 +6,7 @@ import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-
-interface TableState<T> {
-  data: T[]
-  pagination: Pagination
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: undefined,
-  pagination: {
-    currentPage: 1,
-    selectedSize: 5
-  },
-  loading: false
-})
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
@@ -41,8 +27,8 @@ export interface State {
 const initialState: State = {
   accountAddress: undefined,
   currentCycle: undefined,
-  bakingRights: getInitialTableState(),
-  endorsingRights: getInitialTableState(),
+  bakingRights: getInitialTableState(5),
+  endorsingRights: getInitialTableState(5),
   kind: undefined,
   efficiencyLast10Cycles: undefined,
   busy: {

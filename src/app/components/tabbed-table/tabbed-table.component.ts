@@ -8,6 +8,7 @@ import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
+// I don't like it !!!
 type KindType = string | string[]
 
 export interface Tab {
@@ -31,16 +32,11 @@ export const kindToOperationTypes = (kind: KindType): string => (Array.isArray(k
 })
 export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
-  page: string = 'account'
-
-  selectedTab: Tab | undefined
-
-  @Input()
   set tabs(value: Tab[]) {
     if (value !== this._tabs) {
-      this._tabs = value
+      const selectedTab = value.find(tab => tab.active)
 
-      const selectedTab = value.find(tab => tab.kind === OperationTypes.Transaction)
+      this._tabs = value
       this.updateSelectedTab(selectedTab)
     }
   }
@@ -49,23 +45,40 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     return this._tabs || []
   }
 
-  get id(): string {
-    return this.activatedRoute.snapshot.paramMap.get('id')
+  // ????
+  @Input()
+  set counts(value: number[]) {
+    if (value !== this._counts) {
+      this._counts = value
+    }
   }
+
+  get counts(): number[] {
+    return this._counts || this.tabs.length > 0 ? [...Array(this.tabs.length)] : undefined
+  }
+
+  private _counts: number[]
 
   @Input()
   actionType$: Observable<LayoutPages>
 
-  @Input() data?: any[]
+  @Input()
+  data: any[]
 
   @Input()
-  loading?: Observable<boolean>
+  loading: Observable<boolean>
 
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()
 
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
+
+  get id(): string {
+    return this.activatedRoute.snapshot.paramMap.get('id')
+  }
+
+  selectedTab: Tab | undefined
 
   private _tabs: Tab[] | undefined
 
@@ -106,13 +119,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
     const firstTabWithData = this.tabs.find(hasData)
     const selectedTab = tabFromQuery || firstTabWithData
-    const defaultKind = OperationTypes.Transaction
 
-    if (selectedTab) {
-      if (selectedTab.kind === defaultKind) {
-        this.updateSelectedTab(selectedTab)
-      }
-
+    if (selectedTab !== this.selectedTab) {
       this.selectTab(selectedTab)
     }
   }
@@ -130,10 +138,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const aggregateFunction = (info: OperationCount, field: string) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
         Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-      const tab =
-        info.kind === 'proposals'
-          ? this.tabs.find(isTabKindEqualTo('ballot'))
-          : this.tabs.find(isTabKindEqualTo(info.kind))
+      const tab = info.kind === 'proposals' ? this.tabs.find(isTabKindEqualTo('ballot')) : this.tabs.find(isTabKindEqualTo(info.kind))
 
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)

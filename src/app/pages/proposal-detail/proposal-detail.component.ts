@@ -2,12 +2,16 @@ import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable } from 'rxjs'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CopyService } from 'src/app/services/copy/copy.service'
 import * as actions from './actions'
 import * as fromRoot from '@tezblock/reducers'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
+import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { columns } from './table-definitions'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -16,9 +20,15 @@ import { ProposalDto } from '@tezblock/interfaces/proposal'
 })
 export class ProposalDetailComponent extends BaseComponent implements OnInit {
   proposal$: Observable<ProposalDto>
+  tabs: Tab[]
+
+  get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -26,7 +36,12 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.reset())
 
     this.subscriptions.push(
-      this.activatedRoute.paramMap.subscribe(paramMap => this.store$.dispatch(actions.loadProposal({ id: paramMap.get('id') })))
+      this.activatedRoute.paramMap.subscribe(paramMap => {
+        const id = paramMap.get('id')
+
+        this.store$.dispatch(actions.loadProposal({ id }))
+        this.setTabs()
+      })
     )
   }
 
@@ -36,5 +51,38 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
   copyToClipboard() {
     this.copyService.copyToClipboard(fromRoot.getState(this.store$).proposalDetails.proposal.proposal)
+  }
+
+  private setTabs() {
+    this.tabs = [
+      {
+        title: 'Proposal',
+        active: true,
+        kind: 'proposal',
+        count: undefined,
+        columns
+      },
+      {
+        title: 'Expolration',
+        active: false,
+        kind: 'expolration',
+        count: undefined,
+        columns
+      },
+      {
+        title: 'Testing',
+        active: false,
+        kind: 'testing',
+        count: undefined,
+        columns
+      },
+      {
+        title: 'Promotion',
+        active: false,
+        kind: 'promotion',
+        count: undefined,
+        columns
+      }
+    ]
   }
 }

@@ -23,7 +23,7 @@ export enum OperationTypes {
     Block = 'block'
   }
   
-  // TODO: more to more proper place ( separate file )
+  // TODO: move to more proper place ( separate file ) or try DELETE
   export enum LayoutPages {
     Account = 'account',
     Block = 'block',
