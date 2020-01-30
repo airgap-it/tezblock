@@ -6,6 +6,7 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
+import { DownloadService } from '@tezblock/services/download/download.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 type KindType = string | string[]
@@ -61,6 +62,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   loading?: Observable<boolean>
 
+  @Input()
+  downloadable?: boolean = false
+
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()
 
@@ -68,8 +72,14 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
   private _tabs: Tab[] | undefined
+  public enableDownload: boolean = false
 
-  constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly downloadService: DownloadService
+  ) {
     super()
   }
 
@@ -130,10 +140,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const aggregateFunction = (info: OperationCount, field: string) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
         Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-      const tab =
-        info.kind === 'proposals'
-          ? this.tabs.find(isTabKindEqualTo('ballot'))
-          : this.tabs.find(isTabKindEqualTo(info.kind))
+      const tab = info.kind === 'proposals' ? this.tabs.find(isTabKindEqualTo('ballot')) : this.tabs.find(isTabKindEqualTo(info.kind))
 
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)
@@ -197,5 +204,12 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+    this.enableDownload = selectedTab.kind === 'transaction' || selectedTab.kind === 'delegation' || selectedTab.kind === 'origination'
+  }
+
+  public download() {
+    if (this.downloadable) {
+      this.downloadService.download(this.page, this.selectedTab.count, this.selectedTab.kind)
+    }
   }
 }
