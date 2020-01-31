@@ -2,7 +2,7 @@
   class="d-inline-block"
   [innerHtml]="data.amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
 ></span>
-ꜩ
+{{ options?.symbol || 'ꜩ' }}
 <ng-container *ngIf="enableComparison; else noComparison">
   <ng-container *ngIf="showOldValue">
     <span

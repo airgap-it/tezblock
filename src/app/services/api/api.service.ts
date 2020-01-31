@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
 import { AggregatedBakingRights, BakingRights } from './../../interfaces/BakingRights'
 import { EndorsingRights, AggregatedEndorsingRights } from './../../interfaces/EndorsingRights'
@@ -12,12 +13,12 @@ import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
-import { TezosProtocol } from 'airgap-coin-lib'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { Contract } from '@tezblock/domain/contract'
 
 export interface OperationCount {
   [key: string]: string
@@ -1309,7 +1310,24 @@ export class ApiService {
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
-  getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+  getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
+    const protocol = new TezosFAProtocol({
+      symbol: contract.symbol,
+      name: contract.name,
+      marketSymbol: contract.symbol,
+      identifier: '', // not important in this context can be empty string
+      contractAddress: contract.id,
+      jsonRPCAPI: this.environmentUrls.rpcUrl,
+      baseApiUrl: this.environmentUrls.conseilUrl,
+      baseApiKey: this.environmentUrls.conseilApiKey,
+      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
+      network: this.chainNetworkService.getNetwork()
+    })
+
+    return from(protocol.getTransactions(10, cursor))
+  }
+
+  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)

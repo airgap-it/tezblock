@@ -9,6 +9,7 @@ import { ApiService } from './../api/api.service'
 import { BlockService } from '../blocks/blocks.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { getContractByAddress } from '@tezblock/domain/contract'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -66,46 +67,54 @@ export class SearchService {
       return false
     }
 
-    subscriptions.push(
-      this.apiService
-        .getAccountById(_searchTerm)
-        .pipe(
-          map(first),
-          filter(negate(isNil))
-        )
-        .subscribe(account =>
-          processResult(account, () => {
-            this.router.navigateByUrl('/account/' + _searchTerm)
-          })
-        ),
-      this.apiService
-        .getTransactionsById(_searchTerm, 1)
-        .pipe(
-          map(first),
-          filter(negate(isNil))
-        )
-        .subscribe(transaction =>
-          processResult(transaction, (transaction: Transaction) => {
-            if (transaction.kind === 'endorsement') {
-              this.router.navigateByUrl('/endorsement/' + _searchTerm)
+    // TODO: implement full search by contract
+    const contract = getContractByAddress(_searchTerm)
+    if (contract) {
+      processResult([contract], () => {
+        this.router.navigateByUrl('/contract/' + _searchTerm)
+      })
+    } else {
+      subscriptions.push(
+        this.apiService
+          .getAccountById(_searchTerm)
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(account =>
+            processResult(account, () => {
+              this.router.navigateByUrl('/account/' + _searchTerm)
+            })
+          ),
+        this.apiService
+          .getTransactionsById(_searchTerm, 1)
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(transaction =>
+            processResult(transaction, (transaction: Transaction) => {
+              if (transaction.kind === 'endorsement') {
+                this.router.navigateByUrl('/endorsement/' + _searchTerm)
 
-              return
-            }
+                return
+              }
 
-            this.router.navigateByUrl('/transaction/' + _searchTerm)
-          })
-        ),
-      merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
-        .pipe(
-          map(first),
-          filter(negate(isNil))
-        )
-        .subscribe(block =>
-          processResult(block, () => {
-            this.router.navigateByUrl('/block/' + block.level)
-          })
-        )
-    )
+              this.router.navigateByUrl('/transaction/' + _searchTerm)
+            })
+          ),
+        merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(block =>
+            processResult(block, () => {
+              this.router.navigateByUrl('/block/' + block.level)
+            })
+          )
+      )
+    }
 
     return result
   }

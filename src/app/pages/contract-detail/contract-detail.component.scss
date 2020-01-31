@@ -1,9 +1,6 @@
-::ng-deep app-account-detail {
-  .chart__container {
-    min-height: 125px;
-  }
+::ng-deep app-contract-detail {
   .card__top {
-    min-height: 328px;
+    min-height: 128px;
   }
   .btn--rotated fa-icon svg {
     transform: rotate(-180deg);
