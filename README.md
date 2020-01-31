@@ -8,7 +8,7 @@ tezblock is a block explorer for [Tezos](https://tezos.com) an open-source platf
 
 ## Local Deployment
 
-tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protocol indexer. It is possible to deploy Conseil locally, simply follow the [README](https://github.com/Cryptonomic/Conseil/blob/master/README.md) on the Conseil github repository.
+tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protocol indexer. Follow the steps to deploy Conseil locally or read through the [README](https://github.com/Cryptonomic/Conseil/blob/master/README.md) in the Conseil GitHub repository.
 
 ### Build and deploy tezblock
 
@@ -18,10 +18,10 @@ Clone the tezblock repository.
 
 Edit the `src/environments/environment.ts` and `src/environments/environment.prod.ts` files and change:
 
-* `MAINNET_RPC_URL` to a URL to the JSON RPC interface of a Tezos node.
-* `MAINNET_CONSEIL_URL` to a URL of a running Conseil service.
-* `MAINNET_CONSEIL_API_KEY` to the API key for the Conseil service.
-* `MAINNET_TARGET_URL` this value can be set to the URL tezblock will be accessible from. This is only needed if switching between the different networks is need. otherwise it can be ignored.
+- `MAINNET_RPC_URL` URL to the JSON RPC interface of a Tezos node
+- `MAINNET_CONSEIL_URL` URL of a running Conseil service
+- `MAINNET_CONSEIL_API_KEY` API key for the Conseil service
+- `MAINNET_TARGET_URL` Value can be set to the URL tezblock will be accessible from. Only needed if switching between the different network deployments is desired, otherwise this can be ignored
 
 If support for multiple networks is needed, similarly edit the `BABYLONNET_` and `CARTHAGENET_` values, or ignore them otherwise.
 
