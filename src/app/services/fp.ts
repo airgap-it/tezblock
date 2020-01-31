@@ -22,3 +22,4 @@ export const toArray = (value: any) => [value]
 
 export const withoutBraces = (value: string): string => value ? value.replace(noBraces, '') : value
 
+export function distinctFilter<T>(value: T, index: number, _array: T[]) { return _array.indexOf(value) === index }

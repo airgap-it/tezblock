@@ -74,8 +74,9 @@ import { ContractDetailComponent } from './pages/contract-detail/contract-detail
 import { ContractDetailEffects } from './pages/contract-detail/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 
 @NgModule({
@@ -160,6 +161,7 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
+    ProtocolConstantComponent,
     ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,

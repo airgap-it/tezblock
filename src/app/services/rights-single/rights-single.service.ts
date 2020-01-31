@@ -14,11 +14,6 @@ interface RightsSingleServiceState {
   loading: boolean
 }
 
-export interface VotingInfo {
-  pkh: string
-  rolls: number
-}
-
 const initialState: RightsSingleServiceState = {
   rights: [],
   kind: '',

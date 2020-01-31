@@ -6,6 +6,7 @@ import { map, switchMap, filter, catchError } from 'rxjs/operators'
 import { ApiService, OperationCount } from '@tezblock/services/api/api.service'
 import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
+import { DownloadService } from '@tezblock/services/download/download.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 type KindType = string | string[]
@@ -21,6 +22,8 @@ export interface Tab {
 
 const toLowerCase = (value: string): string => (value ? value.toLowerCase() : value)
 const compareTabWith = (anotherTabTitle: string) => (tab: Tab) => toLowerCase(tab.title) === toLowerCase(anotherTabTitle)
+
+export const kindToOperationTypes = (kind: KindType): string => (Array.isArray(kind) ? OperationTypes.Ballot : kind)
 
 @Component({
   selector: 'tabbed-table',
@@ -59,6 +62,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   loading?: Observable<boolean>
 
+  @Input()
+  downloadable?: boolean = false
+
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()
 
@@ -66,8 +72,14 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
   private _tabs: Tab[] | undefined
+  public enableDownload: boolean = false
 
-  constructor(private readonly apiService: ApiService, private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly downloadService: DownloadService
+  ) {
     super()
   }
 
@@ -123,21 +135,12 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.loadMore.emit(true)
   }
 
-  kindToOperationTypes(kind: KindType): string {
-    return Array.isArray(kind) ? OperationTypes.Ballot : kind
-  }
-
   private updateTabsCounts$ = (type: LayoutPages): Observable<boolean> => {
     const resetTabsCount = () => this.tabs.forEach(tab => (tab.count = 0))
     const aggregateFunction = (info: OperationCount, field: string) => {
       const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
         Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
-      const tab =
-        info.kind === 'proposals'
-          ? this.tabs.find(isTabKindEqualTo('ballot'))
-          : this.tabs.find(tabArgument =>
-              Array.isArray(tabArgument.kind) ? tabArgument.kind.indexOf(info.kind) !== -1 : tabArgument.kind === info.kind
-            )
+      const tab = info.kind === 'proposals' ? this.tabs.find(isTabKindEqualTo('ballot')) : this.tabs.find(isTabKindEqualTo(info.kind))
 
       if (tab) {
         const count = parseInt(info[`count_${field}`], 10)
@@ -177,6 +180,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       )
     }
 
+    // type === LayoutPages.Block
     return this.apiService.getOperationCount('block_level', this.id).pipe(
       map(blockCounts => {
         resetTabsCount()
@@ -200,5 +204,12 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+    this.enableDownload = selectedTab.kind === 'transaction' || selectedTab.kind === 'delegation' || selectedTab.kind === 'origination'
+  }
+
+  public download() {
+    if (this.downloadable) {
+      this.downloadService.download(this.page, this.selectedTab.count, this.selectedTab.kind)
+    }
   }
 }
