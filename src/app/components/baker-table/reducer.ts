@@ -6,21 +6,7 @@ import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-
-interface TableState<T> {
-  data: T[]
-  pagination: Pagination
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: undefined,
-  pagination: {
-    currentPage: 1,
-    selectedSize: 5
-  },
-  loading: false
-})
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
 
 interface Busy {
   efficiencyLast10Cycles: boolean

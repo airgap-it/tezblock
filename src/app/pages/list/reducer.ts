@@ -3,7 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { Pagination } from '@tezblock/services/facade/facade'
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 const preprocessBakersData = (bakerData: any[]) =>
@@ -11,23 +11,6 @@ const preprocessBakersData = (bakerData: any[]) =>
     ...bakerDataItem,
     number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
   }))
-
-interface TableState<T> {
-  data: T[]
-  pagination: Pagination
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: [],
-  pagination: {
-    currentPage: 1,
-    selectedSize: 10,
-    pageSizes: [5, 10, 20, 50],
-    total: undefined
-  },
-  loading: false
-})
 
 export interface State {
   doubleBakings: TableState<Transaction>
