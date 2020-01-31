@@ -12,23 +12,38 @@ tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protoc
 
 ### Build and deploy Conseil
 
-In short:
+Clone the Conseil repository and `cd` into the cloned folder.
 
-* Clone the Conseil repository
-* `cd` into the cloned folder
-* Build the Conseil docker image with `docker build -t conseil .`
-* Edit the `docker-compose.yml` to configure your own Tezos Node and the just built docker images, or just use the preconfigured one.
-    * To increase performance, uncomment the following line in the `docker-compose.yml` file: 
-        * `- "./sql/conseil.sql:/docker-entrypoint-initdb.d/conseil.sql"`
-    * Edit the `sql/conseil.sql` file by adding:
-        * `ALTER ROLE conseiluser SET search_path TO tezos,public;`
-        * `ALTER DATABASE "conseil-local" SET search_path TO tezos,public;`
-        * `CREATE INDEX ix_accounts_history_account_id ON tezos.accounts_history USING hash (account_id);`
-        * `CREATE INDEX ix_operations_level ON tezos.operations USING hash (level);`
-        * `CREATE INDEX ix_operations_level_kind ON tezos.operations USING btree (level,kind);`
-        * `CREATE INDEX ix_operations_manager_pubkey ON tezos.operations USING hash (manager_pubkey);`
-        * `CREATE INDEX ix_operations_operation_group_hash ON tezos.operations USING hash (operation_group_hash);`
-* Run the Conseil instance with `docker-compose up -d`
+    https://github.com/Cryptonomic/Conseil.git
+    cd Conseil
+
+Build the Conseil docker image
+
+    `docker build -t conseil .`
+
+Edit the `docker-compose.yml` to configure your own Tezos Node and the just built docker images, or just use the preconfigured one.
+
+#### Conseil performance optimization
+
+To increase performance, uncomment the following line in the `docker-compose.yml` file:
+
+    "./sql/conseil.sql:/docker-entrypoint-initdb.d/conseil.sql"`
+
+Edit the `sql/conseil.sql` file by adding:
+
+- `ALTER ROLE conseiluser SET search_path TO tezos,public;`
+- `ALTER DATABASE "conseil-local" SET search_path TO tezos,public;`
+- `CREATE INDEX ix_accounts_history_account_id ON tezos.accounts_history USING hash (account_id);`
+- `CREATE INDEX ix_operations_level ON tezos.operations USING hash (level);`
+- `CREATE INDEX ix_operations_level_kind ON tezos.operations USING btree (level,kind);`
+- `CREATE INDEX ix_operations_manager_pubkey ON tezos.operations USING hash (manager_pubkey);`
+- `CREATE INDEX ix_operations_operation_group_hash ON tezos.operations USING hash (operation_group_hash);`
+
+Run the Conseil instance
+
+    `docker-compose up -d`
+
+#### Setup local Tezos node
 
 To run a Tezos node locally, clone Nautilus:
 
@@ -42,9 +57,10 @@ The above command will create and start a docker container with a Tezos node run
 
 ### Build and deploy tezblock
 
-Clone the tezblock repository.
+Clone the tezblock repository and `cd` into the cloned folder.
 
     git clone https://github.com/airgap-it/tezblock
+    cd tezblock
 
 Edit the `src/environments/environment.ts` and `src/environments/environment.prod.ts` files and change:
 
