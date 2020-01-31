@@ -110,20 +110,23 @@
                 </ng-container>
               </div>
               <h5 class="card-title__secondary mb-3 pt-3">
-                Related Accounts
+                <tooltip-item
+                  [title]="'Related Accounts'"
+                  [tooltip]="'Accounts that are either managed by this account or are the manager of this account.'"
+                ></tooltip-item>
               </h5>
-              <ng-container *ngIf="relatedAccounts | async as relatedAccountsList">
+              <ng-container *ngIf="relatedAccounts$ | async as relatedAccountsList">
                 <p *ngIf="relatedAccountsList.length === 0" class="text-secondary m-0">
                   This account has no related accounts.
                 </p>
-                <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts | async | slice: 0:paginationLimit" [@AnimateList]>
+                <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts$ | async | slice: 0:paginationLimit" [@AnimateList]>
                   <address-item
                     [address]="relatedAccount.account_id"
                     *ngIf="relatedAccount"
                     [showFull]="!(isMobile$ | async)"
                   ></address-item>
                 </div>
-                <div *ngIf="relatedAccounts | async as relatedAccountsList">
+                <div *ngIf="relatedAccounts$ | async as relatedAccountsList">
                   <button
                     class="btn btn-link p-0 collapse--btn"
                     *ngIf="paginationLimit < relatedAccountsList.length"
@@ -183,15 +186,30 @@
               <ng-container *ngIf="delegatedAccountAddress">
                 <div class="row mb-3">
                   <div class=" col-md-5">
-                    <p class="text-secondary mb-0">Delegated Account</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Delegated Account'"
+                        [tooltip]="
+                          'The first delegated account that is managed by this account. This can be the same account or an account that starts with KT1.'
+                        "
+                      ></tooltip-item>
+                    </p>
                   </div>
                   <div class=" col-md-7">
-                    <address-item [address]="delegatedAccountAddress" [clickableButton]="delegatedAccountAddress !== account.account_id"></address-item>
+                    <address-item
+                      [address]="delegatedAccountAddress"
+                      [clickableButton]="delegatedAccountAddress !== account.account_id"
+                    ></address-item>
                   </div>
                 </div>
                 <div class="row mb-3" *ngIf="delegatedAmount">
                   <div class="col-md-5">
-                    <p class="text-secondary mb-0">Amount</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Amount'"
+                        [tooltip]="'The account balance of the delegated account shown above.'"
+                      ></tooltip-item>
+                    </p>
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
@@ -219,7 +237,12 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-5">
-                    <p class="text-secondary mb-0">Next Reward Expected</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Next Reward Expected'"
+                        [tooltip]="'The time until the next reward is exptected to be paid out by the baker.'"
+                      ></tooltip-item>
+                    </p>
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
@@ -237,14 +260,24 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-5">
-                    <p class="text-secondary mb-0">Reward Amount</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Reward Amount'"
+                        [tooltip]="
+                          'The amount being paid out as reward by the baker for the delegation. This is the expected amount to be paid out, the baker split is alreay subtracted.'
+                        "
+                      ></tooltip-item>
+                    </p>
                   </div>
                   <div class="col col-md-7">
                     <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                        <amount-cell *ngIf="rewardAmount$ | async" [data]="rewardAmount$ | async"></amount-cell>
-                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                      <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
+                        <amount-cell
+                          *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
+                          [data]="rewardAmountMinusFee"
+                        ></amount-cell>
+                        <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
                       </ng-container>
@@ -253,7 +286,12 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-5">
-                    <p class="text-secondary mb-0">Baker</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Baker'"
+                        [tooltip]="'A Baker takes part in the validation of the network with his balance and the balances of delegations.'"
+                      ></tooltip-item>
+                    </p>
                   </div>
                   <div class="col-md-7">
                     <address-item [address]="bakerAddress" [clickableButton]="bakerAddress !== account.account_id"></address-item>
@@ -261,10 +299,17 @@
                 </div>
                 <div class="row mb-3">
                   <div class="col-md-5">
-                    <p class="text-secondary mb-0">Baker Split</p>
+                    <p class="text-secondary mb-0">
+                      <tooltip-item
+                        [title]="'Baker Split'"
+                        [tooltip]="
+                          'The baker split is a percentage taken by the baker as a reward for running his infrastrucutre. This split is decided by the baker, happens offchain and could also be 0%.'
+                        "
+                      ></tooltip-item>
+                    </p>
                   </div>
-                  <div class=" col-md-7" *ngIf="tezosBakerFee; else loading">
-                    <p class="mb-0">{{ tezosBakerFee }}</p>
+                  <div class=" col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
+                    <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
                     <div class=" col-md-7">
@@ -278,25 +323,50 @@
         </div>
       </div>
 
-      <div class="pt-5" *ngIf="isValidBaker">
-        <div class="card pt-3">
-          <div class="card-body px-3 py-0">
-            <baker-table [tabs]="bakerTabs" [page]="'account'" [data]="bakerTableInfos" [ratings]="bakerTableRatings"></baker-table>
+      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
+      <div class="pt-5">
+        <div class="card">
+          <div class="card-body px-3 px-sm-3 pt-4 pb-3">
+            <ng-container *ngIf="is_baker">
+              <baker-table
+                [tabs]="bakerTabs"
+                [page]="'account'"
+                [data]="bakerTableInfos"
+                [ratings]="bakerTableRatings$ | async"
+                [bakerFee$]="tezosBakerFee$"
+              ></baker-table>
+            </ng-container>
+            <ng-container *ngIf="!is_baker || bakerTabs[0].active">
+              <div class="container px-3 chart__container">
+                <div class="row">
+                  <div class="col-md-6 col-lg-4 px-0 px-sm-3">
+                    <h5 class="card-title__secondary mb-3">
+                      Balance
+                      <small>last 30 days</small>
+                    </h5>
+                    <ng-container *ngIf="balanceChartDatasets$ | async">
+                      <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
+                    </ng-container>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
           </div>
         </div>
       </div>
 
-      <div class="pt-5">
+      <div #transactions class="pt-5">
         <div class="card pt-3">
           <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
             <tabbed-table
               [tabs]="tabs"
               [page]="'account'"
               [loading]="areTransactionsLoading$"
-              [data]="transactions$"
+              [data]="transactions$ | async"
               [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
+              [downloadable]="true"
             ></tabbed-table>
           </div>
         </div>

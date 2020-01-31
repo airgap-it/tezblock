@@ -18,6 +18,9 @@ export interface ExpTezosRewards extends TezosRewards {
 export class RewardService {
   protocol: TezosProtocol
 
+  private calculatedRewardsMap = new Map<String, TezosRewards>()
+  private pendingPromises = new Map<String, Promise<TezosRewards>>()
+
   constructor(private readonly chainNetworkService: ChainNetworkService) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
@@ -49,7 +52,7 @@ export class RewardService {
       switchMap(cycles =>
         forkJoin(
           cycles.map(cycle =>
-            from(this.protocol.calculateRewards(address, cycle)).pipe(
+            from(this.calculateRewards(address, cycle)).pipe(
               switchMap(rewards =>
                 from(this.protocol.calculatePayouts(rewards, 0, rewards.delegatedContracts.length)).pipe(
                   map(payouts => ({ ...rewards, payouts }))
@@ -65,7 +68,7 @@ export class RewardService {
   getRewardAmont(accountAddress: string, bakerAddress: string): Observable<string> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
       switchMap(currentCycle =>
-        from(this.protocol.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
+        from(this.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
           switchMap(tezosRewards =>
             from(this.protocol.calculatePayouts(tezosRewards, 0, tezosRewards.delegatedContracts.length)).pipe(
               map(payouts => {
@@ -80,5 +83,25 @@ export class RewardService {
         )
       )
     )
+  }
+
+  public async calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
+    const key = `${address}${cycle}`
+
+    if (this.calculatedRewardsMap.has(key)) {
+      return this.calculatedRewardsMap.get(key)
+    }
+
+    if (this.pendingPromises.has(key)) {
+      return this.pendingPromises.get(key)
+    } else {
+      const promise = this.protocol.calculateRewards(address, cycle).then(result => {
+        this.calculatedRewardsMap.set(key, result) 
+        this.pendingPromises.delete(key)
+        return result
+      })
+      this.pendingPromises.set(key, promise)
+      return promise
+    }
   }
 }

@@ -3,6 +3,8 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 const preprocessBakersData = (bakerData: any[]) =>
   bakerData.map(bakerDataItem => ({
@@ -10,42 +12,31 @@ const preprocessBakersData = (bakerData: any[]) =>
     number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
   }))
 
-interface TableState<T> {
-  data: T[]
-  pagination: {
-    currentPage: number
-    selectedSize: number
-    pageSizes: [number, number, number, number]
-  }
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: [],
-  pagination: {
-    currentPage: 1,
-    selectedSize: 10,
-    pageSizes: [5, 10, 20, 50]
-  },
-  loading: false
-})
-
 export interface State {
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
-  activeBakers: {
-    table: TableState<Baker>
-    total: number
-  }
+  proposals: TableState<ProposalListDto>
+  activeBakers: TableState<Baker>
+  activationsCountLast24h: number
+  originationsCountLast24h: number
+  transactionsCountLast24h: number
+
+  activationsCountLastXd: number[]
+  originationsCountLastXd: number[]
+  transactionsCountLastXd: number[]
 }
 
 const initialState: State = {
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
-  activeBakers: {
-    table: getInitialTableState(),
-    total: undefined
-  }
+  proposals: getInitialTableState(),
+  activeBakers: getInitialTableState(),
+  activationsCountLast24h: undefined,
+  originationsCountLast24h: undefined,
+  transactionsCountLast24h: undefined,
+  activationsCountLastXd: undefined,
+  originationsCountLastXd: undefined,
+  transactionsCountLastXd: undefined
 }
 
 export const reducer = createReducer(
@@ -118,43 +109,31 @@ export const reducer = createReducer(
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      table: {
-        ...state.activeBakers.table,
-        loading: true
-      }
+      loading: true
     }
   })),
   on(actions.loadActiveBakersSucceeded, (state, { activeBakers }) => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      table: {
-        ...state.activeBakers.table,
-        data: preprocessBakersData(activeBakers),
-        loading: false
-      }
+      data: preprocessBakersData(activeBakers),
+      loading: false
     }
   })),
   on(actions.loadActiveBakersFailed, state => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      table: {
-        ...state.activeBakers.table,
-        loading: false
-      }
+      loading: false
     }
   })),
   on(actions.increasePageOfActiveBakers, state => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      table: {
-        ...state.activeBakers.table,
-        pagination: {
-          ...state.activeBakers.table.pagination,
-          currentPage: state.activeBakers.table.pagination.currentPage + 1
-        }
+      pagination: {
+        ...state.activeBakers.pagination,
+        currentPage: state.activeBakers.pagination.currentPage + 1
       }
     }
   })),
@@ -162,22 +141,87 @@ export const reducer = createReducer(
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      total: undefined
+      pagination: {
+        ...state.activeBakers.pagination,
+        total: undefined
+      }
     }
   })),
   on(actions.loadTotalActiveBakersSucceeded, (state, { totalActiveBakers }) => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      total: totalActiveBakers
+      pagination: {
+        ...state.activeBakers.pagination,
+        total: totalActiveBakers
+      }
     }
   })),
   on(actions.loadTotalActiveBakersFailed, state => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      total: null
+      pagination: {
+        ...state.activeBakers.pagination,
+        total: null
+      }
     }
+  })),
+  on(actions.loadProposals, state => ({
+    ...state,
+    proposals: {
+      ...state.proposals,
+      loading: true
+    }
+  })),
+  on(actions.loadProposalsSucceeded, (state, { proposals }) => ({
+    ...state,
+    proposals: {
+      ...state.proposals,
+      data: proposals,
+      loading: false
+    }
+  })),
+  on(actions.loadProposalsFailed, state => ({
+    ...state,
+    proposals: {
+      ...state.proposals,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfProposals, state => ({
+    ...state,
+    proposals: {
+      ...state.proposals,
+      pagination: {
+        ...state.proposals.pagination,
+        currentPage: state.proposals.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.loadActivationsCountLast24hSucceeded, (state, { activationsCountLast24h }) => ({
+    ...state,
+    activationsCountLast24h
+  })),
+  on(actions.loadOriginationsCountLast24hSucceeded, (state, { originationsCountLast24h }) => ({
+    ...state,
+    originationsCountLast24h
+  })),
+  on(actions.loadTransactionsCountLast24hSucceeded, (state, { transactionsCountLast24h }) => ({
+    ...state,
+    transactionsCountLast24h
+  })),
+  on(actions.loadActivationsCountLastXdSucceeded, (state, { activationsCountLastXd }) => ({
+    ...state,
+    activationsCountLastXd
+  })),
+  on(actions.loadOriginationsCountLastXdSucceeded, (state, { originationsCountLastXd }) => ({
+    ...state,
+    originationsCountLastXd
+  })),
+  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+    ...state,
+    transactionsCountLastXd
   })),
   on(actions.reset, () => initialState)
 )

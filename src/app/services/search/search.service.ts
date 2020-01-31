@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, Subject, Subscription } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { merge, Observable, Subject, Subscription } from 'rxjs'
+import { filter, map, switchMap } from 'rxjs/operators'
 import { StorageMap } from '@ngx-pwa/local-storage'
+import { negate, isNil } from 'lodash'
 
-import { Block } from './../../interfaces/Block'
-import { TransactionSingleService } from './../transaction-single/transaction-single.service'
 import { ApiService } from './../api/api.service'
-import { AccountSingleService } from './../account-single/account-single.service'
 import { BlockService } from '../blocks/blocks.service'
-import { BlockSingleService } from '../block-single/block-single.service'
-import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { first } from '@tezblock/services/fp'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { getContractByAddress } from '@tezblock/domain/contract'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -23,8 +22,7 @@ export class SearchService {
     private readonly blockService: BlockService,
     private readonly apiService: ApiService,
     private readonly router: Router,
-    private readonly storage: StorageMap,
-	private readonly transactionService: NewTransactionService
+    private readonly storage: StorageMap
   ) {}
 
   // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
@@ -42,14 +40,14 @@ export class SearchService {
     let found = false
     let counter = 0
 
-    const processResult = (data: Array<any>, callback: Function): boolean => {
+    const processResult = (data: any, callback: Function): boolean => {
       if (found) {
         return false
       }
 
       counter++
 
-      if (data.length > 0) {
+      if (data) {
         found = true
         callback(data)
         result.next(true)
@@ -69,41 +67,54 @@ export class SearchService {
       return false
     }
 
-    const accountSingleService = new AccountSingleService(this.apiService)
-    const account$ = accountSingleService.account$
-    accountSingleService.setAddress(_searchTerm)
-
-    const transactionSingleService = new TransactionSingleService(this.apiService, this.transactionService)
-    const transactions$ = transactionSingleService.transactions$
-    transactionSingleService.updateTransactionHash(_searchTerm)
-
-    const blockSingleService = new BlockSingleService(this.blockService)
-    const blocks$: Observable<Block[]> = blockSingleService.block$
-    blockSingleService.updateHash(_searchTerm)
-
-    subscriptions.push(
-      account$.subscribe(account => {
-        if (account) {
-          processResult([account], () => {
-            this.router.navigateByUrl('/account/' + _searchTerm)
-          })
-        }
-      }),
-      transactions$.subscribe(transactions => {
-        if (transactions) {
-          processResult(transactions, () => {
-            this.router.navigateByUrl('/transaction/' + _searchTerm)
-          })
-        }
-      }),
-      blocks$.subscribe(blocks => {
-        if (blocks) {
-          processResult(blocks, () => {
-            this.router.navigateByUrl('/block/' + blocks[0].level)
-          })
-        }
+    // TODO: implement full search by contract
+    const contract = getContractByAddress(_searchTerm)
+    if (contract) {
+      processResult([contract], () => {
+        this.router.navigateByUrl('/contract/' + _searchTerm)
       })
-    )
+    } else {
+      subscriptions.push(
+        this.apiService
+          .getAccountById(_searchTerm)
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(account =>
+            processResult(account, () => {
+              this.router.navigateByUrl('/account/' + _searchTerm)
+            })
+          ),
+        this.apiService
+          .getTransactionsById(_searchTerm, 1)
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(transaction =>
+            processResult(transaction, (transaction: Transaction) => {
+              if (transaction.kind === 'endorsement') {
+                this.router.navigateByUrl('/endorsement/' + _searchTerm)
+
+                return
+              }
+
+              this.router.navigateByUrl('/transaction/' + _searchTerm)
+            })
+          ),
+        merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
+          .pipe(
+            map(first),
+            filter(negate(isNil))
+          )
+          .subscribe(block =>
+            processResult(block, () => {
+              this.router.navigateByUrl('/block/' + block.level)
+            })
+          )
+      )
+    }
 
     return result
   }

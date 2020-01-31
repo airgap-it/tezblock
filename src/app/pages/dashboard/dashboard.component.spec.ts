@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { BaseChartDirective } from 'ng2-charts'
 import { AlertConfig, AlertModule, TooltipConfig, TooltipModule } from 'ngx-bootstrap'
@@ -11,7 +11,7 @@ import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { BlockItemComponent } from './../../components/block-item/block-item.component'
-import { PricechartItemComponent } from './../../components/pricechart-item/pricechart-item.component'
+import { ChartItemComponent } from '../../components/chart-item/chart-item.component'
 import { TransactionItemComponent } from './../../components/transaction-item/transaction-item.component'
 import { DashboardComponent } from './dashboard.component'
 import { SearchItemComponent } from '@tezblock/components/search-item/search-item.component'
@@ -38,7 +38,7 @@ describe('DashboardComponent', () => {
         ],
         imports: [FontAwesomeModule, ProgressbarModule, MomentModule, TooltipModule, AlertModule, TypeaheadModule, ModalModule.forRoot()],
         declarations: [
-          PricechartItemComponent,
+          ChartItemComponent,
           BlockItemComponent,
           TransactionItemComponent,
           IdenticonComponent,

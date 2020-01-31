@@ -3,6 +3,12 @@ import { createAction, props } from '@ngrx/store'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
 import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/account.service'
+import { Balance } from '@tezblock/services/api/api.service'
+
+export interface BakingRatingResponse {
+  bakingRating: string
+  tezosBakerFee: number
+}
 
 const featureName = 'Account Detail'
 
@@ -20,6 +26,21 @@ export const loadAccountFailed = createAction(`[${featureName}] Load Account Fai
 
 export const loadDelegatedAccountsSucceeded = createAction(`[${featureName}] Load Delegated Accounts Succeeded`, props<{ accounts: GetDelegatedAccountsResponseDto }>())
 export const loadDelegatedAccountsFailed = createAction(`[${featureName}] Load Delegated Accounts Failed`, props<{ error: any }>())
+
+export const loadBalanceForLast30Days = createAction(`[${featureName}] Load Balance For Last 30 Days`)
+export const loadBalanceForLast30DaysSucceeded = createAction(
+  `[${featureName}] Load Balance For Last 30 Days Succeeded`,
+  props<{ balanceFromLast30Days: Balance[] }>()
+)
+export const loadBalanceForLast30DaysFailed = createAction(`[${featureName}] Load Balance For Last 30 Days Failed`, props<{ error: any }>())
+
+export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`)
+export const loadBakingBadRatingsSucceeded = createAction(`[${featureName}] Load Baking Bad Ratings Succeeded`, props<{ response: BakingRatingResponse }>())
+export const loadBakingBadRatingsFailed = createAction(`[${featureName}] Load Baking Bad Ratings Failed`, props<{ error: any }>())
+
+export const loadTezosBakerRating = createAction(`[${featureName}] Load Tezos Baker Rating`, props<{ address: string, updateFee: boolean }>())
+export const loadTezosBakerRatingSucceeded = createAction(`[${featureName}] Load Tezos Baker Rating Succeeded`, props<{ response: BakingRatingResponse, address: string, updateFee: boolean }>())
+export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Tezos Baker Rating Failed`, props<{ error: any }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

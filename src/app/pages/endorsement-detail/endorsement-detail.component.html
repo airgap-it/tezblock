@@ -8,7 +8,12 @@
           </h5>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Transaction Hash</p>
+              <p class="text-secondary mb-0">
+                <tooltip-item
+                  [title]="'Transaction Hash'"
+                  [tooltip]="'An identifier that is generated on transaction creation, used to uniquely identify a particular transaction.'"
+                ></tooltip-item>
+              </p>
             </div>
             <div class="col-md-9">
               <p class="mb-0">
@@ -31,7 +36,9 @@
           </ng-template>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Endorser</p>
+              <p class="text-secondary mb-0">
+                <tooltip-item [title]="'Endorser'" [tooltip]="'The baker that validated and endorsed this block.'"></tooltip-item>
+              </p>
             </div>
             <div class="col-md-9">
               <address-item [address]="(selectedEndorsement$ | async)?.delegate"></address-item>
@@ -39,7 +46,12 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Block</p>
+              <p class="text-secondary mb-0">
+                <tooltip-item
+                  [title]="'Block'"
+                  [tooltip]="'The block height at which this endorsement operation was included into the blockchain.'"
+                ></tooltip-item>
+              </p>
             </div>
             <div class="col-md-9">
               <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.block_level]">
@@ -52,7 +64,12 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Cycle</p>
+              <p class="text-secondary mb-0">
+                <tooltip-item
+                  [title]="'Cycle'"
+                  [tooltip]="'The cycle in which this endorsement operation was included in a block.'"
+                ></tooltip-item>
+              </p>
             </div>
             <div class="col-md-9">
               {{ (selectedEndorsement$ | async)?.cycle }}
@@ -60,7 +77,12 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Timestamp</p>
+              <p class="text-secondary mb-0">
+                <tooltip-item
+                  [title]="'Timestamp'"
+                  [tooltip]="'The date an time at which this endorsement operation was included in a block.'"
+                ></tooltip-item>
+              </p>
             </div>
             <div class="col-md-9">
               <p *ngIf="selectedEndorsement$ | async">
@@ -83,7 +105,12 @@
         </h5>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">Endorsed Block</p>
+            <p class="text-secondary mb-0">
+              <tooltip-item
+                [title]="'Endorsed Block'"
+                [tooltip]="'The block height relevant to this endorsement operation.'"
+              ></tooltip-item>
+            </p>
           </div>
           <div class="col-md-9">
             <button type="button" class="btn btn-link p-0" [routerLink]="['/block', (selectedEndorsement$ | async)?.level]">
@@ -93,28 +120,49 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">Deposit</p>
+            <p class="text-secondary mb-0">
+              <tooltip-item
+                [title]="'Deposit'"
+                [tooltip]="'The amount of Tezzies that have been frozen for 5 cycles as collateral for the slots endorsed.'"
+              ></tooltip-item>
+            </p>
           </div>
           <div class=" col-md-9">
-            <!-- TODO -->
-            not available
+            <!-- <span
+              class="d-inline-block"
+              [innerHtml]="
+                64 * (endorsedSlotsCount$ | async)
+                  | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true }
+              "
+            ></span> -->
+            {{ 64 * (endorsedSlotsCount$ | async) }} ꜩ
           </div>
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">Reward</p>
+            <p class="text-secondary mb-0">
+              <tooltip-item
+                [title]="'Reward'"
+                [tooltip]="'The amount of Tezzies received and activated after 5 cycles for this endorsement.'"
+              ></tooltip-item>
+            </p>
           </div>
-          <div class="col-md-9">
-            <!-- TODO -->
-            not available
-          </div>
+
+          <div class="col-md-9">{{ 2 * (endorsedSlotsCount$ | async) }} ꜩ</div>
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">Slots Endorsed</p>
+            <p class="text-secondary mb-0">
+              <tooltip-item
+                [title]="'Slots Endorsed'"
+                [tooltip]="
+                  'The number of slots for this endorsement and baker, more than 1 slot can be endorsed for the same block in one operation.'
+                "
+              ></tooltip-item>
+            </p>
           </div>
           <div class="col-md-9">
-            {{ getSlotsEndorsed((selectedEndorsement$ | async)?.slots) }}
+            {{ endorsedSlots$ | async }}
           </div>
         </div>
         <div class="row mx-1 mb-3">

@@ -16,6 +16,8 @@ import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
+import { StorageModule } from '@ngx-pwa/local-storage'
+
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
@@ -28,7 +30,7 @@ import { FooterComponent } from './components/footer/footer.component'
 import { HeaderItemComponent } from './components/header-item/header-item.component'
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
-import { PricechartItemComponent } from './components/pricechart-item/pricechart-item.component'
+import { ChartItemComponent } from './components/chart-item/chart-item.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -41,9 +43,10 @@ import { ExtendTableCellComponent } from './components/tezblock-table/extend-tab
 import { HashCellComponent } from './components/tezblock-table/hash-cell/hash-cell.component'
 import { ModalCellComponent } from './components/tezblock-table/modal-cell/modal-cell.component'
 import { PlainValueCellComponent } from './components/tezblock-table/plain-value-cell/plain-value-cell.component'
+import { SearchItemComponent } from './components/search-item/search-item.component'
 import { SymbolCellComponent } from './components/tezblock-table/symbol-cell/symbol-cell.component'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { TimestampCellComponent } from './components/tezblock-table/timestamp-cell/timestamp-cell.component'
+import { TooltipItemComponent } from './components/tooltip-item/tooltip-item.component'
 import { TransactionDetailWrapperComponent } from './components/transaction-detail-wrapper/transaction-detail-wrapper.component'
 import { TransactionItemComponent } from './components/transaction-item/transaction-item.component'
 import { addFontAwesome } from './fa-add'
@@ -63,13 +66,19 @@ import { ChainNetworkService } from './services/chain-network/chain-network.serv
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { HealthComponent } from './pages/health/health.component'
-import { SearchItemComponent } from './components/search-item/search-item.component'
 import { ListEffects } from './pages/list/effects'
-import { StorageModule } from '@ngx-pwa/local-storage'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects'
+import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
+import { ContractDetailEffects } from './pages/contract-detail/effects'
+import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
+import { ProposalDetailEffects } from './pages/proposal-detail/effects'
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
+import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 import { HealthEffects } from './pages/health/effects'
 
 @NgModule({
@@ -113,6 +122,8 @@ import { HealthEffects } from './pages/health/effects'
       BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects,
+      ProposalDetailEffects,
+      ContractDetailEffects,
       HealthEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
@@ -133,7 +144,6 @@ import { HealthEffects } from './pages/health/effects'
     HeaderItemComponent,
     QrItemComponent,
     QrModalComponent,
-    TezblockTableComponent,
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,
@@ -141,7 +151,7 @@ import { HealthEffects } from './pages/health/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    ChartItemComponent,
     TabbedTableComponent,
     BlockDetailWrapperComponent,
     TransactionDetailWrapperComponent,
@@ -154,6 +164,14 @@ import { HealthEffects } from './pages/health/effects'
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
+    ProtocolConstantComponent,
+    ProposalDetailComponent,
+    TooltipItemComponent,
+    SearchItemComponent,
+    OccurrenceStatisticsComponent,
+    TezblockTableComponent,
+    ClientSideTableComponent,
+    ContractDetailComponent,
     HealthComponent
   ],
 
@@ -175,7 +193,7 @@ import { HealthEffects } from './pages/health/effects'
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
-    PricechartItemComponent,
+    ChartItemComponent,
     ExtendTableCellComponent,
     ModalCellComponent
   ],

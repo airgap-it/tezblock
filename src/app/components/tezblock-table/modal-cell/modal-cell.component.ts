@@ -9,6 +9,7 @@ import { BsModalService, BsModalRef } from 'ngx-bootstrap'
 export class ModalCellComponent implements OnInit {
 
   @Input() data: string;
+  
   modalRef: BsModalRef;
 
   constructor(private readonly modalService: BsModalService) {}
