@@ -10,6 +10,26 @@ tezblock is a block explorer for [Tezos](https://tezos.com) an open-source platf
 
 tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protocol indexer. It is possible to deploy Conseil locally, simply follow the [README](https://github.com/Cryptonomic/Conseil/blob/master/README.md) on the Conseil github repository.
 
+### Build and deploy Conseil
+
+In short:
+
+* Clone the Conseil repository
+* `cd` into the cloned folder
+* Build the Conseil docker image with `docker build -t conseil .`
+* Edit the `docker-compose.yml` to configure your own Tezos Node if needed, or just use the preconfigured one.
+* Run the Conseil instance with `docker-compose up -d`
+
+To run a Tezos node locally, clone Nautilus:
+
+    git clone https://github.com/airgap-it/Nautilus.git
+
+From the cloned repository, run:
+
+    bash ./docker/nautilus.sh -t
+
+The above command will create and start a docker container with a Tezos node running in archive mode. The docker image name is `tezos-node-local`.
+
 ### Build and deploy tezblock
 
 Clone the tezblock repository.
