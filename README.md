@@ -17,7 +17,17 @@ In short:
 * Clone the Conseil repository
 * `cd` into the cloned folder
 * Build the Conseil docker image with `docker build -t conseil .`
-* Edit the `docker-compose.yml` to configure your own Tezos Node if needed, or just use the preconfigured one.
+* Edit the `docker-compose.yml` to configure your own Tezos Node and the just built docker images, or just use the preconfigured one.
+    * To increase performance, uncomment the following line in the `docker-compose.yml` file: 
+        * `- "./sql/conseil.sql:/docker-entrypoint-initdb.d/conseil.sql"`
+    * Edit the `sql/conseil.sql` file by adding:
+        * `ALTER ROLE conseiluser SET search_path TO tezos,public;`
+        * `ALTER DATABASE "conseil-local" SET search_path TO tezos,public;`
+        * `CREATE INDEX ix_accounts_history_account_id ON tezos.accounts_history USING hash (account_id);`
+        * `CREATE INDEX ix_operations_level ON tezos.operations USING hash (level);`
+        * `CREATE INDEX ix_operations_level_kind ON tezos.operations USING btree (level,kind);`
+        * `CREATE INDEX ix_operations_manager_pubkey ON tezos.operations USING hash (manager_pubkey);`
+        * `CREATE INDEX ix_operations_operation_group_hash ON tezos.operations USING hash (operation_group_hash);`
 * Run the Conseil instance with `docker-compose up -d`
 
 To run a Tezos node locally, clone Nautilus:
