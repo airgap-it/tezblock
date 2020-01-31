@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
+import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 
 @Component({
   selector: 'amount-cell',
@@ -26,15 +27,31 @@ export class AmountCellComponent {
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
 
+  public oldFiatAmount: number
+
   public tooltipClick() {
-    this.showOldValue = !this.showOldValue
+    let daysDifference = this.dayDifference(this.data.timestamp)
+    if (daysDifference >= 1) {
+      let date = new Date(this.data.timestamp)
+      this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
+        let oldValue = response[1].close
+
+        this.oldFiatAmount = oldValue * this.data.amount
+        this.showOldValue = !this.showOldValue
+      })
+    }
   }
   public showOldValue: boolean = false
 
-  constructor(private readonly cryptoPricesService: CryptoPricesService) {
+  constructor(private readonly cryptoPricesService: CryptoPricesService, private readonly chartDataService: ChartDataService) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    // const test = this.cryptoPricesService.getHistoricCryptoPrices(1, this.data.timestamp).then((historicPrice: MarketDataSample[]) => {
-    //   console.log('historic price: ', historicPrice)
-    // })
+  }
+
+  public dayDifference(oldTimestamp): number {
+    let currentTimestamp = +new Date()
+    const difference = currentTimestamp - oldTimestamp
+    const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
+
+    return daysDifference
   }
 }

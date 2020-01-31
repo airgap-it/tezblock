@@ -8,10 +8,11 @@
     *ngIf="options?.showFiatValue"
     class="badge badge-pill badge-primary-light ml-1"
     tooltip="click me to show current value"
-    (click)="tooltipClick()"
+    (click)="tooltipClick(); dayDifference(data.timestamp)"
   >
-    old
-    {{ data.timestamp | json }}
+    old:
+    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+    {{ oldFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
   </span>
 </ng-container>
 <ng-container *ngIf="!showOldValue">
@@ -19,7 +20,7 @@
     *ngIf="options?.showFiatValue"
     class="badge badge-pill badge-primary-light ml-1"
     tooltip="click me to show old value"
-    (click)="tooltipClick()"
+    (click)="tooltipClick(); dayDifference(data.timestamp)"
   >
     {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
     {{ data.amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
