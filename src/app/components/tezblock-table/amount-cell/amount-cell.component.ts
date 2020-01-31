@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
 
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
@@ -9,7 +9,7 @@ import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service
   templateUrl: './amount-cell.component.html',
   styleUrls: ['./amount-cell.component.scss']
 })
-export class AmountCellComponent {
+export class AmountCellComponent implements OnInit {
   @Input() data: any
 
   @Input()
@@ -28,6 +28,8 @@ export class AmountCellComponent {
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
 
   public oldFiatAmount: number
+
+  public enableComparison: boolean = false
 
   public tooltipClick() {
     let daysDifference = this.dayDifference(this.data.timestamp)
@@ -53,5 +55,12 @@ export class AmountCellComponent {
     const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
 
     return daysDifference
+  }
+
+  ngOnInit(): void {
+    if (this.data) {
+      const difference = this.dayDifference(this.data.timestamp)
+      this.enableComparison = difference >= 1
+    }
   }
 }
