@@ -14,14 +14,16 @@ tezblock depends on the [Conseil](https://github.com/Cryptonomic/Conseil) protoc
 
 Clone the Conseil repository and `cd` into the cloned folder.
 
-    https://github.com/Cryptonomic/Conseil.git
+    git clone https://github.com/Cryptonomic/Conseil.git
     cd Conseil
 
 Build the Conseil docker image
 
-    `docker build -t conseil .`
+    docker build -t conseil .
 
-Edit the `docker-compose.yml` to configure your own Tezos Node and the just built docker images, or just use the preconfigured one.
+Edit `docker-compose.yml` by changing the `image` value for the `conseil` and `lorre` services to `conseil` in order to use the docker image built in the previous step, or just leave the preconfigured value to use the published image.
+
+Edit `docker-compose.yml` by changing the `XTZ_Scheme`, `XTZ_Host`, `XTZ_Port` and `XTZ_Network` values to point to your own Tezos node, or just leave the preconfigured value to use the Cryptonomic node.
 
 #### Optional - Conseil performance optimization
 
