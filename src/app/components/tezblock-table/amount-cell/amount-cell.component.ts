@@ -33,5 +33,8 @@ export class AmountCellComponent {
 
   constructor(private readonly cryptoPricesService: CryptoPricesService) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    // const test = this.cryptoPricesService.getHistoricCryptoPrices(1, this.data.timestamp).then((historicPrice: MarketDataSample[]) => {
+    //   console.log('historic price: ', historicPrice)
+    // })
   }
 }

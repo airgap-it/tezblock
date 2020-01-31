@@ -3,14 +3,25 @@
   [innerHtml]="data.amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
 ></span>
 ꜩ
-<span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1" tooltip="click me" (click)="tooltipClick()">
-  {{ showOldValue }}
-  <ng-container <ng-container *ngIf="showOldValue; else currentValue">
+<ng-container *ngIf="showOldValue">
+  <span
+    *ngIf="options?.showFiatValue"
+    class="badge badge-pill badge-primary-light ml-1"
+    tooltip="click me to show current value"
+    (click)="tooltipClick()"
+  >
     old
     {{ data.timestamp | json }}
-  </ng-container>
-  <ng-template #currentValue>
+  </span>
+</ng-container>
+<ng-container *ngIf="!showOldValue">
+  <span
+    *ngIf="options?.showFiatValue"
+    class="badge badge-pill badge-primary-light ml-1"
+    tooltip="click me to show old value"
+    (click)="tooltipClick()"
+  >
     {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
     {{ data.amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
-  </ng-template>
-</span>
+  </span>
+</ng-container>
