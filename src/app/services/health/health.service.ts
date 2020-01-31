@@ -36,7 +36,7 @@ export class HealthService {
   }
 
   loadLatestNodeBlock(): Observable<any> {
-    const url = `${this.environmentUrls.rpcUrl}/chains/main/blocks/head`
+    const url = `${this.environmentUrls.rpcUrl}/chains/main/blocks/head/`
 
     return this.httpClient.get<any>(url)
   }
