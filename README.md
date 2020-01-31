@@ -23,7 +23,7 @@ Build the Conseil docker image
 
 Edit the `docker-compose.yml` to configure your own Tezos Node and the just built docker images, or just use the preconfigured one.
 
-#### Conseil performance optimization
+#### Optional - Conseil performance optimization
 
 To increase performance, uncomment the following line in the `docker-compose.yml` file:
 
