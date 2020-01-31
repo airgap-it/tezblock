@@ -1,6 +1,4 @@
-<ng-template #basicTemplate let-context>
-  {{ context?.data }}
-</ng-template>
+<ng-template #basicTemplate let-context>{{ context?.data }}</ng-template>
 <ng-template #amountTemplate let-context>
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
 </ng-template>
@@ -62,9 +60,7 @@
       <ng-template #thenTemplate>
         <thead>
           <tr>
-            <th *ngFor="let column of columns" [width]="column.width">
-              {{ column.name }}
-            </th>
+            <th *ngFor="let column of columns" [width]="column.width">{{ column.name }}</th>
             <th *ngIf="expandedRow"></th>
           </tr>
         </thead>

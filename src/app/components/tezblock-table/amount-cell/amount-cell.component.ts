@@ -17,6 +17,7 @@ export class AmountCellComponent {
       this._options = value
     }
   }
+
   get options() {
     return this._options === undefined ? { showFiatValue: true } : this._options
   }
@@ -24,6 +25,11 @@ export class AmountCellComponent {
   private _options = undefined
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
+
+  public tooltipClick() {
+    this.showOldValue = !this.showOldValue
+  }
+  public showOldValue: boolean = false
 
   constructor(private readonly cryptoPricesService: CryptoPricesService) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
