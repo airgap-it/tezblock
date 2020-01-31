@@ -3,6 +3,7 @@ import { Observable } from 'rxjs'
 
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
+import BigNumber from 'bignumber.js'
 
 @Component({
   selector: 'amount-cell',
@@ -36,9 +37,9 @@ export class AmountCellComponent implements OnInit {
     if (daysDifference >= 1) {
       let date = new Date(this.data.timestamp)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
-        let oldValue = response[1].close
-
-        this.oldFiatAmount = oldValue * this.data.amount
+        let oldValue = new BigNumber(response[1].close)
+        const amount = new BigNumber(this.data.amount)
+        this.oldFiatAmount = amount.multipliedBy(oldValue).toNumber()
         this.showOldValue = !this.showOldValue
       })
     }
