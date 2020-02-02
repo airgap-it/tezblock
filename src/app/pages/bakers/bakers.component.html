@@ -3,7 +3,7 @@
     <div class="card h-100 pt-3">
       <div class="card-body p-4">
         <h5 class="card-title mb-3">
-            Bakers
+          Bakers
         </h5>
         <div class="row">
           <div class="col py-3">
@@ -15,6 +15,22 @@
                 {{ totalActiveBakers }}
                 <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
               </h3>
+            </ng-container>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col px-2">
+            <ng-container *ngIf="top24ChartDatasets$ | async">
+              <div style="position: relative;">
+                <chart-item
+                  [datasets]="top24ChartDatasets$ | async"
+                  [labels]="top24ChartLabels$ | async"
+                  [options]="top24ChartOptions"
+                  [colors]="top24ChartColors"
+                  [size]="top24ChartSize"
+                  chartType="pie"
+                ></chart-item>
+              </div>
             </ng-container>
           </div>
         </div>

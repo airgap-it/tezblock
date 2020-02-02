@@ -4,6 +4,8 @@ import * as actions from './actions'
 import { Baker } from '@tezblock/services/api/api.service'
 import { Pagination } from '@tezblock/services/facade/facade'
 
+export const othersBakersLabel = 'Others'
+
 const preprocessBakersData = (bakerData: any[]) =>
   bakerData.map(bakerDataItem => ({
     ...bakerDataItem,
