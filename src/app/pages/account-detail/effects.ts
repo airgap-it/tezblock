@@ -75,6 +75,14 @@ export class AccountDetailEffects {
     )
   )
 
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransactionsByKind),
+      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+      map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
   loadBalanceForLast30Days$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBalanceForLast30Days),

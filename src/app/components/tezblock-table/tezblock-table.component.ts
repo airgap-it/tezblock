@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild } from '@angular/core'
+import { Tab } from '../tabbed-table/tabbed-table.component'
 
 export enum Template {
   address,
@@ -90,7 +91,12 @@ export class TezblockTableComponent implements OnInit {
 
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
 
+  @Output()
+  public readonly sortingClicked: EventEmitter<{ value: string; tab: Tab }> = new EventEmitter()
+
   private expandedRows: any[] = []
+
+  private sortableColumns: string[] = ['timestamp', 'amount', 'block_level', 'delegatedBalance', 'originatedBalance', 'balance', 'level']
 
   constructor() {}
 
@@ -123,6 +129,14 @@ export class TezblockTableComponent implements OnInit {
 
   public downloadCSV() {
     this.downloadClicked.emit()
+  }
+
+  public sorting(sortBy: string) {
+    if (this.sortableColumns.includes(sortBy)) {
+      this.sortingClicked.emit({ value: sortBy, tab: null })
+    } else {
+      return
+    }
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {

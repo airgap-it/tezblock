@@ -355,6 +355,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
+  sortBy(data: any) {
+    console.log('data in component: ', data)
+    // this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
+    this.store$.dispatch(actions.sortTransactionsByKind({ value: data.value, kind: data.tab.kind }))
+  }
+
   private setTabs(pageId: string) {
     this.tabs = [
       {
