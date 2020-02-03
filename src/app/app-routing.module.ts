@@ -12,6 +12,7 @@ import { TransactionDetailComponent } from './pages/transaction-detail/transacti
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { HealthComponent } from './pages/health/health.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -24,7 +25,8 @@ const routes: Routes = [
   { path: 'endorsement/:id', component: EndorsementDetailComponent },
   { path: 'constants', component: ProtocolConstantComponent },
   { path: 'proposal/:id', component: ProposalDetailComponent },
-  { path: 'contract/:id', component: ContractDetailComponent }
+  { path: 'contract/:id', component: ContractDetailComponent },
+  { path: 'health', component: HealthComponent }
 ]
 
 @NgModule({
