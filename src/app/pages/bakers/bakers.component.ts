@@ -6,7 +6,6 @@ import { Actions, ofType } from '@ngrx/effects'
 import { ChartOptions, ChartSize } from 'chart.js'
 import 'chartjs-plugin-piechart-outlabels'
 
-
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { columns } from './table-definitions'
@@ -29,34 +28,33 @@ const labelsParams = {
   }
 }
 
-// https://www.materialpalette.com/colors
 const palette = [
-  '#e53935',
-  '#d81b60',
-  '#8e24aa',
+  '#311b92',
+  '#4527a0',
+  '#512da8',
   '#5e35b1',
+  '#673ab7',
+  '#7e57c2',
+  '#4a148c',
+  '#6a1b9a',
+  '#7b1fa2',
+  '#8e24aa',
+  '#9c27b0',
+  '#ab47bc',
+  '#1a237e',
+  '#283593',
+  '#303f9f',
   '#3949ab',
-  '#1e88e5',
-  '#039be5',
-  '#00acc1',
-  '#00897b',
-  '#43a047',
-  '#7cb342',
-  '#c0ca33',
-  '#fdd835',
-  '#ffb300',
-  '#fb8c00',
-  '#f4511e',
-  '#795548',
-  '#bdbdbd',
-  '#78909c',
+  '#3f51b5',
+  '#5c6bc0',
+  '#0d47a1',
   // plus some 6 random ones ...
-  '#581845',
-  '#900C3F',
-  '#C70039',
-  '#FF5733',
-  '#FFC300',
-  '#BF77AA'
+  '#e91e63',
+  '#d81b60',
+  '#c2185b',
+  '#ad1457',
+  '#880e4f',
+  '#2e5bff'
 ]
 
 @Component({
