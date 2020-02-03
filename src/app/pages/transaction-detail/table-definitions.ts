@@ -82,13 +82,13 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Value',
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.delegatedBalance, options })
+      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options })
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
     },
     {
       name: 'Gas Limit',
@@ -116,7 +116,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Balance',
       field: 'originatedBalance',
-      template: Template.amount
+      template: Template.amount,
+      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options })
     },
     {
       name: 'Originator',
@@ -136,7 +137,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
     },
     {
       name: 'Burn',
@@ -178,7 +179,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
     },
     {
       name: 'Gas Limit',
