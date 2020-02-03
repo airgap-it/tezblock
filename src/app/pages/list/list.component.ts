@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { merge, Observable, of, timer } from 'rxjs'
-import { filter, map, switchMap } from 'rxjs/operators'
+import { Observable, of } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range } from 'lodash'
@@ -12,21 +12,16 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { TransactionService } from '@tezblock/services/transaction/transaction.service'
-import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { refreshRate } from '@tezblock/services/facade/facade'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { toArray } from '@tezblock/services/fp'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { getRefresh } from '@tezblock/domain/synchronization'
 
 const noOfDays = 7
-
-//TODO: create some shared file for it
-const getRefresh = (streams: Observable<any>[]): Observable<number> =>
-  merge(of(-1), merge(streams).pipe(switchMap(() => timer(refreshRate, refreshRate))))
 
 const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
@@ -45,13 +40,10 @@ const timestampsToChartDataSource = (label: string) => (timestamps: number[]): {
   styleUrls: ['./list.component.scss']
 })
 export class ListComponent extends BaseComponent implements OnInit {
-  tabs: Tab[]
   columns: Column[]
   loading$: Observable<boolean>
   data$: Observable<Object>
-  transactionsLoading$: Observable<boolean>
   showLoadMore$: Observable<boolean>
-  totalActiveBakers$: Observable<number>
   activationsCountLast24h$: Observable<number>
   originationsCountLast24h$: Observable<number>
   transactionsCountLast24h$: Observable<number>
@@ -88,19 +80,6 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    // is this refresh rly good .. ?
-    const refresh$ = merge(
-      of(1),
-      merge(
-        this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
-        this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
-        this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
-        this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded)),
-        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
-        this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
-      ).pipe(switchMap(() => timer(refreshRate, refreshRate)))
-    )
-
     this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
 
     this.routeName$.subscribe(routeName => {
@@ -204,29 +183,30 @@ export class ListComponent extends BaseComponent implements OnInit {
             const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
             const dbData$ = this.store$.select(state => state.list.doubleBakings.data)
 
-            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleBakings())))
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
+                this.actions$.pipe(ofType(actions.loadDoubleBakingsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadDoubleBakings()))
+            )
             this.setupTable(columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }), dbData$, dbLoading$)
             break
           case 'double-endorsement':
             const deLoading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
             const deData$ = this.store$.select(state => state.list.doubleEndorsements.data)
 
-            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
-            this.setupTable(columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }), deData$, deLoading$)
-            break
-          case 'bakers':
-            const bakersLoading$ = this.store$.select(state => state.list.activeBakers.loading)
-            const bakersData$ = this.store$.select(state => state.list.activeBakers.data)
-
-            this.totalActiveBakers$ = this.store$.select(state => state.list.activeBakers.pagination.total)
             this.subscriptions.push(
-              refresh$.subscribe(() => {
-                this.store$.dispatch(actions.loadActiveBakers())
-                this.store$.dispatch(actions.loadTotalActiveBakers())
-              })
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
+                this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
-            this.setupTable(columns[OperationTypes.BakerOverview]({ showFiatValue: this.isMainnet }), bakersData$, bakersLoading$)
-            break
+            this.setupTable(
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              deData$,
+              deLoading$
+            )
+            break            
           case 'proposal':
             const showLoadMore$ = this.store$
               .select(state => state.list.proposals)
@@ -240,7 +220,10 @@ export class ListComponent extends BaseComponent implements OnInit {
             const loading$ = this.store$.select(state => state.list.proposals.loading)
             const data$ = this.store$.select(state => state.list.proposals.data)
 
-            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadProposals())))
+            this.subscriptions.push(getRefresh([
+              this.actions$.pipe(ofType(actions.loadProposalsSucceeded)),
+              this.actions$.pipe(ofType(actions.loadProposalsFailed))
+            ]).subscribe(() => this.store$.dispatch(actions.loadProposals())))
             this.setupTable(columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }), data$, loading$, showLoadMore$)
             break
           default:
@@ -260,9 +243,6 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'double-endorsement':
         this.store$.dispatch(actions.increasePageOfDoubleEndorsements())
-        break
-      case 'bakers':
-        this.store$.dispatch(actions.increasePageOfActiveBakers())
         break
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())

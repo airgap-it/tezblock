@@ -16,7 +16,6 @@ export interface State {
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
-  activeBakers: TableState<Baker>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -30,7 +29,6 @@ const initialState: State = {
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
-  activeBakers: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -102,68 +100,6 @@ export const reducer = createReducer(
       pagination: {
         ...state.doubleEndorsements.pagination,
         currentPage: state.doubleEndorsements.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.loadActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: true
-    }
-  })),
-  on(actions.loadActiveBakersSucceeded, (state, { activeBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      data: preprocessBakersData(activeBakers),
-      loading: false
-    }
-  })),
-  on(actions.loadActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: false
-    }
-  })),
-  on(actions.increasePageOfActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        currentPage: state.activeBakers.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: undefined
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersSucceeded, (state, { totalActiveBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: totalActiveBakers
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: null
       }
     }
   })),

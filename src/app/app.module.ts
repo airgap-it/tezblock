@@ -79,6 +79,8 @@ import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-co
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
+import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { BakersEffects } from './pages/baker-overview/effects'
 import { HealthEffects } from './pages/health/effects'
 
 @NgModule({
@@ -124,6 +126,7 @@ import { HealthEffects } from './pages/health/effects'
       TransactionDetailEffects,
       ProposalDetailEffects,
       ContractDetailEffects,
+      BakersEffects,
       HealthEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
@@ -172,6 +175,7 @@ import { HealthEffects } from './pages/health/effects'
     TezblockTableComponent,
     ClientSideTableComponent,
     ContractDetailComponent,
+    BakerOverviewComponent,
     HealthComponent
   ],
 
