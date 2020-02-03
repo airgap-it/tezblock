@@ -6,7 +6,7 @@
           Bakers
         </h5>
         <div class="row">
-          <div class="col py-3">
+          <div class="col col-md-3">
             <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
               <h5 class="card-title__secondary mb-3 ">
                 Total Number of Bakers
@@ -17,9 +17,7 @@
               </h3>
             </ng-container>
           </div>
-        </div>
-        <div class="row">
-          <div class="col px-2">
+          <div class="col col-md-9">
             <ng-container *ngIf="top24ChartDatasets$ | async">
               <div style="position: relative;">
                 <chart-item

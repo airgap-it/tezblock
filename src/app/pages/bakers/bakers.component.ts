@@ -21,12 +21,12 @@ const labelsParams = {
   display: true,
   stretch: 45,
   valuePrecision: 1,
-  percentPrecision: 2
-  // font: {
-  //   resizable: true,
-  //   minSize: 12,
-  //   maxSize: 18
-  // }
+  percentPrecision: 2,
+  font: {
+    resizable: true,
+    minSize: 8,
+    maxSize: 12
+  }
 }
 
 // https://www.materialpalette.com/colors
@@ -76,14 +76,19 @@ export class BakersComponent extends BaseComponent implements OnInit {
     responsive: true,
     maintainAspectRatio: false,
     layout: {
-      padding: 250
+      padding: {
+        top: 130,
+        right: 150,
+        bottom: 170,
+        left: 150
+      }
     },
     plugins: {
       outlabels: labelsParams
     }
   }
   top24ChartColors: any[] = [{ backgroundColor: palette }]
-  top24ChartSize: ChartSize = { width: 1090, height: 700 }
+  top24ChartSize: ChartSize = { width: 800, height: 600 }
 
   constructor(private readonly actions$: Actions, private readonly aliasPipe: AliasPipe, private readonly store$: Store<fromRoot.State>) {
     super()
