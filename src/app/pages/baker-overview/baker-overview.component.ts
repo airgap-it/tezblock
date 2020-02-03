@@ -116,7 +116,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
       .observe([Breakpoints.Small, Breakpoints.Handset])
       .pipe(map(breakpointState => breakpointState.matches))
     this.top24ChartOptions$ = this.isMobile$.pipe(map(this.getOptions.bind(this)))
-    this.top24ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 750, height: 440 })))
+    this.top24ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 800, height: 480 })))
 
     this.subscriptions.push(
       getRefresh([
