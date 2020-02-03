@@ -23,9 +23,9 @@
                 <chart-item
                   [datasets]="top24ChartDatasets$ | async"
                   [labels]="top24ChartLabels$ | async"
-                  [options]="top24ChartOptions"
+                  [options]="top24ChartOptions$ | async"
                   [colors]="top24ChartColors"
-                  [size]="top24ChartSize"
+                  [size]="top24ChartSize$ | async"
                   chartType="pie"
                 ></chart-item>
               </div>
