@@ -27,13 +27,13 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.amount, options })
+      data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options })
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
     },
     {
       name: 'Gas Limit',
