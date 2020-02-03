@@ -13,7 +13,7 @@
     >
       old:
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ oldFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      {{ historicFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
     </span>
   </ng-container>
   <ng-container *ngIf="!showOldValue">

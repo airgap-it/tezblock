@@ -28,7 +28,7 @@ export class AmountCellComponent implements OnInit {
 
   public fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  public oldFiatAmount: number
+  public historicFiatAmount: number
 
   public enableComparison: boolean = false
 
@@ -39,7 +39,7 @@ export class AmountCellComponent implements OnInit {
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
         let oldValue = new BigNumber(response[1].close)
         const amount = new BigNumber(this.data.amount)
-        this.oldFiatAmount = amount.multipliedBy(oldValue).toNumber()
+        this.historicFiatAmount = amount.multipliedBy(oldValue).toNumber()
         this.showOldValue = !this.showOldValue
       })
     }
