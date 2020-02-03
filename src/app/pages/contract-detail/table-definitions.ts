@@ -27,11 +27,11 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, symbol: options.symbol } })
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false } })
     },
     {
       name: 'Tx Hash',
-      field: 'operation_group_hash',
+      field: 'hash',
       template: Template.hash
     }
   ]
