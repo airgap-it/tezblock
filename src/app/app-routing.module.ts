@@ -10,6 +10,7 @@ import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-co
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
 
 const routes: Routes = [
@@ -22,7 +23,8 @@ const routes: Routes = [
   { path: 'transaction/:id', component: TransactionDetailComponent },
   { path: 'endorsement/:id', component: EndorsementDetailComponent },
   { path: 'constants', component: ProtocolConstantComponent },
-  { path: 'proposal/:id', component: ProposalDetailComponent }
+  { path: 'proposal/:id', component: ProposalDetailComponent },
+  { path: 'contract/:id', component: ContractDetailComponent }
 ]
 
 @NgModule({

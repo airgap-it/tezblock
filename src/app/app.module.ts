@@ -70,6 +70,8 @@ import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { BakerTableEffects } from './components/baker-table/effects'
+import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
+import { ContractDetailEffects } from './pages/contract-detail/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
@@ -121,6 +123,7 @@ import { BakersEffects } from './pages/baker-overview/effects'
       BlockDetailEffects,
       TransactionDetailEffects,
       ProposalDetailEffects,
+      ContractDetailEffects,
       BakersEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
@@ -168,6 +171,7 @@ import { BakersEffects } from './pages/baker-overview/effects'
     OccurrenceStatisticsComponent,
     TezblockTableComponent,
     ClientSideTableComponent,
+    ContractDetailComponent,
     BakerOverviewComponent
   ],
 
