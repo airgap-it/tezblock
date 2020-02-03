@@ -9,11 +9,11 @@ export interface TableState<T> {
     loading: boolean
   }
   
-  export const getInitialTableState = (): TableState<any> => ({
+  export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
     data: [],
     pagination: {
       currentPage: 1,
-      selectedSize: 10,
+      selectedSize,
       pageSizes: [5, 10, 20, 50],
       total: undefined
     },
