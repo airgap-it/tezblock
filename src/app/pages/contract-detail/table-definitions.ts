@@ -1,8 +1,8 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
-export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean }) => Column[] } = {
-  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean }) => [
+export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => Column[] } = {
+  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
     {
       name: 'From',
       field: 'singleFrom',
@@ -21,13 +21,13 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: any) => ({ data: item.amount, options: { showFiatValue: options.showFiatValue } })
+      data: (item: any) => ({ data: item.amount, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } })
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, symbol: options.symbol } })
     },
     {
       name: 'Tx Hash',
