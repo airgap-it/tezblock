@@ -76,8 +76,8 @@ import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-co
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component';
-import { BakersComponent } from './pages/bakers/bakers.component'
-import { BakersEffects } from './pages/bakers/effects'
+import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { BakersEffects } from './pages/baker-overview/effects'
 
 @NgModule({
   imports: [
@@ -168,7 +168,7 @@ import { BakersEffects } from './pages/bakers/effects'
     OccurrenceStatisticsComponent,
     TezblockTableComponent,
     ClientSideTableComponent,
-    BakersComponent
+    BakerOverviewComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

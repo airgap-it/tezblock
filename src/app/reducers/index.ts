@@ -10,7 +10,7 @@ import * as fromBlockDetails from '../pages/block-detail/reducer'
 import * as fromTransactionDetails from '../pages/transaction-detail/reducer'
 import * as fromProposalDetails from '../pages/proposal-detail/reducer'
 import * as fromBakerTable from '../components/baker-table/reducer'
-import * as fromBakers from '../pages/bakers/reducer'
+import * as fromBakers from '../pages/baker-overview/reducer'
 import * as fromApp from '../app.reducer'
 
 export interface State {

@@ -61,11 +61,11 @@ const palette = [
 ]
 
 @Component({
-  selector: 'app-bakers',
-  templateUrl: './bakers.component.html',
-  styleUrls: ['./bakers.component.scss']
+  selector: 'app-baker-overview',
+  templateUrl: './baker-overview.component.html',
+  styleUrls: ['./baker-overview.component.scss']
 })
-export class BakersComponent extends BaseComponent implements OnInit {
+export class BakerOverviewComponent extends BaseComponent implements OnInit {
   columns: Column[]
   loading$: Observable<boolean>
   data$: Observable<Object>
