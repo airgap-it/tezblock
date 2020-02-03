@@ -8,7 +8,7 @@
     <span
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary-light ml-1"
-      tooltip="click me to show current value"
+      tooltip="Displaying value at time of transaction, click to display current value"
       (click)="tooltipClick(); dayDifference(data.timestamp)"
     >
       old:
@@ -20,7 +20,7 @@
     <span
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary-light ml-1"
-      tooltip="click me to show old value"
+      tooltip="Displaying current value, click to display value at time of transaction"
       (click)="tooltipClick(); dayDifference(data.timestamp)"
     >
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}

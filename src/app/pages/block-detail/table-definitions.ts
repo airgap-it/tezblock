@@ -32,7 +32,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Fee',
       field: 'fee',
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
       template: Template.amount
     },
     {
@@ -80,7 +80,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } })
     },
     {
       name: 'Gas Limit',
@@ -126,7 +126,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } })
     },
     {
       name: 'Burn',
