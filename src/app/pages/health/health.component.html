@@ -1,0 +1,80 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <div class="row">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card h-100 pt-3">
+          <div class="card-body p-4 ">
+            <div class="row">
+              <div class="col-10">
+                <h5 class="card-title mb-4">
+                  Tezos Node Health
+                </h5>
+              </div>
+              <div class="col-2 d-flex justify-content-end">
+                <div class="health--indicator  rounded" [ngClass]="{'bg-success': isNodeUp$ | async, 'bg-danger': !(isNodeUp$ | async)}"></div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class=" col-md-5">
+                <p class="text-secondary mb-0">Status</p>
+              </div>
+              <div class="col-md-7 d-flex justify-content-sm-end">
+                <p class="m-0" [ngSwitch]="isNodeUp$ | async">
+                  <ng-container *ngSwitchCase="true">Up</ng-container>
+                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                </p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class=" col-md-5">
+                <p class="text-secondary mb-0">Latest Block Seen</p>
+              </div>
+              <div class="col-md-7 d-flex justify-content-sm-end">
+                <p class="m-0">
+                  <app-timestamp-cell [data]="(latestNodeBlock$ | async)?.header.timestamp"></app-timestamp-cell>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class=" col-lg-6 mb-4 mb-lg-0">
+        <div class="card h-100 pt-3">
+          <div class="card-body p-4">
+            <div class="row">
+              <div class="col-10">
+                <h5 class="card-title mb-4">
+                  Conseil Health
+                </h5>
+              </div>
+              <div class="col-2 d-flex justify-content-end">
+                <div class="health--indicator bg-success rounded" [ngClass]="{'bg-success': isConseilUp$ | async, 'bg-danger': !(isConseilUp$ | async)}"></div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class=" col-md-5">
+                <p class="text-secondary mb-0">Status</p>
+              </div>
+              <div class="col-md-7 d-flex justify-content-sm-end">
+                <p class="m-0" [ngSwitch]="isConseilUp$ | async">
+                  <ng-container *ngSwitchCase="true">Up</ng-container>
+                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                </p>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class=" col-md-5">
+                <p class="text-secondary mb-0">Latest Block Seen</p>
+              </div>
+              <div class="col-md-7 d-flex justify-content-sm-end">
+                <p class="m-0">
+                  <app-timestamp-cell [data]="(latestConseilBlock$ | async)?.timestamp"></app-timestamp-cell>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

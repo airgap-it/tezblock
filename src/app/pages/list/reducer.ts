@@ -3,7 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { Pagination } from '@tezblock/services/facade/facade'
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 
 const preprocessBakersData = (bakerData: any[]) =>
@@ -12,28 +12,10 @@ const preprocessBakersData = (bakerData: any[]) =>
     number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
   }))
 
-interface TableState<T> {
-  data: T[]
-  pagination: Pagination
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: [],
-  pagination: {
-    currentPage: 1,
-    selectedSize: 10,
-    pageSizes: [5, 10, 20, 50],
-    total: undefined
-  },
-  loading: false
-})
-
 export interface State {
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
-  activeBakers: TableState<Baker>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -47,7 +29,6 @@ const initialState: State = {
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
-  activeBakers: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -119,68 +100,6 @@ export const reducer = createReducer(
       pagination: {
         ...state.doubleEndorsements.pagination,
         currentPage: state.doubleEndorsements.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.loadActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: true
-    }
-  })),
-  on(actions.loadActiveBakersSucceeded, (state, { activeBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      data: preprocessBakersData(activeBakers),
-      loading: false
-    }
-  })),
-  on(actions.loadActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: false
-    }
-  })),
-  on(actions.increasePageOfActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        currentPage: state.activeBakers.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: undefined
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersSucceeded, (state, { totalActiveBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: totalActiveBakers
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: null
       }
     }
   })),

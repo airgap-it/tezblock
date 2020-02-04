@@ -3,13 +3,12 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge, timer, BehaviorSubject, pipe } from 'rxjs'
+import { from, Observable, combineLatest, merge, timer } from 'rxjs'
 import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
-import { first, get } from '@tezblock/services/fp'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
@@ -20,7 +19,6 @@ import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
-import { FeeByCycle } from 'src/app/interfaces/BakingBadResponse'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '@tezblock/services/cycle/cycle.service'
@@ -29,7 +27,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { Busy } from './reducer'
+import { Busy, BakerTableRatings } from './reducer'
 import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
@@ -71,7 +69,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
-      this.getTezosBakerInfos(value, true)
+      this.store$.dispatch(actions.loadTezosBakerRating({ address: value, updateFee: true }))
     }
   }
   private _bakerAddress: string | undefined
@@ -79,9 +77,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   @ViewChild('transactions', { static: false }) transactions: ElementRef
 
   bakerTableInfos: any
-  bakerTableRatings: any = {}
-
-  tezosBakerFee$: BehaviorSubject<number | undefined> = new BehaviorSubject(undefined)
+  bakerTableRatings$: Observable<BakerTableRatings>
+  tezosBakerFee$: Observable<number>
   tezosBakerFeeLabel$: Observable<string | undefined>
 
   revealed$: Observable<string>
@@ -126,6 +123,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   is_baker = false
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
+  private scrolledToTransactions = false
 
   constructor(
     private readonly actions$: Actions,
@@ -154,8 +152,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
-      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+      .observe([Breakpoints.Handset, Breakpoints.Small])
       .pipe(map(breakpointState => breakpointState.matches))
+    this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
+    this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
       map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
@@ -176,7 +176,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
-      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : null))
+      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
     this.balanceChartDatasets$ = this.store$
       .select(state => state.accountDetails.balanceFromLast30Days)
@@ -254,11 +254,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.account$
         .pipe(
           withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
-          filter(([account, navigationHistory]) => account && navigationHistory.length === 1),
+          filter(([account, navigationHistory]) => !this.scrolledToTransactions && account && navigationHistory.length === 1),
           delay(500)
         )
         .subscribe(() => {
           this.transactions.nativeElement.scrollIntoView({ behavior: 'smooth' })
+          this.scrolledToTransactions = true
         })
     )
   }
@@ -285,74 +286,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.is_baker = true
     })
 
-    this.bakingService.getBakingBadRatings(address).subscribe(response => {
-      const ratingNumberToLabel = [
-        /* 0 */ 'awesome',
-        /* 1 */ 'so-so',
-        /* 2 */ 'dead',
-        /* 3 */ 'specific',
-        /* 4 */ 'hidden',
-        /* 5 */ 'new',
-        /* 6 */ undefined,
-        /* 7 */ undefined,
-        /* 8 */ undefined,
-        /* 9 */ 'unknown'
-      ]
-      const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
-        first,
-        get(feeByCycle => feeByCycle.value * 100)
-      )
-
-      this.bakerTableRatings = {
-        ...this.bakerTableRatings,
-        bakingBadRating:
-          response.status === 'success' && ratingNumberToLabel[response.rating.status]
-            ? ratingNumberToLabel[response.rating.status]
-            : 'not available'
-      }
-
-      if (response.status === 'success') {
-        this.tezosBakerFee$.next(extractFee(response.config.fee))
-      }
-    })
-
-    this.getTezosBakerInfos(address, false)
-  }
-
-  /**
-   * @param {boolean} [updateFee] - this method was used only in getBakingInfos method ( from my reasoning only to
-   * update bakerTableRatings.tezosBakerRating ), now it's used also in bakerAddress's setter to update tezosBakerFee
-   * propery, thats why this flag was introduced )
-   */
-  private getTezosBakerInfos(address, updateFee = false) {
-    this.bakingService
-      .getTezosBakerInfos(address)
-      .then(result => {
-        if (result.status === 'success' && result.rating && result.fee) {
-          this.bakerTableRatings = {
-            ...this.bakerTableRatings,
-            tezosBakerRating: (Math.round((Number(result.rating) + 0.00001) * 100) / 100).toString() + ' %'
-          }
-
-          if (updateFee) {
-            this.tezosBakerFee$.next(parseFloat(result.fee))
-          }
-
-          return
-        }
-
-        this.bakerTableRatings = {
-          ...this.bakerTableRatings,
-          tezosBakerRating: 'not available'
-        }
-
-        if (updateFee) {
-          this.tezosBakerFee$.next(null)
-        }
-      })
-      .catch(() => {
-        this.tezosBakerFee$.next(null)
-      })
+    this.store$.dispatch(actions.loadBakingBadRatings())
+    this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
   }
 
   private setRewardAmont() {

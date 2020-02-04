@@ -330,33 +330,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       }
     ].concat(<any>blockAndTxHashColumns),
 
-  /* BAKER */
-  [OperationTypes.BakerOverview]: () => [
-    {
-      name: 'Baker',
-      field: 'pkh',
-      template: Template.address
-    },
-    {
-      name: 'Balance',
-      field: 'balance',
-      template: Template.amount
-    },
-    {
-      name: '# of Votes',
-      field: 'number_of_votes'
-    },
-    {
-      name: 'Staking Balance',
-      field: 'staking_balance',
-      template: Template.amount
-    },
-    {
-      name: '# of Delegators',
-      field: 'number_of_delegators'
-    }
-  ],
-
   /* PROPOSAL */
   [OperationTypes.ProposalOverview]: () => [
     {

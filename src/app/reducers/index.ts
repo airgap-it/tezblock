@@ -5,22 +5,28 @@ import { take } from 'rxjs/operators'
 import { environment } from '../../environments/environment'
 import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer'
 import * as fromList from '../pages/list/reducer'
-import * as accountDetails from '../pages/account-detail/reducer'
-import * as blockDetails from '../pages/block-detail/reducer'
-import * as transactionDetails from '../pages/transaction-detail/reducer'
-import * as proposalDetails from '../pages//proposal-detail/reducer'
-import * as bakerTable from '../components/baker-table/reducer'
-import * as app from '../app.reducer'
+import * as fromAccountDetails from '../pages/account-detail/reducer'
+import * as fromBlockDetails from '../pages/block-detail/reducer'
+import * as fromTransactionDetails from '../pages/transaction-detail/reducer'
+import * as fromProposalDetails from '../pages/proposal-detail/reducer'
+import * as fromBakerTable from '../components/baker-table/reducer'
+import * as fromContractDetails from '../pages/contract-detail/reducer'
+import * as fromBakers from '../pages/baker-overview/reducer'
+import * as fromHealth from '../pages/health/reducer'
+import * as fromApp from '../app.reducer'
 
 export interface State {
-  app: app.State,
-  accountDetails: accountDetails.State
-  bakerTable: bakerTable.State
-  blockDetails: blockDetails.State
+  app: fromApp.State
+  accountDetails: fromAccountDetails.State
+  bakerTable: fromBakerTable.State
+  bakers: fromBakers.State
+  blockDetails: fromBlockDetails.State
   endorsementDetails: fromEndorsementDetails.State
-  transactionDetails: transactionDetails.State
-  proposalDetails: proposalDetails.State
+  transactionDetails: fromTransactionDetails.State
+  proposalDetails: fromProposalDetails.State
+contractDetails: fromContractDetails.State
   list: fromList.State
+health: fromHealth.State
 }
 
 /**
@@ -30,14 +36,17 @@ export interface State {
  */
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
-    app: app.reducer,
-    accountDetails: accountDetails.reducer,
-    bakerTable: bakerTable.reducer,
-    blockDetails: blockDetails.reducer,
+    app: fromApp.reducer,
+    accountDetails: fromAccountDetails.reducer,
+    bakerTable: fromBakerTable.reducer,
+    bakers: fromBakers.reducer,
+    blockDetails: fromBlockDetails.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
-    transactionDetails: transactionDetails.reducer,
-    proposalDetails: proposalDetails.reducer,
-    list: fromList.reducer
+    transactionDetails: fromTransactionDetails.reducer,
+    proposalDetails: fromProposalDetails.reducer,
+contractDetails: fromContractDetails.reducer,
+    list: fromList.reducer,
+health: fromHealth.reducer
   })
 })
 
@@ -65,12 +74,27 @@ export const getState = (store: Store<State>): State => {
   return state
 }
 
-export const selectBlockDetails = (state: State) => state.blockDetails;
+export const selectBlockDetails = (state: State) => state.blockDetails
+export const selectApp = (state: State) => state.app
 
-// TODO: refactor, it's too long
-export const selector = {
-  blockDetails: {
-    id: createSelector(selectBlockDetails, state => state.id),
-    block: createSelector(selectBlockDetails, state => state.block)
-  }
+export const blockDetails = {
+  id: createSelector(
+    selectBlockDetails,
+    state => state.id
+  ),
+  block: createSelector(
+    selectBlockDetails,
+    state => state.block
+  )
+}
+
+export const app = {
+  currentCycle: createSelector(
+    selectApp,
+    fromApp.currentCycleSelector
+  ),
+  currentBlockLevel: createSelector(
+    selectApp,
+    fromApp.currentBlockLevelSelector
+  )
 }

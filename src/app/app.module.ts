@@ -65,16 +65,23 @@ import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { HealthComponent } from './pages/health/health.component'
 import { ListEffects } from './pages/list/effects'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
-import { BakerTableEffects } from './components/baker-table/effects';
+import { BakerTableEffects } from './components/baker-table/effects'
+import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
+import { ContractDetailEffects } from './pages/contract-detail/effects'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
+import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
-import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component';
+import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
+import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { BakersEffects } from './pages/baker-overview/effects'
+import { HealthEffects } from './pages/health/effects'
 
 @NgModule({
   imports: [
@@ -117,7 +124,10 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
       BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects,
-      ProposalDetailEffects
+      ProposalDetailEffects,
+      ContractDetailEffects,
+      BakersEffects,
+      HealthEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -157,12 +167,16 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
+    ProtocolConstantComponent,
     ProposalDetailComponent,
     TooltipItemComponent,
     SearchItemComponent,
     OccurrenceStatisticsComponent,
     TezblockTableComponent,
-    ClientSideTableComponent
+    ClientSideTableComponent,
+    ContractDetailComponent,
+    BakerOverviewComponent,
+    HealthComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

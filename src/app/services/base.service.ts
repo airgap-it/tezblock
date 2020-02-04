@@ -4,11 +4,25 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { ChainNetworkService } from './chain-network/chain-network.service'
 import { Observable } from 'rxjs'
 
+export const maxLimit = 100000
+
+export enum Operation {
+  after = 'after',
+  between = 'between',
+  eq = 'eq',
+  in = 'in',
+  lt = 'lt',
+  gt = 'gt',
+  isnull = 'isnull',
+  startsWith = 'startsWith'
+}
+
 export interface Predicate {
   field: string
-  operation: string
+  operation?: Operation
   set?: any[]
   inverse?: boolean
+  group?: string
 }
 
 export interface Aggregation
@@ -19,11 +33,18 @@ export interface Aggregation
 
 export interface Body {
   fields?: string[]
-  predicates: Predicate[]
+  predicates?: Predicate[]
   orderBy?: { field: string; direction: string }[]
   aggregation?: Aggregation[]
   limit?: number
 }
+
+export const andGroup = (pradicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
+  pradicates.map(predicate => ({
+    ...predicate,
+    operation: predicate.operation || operation,
+    group: groupSymbol
+  }))
 
 export enum ENVIRONMENT_URL {
   rpcUrl = '{rpcUrl}',

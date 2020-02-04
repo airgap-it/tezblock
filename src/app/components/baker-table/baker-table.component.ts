@@ -21,14 +21,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
-
-export interface Tab {
-  title: string
-  active: boolean
-  kind: string
-  icon?: string[]
-  count: number
-}
+import { kindToOperationTypes, Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -56,12 +49,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
 
-  bakingBadRating: string | undefined
-  tezosBakerRating: string | undefined
-
-  bakingInfos: any
-
-  isValidBaker: boolean | undefined
   rewardsLoading$: Observable<boolean>
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
@@ -111,13 +98,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   @Input() data: any
 
-  @Input()
-  set ratings(bakerTableRatings: any) {
-    if (bakerTableRatings) {
-      this.tezosBakerRating = bakerTableRatings.tezosBakerRating
-      this.bakingBadRating = bakerTableRatings.bakingBadRating
-    }
-  }
+  @Input() ratings: any
 
   @Input() bakerFee$: Observable<number>
 
@@ -164,6 +145,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.route.paramMap.subscribe(async paramMap => {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
+        this.store$.dispatch(actions.loadBakingRights())
+        this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
@@ -190,6 +173,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           return EMPTY
         })
       )
+
     this.rewards$ = combineLatest(this.rewardSingleService.rewards$, this.bakerFee$).pipe(
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
       map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
@@ -211,9 +195,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   selectTab(selectedTab: Tab) {
-    this.store$.dispatch(actions.kindChanged({ kind: selectedTab.kind }))
+    this.store$.dispatch(actions.kindChanged({ kind: kindToOperationTypes(selectedTab.kind) }))
     this.updateSelectedTab(selectedTab)
-    this.overviewTabClicked.emit(selectedTab.kind)
+    this.overviewTabClicked.emit(kindToOperationTypes(selectedTab.kind))
   }
 
   getTabCount(tabs: Tab[]) {
@@ -309,9 +293,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Age', field: 'estimated_time', template: Template.timestamp },
           { name: 'Level', field: 'level', template: Template.block },
           { name: 'Priority', field: 'priority' },
-          { name: 'Rewards', field: 'rewards' },
-          { name: 'Fees', field: null, template: Template.amount },
-          { name: 'Deposits', field: null, template: Template.amount }
+          { name: 'Rewards', field: 'rewards', template: Template.amount },
+          { name: 'Fees', field: 'fees', template: Template.amount },
+          { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query
@@ -333,7 +317,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             template: Template.amount,
             data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
           },
-          { name: 'Deposits', field: null, template: Template.amount }
+          { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query
