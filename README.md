@@ -29,7 +29,7 @@ Edit `docker-compose.yml` by changing the `XTZ_Scheme`, `XTZ_Host`, `XTZ_Port` a
 
 To increase performance, uncomment the following line in the `docker-compose.yml` file:
 
-    "./sql/conseil.sql:/docker-entrypoint-initdb.d/conseil.sql"`
+    "./sql/conseil.sql:/docker-entrypoint-initdb.d/conseil.sql"
 
 Edit the `sql/conseil.sql` file by adding:
 
@@ -43,7 +43,7 @@ Edit the `sql/conseil.sql` file by adding:
 
 Run the Conseil instance
 
-    `docker-compose up -d`
+    docker-compose up -d
 
 #### Setup local Tezos node
 
