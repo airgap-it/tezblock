@@ -351,7 +351,12 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
   /* CONTRACT */
   [OperationTypes.Contract]: () => [
     {
-      name: 'Contract',
+      name: 'Token',
+      field: 'id',
+      template: Template.address
+    },
+    {
+      name: 'Contract Address',
       field: 'id',
       template: Template.address
     },
