@@ -12,14 +12,16 @@ import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadRes
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
-  const lastDay = balance && balance.length > 0 ? moment.utc(balance[0].asof).startOf('day') : moment.utc().startOf('day')
-  const missingDays = 30 - (moment.utc().startOf('day').diff(lastDay, 'days') + 1)
-  const missingBalance: Balance[] = range(0, missingDays).map(index => ({
-    balance: 0,
-    asof: moment.utc().add(-29 + index, 'days').valueOf()
-  }))
+  const toDay = (index: number): number =>
+    moment
+      .utc()
+      .add(-29 + index, 'days')
+      .valueOf()
+  const getBalanceFrom = (date: number) => (balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isSame(moment(date).startOf('day'))
+  const getPreviousBalance = (date: number) => (balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isBefore(moment(date).startOf('day'))
+  const attachBalance = (date: number): Balance => balance.find(getBalanceFrom(date)) || balance.find(getPreviousBalance(date)) || { balance: 0, asof: date }
 
-  return missingBalance.concat(balance)
+  return range(0, 30).map(pipe(toDay, attachBalance))
 }
 
 const ratingNumberToLabel = [
@@ -41,21 +43,27 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
 )
 
 export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
-  bakingRating: response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  bakingRating:
+    response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
 })
 
-export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): actions.BakingRatingResponse => ({
-  bakingRating: response.status === 'success' && response.rating
-  ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
-  : null,
+export const fromMyTezosBakerResponse = (
+  response: MyTezosBakerResponse,
+  state: State,
+  updateFee: boolean
+): actions.BakingRatingResponse => ({
+  bakingRating:
+    response.status === 'success' && response.rating
+      ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
+      : null,
   tezosBakerFee: updateFee ? (response.status === 'success' && response.fee ? parseFloat(response.fee) : null) : state.tezosBakerFee
 })
 
 export interface Busy {
   transactions: boolean
   rewardAmont: boolean
-} 
+}
 
 export interface BakerTableRatings {
   bakingBadRating: string
