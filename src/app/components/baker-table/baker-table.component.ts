@@ -193,9 +193,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.isRightsTabAvailable$ = this.store$
       .select(state => state.bakerTable.upcomingRights)
       .pipe(
-        filter(upcomingRights => !!upcomingRights),
         map(upcomingRights =>
-          this.selectedTab.kind === 'baking_rights' ? upcomingRights.baking !== null : upcomingRights.endorsing !== null
+          !upcomingRights
+            ? true
+            : this.selectedTab.kind === 'baking_rights'
+            ? upcomingRights.baking !== null
+            : upcomingRights.endorsing !== null
         )
       )
 

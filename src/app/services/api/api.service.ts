@@ -988,7 +988,7 @@ export class ApiService {
                     )
                     return {
                       ...aggregatedRight,
-                      blockRewards: reward.totalRewards,
+                      blockRewards: reward.bakingRewards,
                       deposits: reward.bakingDeposits,
                       fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
@@ -1082,7 +1082,7 @@ export class ApiService {
 
                     return {
                       ...aggregatedRight,
-                      endorsementRewards: reward.totalRewards,
+                      endorsementRewards: reward.endorsingRewards,
                       deposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
