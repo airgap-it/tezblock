@@ -309,8 +309,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Fees', field: 'fees', template: Template.amount },
           { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }
@@ -331,8 +330,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           },
           { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }
