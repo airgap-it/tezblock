@@ -148,7 +148,9 @@ export class BakerTableEffects {
           this.baseService.post<any>('baking_rights', body(accountAddress)).pipe(map(first)),
           this.baseService.post<any>('endorsing_rights', body(accountAddress, true)).pipe(map(first))
         ).pipe(
-          map(([baking, endorsing]: [any, any]) => actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking, endorsing } })),
+          map(([baking, endorsing]: [any, any]) =>
+            actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking: baking || null, endorsing: endorsing || null } })
+          ),
           catchError(error => of(actions.loadUpcomingRightsFailed({ error })))
         )
       )

@@ -195,17 +195,18 @@
                 <h5 class="card-title__secondary mb-3">
                   Next Baking Right
                 </h5>
-                <h5>
-                  <ng-container *ngIf="upcomingRightsLoading$ | async; else nextBakingRight">
-                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                  </ng-container>
-                  <ng-template #nextBakingRight>
-                    <div *ngIf="upcomingRights$ | async as upcomingRights">
-                      {{ upcomingRights.baking.level }}
-                      <app-timestamp-cell [data]="upcomingRights.baking.estimated_time"></app-timestamp-cell>
-                    </div>
-                  </ng-template>
-                </h5>
+                <ng-container *ngIf="upcomingRightsLoading$ | async; else nextBakingRight">
+                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                </ng-container>
+                <ng-template #nextBakingRight>
+                  <div *ngIf="(upcomingRights$ | async)?.baking as baking; else noBaking">
+                    <h5>
+                      {{ baking?.level }}
+                      <app-timestamp-cell [data]="baking?.estimated_time"></app-timestamp-cell>
+                    </h5>
+                  </div>
+                  <ng-template #noBaking>not available</ng-template>
+                </ng-template>
               </div>
             </div>
             <div class=" col-md-6 col-lg-4">
@@ -305,17 +306,18 @@
                 <h5 class="card-title__secondary mb-3">
                   Next Endorsing Right
                 </h5>
-                <h5>
-                  <ng-container *ngIf="upcomingRightsLoading$ | async; else nextEndorsingRight">
-                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                  </ng-container>
-                  <ng-template #nextEndorsingRight>
-                    <div *ngIf="upcomingRights$ | async as upcomingRights">
-                      {{ upcomingRights.endorsing.level }}
-                      <app-timestamp-cell [data]="upcomingRights.endorsing.estimated_time"></app-timestamp-cell>
-                    </div>
-                  </ng-template>
-                </h5>
+                <ng-container *ngIf="upcomingRightsLoading$ | async; else nextEndorsingRight">
+                  <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                </ng-container>
+                <ng-template #nextEndorsingRight>
+                  <div *ngIf="(upcomingRights$ | async)?.endorsing as endorsing; else noEndorsing">
+                    <h5>
+                      {{ endorsing?.level }}
+                      <app-timestamp-cell [data]="endorsing?.estimated_time"></app-timestamp-cell>
+                    </h5>
+                  </div>
+                  <ng-template #noEndorsing>not available</ng-template>
+                </ng-template>
               </div>
             </div>
           </div>
@@ -324,7 +326,7 @@
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
-      <tezblock-table
+      <tezblock-table *ngIf="isRightsTabAvailable$ | async; else noRights"
         [columns]="rightsColumns"
         [data]="rights$ | async"
         [loading]="rightsLoading$ | async"
@@ -332,6 +334,7 @@
         [pagination]="true"
         (onLoadMore)="loadMoreRights()"
       ></tezblock-table>
+      <ng-template #noRights><span class="tab-content">not available</span></ng-template>
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">
