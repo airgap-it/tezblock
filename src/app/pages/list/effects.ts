@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, Observable, from } from 'rxjs'
+import { of, Observable, from, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
@@ -166,9 +166,21 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.loadContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
-      map(([action, pagination]) =>
-        listActions.loadContractsSucceeded({ contracts: getContracts(pagination.currentPage * pagination.selectedSize) })
-      )
+      switchMap(([action, pagination]) => {
+        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
+
+        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
+          map(totalSupplies =>
+            listActions.loadContractsSucceeded({
+              contracts: {
+                data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
+                total: contracts.total
+              }
+            })
+          ),
+          catchError(error => of(listActions.loadContractsFailed({ error })))
+        )
+      })
     )
   )
 

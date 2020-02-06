@@ -1311,23 +1311,12 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = new TezosFAProtocol({
-      symbol: contract.symbol,
-      name: contract.name,
-      marketSymbol: contract.symbol,
-      identifier: '', // not important in this context can be empty string
-      contractAddress: contract.id,
-      jsonRPCAPI: this.environmentUrls.rpcUrl,
-      baseApiUrl: this.environmentUrls.conseilUrl,
-      baseApiKey: this.environmentUrls.conseilApiKey,
-      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork()
-    })
+    const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTransactions(10, cursor))
   }
 
-  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+  getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
@@ -1370,5 +1359,26 @@ export class ApiService {
         ),
         map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
+  }
+
+  getTotalSupplyByContract(contract: Contract): Observable<string> {
+    const protocol = this.getFaProtocol(contract)
+
+    return from(protocol.getTotalSupply(contract.id))
+  }
+
+  private getFaProtocol(contract: Contract): TezosFAProtocol {
+    return new TezosFAProtocol({
+      symbol: contract.symbol,
+      name: contract.name,
+      marketSymbol: contract.symbol,
+      identifier: '', // not important in this context can be empty string
+      contractAddress: contract.id,
+      jsonRPCAPI: this.environmentUrls.rpcUrl,
+      baseApiUrl: this.environmentUrls.conseilUrl,
+      baseApiKey: this.environmentUrls.conseilApiKey,
+      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
+      network: this.chainNetworkService.getNetwork()
+    })
   }
 }
