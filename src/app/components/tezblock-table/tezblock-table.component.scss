@@ -1,15 +1,29 @@
 ::ng-deep tezblock-table {
-    .table-hover tbody tr.table-extended__active:hover {
-      background-color: transparent;
-    }
+  .table-hover tbody tr.table-extended__active:hover {
+    background-color: transparent;
+  }
+  .btn fa-icon svg {
+    transform: rotate(90deg);
+    opacity: 0.6;
+  }
+  .btn--ascending fa-icon svg {
+    transform: rotate(-180deg);
+    color: orangered;
+  }
+
+  tr td:first-of-type,
+  tr th:first-of-type {
+    padding-left: 16px;
+  }
+
+  .btn--descending fa-icon svg {
+    transform: rotate(360deg);
+    color: orangered;
+  }
+  @media (max-width: 576px) {
     tr td:first-of-type,
     tr th:first-of-type {
-      padding-left: 16px;
-    }
-    @media (max-width: 576px) {
-      tr td:first-of-type,
-      tr th:first-of-type {
-        padding-left: 0;
-      }
+      padding-left: 0;
     }
   }
+}

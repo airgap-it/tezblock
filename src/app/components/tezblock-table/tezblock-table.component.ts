@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild } from '@angular/core'
-import { Tab } from '../tabbed-table/tabbed-table.component'
 
 export enum Template {
   address,
@@ -100,6 +99,7 @@ export class TezblockTableComponent implements OnInit {
   private expandedRows: any[] = []
 
   private sortingDirection = new Map<String, string>()
+  private activeSorting: string[] = []
 
   constructor() {}
 
