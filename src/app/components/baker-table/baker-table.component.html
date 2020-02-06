@@ -326,7 +326,8 @@
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'">
-      <tezblock-table *ngIf="isRightsTabAvailable$ | async; else noRights"
+      <tezblock-table
+        *ngIf="isRightsTabAvailable$ | async; else noRights"
         [columns]="rightsColumns"
         [data]="rights$ | async"
         [loading]="rightsLoading$ | async"
@@ -334,7 +335,7 @@
         [pagination]="true"
         (onLoadMore)="loadMoreRights()"
       ></tezblock-table>
-      <ng-template #noRights><span class="tab-content">not available</span></ng-template>
+      <ng-template #noRights><div class="p-0 pt-3 p-md-3">not available</div></ng-template>
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">
