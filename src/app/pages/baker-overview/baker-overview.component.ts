@@ -108,7 +108,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
       .pipe(
         filter(Array.isArray),
         map((data: Baker[]) =>
-          data.map(dataItem => (dataItem.pkh !== othersBakersLabel ? this.aliasPipe.transform(dataItem.pkh) : othersBakersLabel))
+          data.map(dataItem => (dataItem.pkh !== othersBakersLabel ? (this.aliasPipe.transform(dataItem.pkh) || dataItem.pkh) : othersBakersLabel))
         ),
         map((labels: string[]) => labels.map(label => `${label} -`))
       )
