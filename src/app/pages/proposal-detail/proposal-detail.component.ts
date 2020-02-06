@@ -40,6 +40,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         const id = paramMap.get('id')
 
         this.store$.dispatch(actions.loadProposal({ id }))
+        this.store$.dispatch(actions.loadVotes({ periodKind: 'proposal' }))
         this.setTabs()
       })
     )
@@ -47,6 +48,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
+    this.store$.select(state => state.proposalDetails.votes).subscribe(x => {
+      const foo = x
+    })
   }
 
   copyToClipboard() {

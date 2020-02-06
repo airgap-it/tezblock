@@ -33,6 +33,9 @@ export const kindToOperationTypes = (kind: KindType): string => (Array.isArray(k
 })
 export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
+  page: string = 'account'
+
+  @Input()
   set tabs(value: Tab[]) {
     if (value !== this._tabs) {
       const selectedTab = value.find(tab => tab.active)

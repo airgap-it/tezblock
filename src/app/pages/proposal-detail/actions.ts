@@ -11,6 +11,6 @@ export const loadProposal = createAction(`[${featureName}] Load Proposal`, props
 export const loadProposalSucceeded = createAction(`[${featureName}] Load Proposal Succeeded`, props<{ proposal: ProposalDto }>())
 export const loadProposalFailed = createAction(`[${featureName}] Load Proposal Failed`, props<{ error: any }>())
 
-export const loadVotes = createAction(`[${featureName}] Load Votes`)
+export const loadVotes = createAction(`[${featureName}] Load Votes`, props<{ periodKind: string }>())
 export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: Transaction[] }>())
 export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())

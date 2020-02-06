@@ -9,10 +9,11 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { BaseService, Operation } from '@tezblock/services/base.service'
+import { first } from '@tezblock/services/fp'
+import { Block } from '@tezblock/interfaces/Block'
 
 @Injectable()
 export class ProposalDetailEffects {
-
   getProposal$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadProposal),
@@ -29,21 +30,39 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
-      switchMap(([action, id]) =>
-        // TODO: THIS IS TOTALLY WRONG ( WORK IN PROGRESS )
-        this.baseService.post('blocks', {
-          predicates: [{ field: 'period_kind', operation: Operation.eq, set: ['proposal'] }],
-          orderBy: [
-            {
-              field: 'timestamp',
-              direction: 'desc'
-            }
-          ],
-          limit: 5
-        }).pipe(
-          map(votes => actions.loadVotesSucceeded({ votes: [] })),
-          catchError(error => of(actions.loadVotesFailed({ error })))
-        )
+      switchMap(([{ periodKind }, proposalHash]) =>
+        this.baseService
+          .post<Block[]>('blocks', {
+            fields: ['meta_voting_period'],
+            predicates: [
+              {
+                field: 'active_proposal',
+                operation: Operation.eq,
+                set: [proposalHash],
+                inverse: false
+              },
+              {
+                field: 'period_kind',
+                operation: Operation.eq,
+                set: [periodKind],
+                inverse: false
+              }
+            ],
+            orderBy: [
+              {
+                field: 'level',
+                direction: 'desc'
+              }
+            ],
+            limit: 1
+          })
+          .pipe(
+            map(first),
+            map(block => {
+              return actions.loadVotesSucceeded({ votes: [] })
+            }),
+            catchError(error => of(actions.loadVotesFailed({ error })))
+          )
       )
     )
   )
