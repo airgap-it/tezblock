@@ -71,7 +71,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
-  @Output() sortingBy: EventEmitter<{ value: string; tab: Tab }> = new EventEmitter()
+  @Output() sortingBy: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
 
   private _tabs: Tab[] | undefined
   public enableDownload: boolean = false
@@ -216,10 +216,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   public sortTransactions(data: any) {
-    // if (sortBy === 'originatedBalance' || sortBy === 'delegatedBalance') {
-    //   sortBy = 'balance'
-    // }
-    // console.log('this selected tab: ', this.selectedTab)
-    this.sortingBy.emit({ value: data.value, tab: this.selectedTab })
+    this.sortingBy.emit(data)
   }
 }

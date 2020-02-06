@@ -95,9 +95,11 @@ export class TezblockTableComponent implements OnInit {
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
 
   @Output()
-  public readonly sortingClicked: EventEmitter<{ value: string; tab: Tab }> = new EventEmitter()
+  public readonly sortingClicked: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
 
   private expandedRows: any[] = []
+
+  private sortingDirection = new Map<String, string>()
 
   constructor() {}
 
@@ -133,7 +135,18 @@ export class TezblockTableComponent implements OnInit {
   }
 
   public sorting(sortBy: string) {
-    this.sortingClicked.emit({ value: sortBy, tab: null })
+    const key: string = sortBy
+    if (this.sortingDirection.has(key)) {
+      if (this.sortingDirection.get(key) === 'desc') {
+        this.sortingDirection.set(key, 'asc')
+      } else if (this.sortingDirection.get(key) === 'asc') {
+        this.sortingDirection.delete(key)
+      }
+    } else {
+      this.sortingDirection.set(key, 'desc')
+    }
+
+    this.sortingClicked.emit({ value: sortBy, sortingDirection: this.sortingDirection.get(key) })
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {

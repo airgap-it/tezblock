@@ -57,13 +57,33 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.accountDetails.pageSize), this.store$.select(state => state.accountDetails.address)),
-      switchMap(([{ kind }, pageSize, address]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
-          map(data => actions.loadTransactionsByKindSucceeded({ data })),
-          catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-        )
-      )
+      withLatestFrom(
+        this.store$.select(state => state.accountDetails.pageSize),
+        this.store$.select(state => state.accountDetails.address),
+        this.store$.select(state => state.accountDetails.sortingValue),
+        this.store$.select(state => state.accountDetails.sortingDirection)
+      ),
+
+      switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+            map(data => actions.loadTransactionsByKindSucceeded({ data })),
+            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+              map(data => actions.loadTransactionsByKindSucceeded({ data })),
+              catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+            )
+          } else {
+            return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
+              map(data => actions.loadTransactionsByKindSucceeded({ data })),
+              catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+            )
+          }
+        }
+      })
     )
   )
 

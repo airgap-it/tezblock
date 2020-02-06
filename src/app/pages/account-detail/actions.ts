@@ -16,7 +16,10 @@ export const loadRewardAmont = createAction(`[${featureName}] Load Reward Amont`
 export const loadRewardAmontSucceeded = createAction(`[${featureName}] Load Reward Amont Succeeded`, props<{ rewardAmont: string }>())
 export const loadRewardAmontFailed = createAction(`[${featureName}] Load Reward Amont Failed`, props<{ error: any }>())
 
-export const loadTransactionsByKind = createAction(`[${featureName}] Load Transactions By Kind`, props<{ kind: string }>())
+export const loadTransactionsByKind = createAction(
+  `[${featureName}] Load Transactions By Kind`,
+  props<{ kind: string; sortingDirection?: string; sortingValue?: string }>()
+)
 export const loadTransactionsByKindSucceeded = createAction(
   `[${featureName}] Load Transactions By Kind Succeeded`,
   props<{ data: Transaction[] }>()
@@ -57,7 +60,10 @@ export const loadTezosBakerRatingSucceeded = createAction(
 )
 export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Tezos Baker Rating Failed`, props<{ error: any }>())
 
-export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ value: string; kind: string }>())
+export const sortTransactionsByKind = createAction(
+  `[${featureName}] Sort Transactions`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

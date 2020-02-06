@@ -391,61 +391,84 @@ export class ApiService {
       )
   }
 
-  getTransactionsByPredicates(predicates: Predicate[], limit: number): Observable<Transaction[]> {
-    return this.http
-      .post<Transaction[]>(
+  getTransactionsByPredicates(
+    predicates: Predicate[],
+    limit: number,
+    orderBy?: {
+      field: string
+      direction: string
+    }
+  ): Observable<Transaction[]> {
+    let postRequest = this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [...predicates],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        limit
+      },
+      this.options
+    )
+    if (orderBy) {
+      if (orderBy.field === 'originatedBalance' || orderBy.field === 'delegatedBalance') {
+        orderBy = {
+          field: 'block_level',
+          direction: 'desc'
+        }
+      }
+      postRequest = this.http.post<Transaction[]>(
         this.transactionsApiUrl,
         {
           predicates: [...predicates],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [orderBy],
           limit
         },
         this.options
       )
-      .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+    }
+    return postRequest.pipe(
+      map((transactions: Transaction[]) => transactions.slice(0, limit)),
+      switchMap((transactions: Transaction[]) => {
+        const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
 
-          if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
+        if (sources.length > 0) {
+          return this.getAccountsByIds(sources).pipe(
+            map((accounts: Account[]) =>
+              transactions.map(transaction => {
+                const match = accounts.find(account => account.account_id === transaction.source)
 
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
+                return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+              })
             )
-          }
+          )
+        }
 
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
+        return of(transactions)
+      }),
+      switchMap((transactions: Transaction[]) => {
+        const originatedAccounts = transactions
+          .filter(transaction => transaction.kind === 'origination')
+          .map(transaction => transaction.originated_contracts)
 
-          if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+        if (originatedAccounts.length > 0) {
+          return this.getAccountsByIds(originatedAccounts).pipe(
+            map((accounts: Account[]) =>
+              transactions.map(transaction => {
+                const match = accounts.find(account => account.account_id === transaction.originated_contracts)
 
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
+                return match ? { ...transaction, originatedBalance: match.balance } : transaction
+              })
             )
-          }
+          )
+        }
 
-          return of(transactions)
-        })
-      )
+        return of(transactions)
+      })
+    )
   }
 
   getLatestAccounts(limit: number): Observable<Account[]> {

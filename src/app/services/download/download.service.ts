@@ -4,7 +4,6 @@ import * as store from '@ngrx/store'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
 import { NewTransactionService } from '../transaction/new-transaction.service'
-import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +15,6 @@ export class DownloadService {
     private readonly newTransactionService: NewTransactionService
   ) {}
 
-  // TODO: getAllTransactionsByAddress needs to be redone. As of now, in case of delegations, the index value delegatedBalance
-  // is not assigned at runtime and therefore we need to make use of setTimeout
   public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)

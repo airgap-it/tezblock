@@ -110,7 +110,7 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  sortingDirection: 'asc' || 'desc',
+  sortingDirection: undefined || 'asc' || 'desc',
   sortingValue: undefined
 }
 
@@ -184,10 +184,10 @@ export const reducer = createReducer(
     pageSize: state.pageSize + 10
   })),
 
-  on(actions.sortTransactionsByKind, (state, { value }) => ({
+  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
     ...state,
-    sortingDirection: 'desc',
-    sortingValue: value
+    sortingDirection: sortingDirection,
+    sortingValue: sortingValue
   })),
 
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({

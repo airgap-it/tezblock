@@ -356,9 +356,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   sortBy(data: any) {
-    console.log('data in component: ', data)
-    // this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
-    this.store$.dispatch(actions.sortTransactionsByKind({ value: data.value, kind: data.tab.kind }))
+    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
   }
 
   private setTabs(pageId: string) {

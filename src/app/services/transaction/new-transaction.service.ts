@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core'
-import { of } from 'rxjs'
+import { of, concat } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
 import { ApiService } from '../api/api.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { andGroup, Operation, Predicate } from '@tezblock/services/base.service'
+import { andGroup, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 
 const kindToFieldsMap = {
   transaction: ['source', 'destination'],
@@ -21,7 +21,7 @@ const kindToFieldsMap = {
 export class NewTransactionService {
   constructor(private readonly apiService: ApiService) {}
 
-  getAllTransactionsByAddress(address: string, kind: string, limit: number) {
+  getAllTransactionsByAddress(address: string, kind: string, limit: number, sortingValue?: string, sortingDirection?: any) {
     const fields = kindToFieldsMap[kind]
     const idNotNullPredicate = {
       field: 'operation_group_hash',
@@ -31,10 +31,10 @@ export class NewTransactionService {
 
     // it was applied to transactions with kind ballot ...
     const preprocess = (transactions: Transaction[]) =>
-        transactions.map(transaction => ({
-          ...transaction,
-          proposal: transaction.proposal ? transaction.proposal.slice(1, transaction.proposal.length - 1) : transaction.proposal
-        }))
+      transactions.map(transaction => ({
+        ...transaction,
+        proposal: transaction.proposal ? transaction.proposal.slice(1, transaction.proposal.length - 1) : transaction.proposal
+      }))
     const predicates: Predicate[] = []
 
     predicates.push(
@@ -61,12 +61,24 @@ export class NewTransactionService {
       )
     }
 
-    return this.apiService.getTransactionsByPredicates(predicates, limit).pipe(
+    let apiCall = this.apiService.getTransactionsByPredicates(predicates, limit)
+
+    if (sortingValue && sortingDirection) {
+      const orderBy: OrderBy = { field: sortingValue, direction: sortingDirection }
+      apiCall = this.apiService.getTransactionsByPredicates(predicates, limit, orderBy)
+    }
+
+    return apiCall.pipe(
       // map(preprocess),
       switchMap(operation => {
-        const transactions = operation
-          .sort((a, b) => b.timestamp - a.timestamp)
-          .slice(0, limit)
+        let transactions = operation
+        sortingValue && sortingDirection
+          ? sortingValue === 'delegatedBalance' || sortingValue === 'originatedBalance'
+            ? sortingDirection === 'desc'
+              ? (transactions = operation.sort((a, b) => b.delegatedBalance - a.delegatedBalance)) // tslint:disable
+              : (transactions = operation.sort((a, b) => a.delegatedBalance - b.delegatedBalance)) // tslint:disable
+            : (transactions = operation)
+          : (transactions = operation.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit))
         const sources: string[] = transactions.map(transaction => transaction.source)
 
         if (kind === 'delegation' && sources.length > 0) {
