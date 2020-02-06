@@ -98,8 +98,7 @@ export class TezblockTableComponent implements OnInit {
 
   private expandedRows: any[] = []
 
-  private sortingDirection = new Map<String, string>()
-  private activeSorting: string[] = []
+  public sortingDirection = new Map<String, string>()
 
   constructor() {}
 
