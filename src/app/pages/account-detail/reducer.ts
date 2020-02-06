@@ -18,8 +18,12 @@ const ensure30Days = (balance: Balance[]): Balance[] => {
       .add(-29 + index, 'days')
       .valueOf()
   const getBalanceFrom = (date: number) => (balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isSame(moment(date).startOf('day'))
-  const getPreviousBalance = (date: number) => (balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isBefore(moment(date).startOf('day'))
-  const attachBalance = (date: number): Balance => balance.find(getBalanceFrom(date)) || balance.find(getPreviousBalance(date)) || { balance: 0, asof: date }
+  const getPreviousBalance = (balance: Balance[], date: number) => {
+    const match = balance.find((balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isBefore(moment(date).startOf('day')))
+
+    return match ? { ...match, asof: date } : undefined
+  }
+  const attachBalance = (date: number): Balance => balance.find(getBalanceFrom(date)) ||  getPreviousBalance(balance, date) || { balance: 0, asof: date }
 
   return range(0, 30).map(pipe(toDay, attachBalance))
 }
