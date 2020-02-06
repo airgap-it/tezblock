@@ -19,6 +19,7 @@ export interface Column {
   width?: string
   data?: (item: any) => any
   template?: TemplateRef<any> | Template
+  sortable?: boolean
 }
 
 export interface ExpandedRow<Entity> {
@@ -31,13 +32,15 @@ export const blockAndTxHashColumns: Column[] = [
   {
     name: 'Block',
     field: 'block_level',
-    template: Template.block
+    template: Template.block,
+    sortable: true
   },
   {
     name: 'Tx Hash',
     field: 'operation_group_hash',
     template: Template.hash,
-    data: (item: any) => ({ data: item.operation_group_hash })
+    data: (item: any) => ({ data: item.operation_group_hash }),
+    sortable: false
   }
 ]
 
@@ -96,8 +99,6 @@ export class TezblockTableComponent implements OnInit {
 
   private expandedRows: any[] = []
 
-  private sortableColumns: string[] = ['timestamp', 'amount', 'block_level', 'delegatedBalance', 'originatedBalance', 'balance', 'level']
-
   constructor() {}
 
   ngOnInit() {}
@@ -132,11 +133,7 @@ export class TezblockTableComponent implements OnInit {
   }
 
   public sorting(sortBy: string) {
-    if (this.sortableColumns.includes(sortBy)) {
-      this.sortingClicked.emit({ value: sortBy, tab: null })
-    } else {
-      return
-    }
+    this.sortingClicked.emit({ value: sortBy, tab: null })
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {

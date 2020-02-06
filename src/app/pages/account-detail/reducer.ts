@@ -110,7 +110,7 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  sortingDirection: undefined,
+  sortingDirection: 'asc' || 'desc',
   sortingValue: undefined
 }
 
