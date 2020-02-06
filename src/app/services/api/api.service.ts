@@ -318,7 +318,30 @@ export class ApiService {
     )
   }
 
-  getTransactionsByField(value: string, field: string, kind: string, limit: number): Observable<Transaction[]> {
+  getTransactionsByField(
+    value: string,
+    field: string,
+    kind: string,
+    limit: number,
+    sortingValue?: string,
+    sortingDirection?: string
+  ): Observable<Transaction[]> {
+    let orderBy = {
+      field: 'block_level',
+      direction: 'desc'
+    }
+    let delegatedOriginatedMemory: string
+    if (sortingValue && sortingDirection) {
+      if (sortingValue === 'originatedBalance' || sortingValue === 'delegatedBalance') {
+        delegatedOriginatedMemory = sortingValue
+        orderBy = {
+          field: 'block_level',
+          direction: 'desc'
+        }
+      } else {
+        orderBy = { field: sortingValue, direction: sortingDirection }
+      }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -340,12 +363,7 @@ export class ApiService {
               set: [kind]
             }
           ],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [orderBy],
           limit
         },
         this.options
@@ -385,6 +403,13 @@ export class ApiService {
               )
             )
           }
+          sortingValue && sortingDirection
+            ? sortingValue === 'delegatedBalance' || sortingValue === 'originatedBalance'
+              ? sortingDirection === 'desc'
+                ? (transactions = transactions.sort((a, b) => b.delegatedBalance - a.delegatedBalance)) // tslint:disable
+                : (transactions = transactions.sort((a, b) => a.delegatedBalance - b.delegatedBalance)) // tslint:disable
+              : transactions
+            : (transactions = transactions.sort((a, b) => b.block_level - a.block_level).slice(0, limit))
 
           return of(transactions)
         })

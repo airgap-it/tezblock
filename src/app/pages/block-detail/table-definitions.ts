@@ -180,7 +180,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
-      sortable: true
+      sortable: false
     },
     {
       name: 'Slots',

@@ -17,6 +17,8 @@ export interface State {
   kind: string
   pageSize: number // transactions
   busy: Busy
+  sortingDirection: string
+  sortingValue: string
 }
 
 const initialState: State = {
@@ -29,7 +31,9 @@ const initialState: State = {
   busy: {
     block: false,
     transactions: false
-  }
+  },
+  sortingDirection: undefined || 'asc' || 'desc',
+  sortingValue: undefined
 }
 
 export const reducer = createReducer(
@@ -87,5 +91,10 @@ export const reducer = createReducer(
     ...state,
     pageSize: state.pageSize + 10
   })),
-  on(actions.reset, () => initialState)
+  on(actions.reset, () => initialState),
+  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    sortingDirection: sortingDirection,
+    sortingValue: sortingValue
+  }))
 )
