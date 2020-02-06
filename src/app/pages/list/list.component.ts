@@ -206,7 +206,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               deData$,
               deLoading$
             )
-            break            
+            break
           case 'proposal':
             const showLoadMore$ = this.store$
               .select(state => state.list.proposals)
@@ -220,11 +220,24 @@ export class ListComponent extends BaseComponent implements OnInit {
             const loading$ = this.store$.select(state => state.list.proposals.loading)
             const data$ = this.store$.select(state => state.list.proposals.data)
 
-            this.subscriptions.push(getRefresh([
-              this.actions$.pipe(ofType(actions.loadProposalsSucceeded)),
-              this.actions$.pipe(ofType(actions.loadProposalsFailed))
-            ]).subscribe(() => this.store$.dispatch(actions.loadProposals())))
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadProposalsSucceeded)),
+                this.actions$.pipe(ofType(actions.loadProposalsFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadProposals()))
+            )
             this.setupTable(columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }), data$, loading$, showLoadMore$)
+            break
+          case 'contract':
+            const showLoadMoreContracts$ = this.store$
+              .select(state => state.list.contracts)
+              .pipe(map(contracts => contracts.data.length < contracts.pagination.total))
+            const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
+            const contractsData$ = this.store$.select(state => state.list.contracts.data)
+
+            this.store$.dispatch(actions.loadContracts())
+
+            this.setupTable(columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }), contractsData$, loadingContracts$, showLoadMoreContracts$)
             break
           default:
             throw new Error('unknown route')
@@ -246,6 +259,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
+        break
+      case 'contracts':
+        this.store$.dispatch(actions.increasePageOfContracts())
         break
       default:
         ;(this.dataService as any).loadMore()

@@ -2,6 +2,8 @@ import { createAction, props } from '@ngrx/store'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { Contract } from '@tezblock/domain/contract'
+import { Data } from '@tezblock/domain/table'
 
 const featureName = 'List'
 
@@ -52,5 +54,10 @@ export const loadActivationsCountLastXdFailed = createAction(`[${featureName}] L
 export const loadOriginationsCountLastXd = createAction(`[${featureName}] Load Originations Count Last 30d`)
 export const loadOriginationsCountLastXdSucceeded = createAction(`[${featureName}] Load Originations Count Last 30d Succeeded`, props<{ originationsCountLastXd: number[] }>())
 export const loadOriginationsCountLastXdFailed = createAction(`[${featureName}] Load Originations Count Last 30d Failed`, props<{ error: any }>())
+
+export const loadContracts = createAction(`[${featureName}] Load Contracts`)
+export const loadContractsSucceeded = createAction(`[${featureName}] Load Contracts Succeeded`, props<{ contracts: Data<Contract> }>())
+export const loadContractsFailed = createAction(`[${featureName}] Load Contracts Failed`, props<{ error: any }>())
+export const increasePageOfContracts = createAction(`[${featureName}] Increase Page Of Contracts`)
 
 export const reset = createAction(`[${featureName}] Reset`)
