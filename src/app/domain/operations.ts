@@ -20,7 +20,8 @@ export enum OperationTypes {
     ProposalOverview = 'proposal_overview',
 
     // these are not operation types...
-    Block = 'block'
+    Block = 'block',
+    Contract = 'contract'
   }
   
   // TODO: move to more proper place ( separate file ) or try DELETE

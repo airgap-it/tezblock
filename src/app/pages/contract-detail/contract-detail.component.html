@@ -1,0 +1,161 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <ng-container *ngIf="contract$ | async as contract; else noContract">
+      <div class="row mb-4">
+        <!-- TODO: create component ( the same as in account-detail ) -->
+        <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3 ">
+            <div class="card-body p-4 ">
+              <div class="row mb-4">
+                <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
+                  <identicon [address]="contract.id" [sizeLarge]="true"></identicon>
+                  <a
+                    (click)="copyToClipboard(contract.id)"
+                    value="click to copy"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none"
+                  >
+                    <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showQr()">
+                    <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-inline-block d-sm-none" (click)="showTelegramModal()">
+                    <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                </div>
+                <div class="col-md-10 pl-sm-0 pr-0 address--item__container">
+                  <address-item
+                    class="d-inline-flex"
+                    [address]="contract.id"
+                    [showFull]="true"
+                    [clickableButton]="false"
+                    [forceIdenticon]="true"
+                    [hideIdenticon]="false"
+                  ></address-item>
+
+                  <a
+                    [@changeBtnColor]="copyToClipboardState$ | async"
+                    (click)="copyToClipboard(contract.id)"
+                    value="click to copy"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block"
+                  >
+                    <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showQr()">
+                    <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showTelegramModal()">
+                    <fa-icon [icon]="'bell' | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                  <div>
+                    <address-item
+                      *ngIf="hasAlias$ | async"
+                      class="d-inline-flex"
+                      [address]="contract.id"
+                      [hideIdenticon]="true"
+                    ></address-item>
+                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
+                    <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
+                      Not Revealed
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Name</p>
+                </div>
+                <div class="col-md-10 pl-sm-0">
+                  <p class="mb-0">{{ contract.name }}</p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Symbol</p>
+                </div>
+                <div class="col-md-10 pl-sm-0">
+                  <p class="mb-0">{{ contract.symbol }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3 ">
+            <div class="card-body right p-4">
+              <h5 class="card-title mb-4 ">
+                Contract Overview
+              </h5>
+
+              <div class="row mb-3">
+                <div class=" col-md-5">
+                  <p class="text-secondary mb-0">Description</p>
+                </div>
+                <div class=" col-md-7">
+                  <p class="mb-0">{{ contract.description }}</p>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class=" col-md-5">
+                  <p class="text-secondary mb-0">Website</p>
+                </div>
+                <div class=" col-md-7">
+                  <a [href]="website$ | async" target="_blank">
+                    {{ website$ | async }}
+                  </a>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class=" col-md-5">
+                  <p class="text-secondary mb-0">Social Profiles</p>
+                </div>
+                <div class=" col-md-7">
+                  <a
+                    *ngFor="let social of contract.socials"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                    [href]="social.url"
+                    target="_blank"
+                  >
+                    <fa-icon [icon]="social.type | iconPipe" class="text-secondary"></fa-icon>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card h-100 pt-3">
+        <div class="card-body p-4 ">
+          <h5 class="card-title mb-3 ">
+            Transfers
+          </h5>
+          <div class="row">
+            <div class="col px-2">
+              <tezblock-table
+              [columns]="columns$ | async"
+              [data]="transferOperations$ | async"
+              [loading]="loading$ | async"
+              [pagination]="showLoadMore$ | async"
+              (onLoadMore)="loadMore()"
+            ></tezblock-table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #noContract>
+      <div class="card p-3" *ngIf="(contract$ | async) === null">
+        <h5 class="card-title mb-4 ">
+          Invalid Address
+        </h5>
+        <p>
+          This contract is currently not visible on the blockchain.
+        </p>
+      </div>
+    </ng-template>
+  </div>
+</div>

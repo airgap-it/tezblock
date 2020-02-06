@@ -64,39 +64,39 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
 
   [OperationTypes.Rewards]: (options?: { showFiatValue?: boolean }) => [
     {
-        name: 'Cycle',
-        field: 'cycle',
-        template: Template.basic
-      },
-      {
-        name: 'Delegations',
-        field: 'delegatedContracts',
-        data: (item: TezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
-        template: Template.basic
-      },
-      {
-        name: 'Staking Balance',
-        field: 'stakingBalance',
-        data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
-        template: Template.amount
-      },
-      {
-        name: 'Block Rewards',
-        field: 'bakingRewards',
-        data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
-        template: Template.amount
-      },
-      {
-        name: 'Endorsement Rewards',
-        field: 'endorsingRewards',
-        data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
-        template: Template.amount
-      },
-      {
-        name: 'Fees',
-        field: 'fees',
-        data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
-        template: Template.amount
-      }
+      name: 'Cycle',
+      field: 'cycle',
+      template: Template.basic
+    },
+    {
+      name: 'Delegations',
+      field: 'delegatedContracts',
+      data: (item: TezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
+      template: Template.basic
+    },
+    {
+      name: 'Staking Balance',
+      field: 'stakingBalance',
+      data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
+      template: Template.amount
+    },
+    {
+      name: 'Block Rewards',
+      field: 'bakingRewards',
+      data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
+      template: Template.amount
+    },
+    {
+      name: 'Endorsement Rewards',
+      field: 'endorsingRewards',
+      data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
+      template: Template.amount
+    },
+    {
+      name: 'Fees',
+      field: 'fees',
+      data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+      template: Template.amount
+    }
   ]
 }

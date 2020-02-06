@@ -145,6 +145,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.route.paramMap.subscribe(async paramMap => {
         const accountAddress = paramMap.get('id')
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
+        this.store$.dispatch(actions.loadBakingRights())
+        this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
@@ -171,6 +173,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           return EMPTY
         })
       )
+
     this.rewards$ = combineLatest(this.rewardSingleService.rewards$, this.bakerFee$).pipe(
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
       map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
@@ -290,9 +293,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Age', field: 'estimated_time', template: Template.timestamp },
           { name: 'Level', field: 'level', template: Template.block },
           { name: 'Priority', field: 'priority' },
-          { name: 'Rewards', field: 'rewards' },
-          { name: 'Fees', field: null, template: Template.amount },
-          { name: 'Deposits', field: null, template: Template.amount }
+          { name: 'Rewards', field: 'rewards', template: Template.amount },
+          { name: 'Fees', field: 'fees', template: Template.amount },
+          { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query
@@ -314,7 +317,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             template: Template.amount,
             data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
           },
-          { name: 'Deposits', field: null, template: Template.amount }
+          { name: 'Deposits', field: 'deposit', template: Template.amount }
         ],
         data: item.items,
         filterCondition: (detail, query) => detail.block_hash === query

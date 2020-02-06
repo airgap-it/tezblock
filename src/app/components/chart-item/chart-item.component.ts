@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
 import { BaseChartDirective } from 'ng2-charts'
-import { ChartOptions } from 'chart.js'
+import { ChartOptions, ChartSize } from 'chart.js'
 
 export const defaultOptions: ChartOptions = {
+  responsive: true,
   layout: {
     padding: {
       left: 0,
@@ -15,13 +16,14 @@ export const defaultOptions: ChartOptions = {
     duration: 1250 // general animation time
   },
   hover: {
-    animationDuration: 250 // duration of animations when hovering an item
+    animationDuration: 250, // duration of animations when hovering an item
+    intersect: false,
+    mode: 'x-axis'
   },
   responsiveAnimationDuration: 0, // animation duration after a resize
   legend: {
     display: false
   },
-  responsive: true,
   scales: {
     yAxes: [
       {
@@ -46,6 +48,34 @@ export const defaultOptions: ChartOptions = {
     },
     line: {
       tension: 0 // disables bezier curves
+    }
+  },
+
+  tooltips: {
+    mode: 'x-axis',
+    intersect: false,
+    displayColors: false, // removes color box and label
+
+    callbacks: {
+      title: function(data) {
+        if (data[0].label.includes(':')) {
+          return data[0].label.slice(0, -3)
+        } else {
+          return data[0].label
+        }
+      },
+      label: function(data, labels): string {
+        if (Number(data.value) % 1 !== 0) {
+          let value = parseFloat(data.value).toFixed(2)
+          if (labels.datasets[0].label === 'Balance') {
+            return value + ' ꜩ'
+          } else {
+            return '$' + value
+          }
+        } else {
+          return data.value
+        }
+      }
     }
   }
 }
@@ -91,14 +121,16 @@ export class ChartItemComponent implements AfterViewInit {
 
   @Input() colorOptions: ColorOptions = { gradientFrom: 'rgba(46,91,255,0.00)' }
 
-  chartColors: {}[] = []
+  @Input() colors: any[] = []
+
+  @Input() size: ChartSize // = { width: 700, height: 200 }
 
   constructor() {}
 
   ngAfterViewInit() {
     const navyBlue = '#2E5BFF'
 
-    if (this.chart) {
+    if (this.chart && this.colors.length === 0) {
       const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
 
       const gradientStroke1: CanvasGradient = ctx.createLinearGradient(0, 10, 0, 0)
@@ -108,7 +140,7 @@ export class ChartItemComponent implements AfterViewInit {
       gradientFill1.addColorStop(0, this.colorOptions.gradientFrom)
       gradientFill1.addColorStop(1, 'rgba(46,91,255,0.24)')
 
-      this.chartColors[0] = {
+      this.colors[0] = {
         backgroundColor: gradientFill1,
         borderColor: gradientStroke1,
         pointBackgroundColor: gradientStroke1,

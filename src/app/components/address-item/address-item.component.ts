@@ -1,5 +1,7 @@
 import { Component, Input } from '@angular/core'
 
+import { getContractByAddress, Contract } from '@tezblock/domain/contract'
+
 @Component({
   selector: 'address-item',
   templateUrl: './address-item.component.html',
@@ -10,6 +12,7 @@ export class AddressItemComponent {
   set address(value: string) {
     if (value !== this._address) {
       this._address = value
+      this.contract = getContractByAddress(this.address)
     }
   }
   get address(): string {
@@ -31,6 +34,12 @@ export class AddressItemComponent {
 
   @Input()
   isText: boolean
+
+  get path(): string {
+    return `/${this.contract ? 'contract' : 'account'}`
+  }
+
+  private contract: Contract
 
   constructor() {}
 }

@@ -10,6 +10,7 @@ export interface Pagination {
   total?: number
 }
 
+// TODO: move to synchronization.ts
 export const refreshRate = 30000;
 
 export class Facade<T> implements OnDestroy {
