@@ -74,11 +74,10 @@
               <ng-container *ngIf="enableComparison; else noComparisonValue">
                 <ng-container *ngIf="showOldValueVolume">
                   <span
-                    class="badge badge-pill badge-primary-light ml-1"
+                    class="badge badge-pill badge-primary ml-1 cursor--pointer"
                     (click)="tooltipClick(block.volume, 'volume')"
                     tooltip="Displaying value at time of transaction, click to display current value"
                   >
-                    old:
                     {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
                     {{
                       getHistoricFiatAmount('volume')
@@ -89,7 +88,7 @@
                 </ng-container>
                 <ng-container *ngIf="!showOldValueVolume">
                   <span
-                    class="badge badge-pill badge-primary-light ml-1"
+                    class="badge badge-pill badge-primary-light ml-1 cursor--pointer"
                     (click)="tooltipClick(block.volume, 'volume')"
                     tooltip="Displaying current value, click to display value at time of transaction"
                   >
@@ -140,11 +139,10 @@
               <ng-container *ngIf="enableComparison; else noComparisonFee">
                 <ng-container *ngIf="showOldValueFee">
                   <span
-                    class="badge badge-pill badge-primary-light ml-1"
+                    class="badge badge-pill badge-primary ml-1 cursor--pointer"
                     (click)="tooltipClick(block.fee, 'fee')"
                     tooltip="Displaying value at time of transaction, click to display current value"
                   >
-                    old:
                     {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
                     {{
                       getHistoricFiatAmount('fee') | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8'
@@ -153,7 +151,7 @@
                 </ng-container>
                 <ng-container *ngIf="!showOldValueFee">
                   <span
-                    class="badge badge-pill badge-primary-light ml-1"
+                    class="badge badge-pill badge-primary-light ml-1 cursor--pointer"
                     (click)="tooltipClick(block.fee, 'fee')"
                     tooltip="Displaying current value, click to display value at time of transaction"
                   >

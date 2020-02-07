@@ -90,6 +90,11 @@ tabset {
   }
 }
 
+/* display hand cursor */
+.cursor--pointer {
+  cursor: pointer;
+}
+
 /* font family & weight of secondary colored text */
 .text-secondary {
   font-family: 'Manrope', sans-serif;
