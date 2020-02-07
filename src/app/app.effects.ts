@@ -10,7 +10,7 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
 @Injectable()
 export class AppEffects {
@@ -47,10 +47,10 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<ByCycleState>(CacheKeys.fromCurrentCycle)).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
-          this.cacheService.set(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle }).subscribe(() => {})
+          this.cacheService.set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle }).subscribe(() => {})
         })
       ),
     { dispatch: false }

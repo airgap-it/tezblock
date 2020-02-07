@@ -10,7 +10,7 @@ import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { NewAccountService } from '@tezblock/services/account/account.service'
-import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
@@ -119,7 +119,7 @@ export class AccountDetailEffects {
         ofType(actions.loadBakingBadRatingsSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([action, state]) =>
-          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
@@ -169,7 +169,7 @@ export class AccountDetailEffects {
         ofType(actions.loadTezosBakerRatingSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([{ response, address }, state]) =>
-          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
