@@ -4,7 +4,7 @@ import { Observable } from 'rxjs'
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
-import { ApiService } from '@tezblock/services/api/api.service'
+import { DayDifferenceService } from '@tezblock/services/day-difference/day-difference.service'
 
 @Component({
   selector: 'amount-cell',
@@ -61,13 +61,13 @@ export class AmountCellComponent implements OnInit {
   constructor(
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly chartDataService: ChartDataService,
-    private apiService: ApiService
+    private dayDifferenceService: DayDifferenceService
   ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
 
   public dayDifference(oldTimestamp: number): number {
-    return this.apiService.calcateDayDifference(oldTimestamp)
+    return this.dayDifferenceService.calcateDayDifference(oldTimestamp)
   }
 
   ngOnInit(): void {
