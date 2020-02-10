@@ -10,7 +10,7 @@ import * as actions from './actions'
 import * as fromRoot from '@tezblock/reducers'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { Tab } from '@tezblock/domain/tab'
 import { columns } from './table-definitions'
 
 @Component({
@@ -40,7 +40,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         const id = paramMap.get('id')
 
         this.store$.dispatch(actions.loadProposal({ id }))
-        this.store$.dispatch(actions.loadVotes({ periodKind: 'proposal' }))
+        this.store$.dispatch(actions.loadVotes({ periodKind: 'testing_vote' }))
         this.setTabs()
       })
     )

@@ -8,6 +8,7 @@ import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
+import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
 export class TransactionDetailEffects {
@@ -39,10 +40,29 @@ export class TransactionDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(
-        this.store$.select(state => state.transactionDetails.transactionHash)
-      ),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
       map(([action, transactionHash]) => actions.loadTransactionsByHash({ transactionHash }))
+    )
+  )
+
+  onLoadTransactionLoadCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByHash),
+      map(() => actions.loadTransactionsCounts())
+    )
+  )
+
+  loadTransactionsCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsCounts),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
+      switchMap(([action, address]) =>
+        this.apiService.getOperationCount('operation_group_hash', address).pipe(
+          map(aggregateOperationCounts),
+          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
+          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
     )
   )
 

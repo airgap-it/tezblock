@@ -22,7 +22,7 @@ import { Contract } from '@tezblock/domain/contract'
 
 export interface OperationCount {
   [key: string]: string
-  count_operation_group_hash: string
+  field: string
   kind: string
 }
 
@@ -857,7 +857,9 @@ export class ApiService {
       ]
     }
 
-    return this.http.post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
+    return this.http
+      .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
+      .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field }))))
   }
 
   getBlockById(id: string): Observable<Block[]> {

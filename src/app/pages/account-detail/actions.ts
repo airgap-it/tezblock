@@ -4,6 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
 import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/account.service'
 import { Balance } from '@tezblock/services/api/api.service'
+import { Count } from '@tezblock/domain/tab'
 
 export interface BakingRatingResponse {
   bakingRating: string
@@ -19,6 +20,10 @@ export const loadRewardAmontFailed = createAction(`[${featureName}] Load Reward 
 export const loadTransactionsByKind = createAction(`[${featureName}] Load Transactions By Kind`, props<{ kind: string }>())
 export const loadTransactionsByKindSucceeded = createAction(`[${featureName}] Load Transactions By Kind Succeeded`, props<{ data: Transaction[] }>())
 export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load Transactions By Kind Failed`, props<{ error: any }>())
+
+export const loadTransactionsCounts = createAction(`[${featureName}] Load Transactions Counts`)
+export const loadTransactionsCountsSucceeded = createAction(`[${featureName}] Load Transactions Counts Succeeded`, props<{ counts: Count[] }>())
+export const loadTransactionsCountsFailed = createAction(`[${featureName}] Load Transactions Counts Failed`, props<{ error: any }>())
 
 export const loadAccount = createAction(`[${featureName}] Load Account`, props<{ address: string }>())
 export const loadAccountSucceeded = createAction(`[${featureName}] Load Account Succeeded`, props<{ account: Account }>())

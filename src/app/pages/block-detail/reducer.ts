@@ -3,6 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { Count } from '@tezblock/domain/tab'
 
 export interface Busy {
   block: boolean
@@ -13,6 +14,7 @@ export interface State {
   id: string
   block: Block
   transactions: Transaction[]
+  counts: Count[]
   transactionsLoadedByBlockHash: string
   kind: string
   pageSize: number // transactions
@@ -23,6 +25,7 @@ const initialState: State = {
   id: undefined,
   block: undefined,
   transactions: undefined,
+  counts: undefined,
   transactionsLoadedByBlockHash: undefined,
   kind: undefined,
   pageSize: 10,
@@ -86,6 +89,10 @@ export const reducer = createReducer(
   on(actions.increasePageSize, state => ({
     ...state,
     pageSize: state.pageSize + 10
+  })),
+  on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
+    ...state,
+    counts
   })),
   on(actions.reset, () => initialState)
 )

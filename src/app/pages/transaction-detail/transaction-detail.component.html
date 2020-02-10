@@ -20,7 +20,6 @@
               [page]="'transaction'"
               [loading]="transactionsLoading$"
               [data]="filteredTransactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"

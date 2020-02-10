@@ -10,6 +10,8 @@ export interface State {
   id: string
   proposal: ProposalDto
   loadingProposal: boolean
+  periodKind: string
+  metaVotingPeriod: number
   votes: TableState<Transaction>
 }
 
@@ -17,6 +19,8 @@ const initialState: State = {
   id: undefined,
   proposal: undefined,
   loadingProposal: false,
+  periodKind: undefined,
+  metaVotingPeriod: undefined,
   votes: getInitialTableState()
 }
 
@@ -38,8 +42,20 @@ export const reducer = createReducer(
     proposal: null,
     loadingProposal: false
   })),
-  on(actions.loadVotes, state => ({
+  on(actions.loadMetaVotingPeriodSucceeded, (state, { metaVotingPeriod }) => ({
     ...state,
+    metaVotingPeriod
+  })),
+  on(actions.loadMetaVotingPeriodFailed, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: false
+    }
+  })),
+  on(actions.loadVotes, (state, { periodKind }) => ({
+    ...state,
+    periodKind,
     votes: {
       ...state.votes,
       loading: true

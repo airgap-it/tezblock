@@ -10,6 +10,7 @@ import { Balance } from '@tezblock/services/api/api.service'
 import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
+import { Count } from '@tezblock/domain/tab'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const lastDay = balance && balance.length > 0 ? moment.utc(balance[0].asof).startOf('day') : moment.utc().startOf('day')
@@ -68,6 +69,7 @@ export interface State {
   delegatedAccounts: Account[]
   relatedAccounts: Account[]
   transactions: Transaction[]
+  counts: Count[],
   kind: string
   pageSize: number // transactions
   rewardAmont: string
@@ -83,6 +85,7 @@ const initialState: State = {
   delegatedAccounts: undefined,
   relatedAccounts: undefined,
   transactions: undefined,
+  counts: undefined,
   kind: undefined,
   pageSize: 10,
   rewardAmont: undefined,
@@ -192,6 +195,9 @@ export const reducer = createReducer(
       bakerTableRatings: false
     }
   })),
-
+  on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
+    ...state,
+    counts
+  })),
   on(actions.reset, () => initialState)
 )

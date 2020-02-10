@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
+import { forkJoin, of } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
@@ -9,6 +9,7 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
 export class BlockDetailEffects {
@@ -29,7 +30,9 @@ export class BlockDetailEffects {
       ofType(actions.loadBlockSucceeded),
       withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction }))
+      map(([{ block }, transactionsLoadedByBlockHash]) =>
+        actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction })
+      )
     )
   )
 
@@ -51,6 +54,27 @@ export class BlockDetailEffects {
       ofType(actions.increasePageSize),
       withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
+    )
+  )
+
+  onLoadTransactionLoadCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKind),
+      map(() => actions.loadTransactionsCounts())
+    )
+  )
+
+  loadTransactionsCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsCounts),
+      withLatestFrom(this.store$.select(state => state.blockDetails.id)),
+      switchMap(([action, address]) =>
+        this.apiService.getOperationCount('block_level', address).pipe(
+          map(aggregateOperationCounts),
+          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
+          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
     )
   )
 

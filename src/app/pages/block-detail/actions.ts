@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { Count } from '@tezblock/domain/tab'
 
 const featureName = 'Block Detail'
 
@@ -15,5 +16,9 @@ export const loadTransactionsByKindSucceeded = createAction(`[${featureName}] Lo
 export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load Transactions By Kind Failed`, props<{ error: any }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
+
+export const loadTransactionsCounts = createAction(`[${featureName}] Load Transactions Counts`)
+export const loadTransactionsCountsSucceeded = createAction(`[${featureName}] Load Transactions Counts Succeeded`, props<{ counts: Count[] }>())
+export const loadTransactionsCountsFailed = createAction(`[${featureName}] Load Transactions Counts Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)
