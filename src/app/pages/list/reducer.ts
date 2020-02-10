@@ -15,6 +15,7 @@ const preprocessBakersData = (bakerData: any[]) =>
 
 export interface State {
   blocks: TableState<Block>
+  transactions: TableState<Transaction>
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
@@ -30,6 +31,7 @@ export interface State {
 
 const initialState: State = {
   blocks: getInitialTableState(),
+  transactions: getInitialTableState(),
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
@@ -44,6 +46,108 @@ const initialState: State = {
 
 export const reducer = createReducer(
   initialState,
+
+  on(actions.loadBlocks, state => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      loading: true
+    }
+  })),
+
+  on(actions.loadBlocksFailed, state => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      loading: false
+    }
+  })),
+
+  on(actions.loadAdditionalBlockData, (state, { blocks }) => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      data: blocks,
+      loading: true
+    }
+  })),
+
+  on(actions.loadAdditionalBlockDataSucceeded, (state, { blocks }) => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      data: blocks,
+      loading: false
+    }
+  })),
+
+  on(actions.loadAdditionalBlockDataFailed, state => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      loading: false
+    }
+  })),
+
+  on(actions.increasePageOfBlocks, state => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      pagination: {
+        ...state.blocks.pagination,
+        currentPage: state.blocks.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortBlocksByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
+
+  on(actions.loadTransactions, state => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      loading: true
+    }
+  })),
+  on(actions.loadTransactionsSucceeded, (state, { transactions }) => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      data: transactions,
+      loading: false
+    }
+  })),
+  on(actions.loadTransactionsFailed, state => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfTransactions, state => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      pagination: {
+        ...state.transactions.pagination,
+        currentPage: state.transactions.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
 
   on(actions.loadDoubleBakings, state => ({
     ...state,

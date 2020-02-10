@@ -3,8 +3,32 @@ import { createAction, props } from '@ngrx/store'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { Block } from '@tezblock/interfaces/Block'
 
 const featureName = 'List'
+
+export const loadBlocks = createAction(`[${featureName}] Load Blocks`)
+export const loadBlocksFailed = createAction(`[${featureName}] Load Blocks Failed`, props<{ error: any }>())
+export const loadAdditionalBlockData = createAction(`[${featureName}] Load Additional Block Data`, props<{ blocks: Block[] }>())
+export const loadAdditionalBlockDataSucceeded = createAction(
+  `[${featureName}] Load Additional Block Data Succeeded`,
+  props<{ blocks: Block[] }>()
+)
+export const loadAdditionalBlockDataFailed = createAction(`[${featureName}] Load Additional Block Data Failed`, props<{ error: any }>())
+export const increasePageOfBlocks = createAction(`[${featureName}] Increase Page Of Blocks`)
+export const sortBlocksByKind = createAction(`[${featureName}] Sort Blocks`, props<{ sortingValue: string; sortingDirection: string }>())
+
+export const loadTransactions = createAction(`[${featureName}] Load Transactions`)
+export const loadTransactionsSucceeded = createAction(
+  `[${featureName}] Load Transactions Succeeded`,
+  props<{ transactions: Transaction[] }>()
+)
+export const loadTransactionsFailed = createAction(`[${featureName}] Load Transactions Failed`, props<{ error: any }>())
+export const increasePageOfTransactions = createAction(`[${featureName}] Increase Page Of Transactions`)
+export const sortTransactionsByKind = createAction(
+  `[${featureName}] Sort Transactions`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadDoubleBakings = createAction(`[${featureName}] Load Double Bakings`)
 export const loadDoubleBakingsSucceeded = createAction(

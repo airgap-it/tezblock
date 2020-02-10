@@ -7,9 +7,11 @@ import * as moment from 'moment'
 
 import * as listActions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
+import { Block } from '@tezblock/interfaces/Block'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -23,6 +25,106 @@ const getTimestamp7dAgo = (): number =>
 
 @Injectable()
 export class ListEffects {
+  blocksPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfBlocks),
+      map(() => listActions.loadBlocks())
+    )
+  )
+
+  onSortingBlocks$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortBlocksByKind),
+      map(() => listActions.loadBlocks())
+    )
+  )
+
+  getBlocks$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadBlocks),
+      withLatestFrom(
+        this.store$.select(state => state.list.blocks.pagination),
+        this.store$.select(state => state.list.blocks.sortingValue),
+        this.store$.select(state => state.list.blocks.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        return this.apiService.getLatestBlocks(pagination.currentPage * pagination.selectedSize).pipe(
+          map((blocks: Block[]) => {
+            return listActions.loadAdditionalBlockData({ blocks })
+          }),
+          catchError(error => of(listActions.loadBlocksFailed({ error })))
+        )
+      })
+    )
+  )
+  getAdditonalBlockData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadAdditionalBlockData),
+      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.data)),
+      switchMap(([action, pagination, data]) => {
+        console.log('data: ', data)
+        const promise = this.blockService.getAdditionalBlockData(data, pagination.currentPage * pagination.selectedSize)
+
+        const additionalData = of(promise)
+        return this.apiService.getLatestBlocks(pagination.currentPage * pagination.selectedSize).pipe(
+          map((blocks: Block[]) => {
+            // const promise = this.blockService.getAdditionalBlockData(blocks, pagination.currentPage * pagination.selectedSize)
+
+            return listActions.loadAdditionalBlockDataSucceeded({ blocks })
+          }),
+          catchError(error => of(listActions.loadAdditionalBlockDataFailed({ error })))
+        )
+      })
+    )
+  )
+
+  transactionsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfTransactions),
+      map(() => listActions.loadTransactions())
+    )
+  )
+
+  onSortingTransactions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortTransactionsByKind),
+      map(() => listActions.loadTransactions())
+    )
+  )
+
+  getTransactions = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactions),
+      withLatestFrom(
+        this.store$.select(state => state.list.transactions.pagination),
+        this.store$.select(state => state.list.transactions.sortingValue),
+        this.store$.select(state => state.list.transactions.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction']).pipe(
+            map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
+            catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction']).pipe(
+              map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
+              catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+            )
+          } else {
+            return this.apiService
+              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction'], sortingValue, sortingDirection)
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+              )
+          }
+        }
+      })
+    )
+  )
+
   doubleBakingsPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfDoubleBakings),
@@ -294,6 +396,7 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly blockService: BlockService
   ) {}
 }

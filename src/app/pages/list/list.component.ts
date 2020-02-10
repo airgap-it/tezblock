@@ -92,6 +92,7 @@ export class ListComponent extends BaseComponent implements OnInit {
     const refresh$ = merge(
       of(1),
       merge(
+        this.actions$.pipe(ofType(actions.loadBlocksFailed)),
         this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
         this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
         this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
@@ -110,6 +111,11 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService = new BlockService(this.apiService)
             this.dataService.setPageSize(10)
             this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
+            // const blockLoading$ = this.store$.select(state => state.list.blocks.loading)
+            // const blockData$ = this.store$.select(state => state.list.blocks.data)
+            // this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadBlocks())))
+            // this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$)
+
             break
           case 'transaction':
             this.subscriptions.push(
@@ -130,9 +136,14 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Transactions`)),
                 map(toArray)
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
+
+            const transactionLoading$ = this.store$.select(state => state.list.transactions.loading)
+            const transactionData$ = this.store$.select(state => state.list.transactions.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadTransactions())))
+            this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }), transactionData$, transactionLoading$)
             break
           case 'activation':
             this.subscriptions.push(
@@ -271,6 +282,13 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
         break
+      case 'block':
+        this.store$.dispatch(actions.increasePageOfBlocks())
+        break
+      case 'transaction':
+        this.store$.dispatch(actions.increasePageOfTransactions())
+        break
+
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -293,6 +311,7 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'block':
         break
       case 'transaction':
+        this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'activation':
         break
