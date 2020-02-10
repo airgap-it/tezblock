@@ -26,22 +26,46 @@ export class TransactionDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByHash),
-      withLatestFrom(this.store$.select(state => state.transactionDetails.pageSize)),
-      switchMap(([{ transactionHash }, pageSize]) =>
-        this.apiService.getTransactionsById(transactionHash, pageSize).pipe(
-          map(data => actions.loadTransactionsByHashSucceeded({ data })),
-          catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
-        )
-      )
+      withLatestFrom(
+        this.store$.select(state => state.transactionDetails.pageSize),
+        this.store$.select(state => state.accountDetails.sortingValue),
+        this.store$.select(state => state.accountDetails.sortingDirection)
+      ),
+      switchMap(([{ transactionHash }, pageSize, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService.getTransactionsById(transactionHash, pageSize).pipe(
+            map(data => actions.loadTransactionsByHashSucceeded({ data })),
+            catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService.getTransactionsById(transactionHash, pageSize).pipe(
+              map(data => actions.loadTransactionsByHashSucceeded({ data })),
+              catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
+            )
+          } else {
+            return this.apiService.getTransactionsById(transactionHash, pageSize).pipe(
+              map(data => actions.loadTransactionsByHashSucceeded({ data })),
+              catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
+            )
+          }
+        }
+      })
     )
   )
 
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(
-        this.store$.select(state => state.transactionDetails.transactionHash)
-      ),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
+      map(([action, transactionHash]) => actions.loadTransactionsByHash({ transactionHash }))
+    )
+  )
+
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransactionsByKind),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
       map(([action, transactionHash]) => actions.loadTransactionsByHash({ transactionHash }))
     )
   )

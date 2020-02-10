@@ -14,6 +14,8 @@ export interface State {
   latestBlock: Block
   pageSize: number // transactions
   busy: Busy
+  sortingDirection: string
+  sortingValue: string
 }
 
 const initialState: State = {
@@ -23,7 +25,9 @@ const initialState: State = {
   pageSize: 10,
   busy: {
     transactions: false
-  }
+  },
+  sortingDirection: undefined || 'asc' || 'desc',
+  sortingValue: undefined
 }
 
 export const reducer = createReducer(
@@ -53,12 +57,18 @@ export const reducer = createReducer(
     }
   })),
   on(actions.loadLatestBlockSucceeded, (state, { latestBlock }) => ({
-      ...state,
-      latestBlock
+    ...state,
+    latestBlock
   })),
   on(actions.increasePageSize, state => ({
     ...state,
     pageSize: state.pageSize + 10
   })),
-  on(actions.reset, () => initialState)
+  on(actions.reset, () => initialState),
+
+  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    sortingDirection: sortingDirection,
+    sortingValue: sortingValue
+  }))
 )
