@@ -5,6 +5,7 @@ import { Block } from 'src/app/interfaces/Block'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
+import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
 
 @Component({
   selector: 'block-detail-wrapper',
@@ -39,7 +40,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   public showOldValueVolume: boolean = false
   public showOldValueFee: boolean = false
 
-  public tooltipClick(amount, kind) {
+  public tooltipClick(amount: number | BigNumber, kind: string) {
     this.wrapperBlock$.subscribe((block: Block) => {
       const timestamp = block.timestamp
 
@@ -61,7 +62,11 @@ export class BlockDetailWrapperComponent implements OnInit {
     })
   }
 
-  constructor(private readonly route: ActivatedRoute, private readonly chartDataService: ChartDataService) {}
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly chartDataService: ChartDataService,
+    private amountCell: AmountCellComponent
+  ) {}
 
   public ngOnInit() {
     if (this.wrapperBlock$) {
@@ -73,12 +78,8 @@ export class BlockDetailWrapperComponent implements OnInit {
     }
   }
 
-  public dayDifference(oldTimestamp): number {
-    let currentTimestamp = +new Date()
-    const difference = currentTimestamp - oldTimestamp
-    const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
-
-    return daysDifference
+  public dayDifference(oldTimestamp: number): number {
+    return this.amountCell.dayDifference(oldTimestamp)
   }
 
   public getHistoricFiatAmount(key: string): number {

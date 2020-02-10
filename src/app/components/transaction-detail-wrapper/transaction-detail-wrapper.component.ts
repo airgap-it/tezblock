@@ -9,6 +9,7 @@ import { Observable } from 'rxjs'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
+import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -58,7 +59,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
   public showOldValueVolume: boolean = false
   public showOldValueFee: boolean = false
 
-  public tooltipClick(amount, kind) {
+  public tooltipClick(amount: number | BigNumber, kind: string) {
     this.latestTransaction$.subscribe((transaction: Transaction) => {
       const timestamp = transaction.timestamp
 
@@ -84,7 +85,8 @@ export class TransactionDetailWrapperComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
     private readonly toastrService: ToastrService,
-    private readonly chartDataService: ChartDataService
+    private readonly chartDataService: ChartDataService,
+    private amountCell: AmountCellComponent
   ) {}
 
   public ngOnInit() {
@@ -109,12 +111,8 @@ export class TransactionDetailWrapperComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
-  public dayDifference(oldTimestamp): number {
-    let currentTimestamp = +new Date()
-    const difference = currentTimestamp - oldTimestamp
-    const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
-
-    return daysDifference
+  public dayDifference(oldTimestamp: number): number {
+    return this.amountCell.dayDifference(oldTimestamp)
   }
 
   public getHistoricFiatAmount(key: string): number {
