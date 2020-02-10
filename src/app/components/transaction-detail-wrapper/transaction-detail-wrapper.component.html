@@ -73,60 +73,12 @@
       </div>
       <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <ng-container *ngIf="amount$ | async as amount">
-          <div
-            class="col col-md-9"
-            *ngIf="
-              (amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-              else hideValue
-            "
-          >
-            <p class="mb-0">
-              <span
-                class="d-inline-block"
-                [innerHtml]="
-                  amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-                "
-              ></span>
-              ꜩ
-              <ng-container *ngIf="isMainnet">
-                <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                  <ng-container *ngIf="enableComparison; else noComparisonValue">
-                    <ng-container *ngIf="showOldValueVolume">
-                      <span
-                        class="badge badge-pill badge-primary-light ml-1"
-                        (click)="tooltipClick(amount, 'volume')"
-                        tooltip="Displaying value at time of transaction, click to display current value"
-                      >
-                        old:
-                        {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                        {{
-                          getHistoricFiatAmount('volume')
-                            | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' }
-                            | number: '1.0-5'
-                        }}
-                      </span>
-                    </ng-container>
-                    <ng-container *ngIf="!showOldValueVolume">
-                      <span
-                        class="badge badge-pill badge-primary-light ml-1"
-                        (click)="tooltipClick(amount, 'volume')"
-                        tooltip="Displaying current value, click to display value at time of transaction"
-                      >
-                        {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                        {{ amount | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                      </span>
-                    </ng-container>
-                  </ng-container>
-
-                  <ng-template #noComparisonValue>
-                    <span class="badge badge-pill badge-primary-light ml-1">
-                      {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                      {{ amount | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                    </span>
-                  </ng-template>
-                </ng-container>
+          <div class="col col-md-9">
+            <ng-container *ngIf="isMainnet">
+              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+                <amount-cell [data]="latestTransaction"></amount-cell>
               </ng-container>
-            </p>
+            </ng-container>
           </div>
         </ng-container>
       </ng-container>
@@ -147,60 +99,8 @@
       </div>
       <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <ng-container *ngIf="fee$ | async as fee">
-          <div
-            class=" col-md-9"
-            *ngIf="
-              (fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-              else hideValue
-            "
-          >
-            <p class="mb-0">
-              <span
-                class="d-inline-block"
-                [innerHtml]="
-                  fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-                "
-              ></span>
-              ꜩ
-              <ng-container *ngIf="isMainnet">
-                <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                  <ng-container *ngIf="enableComparison; else noComparisonFee">
-                    <ng-container *ngIf="showOldValueFee">
-                      <span
-                        class="badge badge-pill badge-primary-light ml-1"
-                        (click)="tooltipClick(fee, 'fee')"
-                        tooltip="Displaying value at time of transaction, click to display current value"
-                      >
-                        old:
-                        {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                        {{
-                          getHistoricFiatAmount('fee')
-                            | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' }
-                            | number: '1.0-5'
-                        }}
-                      </span>
-                    </ng-container>
-                    <ng-container *ngIf="!showOldValueFee">
-                      <span
-                        class="badge badge-pill badge-primary-light ml-1"
-                        (click)="tooltipClick(fee, 'fee')"
-                        tooltip="Displaying current value, click to display value at time of transaction"
-                      >
-                        {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                        {{ fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                      </span>
-                    </ng-container>
-                  </ng-container>
-
-                  <ng-template #noComparisonFee>
-                    <span class="badge badge-pill badge-primary-light ml-1">
-                      {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                      {{ fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                    </span>
-                  </ng-template>
-                </ng-container>
-              </ng-container>
-            </p>
+          <div class=" col-md-9">
+            <amount-cell [data]="latestTransaction" [showFee]="true"></amount-cell>
           </div>
         </ng-container>
       </ng-container>
