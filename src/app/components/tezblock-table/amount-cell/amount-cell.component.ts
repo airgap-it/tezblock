@@ -61,7 +61,7 @@ export class AmountCellComponent implements OnInit {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
 
-  public dayDifference(oldTimestamp): number {
+  public dayDifference(oldTimestamp: number): number {
     let currentTimestamp = +new Date()
     const difference = currentTimestamp - oldTimestamp
     const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
