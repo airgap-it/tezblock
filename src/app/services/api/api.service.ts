@@ -120,7 +120,11 @@ export class ApiService {
     )
   }
 
-  getLatestTransactions(limit: number, kindList: string[]): Observable<Transaction[]> {
+  getLatestTransactions(limit: number, kindList: string[], sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
+    let orderBy = this.orderByBlockLevelDesc
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -137,7 +141,7 @@ export class ApiService {
               set: kindList
             }
           ],
-          orderBy: [this.orderByBlockLevelDesc],
+          orderBy: [orderBy],
           limit
         },
         this.options

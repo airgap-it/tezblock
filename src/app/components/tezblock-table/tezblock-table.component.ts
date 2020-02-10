@@ -32,7 +32,7 @@ export const blockAndTxHashColumns: Column[] = [
     name: 'Block',
     field: 'block_level',
     template: Template.block,
-    sortable: false
+    sortable: true
   },
   {
     name: 'Tx Hash',

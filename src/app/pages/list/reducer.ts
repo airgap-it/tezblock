@@ -5,6 +5,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { Block } from '@tezblock/interfaces/Block'
 
 const preprocessBakersData = (bakerData: any[]) =>
   bakerData.map(bakerDataItem => ({
@@ -13,6 +14,7 @@ const preprocessBakersData = (bakerData: any[]) =>
   }))
 
 export interface State {
+  blocks: TableState<Block>
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
@@ -27,6 +29,7 @@ export interface State {
 }
 
 const initialState: State = {
+  blocks: getInitialTableState(),
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
@@ -41,6 +44,7 @@ const initialState: State = {
 
 export const reducer = createReducer(
   initialState,
+
   on(actions.loadDoubleBakings, state => ({
     ...state,
     doubleBakings: {
@@ -71,6 +75,14 @@ export const reducer = createReducer(
         ...state.doubleBakings.pagination,
         currentPage: state.doubleBakings.pagination.currentPage + 1
       }
+    }
+  })),
+  on(actions.sortDoubleBakingsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    doubleBakings: {
+      ...state.doubleBakings,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
     }
   })),
   on(actions.loadDoubleEndorsements, state => ({

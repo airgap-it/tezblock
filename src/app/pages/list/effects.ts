@@ -30,16 +30,48 @@ export class ListEffects {
     )
   )
 
+  onSortingDoubleBakings$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortDoubleBakingsByKind),
+      map(() => listActions.loadDoubleBakings())
+    )
+  )
+
   getDoubleBakings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadDoubleBakings),
-      withLatestFrom(this.store$.select(state => state.list.doubleBakings.pagination)),
-      switchMap(([action, pagination]) =>
-        this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence']).pipe(
-          map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
-          catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
-        )
-      )
+      withLatestFrom(
+        this.store$.select(state => state.list.doubleBakings.pagination),
+        this.store$.select(state => state.list.doubleBakings.sortingValue),
+        this.store$.select(state => state.list.doubleBakings.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence']).pipe(
+            map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
+            catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence']).pipe(
+              map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
+              catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+            )
+          } else {
+            return this.apiService
+              .getLatestTransactions(
+                pagination.selectedSize * pagination.currentPage,
+                ['double_baking_evidence'],
+                sortingValue,
+                sortingDirection
+              )
+              .pipe(
+                map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
+                catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+              )
+          }
+        }
+      })
     )
   )
 

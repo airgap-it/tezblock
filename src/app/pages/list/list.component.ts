@@ -212,7 +212,11 @@ export class ListComponent extends BaseComponent implements OnInit {
             const deData$ = this.store$.select(state => state.list.doubleEndorsements.data)
 
             this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements())))
-            this.setupTable(columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }), deData$, deLoading$)
+            this.setupTable(
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              deData$,
+              deLoading$
+            )
             break
           case 'bakers':
             const bakersLoading$ = this.store$.select(state => state.list.activeBakers.loading)
@@ -267,6 +271,40 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
         break
+      default:
+        ;(this.dataService as any).loadMore()
+    }
+  }
+
+  sortBy(data: any) {
+    switch (this.routeName) {
+      case 'double-baking':
+        this.store$.dispatch(actions.sortDoubleBakingsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'double-endorsement':
+        // this.store$.dispatch(actions.increasePageOfDoubleEndorsements())
+        break
+      case 'bakers':
+        // this.store$.dispatch(actions.increasePageOfActiveBakers())
+        break
+      case 'proposal':
+        // this.store$.dispatch(actions.increasePageOfProposals())
+        break
+      case 'block':
+        break
+      case 'transaction':
+        break
+      case 'activation':
+        break
+      case 'origination':
+        break
+      case 'delegation':
+        break
+      case 'endorsement':
+        break
+      case 'vote':
+        break
+
       default:
         ;(this.dataService as any).loadMore()
     }
