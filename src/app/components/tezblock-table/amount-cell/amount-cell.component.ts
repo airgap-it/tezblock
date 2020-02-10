@@ -20,6 +20,10 @@ export class AmountCellComponent implements OnInit {
     }
   }
 
+  @Input() showFee: boolean = false
+
+  @Input() fromBlock?: boolean = false
+
   get options() {
     return this._options === undefined ? { showFiatValue: true } : this._options
   }
@@ -32,13 +36,21 @@ export class AmountCellComponent implements OnInit {
 
   public enableComparison: boolean = false
 
+  public amount: number
+
   public tooltipClick() {
     let daysDifference = this.dayDifference(this.data.timestamp)
     if (daysDifference >= 1) {
       let date = new Date(this.data.timestamp)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
         let oldValue = new BigNumber(response[1].close)
-        const amount = new BigNumber(this.data.amount)
+        let amount
+        if (this.showFee) {
+          amount = new BigNumber(this.data.fee)
+        } else {
+          amount = new BigNumber(this.amount)
+        }
+
         this.historicFiatAmount = amount.multipliedBy(oldValue).toNumber()
         this.showOldValue = !this.showOldValue
       })
@@ -62,6 +74,11 @@ export class AmountCellComponent implements OnInit {
     if (this.data) {
       const difference = this.dayDifference(this.data.timestamp)
       this.enableComparison = difference >= 1
+      if (this.fromBlock) {
+        this.amount = this.data.volume
+      } else {
+        this.amount = this.data.amount
+      }
     }
   }
 }

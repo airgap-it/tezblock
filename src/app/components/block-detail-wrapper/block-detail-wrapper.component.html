@@ -54,59 +54,8 @@
       </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <div
-        class=" col-md-9"
-        *ngIf="
-          (block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-          else hideValue
-        "
-      >
-        <p class="mb-0">
-          <span
-            class="d-inline-block"
-            [innerHtml]="
-              block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-            "
-          ></span>
-          ꜩ
-          <ng-container *ngIf="isMainnet">
-            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-              <ng-container *ngIf="enableComparison; else noComparisonValue">
-                <ng-container *ngIf="showOldValueVolume">
-                  <span
-                    class="badge badge-pill badge-primary-light ml-1"
-                    (click)="tooltipClick(block.volume, 'volume')"
-                    tooltip="Displaying value at time of transaction, click to display current value"
-                  >
-                    old:
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{
-                      getHistoricFiatAmount('volume')
-                        | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' }
-                        | number: '1.0-5'
-                    }}
-                  </span>
-                </ng-container>
-                <ng-container *ngIf="!showOldValueVolume">
-                  <span
-                    class="badge badge-pill badge-primary-light ml-1"
-                    (click)="tooltipClick(block.volume, 'volume')"
-                    tooltip="Displaying current value, click to display value at time of transaction"
-                  >
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                  </span>
-                </ng-container>
-              </ng-container>
-              <ng-template #noComparisonValue>
-                <span class="badge badge-pill badge-primary-light ml-1">
-                  {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                  {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                </span>
-              </ng-template>
-            </ng-container>
-          </ng-container>
-        </p>
+      <div class=" col-md-9">
+        <amount-cell [data]="block" [fromBlock]="true"></amount-cell>
       </div>
     </ng-container>
   </div>
@@ -120,57 +69,8 @@
       </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <div
-        class=" col-md-9"
-        *ngIf="
-          (block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-          else hideValue
-        "
-      >
-        <p class="mb-0">
-          <span
-            class="d-inline-block"
-            [innerHtml]="
-              block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-            "
-          ></span>
-          ꜩ
-          <ng-container *ngIf="isMainnet">
-            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-              <ng-container *ngIf="enableComparison; else noComparisonFee">
-                <ng-container *ngIf="showOldValueFee">
-                  <span
-                    class="badge badge-pill badge-primary-light ml-1"
-                    (click)="tooltipClick(block.fee, 'fee')"
-                    tooltip="Displaying value at time of transaction, click to display current value"
-                  >
-                    old:
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{
-                      getHistoricFiatAmount('fee') | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8'
-                    }}
-                  </span>
-                </ng-container>
-                <ng-container *ngIf="!showOldValueFee">
-                  <span
-                    class="badge badge-pill badge-primary-light ml-1"
-                    (click)="tooltipClick(block.fee, 'fee')"
-                    tooltip="Displaying current value, click to display value at time of transaction"
-                  >
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
-                  </span>
-                </ng-container>
-              </ng-container>
-              <ng-template #noComparisonFee>
-                <span class="badge badge-pill badge-primary-light ml-1">
-                  {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                  {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
-                </span>
-              </ng-template>
-            </ng-container>
-          </ng-container>
-        </p>
+      <div class=" col-md-9">
+        <amount-cell [data]="block" [showFee]="true"></amount-cell>
       </div>
     </ng-container>
     <ng-template #hideValue>

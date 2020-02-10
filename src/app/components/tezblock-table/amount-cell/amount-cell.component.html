@@ -1,36 +1,77 @@
-<span
-  class="d-inline-block"
-  [innerHtml]="data.amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
-></span>
-{{ options?.symbol || 'ꜩ' }}
-<ng-container *ngIf="enableComparison; else noComparison">
-  <ng-container *ngIf="showOldValue">
-    <span
-      *ngIf="options?.showFiatValue"
-      class="badge badge-pill badge-primary-light ml-1"
-      tooltip="Displaying value at time of transaction, click to display current value"
-      (click)="tooltipClick(); dayDifference(data.timestamp)"
-    >
-      old:
-      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ historicFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
-    </span>
+<ng-container *ngIf="!showFee; else feeTemplate">
+  <span
+    class="d-inline-block"
+    [innerHtml]="amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
+  ></span>
+  {{ options?.symbol || 'ꜩ' }}
+  <ng-container *ngIf="enableComparison; else noComparison">
+    <ng-container *ngIf="showOldValue">
+      <span
+        *ngIf="options?.showFiatValue"
+        class="badge badge-pill badge-primary-light ml-1"
+        tooltip="Displaying value at time of transaction, click to display current value"
+        (click)="tooltipClick(); dayDifference(data.timestamp)"
+      >
+        old:
+        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+        {{ historicFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      </span>
+    </ng-container>
+    <ng-container *ngIf="!showOldValue">
+      <span
+        *ngIf="options?.showFiatValue"
+        class="badge badge-pill badge-primary-light ml-1"
+        tooltip="Displaying current value, click to display value at time of transaction"
+        (click)="tooltipClick(); dayDifference(data.timestamp)"
+      >
+        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+        {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      </span>
+    </ng-container>
   </ng-container>
-  <ng-container *ngIf="!showOldValue">
-    <span
-      *ngIf="options?.showFiatValue"
-      class="badge badge-pill badge-primary-light ml-1"
-      tooltip="Displaying current value, click to display value at time of transaction"
-      (click)="tooltipClick(); dayDifference(data.timestamp)"
-    >
+  <ng-template #noComparison>
+    <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ data.amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
     </span>
-  </ng-container>
+  </ng-template>
 </ng-container>
-<ng-template #noComparison>
-  <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
-    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-    {{ data.amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
-  </span>
+
+<ng-template #feeTemplate>
+  <span
+    class="d-inline-block"
+    [innerHtml]="data.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
+  ></span>
+  {{ options?.symbol || 'ꜩ' }}
+  <ng-container *ngIf="enableComparison; else noComparison">
+    <ng-container *ngIf="showOldValue">
+      <span
+        *ngIf="options?.showFiatValue"
+        class="badge badge-pill badge-primary-light ml-1"
+        tooltip="Displaying value at time of transaction, click to display current value"
+        (click)="tooltipClick(); dayDifference(data.timestamp)"
+      >
+        old:
+        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+        {{ historicFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      </span>
+    </ng-container>
+    <ng-container *ngIf="!showOldValue">
+      <span
+        *ngIf="options?.showFiatValue"
+        class="badge badge-pill badge-primary-light ml-1"
+        tooltip="Displaying current value, click to display value at time of transaction"
+        (click)="tooltipClick(); dayDifference(data.timestamp)"
+      >
+        {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+        {{ data.fee | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      </span>
+    </ng-container>
+  </ng-container>
+  <ng-template #noComparison>
+    <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
+      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
+      {{ data.fee | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+    </span>
+  </ng-template>
 </ng-template>
