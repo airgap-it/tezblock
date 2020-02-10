@@ -4,6 +4,7 @@ import { Observable } from 'rxjs'
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
+import { ApiService } from '@tezblock/services/api/api.service'
 
 @Component({
   selector: 'amount-cell',
@@ -57,16 +58,16 @@ export class AmountCellComponent implements OnInit {
   }
   public showOldValue: boolean = false
 
-  constructor(private readonly cryptoPricesService: CryptoPricesService, private readonly chartDataService: ChartDataService) {
+  constructor(
+    private readonly cryptoPricesService: CryptoPricesService,
+    private readonly chartDataService: ChartDataService,
+    private apiService: ApiService
+  ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
 
   public dayDifference(oldTimestamp: number): number {
-    let currentTimestamp = +new Date()
-    const difference = currentTimestamp - oldTimestamp
-    const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
-
-    return daysDifference
+    return this.apiService.calcateDayDifference(oldTimestamp)
   }
 
   ngOnInit(): void {

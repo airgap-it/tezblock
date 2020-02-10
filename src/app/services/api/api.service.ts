@@ -1377,4 +1377,12 @@ export class ApiService {
         map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
   }
+
+  calcateDayDifference(oldTimestamp: number): number {
+    let currentTimestamp = new Date().getTime()
+    const difference = currentTimestamp - oldTimestamp
+    const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
+
+    return daysDifference
+  }
 }

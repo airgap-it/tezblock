@@ -5,7 +5,7 @@ import { Block } from 'src/app/interfaces/Block'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
-import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
+import { ApiService } from '@tezblock/services/api/api.service'
 
 @Component({
   selector: 'block-detail-wrapper',
@@ -65,7 +65,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly chartDataService: ChartDataService,
-    private amountCell: AmountCellComponent
+    private apiService: ApiService
   ) {}
 
   public ngOnInit() {
@@ -79,7 +79,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   }
 
   public dayDifference(oldTimestamp: number): number {
-    return this.amountCell.dayDifference(oldTimestamp)
+    return this.apiService.calcateDayDifference(oldTimestamp)
   }
 
   public getHistoricFiatAmount(key: string): number {

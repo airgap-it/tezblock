@@ -9,7 +9,7 @@ import { Observable } from 'rxjs'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
-import { AmountCellComponent } from '../tezblock-table/amount-cell/amount-cell.component'
+import { ApiService } from '@tezblock/services/api/api.service'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -86,7 +86,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
     private readonly copyService: CopyService,
     private readonly toastrService: ToastrService,
     private readonly chartDataService: ChartDataService,
-    private amountCell: AmountCellComponent
+    private apiService: ApiService
   ) {}
 
   public ngOnInit() {
@@ -112,7 +112,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
   }
 
   public dayDifference(oldTimestamp: number): number {
-    return this.amountCell.dayDifference(oldTimestamp)
+    return this.apiService.calcateDayDifference(oldTimestamp)
   }
 
   public getHistoricFiatAmount(key: string): number {
