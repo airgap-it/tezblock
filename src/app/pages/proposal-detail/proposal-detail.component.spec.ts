@@ -17,8 +17,6 @@ import { AddressItemComponent } from './../../components/address-item/address-it
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
-import { ChartItemComponent } from '@tezblock/components/chart-item/chart-item.component'
-import { ClientSideTableComponent } from '@tezblock/components/client-side-table/client-side-table.component'
 import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
 import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
 import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
