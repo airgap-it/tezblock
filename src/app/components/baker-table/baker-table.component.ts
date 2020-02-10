@@ -62,6 +62,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   efficiencyLast10CyclesLoading$: Observable<boolean>
 
   activeDelegations$: Observable<number>
+  isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance: number | undefined
   rewardsExpandedRow: ExpandedRow<ExpTezosRewards>
@@ -189,6 +190,17 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
     this.upcomingRights$ = this.store$.select(state => state.bakerTable.upcomingRights)
     this.upcomingRightsLoading$ = this.store$.select(state => state.bakerTable.busy.upcomingRights)
+    this.isRightsTabAvailable$ = this.store$
+      .select(state => state.bakerTable.upcomingRights)
+      .pipe(
+        map(upcomingRights =>
+          !upcomingRights
+            ? true
+            : this.selectedTab.kind === 'baking_rights'
+            ? upcomingRights.baking !== null
+            : upcomingRights.endorsing !== null
+        )
+      )
 
     this.setupExpandedRows()
     this.setupTables()
@@ -307,8 +319,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: BakingRights) => ({ data: { amount: item.deposit } })
           }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }
@@ -334,8 +345,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
           }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }

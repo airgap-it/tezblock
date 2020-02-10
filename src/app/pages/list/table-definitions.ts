@@ -331,35 +331,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       }
     ].concat(<any>blockAndTxHashColumns),
 
-  /* BAKER */
-  [OperationTypes.BakerOverview]: () => [
-    {
-      name: 'Baker',
-      field: 'pkh',
-      template: Template.address
-    },
-    {
-      name: 'Balance',
-      field: 'balance',
-      template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.balance, timestamp: item.timestamp } })
-    },
-    {
-      name: '# of Votes',
-      field: 'number_of_votes'
-    },
-    {
-      name: 'Staking Balance',
-      field: 'staking_balance',
-      template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.staking_balance, timestamp: item.timestamp } })
-    },
-    {
-      name: '# of Delegators',
-      field: 'number_of_delegators'
-    }
-  ],
-
   /* PROPOSAL */
   [OperationTypes.ProposalOverview]: () => [
     {
@@ -375,6 +346,29 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Period',
       field: 'period'
+    }
+  ],
+
+  /* CONTRACT */
+  [OperationTypes.Contract]: () => [
+    {
+      name: 'Token',
+      field: 'id',
+      template: Template.address
+    },
+    {
+      name: 'Contract Address',
+      field: 'id',
+      template: Template.address,
+      data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
+    },
+    {
+      name: 'Symbol',
+      field: 'symbol'
+    },
+    {
+      name: 'Description',
+      field: 'description'
     }
   ]
 }

@@ -2,41 +2,34 @@ import { createReducer, on } from '@ngrx/store'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Baker } from '@tezblock/services/api/api.service'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
-
-const preprocessBakersData = (bakerData: any[]) =>
-  bakerData.map(bakerDataItem => ({
-    ...bakerDataItem,
-    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
-  }))
+import { Contract } from '@tezblock/domain/contract'
 
 export interface State {
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
-  activeBakers: TableState<Baker>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
-
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
   transactionsCountLastXd: number[]
+  contracts: TableState<Contract>
 }
 
 const initialState: State = {
   doubleBakings: getInitialTableState(),
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
-  activeBakers: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
-  transactionsCountLastXd: undefined
+  transactionsCountLastXd: undefined,
+  contracts: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -105,68 +98,6 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.loadActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: true
-    }
-  })),
-  on(actions.loadActiveBakersSucceeded, (state, { activeBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      data: preprocessBakersData(activeBakers),
-      loading: false
-    }
-  })),
-  on(actions.loadActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      loading: false
-    }
-  })),
-  on(actions.increasePageOfActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        currentPage: state.activeBakers.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakers, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: undefined
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersSucceeded, (state, { totalActiveBakers }) => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: totalActiveBakers
-      }
-    }
-  })),
-  on(actions.loadTotalActiveBakersFailed, state => ({
-    ...state,
-    activeBakers: {
-      ...state.activeBakers,
-      pagination: {
-        ...state.activeBakers.pagination,
-        total: null
-      }
-    }
-  })),
   on(actions.loadProposals, state => ({
     ...state,
     proposals: {
@@ -222,6 +153,42 @@ export const reducer = createReducer(
   on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
     ...state,
     transactionsCountLastXd
+  })),
+  on(actions.loadContracts, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      loading: true
+    }
+  })),
+  on(actions.loadContractsSucceeded, (state, { contracts }) => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      data: contracts.data,
+      pagination: {
+        ...state.contracts.pagination,
+        total: contracts.total
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadContractsFailed, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfContracts, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      pagination: {
+        ...state.contracts.pagination,
+        currentPage: state.contracts.pagination.currentPage + 1
+      }
+    }
   })),
   on(actions.reset, () => initialState)
 )

@@ -49,7 +49,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   loading$: Observable<boolean>
   transferOperations$: Observable<ContractOperation[]>
   showLoadMore$: Observable<boolean>
-  columns: Column[]
+  columns$: Observable<Column[]>
   current: string = 'copyGrey'
 
   get isMainnet(): boolean {
@@ -69,7 +69,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
-        this.columns = columns[OperationTypes.Transaction]({ pageId: address, showFiatValue: this.isMainnet })
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
 
@@ -98,6 +97,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     ).pipe(
       map(([transferOperations, pagination]) =>
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
+      )
+    )
+    this.columns$ = combineLatest(this.address$, this.contract$).pipe(
+      filter(([address, contract]) => !!address && !!contract),
+      map(([address, contract]) =>
+        columns[OperationTypes.Transaction]({ pageId: address, showFiatValue: this.isMainnet, symbol: contract.symbol })
       )
     )
   }

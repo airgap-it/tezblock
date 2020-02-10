@@ -2,11 +2,12 @@ import { Injectable } from '@angular/core'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
-import { BehaviorSubject, combineLatest, Observable, timer, from } from 'rxjs'
-import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import { combineLatest, Observable, from, of } from 'rxjs'
+import { distinctUntilChanged, map, switchMap, tap, catchError } from 'rxjs/operators'
 
 import { Facade, disctinctChartData } from '../facade/facade'
-import { ObserveOnOperator } from 'rxjs/internal/operators/observeOn'
+import { CacheService, CacheKeys, Currency } from '@tezblock/services/cache/cache.service'
+import { get } from 'lodash'
 
 export interface CurrencyInfo {
   symbol: string
@@ -59,38 +60,38 @@ export class CryptoPricesService extends Facade<CryptoPricesServiceState> {
     distinctUntilChanged()
   )
 
-  constructor() {
+  constructor(private readonly cacheService: CacheService) {
     super(initialState)
 
     // We need this to not trigger infinite refreshes
-    const fiatCurrencyInfo$ = this.fiatCurrencyInfo$.pipe(
-      distinctUntilChanged(
-        (previous, current) => previous.currency === current.currency && previous.price.toString(10) === current.price.toString(10)
-      )
-    )
-    // We need this to not trigger infinite refreshes
-    const cryptoCurrencyInfo$ = this.cryptoCurrencyInfo$.pipe(
-      distinctUntilChanged(
-        (previous, current) => previous.currency === current.currency && previous.price.toString(10) === current.price.toString(10)
-      )
-    )
+    const currencyInfoDistinct = (previous: CurrencyInfo, current: CurrencyInfo): boolean =>
+      previous.currency === current.currency && previous.price.toString(10) === current.price.toString(10)
 
+    const fiatCurrencyInfo$ = this.fiatCurrencyInfo$.pipe(distinctUntilChanged(currencyInfoDistinct))
+    const cryptoCurrencyInfo$ = this.cryptoCurrencyInfo$.pipe(distinctUntilChanged(currencyInfoDistinct))
     const historicData$ = this.historicData$.pipe(distinctUntilChanged())
 
-    combineLatest([fiatCurrencyInfo$, cryptoCurrencyInfo$, this.timer$])
+    combineLatest([fiatCurrencyInfo$, cryptoCurrencyInfo$, this.timer$, this.cacheService.get<Currency>(CacheKeys.currency)])
       .pipe(
-        switchMap(([fiatCurrencyInfo, cryptoCurrencyInfo, _]) => {
-          return new Observable<{ fiatPrice: BigNumber; cryptoPrice: BigNumber }>(observer => {
-            this.getCryptoPrices('xtz', [fiatCurrencyInfo.currency, cryptoCurrencyInfo.currency])
-              .then((prices: { [key: string]: number }) => {
-                const fiatPrice = new BigNumber(prices[fiatCurrencyInfo.currency])
-                const cryptoPrice = new BigNumber(prices[cryptoCurrencyInfo.currency])
-                observer.next({ fiatPrice, cryptoPrice })
-              })
-              // tslint:disable-next-line:no-console
-              .catch(console.error)
-          })
-        })
+        switchMap(([fiatCurrencyInfo, cryptoCurrencyInfo, _, currency]) =>
+          this.getCryptoPrices('xtz', [fiatCurrencyInfo.currency, cryptoCurrencyInfo.currency]).pipe(
+            map(prices => {
+              const fiatCurrency = get(prices, fiatCurrencyInfo.currency) || get(currency, fiatCurrencyInfo.currency)
+              const cryptoCurrency = get(prices, cryptoCurrencyInfo.currency) || get(currency, cryptoCurrencyInfo.currency)
+              const fiatPrice = new BigNumber(fiatCurrency)
+              const cryptoPrice = new BigNumber(cryptoCurrency)
+
+              return { fiatPrice, cryptoPrice }
+            }),
+            catchError(error => {
+              console.error(error)
+              const fiatPrice = new BigNumber(get(currency, fiatCurrencyInfo.currency))
+              const cryptoPrice = new BigNumber(get(currency, cryptoCurrencyInfo.currency))
+
+              return of({ fiatPrice, cryptoPrice })
+            })
+          )
+        )
       )
       .subscribe(({ fiatPrice, cryptoPrice }) => {
         const fiatCurrencyInfo = { ...this._state.fiatCurrencyInfo, price: fiatPrice }
@@ -142,8 +143,15 @@ export class CryptoPricesService extends Facade<CryptoPricesServiceState> {
     this.updateState({ ...this._state, cryptoCurrencyInfo, loading: true })
   }
 
-  public getCryptoPrices(protocolIdentifier: string, baseSymbols = ['USD', 'BTC']): Promise<{ [key: string]: number }> {
-    return cryptocompare.price(protocolIdentifier.toUpperCase(), baseSymbols)
+  public getCryptoPrices(protocolIdentifier: string, baseSymbols = ['USD', 'BTC']): Observable<{ [key: string]: number }> {
+    return from(<Promise<{ [key: string]: number }>>cryptocompare.price(protocolIdentifier.toUpperCase(), baseSymbols)).pipe(
+      tap(prices => {
+        const change = baseSymbols
+          .map(baseSymbol => ({ [baseSymbol]: prices[baseSymbol] }))
+          .reduce((accumulator, currentValue) => ({ ...currentValue, ...accumulator }), {})
+        this.cacheService.update<Currency>(CacheKeys.currency, value => ({ ...value, ...change }))
+      })
+    )
   }
 
   public getGrowthPercentage(priceNow: BigNumber, startingPrice: MarketDataSample[]): number | undefined {

@@ -18,3 +18,12 @@ export interface AggregatedBakingRights {
   fees: number
   items: BakingRights[]
 }
+
+export const getEmptyAggregatedBakingRight = () => ({
+  cycle: null,
+  bakingsCount: 0,
+  blockRewards: null,
+  deposits: null,
+  fees: 0,
+  items: []
+})

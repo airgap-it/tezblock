@@ -65,6 +65,7 @@ import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { HealthComponent } from './pages/health/health.component'
 import { ListEffects } from './pages/list/effects'
 import { AccountDetailEffects } from './pages/account-detail/effects'
 import { BlockDetailEffects } from './pages/block-detail/effects'
@@ -78,6 +79,9 @@ import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-co
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { TezblockTableComponent } from './components/tezblock-table/tezblock-table.component'
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
+import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { BakersEffects } from './pages/baker-overview/effects'
+import { HealthEffects } from './pages/health/effects'
 
 @NgModule({
   imports: [
@@ -121,7 +125,9 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
       BlockDetailEffects,
       TransactionDetailEffects,
       ProposalDetailEffects,
-      ContractDetailEffects
+      ContractDetailEffects,
+      BakersEffects,
+      HealthEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -168,7 +174,9 @@ import { ClientSideTableComponent } from './components/client-side-table/client-
     OccurrenceStatisticsComponent,
     TezblockTableComponent,
     ClientSideTableComponent,
-    ContractDetailComponent
+    ContractDetailComponent,
+    BakerOverviewComponent,
+    HealthComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

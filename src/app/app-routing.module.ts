@@ -11,10 +11,13 @@ import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-w
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
+import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
+import { HealthComponent } from './pages/health/health.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'resources/wallets', component: ResourcesWalletsComponent },
+  { path: 'baker/list', component: BakerOverviewComponent },
   { path: ':route/list', component: ListComponent },
   { path: 'block/:id', component: BlockDetailComponent },
   { path: 'account/:id', component: AccountDetailComponent },
@@ -22,7 +25,8 @@ const routes: Routes = [
   { path: 'endorsement/:id', component: EndorsementDetailComponent },
   { path: 'constants', component: ProtocolConstantComponent },
   { path: 'proposal/:id', component: ProposalDetailComponent },
-  { path: 'contract/:id', component: ContractDetailComponent }
+  { path: 'contract/:id', component: ContractDetailComponent },
+  { path: 'health', component: HealthComponent }
 ]
 
 @NgModule({

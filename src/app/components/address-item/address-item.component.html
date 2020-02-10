@@ -7,7 +7,7 @@
       <a *ngSwitchCase="false" class="btn p-0" role="button">
         {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
       </a>
-      <a *ngSwitchDefault [routerLink]="['/account', address]" class="btn btn-link p-0" role="button">
+      <a *ngSwitchDefault [routerLink]="[path, address]" class="btn btn-link p-0" role="button">
         {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
       </a>
     </div>

@@ -7,8 +7,8 @@ import { Observable, of, pipe, from, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
-import { AggregatedBakingRights, BakingRights } from './../../interfaces/BakingRights'
-import { EndorsingRights, AggregatedEndorsingRights } from './../../interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from './../../interfaces/BakingRights'
+import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from './../../interfaces/EndorsingRights'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
@@ -52,6 +52,10 @@ export interface Balance {
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const cycleToLevel = (cycle: number): number => cycle * 4096
 export const addCycleFromLevel = right => ({ ...right, cycle: Math.floor(right.level / 4096) })
+
+function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
+  return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
+}
 
 @Injectable({
   providedIn: 'root'
@@ -988,7 +992,7 @@ export class ApiService {
                     )
                     return {
                       ...aggregatedRight,
-                      blockRewards: reward.totalRewards,
+                      blockRewards: reward.bakingRewards,
                       deposits: reward.bakingDeposits,
                       fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
@@ -1003,7 +1007,8 @@ export class ApiService {
               )
             )
           }),
-          map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle))
+          map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
         )
       })
     )
@@ -1082,7 +1087,7 @@ export class ApiService {
 
                     return {
                       ...aggregatedRight,
-                      endorsementRewards: reward.totalRewards,
+                      endorsementRewards: reward.endorsingRewards,
                       deposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
@@ -1095,7 +1100,8 @@ export class ApiService {
               )
             )
           }),
-          map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle))
+          map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
       })
     )

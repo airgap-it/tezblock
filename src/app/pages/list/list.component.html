@@ -51,23 +51,10 @@
           <ng-container *ngSwitchCase="'double-endorsement'">
             Double Endorsement Evidence
           </ng-container>
-          <ng-container *ngSwitchCase="'bakers'">
-            Bakers
+          <ng-container *ngSwitchCase="'contract'">
+            Token Contracts
           </ng-container>
         </h5>
-        <div *ngIf="(routeName$ | async) === 'bakers'" class="row">
-          <div class="col py-3">
-            <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
-              <h5 class="card-title__secondary mb-3 ">
-                Total Number of Bakers
-              </h5>
-              <h3>
-                {{ totalActiveBakers }}
-                <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
-              </h3>
-            </ng-container>
-          </div>
-        </div>
         <div class="row">
           <div class="col px-2">
             <tezblock-table
