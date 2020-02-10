@@ -282,7 +282,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortDoubleBakingsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'double-endorsement':
-        // this.store$.dispatch(actions.increasePageOfDoubleEndorsements())
+        this.store$.dispatch(actions.sortDoubleEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'bakers':
         // this.store$.dispatch(actions.increasePageOfActiveBakers())

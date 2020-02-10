@@ -117,6 +117,14 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.sortDoubleEndorsementsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    doubleEndorsements: {
+      ...state.doubleEndorsements,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
   on(actions.loadActiveBakers, state => ({
     ...state,
     activeBakers: {

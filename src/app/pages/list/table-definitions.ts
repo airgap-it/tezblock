@@ -358,7 +358,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Age',
         field: 'timestamp',
         template: Template.timestamp,
-        sortable: false
+        sortable: true
       },
       {
         name: 'Reward',

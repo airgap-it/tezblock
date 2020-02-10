@@ -82,16 +82,52 @@ export class ListEffects {
     )
   )
 
+  onSortingDoubleEndorsements$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortDoubleEndorsementsByKind),
+      map(() => listActions.loadDoubleEndorsements())
+    )
+  )
+
   getDoubleEndorsements$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadDoubleEndorsements),
-      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
-      switchMap(([action, pagination]) =>
-        this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence']).pipe(
-          map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
-          catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
-        )
-      )
+      withLatestFrom(
+        this.store$.select(state => state.list.doubleEndorsements.pagination),
+        this.store$.select(state => state.list.doubleEndorsements.sortingValue),
+        this.store$.select(state => state.list.doubleEndorsements.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService
+            .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'])
+            .pipe(
+              map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+              catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+            )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService
+              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'])
+              .pipe(
+                map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+                catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+              )
+          } else {
+            return this.apiService
+              .getLatestTransactions(
+                pagination.selectedSize * pagination.currentPage,
+                ['double_baking_evidence'],
+                sortingValue,
+                sortingDirection
+              )
+              .pipe(
+                map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+                catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+              )
+          }
+        }
+      })
     )
   )
 

@@ -25,6 +25,10 @@ export const loadDoubleEndorsementsSucceeded = createAction(
 )
 export const loadDoubleEndorsementsFailed = createAction(`[${featureName}] Load Double Endorsements Failed`, props<{ error: any }>())
 export const increasePageOfDoubleEndorsements = createAction(`[${featureName}] Increase Page Of Double Endorsements`)
+export const sortDoubleEndorsementsByKind = createAction(
+  `[${featureName}] Sort Double Endorsements`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadActiveBakers = createAction(`[${featureName}] Load Active Bakers`)
 export const loadActiveBakersSucceeded = createAction(`[${featureName}] Load Active Bakers Succeeded`, props<{ activeBakers: Baker[] }>())
