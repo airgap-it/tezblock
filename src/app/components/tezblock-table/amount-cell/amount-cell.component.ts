@@ -36,7 +36,7 @@ export class AmountCellComponent implements OnInit {
 
   public enableComparison: boolean = false
 
-  public amount: number
+  public amount: number | BigNumber
 
   public tooltipClick() {
     let daysDifference = this.dayDifference(this.data.timestamp)
@@ -44,14 +44,13 @@ export class AmountCellComponent implements OnInit {
       let date = new Date(this.data.timestamp)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
         let oldValue = new BigNumber(response[1].close)
-        let amount
         if (this.showFee) {
-          amount = new BigNumber(this.data.fee)
+          this.amount = new BigNumber(this.data.fee)
         } else {
-          amount = new BigNumber(this.amount)
+          this.amount = new BigNumber(this.amount)
         }
 
-        this.historicFiatAmount = amount.multipliedBy(oldValue).toNumber()
+        this.historicFiatAmount = this.amount.multipliedBy(oldValue).toNumber()
         this.showOldValue = !this.showOldValue
       })
     }
@@ -76,6 +75,8 @@ export class AmountCellComponent implements OnInit {
       this.enableComparison = difference >= 1
       if (this.fromBlock) {
         this.amount = this.data.volume
+      } else if (this.showFee) {
+        this.amount = this.data.fee
       } else {
         this.amount = this.data.amount
       }
