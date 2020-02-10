@@ -18,7 +18,7 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'block'"
-              [loading]="transactionsLoading$"
+              [loading]="transactionsLoading$ | async"
               [data]="transactions$ | async"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"

@@ -5,13 +5,26 @@ import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
+import { MetaVotingPeriod } from '@tezblock/domain/vote'
+
+const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
+  if (!state.metaVotingPeriods) {
+    return metaVotingPeriods
+  }
+
+  return metaVotingPeriods.map(metaVotingPeriod => {
+    const match = state.metaVotingPeriods.find(_metaVotingPeriod => _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind)
+
+    return { ...match, [property]: metaVotingPeriod[property] }
+  })
+}
 
 export interface State {
   id: string
   proposal: ProposalDto
   loadingProposal: boolean
   periodKind: string
-  metaVotingPeriod: number
+  metaVotingPeriods: MetaVotingPeriod[]
   votes: TableState<Transaction>
 }
 
@@ -20,7 +33,7 @@ const initialState: State = {
   proposal: undefined,
   loadingProposal: false,
   periodKind: undefined,
-  metaVotingPeriod: undefined,
+  metaVotingPeriods: undefined,
   votes: getInitialTableState()
 }
 
@@ -42,11 +55,15 @@ export const reducer = createReducer(
     proposal: null,
     loadingProposal: false
   })),
-  on(actions.loadMetaVotingPeriodSucceeded, (state, { metaVotingPeriod }) => ({
+  on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
     ...state,
-    metaVotingPeriod
+    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'value')
   })),
-  on(actions.loadMetaVotingPeriodFailed, state => ({
+  on(actions.loadVotesTotalSucceeded, (state, { metaVotingPeriods }) => ({
+    ...state,
+    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'count')
+  })),
+  on(actions.loadMetaVotingPeriodsFailed, state => ({
     ...state,
     votes: {
       ...state.votes,
@@ -74,6 +91,16 @@ export const reducer = createReducer(
     votes: {
       ...state.votes,
       loading: false
+    }
+  })),
+  on(actions.increasePageSize, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      pagination: {
+        ...state.votes.pagination,
+        currentPage: state.votes.pagination.currentPage + 1
+      }
     }
   }))
 )

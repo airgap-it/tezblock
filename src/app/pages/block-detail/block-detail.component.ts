@@ -19,7 +19,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
-import { OperationTypes, LayoutPages } from '@tezblock/domain/operations'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 
 @Component({

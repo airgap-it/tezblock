@@ -28,7 +28,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
-import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
@@ -112,7 +112,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   isBusy$: Observable<Busy>
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
-  actionType$: Observable<LayoutPages>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
 
@@ -175,7 +174,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.remainingTime$ = this.cycleService.remainingTime$
     this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
-    this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )

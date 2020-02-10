@@ -5,7 +5,7 @@
         <span class="d-none d-sm-inline-block">
           {{ tab.title }}
         </span>
-        <fa-icon [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
+        <fa-icon *ngIf="tab.icon" [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
       </button>
       <span class="badge badge-pill d-none d-sm-inline-block" [ngClass]="tab.active ? 'badge-primary' : 'badge-primary-light'">
         {{ tab.count || 0 }}
@@ -24,7 +24,7 @@
   <tezblock-table
     [columns]="selectedTab.columns"
     [data]="data"
-    [loading]="loading | async"
+    [loading]="loading"
     [pagination]="data && selectedTab && data.length < selectedTab.count"
     (onLoadMore)="onLoadMore()"
     (downloadClicked)="download()"

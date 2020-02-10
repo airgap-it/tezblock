@@ -1,9 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { Observable } from 'rxjs'
 import { filter } from 'rxjs/operators'
 
-import { LayoutPages } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { DownloadService } from '@tezblock/services/download/download.service'
 import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab'
@@ -11,7 +9,8 @@ import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab'
 @Component({
   selector: 'tabbed-table',
   templateUrl: './tabbed-table.component.html',
-  styleUrls: ['./tabbed-table.component.scss']
+  styleUrls: ['./tabbed-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
@@ -19,18 +18,16 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   @Input()
   set tabs(value: Tab[]) {
-    if (value !== this._tabs) {
+    if (value !== null && value !== this._tabs) {
       const selectedTab = value.find(tab => tab.active)
 
       this._tabs = value
 
+      this.updateSelectedTab(selectedTab)
+
       if (this._tabs.some(tab => tab.count > 0)) {
         this.setInitTabSelection()
-
-        return
       }
-
-      this.updateSelectedTab(selectedTab)
     }
   }
 
@@ -39,13 +36,10 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   @Input()
-  actionType$: Observable<LayoutPages>
-
-  @Input()
   data: any[]
 
   @Input()
-  loading: Observable<boolean>
+  loading: boolean
 
   @Input()
   downloadable?: boolean = false
@@ -74,7 +68,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    const isSet = (tab: Tab) => this.tabs.find(_tab => _tab.title === tab.title).count !== null
+    const isSet = (tab: Tab) => tab && this.tabs.find(_tab => _tab.title === tab.title).count !== null
 
     this.subscriptions.push(
       this.activatedRoute.queryParamMap
@@ -99,7 +93,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const firstTabWithData = this.tabs.find(hasData)
     const selectedTab = tabFromQuery || firstTabWithData
 
-    if (selectedTab !== this.selectedTab) {
+    if (selectedTab && (!this.selectedTab || selectedTab.title !== this.selectedTab.title)) {
       this.selectTab(selectedTab)
     }
   }
@@ -123,7 +117,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   private selectTab(selectedTab: Tab) {
-    if (selectedTab.title === this.selectedTab.title) {
+    if (this.selectedTab && selectedTab.title === this.selectedTab.title) {
       return
     }
 

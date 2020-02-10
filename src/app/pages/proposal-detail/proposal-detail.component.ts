@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable } from 'rxjs'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Actions, ofType } from '@ngrx/effects'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CopyService } from 'src/app/services/copy/copy.service'
@@ -10,8 +11,10 @@ import * as actions from './actions'
 import * as fromRoot from '@tezblock/reducers'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { Tab } from '@tezblock/domain/tab'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { columns } from './table-definitions'
+import { PeriodKind } from '@tezblock/domain/vote'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -20,6 +23,8 @@ import { columns } from './table-definitions'
 })
 export class ProposalDetailComponent extends BaseComponent implements OnInit {
   proposal$: Observable<ProposalDto>
+  votes$: Observable<Transaction[]>
+  loading$: Observable<boolean>
   tabs: Tab[]
 
   get isMainnet(): boolean {
@@ -27,6 +32,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   }
 
   constructor(
+    private readonly actions$: Actions,
     private readonly activatedRoute: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
@@ -42,19 +48,37 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadProposal({ id }))
         this.store$.dispatch(actions.loadVotes({ periodKind: 'testing_vote' }))
         this.setTabs()
-      })
+      }),
+
+      this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
+        ({ metaVotingPeriods }) =>
+          (this.tabs = updateTabCounts(
+            this.tabs,
+            metaVotingPeriods.map(metaVotingPeriod => ({
+              key: metaVotingPeriod.periodKind,
+              count: metaVotingPeriod.count
+            }))
+          ))
+      )
     )
   }
 
   ngOnInit() {
     this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
-    this.store$.select(state => state.proposalDetails.votes).subscribe(x => {
-      const foo = x
-    })
+    this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
+    this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
   }
 
   copyToClipboard() {
     this.copyService.copyToClipboard(fromRoot.getState(this.store$).proposalDetails.proposal.proposal)
+  }
+
+  onLoadMore() {
+    this.store$.dispatch(actions.increasePageSize())
+  }
+
+  tabSelected(periodKind: string) {
+    this.store$.dispatch(actions.loadVotes({ periodKind }))
   }
 
   private setTabs() {
@@ -62,28 +86,28 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       {
         title: 'Proposal',
         active: true,
-        kind: 'proposal',
+        kind: PeriodKind.Proposal,
         count: undefined,
         columns
       },
       {
         title: 'Expolration',
         active: false,
-        kind: 'expolration',
+        kind: PeriodKind.Exploration,
         count: undefined,
         columns
       },
       {
         title: 'Testing',
         active: false,
-        kind: 'testing',
+        kind: PeriodKind.Testing,
         count: undefined,
         columns
       },
       {
         title: 'Promotion',
         active: false,
-        kind: 'promotion',
+        kind: PeriodKind.Promotion,
         count: undefined,
         columns
       }

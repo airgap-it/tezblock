@@ -23,6 +23,11 @@ export interface Count {
   count: number
 }
 
+export interface GetTabsArguments {
+  options: { pageId: string; showFiatValue: boolean }
+  counts: Count[]
+}
+
 export const isTabKindEqualTo = (kind: string) => (tab: Tab): boolean =>
   Array.isArray(tab.kind) ? tab.kind.indexOf(kind) !== -1 : tab.kind === kind
 

@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { MetaVotingPeriod } from '@tezblock/domain/vote'
 
 const featureName = 'Proposal Details'
 
@@ -15,10 +16,12 @@ export const loadVotes = createAction(`[${featureName}] Load Votes`, props<{ per
 export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: Transaction[] }>())
 export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
 
-export const loadMetaVotingPeriod = createAction(`[${featureName}] Load Meta Voting Period`)
-export const loadMetaVotingPeriodSucceeded = createAction(`[${featureName}] Load Meta Voting Period Succeeded`, props<{ metaVotingPeriod: number }>())
-export const loadMetaVotingPeriodFailed = createAction(`[${featureName}] Load Meta Voting Period Failed`, props<{ error: any }>())
+export const loadMetaVotingPeriods = createAction(`[${featureName}] Load Meta Voting Periods`)
+export const loadMetaVotingPeriodsSucceeded = createAction(`[${featureName}] Load Meta Voting Periods Succeeded`, props<{ metaVotingPeriods: MetaVotingPeriod[] }>())
+export const loadMetaVotingPeriodsFailed = createAction(`[${featureName}] Load Meta Voting Periods Failed`, props<{ error: any }>())
 
 export const loadVotesTotal = createAction(`[${featureName}] Load Votes Total`)
-export const loadVotesTotalSucceeded = createAction(`[${featureName}] Load Votes Total Succeeded`, props<{ total: number }>())
+export const loadVotesTotalSucceeded = createAction(`[${featureName}] Load Votes Total Succeeded`, props<{ metaVotingPeriods: MetaVotingPeriod[] }>())
 export const loadVotesTotalFailed = createAction(`[${featureName}] Load Votes Total Failed`, props<{ error: any }>())
+
+export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
