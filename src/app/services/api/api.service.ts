@@ -799,16 +799,18 @@ export class ApiService {
     })
   }
 
-  getLatestBlocks(limit: number): Observable<Block[]> {
+  getLatestBlocks(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
+    let orderBy = {
+      field: 'timestamp',
+      direction: 'desc'
+    }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http.post<Block[]>(
       this.blocksApiUrl,
       {
-        orderBy: [
-          {
-            field: 'timestamp',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [orderBy],
         limit
       },
       this.options
