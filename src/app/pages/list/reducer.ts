@@ -22,6 +22,7 @@ export interface State {
   activeBakers: TableState<Baker>
   activations: TableState<Transaction>
   originations: TableState<Transaction>
+  endorsements: TableState<Transaction>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -40,6 +41,7 @@ const initialState: State = {
   activeBakers: getInitialTableState(),
   activations: getInitialTableState(),
   originations: getInitialTableState(),
+  endorsements: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -339,6 +341,47 @@ export const reducer = createReducer(
     ...state,
     proposals: {
       ...state.proposals,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
+
+  on(actions.loadEndorsements, state => ({
+    ...state,
+    endorsements: {
+      ...state.endorsements,
+      loading: true
+    }
+  })),
+  on(actions.loadEndorsementsSucceeded, (state, { endorsements }) => ({
+    ...state,
+    endorsements: {
+      ...state.endorsements,
+      data: endorsements,
+      loading: false
+    }
+  })),
+  on(actions.loadDoubleEndorsementsFailed, state => ({
+    ...state,
+    endorsements: {
+      ...state.endorsements,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfEndorsements, state => ({
+    ...state,
+    endorsements: {
+      ...state.endorsements,
+      pagination: {
+        ...state.endorsements.pagination,
+        currentPage: state.endorsements.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortEndorsementsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    endorsements: {
+      ...state.endorsements,
       sortingDirection: sortingDirection,
       sortingValue: sortingValue
     }

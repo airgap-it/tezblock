@@ -79,6 +79,18 @@ export const sortProposalsByKind = createAction(
   props<{ sortingValue: string; sortingDirection: string }>()
 )
 
+export const loadEndorsements = createAction(`[${featureName}] Load Endorsements`)
+export const loadEndorsementsSucceeded = createAction(
+  `[${featureName}] Load Endorsements Succeeded`,
+  props<{ endorsements: Transaction[] }>()
+)
+export const loadEndorsementsFailed = createAction(`[${featureName}] Load Endorsements Failed`, props<{ error: any }>())
+export const increasePageOfEndorsements = createAction(`[${featureName}] Increase Page Of Endorsements`)
+export const sortEndorsementsByKind = createAction(
+  `[${featureName}] Sort Endorsements`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
+
 export const loadTransactionsCountLast24h = createAction(`[${featureName}] Load Transactions Count Last 24h`)
 export const loadTransactionsCountLast24hSucceeded = createAction(
   `[${featureName}] Load Transactions Count Last 24h Succeeded`,

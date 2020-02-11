@@ -208,10 +208,14 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
             break
           case 'endorsement':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['endorsement'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['endorsement'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
+            const endorsementsLoading$ = this.store$.select(state => state.list.endorsements.loading)
+            const endorsementsData$ = this.store$.select(state => state.list.endorsements.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadEndorsements())))
+            this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }), endorsementsData$, endorsementsLoading$)
             break
           case 'vote':
             this.dataService = new TransactionService(this.apiService)
@@ -302,6 +306,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'origination':
         this.store$.dispatch(actions.increasePageOfOriginations())
         break
+      case 'endorsement':
+        this.store$.dispatch(actions.increasePageOfEndorsements())
+        break
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -335,6 +342,7 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'delegation':
         break
       case 'endorsement':
+        this.store$.dispatch(actions.sortEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'vote':
         break

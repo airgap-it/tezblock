@@ -241,7 +241,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
-      sortable: false
+      sortable: true
     },
     {
       name: 'Slots',
@@ -252,7 +252,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Block',
       field: 'block_level',
       template: Template.block,
-      sortable: false
+      sortable: true
     },
     {
       name: 'Tx Hash',

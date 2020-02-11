@@ -426,6 +426,51 @@ export class ListEffects {
     )
   )
 
+  endorsementsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfEndorsements),
+      map(() => listActions.loadEndorsements())
+    )
+  )
+
+  getEndorsements$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadEndorsements),
+      withLatestFrom(
+        this.store$.select(state => state.list.endorsements.pagination),
+        this.store$.select(state => state.list.endorsements.sortingValue),
+        this.store$.select(state => state.list.endorsements.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (sortingValue && sortingDirection) {
+          return this.apiService
+            .getLatestTransactions(
+              pagination.selectedSize * pagination.currentPage,
+              [OperationTypes.Endorsement],
+              sortingValue,
+              sortingDirection
+            )
+            .pipe(
+              map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
+              catchError(error => of(listActions.loadEndorsementsFailed({ error })))
+            )
+        } else {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Endorsement]).pipe(
+            map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
+            catchError(error => of(listActions.loadEndorsementsFailed({ error })))
+          )
+        }
+      })
+    )
+  )
+
+  onSortingEndorsements$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortEndorsementsByKind),
+      map(() => listActions.loadEndorsements())
+    )
+  )
+
   loadActivationsCountLast24h$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadActivationsCountLast24h),
