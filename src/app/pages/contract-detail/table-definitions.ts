@@ -11,6 +11,11 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
+      field: '',
+      width: '1',
+      template: Template.symbol
+    },
+    {
       name: 'To',
       field: 'singleTo',
       width: '1',

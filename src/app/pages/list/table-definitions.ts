@@ -366,6 +366,10 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       field: 'symbol'
     },
     {
+      name: 'Total Supply',
+      field: 'totalSupply'
+    },
+    {
       name: 'Description',
       field: 'description'
     }
