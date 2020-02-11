@@ -28,8 +28,8 @@ export class TransactionDetailEffects {
       ofType(actions.loadTransactionsByHash),
       withLatestFrom(
         this.store$.select(state => state.transactionDetails.pageSize),
-        this.store$.select(state => state.accountDetails.sortingValue),
-        this.store$.select(state => state.accountDetails.sortingDirection)
+        this.store$.select(state => state.accountDetails.sorting.value),
+        this.store$.select(state => state.accountDetails.sorting.direction)
       ),
       switchMap(([{ transactionHash }, pageSize, sortingValue, sortingDirection]) => {
         if (!sortingValue) {

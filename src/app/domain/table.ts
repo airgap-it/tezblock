@@ -7,8 +7,12 @@ export interface TableState<T> {
     total?: number
   }
   loading: boolean
-  sortingDirection: string
-  sortingValue: string
+  sorting: Sorting
+}
+
+export interface Sorting {
+  direction: string
+  value: string
 }
 
 export const getInitialTableState = (): TableState<any> => ({
@@ -20,6 +24,5 @@ export const getInitialTableState = (): TableState<any> => ({
     total: undefined
   },
   loading: false,
-  sortingDirection: undefined || 'asc' || 'desc',
-  sortingValue: undefined
+  sorting: { direction: undefined, value: undefined }
 })

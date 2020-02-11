@@ -45,8 +45,8 @@ export class ListEffects {
       ofType(listActions.loadBlocks),
       withLatestFrom(
         this.store$.select(state => state.list.blocks.pagination),
-        this.store$.select(state => state.list.blocks.sortingValue),
-        this.store$.select(state => state.list.blocks.sortingDirection)
+        this.store$.select(state => state.list.blocks.sorting.value),
+        this.store$.select(state => state.list.blocks.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         return this.apiService.getLatestBlocks(pagination.currentPage * pagination.selectedSize).pipe(
@@ -98,8 +98,8 @@ export class ListEffects {
       ofType(listActions.loadTransactions),
       withLatestFrom(
         this.store$.select(state => state.list.transactions.pagination),
-        this.store$.select(state => state.list.transactions.sortingValue),
-        this.store$.select(state => state.list.transactions.sortingDirection)
+        this.store$.select(state => state.list.transactions.sorting.value),
+        this.store$.select(state => state.list.transactions.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -143,8 +143,8 @@ export class ListEffects {
       ofType(listActions.loadActivations),
       withLatestFrom(
         this.store$.select(state => state.list.activations.pagination),
-        this.store$.select(state => state.list.activations.sortingValue),
-        this.store$.select(state => state.list.activations.sortingDirection)
+        this.store$.select(state => state.list.activations.sorting.value),
+        this.store$.select(state => state.list.activations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -188,8 +188,8 @@ export class ListEffects {
       ofType(listActions.loadOriginations),
       withLatestFrom(
         this.store$.select(state => state.list.originations.pagination),
-        this.store$.select(state => state.list.originations.sortingValue),
-        this.store$.select(state => state.list.originations.sortingDirection)
+        this.store$.select(state => state.list.originations.sorting.value),
+        this.store$.select(state => state.list.originations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -233,8 +233,8 @@ export class ListEffects {
       ofType(listActions.loadDelegations),
       withLatestFrom(
         this.store$.select(state => state.list.originations.pagination),
-        this.store$.select(state => state.list.originations.sortingValue),
-        this.store$.select(state => state.list.originations.sortingDirection)
+        this.store$.select(state => state.list.originations.sorting.value),
+        this.store$.select(state => state.list.originations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -278,8 +278,8 @@ export class ListEffects {
       ofType(listActions.loadDoubleBakings),
       withLatestFrom(
         this.store$.select(state => state.list.doubleBakings.pagination),
-        this.store$.select(state => state.list.doubleBakings.sortingValue),
-        this.store$.select(state => state.list.doubleBakings.sortingDirection)
+        this.store$.select(state => state.list.doubleBakings.sorting.value),
+        this.store$.select(state => state.list.doubleBakings.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -323,8 +323,8 @@ export class ListEffects {
       ofType(listActions.loadDoubleEndorsements),
       withLatestFrom(
         this.store$.select(state => state.list.doubleEndorsements.pagination),
-        this.store$.select(state => state.list.doubleEndorsements.sortingValue),
-        this.store$.select(state => state.list.doubleEndorsements.sortingDirection)
+        this.store$.select(state => state.list.doubleEndorsements.sorting.value),
+        this.store$.select(state => state.list.doubleEndorsements.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -370,8 +370,8 @@ export class ListEffects {
       ofType(listActions.loadActiveBakers),
       withLatestFrom(
         this.store$.select(state => state.list.activeBakers.pagination),
-        this.store$.select(state => state.list.activeBakers.sortingValue),
-        this.store$.select(state => state.list.activeBakers.sortingDirection)
+        this.store$.select(state => state.list.activeBakers.sorting.value),
+        this.store$.select(state => state.list.activeBakers.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -445,8 +445,8 @@ export class ListEffects {
       ofType(listActions.loadProposals),
       withLatestFrom(
         this.store$.select(state => state.list.proposals.pagination),
-        this.store$.select(state => state.list.proposals.sortingValue),
-        this.store$.select(state => state.list.proposals.sortingDirection)
+        this.store$.select(state => state.list.proposals.sorting.value),
+        this.store$.select(state => state.list.proposals.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
@@ -483,8 +483,8 @@ export class ListEffects {
       ofType(listActions.loadEndorsements),
       withLatestFrom(
         this.store$.select(state => state.list.endorsements.pagination),
-        this.store$.select(state => state.list.endorsements.sortingValue),
-        this.store$.select(state => state.list.endorsements.sortingDirection)
+        this.store$.select(state => state.list.endorsements.sorting.value),
+        this.store$.select(state => state.list.endorsements.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {

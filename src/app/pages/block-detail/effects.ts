@@ -40,8 +40,8 @@ export class BlockDetailEffects {
       ofType(actions.loadTransactionsByKind),
       withLatestFrom(
         this.store$.select(state => state.blockDetails.pageSize),
-        this.store$.select(state => state.blockDetails.sortingValue),
-        this.store$.select(state => state.blockDetails.sortingDirection)
+        this.store$.select(state => state.blockDetails.sorting.value),
+        this.store$.select(state => state.blockDetails.sorting.direction)
       ),
       switchMap(([{ blockHash, kind }, pageSize, sortingValue, sortingDirection]) => {
         if (!sortingValue) {

@@ -60,8 +60,8 @@ export class AccountDetailEffects {
       withLatestFrom(
         this.store$.select(state => state.accountDetails.pageSize),
         this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.sortingValue),
-        this.store$.select(state => state.accountDetails.sortingDirection)
+        this.store$.select(state => state.accountDetails.sorting.value),
+        this.store$.select(state => state.accountDetails.sorting.direction)
       ),
 
       switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) => {

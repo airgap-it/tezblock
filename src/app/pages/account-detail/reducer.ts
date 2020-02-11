@@ -77,6 +77,11 @@ export interface BakerTableRatings {
   tezosBakerRating: string
 }
 
+export interface Sorting {
+  direction: string
+  value: string
+}
+
 export interface State {
   address: string
   account: Account
@@ -90,8 +95,7 @@ export interface State {
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
-  sortingDirection: string
-  sortingValue: string
+  sorting: Sorting
 }
 
 const initialState: State = {
@@ -110,8 +114,7 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  sortingDirection: undefined || 'asc' || 'desc',
-  sortingValue: undefined
+  sorting: { direction: undefined, value: undefined }
 }
 
 export const reducer = createReducer(
@@ -186,8 +189,11 @@ export const reducer = createReducer(
 
   on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
     ...state,
-    sortingDirection: sortingDirection,
-    sortingValue: sortingValue
+    sorting: {
+      ...state.sorting,
+      direction: sortingDirection,
+      value: sortingValue
+    }
   })),
 
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({

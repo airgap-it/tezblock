@@ -111,8 +111,11 @@ export const reducer = createReducer(
     ...state,
     blocks: {
       ...state.blocks,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.blocks.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -152,8 +155,11 @@ export const reducer = createReducer(
     ...state,
     transactions: {
       ...state.transactions,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.transactions.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -193,8 +199,11 @@ export const reducer = createReducer(
     ...state,
     doubleBakings: {
       ...state.doubleBakings,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.doubleBakings.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
   on(actions.loadDoubleEndorsements, state => ({
@@ -233,8 +242,11 @@ export const reducer = createReducer(
     ...state,
     doubleEndorsements: {
       ...state.doubleEndorsements,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.doubleEndorsements.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
   on(actions.loadActiveBakers, state => ({
@@ -273,8 +285,11 @@ export const reducer = createReducer(
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.activeBakers.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
   on(actions.loadTotalActiveBakers, state => ({
@@ -343,8 +358,11 @@ export const reducer = createReducer(
     ...state,
     proposals: {
       ...state.proposals,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.proposals.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -384,8 +402,11 @@ export const reducer = createReducer(
     ...state,
     endorsements: {
       ...state.endorsements,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.endorsements.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -425,8 +446,11 @@ export const reducer = createReducer(
     ...state,
     activations: {
       ...state.activations,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.activations.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -466,8 +490,11 @@ export const reducer = createReducer(
     ...state,
     originations: {
       ...state.originations,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.originations.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
@@ -507,8 +534,11 @@ export const reducer = createReducer(
     ...state,
     delegations: {
       ...state.delegations,
-      sortingDirection: sortingDirection,
-      sortingValue: sortingValue
+      sorting: {
+        ...state.delegations.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
     }
   })),
 
