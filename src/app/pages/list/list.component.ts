@@ -222,10 +222,15 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }), endorsementsData$, endorsementsLoading$)
             break
           case 'vote':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['ballot', 'proposals'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['ballot', 'proposals'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
+
+            const votesLoading$ = this.store$.select(state => state.list.votes.loading)
+            const votesData$ = this.store$.select(state => state.list.votes.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadVotes())))
+            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$)
             break
           case 'double-baking':
             const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
@@ -316,6 +321,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'delegation':
         this.store$.dispatch(actions.increasePageOfDelegations())
         break
+      case 'vote':
+        this.store$.dispatch(actions.increasePageOfVotes())
+        break
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -353,6 +361,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'vote':
+        this.store$.dispatch(actions.sortVotesByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
 
       default:

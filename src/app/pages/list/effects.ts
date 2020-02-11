@@ -472,6 +472,51 @@ export class ListEffects {
     )
   )
 
+  votesPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfVotes),
+      map(() => listActions.loadVotes())
+    )
+  )
+
+  onSortingVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortVotesByKind),
+      map(() => listActions.loadVotes())
+    )
+  )
+
+  getVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadVotes),
+      withLatestFrom(
+        this.store$.select(state => state.list.votes.pagination),
+        this.store$.select(state => state.list.votes.sorting.value),
+        this.store$.select(state => state.list.votes.sorting.direction)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (sortingValue && sortingDirection) {
+          return this.apiService
+            .getLatestTransactions(
+              pagination.selectedSize * pagination.currentPage,
+              ['ballot', 'proposals'],
+              sortingValue,
+              sortingDirection
+            )
+            .pipe(
+              map(votes => listActions.loadVotesSucceeded({ votes })),
+              catchError(error => of(listActions.loadVotesFailed({ error })))
+            )
+        } else {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals']).pipe(
+            map(votes => listActions.loadVotesSucceeded({ votes })),
+            catchError(error => of(listActions.loadVotesFailed({ error })))
+          )
+        }
+      })
+    )
+  )
+
   endorsementsPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfEndorsements),

@@ -79,6 +79,12 @@ export const sortProposalsByKind = createAction(
   props<{ sortingValue: string; sortingDirection: string }>()
 )
 
+export const loadVotes = createAction(`[${featureName}] Load Votes`)
+export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: any[] }>())
+export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
+export const increasePageOfVotes = createAction(`[${featureName}] Increase Page Of Votes`)
+export const sortVotesByKind = createAction(`[${featureName}] Sort Votes`, props<{ sortingValue: string; sortingDirection: string }>())
+
 export const loadEndorsements = createAction(`[${featureName}] Load Endorsements`)
 export const loadEndorsementsSucceeded = createAction(
   `[${featureName}] Load Endorsements Succeeded`,

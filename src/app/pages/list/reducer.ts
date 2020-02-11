@@ -24,6 +24,7 @@ export interface State {
   originations: TableState<Transaction>
   endorsements: TableState<Transaction>
   delegations: TableState<Transaction>
+  votes: TableState<Transaction>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -44,6 +45,7 @@ const initialState: State = {
   originations: getInitialTableState(),
   endorsements: getInitialTableState(),
   delegations: getInitialTableState(),
+  votes: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -360,6 +362,50 @@ export const reducer = createReducer(
       ...state.proposals,
       sorting: {
         ...state.proposals.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
+    }
+  })),
+
+  on(actions.loadVotes, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: true
+    }
+  })),
+  on(actions.loadVotesSucceeded, (state, { votes }) => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      data: votes,
+      loading: false
+    }
+  })),
+  on(actions.loadVotesFailed, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfVotes, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      pagination: {
+        ...state.votes.pagination,
+        currentPage: state.votes.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortVotesByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      sorting: {
+        ...state.votes.sorting,
         direction: sortingDirection,
         value: sortingValue
       }

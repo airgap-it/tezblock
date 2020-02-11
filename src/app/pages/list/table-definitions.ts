@@ -197,7 +197,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Value',
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options }),
+        data: (item: Transaction) => ({ data: item.fee, options })
       },
       {
         name: 'Fee',
@@ -255,16 +255,19 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Ballot',
-        field: 'ballot'
+        field: 'ballot',
+        sortable: true
       },
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Kind',
-        field: 'kind'
+        field: 'kind',
+        sortable: true
       },
       {
         name: 'Voting Period',
