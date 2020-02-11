@@ -31,14 +31,14 @@ export class BlockDetailWrapperComponent implements OnInit {
   public blockLoading$: Observable<boolean> | undefined
 
   @Input()
-  public isMainnet: boolean = true
+  public isMainnet = true
 
   public historicFiatAmount = new Map<String, number>()
 
-  public enableComparison: boolean = false
+  public enableComparison = false
 
-  public showOldValueVolume: boolean = false
-  public showOldValueFee: boolean = false
+  public showOldValueVolume = false
+  public showOldValueFee = false
 
   public tooltipClick(amount: number | BigNumber, kind: string) {
     this.wrapperBlock$.subscribe((block: Block) => {

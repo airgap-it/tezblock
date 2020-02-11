@@ -29,7 +29,7 @@ import { DayDifferenceService } from '@tezblock/services/day-difference/day-diff
   ]
 })
 export class TransactionDetailWrapperComponent implements OnInit {
-  public current: string = 'copyGrey'
+  public current = 'copyGrey'
 
   @Input()
   public latestTransaction$: Observable<Transaction> | undefined
@@ -50,20 +50,20 @@ export class TransactionDetailWrapperComponent implements OnInit {
   public fiatInfo$: Observable<CurrencyInfo> | undefined
 
   @Input()
-  public isMainnet: boolean = true
+  public isMainnet = true
 
   public historicFiatAmount = new Map<String, number>()
 
-  public enableComparison: boolean = false
+  public enableComparison = false
 
-  public showOldValueVolume: boolean = false
-  public showOldValueFee: boolean = false
+  public showOldValueVolume = false
+  public showOldValueFee = false
 
   public tooltipClick(amount: number | BigNumber, kind: string) {
     this.latestTransaction$.subscribe((transaction: Transaction) => {
       const timestamp = transaction.timestamp
 
-      let daysDifference = this.dayDifference(timestamp)
+      const daysDifference = this.dayDifference(timestamp)
       if (daysDifference >= 1) {
         let date = new Date(timestamp)
         this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {

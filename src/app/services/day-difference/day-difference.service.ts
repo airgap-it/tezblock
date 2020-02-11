@@ -7,7 +7,7 @@ export class DayDifferenceService {
   constructor() {}
 
   calcateDayDifference(oldTimestamp: number): number {
-    let currentTimestamp = new Date().getTime()
+    const currentTimestamp = new Date().getTime()
     const difference = currentTimestamp - oldTimestamp
     const daysDifference = Math.floor(difference / 1000 / 60 / 60 / 24)
 
