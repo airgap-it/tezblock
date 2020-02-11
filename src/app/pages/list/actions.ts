@@ -143,6 +143,18 @@ export const sortOriginationsByKind = createAction(
   props<{ sortingValue: string; sortingDirection: string }>()
 )
 
+export const loadDelegations = createAction(`[${featureName}] Load Delegations`)
+export const loadDelegationsSucceeded = createAction(
+  `[${featureName}] Load Originations Succeeded`,
+  props<{ transactions: Transaction[] }>()
+)
+export const loadDelegationsFailed = createAction(`[${featureName}] Load Delegations Failed`, props<{ error: any }>())
+export const increasePageOfDelegations = createAction(`[${featureName}] Increase Page Of Delegations`)
+export const sortDelegationsByKind = createAction(
+  `[${featureName}] Sort Delegations`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
+
 export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
 export const loadTransactionsCountLastXdSucceeded = createAction(
   `[${featureName}] Load Transactions Count Last 30d Succeeded`,

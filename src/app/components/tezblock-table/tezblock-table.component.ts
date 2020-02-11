@@ -18,7 +18,7 @@ export interface Column {
   width?: string
   data?: (item: any) => any
   template?: TemplateRef<any> | Template
-  sortable?: boolean
+  sortable?: boolean | undefined
 }
 
 export interface ExpandedRow<Entity> {
@@ -38,8 +38,7 @@ export const blockAndTxHashColumns: Column[] = [
     name: 'Tx Hash',
     field: 'operation_group_hash',
     template: Template.hash,
-    data: (item: any) => ({ data: item.operation_group_hash }),
-    sortable: false
+    data: (item: any) => ({ data: item.operation_group_hash })
   }
 ]
 

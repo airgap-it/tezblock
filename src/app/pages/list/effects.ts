@@ -214,6 +214,51 @@ export class ListEffects {
     )
   )
 
+  onSortingDelgations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfDelegations),
+      map(() => listActions.loadDelegations())
+    )
+  )
+
+  delegationsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfDelegations),
+      map(() => listActions.loadDelegations())
+    )
+  )
+
+  getDelegations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadDelegations),
+      withLatestFrom(
+        this.store$.select(state => state.list.originations.pagination),
+        this.store$.select(state => state.list.originations.sortingValue),
+        this.store$.select(state => state.list.originations.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (sortingValue && sortingDirection) {
+          return this.apiService
+            .getLatestTransactions(
+              pagination.selectedSize * pagination.currentPage,
+              [OperationTypes.Delegation],
+              sortingValue,
+              sortingDirection
+            )
+            .pipe(
+              map((transactions: Transaction[]) => listActions.loadDelegationsSucceeded({ transactions })),
+              catchError(error => of(listActions.loadDelegationsFailed({ error })))
+            )
+        } else {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Delegation]).pipe(
+            map((transactions: Transaction[]) => listActions.loadDelegationsSucceeded({ transactions })),
+            catchError(error => of(listActions.loadDelegationsFailed({ error })))
+          )
+        }
+      })
+    )
+  )
+
   doubleBakingsPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfDoubleBakings),

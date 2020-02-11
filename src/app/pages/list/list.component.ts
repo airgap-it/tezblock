@@ -206,6 +206,10 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.dataService.updateKind(['delegation'])
             this.dataService.setPageSize(10)
             this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
+            // const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
+            // const delegationsData$ = this.store$.select(state => state.list.delegations.data)
+            // this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDelegations())))
+            // this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }), delegationsData$, delegationsLoading$)
             break
           case 'endorsement':
             // this.dataService = new TransactionService(this.apiService)
@@ -309,6 +313,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'endorsement':
         this.store$.dispatch(actions.increasePageOfEndorsements())
         break
+      // case 'delegation':
+      //   this.store$.dispatch(actions.increasePageOfDelegations())
+      //   break
       default:
         ;(this.dataService as any).loadMore()
     }
