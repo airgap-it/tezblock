@@ -100,8 +100,12 @@ export class ProposalDetailEffects {
             limit: pagination.currentPage * pagination.selectedSize
           })
           .pipe(
-            map(votes => actions.loadVotesSucceeded({ votes })),
-            catchError(error => of(actions.loadVotesFailed({ error })))
+            switchMap((votes: Transaction[]) =>
+              this.apiService.addVoteData(votes).pipe(
+                map(votes => actions.loadVotesSucceeded({ votes })),
+                catchError(error => of(actions.loadVotesFailed({ error })))
+              )
+            )
           )
       )
     )
@@ -123,7 +127,7 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.proposalDetails.metaVotingPeriods)
       ),
       switchMap(([action, proposalHash, metaVotingPeriods]) => {
-        const _metaVotingPeriods  = metaVotingPeriods.filter(metaVotingPeriod => !!metaVotingPeriod.value)
+        const _metaVotingPeriods = metaVotingPeriods.filter(metaVotingPeriod => !!metaVotingPeriod.value)
 
         return forkJoin(
           _metaVotingPeriods.map(metaVotingPeriod => this.getMetaVotingPeriodCount(proposalHash, metaVotingPeriod.value))
@@ -165,7 +169,7 @@ export class ProposalDetailEffects {
             inverse: false
           }
         ],
-        limit: 100
+        limit: 1
       })
       .pipe(
         map(

@@ -85,14 +85,14 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.tabs = [
       {
         title: 'Proposal',
-        active: true,
+        active: false,
         kind: PeriodKind.Proposal,
         count: undefined,
         columns
       },
       {
         title: 'Expolration',
-        active: false,
+        active: true,
         kind: PeriodKind.Exploration,
         count: undefined,
         columns
