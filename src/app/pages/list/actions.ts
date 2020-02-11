@@ -58,6 +58,10 @@ export const loadActiveBakers = createAction(`[${featureName}] Load Active Baker
 export const loadActiveBakersSucceeded = createAction(`[${featureName}] Load Active Bakers Succeeded`, props<{ activeBakers: Baker[] }>())
 export const loadActiveBakersFailed = createAction(`[${featureName}] Load Active Bakers Failed`, props<{ error: any }>())
 export const increasePageOfActiveBakers = createAction(`[${featureName}] Increase Page Of Active Bakers`)
+export const sortActiveBakersByKind = createAction(
+  `[${featureName}] Sort Active Bakers`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadTotalActiveBakers = createAction(`[${featureName}] Load Total Active Bakers`)
 export const loadTotalActiveBakersSucceeded = createAction(

@@ -390,13 +390,13 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Baker',
       field: 'pkh',
       template: Template.address,
-      sortable: false
+      sortable: true
     },
     {
       name: 'Balance',
       field: 'balance',
       template: Template.amount,
-      sortable: false
+      sortable: true
     },
     {
       name: '# of Votes',
@@ -407,7 +407,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Staking Balance',
       field: 'staking_balance',
       template: Template.amount,
-      sortable: false
+      sortable: true
     },
     {
       name: '# of Delegators',

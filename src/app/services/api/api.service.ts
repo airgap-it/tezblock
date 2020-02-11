@@ -1254,7 +1254,11 @@ export class ApiService {
     )
   }
 
-  getActiveBakers(limit: number): Observable<Baker[]> {
+  getActiveBakers(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Baker[]> {
+    let orderBy = { field: 'staking_balance', direction: 'desc' }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http.post<Baker[]>(
       this.delegatesApiUrl,
       {
@@ -1267,7 +1271,7 @@ export class ApiService {
             inverse: false
           }
         ],
-        orderBy: [{ field: 'staking_balance', direction: 'desc' }],
+        orderBy: [orderBy],
         limit
       },
       this.options

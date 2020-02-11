@@ -265,6 +265,14 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.sortActiveBakersByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    activeBakers: {
+      ...state.activeBakers,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
   on(actions.loadTotalActiveBakers, state => ({
     ...state,
     activeBakers: {
