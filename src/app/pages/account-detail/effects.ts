@@ -65,23 +65,16 @@ export class AccountDetailEffects {
       ),
 
       switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) => {
-        if (!sortingValue) {
-          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+        if (sortingValue && sortingDirection) {
+          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
             map(data => actions.loadTransactionsByKindSucceeded({ data })),
             catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
           )
         } else {
-          if (!sortingDirection) {
-            return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
-              map(data => actions.loadTransactionsByKindSucceeded({ data })),
-              catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-            )
-          } else {
-            return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
-              map(data => actions.loadTransactionsByKindSucceeded({ data })),
-              catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-            )
-          }
+          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+            map(data => actions.loadTransactionsByKindSucceeded({ data })),
+            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+          )
         }
       })
     )

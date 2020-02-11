@@ -171,7 +171,14 @@ export class ApiService {
       )
   }
 
-  getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
+  getTransactionsById(id: string, limit: number, sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
+    let orderBy = {
+      field: 'block_level',
+      direction: 'desc'
+    }
+    if (sortingDirection && sortingValue) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -184,6 +191,7 @@ export class ApiService {
               inverse: false
             }
           ],
+          orderBy: [orderBy],
           limit
         },
         this.options
