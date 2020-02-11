@@ -10,35 +10,30 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
     {
       name: 'Cycle',
       field: 'cycle',
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: '# of Bakings',
       field: 'bakingsCount',
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: 'Block Rewards',
       field: 'blockRewards',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.blockRewards, options }),
-      sortable: false
+      data: (item: AggregatedBakingRights) => ({ data: item.blockRewards, options })
     },
     {
       name: 'Deposits',
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.deposits, options }),
-      sortable: false
+      data: (item: AggregatedBakingRights) => ({ data: item.deposits, options })
     },
     {
       name: 'Fees',
       field: 'fees',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.fees, options }),
-      sortable: false
+      data: (item: AggregatedBakingRights) => ({ data: item.fees, options })
     }
   ],
 
@@ -46,28 +41,24 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
     {
       name: 'Cycle',
       field: 'cycle',
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: '# of Endorsements',
       field: 'endorsementsCount',
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: 'Endorsement Rewards',
       field: 'endorsementRewards',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: item.endorsementRewards, options }),
-      sortable: false
+      data: (item: AggregatedEndorsingRights) => ({ data: item.endorsementRewards, options })
     },
     {
       name: 'Deposits',
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: item.deposits, options }),
-      sortable: false
+      data: (item: AggregatedEndorsingRights) => ({ data: item.deposits, options })
     }
   ],
 
@@ -75,43 +66,37 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
     {
       name: 'Cycle',
       field: 'cycle',
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: 'Delegations',
       field: 'delegatedContracts',
       data: (item: TezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
-      template: Template.basic,
-      sortable: false
+      template: Template.basic
     },
     {
       name: 'Staking Balance',
       field: 'stakingBalance',
       data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
-      template: Template.amount,
-      sortable: false
+      template: Template.amount
     },
     {
       name: 'Block Rewards',
       field: 'bakingRewards',
       data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
-      template: Template.amount,
-      sortable: false
+      template: Template.amount
     },
     {
       name: 'Endorsement Rewards',
       field: 'endorsingRewards',
       data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
-      template: Template.amount,
-      sortable: false
+      template: Template.amount
     },
     {
       name: 'Fees',
       field: 'fees',
       data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
-      template: Template.amount,
-      sortable: false
+      template: Template.amount
     }
   ]
 }
