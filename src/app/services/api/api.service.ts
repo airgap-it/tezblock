@@ -1364,7 +1364,7 @@ export class ApiService {
   getTotalSupplyByContract(contract: Contract): Observable<string> {
     const protocol = this.getFaProtocol(contract)
 
-    return from(protocol.getTotalSupply(contract.id))
+    return from(protocol.getTotalSupply())
   }
 
   private getFaProtocol(contract: Contract): TezosFAProtocol {
