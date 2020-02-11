@@ -145,7 +145,7 @@ export const sortOriginationsByKind = createAction(
 
 export const loadDelegations = createAction(`[${featureName}] Load Delegations`)
 export const loadDelegationsSucceeded = createAction(
-  `[${featureName}] Load Originations Succeeded`,
+  `[${featureName}] Load Delegations Succeeded`,
   props<{ transactions: Transaction[] }>()
 )
 export const loadDelegationsFailed = createAction(`[${featureName}] Load Delegations Failed`, props<{ error: any }>())

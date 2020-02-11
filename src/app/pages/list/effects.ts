@@ -216,14 +216,7 @@ export class ListEffects {
 
   onSortingDelgations$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.increasePageOfDelegations),
-      map(() => listActions.loadDelegations())
-    )
-  )
-
-  delegationsPaging$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.increasePageOfDelegations),
+      ofType(listActions.sortDelegationsByKind),
       map(() => listActions.loadDelegations())
     )
   )
@@ -232,12 +225,13 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.loadDelegations),
       withLatestFrom(
-        this.store$.select(state => state.list.originations.pagination),
-        this.store$.select(state => state.list.originations.sorting.value),
-        this.store$.select(state => state.list.originations.sorting.direction)
+        this.store$.select(state => state.list.delegations.pagination),
+        this.store$.select(state => state.list.delegations.sorting.value),
+        this.store$.select(state => state.list.delegations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (sortingValue && sortingDirection) {
+          console.log('okkkkkk')
           return this.apiService
             .getLatestTransactions(
               pagination.selectedSize * pagination.currentPage,
@@ -256,6 +250,13 @@ export class ListEffects {
           )
         }
       })
+    )
+  )
+
+  delegationsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfDelegations),
+      map(() => listActions.loadDelegations())
     )
   )
 

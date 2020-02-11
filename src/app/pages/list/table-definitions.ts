@@ -198,7 +198,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         field: 'amount',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.fee, options }),
-        sortable: true
       },
       {
         name: 'Fee',

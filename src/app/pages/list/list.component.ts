@@ -202,14 +202,14 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }), originationsData$, originationsLoading$)
             break
           case 'delegation':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['delegation'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
-            // const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
-            // const delegationsData$ = this.store$.select(state => state.list.delegations.data)
-            // this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDelegations())))
-            // this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }), delegationsData$, delegationsLoading$)
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['delegation'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
+            const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
+            const delegationsData$ = this.store$.select(state => state.list.delegations.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadDelegations())))
+            this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }), delegationsData$, delegationsLoading$)
             break
           case 'endorsement':
             // this.dataService = new TransactionService(this.apiService)
@@ -313,9 +313,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'endorsement':
         this.store$.dispatch(actions.increasePageOfEndorsements())
         break
-      // case 'delegation':
-      //   this.store$.dispatch(actions.increasePageOfDelegations())
-      //   break
+      case 'delegation':
+        this.store$.dispatch(actions.increasePageOfDelegations())
+        break
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -347,6 +347,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortOriginationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'delegation':
+        this.store$.dispatch(actions.sortDelegationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'endorsement':
         this.store$.dispatch(actions.sortEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
