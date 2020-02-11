@@ -52,14 +52,14 @@ export class TransactionDetailWrapperComponent implements OnInit {
   @Input()
   public isMainnet = true
 
-  public historicFiatAmount = new Map<String, number>()
+  historicFiatAmount = new Map<String, number>()
 
-  public enableComparison = false
+  enableComparison = false
 
-  public showOldValueVolume = false
-  public showOldValueFee = false
+  showOldValueVolume = false
+  showOldValueFee = false
 
-  public tooltipClick(amount: number | BigNumber, kind: string) {
+  tooltipClick(amount: number | BigNumber, kind: string) {
     this.latestTransaction$.subscribe((transaction: Transaction) => {
       const timestamp = transaction.timestamp
 
@@ -111,11 +111,11 @@ export class TransactionDetailWrapperComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
-  public dayDifference(oldTimestamp: number): number {
+  dayDifference(oldTimestamp: number): number {
     return this.dayDifferenceService.calcateDayDifference(oldTimestamp)
   }
 
-  public getHistoricFiatAmount(key: string): number {
+  getHistoricFiatAmount(key: string): number {
     return this.historicFiatAmount.get(key)
   }
 }

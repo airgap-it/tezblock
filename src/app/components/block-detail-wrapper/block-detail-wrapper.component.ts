@@ -33,14 +33,14 @@ export class BlockDetailWrapperComponent implements OnInit {
   @Input()
   public isMainnet = true
 
-  public historicFiatAmount = new Map<String, number>()
+  historicFiatAmount = new Map<String, number>()
 
-  public enableComparison = false
+  enableComparison = false
 
-  public showOldValueVolume = false
-  public showOldValueFee = false
+  showOldValueVolume = false
+  showOldValueFee = false
 
-  public tooltipClick(amount: number | BigNumber, kind: string) {
+  tooltipClick(amount: number | BigNumber, kind: string) {
     this.wrapperBlock$.subscribe((block: Block) => {
       const timestamp = block.timestamp
 
@@ -68,7 +68,7 @@ export class BlockDetailWrapperComponent implements OnInit {
     private dayDifferenceService: DayDifferenceService
   ) {}
 
-  public ngOnInit() {
+  ngOnInit() {
     if (this.wrapperBlock$) {
       this.wrapperBlock$.subscribe((block: Block) => {
         const timestamp = block.timestamp
@@ -78,11 +78,11 @@ export class BlockDetailWrapperComponent implements OnInit {
     }
   }
 
-  public dayDifference(oldTimestamp: number): number {
+  dayDifference(oldTimestamp: number): number {
     return this.dayDifferenceService.calcateDayDifference(oldTimestamp)
   }
 
-  public getHistoricFiatAmount(key: string): number {
+  getHistoricFiatAmount(key: string): number {
     return this.historicFiatAmount.get(key)
   }
 }
