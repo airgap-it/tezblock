@@ -21,6 +21,7 @@ export interface State {
   proposals: TableState<ProposalListDto>
   activeBakers: TableState<Baker>
   activations: TableState<Transaction>
+  originations: TableState<Transaction>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -38,6 +39,7 @@ const initialState: State = {
   proposals: getInitialTableState(),
   activeBakers: getInitialTableState(),
   activations: getInitialTableState(),
+  originations: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -362,6 +364,47 @@ export const reducer = createReducer(
     ...state,
     activations: {
       ...state.activations,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
+
+  on(actions.loadOriginations, state => ({
+    ...state,
+    originations: {
+      ...state.originations,
+      loading: true
+    }
+  })),
+  on(actions.loadOriginationsSucceeded, (state, { transactions }) => ({
+    ...state,
+    originations: {
+      ...state.originations,
+      data: transactions,
+      loading: false
+    }
+  })),
+  on(actions.loadOriginationsFailed, state => ({
+    ...state,
+    originations: {
+      ...state.originations,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfOriginations, state => ({
+    ...state,
+    originations: {
+      ...state.originations,
+      pagination: {
+        ...state.originations.pagination,
+        currentPage: state.originations.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortOriginationsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    originations: {
+      ...state.originations,
       sortingDirection: sortingDirection,
       sortingValue: sortingValue
     }

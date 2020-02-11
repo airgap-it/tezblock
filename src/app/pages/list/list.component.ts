@@ -192,10 +192,14 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Originations`)),
                 map(toArray)
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['origination'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['origination'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
+            const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
+            const originationsData$ = this.store$.select(state => state.list.originations.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadOriginations())))
+            this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }), originationsData$, originationsLoading$)
             break
           case 'delegation':
             this.dataService = new TransactionService(this.apiService)
@@ -295,6 +299,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'activation':
         this.store$.dispatch(actions.increasePageOfActivations())
         break
+      case 'origination':
+        this.store$.dispatch(actions.increasePageOfOriginations())
+        break
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -321,9 +328,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'activation':
         this.store$.dispatch(actions.sortActivationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
-
         break
       case 'origination':
+        this.store$.dispatch(actions.sortOriginationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'delegation':
         break

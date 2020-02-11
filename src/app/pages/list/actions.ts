@@ -111,6 +111,17 @@ export const loadOriginationsCountLast24hFailed = createAction(
   `[${featureName}] Load Originations Count Last 24h Failed`,
   props<{ error: any }>()
 )
+export const loadOriginations = createAction(`[${featureName}] Load Originations`)
+export const loadOriginationsSucceeded = createAction(
+  `[${featureName}] Load Originations Succeeded`,
+  props<{ transactions: Transaction[] }>()
+)
+export const loadOriginationsFailed = createAction(`[${featureName}] Load Originations Failed`, props<{ error: any }>())
+export const increasePageOfOriginations = createAction(`[${featureName}] Increase Page Of Originations`)
+export const sortOriginationsByKind = createAction(
+  `[${featureName}] Sort Originations`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
 export const loadTransactionsCountLastXdSucceeded = createAction(

@@ -187,6 +187,60 @@ export class ListEffects {
     )
   )
 
+  originationsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfOriginations),
+      map(() => listActions.loadOriginations())
+    )
+  )
+
+  onSortingOriginations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortOriginationsByKind),
+      map(() => listActions.loadOriginations())
+    )
+  )
+
+  getOriginations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadOriginations),
+      withLatestFrom(
+        this.store$.select(state => state.list.originations.pagination),
+        this.store$.select(state => state.list.originations.sortingValue),
+        this.store$.select(state => state.list.originations.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Origination]).pipe(
+            map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
+            catchError(error => of(listActions.loadOriginationsFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService
+              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Origination])
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadOriginationsFailed({ error })))
+              )
+          } else {
+            return this.apiService
+              .getLatestTransactions(
+                pagination.selectedSize * pagination.currentPage,
+                [OperationTypes.Origination],
+                sortingValue,
+                sortingDirection
+              )
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadOriginationsFailed({ error })))
+              )
+          }
+        }
+      })
+    )
+  )
+
   doubleBakingsPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfDoubleBakings),

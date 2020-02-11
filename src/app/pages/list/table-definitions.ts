@@ -139,7 +139,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Age',
         field: 'timestamp',
         template: Template.timestamp,
-        sortable: false
+        sortable: true
       },
       {
         name: 'Balance',
@@ -171,7 +171,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         field: 'fee',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
-        sortable: false
+        sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
 
