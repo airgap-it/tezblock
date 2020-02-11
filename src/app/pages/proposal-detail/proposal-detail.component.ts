@@ -91,7 +91,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         columns
       },
       {
-        title: 'Expolration',
+        title: 'Exploration',
         active: true,
         kind: PeriodKind.Exploration,
         count: undefined,
