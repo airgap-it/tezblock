@@ -12,6 +12,7 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Block } from '@tezblock/interfaces/Block'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -102,22 +103,83 @@ export class ListEffects {
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
         if (!sortingValue) {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction']).pipe(
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Transaction]).pipe(
             map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
-            catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+            catchError(error => of(listActions.loadTransactionsFailed({ error })))
           )
         } else {
           if (!sortingDirection) {
-            return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction']).pipe(
-              map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
-              catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
-            )
-          } else {
             return this.apiService
-              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['transaction'], sortingValue, sortingDirection)
+              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Transaction])
               .pipe(
                 map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
-                catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+                catchError(error => of(listActions.loadTransactionsFailed({ error })))
+              )
+          } else {
+            return this.apiService
+              .getLatestTransactions(
+                pagination.selectedSize * pagination.currentPage,
+                [OperationTypes.Transaction],
+                sortingValue,
+                sortingDirection
+              )
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadTransactionsFailed({ error })))
+              )
+          }
+        }
+      })
+    )
+  )
+
+  activationsPaging$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfActivations),
+      map(() => listActions.loadActivations())
+    )
+  )
+
+  onSortingActivations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortActivationsByKind),
+      map(() => listActions.loadActivations())
+    )
+  )
+
+  getActivations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadActivations),
+      withLatestFrom(
+        this.store$.select(state => state.list.activations.pagination),
+        this.store$.select(state => state.list.activations.sortingValue),
+        this.store$.select(state => state.list.activations.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (!sortingValue) {
+          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Activation]).pipe(
+            map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
+            catchError(error => of(listActions.loadActivationsFailed({ error })))
+          )
+        } else {
+          if (!sortingDirection) {
+            return this.apiService
+              .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Activation])
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadActivationsFailed({ error })))
+              )
+          } else {
+            return this.apiService
+              .getLatestTransactions(
+                pagination.selectedSize * pagination.currentPage,
+                [OperationTypes.Activation],
+                sortingValue,
+                sortingDirection
+              )
+              .pipe(
+                map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
+                catchError(error => of(listActions.loadActivationsFailed({ error })))
               )
           }
         }

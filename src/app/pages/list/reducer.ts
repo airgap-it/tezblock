@@ -20,6 +20,7 @@ export interface State {
   doubleEndorsements: TableState<Transaction>
   proposals: TableState<ProposalListDto>
   activeBakers: TableState<Baker>
+  activations: TableState<Transaction>
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
@@ -36,6 +37,7 @@ const initialState: State = {
   doubleEndorsements: getInitialTableState(),
   proposals: getInitialTableState(),
   activeBakers: getInitialTableState(),
+  activations: getInitialTableState(),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -323,6 +325,48 @@ export const reducer = createReducer(
       }
     }
   })),
+
+  on(actions.loadActivations, state => ({
+    ...state,
+    activations: {
+      ...state.activations,
+      loading: true
+    }
+  })),
+  on(actions.loadActivationsSucceeded, (state, { transactions }) => ({
+    ...state,
+    activations: {
+      ...state.activations,
+      data: transactions,
+      loading: false
+    }
+  })),
+  on(actions.loadActivationsFailed, state => ({
+    ...state,
+    activations: {
+      ...state.activations,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfActivations, state => ({
+    ...state,
+    activations: {
+      ...state.activations,
+      pagination: {
+        ...state.activations.pagination,
+        currentPage: state.activations.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortActivationsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    activations: {
+      ...state.activations,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
+
   on(actions.loadActivationsCountLast24hSucceeded, (state, { activationsCountLast24h }) => ({
     ...state,
     activationsCountLast24h

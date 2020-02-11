@@ -116,12 +116,12 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Age',
         field: 'timestamp',
         template: Template.timestamp,
-        sortable: false
+        sortable: true
       },
       {
         name: 'Secret',
         field: 'secret',
-        sortable: false
+        sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
 

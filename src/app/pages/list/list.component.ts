@@ -164,10 +164,14 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Activations`)),
                 map(toArray)
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['activate_account'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['activate_account'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
+            const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
+            const activationsData$ = this.store$.select(state => state.list.activations.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadActivations())))
+            this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }), activationsData$, activationsLoading$)
             break
           case 'origination':
             this.subscriptions.push(
@@ -288,7 +292,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'transaction':
         this.store$.dispatch(actions.increasePageOfTransactions())
         break
-
+      case 'activation':
+        this.store$.dispatch(actions.increasePageOfActivations())
+        break
       default:
         ;(this.dataService as any).loadMore()
     }
@@ -314,6 +320,8 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'activation':
+        this.store$.dispatch(actions.sortActivationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+
         break
       case 'origination':
         break

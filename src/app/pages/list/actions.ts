@@ -90,6 +90,17 @@ export const loadActivationsCountLast24hFailed = createAction(
   `[${featureName}] Load Activations Count Last 24h Failed`,
   props<{ error: any }>()
 )
+export const loadActivations = createAction(`[${featureName}] Load Activations`)
+export const loadActivationsSucceeded = createAction(
+  `[${featureName}] Load Activations Succeeded`,
+  props<{ transactions: Transaction[] }>()
+)
+export const loadActivationsFailed = createAction(`[${featureName}] Load Activations Failed`, props<{ error: any }>())
+export const increasePageOfActivations = createAction(`[${featureName}] Increase Page Of Activations`)
+export const sortActivationsByKind = createAction(
+  `[${featureName}] Sort Activations`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadOriginationsCountLast24h = createAction(`[${featureName}] Load Originations Count Last 24h`)
 export const loadOriginationsCountLast24hSucceeded = createAction(
