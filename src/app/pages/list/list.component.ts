@@ -319,7 +319,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortActiveBakersByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'proposal':
-        // this.store$.dispatch(actions.increasePageOfProposals())
+        this.store$.dispatch(actions.sortProposalsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'block':
         break

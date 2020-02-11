@@ -428,12 +428,12 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Proposal Hash',
       field: 'proposal',
-      sortable: false
+      sortable: true
     },
     {
       name: 'Period',
       field: 'period',
-      sortable: false
+      sortable: true
     }
   ]
 }

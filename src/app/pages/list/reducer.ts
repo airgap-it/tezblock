@@ -335,6 +335,14 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.sortProposalsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    proposals: {
+      ...state.proposals,
+      sortingDirection: sortingDirection,
+      sortingValue: sortingValue
+    }
+  })),
 
   on(actions.loadActivations, state => ({
     ...state,

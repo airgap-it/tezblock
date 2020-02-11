@@ -1352,14 +1352,18 @@ export class ApiService {
       .pipe(map(first))
   }
 
-  getProposals(limit: number): Observable<ProposalListDto[]> {
+  getProposals(limit: number, sortingValue?: string, sortingDirection?: string): Observable<ProposalListDto[]> {
+    let orderBy = { field: 'period', direction: 'desc' }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'operation_group_hash', 'period'],
           predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
-          orderBy: [{ field: 'period', direction: 'desc' }],
+          orderBy: [orderBy],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],
           limit
         },

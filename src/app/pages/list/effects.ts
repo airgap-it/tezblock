@@ -398,13 +398,31 @@ export class ListEffects {
   getProposals$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadProposals),
-      withLatestFrom(this.store$.select(state => state.list.proposals.pagination)),
-      switchMap(([action, pagination]) =>
-        this.apiService.getProposals(pagination.selectedSize * pagination.currentPage).pipe(
-          map(proposals => listActions.loadProposalsSucceeded({ proposals })),
-          catchError(error => of(listActions.loadProposalsFailed({ error })))
-        )
-      )
+      withLatestFrom(
+        this.store$.select(state => state.list.proposals.pagination),
+        this.store$.select(state => state.list.proposals.sortingValue),
+        this.store$.select(state => state.list.proposals.sortingDirection)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+        if (sortingValue && sortingDirection) {
+          return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+            map(proposals => listActions.loadProposalsSucceeded({ proposals })),
+            catchError(error => of(listActions.loadProposalsFailed({ error })))
+          )
+        } else {
+          return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage).pipe(
+            map(proposals => listActions.loadProposalsSucceeded({ proposals })),
+            catchError(error => of(listActions.loadProposalsFailed({ error })))
+          )
+        }
+      })
+    )
+  )
+
+  onSortingProposals$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortProposalsByKind),
+      map(() => listActions.loadProposals())
     )
   )
 

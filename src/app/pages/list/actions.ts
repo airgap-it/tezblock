@@ -74,6 +74,10 @@ export const loadProposals = createAction(`[${featureName}] Load Proposals`)
 export const loadProposalsSucceeded = createAction(`[${featureName}] Load Proposals Succeeded`, props<{ proposals: ProposalListDto[] }>())
 export const loadProposalsFailed = createAction(`[${featureName}] Load Proposals Failed`, props<{ error: any }>())
 export const increasePageOfProposals = createAction(`[${featureName}] Increase Page Of Proposals`)
+export const sortProposalsByKind = createAction(
+  `[${featureName}] Sort Proposals`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const loadTransactionsCountLast24h = createAction(`[${featureName}] Load Transactions Count Last 24h`)
 export const loadTransactionsCountLast24hSucceeded = createAction(
