@@ -15,11 +15,11 @@ export interface Sorting {
   value: string
 }
 
-export const getInitialTableState = (): TableState<any> => ({
+export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
   data: [],
   pagination: {
     currentPage: 1,
-    selectedSize: 1,
+    selectedSize,
     pageSizes: [5, 10, 20, 50],
     total: undefined
   },
