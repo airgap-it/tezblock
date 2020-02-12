@@ -10,7 +10,8 @@ export const columns: Column[] = [
   {
     name: 'Balance',
     field: 'balance',
-    template: Template.amount
+    template: Template.amount,
+    sortable: true
   },
   {
     name: '# of Votes',
@@ -19,7 +20,8 @@ export const columns: Column[] = [
   {
     name: 'Staking Balance',
     field: 'staking_balance',
-    template: Template.amount
+    template: Template.amount,
+    sortable: true
   },
   {
     name: '# of Delegators',

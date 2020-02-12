@@ -35,8 +35,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     },
     {
       name: 'Fitness',
-      field: 'fitness',
-      sortable: true
+      field: 'fitness'
     },
     {
       name: 'Block',
@@ -111,8 +110,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Secret',
-        field: 'secret',
-        sortable: true
+        field: 'secret'
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -207,8 +205,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Gas Limit',
-        field: 'gas_limit',
-        sortable: true
+        field: 'gas_limit'
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -390,13 +387,11 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     },
     {
       name: 'Proposal Hash',
-      field: 'proposal',
-      sortable: true
+      field: 'proposal'
     },
     {
       name: 'Period',
-      field: 'period',
-      sortable: true
+      field: 'period'
     }
   ],
 
