@@ -77,11 +77,19 @@
                   <button
                     class="btn btn-link  p-0 collapse--btn"
                     [ngClass]="{
-                      'text-primary': sortingDirection.get(column.field) === 'asc' || sortingDirection.get(column.field) === 'desc'
+                      'btn--ascending': sortingDirection.get(column.field) === 'asc',
+                      'btn--descending': sortingDirection.get(column.field) === 'desc'
                     }"
                     id="sortingButton"
                   >
-                    <fa-icon [icon]="'circle' | iconPipe" class="ml-1"></fa-icon>
+                    <ng-container
+                      *ngIf="sortingDirection.get(column.field) !== 'asc' && sortingDirection.get(column.field) !== 'desc'; else arrow"
+                    >
+                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1"></fa-icon>
+                    </ng-container>
+                    <ng-template #arrow>
+                      <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                    </ng-template>
                   </button>
                 </th>
               </ng-container>
