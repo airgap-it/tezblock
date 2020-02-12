@@ -65,7 +65,9 @@
             <ng-container *ngFor="let column of columns">
               <ng-container *ngIf="column.sortable; else notSortable">
                 <th [width]="column.width" (click)="sorting(column.field)">
-                  {{ column.name }}
+                  <button class="btn btn-link p-0 collapse--btn text-dark">
+                    {{ column.name }}
+                  </button>
                   <button
                     class="btn btn-link p-0 collapse--btn"
                     [ngClass]="{
