@@ -85,7 +85,7 @@
                     <ng-container
                       *ngIf="sortingDirection.get(column.field) !== 'asc' && sortingDirection.get(column.field) !== 'desc'; else arrow"
                     >
-                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1"></fa-icon>
+                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
                     </ng-container>
                     <ng-template #arrow>
                       <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
