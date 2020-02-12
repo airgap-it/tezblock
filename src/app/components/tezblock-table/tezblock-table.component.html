@@ -63,7 +63,7 @@
         <thead>
           <tr>
             <ng-container *ngFor="let column of columns">
-              <ng-container *ngIf="column.sortable; else notSortable">
+              <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
                 <th [width]="column.width" (click)="sorting(column.field)">
                   <button
                     class="btn btn-link p-0 collapse--btn"
