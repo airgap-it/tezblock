@@ -7,8 +7,8 @@ import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
-import { AggregatedBakingRights, BakingRights } from './../../interfaces/BakingRights'
-import { EndorsingRights, AggregatedEndorsingRights } from './../../interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from './../../interfaces/BakingRights'
+import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from './../../interfaces/EndorsingRights'
 import { Account } from '../../interfaces/Account'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
@@ -52,6 +52,10 @@ export interface Balance {
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const cycleToLevel = (cycle: number): number => cycle * 4096
 export const addCycleFromLevel = right => ({ ...right, cycle: Math.floor(right.level / 4096) })
+
+function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
+  return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
+}
 
 @Injectable({
   providedIn: 'root'
@@ -1184,7 +1188,7 @@ export class ApiService {
                     )
                     return {
                       ...aggregatedRight,
-                      blockRewards: reward.totalRewards,
+                      blockRewards: reward.bakingRewards,
                       deposits: reward.bakingDeposits,
                       fees: new BigNumber(reward.fees).toNumber(),
                       items: aggregatedRight.items.map(item => ({
@@ -1199,7 +1203,8 @@ export class ApiService {
               )
             )
           }),
-          map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle))
+          map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
         )
       })
     )
@@ -1278,7 +1283,7 @@ export class ApiService {
 
                     return {
                       ...aggregatedRight,
-                      endorsementRewards: reward.totalRewards,
+                      endorsementRewards: reward.endorsingRewards,
                       deposits: reward.endorsingDeposits,
                       items: aggregatedRight.items.map(item => ({
                         ...item,
@@ -1291,7 +1296,8 @@ export class ApiService {
               )
             )
           }),
-          map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle))
+          map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
       })
     )
@@ -1515,23 +1521,12 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = new TezosFAProtocol({
-      symbol: contract.symbol,
-      name: contract.name,
-      marketSymbol: contract.symbol,
-      identifier: '', // not important in this context can be empty string
-      contractAddress: contract.id,
-      jsonRPCAPI: this.environmentUrls.rpcUrl,
-      baseApiUrl: this.environmentUrls.conseilUrl,
-      baseApiKey: this.environmentUrls.conseilApiKey,
-      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork()
-    })
+    const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTransactions(10, cursor))
   }
 
-  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+  getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
@@ -1574,5 +1569,26 @@ export class ApiService {
         ),
         map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
+  }
+
+  getTotalSupplyByContract(contract: Contract): Observable<string> {
+    const protocol = this.getFaProtocol(contract)
+
+    return from(protocol.getTotalSupply())
+  }
+
+  private getFaProtocol(contract: Contract): TezosFAProtocol {
+    return new TezosFAProtocol({
+      symbol: contract.symbol,
+      name: contract.name,
+      marketSymbol: contract.symbol,
+      identifier: '', // not important in this context can be empty string
+      contractAddress: contract.id,
+      jsonRPCAPI: this.environmentUrls.rpcUrl,
+      baseApiUrl: this.environmentUrls.conseilUrl,
+      baseApiKey: this.environmentUrls.conseilApiKey,
+      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
+      network: this.chainNetworkService.getNetwork()
+    })
   }
 }

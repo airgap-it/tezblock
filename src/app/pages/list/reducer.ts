@@ -5,13 +5,8 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { Contract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
-
-const preprocessBakersData = (bakerData: any[]) =>
-  bakerData.map(bakerDataItem => ({
-    ...bakerDataItem,
-    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
-  }))
 
 export interface State {
   blocks: TableState<Block>
@@ -28,10 +23,10 @@ export interface State {
   activationsCountLast24h: number
   originationsCountLast24h: number
   transactionsCountLast24h: number
-
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
   transactionsCountLastXd: number[]
+  contracts: TableState<Contract>
 }
 
 const initialState: State = {
@@ -51,7 +46,8 @@ const initialState: State = {
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
-  transactionsCountLastXd: undefined
+  transactionsCountLastXd: undefined,
+  contracts: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -242,7 +238,7 @@ export const reducer = createReducer(
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      data: preprocessBakersData(activeBakers),
+      data: activeBakers,
       loading: false
     }
   })),
@@ -591,6 +587,42 @@ export const reducer = createReducer(
   on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
     ...state,
     transactionsCountLastXd
+  })),
+  on(actions.loadContracts, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      loading: true
+    }
+  })),
+  on(actions.loadContractsSucceeded, (state, { contracts }) => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      data: contracts.data,
+      pagination: {
+        ...state.contracts.pagination,
+        total: contracts.total
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadContractsFailed, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfContracts, state => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      pagination: {
+        ...state.contracts.pagination,
+        currentPage: state.contracts.pagination.currentPage + 1
+      }
+    }
   })),
   on(actions.reset, () => initialState)
 )

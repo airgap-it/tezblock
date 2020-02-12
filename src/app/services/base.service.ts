@@ -4,6 +4,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 import { ChainNetworkService } from './chain-network/chain-network.service'
 import { Observable } from 'rxjs'
 
+export const maxLimit = 100000
+
 export enum Operation {
   after = 'after',
   between = 'between',

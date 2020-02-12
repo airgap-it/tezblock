@@ -12,6 +12,11 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
+      field: '',
+      width: '1',
+      template: Template.symbol
+    },
+    {
       name: 'To',
       field: 'singleTo',
       width: '1',

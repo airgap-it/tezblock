@@ -398,5 +398,32 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       field: 'period',
       sortable: true
     }
+  ],
+
+  /* CONTRACT */
+  [OperationTypes.Contract]: () => [
+    {
+      name: 'Token',
+      field: 'id',
+      template: Template.address
+    },
+    {
+      name: 'Contract Address',
+      field: 'id',
+      template: Template.address,
+      data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
+    },
+    {
+      name: 'Symbol',
+      field: 'symbol'
+    },
+    {
+      name: 'Total Supply',
+      field: 'totalSupply'
+    },
+    {
+      name: 'Description',
+      field: 'description'
+    }
   ]
 }

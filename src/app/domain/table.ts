@@ -19,10 +19,15 @@ export const getInitialTableState = (): TableState<any> => ({
   data: [],
   pagination: {
     currentPage: 1,
-    selectedSize: 10,
+    selectedSize: 1,
     pageSizes: [5, 10, 20, 50],
     total: undefined
   },
   loading: false,
   sorting: { direction: undefined, value: undefined }
 })
+
+export interface Data<T> {
+  data: T[]
+  total: number
+}

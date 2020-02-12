@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core'
-import { Router } from '@angular/router'
 
-import { getContractByAddress } from '@tezblock/domain/contract'
+import { getContractByAddress, Contract } from '@tezblock/domain/contract'
 
 @Component({
   selector: 'address-item',
@@ -13,6 +12,7 @@ export class AddressItemComponent {
   set address(value: string) {
     if (value !== this._address) {
       this._address = value
+      this.contract = getContractByAddress(this.address)
     }
   }
   get address(): string {
@@ -35,19 +35,11 @@ export class AddressItemComponent {
   @Input()
   isText: boolean
 
-  constructor(private readonly router: Router) {}
-
-  public inspectDetail() {
-    if (!this.isText && this.clickableButton) {
-      const contract = getContractByAddress(this.address)
-
-      if (contract) {
-        this.router.navigate([`/contract/${this.address}`])
-
-        return
-      }
-
-      this.router.navigate([`/account/${this.address}`])
-    }
+  get path(): string {
+    return `/${this.contract ? 'contract' : 'account'}`
   }
+
+  private contract: Contract
+
+  constructor() {}
 }

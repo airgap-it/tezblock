@@ -1,8 +1,9 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
 import { BaseChartDirective } from 'ng2-charts'
-import { ChartOptions } from 'chart.js'
+import { ChartOptions, ChartSize } from 'chart.js'
 
 export const defaultOptions: ChartOptions = {
+  responsive: true,
   layout: {
     padding: {
       left: 0,
@@ -23,7 +24,6 @@ export const defaultOptions: ChartOptions = {
   legend: {
     display: false
   },
-  responsive: true,
   scales: {
     yAxes: [
       {
@@ -121,14 +121,16 @@ export class ChartItemComponent implements AfterViewInit {
 
   @Input() colorOptions: ColorOptions = { gradientFrom: 'rgba(46,91,255,0.00)' }
 
-  chartColors: {}[] = []
+  @Input() colors: any[] = []
+
+  @Input() size: ChartSize // = { width: 700, height: 200 }
 
   constructor() {}
 
   ngAfterViewInit() {
     const navyBlue = '#2E5BFF'
 
-    if (this.chart) {
+    if (this.chart && this.colors.length === 0) {
       const ctx: CanvasRenderingContext2D = (this.chart.ctx as any) as CanvasRenderingContext2D
 
       const gradientStroke1: CanvasGradient = ctx.createLinearGradient(0, 10, 0, 0)
@@ -138,7 +140,7 @@ export class ChartItemComponent implements AfterViewInit {
       gradientFill1.addColorStop(0, this.colorOptions.gradientFrom)
       gradientFill1.addColorStop(1, 'rgba(46,91,255,0.24)')
 
-      this.chartColors[0] = {
+      this.colors[0] = {
         backgroundColor: gradientFill1,
         borderColor: gradientStroke1,
         pointBackgroundColor: gradientStroke1,

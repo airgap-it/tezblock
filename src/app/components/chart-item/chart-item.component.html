@@ -1,13 +1,18 @@
-<div>
+<div class="chart" [style.height.px]="size?.height" [style.width.px]="size?.width">
   <canvas
-    baseChart    
+    baseChart
     width="700"
     height="200"
     [chartType]="chartType"
     [datasets]="datasets"
     [labels]="labels"
-    [colors]="chartColors"
+    [colors]="colors"
     [options]="options"
     [legend]="false"
+    
   ></canvas>
+  <!-- // wrong results with binding .. : /
+    [width]="size.width"
+    [height]="size.height" 
+  -->
 </div>

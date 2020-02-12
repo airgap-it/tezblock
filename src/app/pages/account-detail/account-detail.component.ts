@@ -152,7 +152,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
-      .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
+      .observe([Breakpoints.Handset, Breakpoints.Small])
       .pipe(map(breakpointState => breakpointState.matches))
     this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
     this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)

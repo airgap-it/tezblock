@@ -12,22 +12,26 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getContractByAddress } from '@tezblock/domain/contract'
+import { getContractByAddress, Contract } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
+import { get } from '@tezblock/services/fp'
 
 @Injectable()
 export class ContractDetailEffects {
   getContract$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContract),
-      map(({ address }) => {
-        const contract = getContractByAddress(address)
+      switchMap(({ address }) => {
+        const contract = get<Contract>(_contract => ({ ..._contract, id: address }))(getContractByAddress(address))
 
         if (contract) {
-          return actions.loadContractSucceeded({ contract: { ...contract, id: address } })
+          return this.apiService.getTotalSupplyByContract(contract).pipe(
+            map(totalSupply => actions.loadContractSucceeded({ contract: { ...contract, totalSupply } })),
+            catchError(error => of(actions.loadContractFailed({ error })))
+          )
         }
 
-        return actions.loadContractFailed({ error: 'Not Found' })
+        return of(actions.loadContractFailed({ error: 'Not Found' }))
       })
     )
   )

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, Observable } from 'rxjs'
+import { of, Observable, from, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
@@ -13,6 +13,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Block } from '@tezblock/interfaces/Block'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { getContracts } from '@tezblock/domain/contract'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -523,6 +524,35 @@ export class ListEffects {
           catchError(error => of(listActions.loadTransactionsCountLastXdFailed({ error })))
         )
       )
+    )
+  )
+
+  loadContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadContracts),
+      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
+      switchMap(([action, pagination]) => {
+        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
+
+        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
+          map(totalSupplies =>
+            listActions.loadContractsSucceeded({
+              contracts: {
+                data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
+                total: contracts.total
+              }
+            })
+          ),
+          catchError(error => of(listActions.loadContractsFailed({ error })))
+        )
+      })
+    )
+  )
+
+  increasePageOfContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfContracts),
+      map(() => listActions.loadContracts())
     )
   )
 

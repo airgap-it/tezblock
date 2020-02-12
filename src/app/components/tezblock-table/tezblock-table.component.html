@@ -115,7 +115,7 @@
       </ng-template>
     </table>
     <div class="w-100" [ngClass]="downloadable && enableDownload ? 'pb-2' : 'pb-3'">
-      <ng-container *ngIf="downloadable && enableDownload">
+      <ng-container *ngIf="downloadable && enableDownload && data.length > 0">
         <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
           <small>
             <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>

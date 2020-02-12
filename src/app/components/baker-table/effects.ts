@@ -12,7 +12,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { BaseService, Body, Operation } from '@tezblock/services/base.service'
 import { first } from '@tezblock/services/fp'
-import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { get } from 'lodash'
 
 @Injectable()
@@ -104,7 +104,7 @@ export class BakerTableEffects {
         ofType(actions.loadEfficiencyLast10CyclesSucceeded),
         withLatestFrom(this.store$.select(state => state.bakerTable.accountAddress)),
         tap(([{ efficiencyLast10Cycles }, accountAddress]) =>
-          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
@@ -148,7 +148,9 @@ export class BakerTableEffects {
           this.baseService.post<any>('baking_rights', body(accountAddress)).pipe(map(first)),
           this.baseService.post<any>('endorsing_rights', body(accountAddress, true)).pipe(map(first))
         ).pipe(
-          map(([baking, endorsing]: [any, any]) => actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking, endorsing } })),
+          map(([baking, endorsing]: [any, any]) =>
+            actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking: baking || null, endorsing: endorsing || null } })
+          ),
           catchError(error => of(actions.loadUpcomingRightsFailed({ error })))
         )
       )
