@@ -65,17 +65,23 @@
             <ng-container *ngFor="let column of columns">
               <ng-container *ngIf="column.sortable; else notSortable">
                 <th [width]="column.width" (click)="sorting(column.field)">
-                  <button class="btn btn-link p-0 collapse--btn text-dark">
-                    {{ column.name }}
-                  </button>
                   <button
                     class="btn btn-link p-0 collapse--btn"
                     [ngClass]="{
-                      'btn--ascending': sortingDirection.get(column.field) === 'asc',
-                      'btn--descending': sortingDirection.get(column.field) === 'desc'
+                      'text-primary': sortingDirection.get(column.field) === 'asc' || sortingDirection.get(column.field) === 'desc'
                     }"
+                    id="sortingColumn"
                   >
-                    <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                    {{ column.name }}
+                  </button>
+                  <button
+                    class="btn btn-link  p-0 collapse--btn"
+                    [ngClass]="{
+                      'text-primary': sortingDirection.get(column.field) === 'asc' || sortingDirection.get(column.field) === 'desc'
+                    }"
+                    id="sortingButton"
+                  >
+                    <fa-icon [icon]="'circle' | iconPipe" class="ml-1"></fa-icon>
                   </button>
                 </th>
               </ng-container>
