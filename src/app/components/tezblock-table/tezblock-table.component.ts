@@ -67,7 +67,11 @@ export class TezblockTableComponent implements OnInit {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
       if (this._columns.some(column => column.field === 'timestamp')) {
-        this.sorting('timestamp')
+        if (this.sortingDirection.get('timestamp') === 'desc') {
+          return
+        } else {
+          this.sorting('timestamp')
+        }
       }
     }
   }
