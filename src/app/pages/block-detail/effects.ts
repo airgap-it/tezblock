@@ -43,19 +43,12 @@ export class BlockDetailEffects {
         this.store$.select(state => state.blockDetails.sorting.value),
         this.store$.select(state => state.blockDetails.sorting.direction)
       ),
-      switchMap(([{ blockHash, kind }, pageSize, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, sortingValue, sortingDirection).pipe(
-            map(data => actions.loadTransactionsByKindSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-          )
-        } else {
-          return this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize).pipe(
-            map(data => actions.loadTransactionsByKindSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-          )
-        }
-      })
+      switchMap(([{ blockHash, kind }, pageSize, sortingValue, sortingDirection]) =>
+        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, sortingValue, sortingDirection).pipe(
+          map(data => actions.loadTransactionsByKindSucceeded({ data })),
+          catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+        )
+      )
     )
   )
 

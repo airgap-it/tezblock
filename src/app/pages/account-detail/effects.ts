@@ -64,19 +64,12 @@ export class AccountDetailEffects {
         this.store$.select(state => state.accountDetails.sorting.direction)
       ),
 
-      switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
-            map(data => actions.loadTransactionsByKindSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-          )
-        } else {
-          return this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
-            map(data => actions.loadTransactionsByKindSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-          )
-        }
-      })
+      switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
+          map(data => actions.loadTransactionsByKindSucceeded({ data })),
+          catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+        )
+      )
     )
   )
 

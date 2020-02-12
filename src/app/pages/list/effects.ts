@@ -82,24 +82,17 @@ export class ListEffects {
         this.store$.select(state => state.list.transactions.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              [OperationTypes.Transaction],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
-              catchError(error => of(listActions.loadTransactionsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Transaction]).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            [OperationTypes.Transaction],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
             catchError(error => of(listActions.loadTransactionsFailed({ error })))
           )
-        }
       })
     )
   )
@@ -127,24 +120,17 @@ export class ListEffects {
         this.store$.select(state => state.list.activations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              [OperationTypes.Activation],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
-              catchError(error => of(listActions.loadActivationsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Activation]).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            [OperationTypes.Activation],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadActivationsFailed({ error })))
           )
-        }
       })
     )
   )
@@ -172,24 +158,17 @@ export class ListEffects {
         this.store$.select(state => state.list.originations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              [OperationTypes.Origination],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
-              catchError(error => of(listActions.loadOriginationsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Origination]).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            [OperationTypes.Origination],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadOriginationsFailed({ error })))
           )
-        }
       })
     )
   )
@@ -210,25 +189,17 @@ export class ListEffects {
         this.store$.select(state => state.list.delegations.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          console.log('okkkkkk')
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              [OperationTypes.Delegation],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((transactions: Transaction[]) => listActions.loadDelegationsSucceeded({ transactions })),
-              catchError(error => of(listActions.loadDelegationsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Delegation]).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            [OperationTypes.Delegation],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((transactions: Transaction[]) => listActions.loadDelegationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadDelegationsFailed({ error })))
           )
-        }
       })
     )
   )
@@ -263,24 +234,17 @@ export class ListEffects {
         this.store$.select(state => state.list.doubleBakings.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              ['double_baking_evidence'],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
-              catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence']).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            ['double_baking_evidence'],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
             catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
           )
-        }
       })
     )
   )
@@ -308,26 +272,17 @@ export class ListEffects {
         this.store$.select(state => state.list.doubleEndorsements.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              ['double_baking_evidence'],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
-              catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
-            )
-        } else {
-          return this.apiService
-            .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'])
-            .pipe(
-              map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
-              catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
-            )
-        }
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            ['double_baking_evidence'],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
+            map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+            catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+          )
       })
     )
   )
@@ -355,49 +310,26 @@ export class ListEffects {
         this.store$.select(state => state.list.activeBakers.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
-            switchMap(activeBakers =>
-              this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
-                map(numberOfDelegatorsByBakers =>
-                  listActions.loadActiveBakersSucceeded({
-                    activeBakers: activeBakers.map(activeBaker => {
-                      const match = numberOfDelegatorsByBakers.find(item => item.delegate_value == activeBaker.pkh)
-                      const number_of_delegators = match ? match.number_of_delegators : null
+        return this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+          switchMap(activeBakers =>
+            this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
+              map(numberOfDelegatorsByBakers =>
+                listActions.loadActiveBakersSucceeded({
+                  activeBakers: activeBakers.map(activeBaker => {
+                    const match = numberOfDelegatorsByBakers.find(item => item.delegate_value == activeBaker.pkh)
+                    const number_of_delegators = match ? match.number_of_delegators : null
 
-                      return {
-                        ...activeBaker,
-                        number_of_delegators
-                      }
-                    })
+                    return {
+                      ...activeBaker,
+                      number_of_delegators
+                    }
                   })
-                ),
-                catchError(error => of(listActions.loadActiveBakersFailed({ error })))
-              )
+                })
+              ),
+              catchError(error => of(listActions.loadActiveBakersFailed({ error })))
             )
           )
-        } else {
-          return this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage).pipe(
-            switchMap(activeBakers =>
-              this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
-                map(numberOfDelegatorsByBakers =>
-                  listActions.loadActiveBakersSucceeded({
-                    activeBakers: activeBakers.map(activeBaker => {
-                      const match = numberOfDelegatorsByBakers.find(item => item.delegate_value == activeBaker.pkh)
-                      const number_of_delegators = match ? match.number_of_delegators : null
-
-                      return {
-                        ...activeBaker,
-                        number_of_delegators
-                      }
-                    })
-                  })
-                ),
-                catchError(error => of(listActions.loadActiveBakersFailed({ error })))
-              )
-            )
-          )
-        }
+        )
       })
     )
   )
@@ -430,17 +362,10 @@ export class ListEffects {
         this.store$.select(state => state.list.proposals.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
-            map(proposals => listActions.loadProposalsSucceeded({ proposals })),
-            catchError(error => of(listActions.loadProposalsFailed({ error })))
-          )
-        } else {
-          return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage).pipe(
-            map(proposals => listActions.loadProposalsSucceeded({ proposals })),
-            catchError(error => of(listActions.loadProposalsFailed({ error })))
-          )
-        }
+        return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+          map(proposals => listActions.loadProposalsSucceeded({ proposals })),
+          catchError(error => of(listActions.loadProposalsFailed({ error })))
+        )
       })
     )
   )
@@ -475,24 +400,12 @@ export class ListEffects {
         this.store$.select(state => state.list.votes.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              ['ballot', 'proposals'],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map(votes => listActions.loadVotesSucceeded({ votes })),
-              catchError(error => of(listActions.loadVotesFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals']).pipe(
+        return this.apiService
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], sortingValue, sortingDirection)
+          .pipe(
             map(votes => listActions.loadVotesSucceeded({ votes })),
             catchError(error => of(listActions.loadVotesFailed({ error })))
           )
-        }
       })
     )
   )
@@ -513,24 +426,17 @@ export class ListEffects {
         this.store$.select(state => state.list.endorsements.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService
-            .getLatestTransactions(
-              pagination.selectedSize * pagination.currentPage,
-              [OperationTypes.Endorsement],
-              sortingValue,
-              sortingDirection
-            )
-            .pipe(
-              map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
-              catchError(error => of(listActions.loadEndorsementsFailed({ error })))
-            )
-        } else {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Endorsement]).pipe(
+        return this.apiService
+          .getLatestTransactions(
+            pagination.selectedSize * pagination.currentPage,
+            [OperationTypes.Endorsement],
+            sortingValue,
+            sortingDirection
+          )
+          .pipe(
             map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
             catchError(error => of(listActions.loadEndorsementsFailed({ error })))
           )
-        }
       })
     )
   )

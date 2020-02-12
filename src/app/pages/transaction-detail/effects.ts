@@ -31,19 +31,12 @@ export class TransactionDetailEffects {
         this.store$.select(state => state.accountDetails.sorting.value),
         this.store$.select(state => state.accountDetails.sorting.direction)
       ),
-      switchMap(([{ transactionHash }, pageSize, sortingValue, sortingDirection]) => {
-        if (sortingValue && sortingDirection) {
-          return this.apiService.getTransactionsById(transactionHash, pageSize, sortingValue, sortingDirection).pipe(
-            map(data => actions.loadTransactionsByHashSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
-          )
-        } else {
-          return this.apiService.getTransactionsById(transactionHash, pageSize).pipe(
-            map(data => actions.loadTransactionsByHashSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
-          )
-        }
-      })
+      switchMap(([{ transactionHash }, pageSize, sortingValue, sortingDirection]) =>
+        this.apiService.getTransactionsById(transactionHash, pageSize, sortingValue, sortingDirection).pipe(
+          map(data => actions.loadTransactionsByHashSucceeded({ data })),
+          catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
+        )
+      )
     )
   )
 
