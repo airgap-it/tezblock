@@ -5,6 +5,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Contract } from '@tezblock/domain/contract'
+// import { toTransactionsChartDataSource } from './list.component'
 
 export interface State {
   doubleBakings: TableState<Transaction>
@@ -16,6 +17,7 @@ export interface State {
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
   transactionsChartData: actions.TransactionChartItem[]
+  transactionsChartDatasets: { data: number[]; label: string }[]
   contracts: TableState<Contract>
 }
 
@@ -29,6 +31,7 @@ const initialState: State = {
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
   transactionsChartData: undefined,
+  transactionsChartDatasets: undefined,
   contracts: getInitialTableState()
 }
 
@@ -152,7 +155,9 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsChartData
+    transactionsChartData,
+    // TODO: why selecting this data throws error in chart.js ... ?
+    //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
   })),
   on(actions.loadContracts, state => ({
     ...state,

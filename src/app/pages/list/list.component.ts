@@ -38,7 +38,7 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
   const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
     data.map(item => ({
       diffInDays: moment().diff(moment(item.timestamp), 'days'),
-      amount: toXTZ(item.amount, protocol) / 1000
+      amount: item.amount
     }))
   const sum = (data: { [key: string]: { diffInDays: number; amount: number }[] }): number[] =>
     range(0, noOfDays).map(index => {
@@ -46,15 +46,17 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
 
       return match ? match.map(item => item.amount).reduce((a, b) => a + b) : 0
     })
+  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
 
   return pipe(
     toDiffsInDays,
     groupBy('diffInDays'),
-    sum
+    sum,
+    amountToXTZ
   )(data)
 }
 
-const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
+export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
   data: actions.TransactionChartItem[]
 ): { data: number[]; label: string }[] => [
   { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
@@ -152,18 +154,20 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsChartData()))
             )
             this.transactionsCountLast24h$ = this.store$.select(state => state.list.transactionsCountLast24h)
-            this.transactionsChartDatasets$ = this.store$
-              .select(state => state.list.transactionsChartData)
-              .pipe(
-                filter(Array.isArray),
-                map(toTransactionsChartDataSource('Transactions', 'Total XTZ'))
-              )
-            this.transactionsChartDatasets$.subscribe(x => console.log(`>>>>>>>>>> transactionsChartDatasets$`))
+            this.transactionsChartDatasets$ =
+              //this.store$.select(state => state.list.transactionsChartDatasets)
+              this.store$
+                .select(state => state.list.transactionsChartData)
+                .pipe(
+                  filter(Array.isArray),
+                  map(toTransactionsChartDataSource('Transactions', 'Total XTZ'))
+                )
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(
                 filter(negate(isNil)),
-                map(transactionsChartData => transactionsChartData.map(item => item.amount).reduce((a, b) => a + b)))
+                map(transactionsChartData => transactionsChartData.map(item => item.amount).reduce((a, b) => a + b))
+              )
             this.dataService = new TransactionService(this.apiService)
             this.dataService.setPageSize(10)
             this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
