@@ -64,7 +64,14 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-
+  on(actions.loadBlocksSucceeded, (state, { blocks }) => ({
+    ...state,
+    blocks: {
+      ...state.blocks,
+      data: blocks,
+      loading: false
+    }
+  })),
   on(actions.loadBlocksFailed, state => ({
     ...state,
     blocks: {
@@ -72,33 +79,6 @@ export const reducer = createReducer(
       loading: false
     }
   })),
-
-  on(actions.loadAdditionalBlockData, (state, { blocks }) => ({
-    ...state,
-    blocks: {
-      ...state.blocks,
-      data: blocks,
-      loading: true
-    }
-  })),
-
-  on(actions.loadAdditionalBlockDataSucceeded, (state, { blocks }) => ({
-    ...state,
-    blocks: {
-      ...state.blocks,
-      data: blocks,
-      loading: false
-    }
-  })),
-
-  on(actions.loadAdditionalBlockDataFailed, state => ({
-    ...state,
-    blocks: {
-      ...state.blocks,
-      loading: false
-    }
-  })),
-
   on(actions.increasePageOfBlocks, state => ({
     ...state,
     blocks: {

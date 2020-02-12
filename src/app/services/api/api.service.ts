@@ -3,7 +3,7 @@ import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
-import { Observable, of, pipe, from, forkJoin } from 'rxjs'
+import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
@@ -825,6 +825,49 @@ export class ApiService {
     )
   }
 
+  getLatestBlocksWithData(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
+    let orderBy = {
+      field: 'timestamp',
+      direction: 'desc'
+    }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          orderBy: [orderBy],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        switchMap(blocks => {
+          const blockRange = blocks.map(blocksList => blocksList.level)
+          const amountObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'amount', 'sum', limit)
+          const feeObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'fee', 'sum', limit)
+          const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
+
+          return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
+            map(([amount, fee, operationGroup]) => {
+              return blocks.map(block => {
+                const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
+                const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
+                const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
+                return {
+                  ...block,
+                  volume: blockAmount ? blockAmount.sum_amount : 0,
+                  fee: blockFee ? blockFee.sum_fee : 0,
+                  txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
+                }
+              })
+            })
+          )
+        })
+      )
+  }
+
   getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
     let headers
     if (field === 'operation_group_hash') {
@@ -898,6 +941,77 @@ export class ApiService {
         resolve(volumePerBlock)
       })
     })
+  }
+
+  getAdditionalBlockFieldObservable<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
+    let headers
+    if (field === 'operation_group_hash') {
+      // then we only care about spend transactions
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          },
+          {
+            field: 'kind',
+            operation: 'in',
+            set: ['transaction']
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    } else {
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    }
+
+    return this.http.post<T[]>(this.transactionsApiUrl, headers, this.options)
   }
 
   getOperationCount(field: string, value: string): Observable<OperationCount[]> {

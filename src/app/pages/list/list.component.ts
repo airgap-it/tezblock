@@ -92,7 +92,6 @@ export class ListComponent extends BaseComponent implements OnInit {
     const refresh$ = merge(
       of(1),
       merge(
-        this.actions$.pipe(ofType(actions.loadBlocksFailed)),
         this.actions$.pipe(ofType(actions.loadActiveBakersFailed)),
         this.actions$.pipe(ofType(actions.loadActiveBakersSucceeded)),
         this.actions$.pipe(ofType(actions.loadDoubleBakingsFailed)),
@@ -108,13 +107,13 @@ export class ListComponent extends BaseComponent implements OnInit {
       try {
         switch (routeName) {
           case 'block':
-            this.dataService = new BlockService(this.apiService)
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
-            // const blockLoading$ = this.store$.select(state => state.list.blocks.loading)
-            // const blockData$ = this.store$.select(state => state.list.blocks.data)
-            // this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadBlocks())))
-            // this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$)
+            // this.dataService = new BlockService(this.apiService)
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
+            const blockLoading$ = this.store$.select(state => state.list.blocks.loading)
+            const blockData$ = this.store$.select(state => state.list.blocks.data)
+            this.subscriptions.push(refresh$.subscribe(() => this.store$.dispatch(actions.loadBlocks())))
+            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$)
 
             break
           case 'transaction':
@@ -303,9 +302,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
         break
-      case 'block':
-        this.store$.dispatch(actions.increasePageOfBlocks())
-        break
+      // case 'block':
+      //   this.store$.dispatch(actions.increasePageOfBlocks())
+      //   break
       case 'transaction':
         this.store$.dispatch(actions.increasePageOfTransactions())
         break

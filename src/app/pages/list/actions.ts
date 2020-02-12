@@ -8,13 +8,8 @@ import { Block } from '@tezblock/interfaces/Block'
 const featureName = 'List'
 
 export const loadBlocks = createAction(`[${featureName}] Load Blocks`)
+export const loadBlocksSucceeded = createAction(`[${featureName}] Load Blocks Succeeded`, props<{ blocks: Block[] }>())
 export const loadBlocksFailed = createAction(`[${featureName}] Load Blocks Failed`, props<{ error: any }>())
-export const loadAdditionalBlockData = createAction(`[${featureName}] Load Additional Block Data`, props<{ blocks: Block[] }>())
-export const loadAdditionalBlockDataSucceeded = createAction(
-  `[${featureName}] Load Additional Block Data Succeeded`,
-  props<{ blocks: Block[] }>()
-)
-export const loadAdditionalBlockDataFailed = createAction(`[${featureName}] Load Additional Block Data Failed`, props<{ error: any }>())
 export const increasePageOfBlocks = createAction(`[${featureName}] Increase Page Of Blocks`)
 export const sortBlocksByKind = createAction(`[${featureName}] Sort Blocks`, props<{ sortingValue: string; sortingDirection: string }>())
 

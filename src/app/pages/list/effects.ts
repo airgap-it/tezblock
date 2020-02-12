@@ -49,31 +49,9 @@ export class ListEffects {
         this.store$.select(state => state.list.blocks.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        return this.apiService.getLatestBlocks(pagination.currentPage * pagination.selectedSize).pipe(
-          map((blocks: Block[]) => {
-            return listActions.loadAdditionalBlockData({ blocks })
-          }),
+        return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize).pipe(
+          map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
           catchError(error => of(listActions.loadBlocksFailed({ error })))
-        )
-      })
-    )
-  )
-  getAdditonalBlockData$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.loadAdditionalBlockData),
-      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.data)),
-      switchMap(([action, pagination, data]) => {
-        console.log('data: ', data)
-        const promise = this.blockService.getAdditionalBlockData(data, pagination.currentPage * pagination.selectedSize)
-
-        const additionalData = of(promise)
-        return this.apiService.getLatestBlocks(pagination.currentPage * pagination.selectedSize).pipe(
-          map((blocks: Block[]) => {
-            // const promise = this.blockService.getAdditionalBlockData(blocks, pagination.currentPage * pagination.selectedSize)
-
-            return listActions.loadAdditionalBlockDataSucceeded({ blocks })
-          }),
-          catchError(error => of(listActions.loadAdditionalBlockDataFailed({ error })))
         )
       })
     )
