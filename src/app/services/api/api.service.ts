@@ -830,8 +830,18 @@ export class ApiService {
       field: 'timestamp',
       direction: 'desc'
     }
+    let sortValueMemory: string
+
     if (sortingValue && sortingDirection) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
+      if (sortingValue === 'volume' || sortingValue === 'fee') {
+        sortValueMemory = sortingValue
+        orderBy = {
+          field: 'timestamp',
+          direction: 'desc'
+        }
+      } else {
+        orderBy = { field: sortingValue, direction: sortingDirection }
+      }
     }
     return this.http
       .post<Block[]>(
@@ -851,7 +861,7 @@ export class ApiService {
 
           return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
             map(([amount, fee, operationGroup]) => {
-              return blocks.map(block => {
+              blocks = blocks.map(block => {
                 const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
                 const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
                 const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
@@ -862,6 +872,16 @@ export class ApiService {
                   txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
                 }
               })
+
+              sortingValue && sortingDirection
+                ? sortValueMemory === 'volume' || sortValueMemory === 'fee'
+                  ? sortingDirection === 'desc'
+                    ? (blocks = blocks.sort((a: any, b: any) => b.sortValueMemory - a.sortValueMemory))
+                    : (blocks = blocks.sort((a: any, b: any) => a.sortValueMemory - b.sortValueMemory))
+                  : blocks
+                : (blocks = blocks.sort((a, b) => b.level - a.level).slice(0, limit))
+
+              return blocks
             })
           )
         })

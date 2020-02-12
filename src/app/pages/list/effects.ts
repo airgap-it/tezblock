@@ -49,10 +49,12 @@ export class ListEffects {
         this.store$.select(state => state.list.blocks.sorting.direction)
       ),
       switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize).pipe(
-          map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
-          catchError(error => of(listActions.loadBlocksFailed({ error })))
-        )
+        return this.apiService
+          .getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, sortingValue, sortingDirection)
+          .pipe(
+            map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
+            catchError(error => of(listActions.loadBlocksFailed({ error })))
+          )
       })
     )
   )

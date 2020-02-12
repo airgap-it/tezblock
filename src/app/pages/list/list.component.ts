@@ -302,9 +302,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
         break
-      // case 'block':
-      //   this.store$.dispatch(actions.increasePageOfBlocks())
-      //   break
+      case 'block':
+        this.store$.dispatch(actions.increasePageOfBlocks())
+        break
       case 'transaction':
         this.store$.dispatch(actions.increasePageOfTransactions())
         break
@@ -343,6 +343,7 @@ export class ListComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.sortProposalsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'block':
+        this.store$.dispatch(actions.sortBlocksByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
       case 'transaction':
         this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))

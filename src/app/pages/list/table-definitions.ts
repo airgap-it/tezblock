@@ -21,15 +21,13 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Transaction Volume',
       field: 'volume',
-      template: Template.amount,
-      sortable: true
+      template: Template.amount
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Block) => ({ data: item.fee, options: { showFiatValue: false } }),
-      sortable: true
+      data: (item: Block) => ({ data: item.fee, options: { showFiatValue: false } })
     },
     {
       name: 'Transactions',
@@ -37,7 +35,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     },
     {
       name: 'Fitness',
-      field: 'fitness'
+      field: 'fitness',
+      sortable: true
     },
     {
       name: 'Block',
