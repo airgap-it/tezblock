@@ -66,7 +66,7 @@ export class TezblockTableComponent implements OnInit {
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
-      if (this._columns.some(column => (column.field = 'timestamp'))) {
+      if (this._columns.some(column => column.field === 'timestamp')) {
         this.sorting('timestamp')
       }
     }
