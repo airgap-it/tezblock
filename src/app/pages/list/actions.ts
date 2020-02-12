@@ -5,6 +5,11 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Contract } from '@tezblock/domain/contract'
 import { Data } from '@tezblock/domain/table'
 
+export interface TransactionChartItem {
+  timestamp: number
+  amount: number
+}
+
 const featureName = 'List'
 
 export const loadDoubleBakings = createAction(`[${featureName}] Load Double Bakings`)
@@ -43,9 +48,9 @@ export const loadOriginationsCountLast24h = createAction(`[${featureName}] Load 
 export const loadOriginationsCountLast24hSucceeded = createAction(`[${featureName}] Load Originations Count Last 24h Succeeded`, props<{ originationsCountLast24h: number }>())
 export const loadOriginationsCountLast24hFailed = createAction(`[${featureName}] Load Originations Count Last 24h Failed`, props<{ error: any }>())
 
-export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
-export const loadTransactionsCountLastXdSucceeded = createAction(`[${featureName}] Load Transactions Count Last 30d Succeeded`, props<{ transactionsCountLastXd: number[] }>())
-export const loadTransactionsCountLastXdFailed = createAction(`[${featureName}] Load Transactions Count Last 30d Failed`, props<{ error: any }>())
+export const loadTransactionsChartData = createAction(`[${featureName}] Load Transactions Chart Data`)
+export const loadTransactionsChartDataSucceeded = createAction(`[${featureName}] Load Transactions Chart Data Succeeded`, props<{ transactionsChartData: TransactionChartItem[] }>())
+export const loadTransactionsChartDataFailed = createAction(`[${featureName}] Load Transactions Chart Data Failed`, props<{ error: any }>())
 
 export const loadActivationsCountLastXd = createAction(`[${featureName}] Load Activations Count Last 30d`)
 export const loadActivationsCountLastXdSucceeded = createAction(`[${featureName}] Load Activations Count Last 30d Succeeded`, props<{ activationsCountLastXd: number[] }>())

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Observable, of } from 'rxjs'
+import { Observable, of, pipe } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
-import { range } from 'lodash'
+import { range, negate, isNil } from 'lodash'
 import * as moment from 'moment'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -16,12 +17,16 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { toArray } from '@tezblock/services/fp'
+import { toArray, groupBy } from '@tezblock/services/fp'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
+import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 
 const noOfDays = 7
+const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
+const protocol = tryGetProtocolByIdentifier('xtz')
 
 const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
@@ -29,6 +34,32 @@ const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
+const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
+  const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
+    data.map(item => ({
+      diffInDays: moment().diff(moment(item.timestamp), 'days'),
+      amount: toXTZ(item.amount, protocol) / 1000
+    }))
+  const sum = (data: { [key: string]: { diffInDays: number; amount: number }[] }): number[] =>
+    range(0, noOfDays).map(index => {
+      const match = data[index]
+
+      return match ? match.map(item => item.amount).reduce((a, b) => a + b) : 0
+    })
+
+  return pipe(
+    toDiffsInDays,
+    groupBy('diffInDays'),
+    sum
+  )(data)
+}
+
+const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
+  data: actions.TransactionChartItem[]
+): { data: number[]; label: string }[] => [
+  { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
+  { data: toAmountPerDay(data), label: amountLabel }
+]
 const timestampsToChartDataSource = (label: string) => (timestamps: number[]): { data: number[]; label: string } => ({
   data: timestampsToCountsPerDay(timestamps),
   label: label
@@ -45,11 +76,14 @@ export class ListComponent extends BaseComponent implements OnInit {
   data$: Observable<Object>
   showLoadMore$: Observable<boolean>
   activationsCountLast24h$: Observable<number>
-  originationsCountLast24h$: Observable<number>
-  transactionsCountLast24h$: Observable<number>
   activationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  originationsCountLast24h$: Observable<number>
   originationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  transactionsCountLast24h$: Observable<number>
   transactionsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  transactionsChartOptions: ChartOptions
+  transactionsTotalXTZ$: Observable<number>
+
   routeName$: Observable<string>
 
   readonly chartLabels: string[] = range(0, noOfDays).map(index =>
@@ -91,24 +125,45 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
             break
           case 'transaction':
+            this.transactionsChartOptions = {
+              ...defaultOptions,
+              tooltips: {
+                callbacks: {
+                  label: (tooltipItem: ChartTooltipItem, data: ChartData) => {
+                    const label: string = data.datasets[tooltipItem.datasetIndex].label
+                    const value = parseInt(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString())
+                      .toString()
+                      .replace(thousandSeparator, ',')
+                    const valueLabel = tooltipItem.datasetIndex === 0 ? value : `${value}K ꜩ`
+
+                    return `${label}: ${valueLabel}`
+                  }
+                }
+              }
+            }
             this.subscriptions.push(
               getRefresh([
                 this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hSucceeded)),
                 this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hFailed))
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsCountLast24h())),
               getRefresh([
-                this.actions$.pipe(ofType(actions.loadTransactionsCountLastXdSucceeded)),
-                this.actions$.pipe(ofType(actions.loadTransactionsCountLastXdFailed))
-              ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsCountLastXd()))
+                this.actions$.pipe(ofType(actions.loadTransactionsChartDataSucceeded)),
+                this.actions$.pipe(ofType(actions.loadTransactionsChartDataFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsChartData()))
             )
             this.transactionsCountLast24h$ = this.store$.select(state => state.list.transactionsCountLast24h)
             this.transactionsChartDatasets$ = this.store$
-              .select(state => state.list.transactionsCountLastXd)
+              .select(state => state.list.transactionsChartData)
               .pipe(
                 filter(Array.isArray),
-                map(timestampsToChartDataSource(`Transactions`)),
-                map(toArray)
+                map(toTransactionsChartDataSource('Transactions', 'Total XTZ'))
               )
+            this.transactionsChartDatasets$.subscribe(x => console.log(`>>>>>>>>>> transactionsChartDatasets$`))
+            this.transactionsTotalXTZ$ = this.store$
+              .select(state => state.list.transactionsChartData)
+              .pipe(
+                filter(negate(isNil)),
+                map(transactionsChartData => transactionsChartData.map(item => item.amount).reduce((a, b) => a + b)))
             this.dataService = new TransactionService(this.apiService)
             this.dataService.setPageSize(10)
             this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
@@ -129,7 +184,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               .select(state => state.list.activationsCountLastXd)
               .pipe(
                 filter(Array.isArray),
-                map(timestampsToChartDataSource(`Activations`)),
+                map(timestampsToChartDataSource('Activations')),
                 map(toArray)
               )
             this.dataService = new TransactionService(this.apiService)
@@ -153,7 +208,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               .select(state => state.list.originationsCountLastXd)
               .pipe(
                 filter(Array.isArray),
-                map(timestampsToChartDataSource(`Originations`)),
+                map(timestampsToChartDataSource('Originations')),
                 map(toArray)
               )
             this.dataService = new TransactionService(this.apiService)
@@ -237,7 +292,12 @@ export class ListComponent extends BaseComponent implements OnInit {
 
             this.store$.dispatch(actions.loadContracts())
 
-            this.setupTable(columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }), contractsData$, loadingContracts$, showLoadMoreContracts$)
+            this.setupTable(
+              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
+              contractsData$,
+              loadingContracts$,
+              showLoadMoreContracts$
+            )
             break
           default:
             throw new Error('unknown route')

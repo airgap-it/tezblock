@@ -15,7 +15,7 @@ export interface State {
   transactionsCountLast24h: number
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
-  transactionsCountLastXd: number[]
+  transactionsChartData: actions.TransactionChartItem[]
   contracts: TableState<Contract>
 }
 
@@ -28,7 +28,7 @@ const initialState: State = {
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
-  transactionsCountLastXd: undefined,
+  transactionsChartData: undefined,
   contracts: getInitialTableState()
 }
 
@@ -150,9 +150,9 @@ export const reducer = createReducer(
     ...state,
     originationsCountLastXd
   })),
-  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+  on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsCountLastXd
+    transactionsChartData
   })),
   on(actions.loadContracts, state => ({
     ...state,

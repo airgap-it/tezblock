@@ -13,11 +13,16 @@ export function last<T>(array: T[]) {
 export function get<T>(accessor: (_entity: T) => any) {
   return (entity: T) => (entity ? accessor(entity) : undefined)
 }
-export const groupBy = (key: string) => (array: any[]) =>
-  array.reduce((accumulator, currentItem) => {
-    ;(accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
-    return accumulator
-  }, {})
+
+export function groupBy<T>(key: string): (array: T[]) =>  { [key: string]: T[] } {
+  return function(array: T[]): { [key: string]: T[] } {
+    return array.reduce((accumulator, currentItem) => {
+      ;(accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
+      return accumulator
+    }, {})
+  }
+}
+
 export const toArray = (value: any) => [value]
 
 export const withoutBraces = (value: string): string => value ? value.replace(noBraces, '') : value

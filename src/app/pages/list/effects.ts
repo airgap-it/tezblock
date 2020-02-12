@@ -151,12 +151,11 @@ export class ListEffects {
 
   loadTransactionsCountLastXd$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadTransactionsCountLastXd),
+      ofType(listActions.loadTransactionsChartData),
       switchMap(() =>
-        this.getEntitiesSince(getTimestamp7dAgo(), 'transaction').pipe(
-          map(transactions => transactions.map(transaction => transaction.timestamp)),
-          map(transactionsCountLastXd => listActions.loadTransactionsCountLastXdSucceeded({ transactionsCountLastXd })),
-          catchError(error => of(listActions.loadTransactionsCountLastXdFailed({ error })))
+        this.getEntitiesSince(getTimestamp7dAgo(), 'transaction', ['timestamp', 'amount']).pipe(
+          map(transactionsChartData => listActions.loadTransactionsChartDataSucceeded({ transactionsChartData })),
+          catchError(error => of(listActions.loadTransactionsChartDataFailed({ error })))
         )
       )
     )
@@ -191,9 +190,9 @@ export class ListEffects {
     )
   )
 
-  private getEntitiesSince(since: number, kind: string): Observable<Transaction[]> {
+  private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
-      fields: ['timestamp'],
+      fields,
       predicates: [
         { field: 'operation_group_hash', operation: Operation.isnull, inverse: true },
         { field: 'kind', operation: Operation.in, set: [kind] },
