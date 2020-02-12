@@ -66,6 +66,9 @@ export class TezblockTableComponent implements OnInit {
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
+      if (this._columns.some(column => (column.field = 'timestamp'))) {
+        this.sorting('timestamp')
+      }
     }
   }
   get columns(): Column[] {
@@ -136,11 +139,13 @@ export class TezblockTableComponent implements OnInit {
     const key: string = sortBy
     if (this.sortingDirection.has(key)) {
       if (this.sortingDirection.get(key) === 'desc') {
+        this.sortingDirection.clear()
         this.sortingDirection.set(key, 'asc')
       } else if (this.sortingDirection.get(key) === 'asc') {
-        this.sortingDirection.delete(key)
+        this.sortingDirection.clear()
       }
     } else {
+      this.sortingDirection.clear()
       this.sortingDirection.set(key, 'desc')
     }
 
