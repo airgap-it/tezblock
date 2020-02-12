@@ -4,7 +4,7 @@ import * as store from '@ngrx/store'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
 import { NewTransactionService } from '../transaction/new-transaction.service'
-import { distinctPagination, distinctTransactionArray, distinctString, Facade, Pagination, refreshRate } from '../facade/facade'
+import { Router } from '@angular/router'
 
 @Injectable({
   providedIn: 'root'
@@ -13,17 +13,15 @@ export class DownloadService {
   constructor(
     private readonly store$: store.Store<fromRoot.State>,
     private readonly apiService: ApiService,
-    private readonly newTransactionService: NewTransactionService
+    private readonly newTransactionService: NewTransactionService,
+    private router: Router
   ) {}
 
-  // TODO: getAllTransactionsByAddress needs to be redone. As of now, in case of delegations, the index value delegatedBalance
-  // is not assigned at runtime and therefore we need to make use of setTimeout
   public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
 
-    console.log('downloading')
     if (layoutPage === 'account') {
       account$.subscribe(account => {
         this.newTransactionService.getAllTransactionsByAddress(account, kind, limit).subscribe(transactions => {
@@ -36,7 +34,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
             a.click()
           }, 1000)
         })
@@ -53,7 +51,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
             a.click()
           }, 1000)
         })
@@ -70,7 +68,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
             a.click()
           }, 1000)
         })
