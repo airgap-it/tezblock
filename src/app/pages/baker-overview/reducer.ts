@@ -17,6 +17,7 @@ interface TableState<T> {
   data: T[]
   pagination: Pagination
   loading: boolean
+  sorting: Sorting
 }
 
 const getInitialTableState = (): TableState<any> => ({
@@ -27,13 +28,18 @@ const getInitialTableState = (): TableState<any> => ({
     pageSizes: [5, 10, 20, 50],
     total: undefined
   },
-  loading: false
+  loading: false,
+  sorting: { direction: undefined, value: undefined }
 })
 
 export interface State {
   activeBakers: TableState<Baker>
   top24Bakers: Baker[]
   top24BakersLoading: boolean
+}
+export interface Sorting {
+  direction: string
+  value: string
 }
 
 const initialState: State = {
@@ -119,5 +125,16 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.reset, () => initialState)
+  on(actions.reset, () => initialState),
+  on(actions.sortActiveBakersByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    activeBakers: {
+      ...state.activeBakers,
+      sorting: {
+        ...state.activeBakers.sorting,
+        direction: sortingDirection,
+        value: sortingValue
+      }
+    }
+  }))
 )

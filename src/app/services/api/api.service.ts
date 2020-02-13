@@ -3,7 +3,7 @@ import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
-import { Observable, of, pipe, from, forkJoin } from 'rxjs'
+import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
@@ -124,7 +124,11 @@ export class ApiService {
     )
   }
 
-  getLatestTransactions(limit: number, kindList: string[]): Observable<Transaction[]> {
+  getLatestTransactions(limit: number, kindList: string[], sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
+    let orderBy = this.orderByBlockLevelDesc
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -141,7 +145,7 @@ export class ApiService {
               set: kindList
             }
           ],
-          orderBy: [this.orderByBlockLevelDesc],
+          orderBy: [orderBy],
           limit
         },
         this.options
@@ -171,7 +175,14 @@ export class ApiService {
       )
   }
 
-  getTransactionsById(id: string, limit: number): Observable<Transaction[]> {
+  getTransactionsById(id: string, limit: number, sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
+    let orderBy = {
+      field: 'block_level',
+      direction: 'desc'
+    }
+    if (sortingDirection && sortingValue) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -184,6 +195,7 @@ export class ApiService {
               inverse: false
             }
           ],
+          orderBy: [orderBy],
           limit
         },
         this.options
@@ -322,7 +334,30 @@ export class ApiService {
     )
   }
 
-  getTransactionsByField(value: string, field: string, kind: string, limit: number): Observable<Transaction[]> {
+  getTransactionsByField(
+    value: string,
+    field: string,
+    kind: string,
+    limit: number,
+    sortingValue?: string,
+    sortingDirection?: string
+  ): Observable<Transaction[]> {
+    let orderBy = {
+      field: 'block_level',
+      direction: 'desc'
+    }
+    let delegatedOriginatedMemory: string
+    if (sortingValue && sortingDirection) {
+      if (sortingValue === 'originatedBalance' || sortingValue === 'delegatedBalance') {
+        delegatedOriginatedMemory = sortingValue
+        orderBy = {
+          field: 'block_level',
+          direction: 'desc'
+        }
+      } else {
+        orderBy = { field: sortingValue, direction: sortingDirection }
+      }
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -344,12 +379,7 @@ export class ApiService {
               set: [kind]
             }
           ],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [orderBy],
           limit
         },
         this.options
@@ -389,67 +419,97 @@ export class ApiService {
               )
             )
           }
+          sortingValue && sortingDirection
+            ? sortingValue === 'delegatedBalance' || sortingValue === 'originatedBalance'
+              ? sortingDirection === 'desc'
+                ? (transactions = transactions.sort((a, b) => b.delegatedBalance - a.delegatedBalance)) // tslint:disable
+                : (transactions = transactions.sort((a, b) => a.delegatedBalance - b.delegatedBalance)) // tslint:disable
+              : transactions
+            : (transactions = transactions.sort((a, b) => b.block_level - a.block_level).slice(0, limit))
 
           return of(transactions)
         })
       )
   }
 
-  getTransactionsByPredicates(predicates: Predicate[], limit: number): Observable<Transaction[]> {
-    return this.http
-      .post<Transaction[]>(
+  getTransactionsByPredicates(
+    predicates: Predicate[],
+    limit: number,
+    orderBy?: {
+      field: string
+      direction: string
+    }
+  ): Observable<Transaction[]> {
+    let postRequest = this.http.post<Transaction[]>(
+      this.transactionsApiUrl,
+      {
+        predicates: [...predicates],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        limit
+      },
+      this.options
+    )
+    if (orderBy) {
+      if (orderBy.field === 'originatedBalance' || orderBy.field === 'delegatedBalance') {
+        orderBy = {
+          field: 'block_level',
+          direction: 'desc'
+        }
+      }
+      postRequest = this.http.post<Transaction[]>(
         this.transactionsApiUrl,
         {
           predicates: [...predicates],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [orderBy],
           limit
         },
         this.options
       )
-      .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+    }
+    return postRequest.pipe(
+      map((transactions: Transaction[]) => transactions.slice(0, limit)),
+      switchMap((transactions: Transaction[]) => {
+        const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
 
-          if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
+        if (sources.length > 0) {
+          return this.getAccountsByIds(sources).pipe(
+            map((accounts: Account[]) =>
+              transactions.map(transaction => {
+                const match = accounts.find(account => account.account_id === transaction.source)
 
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
+                return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+              })
             )
-          }
+          )
+        }
 
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
+        return of(transactions)
+      }),
+      switchMap((transactions: Transaction[]) => {
+        const originatedAccounts = transactions
+          .filter(transaction => transaction.kind === 'origination')
+          .map(transaction => transaction.originated_contracts)
 
-          if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+        if (originatedAccounts.length > 0) {
+          return this.getAccountsByIds(originatedAccounts).pipe(
+            map((accounts: Account[]) =>
+              transactions.map(transaction => {
+                const match = accounts.find(account => account.account_id === transaction.originated_contracts)
 
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
+                return match ? { ...transaction, originatedBalance: match.balance } : transaction
+              })
             )
-          }
+          )
+        }
 
-          return of(transactions)
-        })
-      )
+        return of(transactions)
+      })
+    )
   }
 
   getLatestAccounts(limit: number): Observable<Account[]> {
@@ -751,20 +811,85 @@ export class ApiService {
     })
   }
 
-  getLatestBlocks(limit: number): Observable<Block[]> {
+  getLatestBlocks(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
+    let orderBy = {
+      field: 'timestamp',
+      direction: 'desc'
+    }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http.post<Block[]>(
       this.blocksApiUrl,
       {
-        orderBy: [
-          {
-            field: 'timestamp',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [orderBy],
         limit
       },
       this.options
     )
+  }
+
+  getLatestBlocksWithData(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
+    let orderBy = {
+      field: 'timestamp',
+      direction: 'desc'
+    }
+    let sortValueMemory: string
+
+    if (sortingValue && sortingDirection) {
+      if (sortingValue === 'volume' || sortingValue === 'fee') {
+        sortValueMemory = sortingValue
+        orderBy = {
+          field: 'timestamp',
+          direction: 'desc'
+        }
+      } else {
+        orderBy = { field: sortingValue, direction: sortingDirection }
+      }
+    }
+    return this.http
+      .post<Block[]>(
+        this.blocksApiUrl,
+        {
+          orderBy: [orderBy],
+          limit
+        },
+        this.options
+      )
+      .pipe(
+        switchMap(blocks => {
+          const blockRange = blocks.map(blocksList => blocksList.level)
+          const amountObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'amount', 'sum', limit)
+          const feeObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'fee', 'sum', limit)
+          const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
+
+          return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
+            map(([amount, fee, operationGroup]) => {
+              blocks = blocks.map(block => {
+                const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
+                const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
+                const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
+                return {
+                  ...block,
+                  volume: blockAmount ? blockAmount.sum_amount : 0,
+                  fee: blockFee ? blockFee.sum_fee : 0,
+                  txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
+                }
+              })
+
+              sortingValue && sortingDirection
+                ? sortValueMemory === 'volume' || sortValueMemory === 'fee'
+                  ? sortingDirection === 'desc'
+                    ? (blocks = blocks.sort((a: any, b: any) => b.sortValueMemory - a.sortValueMemory))
+                    : (blocks = blocks.sort((a: any, b: any) => a.sortValueMemory - b.sortValueMemory))
+                  : blocks
+                : (blocks = blocks.sort((a, b) => b.level - a.level).slice(0, limit))
+
+              return blocks
+            })
+          )
+        })
+      )
   }
 
   getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
@@ -840,6 +965,77 @@ export class ApiService {
         resolve(volumePerBlock)
       })
     })
+  }
+
+  getAdditionalBlockFieldObservable<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
+    let headers
+    if (field === 'operation_group_hash') {
+      // then we only care about spend transactions
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          },
+          {
+            field: 'kind',
+            operation: 'in',
+            set: ['transaction']
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    } else {
+      headers = {
+        fields: [field, 'block_level'],
+        predicates: [
+          {
+            field,
+            operation: 'isnull',
+            inverse: true
+          },
+          {
+            field: 'block_level',
+            operation: 'in',
+            set: blockRange
+          }
+        ],
+        orderBy: [
+          {
+            field: 'block_level',
+            direction: 'desc'
+          }
+        ],
+        aggregation: [
+          {
+            field,
+            function: operation
+          }
+        ],
+        limit
+      }
+    }
+
+    return this.http.post<T[]>(this.transactionsApiUrl, headers, this.options)
   }
 
   getOperationCount(field: string, value: string): Observable<OperationCount[]> {
@@ -1208,7 +1404,11 @@ export class ApiService {
     )
   }
 
-  getActiveBakers(limit: number): Observable<Baker[]> {
+  getActiveBakers(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Baker[]> {
+    let orderBy = { field: 'staking_balance', direction: 'desc' }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http.post<Baker[]>(
       this.delegatesApiUrl,
       {
@@ -1221,7 +1421,7 @@ export class ApiService {
             inverse: false
           }
         ],
-        orderBy: [{ field: 'staking_balance', direction: 'desc' }],
+        orderBy: [orderBy],
         limit
       },
       this.options
@@ -1302,14 +1502,18 @@ export class ApiService {
       .pipe(map(first))
   }
 
-  getProposals(limit: number): Observable<ProposalListDto[]> {
+  getProposals(limit: number, sortingValue?: string, sortingDirection?: string): Observable<ProposalListDto[]> {
+    let orderBy = { field: 'period', direction: 'desc' }
+    if (sortingValue && sortingDirection) {
+      orderBy = { field: sortingValue, direction: sortingDirection }
+    }
     return this.http
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'operation_group_hash', 'period'],
           predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
-          orderBy: [{ field: 'period', direction: 'desc' }],
+          orderBy: [orderBy],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],
           limit
         },
@@ -1319,23 +1523,12 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = new TezosFAProtocol({
-      symbol: contract.symbol,
-      name: contract.name,
-      marketSymbol: contract.symbol,
-      identifier: '', // not important in this context can be empty string
-      contractAddress: contract.id,
-      jsonRPCAPI: this.environmentUrls.rpcUrl,
-      baseApiUrl: this.environmentUrls.conseilUrl,
-      baseApiKey: this.environmentUrls.conseilApiKey,
-      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork()
-    })
+    const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTransactions(10, cursor))
   }
 
-  public getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
+  getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
@@ -1378,5 +1571,26 @@ export class ApiService {
         ),
         map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
+  }
+
+  getTotalSupplyByContract(contract: Contract): Observable<string> {
+    const protocol = this.getFaProtocol(contract)
+
+    return from(protocol.getTotalSupply())
+  }
+
+  private getFaProtocol(contract: Contract): TezosFAProtocol {
+    return new TezosFAProtocol({
+      symbol: contract.symbol,
+      name: contract.name,
+      marketSymbol: contract.symbol,
+      identifier: '', // not important in this context can be empty string
+      contractAddress: contract.id,
+      jsonRPCAPI: this.environmentUrls.rpcUrl,
+      baseApiUrl: this.environmentUrls.conseilUrl,
+      baseApiKey: this.environmentUrls.conseilApiKey,
+      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
+      network: this.chainNetworkService.getNetwork()
+    })
   }
 }

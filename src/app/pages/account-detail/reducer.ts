@@ -18,15 +18,28 @@ const ensure30Days = (balance: Balance[]): Balance[] => {
       .utc()
       .add(-29 + index, 'days')
       .valueOf()
-  const getBalanceFrom = (date: number) => (balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isSame(moment(date).startOf('day'))
+  const getBalanceFrom = (date: number) => (balanceItem: Balance) =>
+    moment(balanceItem.asof)
+      .startOf('day')
+      .isSame(moment(date).startOf('day'))
   const getPreviousBalance = (balance: Balance[], date: number) => {
-    const match = balance.find((balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isBefore(moment(date).startOf('day')))
+    const match = balance.find((balanceItem: Balance) =>
+      moment(balanceItem.asof)
+        .startOf('day')
+        .isBefore(moment(date).startOf('day'))
+    )
 
     return match ? { ...match, asof: date } : undefined
   }
-  const attachBalance = (date: number): Balance => balance.find(getBalanceFrom(date)) ||  getPreviousBalance(balance, date) || { balance: 0, asof: date }
+  const attachBalance = (date: number): Balance =>
+    balance.find(getBalanceFrom(date)) || getPreviousBalance(balance, date) || { balance: 0, asof: date }
 
-  return range(0, 30).map(pipe(toDay, attachBalance))
+  return range(0, 30).map(
+    pipe(
+      toDay,
+      attachBalance
+    )
+  )
 }
 
 const ratingNumberToLabel = [
@@ -75,6 +88,11 @@ export interface BakerTableRatings {
   tezosBakerRating: string
 }
 
+export interface Sorting {
+  direction: string
+  value: string
+}
+
 export interface State {
   address: string
   account: Account
@@ -89,6 +107,7 @@ export interface State {
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
+  sorting: Sorting
 }
 
 const initialState: State = {
@@ -107,7 +126,8 @@ const initialState: State = {
   },
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
-  tezosBakerFee: undefined
+  tezosBakerFee: undefined,
+  sorting: { direction: undefined, value: undefined }
 }
 
 export const reducer = createReducer(
@@ -179,6 +199,16 @@ export const reducer = createReducer(
     ...state,
     pageSize: state.pageSize + 10
   })),
+
+  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+    ...state,
+    sorting: {
+      ...state.sorting,
+      direction: sortingDirection,
+      value: sortingValue
+    }
+  })),
+
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
     balanceFromLast30Days: ensure30Days(balanceFromLast30Days)

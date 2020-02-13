@@ -357,6 +357,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
+  sortBy(data: any) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  }
+
   private setTabs(pageId: string) {
     this.tabs = [
       {

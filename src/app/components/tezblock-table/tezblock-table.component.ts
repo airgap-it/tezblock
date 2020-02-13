@@ -18,6 +18,7 @@ export interface Column {
   width?: string
   data?: (item: any) => any
   template?: TemplateRef<any> | Template
+  sortable?: boolean | undefined
 }
 
 export interface ExpandedRow<Entity> {
@@ -30,7 +31,8 @@ export const blockAndTxHashColumns: Column[] = [
   {
     name: 'Block',
     field: 'block_level',
-    template: Template.block
+    template: Template.block,
+    sortable: true
   },
   {
     name: 'Tx Hash',
@@ -65,6 +67,14 @@ export class TezblockTableComponent implements OnInit {
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
+      if (this._columns.some(column => column.field === 'timestamp')) {
+        this.defaultSorting = 'timestamp'
+        if (this.sortingDirection.get('timestamp') === 'desc') {
+          return
+        } else {
+          this.sorting('timestamp')
+        }
+      }
     }
   }
   get columns(): Column[] {
@@ -91,7 +101,13 @@ export class TezblockTableComponent implements OnInit {
 
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
 
+  @Output()
+  public readonly sortingClicked: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
+
   private expandedRows: any[] = []
+
+  public sortingDirection = new Map<String, string>()
+  private defaultSorting: string
 
   constructor() {}
 
@@ -124,6 +140,24 @@ export class TezblockTableComponent implements OnInit {
 
   public downloadCSV() {
     this.downloadClicked.emit()
+  }
+
+  public sorting(sortBy: string) {
+    const key: string = sortBy
+    if (this.sortingDirection.has(key)) {
+      if (this.sortingDirection.get(key) === 'desc') {
+        this.sortingDirection.clear()
+        this.sortingDirection.set(key, 'asc')
+      } else if (this.sortingDirection.get(key) === 'asc') {
+        this.sortingDirection.clear()
+        this.sortingDirection.set(this.defaultSorting, 'desc')
+      }
+    } else {
+      this.sortingDirection.clear()
+      this.sortingDirection.set(key, 'desc')
+    }
+
+    this.sortingClicked.emit({ value: sortBy, sortingDirection: this.sortingDirection.get(key) })
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {

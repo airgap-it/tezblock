@@ -11,22 +11,22 @@ import * as fromRoot from '@tezblock/reducers'
 import { othersBakersLabel } from './reducer'
 import { first, get } from '@tezblock/services/fp'
 
-const addOthersStakingBalance = ([top24Bakers, wholeStakingBalance] : [Baker[], { sum_staking_balance: number }[]]): Baker[] =>
-top24Bakers.concat({
-  pkh: othersBakersLabel,
-  block_level: null,
-  delegated_balance: null,
-  balance: null,
-  deactivated: null,
-  staking_balance: pipe<{ sum_staking_balance: number }[], any, number, number>(
-    first,
-    get(_first => _first.sum_staking_balance),
-    sum_staking_balance => sum_staking_balance - top24Bakers.map(baker => baker.staking_balance).reduce((a, b) => a + b)
-  )(wholeStakingBalance),
-  block_id: null,
-  frozen_balance: null,
-  grace_period: null
-})
+const addOthersStakingBalance = ([top24Bakers, wholeStakingBalance]: [Baker[], { sum_staking_balance: number }[]]): Baker[] =>
+  top24Bakers.concat({
+    pkh: othersBakersLabel,
+    block_level: null,
+    delegated_balance: null,
+    balance: null,
+    deactivated: null,
+    staking_balance: pipe<{ sum_staking_balance: number }[], any, number, number>(
+      first,
+      get(_first => _first.sum_staking_balance),
+      sum_staking_balance => sum_staking_balance - top24Bakers.map(baker => baker.staking_balance).reduce((a, b) => a + b)
+    )(wholeStakingBalance),
+    block_id: null,
+    frozen_balance: null,
+    grace_period: null
+  })
 
 @Injectable()
 export class BakersEffects {
@@ -40,9 +40,13 @@ export class BakersEffects {
   getActiveBakers$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadActiveBakers),
-      withLatestFrom(this.store$.select(state => state.bakers.activeBakers.pagination)),
-      switchMap(([action, pagination]) =>
-        this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.bakers.activeBakers.pagination),
+        this.store$.select(state => state.bakers.activeBakers.sorting.value),
+        this.store$.select(state => state.bakers.activeBakers.sorting.direction)
+      ),
+      switchMap(([action, pagination, sortingValue, sortingDirection]) =>
+        this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
           switchMap(activeBakers =>
             this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
               map(numberOfDelegatorsByBakers =>
@@ -72,8 +76,7 @@ export class BakersEffects {
       switchMap(() =>
         forkJoin(
           this.apiService.getActiveBakers(24),
-          this.baseService.post('delegates',
-          {
+          this.baseService.post('delegates', {
             fields: ['staking_balance'],
             aggregation: [
               {
@@ -83,8 +86,7 @@ export class BakersEffects {
             ],
             limit: maxLimit
           })
-        )
-        .pipe(
+        ).pipe(
           map(addOthersStakingBalance),
           map(top24Bakers => listActions.loadTop24BakersSucceeded({ top24Bakers })),
           catchError(error => of(listActions.loadTop24BakersFailed({ error })))
@@ -102,6 +104,13 @@ export class BakersEffects {
           catchError(error => of(listActions.loadTotalActiveBakersFailed({ error })))
         )
       )
+    )
+  )
+
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortActiveBakersByKind),
+      map(() => listActions.loadActiveBakers())
     )
   )
 
