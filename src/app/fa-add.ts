@@ -26,6 +26,10 @@ import {
   faListAlt,
   faInfoCircle,
   faDownload,
+  faFileUpload,
+  faBinoculars,
+  faHammer,
+  faGraduationCap,
   faCircle
 } from '@fortawesome/pro-light-svg-icons'
 
@@ -62,6 +66,10 @@ export const addFontAwesome = () => {
     faListAlt,
     faInfoCircle,
     faDownload,
+    faFileUpload,
+    faBinoculars,
+    faHammer,
+    faGraduationCap,
     faCircle
   )
 }
