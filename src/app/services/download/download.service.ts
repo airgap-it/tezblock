@@ -23,7 +23,7 @@ export class DownloadService {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
-    this.toastrService.show('<p>preparing download</p><div class="spinner-border spinner-border-sm" role="status"></div>', undefined, {
+    this.toastrService.show('<div class="spinner-border spinner-border-sm" role="status"></div>', 'Preparing Download', {
       enableHtml: true
     })
 
