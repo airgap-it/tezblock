@@ -14,7 +14,7 @@ export class DownloadService {
     private readonly store$: store.Store<fromRoot.State>,
     private readonly apiService: ApiService,
     private readonly newTransactionService: NewTransactionService,
-    private router: Router
+    private readonly router: Router
   ) {}
 
   public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
@@ -77,7 +77,7 @@ export class DownloadService {
   }
 
   private ConvertToCSV(objArray: any): string {
-    const array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+    const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray
     let str = ''
     let row = ''
     const indexTable: string[] = []
@@ -90,6 +90,7 @@ export class DownloadService {
         index === 'timestamp' ||
         index === 'amount' ||
         index === 'delegatedBalance' ||
+        index === 'originatedBalance' ||
         index === 'fee' ||
         index === 'block_level' ||
         index === 'operation_group_hash' ||
@@ -113,6 +114,18 @@ export class DownloadService {
 
         if (index === 'timestamp') {
           array[i][index] = new Date(array[i][index])
+          line += array[i][index]
+        } else if (index === 'amount') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'fee') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'delegatedBalance') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'originatedBalance') {
+          array[i][index] = array[i][index] / 1000000
           line += array[i][index]
         } else {
           line += array[i][index]
