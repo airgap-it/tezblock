@@ -245,7 +245,7 @@ export class ApiService {
   addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {
     kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
 
-    if (kindList.includes('ballot' || 'proposals')) {
+    if (kindList.includes('ballot') || kindList.includes('proposals')) {
       const votingPeriodPredicates: Predicate[] = transactions
         .map(transaction => transaction.block_level)
         .filter(distinctFilter)

@@ -48,7 +48,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         const id = paramMap.get('id')
 
         this.store$.dispatch(actions.loadProposal({ id }))
-        this.store$.dispatch(actions.loadVotes({ periodKind: 'testing_vote' }))
+        this.store$.dispatch(actions.loadVotes({ periodKind: PeriodKind.Proposal }))
         this.setTabs()
       }),
 
