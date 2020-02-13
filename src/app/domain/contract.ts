@@ -23,7 +23,8 @@ export interface Contract {
   name: string
   website: string
   description: string
-  socials: Social[]
+  socials: Social[],
+  totalSupply?: string
 }
 
 export interface ContractOperation extends IAirGapTransaction {

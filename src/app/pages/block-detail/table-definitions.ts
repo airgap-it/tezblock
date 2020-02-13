@@ -9,41 +9,48 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       field: 'applied',
       width: '1',
-      template: Template.symbol
+      template: Template.symbol,
+      sortable: false
     },
     {
       name: 'To',
       field: 'destination',
       width: '1',
       data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } }),
-      template: Template.address
+      template: Template.address,
+      sortable: false
     },
     {
       name: 'Amount',
       field: 'amount',
       data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
-      template: Template.amount
+      template: Template.amount,
+      sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
       data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
-      template: Template.amount
+      template: Template.amount,
+      sortable: true
     },
     {
       name: 'Gas Limit',
-      field: 'gas_limit'
+      field: 'gas_limit',
+      sortable: false
     },
     {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash,
-      data: (item: any) => ({ data: item.operation_group_hash })
+      data: (item: any) => ({ data: item.operation_group_hash }),
+      sortable: false
     }
   ],
 
@@ -53,12 +60,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       field: 'applied',
       width: '1',
-      template: Template.symbol
+      template: Template.symbol,
+      sortable: false
     },
     {
       name: 'Baker',
@@ -68,29 +77,34 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       data: (item: Transaction) => ({
         data: item.delegate || 'undelegate',
         options: { showFullAddress: false, pageId: options.pageId, isText: !item.delegate ? true : undefined }
-      })
+      }),
+      sortable: false
     },
     {
       name: 'Amount',
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options })
+      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
+      sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      sortable: true
     },
     {
       name: 'Gas Limit',
-      field: 'gas_limit'
+      field: 'gas_limit',
+      sortable: false
     },
     {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash,
-      data: (item: any) => ({ data: item.operation_group_hash })
+      data: (item: any) => ({ data: item.operation_group_hash }),
+      sortable: false
     }
   ],
 
@@ -100,49 +114,57 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'originated_contracts',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Balance',
       field: 'originatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options })
+      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
+      sortable: true
     },
     {
       name: 'Originator',
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Baker',
       field: 'delegate',
       width: '1',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } })
+      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      sortable: true
     },
     {
       name: 'Burn',
       field: 'burn',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } })
+      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
+      sortable: false
     },
     {
       name: 'Gas Limit',
-      field: 'gas_limit'
+      field: 'gas_limit',
+      sortable: false
     },
     {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash,
-      data: (item: any) => ({ data: item.operation_group_hash })
+      data: (item: any) => ({ data: item.operation_group_hash }),
+      sortable: false
     }
   ],
 
@@ -151,22 +173,26 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Endorser',
       field: 'delegate',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Age',
       field: 'timestamp',
-      template: Template.timestamp
+      template: Template.timestamp,
+      sortable: false
     },
     {
       name: 'Slots',
-      field: 'slots'
+      field: 'slots',
+      sortable: false
     },
     {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash,
-      data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } })
+      data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } }),
+      sortable: false
     }
   ],
 
@@ -175,17 +201,20 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Account',
       field: 'pkh',
       template: Template.address,
-      data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true, pageId: options.pageId } })
+      data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Secret',
-      field: 'secret'
+      field: 'secret',
+      sortable: false
     },
     {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash,
-      data: (item: Transaction) => ({ data: item.operation_group_hash })
+      data: (item: Transaction) => ({ data: item.operation_group_hash }),
+      sortable: false
     }
   ]
 }

@@ -60,7 +60,43 @@
       <ng-template #thenTemplate>
         <thead>
           <tr>
-            <th *ngFor="let column of columns" [width]="column.width">{{ column.name }}</th>
+            <ng-container *ngFor="let column of columns">
+              <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
+                <th [width]="column.width" (click)="sorting(column.field)">
+                  <button
+                    class="btn btn-link p-0 collapse--btn"
+                    [ngClass]="{
+                      'text-primary': sortingDirection.get(column.field) === 'asc' || sortingDirection.get(column.field) === 'desc'
+                    }"
+                    id="sortingColumn"
+                  >
+                    {{ column.name }}
+                  </button>
+                  <button
+                    class="btn btn-link  p-0 collapse--btn"
+                    [ngClass]="{
+                      'btn--ascending': sortingDirection.get(column.field) === 'asc',
+                      'btn--descending': sortingDirection.get(column.field) === 'desc'
+                    }"
+                    id="sortingButton"
+                  >
+                    <ng-container
+                      *ngIf="sortingDirection.get(column.field) !== 'asc' && sortingDirection.get(column.field) !== 'desc'; else arrow"
+                    >
+                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
+                    </ng-container>
+                    <ng-template #arrow>
+                      <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                    </ng-template>
+                  </button>
+                </th>
+              </ng-container>
+              <ng-template #notSortable>
+                <th [width]="column.width">
+                  {{ column.name }}
+                </th>
+              </ng-template>
+            </ng-container>
             <th *ngIf="expandedRow"></th>
           </tr>
         </thead>
