@@ -122,9 +122,19 @@ export class ListComponent extends BaseComponent implements OnInit {
       try {
         switch (routeName) {
           case 'block':
-            this.dataService = new BlockService(this.apiService)
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new BlockService(this.apiService)
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
+            const blockLoading$ = this.store$.select(state => state.list.blocks.loading)
+            const blockData$ = this.store$.select(state => state.list.blocks.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadBlocksFailed)),
+                this.actions$.pipe(ofType(actions.loadBlocksSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
+            )
+            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$)
+
             break
           case 'transaction':
             this.transactionsChartOptions = {
@@ -168,9 +178,19 @@ export class ListComponent extends BaseComponent implements OnInit {
                 filter(negate(isNil)),
                 map(transactionsChartData => transactionsChartData.map(item => item.amount).reduce((a, b) => a + b))
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
+
+            const transactionLoading$ = this.store$.select(state => state.list.transactions.loading)
+            const transactionData$ = this.store$.select(state => state.list.transactions.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadTransactionsFailed)),
+                this.actions$.pipe(ofType(actions.loadTransactionsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadTransactions()))
+            )
+            this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }), transactionData$, transactionLoading$)
             break
           case 'activation':
             this.subscriptions.push(
@@ -191,10 +211,19 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource('Activations')),
                 map(toArray)
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['activate_account'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['activate_account'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
+            const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
+            const activationsData$ = this.store$.select(state => state.list.activations.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadActivationsFailed)),
+                this.actions$.pipe(ofType(actions.loadActivationsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadActivations()))
+            )
+            this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }), activationsData$, activationsLoading$)
             break
           case 'origination':
             this.subscriptions.push(
@@ -215,28 +244,65 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource('Originations')),
                 map(toArray)
               )
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['origination'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['origination'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
+            const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
+            const originationsData$ = this.store$.select(state => state.list.originations.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadOriginationsFailed)),
+                this.actions$.pipe(ofType(actions.loadOriginationsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadOriginations()))
+            )
+            this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }), originationsData$, originationsLoading$)
             break
           case 'delegation':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['delegation'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['delegation'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
+            const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
+            const delegationsData$ = this.store$.select(state => state.list.delegations.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadDelegationsFailed)),
+                this.actions$.pipe(ofType(actions.loadDelegationsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadDelegations()))
+            )
+            this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }), delegationsData$, delegationsLoading$)
             break
           case 'endorsement':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['endorsement'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['endorsement'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
+            const endorsementsLoading$ = this.store$.select(state => state.list.endorsements.loading)
+            const endorsementsData$ = this.store$.select(state => state.list.endorsements.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadEndorsementsFailed)),
+                this.actions$.pipe(ofType(actions.loadEndorsementsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
+            )
+            this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }), endorsementsData$, endorsementsLoading$)
             break
           case 'vote':
-            this.dataService = new TransactionService(this.apiService)
-            this.dataService.updateKind(['ballot', 'proposals'])
-            this.dataService.setPageSize(10)
-            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
+            // this.dataService = new TransactionService(this.apiService)
+            // this.dataService.updateKind(['ballot', 'proposals'])
+            // this.dataService.setPageSize(10)
+            // this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
+
+            const votesLoading$ = this.store$.select(state => state.list.votes.loading)
+            const votesData$ = this.store$.select(state => state.list.votes.data)
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadVotesFailed)),
+                this.actions$.pipe(ofType(actions.loadVotesSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadVotes()))
+            )
+            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$)
             break
           case 'double-baking':
             const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
@@ -253,6 +319,22 @@ export class ListComponent extends BaseComponent implements OnInit {
           case 'double-endorsement':
             const deLoading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
             const deData$ = this.store$.select(state => state.list.doubleEndorsements.data)
+
+            this.subscriptions.push(
+              getRefresh([
+                this.actions$.pipe(ofType(actions.loadDoubleEndorsementsFailed)),
+                this.actions$.pipe(ofType(actions.loadDoubleEndorsementsSucceeded))
+              ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
+            )
+            this.setupTable(
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              deData$,
+              deLoading$
+            )
+            break
+          case 'bakers':
+            const bakersLoading$ = this.store$.select(state => state.list.activeBakers.loading)
+            const bakersData$ = this.store$.select(state => state.list.activeBakers.data)
 
             this.subscriptions.push(
               getRefresh([
@@ -324,6 +406,68 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'proposal':
         this.store$.dispatch(actions.increasePageOfProposals())
         break
+      case 'block':
+        this.store$.dispatch(actions.increasePageOfBlocks())
+        break
+      case 'transaction':
+        this.store$.dispatch(actions.increasePageOfTransactions())
+        break
+      case 'activation':
+        this.store$.dispatch(actions.increasePageOfActivations())
+        break
+      case 'origination':
+        this.store$.dispatch(actions.increasePageOfOriginations())
+        break
+      case 'endorsement':
+        this.store$.dispatch(actions.increasePageOfEndorsements())
+        break
+      case 'delegation':
+        this.store$.dispatch(actions.increasePageOfDelegations())
+        break
+      case 'vote':
+        this.store$.dispatch(actions.increasePageOfVotes())
+        break
+      default:
+        ;(this.dataService as any).loadMore()
+    }
+  }
+
+  sortBy(data: any) {
+    switch (this.routeName) {
+      case 'double-baking':
+        this.store$.dispatch(actions.sortDoubleBakingsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'double-endorsement':
+        this.store$.dispatch(actions.sortDoubleEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'bakers':
+        this.store$.dispatch(actions.sortActiveBakersByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'proposal':
+        this.store$.dispatch(actions.sortProposalsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'block':
+        this.store$.dispatch(actions.sortBlocksByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'transaction':
+        this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'activation':
+        this.store$.dispatch(actions.sortActivationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'origination':
+        this.store$.dispatch(actions.sortOriginationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'delegation':
+        this.store$.dispatch(actions.sortDelegationsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'endorsement':
+        this.store$.dispatch(actions.sortEndorsementsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+      case 'vote':
+        this.store$.dispatch(actions.sortVotesByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+        break
+
       case 'contracts':
         this.store$.dispatch(actions.increasePageOfContracts())
         break

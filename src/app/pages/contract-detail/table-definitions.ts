@@ -8,7 +8,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'singleFrom',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       field: '',
@@ -20,24 +21,28 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'singleTo',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } }),
+      sortable: false
     },
     {
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: any) => ({ data: item.amount, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } })
+      data: (item: any) => ({ data: item.amount, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
+      sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false } }),
+      sortable: true
     },
     {
       name: 'Tx Hash',
       field: 'hash',
-      template: Template.hash
+      template: Template.hash,
+      sortable: false
     }
   ]
 }

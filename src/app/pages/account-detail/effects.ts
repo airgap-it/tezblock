@@ -57,9 +57,15 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.accountDetails.pageSize), this.store$.select(state => state.accountDetails.address)),
-      switchMap(([{ kind }, pageSize, address]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.accountDetails.pageSize),
+        this.store$.select(state => state.accountDetails.address),
+        this.store$.select(state => state.accountDetails.sorting.value),
+        this.store$.select(state => state.accountDetails.sorting.direction)
+      ),
+
+      switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -70,6 +76,14 @@ export class AccountDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
+      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+      map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransactionsByKind),
       withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
     )

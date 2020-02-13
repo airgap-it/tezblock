@@ -139,7 +139,8 @@ tezblock-table {
   }
 }
 /* no breaks in table cell with spaces */
-.table-responsive table td {
+.table-responsive table td,
+.table-responsive table th {
   white-space: nowrap;
 }
 

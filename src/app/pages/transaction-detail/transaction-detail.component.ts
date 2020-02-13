@@ -119,6 +119,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.store$.dispatch(actions.increasePageSize())
   }
 
+  sortBy(data: any) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  }
+
   private setTabs(pageId: string) {
     const showFiatValue = this.isMainnet
 
