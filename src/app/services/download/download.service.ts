@@ -5,6 +5,7 @@ import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
 import { NewTransactionService } from '../transaction/new-transaction.service'
 import { Router } from '@angular/router'
+import { ToastrService } from 'ngx-toastr'
 
 @Injectable({
   providedIn: 'root'
@@ -14,13 +15,17 @@ export class DownloadService {
     private readonly store$: store.Store<fromRoot.State>,
     private readonly apiService: ApiService,
     private readonly newTransactionService: NewTransactionService,
-    private readonly router: Router
+    private readonly router: Router,
+    private readonly toastrService: ToastrService
   ) {}
 
   public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
+    this.toastrService.show('<p>preparing download</p><div class="spinner-border spinner-border-sm" role="status"></div>', undefined, {
+      enableHtml: true
+    })
 
     if (layoutPage === 'account') {
       account$.subscribe(account => {
@@ -36,6 +41,7 @@ export class DownloadService {
             a.href = url
             a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
@@ -53,6 +59,7 @@ export class DownloadService {
             a.href = url
             a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
@@ -70,6 +77,7 @@ export class DownloadService {
             a.href = url
             a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
