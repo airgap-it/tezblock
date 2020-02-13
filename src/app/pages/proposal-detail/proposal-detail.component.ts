@@ -88,7 +88,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         active: true,
         kind: PeriodKind.Proposal,
         count: undefined,
-        columns
+        columns: columns.filter(column => column.field !== 'ballot')
       },
       {
         title: 'Expolration',

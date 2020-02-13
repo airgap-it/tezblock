@@ -42,7 +42,7 @@ export class ProposalDetailEffects {
         forkJoin(
           // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
           this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
-          this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
+          // this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
           this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion)
         ).pipe(
           map(metaVotingPeriodCounts =>
@@ -50,8 +50,8 @@ export class ProposalDetailEffects {
               metaVotingPeriods: [
                 { periodKind: PeriodKind.Proposal, value: null },
                 { periodKind: PeriodKind.Exploration, value: metaVotingPeriodCounts[0] },
-                { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
-                { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] }
+                { periodKind: PeriodKind.Testing, value: null },
+                { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[1] }
               ]
             })
           ),
