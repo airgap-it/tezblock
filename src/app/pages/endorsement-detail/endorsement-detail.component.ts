@@ -44,11 +44,11 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
     this.endorsedSlots$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
-      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots)
+      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : slots))
     )
     this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
-      map(slots => slots ? slots.replace(/[\[\]']/g, '') : slots),
+      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : slots)),
       map((slots: string) => slots.split(',').length)
     )
 
