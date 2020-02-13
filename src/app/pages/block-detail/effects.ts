@@ -29,16 +29,22 @@ export class BlockDetailEffects {
       ofType(actions.loadBlockSucceeded),
       withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction }))
+      map(([{ block }, transactionsLoadedByBlockHash]) =>
+        actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction })
+      )
     )
   )
 
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.blockDetails.pageSize)),
-      switchMap(([{ blockHash, kind }, pageSize]) =>
-        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.pageSize),
+        this.store$.select(state => state.blockDetails.sorting.value),
+        this.store$.select(state => state.blockDetails.sorting.direction)
+      ),
+      switchMap(([{ blockHash, kind }, pageSize, sortingValue, sortingDirection]) =>
+        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, sortingValue, sortingDirection).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -49,6 +55,14 @@ export class BlockDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
+      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+      map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
+    )
+  )
+
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransactionsByKind),
       withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
     )

@@ -25,22 +25,24 @@ export interface Predicate {
   group?: string
 }
 
-export interface Aggregation
-{
-  field: string,
+export interface Aggregation {
+  field: string
   function: 'count' | 'sum'
 }
-
+export interface OrderBy {
+  field: string
+  direction: 'asc' | 'desc'
+}
 export interface Body {
   fields?: string[]
   predicates?: Predicate[]
-  orderBy?: { field: string; direction: string }[]
+  orderBy?: OrderBy[]
   aggregation?: Aggregation[]
   limit?: number
 }
 
-export const andGroup = (pradicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
-  pradicates.map(predicate => ({
+export const andGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
+  predicates.map(predicate => ({
     ...predicate,
     operation: predicate.operation || operation,
     group: groupSymbol

@@ -71,6 +71,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
+  @Output() sortingBy: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
+
   private _tabs: Tab[] | undefined
   public enableDownload: boolean = false
 
@@ -211,5 +213,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     if (this.downloadable) {
       this.downloadService.download(this.page, this.selectedTab.count, this.selectedTab.kind)
     }
+  }
+
+  public sortTransactions(data: any) {
+    this.sortingBy.emit(data)
   }
 }
