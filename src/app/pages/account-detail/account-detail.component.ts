@@ -119,9 +119,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  //TODO: remove when api will be fixed
-  is_baker = false
-
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
 
@@ -265,8 +262,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   getBakingInfos(address: string) {
-    this.is_baker = false
-
     this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
@@ -282,8 +277,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         : {
             payoutAddress
           }
-
-      this.is_baker = true
     })
 
     this.store$.dispatch(actions.loadBakingBadRatings())
