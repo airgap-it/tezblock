@@ -10,9 +10,6 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { TransactionService } from '@tezblock/services/transaction/transaction.service'
-import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
@@ -58,8 +55,6 @@ export class ListComponent extends BaseComponent implements OnInit {
       .format('DD.MM.YYYY')
   )
 
-  private dataService
-
   private get routeName(): string {
     return this.route.snapshot.paramMap.get('route')
   }
@@ -70,7 +65,6 @@ export class ListComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>
@@ -86,9 +80,6 @@ export class ListComponent extends BaseComponent implements OnInit {
       try {
         switch (routeName) {
           case 'block':
-            // this.dataService = new BlockService(this.apiService)
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }))
             const blockLoading$ = this.store$.select(state => state.list.blocks.loading)
             const blockData$ = this.store$.select(state => state.list.blocks.data)
             this.subscriptions.push(
@@ -119,10 +110,6 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Transactions`)),
                 map(toArray)
               )
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }))
-
             const transactionLoading$ = this.store$.select(state => state.list.transactions.loading)
             const transactionData$ = this.store$.select(state => state.list.transactions.data)
             this.subscriptions.push(
@@ -152,10 +139,6 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Activations`)),
                 map(toArray)
               )
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.updateKind(['activate_account'])
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }))
             const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
             const activationsData$ = this.store$.select(state => state.list.activations.data)
             this.subscriptions.push(
@@ -185,10 +168,6 @@ export class ListComponent extends BaseComponent implements OnInit {
                 map(timestampsToChartDataSource(`Originations`)),
                 map(toArray)
               )
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.updateKind(['origination'])
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }))
             const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
             const originationsData$ = this.store$.select(state => state.list.originations.data)
             this.subscriptions.push(
@@ -200,10 +179,6 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }), originationsData$, originationsLoading$)
             break
           case 'delegation':
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.updateKind(['delegation'])
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }))
             const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
             const delegationsData$ = this.store$.select(state => state.list.delegations.data)
             this.subscriptions.push(
@@ -215,10 +190,6 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }), delegationsData$, delegationsLoading$)
             break
           case 'endorsement':
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.updateKind(['endorsement'])
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }))
             const endorsementsLoading$ = this.store$.select(state => state.list.endorsements.loading)
             const endorsementsData$ = this.store$.select(state => state.list.endorsements.data)
             this.subscriptions.push(
@@ -230,11 +201,6 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }), endorsementsData$, endorsementsLoading$)
             break
           case 'vote':
-            // this.dataService = new TransactionService(this.apiService)
-            // this.dataService.updateKind(['ballot', 'proposals'])
-            // this.dataService.setPageSize(10)
-            // this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }))
-
             const votesLoading$ = this.store$.select(state => state.list.votes.loading)
             const votesData$ = this.store$.select(state => state.list.votes.data)
             this.subscriptions.push(
@@ -285,8 +251,8 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.setupTable(
               columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
-              deData$,
-              deLoading$
+              bakersData$,
+              bakersLoading$
             )
             break
           case 'proposal':
@@ -299,8 +265,8 @@ export class ListComponent extends BaseComponent implements OnInit {
                     proposals.pagination.currentPage * proposals.pagination.selectedSize === proposals.data.length
                 )
               )
-            const loading$ = this.store$.select(state => state.list.proposals.loading)
-            const data$ = this.store$.select(state => state.list.proposals.data)
+            const proposalLoading$ = this.store$.select(state => state.list.proposals.loading)
+            const proposalData$ = this.store$.select(state => state.list.proposals.data)
 
             this.subscriptions.push(
               getRefresh([
@@ -308,7 +274,12 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.actions$.pipe(ofType(actions.loadProposalsFailed))
               ]).subscribe(() => this.store$.dispatch(actions.loadProposals()))
             )
-            this.setupTable(columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }), data$, loading$, showLoadMore$)
+            this.setupTable(
+              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }),
+              proposalData$,
+              proposalLoading$,
+              showLoadMore$
+            )
             break
           case 'contract':
             const showLoadMoreContracts$ = this.store$
@@ -368,8 +339,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.increasePageOfVotes())
         break
-      default:
-        ;(this.dataService as any).loadMore()
+      case 'contracts':
+        this.store$.dispatch(actions.increasePageOfContracts())
+        break
     }
   }
 
@@ -408,19 +380,13 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.sortVotesByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
         break
-
-      case 'contracts':
-        this.store$.dispatch(actions.increasePageOfContracts())
-        break
-      default:
-        ;(this.dataService as any).loadMore()
     }
   }
 
   private setupTable(columns: Column[], data$?: Observable<Object>, loading$?: Observable<boolean>, showLoadMore$?: Observable<boolean>) {
     this.columns = columns
-    this.data$ = data$ || this.dataService.list$
-    this.loading$ = loading$ || this.dataService.loading$
+    this.data$ = data$
+    this.loading$ = loading$
     this.showLoadMore$ = showLoadMore$ || of(true)
   }
 }
