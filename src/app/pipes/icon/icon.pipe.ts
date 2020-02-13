@@ -33,6 +33,11 @@ export type IconRef =
   | 'infoCircle'
   | 'website'
   | 'download'
+  | 'fileUpload'
+  | 'binoculars'
+  | 'hammer'
+  | 'graduationCap'
+
 @Pipe({
   name: 'iconPipe'
 })
@@ -86,7 +91,11 @@ export class IconPipe implements PipeTransform {
       hatChef: { prefix, iconName: hatChef },
       infoCircle: { prefix, iconName: infoCircle },
       website: { prefix, iconName: 'globe' },
-      download: { prefix, iconName: 'download' }
+      download: { prefix, iconName: 'download' },
+      fileUpload: { prefix, iconName: 'file-upload' },
+      binoculars: { prefix, iconName: 'binoculars' },
+      hammer: { prefix, iconName: 'hammer' },
+      graduationCap: { prefix, iconName: 'graduation-cap' }
     }
   }
 
