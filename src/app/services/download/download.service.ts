@@ -34,7 +34,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
           }, 1000)
         })
@@ -51,7 +51,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
           }, 1000)
         })
@@ -68,7 +68,7 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = 'tezblock_{' + kind + '}_{' + this.router.url.substring(1) + '}.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
           }, 1000)
         })
