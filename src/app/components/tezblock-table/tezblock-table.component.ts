@@ -67,6 +67,7 @@ export class TezblockTableComponent implements OnInit {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
       if (this._columns.some(column => column.field === 'timestamp')) {
+        this.defaultSorting = 'timestamp'
         if (this.sortingDirection.get('timestamp') === 'desc') {
           return
         } else {
@@ -105,6 +106,7 @@ export class TezblockTableComponent implements OnInit {
   private expandedRows: any[] = []
 
   public sortingDirection = new Map<String, string>()
+  private defaultSorting: string
 
   constructor() {}
 
@@ -147,6 +149,7 @@ export class TezblockTableComponent implements OnInit {
         this.sortingDirection.set(key, 'asc')
       } else if (this.sortingDirection.get(key) === 'asc') {
         this.sortingDirection.clear()
+        this.sortingDirection.set(this.defaultSorting, 'desc')
       }
     } else {
       this.sortingDirection.clear()
