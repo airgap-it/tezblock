@@ -10,9 +10,20 @@ export const loadBlockSucceeded = createAction(`[${featureName}] Load Block Succ
 export const loadBlockFailed = createAction(`[${featureName}] Load Block Failed`, props<{ error: any }>())
 
 // TODO: remove block argument when it'll be in store
-export const loadTransactionsByKind = createAction(`[${featureName}] Load Transactions By Kind`, props<{ blockHash: string, kind: string }>())
-export const loadTransactionsByKindSucceeded = createAction(`[${featureName}] Load Transactions By Kind Succeeded`, props<{ data: Transaction[] }>())
+export const loadTransactionsByKind = createAction(
+  `[${featureName}] Load Transactions By Kind`,
+  props<{ blockHash: string; kind: string }>()
+)
+export const loadTransactionsByKindSucceeded = createAction(
+  `[${featureName}] Load Transactions By Kind Succeeded`,
+  props<{ data: Transaction[] }>()
+)
 export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load Transactions By Kind Failed`, props<{ error: any }>())
+
+export const sortTransactionsByKind = createAction(
+  `[${featureName}] Sort Transactions`,
+  props<{ sortingValue: string; sortingDirection: string }>()
+)
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

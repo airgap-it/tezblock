@@ -7,6 +7,12 @@ export interface TableState<T> {
     total?: number
   }
   loading: boolean
+  sorting: Sorting
+}
+
+export interface Sorting {
+  direction: string
+  value: string
 }
 
 export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
@@ -17,7 +23,8 @@ export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
     pageSizes: [5, 10, 20, 50],
     total: undefined
   },
-  loading: false
+  loading: false,
+  sorting: { direction: undefined, value: undefined }
 })
 
 export interface Data<T> {

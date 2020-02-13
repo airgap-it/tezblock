@@ -15,7 +15,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Age',
       field: 'timestamp',
-      template: Template.timestamp
+      template: Template.timestamp,
+      sortable: true
     },
     {
       name: 'Transaction Volume',
@@ -39,7 +40,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Block',
       field: 'level',
-      template: Template.block
+      template: Template.block,
+      sortable: true
     }
   ],
 
@@ -66,19 +68,22 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Amount',
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.amount, options })
+        data: (item: Transaction) => ({ data: item.amount, options }),
+        sortable: true
       },
       {
         name: 'Fees',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        sortable: true
       },
       {
         name: 'Parameters',
@@ -100,7 +105,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Secret',
@@ -120,7 +126,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Balance',
@@ -148,7 +155,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -179,7 +187,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Value',
@@ -191,7 +200,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } })
+        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        sortable: true
       },
       {
         name: 'Gas Limit',
@@ -209,7 +219,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Age',
       field: 'timestamp',
-      template: Template.timestamp
+      template: Template.timestamp,
+      sortable: true
     },
     {
       name: 'Slots',
@@ -218,7 +229,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Block',
       field: 'block_level',
-      template: Template.block
+      template: Template.block,
+      sortable: true
     },
     {
       name: 'Tx Hash',
@@ -228,7 +240,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     }
   ],
 
-  /* BALLOUT */
+  /* BALLOT */
   [OperationTypes.Ballot]: () =>
     [
       {
@@ -239,16 +251,19 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Ballot',
-        field: 'ballot'
+        field: 'ballot',
+        sortable: true
       },
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Kind',
-        field: 'kind'
+        field: 'kind',
+        sortable: true
       },
       {
         name: 'Voting Period',
@@ -276,7 +291,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Reward',
@@ -308,7 +324,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Age',
         field: 'timestamp',
-        template: Template.timestamp
+        template: Template.timestamp,
+        sortable: true
       },
       {
         name: 'Reward',
@@ -329,6 +346,36 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         data: (item: Transaction) => ({ data: null, options })
       }
     ].concat(<any>blockAndTxHashColumns),
+
+  /* BAKER */
+  [OperationTypes.BakerOverview]: () => [
+    {
+      name: 'Baker',
+      field: 'pkh',
+      template: Template.address,
+      sortable: true
+    },
+    {
+      name: 'Balance',
+      field: 'balance',
+      template: Template.amount,
+      sortable: true
+    },
+    {
+      name: '# of Votes',
+      field: 'number_of_votes'
+    },
+    {
+      name: 'Staking Balance',
+      field: 'staking_balance',
+      template: Template.amount,
+      sortable: true
+    },
+    {
+      name: '# of Delegators',
+      field: 'number_of_delegators'
+    }
+  ],
 
   /* PROPOSAL */
   [OperationTypes.ProposalOverview]: () => [
