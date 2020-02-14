@@ -36,14 +36,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       {
         name: 'Amount',
         field: 'amount',
-        data: (item: Transaction) => ({ data: item.amount, options }),
+        data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
         template: Template.amount,
         sortable: true
       },
       {
         name: 'Fee',
         field: 'fee',
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         template: Template.amount,
         sortable: true
       }
@@ -86,7 +86,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
         name: 'Amount',
         field: 'delegatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.delegatedBalance, options }),
+        data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
@@ -104,7 +104,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
         name: 'Balance',
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.originatedBalance, options }),
+        data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
         sortable: true
       },
       {
@@ -133,7 +133,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
