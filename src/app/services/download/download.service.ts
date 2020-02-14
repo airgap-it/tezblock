@@ -23,9 +23,13 @@ export class DownloadService {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
-    this.toastrService.show('<div class="spinner-border spinner-border-sm" role="status"></div>', 'Preparing Download', {
-      enableHtml: true
-    })
+    this.toastrService.show(
+      '<div class="spinner-border spinner-border-sm d-inline-block" role="status"></div><span class="ml-3">Preparing Download</span>',
+      '',
+      {
+        enableHtml: true
+      }
+    )
 
     if (layoutPage === 'account') {
       account$.subscribe(account => {
