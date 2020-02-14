@@ -9,7 +9,10 @@
               <div class="col col-md-3 py-3">
                 <div class="row mb-3">
                   <div class="col">
-                    <h5 class="card-title__secondary mb-3 ">Transactions last 24 hours</h5>
+                    <h5 class="card-title__secondary mb-3 ">
+                      Transactions
+                      <small>last 24 hours</small>
+                    </h5>
                     <h3>
                       {{ transactionsCountLast24h$ | async }}
                       <loading-skeleton
@@ -21,7 +24,11 @@
                 </div>
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title__secondary mb-3 ">Total Amount of XTZ Transactions the last 24 hours</h5>
+                    <h5 class="card-title__secondary mb-3 ">
+                      Transaction Volume
+                      <br />
+                      <small>last 24 hours</small>
+                    </h5>
                     <h3>
                       <amount-cell
                         *ngIf="transactionsTotalXTZ$ | async"
@@ -34,7 +41,10 @@
                 </div>
               </div>
               <div class="col col-md-9 py-3">
-                <h5 class="card-title__secondary mb-3 ">Transactions last 7 days</h5>
+                <h5 class="card-title__secondary mb-3 ">
+                  Transactions
+                  <small>last 7 days</small>
+                </h5>
                 <chart-item
                   *ngIf="transactionsChartDatasets$ | async"
                   [datasets]="transactionsChartDatasets$ | async"

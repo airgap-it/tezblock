@@ -170,7 +170,7 @@ export class ListComponent extends BaseComponent implements OnInit {
                 .select(state => state.list.transactionsChartData)
                 .pipe(
                   filter(Array.isArray),
-                  map(toTransactionsChartDataSource('Transactions', 'Total XTZ'))
+                  map(toTransactionsChartDataSource('Transactions', 'Volume'))
                 )
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
