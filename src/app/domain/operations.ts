@@ -21,7 +21,8 @@ export enum OperationTypes {
 
     // these are not operation types...
     Block = 'block',
-    Contract = 'contract'
+    Contract = 'contract',
+    Account = 'account'
   }
   
   // TODO: more to more proper place ( separate file )

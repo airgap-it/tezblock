@@ -19,6 +19,7 @@ export const groupBy = (key: string) => (array: any[]) =>
     return accumulator
   }, {})
 export const toArray = (value: any) => [value]
+export const toNotNilArray = (value: any) => Array.isArray(value) ? value : value ? [value] : []
 
 export const withoutBraces = (value: string): string => value ? value.replace(noBraces, '') : value
 

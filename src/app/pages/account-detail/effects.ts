@@ -60,12 +60,11 @@ export class AccountDetailEffects {
       withLatestFrom(
         this.store$.select(state => state.accountDetails.pageSize),
         this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.sorting.value),
-        this.store$.select(state => state.accountDetails.sorting.direction)
+        this.store$.select(state => state.accountDetails.orderBy)
       ),
 
-      switchMap(([{ kind }, pageSize, address, sortingValue, sortingDirection]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, sortingValue, sortingDirection).pipe(
+      switchMap(([{ kind }, pageSize, address, orderBy]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )

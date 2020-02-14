@@ -42,11 +42,10 @@ export class BakersEffects {
       ofType(listActions.loadActiveBakers),
       withLatestFrom(
         this.store$.select(state => state.bakers.activeBakers.pagination),
-        this.store$.select(state => state.bakers.activeBakers.sorting.value),
-        this.store$.select(state => state.bakers.activeBakers.sorting.direction)
+        this.store$.select(state => state.bakers.activeBakers.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) =>
-        this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+      switchMap(([action, pagination, orderBy]) =>
+        this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, orderBy).pipe(
           switchMap(activeBakers =>
             this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
               map(numberOfDelegatorsByBakers =>

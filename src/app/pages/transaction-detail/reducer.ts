@@ -3,6 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { OrderBy } from '@tezblock/services/base.service'
 
 export interface Busy {
   transactions: boolean
@@ -14,7 +15,7 @@ export interface State {
   latestBlock: Block
   pageSize: number // transactions
   busy: Busy
-  sorting: Sorting
+  orderBy: OrderBy
 }
 
 export interface Sorting {
@@ -30,7 +31,7 @@ const initialState: State = {
   busy: {
     transactions: false
   },
-  sorting: { direction: undefined, value: undefined }
+  orderBy: undefined
 }
 
 export const reducer = createReducer(
@@ -69,12 +70,8 @@ export const reducer = createReducer(
   })),
   on(actions.reset, () => initialState),
 
-  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
-    sorting: {
-      ...state.sorting,
-      direction: sortingDirection,
-      value: sortingValue
-    }
+    orderBy
   }))
 )

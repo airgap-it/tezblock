@@ -20,6 +20,7 @@ import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { OperationTypes, LayoutPages } from '@tezblock/domain/operations'
+import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
   selector: 'app-block-detail',
@@ -41,6 +42,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   public tabs: Tab[]
 
   actionType$: Observable<LayoutPages>
+  orderBy$: Observable<OrderBy>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -71,6 +73,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
     this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Block))
+    this.orderBy$ = this.store$.select(state => state.blockDetails.orderBy)
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -112,8 +115,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  sortBy(data: any) {
-    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
   private setTabs(pageId: string) {

@@ -17,6 +17,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Baker } from '@tezblock/services/api/api.service'
+import { OrderBy } from '@tezblock/services/base.service'
 
 const labelsParams = {
   display: true,
@@ -76,6 +77,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
   top24ChartColors: any[] = [{ backgroundColor: palette }]
   top24ChartSize$: Observable<ChartSize>
   isMobile$: Observable<boolean>
+  orderBy$: Observable<OrderBy>
 
   constructor(
     private readonly actions$: Actions,
@@ -119,6 +121,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
       .pipe(map(breakpointState => breakpointState.matches))
     this.top24ChartOptions$ = this.isMobile$.pipe(map(this.getOptions.bind(this)))
     this.top24ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 800, height: 480 })))
+    this.orderBy$ = this.store$.select(state => state.bakers.activeBakers.orderBy)
 
     this.subscriptions.push(
       getRefresh([
@@ -138,8 +141,8 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageOfActiveBakers())
   }
 
-  sortBy(data: any) {
-    this.store$.dispatch(actions.sortActiveBakersByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortActiveBakersByKind({ orderBy }))
   }
 
   private getOptions(isMobile: boolean): ChartOptions {

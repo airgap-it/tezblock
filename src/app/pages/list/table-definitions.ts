@@ -420,5 +420,22 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Description',
       field: 'description'
     }
-  ]
+  ],
+
+  /* ACCOUNT */
+  [OperationTypes.Account]: () =>
+    [
+      {
+        name: 'Account',
+        field: 'account_id',
+        width: '300px',
+        template: Template.address
+      },
+      {
+        name: 'Balance',
+        field: 'balance',
+        template: Template.amount,
+        sortable: true
+      }
+    ]
 }

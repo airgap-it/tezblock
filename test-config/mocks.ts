@@ -220,7 +220,6 @@ export const ApiServiceMock = jasmine.createSpyObj('ApiService', {
   getBakingRights: of([]),
   getEndorsingRights: of([]),
 
-  getById: of(null),
   getAccountStatus: of(null).toPromise(),
   getOperationCount: of([]),
   getEndorsedSlotsCount: of(null),

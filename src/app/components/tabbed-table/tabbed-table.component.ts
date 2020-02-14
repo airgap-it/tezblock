@@ -8,6 +8,7 @@ import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { DownloadService } from '@tezblock/services/download/download.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { OrderBy } from '@tezblock/services/base.service'
 
 type KindType = string | string[]
 
@@ -63,6 +64,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loading?: Observable<boolean>
 
   @Input()
+  orderBy: OrderBy
+
+  @Input()
   downloadable?: boolean = false
 
   @Output()
@@ -71,7 +75,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
-  @Output() sortingBy: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
+  @Output() onSort: EventEmitter<OrderBy> = new EventEmitter()
 
   private _tabs: Tab[] | undefined
   public enableDownload: boolean = false
@@ -215,7 +219,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  public sortTransactions(data: any) {
-    this.sortingBy.emit(data)
+  public sortTransactions(orderBy: OrderBy) {
+    this.onSort.emit(orderBy)
   }
 }

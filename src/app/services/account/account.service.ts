@@ -4,7 +4,8 @@ import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { Account } from '../../interfaces/Account'
 import { ApiService } from '../api/api.service'
-import { Facade, Pagination } from '../facade/facade'
+import { Facade } from '../facade/facade'
+import { Pagination } from '@tezblock/domain/table'
 import { Transaction } from 'src/app/interfaces/Transaction'
 
 interface AccountServiceState {

@@ -1,18 +1,17 @@
-export interface TableState<T> {
-  data: T[]
-  pagination: {
-    currentPage: number
-    selectedSize: number
-    pageSizes: [number, number, number, number]
-    total?: number
-  }
-  loading: boolean
-  sorting: Sorting
+import { OrderBy } from '@tezblock/services/base.service'
+
+export interface Pagination {
+  currentPage: number
+  selectedSize: number
+  pageSizes: [number, number, number, number]
+  total?: number
 }
 
-export interface Sorting {
-  direction: string
-  value: string
+export interface TableState<T> {
+  data: T[]
+  pagination: Pagination
+  loading: boolean
+  orderBy: OrderBy
 }
 
 export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
@@ -24,7 +23,7 @@ export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
     total: undefined
   },
   loading: false,
-  sorting: { direction: undefined, value: undefined }
+  orderBy: undefined
 })
 
 export interface Data<T> {
