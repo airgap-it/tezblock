@@ -7,11 +7,11 @@ import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
-import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from './../../interfaces/BakingRights'
-import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from './../../interfaces/EndorsingRights'
-import { Account } from '../../interfaces/Account'
-import { Block } from '../../interfaces/Block'
-import { Transaction } from '../../interfaces/Transaction'
+import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from '@tezblock/interfaces/BakingRights'
+import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from '@tezblock/interfaces/EndorsingRights'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp'
@@ -19,6 +19,7 @@ import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation, OrderBy } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Contract } from '@tezblock/domain/contract'
+import { sort } from '@tezblock/domain/table'
 
 export interface OperationCount {
   [key: string]: string
@@ -57,11 +58,6 @@ function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => 
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
 }
 
-const orderByBlockLevelDesc = {
-  field: 'block_level',
-  direction: 'desc'
-}
-
 @Injectable({
   providedIn: 'root'
 })
@@ -83,11 +79,6 @@ export class ApiService {
       'Content-Type': 'application/json',
       apikey: this.environmentUrls.conseilApiKey
     })
-  }
-
-  private readonly orderByTimestampAsc = {
-    field: 'timestamp',
-    direction: 'asc'
   }
 
   constructor(
@@ -117,14 +108,14 @@ export class ApiService {
             inverse: false
           }
         ],
-        orderBy: [this.orderByTimestampAsc],
+        orderBy: [sort('timestamp', 'asc')],
         limit: 1
       },
       this.options
     )
   }
 
-  getLatestTransactions(limit: number, kindList: string[], orderBy = orderByBlockLevelDesc): Observable<Transaction[]> {
+  getLatestTransactions(limit: number, kindList: string[], orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -171,14 +162,7 @@ export class ApiService {
       )
   }
 
-  getTransactionsById(
-    id: string,
-    limit: number,
-    orderBy = {
-      field: 'block_level',
-      direction: 'desc'
-    }
-  ): Observable<Transaction[]> {
+  getTransactionsById(id: string, limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -318,12 +302,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         limit
       },
       this.options
@@ -335,7 +314,7 @@ export class ApiService {
     field: string,
     kind: string,
     limit: number,
-    orderBy = { field: 'block_level', direction: 'desc' }
+    orderBy = sort('block_level', 'desc')
   ): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
@@ -404,14 +383,7 @@ export class ApiService {
       )
   }
 
-  getTransactionsByPredicates(
-    predicates: Predicate[],
-    limit: number,
-    orderBy = {
-      field: 'block_level',
-      direction: 'desc'
-    }
-  ): Observable<Transaction[]> {
+  getTransactionsByPredicates(predicates: Predicate[], limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -719,12 +691,7 @@ export class ApiService {
                 set: [address]
               }
             ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
+            orderBy: [sort('block_level', 'desc')],
             limit: 1
           },
           this.options
@@ -761,24 +728,13 @@ export class ApiService {
     )
   }
 
-  getLatestBlocksWithData(limit: number, sorting: OrderBy): Observable<Block[]> {
-    let orderBy = {
+  getLatestBlocksWithData(
+    limit: number,
+    orderBy = {
       field: 'timestamp',
       direction: 'desc'
     }
-    let sortValueMemory: string
-
-    if (sorting) {
-      if (sorting.field === 'volume' || sorting.field === 'fee') {
-        sortValueMemory = sorting.field
-        orderBy = {
-          field: 'timestamp',
-          direction: 'desc'
-        }
-      } else {
-        orderBy = sorting
-      }
-    }
+  ): Observable<Block[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -796,8 +752,8 @@ export class ApiService {
           const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
 
           return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
-            map(([amount, fee, operationGroup]) => {
-              blocks = blocks.map(block => {
+            map(([amount, fee, operationGroup]) =>
+              blocks.map(block => {
                 const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
                 const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
                 const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
@@ -808,17 +764,7 @@ export class ApiService {
                   txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
                 }
               })
-
-              sorting
-                ? sortValueMemory === 'volume' || sortValueMemory === 'fee'
-                  ? sorting.direction === 'desc'
-                    ? (blocks = blocks.sort((a: any, b: any) => b.sortValueMemory - a.sortValueMemory))
-                    : (blocks = blocks.sort((a: any, b: any) => a.sortValueMemory - b.sortValueMemory))
-                  : blocks
-                : (blocks = blocks.sort((a, b) => b.level - a.level).slice(0, limit))
-
-              return blocks
-            })
+            )
           )
         })
       )
@@ -847,12 +793,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -876,12 +817,7 @@ export class ApiService {
             set: blockRange
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -922,12 +858,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -951,12 +882,7 @@ export class ApiService {
             set: blockRange
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -1257,12 +1183,7 @@ export class ApiService {
               set: ['endorsement']
             }
           ],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [sort('block_level', 'desc')],
           limit: 32
         },
         this.options

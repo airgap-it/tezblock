@@ -74,14 +74,7 @@
                   >
                     {{ column.name }}
                   </button>
-                  <button
-                    class="btn btn-link  p-0 collapse--btn"
-                    [ngClass]="{
-                      'btn--ascending': getDirection(column.field) === 'asc',
-                      'btn--descending': getDirection(column.field) === 'desc'
-                    }"
-                    id="sortingButton"
-                  >
+                  <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
                     <ng-container *ngIf="!getDirection(column.field); else arrow">
                       <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
                     </ng-container>

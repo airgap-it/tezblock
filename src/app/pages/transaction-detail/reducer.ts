@@ -4,6 +4,7 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { OrderBy } from '@tezblock/services/base.service'
+import { sort } from '@tezblock/domain/table'
 
 export interface Busy {
   transactions: boolean
@@ -31,7 +32,7 @@ const initialState: State = {
   busy: {
     transactions: false
   },
-  orderBy: undefined
+  orderBy: sort('block_level', 'desc')
 }
 
 export const reducer = createReducer(

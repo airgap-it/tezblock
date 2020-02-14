@@ -8,6 +8,7 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Contract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { Account } from '@tezblock/interfaces/Account'
+import { sort } from '@tezblock/domain/table'
 
 export interface State {
   accounts: TableState<Account>
@@ -32,18 +33,18 @@ export interface State {
 }
 
 const initialState: State = {
-  accounts: getInitialTableState(),
-  blocks: getInitialTableState(),
-  transactions: getInitialTableState(),
-  doubleBakings: getInitialTableState(),
-  doubleEndorsements: getInitialTableState(),
-  proposals: getInitialTableState(),
-  activeBakers: getInitialTableState(),
-  activations: getInitialTableState(),
-  originations: getInitialTableState(),
-  endorsements: getInitialTableState(),
-  delegations: getInitialTableState(),
-  votes: getInitialTableState(),
+  accounts: getInitialTableState({ field: 'balance', direction: 'desc' }),
+  blocks: getInitialTableState(sort('timestamp', 'desc')),
+  transactions: getInitialTableState(sort('block_level', 'desc')),
+  doubleBakings: getInitialTableState(sort('block_level', 'desc')),
+  doubleEndorsements: getInitialTableState(sort('block_level', 'desc')),
+  proposals: getInitialTableState({ field: 'period', direction: 'desc' }),
+  activeBakers: getInitialTableState({ field: 'staking_balance', direction: 'desc' }),
+  activations: getInitialTableState(sort('block_level', 'desc')),
+  originations: getInitialTableState(sort('block_level', 'desc')),
+  endorsements: getInitialTableState(sort('block_level', 'desc')),
+  delegations: getInitialTableState(sort('block_level', 'desc')),
+  votes: getInitialTableState(sort('block_level', 'desc')),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,

@@ -54,7 +54,7 @@ export const getNextOrderBy = (orderBy?: OrderBy, field?: string): OrderBy => {
     return { ...orderBy, direction: 'asc' }
   }
 
-  return null
+  return undefined
 }
 
 export const andGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>

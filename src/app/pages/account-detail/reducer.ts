@@ -11,6 +11,7 @@ import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { OrderBy } from '@tezblock/services/base.service'
+import { sort } from '@tezblock/domain/table'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>
@@ -120,7 +121,7 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  orderBy: undefined
+  orderBy: sort('block_level', 'desc')
 }
 
 export const reducer = createReducer(

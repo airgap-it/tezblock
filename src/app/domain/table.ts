@@ -1,4 +1,4 @@
-import { OrderBy } from '@tezblock/services/base.service'
+import { OrderBy, Direction } from '@tezblock/services/base.service'
 
 export interface Pagination {
   currentPage: number
@@ -14,7 +14,7 @@ export interface TableState<T> {
   orderBy: OrderBy
 }
 
-export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
+export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): TableState<any> => ({
   data: [],
   pagination: {
     currentPage: 1,
@@ -23,10 +23,12 @@ export const getInitialTableState = (selectedSize = 10): TableState<any> => ({
     total: undefined
   },
   loading: false,
-  orderBy: undefined
+  orderBy
 })
 
 export interface Data<T> {
   data: T[]
   total: number
 }
+
+export const sort = (field: string, direction: Direction): OrderBy => ({ field, direction })

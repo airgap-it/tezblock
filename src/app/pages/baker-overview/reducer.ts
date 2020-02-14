@@ -23,7 +23,7 @@ export interface Sorting {
 }
 
 const initialState: State = {
-  activeBakers: getInitialTableState(),
+  activeBakers: getInitialTableState({ field: 'staking_balance', direction: 'desc' }),
   top24Bakers: undefined,
   top24BakersLoading: false
 }
