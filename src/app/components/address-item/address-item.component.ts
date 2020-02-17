@@ -6,6 +6,7 @@ import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string
 
 export interface Options {
   pageId?: string | number
+  isText?: boolean
   showFiatValue?: boolean
   showFullAddress?: boolean
   showAlliasOrFullAddress?: boolean
