@@ -182,12 +182,12 @@ export class ProposalDetailEffects {
         ).pipe(
           map(counts =>
             actions.loadVotesTotalSucceeded({
-              metaVotingPeriods: [{
-                ...metaVotingPeriods[0],
-                count: counts[0]
-              }].concat(
-                _metaVotingPeriods.map((metaVotingPeriod, index) => ({ ...metaVotingPeriod, count: counts[index + 1] }))
-              )
+              metaVotingPeriods: [
+                {
+                  ...metaVotingPeriods[0],
+                  count: counts[0]
+                }
+              ].concat(_metaVotingPeriods.map((metaVotingPeriod, index) => ({ ...metaVotingPeriod, count: counts[index + 1] })))
             })
           ),
           catchError(error => of(actions.loadVotesTotalFailed({ error })))
@@ -220,6 +220,12 @@ export class ProposalDetailEffects {
             operation: Operation.eq,
             set: [periodKind],
             inverse: false
+          }
+        ],
+        orderBy: [
+          {
+            field: 'level',
+            direction: 'desc'
           }
         ],
         limit: 1
