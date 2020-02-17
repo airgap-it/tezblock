@@ -541,6 +541,13 @@ export class ListEffects {
     )
   )
 
+  increasePageOfAccounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfAccounts),
+      map(() => listActions.loadAccounts())
+    )
+  )
+
   private getEntitiesSince(since: number, kind: string): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
       fields: ['timestamp'],
