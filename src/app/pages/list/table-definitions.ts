@@ -2,6 +2,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { squareBrackets } from '@tezblock/domain/pattern'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) => Column[] } = {
   /* BLOCK */
@@ -384,11 +385,12 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Proposal',
       field: 'proposal',
       template: Template.hash,
-      data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
+      data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, ''), options: { kind: 'proposal' } })
     },
     {
       name: 'Proposal Hash',
-      field: 'proposal'
+      field: 'proposal',
+      data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, '') })
     },
     {
       name: 'Period',

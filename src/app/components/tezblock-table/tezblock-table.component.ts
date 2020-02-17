@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild, ChangeDetectionStrategy } from '@angular/core'
 
 export enum Template {
   address,
@@ -48,7 +48,8 @@ const satisfyData = (column: Column): Column =>
 @Component({
   selector: 'tezblock-table',
   templateUrl: './tezblock-table.component.html',
-  styleUrls: ['./tezblock-table.component.scss']
+  styleUrls: ['./tezblock-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TezblockTableComponent implements OnInit {
   @ViewChild('basicTemplate', { static: true }) basicTemplate: TemplateRef<any>

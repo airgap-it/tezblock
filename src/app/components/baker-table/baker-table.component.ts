@@ -21,7 +21,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { kindToOperationTypes, Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { kindToOperationTypes, Tab } from '@tezblock/domain/tab'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({

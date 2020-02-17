@@ -3,17 +3,38 @@ import * as _ from 'lodash'
 
 import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
+import { MetaVotingPeriod } from '@tezblock/domain/vote'
+
+const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
+  if (!state.metaVotingPeriods) {
+    return metaVotingPeriods
+  }
+
+  return metaVotingPeriods.map(metaVotingPeriod => {
+    const match = state.metaVotingPeriods.find(_metaVotingPeriod => _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind)
+
+    return { ...match, [property]: metaVotingPeriod[property] }
+  })
+}
 
 export interface State {
   id: string
   proposal: ProposalDto
-  loading: boolean
+  loadingProposal: boolean
+  periodKind: string
+  metaVotingPeriods: MetaVotingPeriod[]
+  votes: TableState<Transaction>
 }
 
 const initialState: State = {
   id: undefined,
   proposal: undefined,
-  loading: false
+  loadingProposal: false,
+  periodKind: undefined,
+  metaVotingPeriods: undefined,
+  votes: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -27,11 +48,59 @@ export const reducer = createReducer(
   on(actions.loadProposalSucceeded, (state, { proposal }) => ({
     ...state,
     proposal: proposal || null,
-    loading: false
+    loadingProposal: false
   })),
   on(actions.loadProposalFailed, state => ({
     ...state,
     proposal: null,
-    loading: false
+    loadingProposal: false
+  })),
+  on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
+    ...state,
+    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'value')
+  })),
+  on(actions.loadVotesTotalSucceeded, (state, { metaVotingPeriods }) => ({
+    ...state,
+    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'count')
+  })),
+  on(actions.loadMetaVotingPeriodsFailed, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: false
+    }
+  })),
+  on(actions.loadVotes, (state, { periodKind }) => ({
+    ...state,
+    periodKind,
+    votes: {
+      ...state.votes,
+      loading: true
+    }
+  })),
+  on(actions.loadVotesSucceeded, (state, { votes }) => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      data: votes,
+      loading: false
+    }
+  })),
+  on(actions.loadVotesFailed, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: false
+    }
+  })),
+  on(actions.increasePageSize, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      pagination: {
+        ...state.votes.pagination,
+        currentPage: state.votes.pagination.currentPage + 1
+      }
+    }
   }))
 )

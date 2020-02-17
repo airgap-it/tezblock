@@ -22,7 +22,7 @@ import { Contract } from '@tezblock/domain/contract'
 
 export interface OperationCount {
   [key: string]: string
-  count_operation_group_hash: string
+  field: string
   kind: string
 }
 
@@ -245,7 +245,7 @@ export class ApiService {
   addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {
     kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
 
-    if (kindList.includes('ballot' || 'proposals')) {
+    if (kindList.includes('ballot') || kindList.includes('proposals')) {
       const votingPeriodPredicates: Predicate[] = transactions
         .map(transaction => transaction.block_level)
         .filter(distinctFilter)
@@ -1057,7 +1057,9 @@ export class ApiService {
       ]
     }
 
-    return this.http.post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
+    return this.http
+      .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
+      .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field }))))
   }
 
   getBlockById(id: string): Observable<Block[]> {

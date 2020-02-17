@@ -6,7 +6,7 @@ import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 
 interface Busy {
   efficiencyLast10Cycles: boolean

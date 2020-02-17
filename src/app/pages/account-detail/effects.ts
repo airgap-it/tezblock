@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { from, of } from 'rxjs'
+import { from, of, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
@@ -11,10 +11,11 @@ import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { NewAccountService } from '@tezblock/services/account/account.service'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
-import { first } from '@tezblock/services/fp'
+import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { get } from 'lodash'
+import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -86,6 +87,34 @@ export class AccountDetailEffects {
       ofType(actions.sortTransactionsByKind),
       withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
+  onLoadTransactionLoadCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKind),
+      map(() => actions.loadTransactionsCounts())
+    )
+  )
+
+  loadTransactionsCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsCounts),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        forkJoin(
+          this.apiService.getOperationCount('source', address),
+          this.apiService.getOperationCount('destination', address),
+          this.apiService
+            .getOperationCount('delegate', address)
+            .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
+        ).pipe(
+          map(flatten),
+          map(aggregateOperationCounts),
+          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
+          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
     )
   )
 
