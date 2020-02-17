@@ -3,12 +3,18 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { Contract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { Account } from '@tezblock/interfaces/Account'
 import { sort } from '@tezblock/domain/table'
+
+const preprocessBakersData = (bakerData: any[]) =>
+  bakerData.map(bakerDataItem => ({
+    ...bakerDataItem,
+    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
+  }))
 
 export interface State {
   accounts: TableState<Account>

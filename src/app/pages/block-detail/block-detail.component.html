@@ -18,9 +18,8 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'block'"
-              [loading]="transactionsLoading$"
+              [loading]="transactionsLoading$ | async"
               [data]="transactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"

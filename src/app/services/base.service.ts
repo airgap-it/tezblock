@@ -14,7 +14,8 @@ export enum Operation {
   lt = 'lt',
   gt = 'gt',
   isnull = 'isnull',
-  startsWith = 'startsWith'
+  startsWith = 'startsWith',
+  like = 'like'
 }
 
 export interface Predicate {

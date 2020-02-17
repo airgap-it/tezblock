@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { Tab } from '@tezblock/domain/tab'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -17,11 +17,11 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { first } from '@tezblock/services/fp'
-import { LayoutPages } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
@@ -43,7 +43,6 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   transactionsLoading$: Observable<boolean>
   transactions$: Observable<Transaction[]>
   filteredTransactions$: Observable<Transaction[]>
-  actionType$: Observable<LayoutPages>
   isInvalidHash$: Observable<boolean>
   orderBy$: Observable<OrderBy>
 
@@ -69,7 +68,6 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
     this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
-    this.actionType$ = this.latestTx$.pipe(map(() => LayoutPages.Transaction))
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
@@ -106,7 +104,12 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
           withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
           switchMap(([action, transactionHash]) => timer(refreshRate, refreshRate).pipe(map(() => transactionHash)))
         )
-        .subscribe(transactionHash => this.store$.dispatch(actions.loadTransactionsByHash({ transactionHash })))
+        .subscribe(transactionHash => this.store$.dispatch(actions.loadTransactionsByHash({ transactionHash }))),
+
+      this.store$
+        .select(state => state.transactionDetails.counts)
+        .pipe(filter(counts => !!counts))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
   }
 

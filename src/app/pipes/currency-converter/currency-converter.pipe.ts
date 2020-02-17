@@ -32,7 +32,6 @@ export class CurrencyConverterPipe implements PipeTransform {
     })
     const amount = new BN(value).shiftedBy(protocol.decimals * -1)
     const result: number = args ? this.transformToCurrency(amount, args.currInfo) : value.toNumber()
-
     return result
     /*
     args ? result = this.transformToCurrency(amount, args.currInfo) : result = value.toNumber() */

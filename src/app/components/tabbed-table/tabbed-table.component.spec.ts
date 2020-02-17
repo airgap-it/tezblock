@@ -50,7 +50,6 @@ describe('TabbedTableComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(TabbedTableComponent)
     component = fixture.componentInstance
-    component.actionType$ = EMPTY
     fixture.detectChanges()
   })
 

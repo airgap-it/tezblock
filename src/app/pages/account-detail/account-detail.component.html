@@ -359,9 +359,8 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'account'"
-              [loading]="areTransactionsLoading$"
+              [loading]="areTransactionsLoading$ | async"
               [data]="transactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"

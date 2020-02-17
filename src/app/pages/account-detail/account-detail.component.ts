@@ -3,8 +3,8 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge, timer } from 'rxjs'
-import { delay, map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { from, Observable, combineLatest, merge } from 'rxjs'
+import { delay, map, filter, withLatestFrom } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -14,7 +14,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
-import { Tab } from '../../components/tabbed-table/tabbed-table.component'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { Account } from '../../interfaces/Account'
 import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
@@ -28,9 +28,10 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
-import { LayoutPages, OperationTypes } from '@tezblock/domain/operations'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
+import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -112,7 +113,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   isBusy$: Observable<Busy>
   transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
-  actionType$: Observable<LayoutPages>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
@@ -176,7 +176,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.remainingTime$ = this.cycleService.remainingTime$
     this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
-    this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Account))
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
@@ -245,15 +244,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
-      merge(
+      getRefresh([
         this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
         this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-      )
-        .pipe(
-          withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
-          switchMap(([action, kind]) => timer(refreshRate, refreshRate).pipe(map(() => kind)))
-        )
-        .subscribe(kind => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+      ])
+        .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
+        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+
       this.account$
         .pipe(
           withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
@@ -263,7 +260,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(() => {
           this.transactions.nativeElement.scrollIntoView({ behavior: 'smooth' })
           this.scrolledToTransactions = true
-        })
+        }),
+
+      this.store$
+        .select(state => state.accountDetails.counts)
+        .pipe(filter(counts => !!counts))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
   }
 
