@@ -6,7 +6,6 @@ import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { ChartsModule } from 'ng2-charts'
 
 import { AmountCellComponent } from './../tezblock-table/amount-cell/amount-cell.component'
-import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { BakerTableComponent } from './baker-table.component'
@@ -36,7 +35,6 @@ describe('BakerTableComponent', () => {
           BakerTableComponent,
           TezblockTableComponent,
           LoadingSkeletonComponent,
-          AddressCellComponent,
           IdenticonComponent,
           AmountCellComponent,
           BlockCellComponent,

@@ -429,7 +429,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Account',
         field: 'account_id',
         width: '50%',
-        template: Template.address
+        template: Template.address,
+        data: (item: any) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
       },
       {
         name: 'Balance',

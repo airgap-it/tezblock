@@ -26,10 +26,8 @@
                   <address-item
                     class="d-inline-flex"
                     [address]="account.account_id"
-                    [showFull]="true"
+                    [options]="{ forceIdenticon: true, showFullAddress: true, hideIdenticon: !hasLogo }"
                     [clickableButton]="false"
-                    [forceIdenticon]="true"
-                    [hideIdenticon]="!hasLogo"
                   ></address-item>
 
                   <a
@@ -51,7 +49,7 @@
                       *ngIf="hasAlias"
                       class="d-inline-flex"
                       [address]="account.account_id"
-                      [hideIdenticon]="true"
+                      [options]="{ hideIdenticon: true }"
                     ></address-item>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
@@ -121,9 +119,9 @@
                 </p>
                 <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts$ | async | slice: 0:paginationLimit" [@AnimateList]>
                   <address-item
-                    [address]="relatedAccount.account_id"
                     *ngIf="relatedAccount"
-                    [showFull]="!(isMobile$ | async)"
+                    [address]="relatedAccount.account_id"
+                    [options]="{ showFullAddress: !(isMobile$ | async) }"
                   ></address-item>
                 </div>
                 <div *ngIf="relatedAccounts$ | async as relatedAccountsList">

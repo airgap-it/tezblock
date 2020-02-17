@@ -4,7 +4,6 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { EMPTY } from 'rxjs'
 
 import { AddressItemComponent } from 'src/app/components/address-item/address-item.component'
-import { AddressCellComponent } from './../tezblock-table/address-cell/address-cell.component'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { TabbedTableComponent } from './tabbed-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
@@ -34,7 +33,6 @@ describe('TabbedTableComponent', () => {
           TezblockTableComponent,
           IdenticonComponent,
           LoadingSkeletonComponent,
-          AddressCellComponent,
           AmountCellComponent,
           BlockCellComponent,
           AddressItemComponent,

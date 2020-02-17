@@ -5,7 +5,7 @@
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
 </ng-template>
 <ng-template #addressTemplate let-context>
-  <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
+  <address-item [address]="context?.data" [options]="context?.options"></address-item>
 </ng-template>
 <ng-template #percentageTemplate let-context>
   {{ context?.data | percentage }}

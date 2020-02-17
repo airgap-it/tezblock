@@ -27,10 +27,8 @@
                   <address-item
                     class="d-inline-flex"
                     [address]="contract.id"
-                    [showFull]="true"
+                    [options]="{ showFullAddress: true, forceIdenticon: true }"
                     [clickableButton]="false"
-                    [forceIdenticon]="true"
-                    [hideIdenticon]="false"
                   ></address-item>
 
                   <a
@@ -52,7 +50,7 @@
                       *ngIf="hasAlias$ | async"
                       class="d-inline-flex"
                       [address]="contract.id"
-                      [hideIdenticon]="true"
+                      [options]="{ hideIdenticon: true }"
                     ></address-item>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
