@@ -287,7 +287,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: item.payout, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: { amount: item.payout }, options: { showFiatValue: true } })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
@@ -305,9 +305,19 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Age', field: 'estimated_time', template: Template.timestamp },
           { name: 'Level', field: 'level', template: Template.block },
           { name: 'Priority', field: 'priority' },
-          { name: 'Rewards', field: 'rewards', template: Template.amount },
-          { name: 'Fees', field: 'fees', template: Template.amount },
-          { name: 'Deposits', field: 'deposit', template: Template.amount }
+          {
+            name: 'Rewards',
+            field: 'rewards',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: { amount: item.rewards } })
+          },
+          { name: 'Fees', field: 'fees', template: Template.amount, data: (item: BakingRights) => ({ data: { amount: item.fees } }) },
+          {
+            name: 'Deposits',
+            field: 'deposit',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: { amount: item.deposit } })
+          }
         ],
         data: item.items
       }),
@@ -326,9 +336,14 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: { amount: item.rewards }, options: { showFiatValue: true } })
           },
-          { name: 'Deposits', field: 'deposit', template: Template.amount }
+          {
+            name: 'Deposits',
+            field: 'deposit',
+            template: Template.amount,
+            data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
+          }
         ],
         data: item.items
       }),

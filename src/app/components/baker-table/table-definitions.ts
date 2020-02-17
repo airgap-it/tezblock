@@ -21,19 +21,19 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
       name: 'Block Rewards',
       field: 'blockRewards',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.blockRewards, options })
+      data: (item: AggregatedBakingRights) => ({ data: { amount: item.blockRewards }, options })
     },
     {
       name: 'Deposits',
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.deposits, options })
+      data: (item: AggregatedBakingRights) => ({ data: { amount: item.deposits }, options })
     },
     {
       name: 'Fees',
       field: 'fees',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: item.fees, options })
+      data: (item: AggregatedBakingRights) => ({ data: { amount: item.fees }, options })
     }
   ],
 
@@ -52,13 +52,13 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
       name: 'Endorsement Rewards',
       field: 'endorsementRewards',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: item.endorsementRewards, options })
+      data: (item: AggregatedEndorsingRights) => ({ data: { amount: item.endorsementRewards }, options })
     },
     {
       name: 'Deposits',
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: item.deposits, options })
+      data: (item: AggregatedEndorsingRights) => ({ data: { amount: item.deposits }, options })
     }
   ],
 
@@ -77,25 +77,25 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
     {
       name: 'Staking Balance',
       field: 'stakingBalance',
-      data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
+      data: (item: TezosRewards) => ({ data: { amount: item.stakingBalance }, options }),
       template: Template.amount
     },
     {
       name: 'Block Rewards',
       field: 'bakingRewards',
-      data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
+      data: (item: TezosRewards) => ({ data: { amount: item.bakingRewards }, options }),
       template: Template.amount
     },
     {
       name: 'Endorsement Rewards',
       field: 'endorsingRewards',
-      data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
+      data: (item: TezosRewards) => ({ data: { amount: item.endorsingRewards }, options }),
       template: Template.amount
     },
     {
       name: 'Fees',
       field: 'fees',
-      data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+      data: (item: TezosRewards) => ({ data: { amount: item.fees }, options: { showFiatValue: false } }),
       template: Template.amount
     }
   ]
