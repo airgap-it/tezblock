@@ -7,7 +7,6 @@ import * as moment from 'moment'
 
 import * as listActions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
@@ -503,9 +502,6 @@ export class ListEffects {
     )
   )
 
-<<<<<<< HEAD
-  private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {
-=======
   loadAccounts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadAccounts),
@@ -550,8 +546,7 @@ export class ListEffects {
     )
   )
 
-  private getEntitiesSince(since: number, kind: string): Observable<Transaction[]> {
->>>>>>> origin/develop
+  private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
       fields,
       predicates: [
@@ -568,7 +563,6 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly store$: Store<fromRoot.State>,
-    private readonly blockService: BlockService
+    private readonly store$: Store<fromRoot.State>
   ) {}
 }

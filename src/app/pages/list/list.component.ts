@@ -11,10 +11,6 @@ import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
-<<<<<<< HEAD
-import { ApiService } from '@tezblock/services/api/api.service'
-=======
->>>>>>> origin/develop
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
@@ -22,12 +18,9 @@ import { toArray, groupBy } from '@tezblock/services/fp'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
-<<<<<<< HEAD
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
 import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
-=======
 import { OrderBy } from '@tezblock/services/base.service'
->>>>>>> origin/develop
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g

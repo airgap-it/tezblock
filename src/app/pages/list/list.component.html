@@ -32,7 +32,7 @@
                     <h3>
                       <amount-cell
                         *ngIf="transactionsTotalXTZ$ | async"
-                        [data]="transactionsTotalXTZ$ | async"
+                        [data]="{ amount: transactionsTotalXTZ$ | async }"
                         options="{ showFiatValue: false }"
                       ></amount-cell>
                       <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
