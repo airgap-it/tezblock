@@ -11,8 +11,6 @@ import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'

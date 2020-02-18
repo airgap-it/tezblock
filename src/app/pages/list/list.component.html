@@ -41,7 +41,7 @@
                   [labels]="chartLabels"
                   [options]="transactionsChartOptions"
                   chartType="bar"
-                  [colorOptions]="{ gradientFrom: 'rgba(46,91,255,0.09)', borderWidth: 1 }"
+                  [colorOptions]="{ gradientFrom: 'rgba(46,91,255,0.09)', borderWidth: 1, colors: [{ backgroundColor: '#2e5bff' }] }"
                 ></chart-item>
                 <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
               </div>
