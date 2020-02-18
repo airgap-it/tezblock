@@ -30,6 +30,7 @@
     (downloadClicked)="download()"
     [downloadable]="downloadable"
     [enableDownload]="enableDownload"
-    (sortingClicked)="sortTransactions($event)"
+    (onSort)="sortTransactions($event)"
+    [orderBy]="orderBy"
   ></tezblock-table>
 </tabset>

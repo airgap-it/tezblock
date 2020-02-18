@@ -21,7 +21,7 @@ const kindToFieldsMap = {
 export class NewTransactionService {
   constructor(private readonly apiService: ApiService) {}
 
-  getAllTransactionsByAddress(address: string, kind: string, limit: number, sortingValue?: string, sortingDirection?: any) {
+  getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy) {
     const fields = kindToFieldsMap[kind]
     const idNotNullPredicate = {
       field: 'operation_group_hash',
@@ -61,24 +61,9 @@ export class NewTransactionService {
       )
     }
 
-    let apiCall = this.apiService.getTransactionsByPredicates(predicates, limit)
-
-    if (sortingValue && sortingDirection) {
-      const orderBy: OrderBy = { field: sortingValue, direction: sortingDirection }
-      apiCall = this.apiService.getTransactionsByPredicates(predicates, limit, orderBy)
-    }
-
-    return apiCall.pipe(
+    return this.apiService.getTransactionsByPredicates(predicates, limit, orderBy).pipe(
       // map(preprocess),
-      switchMap(operation => {
-        let transactions = operation
-        sortingValue && sortingDirection
-          ? sortingValue === 'delegatedBalance' || sortingValue === 'originatedBalance'
-            ? sortingDirection === 'desc'
-              ? (transactions = operation.sort((a, b) => b.delegatedBalance - a.delegatedBalance)) // tslint:disable
-              : (transactions = operation.sort((a, b) => a.delegatedBalance - b.delegatedBalance)) // tslint:disable
-            : (transactions = operation)
-          : (transactions = operation.sort((a, b) => b.timestamp - a.timestamp).slice(0, limit))
+      switchMap(transactions => {
         const sources: string[] = transactions.map(transaction => transaction.source)
 
         if (kind === 'delegation' && sources.length > 0) {

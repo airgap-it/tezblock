@@ -1,14 +1,14 @@
-<div [ngSwitch]="isText" class="media d-flex align-items-center">
+<div [ngSwitch]="options?.isText" class="media d-flex align-items-center">
   <ng-container *ngSwitchCase="true">{{ address }}</ng-container>
   <ng-container *ngSwitchDefault>
-    <identicon class="mr-2" [address]="address" *ngIf="!hideIdenticon" [forceIdenticon]="forceIdenticon"></identicon>
+    <identicon *ngIf="!options?.hideIdenticon" class="mr-2" [address]="address" [forceIdenticon]="options?.forceIdenticon"></identicon>
 
     <div class="media-body" [ngSwitch]="clickableButton">
       <a *ngSwitchCase="false" class="btn p-0" role="button">
-        {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
+        {{ formattedAddress }}
       </a>
       <a *ngSwitchDefault [routerLink]="[path, address]" class="btn btn-link p-0" role="button">
-        {{ showFull ? address : (address | alias) ? (address | alias) : (address | shortenString) }}
+        {{ formattedAddress }}
       </a>
     </div>
   </ng-container>

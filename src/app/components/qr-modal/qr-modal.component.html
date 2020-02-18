@@ -5,7 +5,7 @@
 </div>
 <div class="modal-body">
   <identicon [address]="qrdata" [sizeLarge]="true" class="d-block"></identicon>
-  <address-item class="d-inline-flex" [address]="qrdata" [clickableButton]="false" [hideIdenticon]="true"></address-item>
+  <address-item class="d-inline-flex" [address]="qrdata" [clickableButton]="false" [options]="{ hideIdenticon: true }"></address-item>
   <a
     [@changeBtnColor]="current"
     (click)="copyToClipboard(qrdata); changeState(qrdata)"

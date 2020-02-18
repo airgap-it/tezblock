@@ -6,7 +6,6 @@ import { ClientSideTableComponent } from './client-side-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { AmountCellComponent } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { AddressCellComponent } from '@tezblock/components/tezblock-table/address-cell/address-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
 import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
@@ -32,7 +31,6 @@ describe('ClientSideTableComponent', () => {
           TezblockTableComponent,
           LoadingSkeletonComponent,
           AmountCellComponent,
-          AddressCellComponent,
           BlockCellComponent,
           SymbolCellComponent,
           HashCellComponent,

@@ -3,6 +3,7 @@ import { createAction, props } from '@ngrx/store'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 const featureName = 'Transaction Detail'
 
@@ -23,7 +24,7 @@ export const loadLatestBlockFailed = createAction(`[${featureName}] Load Latest 
 
 export const sortTransactionsByKind = createAction(
   `[${featureName}] Sort Transactions`,
-  props<{ sortingValue: string; sortingDirection: string }>()
+  props<{ orderBy: OrderBy }>()
 )
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)

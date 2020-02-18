@@ -36,7 +36,6 @@ import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
 import { TabbedTableComponent } from './components/tabbed-table/tabbed-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
-import { AddressCellComponent } from './components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from './components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from './components/tezblock-table/block-cell/block-cell.component'
 import { ExtendTableCellComponent } from './components/tezblock-table/extend-table-cell/extend-table-cell.component'
@@ -150,7 +149,6 @@ import { HealthEffects } from './pages/health/effects'
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,
-    AddressCellComponent,
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,
@@ -193,7 +191,6 @@ import { HealthEffects } from './pages/health/effects'
     BlockCellComponent,
     PlainValueCellComponent,
     AmountCellComponent,
-    AddressCellComponent,
     TimestampCellComponent,
     HashCellComponent,
     SymbolCellComponent,

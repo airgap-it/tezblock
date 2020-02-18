@@ -24,6 +24,8 @@ export function groupBy<T>(key: string): (array: T[]) =>  { [key: string]: T[] }
 
 export const toArray = (value: any) => (Array.isArray(value) ? value : [value])
 
+export const toNotNilArray = (value: any) => Array.isArray(value) ? value : value ? [value] : []
+
 export const withoutBraces = (value: string): string => (value ? value.replace(noBraces, '') : value) //TODO: use pattern.ts
 
 export function distinctFilter<T>(value: T, index: number, _array: T[]) {

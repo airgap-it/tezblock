@@ -5,6 +5,7 @@ import { Account } from '@tezblock/interfaces/Account'
 import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/account.service'
 import { Balance } from '@tezblock/services/api/api.service'
 import { Count } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 export interface BakingRatingResponse {
   bakingRating: string
@@ -19,7 +20,7 @@ export const loadRewardAmontFailed = createAction(`[${featureName}] Load Reward 
 
 export const loadTransactionsByKind = createAction(
   `[${featureName}] Load Transactions By Kind`,
-  props<{ kind: string; sortingDirection?: string; sortingValue?: string }>()
+  props<{ kind: string; orderBy?: OrderBy }>()
 )
 export const loadTransactionsByKindSucceeded = createAction(
   `[${featureName}] Load Transactions By Kind Succeeded`,
@@ -67,7 +68,7 @@ export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Te
 
 export const sortTransactionsByKind = createAction(
   `[${featureName}] Sort Transactions`,
-  props<{ sortingValue: string; sortingDirection: string }>()
+  props<{ orderBy: OrderBy }>()
 )
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)

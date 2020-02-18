@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, Observable, from, forkJoin } from 'rxjs'
+import { of, Observable, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
@@ -14,6 +14,8 @@ import * as fromRoot from '@tezblock/reducers'
 import { Block } from '@tezblock/interfaces/Block'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getContracts } from '@tezblock/domain/contract'
+import { Account } from '@tezblock/interfaces/Account'
+import { toNotNilArray } from '@tezblock/services/fp'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -44,18 +46,12 @@ export class ListEffects {
   getBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadBlocks),
-      withLatestFrom(
-        this.store$.select(state => state.list.blocks.pagination),
-        this.store$.select(state => state.list.blocks.sorting.value),
-        this.store$.select(state => state.list.blocks.sorting.direction)
-      ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        return this.apiService
-          .getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, sortingValue, sortingDirection)
-          .pipe(
-            map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
-            catchError(error => of(listActions.loadBlocksFailed({ error })))
-          )
+      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.orderBy)),
+      switchMap(([action, pagination, orderBy]) => {
+        return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, orderBy).pipe(
+          map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
+          catchError(error => of(listActions.loadBlocksFailed({ error })))
+        )
       })
     )
   )
@@ -79,17 +75,11 @@ export class ListEffects {
       ofType(listActions.loadTransactions),
       withLatestFrom(
         this.store$.select(state => state.list.transactions.pagination),
-        this.store$.select(state => state.list.transactions.sorting.value),
-        this.store$.select(state => state.list.transactions.sorting.direction)
+        this.store$.select(state => state.list.transactions.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            [OperationTypes.Transaction],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Transaction], orderBy)
           .pipe(
             map((transactions: Transaction[]) => listActions.loadTransactionsSucceeded({ transactions })),
             catchError(error => of(listActions.loadTransactionsFailed({ error })))
@@ -117,17 +107,11 @@ export class ListEffects {
       ofType(listActions.loadActivations),
       withLatestFrom(
         this.store$.select(state => state.list.activations.pagination),
-        this.store$.select(state => state.list.activations.sorting.value),
-        this.store$.select(state => state.list.activations.sorting.direction)
+        this.store$.select(state => state.list.activations.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            [OperationTypes.Activation],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Activation], orderBy)
           .pipe(
             map((transactions: Transaction[]) => listActions.loadActivationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadActivationsFailed({ error })))
@@ -155,17 +139,11 @@ export class ListEffects {
       ofType(listActions.loadOriginations),
       withLatestFrom(
         this.store$.select(state => state.list.originations.pagination),
-        this.store$.select(state => state.list.originations.sorting.value),
-        this.store$.select(state => state.list.originations.sorting.direction)
+        this.store$.select(state => state.list.originations.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            [OperationTypes.Origination],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Origination], orderBy)
           .pipe(
             map((transactions: Transaction[]) => listActions.loadOriginationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadOriginationsFailed({ error })))
@@ -186,17 +164,11 @@ export class ListEffects {
       ofType(listActions.loadDelegations),
       withLatestFrom(
         this.store$.select(state => state.list.delegations.pagination),
-        this.store$.select(state => state.list.delegations.sorting.value),
-        this.store$.select(state => state.list.delegations.sorting.direction)
+        this.store$.select(state => state.list.delegations.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            [OperationTypes.Delegation],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Delegation], orderBy)
           .pipe(
             map((transactions: Transaction[]) => listActions.loadDelegationsSucceeded({ transactions })),
             catchError(error => of(listActions.loadDelegationsFailed({ error })))
@@ -231,17 +203,11 @@ export class ListEffects {
       ofType(listActions.loadDoubleBakings),
       withLatestFrom(
         this.store$.select(state => state.list.doubleBakings.pagination),
-        this.store$.select(state => state.list.doubleBakings.sorting.value),
-        this.store$.select(state => state.list.doubleBakings.sorting.direction)
+        this.store$.select(state => state.list.doubleBakings.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            ['double_baking_evidence'],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
           .pipe(
             map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
             catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
@@ -269,17 +235,11 @@ export class ListEffects {
       ofType(listActions.loadDoubleEndorsements),
       withLatestFrom(
         this.store$.select(state => state.list.doubleEndorsements.pagination),
-        this.store$.select(state => state.list.doubleEndorsements.sorting.value),
-        this.store$.select(state => state.list.doubleEndorsements.sorting.direction)
+        this.store$.select(state => state.list.doubleEndorsements.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            ['double_baking_evidence'],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
           .pipe(
             map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
             catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
@@ -307,11 +267,10 @@ export class ListEffects {
       ofType(listActions.loadActiveBakers),
       withLatestFrom(
         this.store$.select(state => state.list.activeBakers.pagination),
-        this.store$.select(state => state.list.activeBakers.sorting.value),
-        this.store$.select(state => state.list.activeBakers.sorting.direction)
+        this.store$.select(state => state.list.activeBakers.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        return this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+      switchMap(([action, pagination, orderBy]) => {
+        return this.apiService.getActiveBakers(pagination.selectedSize * pagination.currentPage, orderBy).pipe(
           switchMap(activeBakers =>
             this.apiService.getNumberOfDelegatorsByBakers(activeBakers.map(activeBaker => activeBaker.pkh)).pipe(
               map(numberOfDelegatorsByBakers =>
@@ -359,11 +318,10 @@ export class ListEffects {
       ofType(listActions.loadProposals),
       withLatestFrom(
         this.store$.select(state => state.list.proposals.pagination),
-        this.store$.select(state => state.list.proposals.sorting.value),
-        this.store$.select(state => state.list.proposals.sorting.direction)
+        this.store$.select(state => state.list.proposals.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
-        return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage, sortingValue, sortingDirection).pipe(
+      switchMap(([action, pagination, orderBy]) => {
+        return this.apiService.getProposals(pagination.selectedSize * pagination.currentPage, orderBy).pipe(
           map(proposals => listActions.loadProposalsSucceeded({ proposals })),
           catchError(error => of(listActions.loadProposalsFailed({ error })))
         )
@@ -395,14 +353,10 @@ export class ListEffects {
   getVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadVotes),
-      withLatestFrom(
-        this.store$.select(state => state.list.votes.pagination),
-        this.store$.select(state => state.list.votes.sorting.value),
-        this.store$.select(state => state.list.votes.sorting.direction)
-      ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      withLatestFrom(this.store$.select(state => state.list.votes.pagination), this.store$.select(state => state.list.votes.orderBy)),
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], sortingValue, sortingDirection)
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], orderBy)
           .pipe(
             map(votes => listActions.loadVotesSucceeded({ votes })),
             catchError(error => of(listActions.loadVotesFailed({ error })))
@@ -423,17 +377,11 @@ export class ListEffects {
       ofType(listActions.loadEndorsements),
       withLatestFrom(
         this.store$.select(state => state.list.endorsements.pagination),
-        this.store$.select(state => state.list.endorsements.sorting.value),
-        this.store$.select(state => state.list.endorsements.sorting.direction)
+        this.store$.select(state => state.list.endorsements.orderBy)
       ),
-      switchMap(([action, pagination, sortingValue, sortingDirection]) => {
+      switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(
-            pagination.selectedSize * pagination.currentPage,
-            [OperationTypes.Endorsement],
-            sortingValue,
-            sortingDirection
-          )
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Endorsement], orderBy)
           .pipe(
             map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
             catchError(error => of(listActions.loadEndorsementsFailed({ error })))
@@ -553,6 +501,50 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.increasePageOfContracts),
       map(() => listActions.loadContracts())
+    )
+  )
+
+  loadAccounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadAccounts),
+      withLatestFrom(
+        this.store$.select(state => state.list.accounts.pagination),
+        this.store$.select(state => state.list.accounts.orderBy).pipe(map(toNotNilArray))
+      ),
+      switchMap(([action, pagination, orderBy]) =>
+        this.baseService
+          .post<Account[]>('accounts', {
+            fields: [],
+            predicates: [
+              {
+                field: 'account_id',
+                operation: Operation.startsWith,
+                set: ['tz'],
+                inverse: false
+              }
+            ],
+            orderBy,
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(accounts => listActions.loadAccountsSucceeded({ accounts })),
+            catchError(error => of(listActions.loadAccountsFailed({ error })))
+          )
+      )
+    )
+  )
+
+  onSortAccounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortAccounts),
+      map(() => listActions.loadAccounts())
+    )
+  )
+
+  increasePageOfAccounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfAccounts),
+      map(() => listActions.loadAccounts())
     )
   )
 

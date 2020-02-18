@@ -41,11 +41,10 @@ export class BlockDetailEffects {
       ofType(actions.loadTransactionsByKind),
       withLatestFrom(
         this.store$.select(state => state.blockDetails.pageSize),
-        this.store$.select(state => state.blockDetails.sorting.value),
-        this.store$.select(state => state.blockDetails.sorting.direction)
+        this.store$.select(state => state.blockDetails.orderBy)
       ),
-      switchMap(([{ blockHash, kind }, pageSize, sortingValue, sortingDirection]) =>
-        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, sortingValue, sortingDirection).pipe(
+      switchMap(([{ blockHash, kind }, pageSize, orderBy ]) =>
+        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )

@@ -7,18 +7,19 @@ import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
-import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from './../../interfaces/BakingRights'
-import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from './../../interfaces/EndorsingRights'
-import { Account } from '../../interfaces/Account'
-import { Block } from '../../interfaces/Block'
-import { Transaction } from '../../interfaces/Transaction'
+import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from '@tezblock/interfaces/BakingRights'
+import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from '@tezblock/interfaces/EndorsingRights'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate, Operation } from '../base.service'
+import { Predicate, Operation, OrderBy } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Contract } from '@tezblock/domain/contract'
+import { sort } from '@tezblock/domain/table'
 
 export interface OperationCount {
   [key: string]: string
@@ -80,16 +81,6 @@ export class ApiService {
     })
   }
 
-  private readonly orderByTimestampAsc = {
-    field: 'timestamp',
-    direction: 'asc'
-  }
-
-  private readonly orderByBlockLevelDesc = {
-    field: 'block_level',
-    direction: 'desc'
-  }
-
   constructor(
     private readonly http: HttpClient,
     readonly chainNetworkService: ChainNetworkService,
@@ -117,18 +108,14 @@ export class ApiService {
             inverse: false
           }
         ],
-        orderBy: [this.orderByTimestampAsc],
+        orderBy: [sort('timestamp', 'asc')],
         limit: 1
       },
       this.options
     )
   }
 
-  getLatestTransactions(limit: number, kindList: string[], sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
-    let orderBy = this.orderByBlockLevelDesc
-    if (sortingValue && sortingDirection) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
-    }
+  getLatestTransactions(limit: number, kindList: string[], orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -175,14 +162,7 @@ export class ApiService {
       )
   }
 
-  getTransactionsById(id: string, limit: number, sortingValue?: string, sortingDirection?: string): Observable<Transaction[]> {
-    let orderBy = {
-      field: 'block_level',
-      direction: 'desc'
-    }
-    if (sortingDirection && sortingValue) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
-    }
+  getTransactionsById(id: string, limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -322,12 +302,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         limit
       },
       this.options
@@ -339,25 +314,8 @@ export class ApiService {
     field: string,
     kind: string,
     limit: number,
-    sortingValue?: string,
-    sortingDirection?: string
+    orderBy = sort('block_level', 'desc')
   ): Observable<Transaction[]> {
-    let orderBy = {
-      field: 'block_level',
-      direction: 'desc'
-    }
-    let delegatedOriginatedMemory: string
-    if (sortingValue && sortingDirection) {
-      if (sortingValue === 'originatedBalance' || sortingValue === 'delegatedBalance') {
-        delegatedOriginatedMemory = sortingValue
-        orderBy = {
-          field: 'block_level',
-          direction: 'desc'
-        }
-      } else {
-        orderBy = { field: sortingValue, direction: sortingDirection }
-      }
-    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -419,49 +377,15 @@ export class ApiService {
               )
             )
           }
-          sortingValue && sortingDirection
-            ? sortingValue === 'delegatedBalance' || sortingValue === 'originatedBalance'
-              ? sortingDirection === 'desc'
-                ? (transactions = transactions.sort((a, b) => b.delegatedBalance - a.delegatedBalance)) // tslint:disable
-                : (transactions = transactions.sort((a, b) => a.delegatedBalance - b.delegatedBalance)) // tslint:disable
-              : transactions
-            : (transactions = transactions.sort((a, b) => b.block_level - a.block_level).slice(0, limit))
 
           return of(transactions)
         })
       )
   }
 
-  getTransactionsByPredicates(
-    predicates: Predicate[],
-    limit: number,
-    orderBy?: {
-      field: string
-      direction: string
-    }
-  ): Observable<Transaction[]> {
-    let postRequest = this.http.post<Transaction[]>(
-      this.transactionsApiUrl,
-      {
-        predicates: [...predicates],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
-    if (orderBy) {
-      if (orderBy.field === 'originatedBalance' || orderBy.field === 'delegatedBalance') {
-        orderBy = {
-          field: 'block_level',
-          direction: 'desc'
-        }
-      }
-      postRequest = this.http.post<Transaction[]>(
+  getTransactionsByPredicates(predicates: Predicate[], limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
+    return this.http
+      .post<Transaction[]>(
         this.transactionsApiUrl,
         {
           predicates: [...predicates],
@@ -470,46 +394,45 @@ export class ApiService {
         },
         this.options
       )
-    }
-    return postRequest.pipe(
-      map((transactions: Transaction[]) => transactions.slice(0, limit)),
-      switchMap((transactions: Transaction[]) => {
-        const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+      .pipe(
+        map((transactions: Transaction[]) => transactions.slice(0, limit)),
+        switchMap((transactions: Transaction[]) => {
+          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
 
-        if (sources.length > 0) {
-          return this.getAccountsByIds(sources).pipe(
-            map((accounts: Account[]) =>
-              transactions.map(transaction => {
-                const match = accounts.find(account => account.account_id === transaction.source)
+          if (sources.length > 0) {
+            return this.getAccountsByIds(sources).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.source)
 
-                return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-              })
+                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+                })
+              )
             )
-          )
-        }
+          }
 
-        return of(transactions)
-      }),
-      switchMap((transactions: Transaction[]) => {
-        const originatedAccounts = transactions
-          .filter(transaction => transaction.kind === 'origination')
-          .map(transaction => transaction.originated_contracts)
+          return of(transactions)
+        }),
+        switchMap((transactions: Transaction[]) => {
+          const originatedAccounts = transactions
+            .filter(transaction => transaction.kind === 'origination')
+            .map(transaction => transaction.originated_contracts)
 
-        if (originatedAccounts.length > 0) {
-          return this.getAccountsByIds(originatedAccounts).pipe(
-            map((accounts: Account[]) =>
-              transactions.map(transaction => {
-                const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+          if (originatedAccounts.length > 0) {
+            return this.getAccountsByIds(originatedAccounts).pipe(
+              map((accounts: Account[]) =>
+                transactions.map(transaction => {
+                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
 
-                return match ? { ...transaction, originatedBalance: match.balance } : transaction
-              })
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
+                })
+              )
             )
-          )
-        }
+          }
 
-        return of(transactions)
-      })
-    )
+          return of(transactions)
+        })
+      )
   }
 
   getLatestAccounts(limit: number): Observable<Account[]> {
@@ -517,26 +440,6 @@ export class ApiService {
       this.accountsApiUrl,
       {
         limit
-      },
-      this.options
-    )
-  }
-
-  getById(id: string): Observable<Object> {
-    this.getDelegatedAccounts(id, 10)
-
-    return this.http.post(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: 'eq',
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit: 1
       },
       this.options
     )
@@ -578,11 +481,13 @@ export class ApiService {
 
   getAccountsStartingWith(id: string): Observable<Object[]> {
     const result: Object[] = []
-    Object.keys(accounts).forEach(baker => {
-      if (accounts[baker] && accounts[baker].alias && accounts[baker].alias.toLowerCase().startsWith(id.toLowerCase())) {
-        result.push({ name: accounts[baker].alias, type: 'Bakers' })
+
+    Object.keys(accounts).forEach(account => {
+      if (accounts[account] && accounts[account].alias && accounts[account].alias.toLowerCase().startsWith(id.toLowerCase())) {
+        result.push({ name: accounts[account].alias, type: 'Bakers' })
       }
     })
+
     if (result.length === 0) {
       return this.http
         .post<Account[]>(
@@ -786,12 +691,7 @@ export class ApiService {
                 set: [address]
               }
             ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
+            orderBy: [sort('block_level', 'desc')],
             limit: 1
           },
           this.options
@@ -811,14 +711,13 @@ export class ApiService {
     })
   }
 
-  getLatestBlocks(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
-    let orderBy = {
+  getLatestBlocks(
+    limit: number,
+    orderBy = {
       field: 'timestamp',
       direction: 'desc'
     }
-    if (sortingValue && sortingDirection) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
-    }
+  ): Observable<Block[]> {
     return this.http.post<Block[]>(
       this.blocksApiUrl,
       {
@@ -829,24 +728,13 @@ export class ApiService {
     )
   }
 
-  getLatestBlocksWithData(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Block[]> {
-    let orderBy = {
+  getLatestBlocksWithData(
+    limit: number,
+    orderBy = {
       field: 'timestamp',
       direction: 'desc'
     }
-    let sortValueMemory: string
-
-    if (sortingValue && sortingDirection) {
-      if (sortingValue === 'volume' || sortingValue === 'fee') {
-        sortValueMemory = sortingValue
-        orderBy = {
-          field: 'timestamp',
-          direction: 'desc'
-        }
-      } else {
-        orderBy = { field: sortingValue, direction: sortingDirection }
-      }
-    }
+  ): Observable<Block[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -864,8 +752,8 @@ export class ApiService {
           const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
 
           return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
-            map(([amount, fee, operationGroup]) => {
-              blocks = blocks.map(block => {
+            map(([amount, fee, operationGroup]) =>
+              blocks.map(block => {
                 const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
                 const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
                 const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
@@ -876,17 +764,7 @@ export class ApiService {
                   txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
                 }
               })
-
-              sortingValue && sortingDirection
-                ? sortValueMemory === 'volume' || sortValueMemory === 'fee'
-                  ? sortingDirection === 'desc'
-                    ? (blocks = blocks.sort((a: any, b: any) => b.sortValueMemory - a.sortValueMemory))
-                    : (blocks = blocks.sort((a: any, b: any) => a.sortValueMemory - b.sortValueMemory))
-                  : blocks
-                : (blocks = blocks.sort((a, b) => b.level - a.level).slice(0, limit))
-
-              return blocks
-            })
+            )
           )
         })
       )
@@ -915,12 +793,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -944,12 +817,7 @@ export class ApiService {
             set: blockRange
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -990,12 +858,7 @@ export class ApiService {
             set: ['transaction']
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -1019,12 +882,7 @@ export class ApiService {
             set: blockRange
           }
         ],
-        orderBy: [
-          {
-            field: 'block_level',
-            direction: 'desc'
-          }
-        ],
+        orderBy: [sort('block_level', 'desc')],
         aggregation: [
           {
             field,
@@ -1327,12 +1185,7 @@ export class ApiService {
               set: ['endorsement']
             }
           ],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'desc'
-            }
-          ],
+          orderBy: [sort('block_level', 'desc')],
           limit: 32
         },
         this.options
@@ -1404,11 +1257,7 @@ export class ApiService {
     )
   }
 
-  getActiveBakers(limit: number, sortingValue?: string, sortingDirection?: string): Observable<Baker[]> {
-    let orderBy = { field: 'staking_balance', direction: 'desc' }
-    if (sortingValue && sortingDirection) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
-    }
+  getActiveBakers(limit: number, orderBy = { field: 'staking_balance', direction: 'desc' }): Observable<Baker[]> {
     return this.http.post<Baker[]>(
       this.delegatesApiUrl,
       {
@@ -1502,11 +1351,7 @@ export class ApiService {
       .pipe(map(first))
   }
 
-  getProposals(limit: number, sortingValue?: string, sortingDirection?: string): Observable<ProposalListDto[]> {
-    let orderBy = { field: 'period', direction: 'desc' }
-    if (sortingValue && sortingDirection) {
-      orderBy = { field: sortingValue, direction: sortingDirection }
-    }
+  getProposals(limit: number, orderBy = { field: 'period', direction: 'desc' }): Observable<ProposalListDto[]> {
     return this.http
       .post<ProposalListDto[]>(
         this.transactionsApiUrl,

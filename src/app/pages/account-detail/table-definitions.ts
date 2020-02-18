@@ -1,9 +1,10 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Options } from '@tezblock/components/address-item/address-item.component'
 
-export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean }) => Column[] } = {
-  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean }) =>
+export const columns: { [key: string]: (options: Options) => Column[] } = {
+  [OperationTypes.Transaction]: (options: Options) =>
     [
       {
         name: 'From',
@@ -46,7 +47,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       }
     ].concat(<any>blockAndTxHashColumns),
 
-  [OperationTypes.Delegation]: (options: { pageId: string; showFiatValue: boolean }) =>
+  [OperationTypes.Delegation]: (options: Options) =>
     [
       {
         name: 'Delegator',
@@ -85,7 +86,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       }
     ].concat(<any>blockAndTxHashColumns),
 
-  [OperationTypes.Origination]: (options: { pageId: string; showFiatValue: boolean }) =>
+  [OperationTypes.Origination]: (options: Options) =>
     [
       {
         name: 'New Account',
@@ -129,7 +130,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       }
     ].concat(<any>blockAndTxHashColumns),
 
-  [OperationTypes.Endorsement]: (options: { pageId: string; showFiatValue: boolean }) => [
+  [OperationTypes.Endorsement]: (options: Options) => [
     {
       name: 'Age',
       field: 'timestamp',
@@ -160,7 +161,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     }
   ],
 
-  [OperationTypes.Ballot]: (options: { pageId: string; showFiatValue: boolean }) =>
+  [OperationTypes.Ballot]: (options: Options) =>
     [
       {
         name: 'Ballot',

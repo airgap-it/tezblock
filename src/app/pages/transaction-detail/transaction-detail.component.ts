@@ -22,6 +22,7 @@ import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -43,6 +44,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   transactions$: Observable<Transaction[]>
   filteredTransactions$: Observable<Transaction[]>
   isInvalidHash$: Observable<boolean>
+  orderBy$: Observable<OrderBy>
 
   private kind$ = new BehaviorSubject('transaction')
 
@@ -69,6 +71,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
+    this.orderBy$ = this.store$.select(state => state.transactionDetails.orderBy)
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
@@ -122,8 +125,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  sortBy(data: any) {
-    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
   private setTabs(pageId: string) {

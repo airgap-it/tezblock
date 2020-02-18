@@ -21,5 +21,6 @@ export enum OperationTypes {
 
   // these are not operation types...
   Block = 'block',
-  Contract = 'contract'
+  Contract = 'contract',
+  Account = 'account'
 }

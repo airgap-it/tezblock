@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { DownloadService } from '@tezblock/services/download/download.service'
 import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
   selector: 'tabbed-table',
@@ -42,6 +43,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loading: boolean
 
   @Input()
+  orderBy: OrderBy
+
+  @Input()
   downloadable?: boolean = false
 
   @Output()
@@ -50,7 +54,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Output()
   loadMore: EventEmitter<boolean> = new EventEmitter()
 
-  @Output() sortingBy: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
+  @Output() onSort: EventEmitter<OrderBy> = new EventEmitter()
 
   get id(): string {
     return this.activatedRoute.snapshot.paramMap.get('id')
@@ -118,8 +122,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  sortTransactions(data: any) {
-    this.sortingBy.emit(data)
+  sortTransactions(orderBy: OrderBy) {
+    this.onSort.emit(orderBy)
   }
 
   private selectTab(selectedTab: Tab) {

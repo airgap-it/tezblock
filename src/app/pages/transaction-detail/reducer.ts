@@ -4,6 +4,8 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
+import { sort } from '@tezblock/domain/table'
 
 export interface Busy {
   transactions: boolean
@@ -12,11 +14,11 @@ export interface Busy {
 export interface State {
   transactionHash: string
   transactions: Transaction[]
-  counts: Count[],
+  counts: Count[]
   latestBlock: Block
   pageSize: number // transactions
   busy: Busy
-  sorting: Sorting
+  orderBy: OrderBy
 }
 
 export interface Sorting {
@@ -33,7 +35,7 @@ const initialState: State = {
   busy: {
     transactions: false
   },
-  sorting: { direction: undefined, value: undefined }
+  orderBy: sort('block_level', 'desc')
 }
 
 export const reducer = createReducer(
@@ -70,17 +72,13 @@ export const reducer = createReducer(
     ...state,
     pageSize: state.pageSize + 10
   })),
-  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
-    ...state,
-    sorting: {
-      ...state.sorting,
-      direction: sortingDirection,
-      value: sortingValue
-    }
-  })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
     counts
+  })),
+  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
+    ...state,
+    orderBy
   })),
   on(actions.reset, () => initialState)
 )

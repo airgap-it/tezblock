@@ -30,16 +30,32 @@ export interface Aggregation {
   field: string
   function: 'count' | 'sum'
 }
+
+export type Direction = 'asc' | 'desc'
+
 export interface OrderBy {
   field: string
-  direction: 'asc' | 'desc'
+  direction: Direction
 }
+
 export interface Body {
   fields?: string[]
   predicates?: Predicate[]
   orderBy?: OrderBy[]
   aggregation?: Aggregation[]
   limit?: number
+}
+
+export const getNextOrderBy = (orderBy?: OrderBy, field?: string): OrderBy => {
+  if (!orderBy || orderBy.field !== field) {
+    return { field, direction: 'desc' }
+  }
+
+  if (orderBy.direction === 'desc') {
+    return { ...orderBy, direction: 'asc' }
+  }
+
+  return undefined
 }
 
 export const andGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>

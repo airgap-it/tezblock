@@ -32,6 +32,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { OrderBy } from '@tezblock/services/base.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -114,6 +115,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
+  orderBy$: Observable<OrderBy>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -189,6 +191,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         filter(Array.isArray),
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
+    this.orderBy$ = this.store$.select(state => state.accountDetails.orderBy)
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -357,8 +360,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.toastrService.success('has been copied to clipboard', address)
   }
 
-  sortBy(data: any) {
-    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
   private setTabs(pageId: string) {

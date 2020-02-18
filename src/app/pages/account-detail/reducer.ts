@@ -11,6 +11,8 @@ import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
+import { sort } from '@tezblock/domain/table'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>
@@ -88,11 +90,6 @@ export interface BakerTableRatings {
   tezosBakerRating: string
 }
 
-export interface Sorting {
-  direction: string
-  value: string
-}
-
 export interface State {
   address: string
   account: Account
@@ -107,7 +104,7 @@ export interface State {
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
-  sorting: Sorting
+  orderBy: OrderBy
 }
 
 const initialState: State = {
@@ -127,7 +124,7 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  sorting: { direction: undefined, value: undefined }
+  orderBy: sort('block_level', 'desc')
 }
 
 export const reducer = createReducer(
@@ -200,13 +197,9 @@ export const reducer = createReducer(
     pageSize: state.pageSize + 10
   })),
 
-  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
-    sorting: {
-      ...state.sorting,
-      direction: sortingDirection,
-      value: sortingValue
-    }
+    orderBy
   })),
 
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({

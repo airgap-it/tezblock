@@ -8,6 +8,7 @@ export type IconRef =
   | 'levelDownAlt'
   | 'levelUpAlt'
   | 'longArrowAltDown'
+  | 'longArrowAltUp'
   | 'qrcode'
   | 'search'
   | 'exchangeAlt'
@@ -68,6 +69,7 @@ export class IconPipe implements PipeTransform {
       levelDownAlt: { prefix, iconName: 'level-down-alt' },
       levelUpAlt: { prefix, iconName: 'level-up-alt' },
       longArrowAltDown: { prefix, iconName: 'long-arrow-alt-down' },
+      longArrowAltUp: { prefix, iconName: 'long-arrow-alt-up' },
       qrcode: { prefix, iconName: 'qrcode' },
       search: { prefix, iconName: 'search' },
       exchangeAlt: { prefix, iconName: 'exchange-alt' },

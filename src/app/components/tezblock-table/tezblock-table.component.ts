@@ -1,5 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild, ChangeDetectionStrategy } from '@angular/core'
 
+import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
+import { Options } from '@tezblock/components/address-item/address-item.component'
+
 export enum Template {
   address,
   amount,
@@ -16,7 +19,7 @@ export interface Column {
   name?: string
   field?: string
   width?: string
-  data?: (item: any) => any
+  data?: (item: any) => { data?: any, options?: Options }
   template?: TemplateRef<any> | Template
   sortable?: boolean | undefined
 }
@@ -67,14 +70,6 @@ export class TezblockTableComponent implements OnInit {
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
       this._columns = value ? value.map(satisfyData) : value
-      if (this._columns.some(column => column.field === 'timestamp')) {
-        this.defaultSorting = 'timestamp'
-        if (this.sortingDirection.get('timestamp') === 'desc') {
-          return
-        } else {
-          this.sorting('timestamp')
-        }
-      }
     }
   }
   get columns(): Column[] {
@@ -91,23 +86,23 @@ export class TezblockTableComponent implements OnInit {
   @Input() expandedRow?: ExpandedRow<any>
 
   @Input()
-  public downloadable?: boolean = false
+  downloadable?: boolean = false
 
   @Input()
-  public enableDownload?: boolean = false
+  enableDownload?: boolean = false
+
+  @Input()
+  orderBy: OrderBy
 
   @Output()
-  public readonly downloadClicked: EventEmitter<void> = new EventEmitter()
+  readonly downloadClicked: EventEmitter<void> = new EventEmitter()
 
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
 
   @Output()
-  public readonly sortingClicked: EventEmitter<{ value: string; sortingDirection: string }> = new EventEmitter()
+  readonly onSort: EventEmitter<OrderBy> = new EventEmitter()
 
   private expandedRows: any[] = []
-
-  public sortingDirection = new Map<String, string>()
-  private defaultSorting: string
 
   constructor() {}
 
@@ -138,26 +133,12 @@ export class TezblockTableComponent implements OnInit {
     this.onLoadMore.emit()
   }
 
-  public downloadCSV() {
+  downloadCSV() {
     this.downloadClicked.emit()
   }
 
-  public sorting(sortBy: string) {
-    const key: string = sortBy
-    if (this.sortingDirection.has(key)) {
-      if (this.sortingDirection.get(key) === 'desc') {
-        this.sortingDirection.clear()
-        this.sortingDirection.set(key, 'asc')
-      } else if (this.sortingDirection.get(key) === 'asc') {
-        this.sortingDirection.clear()
-        this.sortingDirection.set(this.defaultSorting, 'desc')
-      }
-    } else {
-      this.sortingDirection.clear()
-      this.sortingDirection.set(key, 'desc')
-    }
-
-    this.sortingClicked.emit({ value: sortBy, sortingDirection: this.sortingDirection.get(key) })
+  sorting(field: string) {
+    this.onSort.emit(getNextOrderBy(this.orderBy, field))
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {
@@ -187,5 +168,9 @@ export class TezblockTableComponent implements OnInit {
       default:
         return this.basicTemplate
     }
+  }
+
+  getDirection(field: string): Direction {
+    return this.orderBy && this.orderBy.field === field ? this.orderBy.direction : undefined
   }
 }

@@ -29,11 +29,10 @@ export class TransactionDetailEffects {
       ofType(actions.loadTransactionsByHash),
       withLatestFrom(
         this.store$.select(state => state.transactionDetails.pageSize),
-        this.store$.select(state => state.accountDetails.sorting.value),
-        this.store$.select(state => state.accountDetails.sorting.direction)
+        this.store$.select(state => state.accountDetails.orderBy)
       ),
-      switchMap(([{ transactionHash }, pageSize, sortingValue, sortingDirection]) =>
-        this.apiService.getTransactionsById(transactionHash, pageSize, sortingValue, sortingDirection).pipe(
+      switchMap(([{ transactionHash }, pageSize, orderBy]) =>
+        this.apiService.getTransactionsById(transactionHash, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByHashSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
         )
