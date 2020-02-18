@@ -97,12 +97,10 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <ng-container *ngIf="fee$ | async as fee">
-          <div class=" col-md-9">
-            <amount-cell [data]="latestTransaction" [showFee]="true"></amount-cell>
-          </div>
-        </ng-container>
+      <ng-container *ngIf="amountFromLatestTransactionFee$ | async as amountFromLatestTransactionFee; else loadingTemplate">
+        <div class=" col-md-9">
+          <amount-cell [data]="amountFromLatestTransactionFee"></amount-cell>
+        </div>
       </ng-container>
     </div>
   </div>

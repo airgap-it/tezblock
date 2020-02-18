@@ -151,7 +151,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Burn',
       field: 'burn',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
+      data: (item: Transaction) => ({ data: { amount: item.burn }, options: { showFiatValue: false } }),
       sortable: false
     },
     {

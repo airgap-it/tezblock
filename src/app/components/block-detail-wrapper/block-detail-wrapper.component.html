@@ -53,9 +53,9 @@
         <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in transactions for this block.'"></tooltip-item>
       </p>
     </div>
-    <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+    <ng-container *ngIf="amountFromBlockVolume$ | async as amountFromBlockVolume; else loadingTemplate">
       <div class=" col-md-9">
-        <amount-cell [data]="block" [fromBlock]="true"></amount-cell>
+        <amount-cell [data]="amountFromBlockVolume"></amount-cell>
       </div>
     </ng-container>
   </div>
@@ -68,9 +68,9 @@
         ></tooltip-item>
       </p>
     </div>
-    <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+    <ng-container *ngIf="amountFromBlockFee$ | async as amountFromBlockFee; else loadingTemplate">
       <div class=" col-md-9">
-        <amount-cell [data]="block" [showFee]="true"></amount-cell>
+        <amount-cell [data]="amountFromBlockFee"></amount-cell>
       </div>
     </ng-container>
     <ng-template #hideValue>

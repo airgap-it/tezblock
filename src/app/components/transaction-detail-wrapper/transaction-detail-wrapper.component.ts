@@ -1,15 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import BigNumber from 'bignumber.js'
-import { CopyService } from 'src/app/services/copy/copy.service'
-
 import { animate, state, style, transition, trigger } from '@angular/animations'
+import BigNumber from 'bignumber.js'
 import { ToastrService } from 'ngx-toastr'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
-import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
-import { DayDifferenceService } from '@tezblock/services/day-difference/day-difference.service'
+import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -41,9 +40,6 @@ export class TransactionDetailWrapperComponent implements OnInit {
   public amount$: Observable<BigNumber> | undefined
 
   @Input()
-  public fee$: Observable<BigNumber> | undefined
-
-  @Input()
   public loading$?: Observable<boolean>
 
   @Input()
@@ -52,51 +48,17 @@ export class TransactionDetailWrapperComponent implements OnInit {
   @Input()
   public isMainnet = true
 
-  historicFiatAmount = new Map<String, number>()
-
-  enableComparison = false
-
-  showOldValueVolume = false
-  showOldValueFee = false
-
-  tooltipClick(amount: number | BigNumber, kind: string) {
-    this.latestTransaction$.subscribe((transaction: Transaction) => {
-      const timestamp = transaction.timestamp
-
-      const daysDifference = this.dayDifference(timestamp)
-      if (daysDifference >= 1) {
-        let date = new Date(timestamp)
-        this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
-          let oldValue = new BigNumber(response[1].close)
-          amount = new BigNumber(amount)
-          const result = amount.multipliedBy(oldValue).toNumber()
-          this.historicFiatAmount.set(kind, result)
-          if (kind === 'volume') {
-            this.showOldValueVolume = !this.showOldValueVolume
-          } else if (kind === 'fee') {
-            this.showOldValueFee = !this.showOldValueFee
-          }
-        })
-      }
-    })
-  }
+  amountFromLatestTransactionFee$: Observable<AmountData>
 
   constructor(
-    private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
-    private readonly toastrService: ToastrService,
-    private readonly chartDataService: ChartDataService,
-    private dayDifferenceService: DayDifferenceService
+    private readonly toastrService: ToastrService
   ) {}
 
   public ngOnInit() {
-    if (this.latestTransaction$) {
-      this.latestTransaction$.subscribe((transaction: Transaction) => {
-        const timestamp = transaction.timestamp
-        const difference = this.dayDifference(timestamp)
-        this.enableComparison = difference >= 1
-      })
-    }
+    this.amountFromLatestTransactionFee$ = this.latestTransaction$.pipe(
+      map(transition => ({ amount: transition.fee, timestamp: transition.timestamp }))
+    )
   }
 
   public copyToClipboard(val: string) {
@@ -109,13 +71,5 @@ export class TransactionDetailWrapperComponent implements OnInit {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
-  }
-
-  dayDifference(oldTimestamp: number): number {
-    return this.dayDifferenceService.calcateDayDifference(oldTimestamp)
-  }
-
-  getHistoricFiatAmount(key: string): number {
-    return this.historicFiatAmount.get(key)
   }
 }
