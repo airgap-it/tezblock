@@ -12,6 +12,7 @@ import {
   faLevelUpAlt,
   faLink,
   faLongArrowAltDown,
+  faLongArrowAltUp,
   faQrcode,
   faSearch,
   faStamp,
@@ -26,6 +27,10 @@ import {
   faListAlt,
   faInfoCircle,
   faDownload,
+  faFileUpload,
+  faBinoculars,
+  faHammer,
+  faGraduationCap,
   faCircle
 } from '@fortawesome/pro-light-svg-icons'
 
@@ -36,6 +41,7 @@ export const addFontAwesome = () => {
     faLevelDownAlt,
     faLevelUpAlt,
     faLongArrowAltDown,
+    faLongArrowAltUp,
     faQrcode,
     faSearch,
     faExchangeAlt,
@@ -62,6 +68,10 @@ export const addFontAwesome = () => {
     faListAlt,
     faInfoCircle,
     faDownload,
+    faFileUpload,
+    faBinoculars,
+    faHammer,
+    faGraduationCap,
     faCircle
   )
 }

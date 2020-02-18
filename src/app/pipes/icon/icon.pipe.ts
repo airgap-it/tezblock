@@ -8,6 +8,7 @@ export type IconRef =
   | 'levelDownAlt'
   | 'levelUpAlt'
   | 'longArrowAltDown'
+  | 'longArrowAltUp'
   | 'qrcode'
   | 'search'
   | 'exchangeAlt'
@@ -33,7 +34,12 @@ export type IconRef =
   | 'infoCircle'
   | 'website'
   | 'download'
+  | 'fileUpload'
+  | 'binoculars'
+  | 'hammer'
+  | 'graduationCap'
   | 'circle'
+
 @Pipe({
   name: 'iconPipe'
 })
@@ -63,6 +69,7 @@ export class IconPipe implements PipeTransform {
       levelDownAlt: { prefix, iconName: 'level-down-alt' },
       levelUpAlt: { prefix, iconName: 'level-up-alt' },
       longArrowAltDown: { prefix, iconName: 'long-arrow-alt-down' },
+      longArrowAltUp: { prefix, iconName: 'long-arrow-alt-up' },
       qrcode: { prefix, iconName: 'qrcode' },
       search: { prefix, iconName: 'search' },
       exchangeAlt: { prefix, iconName: 'exchange-alt' },
@@ -88,6 +95,10 @@ export class IconPipe implements PipeTransform {
       infoCircle: { prefix, iconName: infoCircle },
       website: { prefix, iconName: 'globe' },
       download: { prefix, iconName: 'download' },
+      fileUpload: { prefix, iconName: 'file-upload' },
+      binoculars: { prefix, iconName: 'binoculars' },
+      hammer: { prefix, iconName: 'hammer' },
+      graduationCap: { prefix, iconName: 'graduation-cap' },
       circle: { prefix, iconName: 'circle' }
     }
   }

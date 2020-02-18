@@ -2,7 +2,7 @@ import { Component, Input, OnInit, TrackByFunction } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 
-import { Pagination } from '@tezblock/services/facade/facade'
+import { Pagination } from '@tezblock/domain/table'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 @Component({

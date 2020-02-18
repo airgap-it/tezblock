@@ -54,30 +54,8 @@
       </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <div
-        class=" col-md-9"
-        *ngIf="
-          (block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-          else hideValue
-        "
-      >
-        <p class="mb-0">
-          <span
-            class="d-inline-block"
-            [innerHtml]="
-              block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-            "
-          ></span>
-          ꜩ
-          <ng-container *ngIf="isMainnet">
-            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-              <span class="badge badge-pill badge-primary-light ml-1">
-                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                {{ block.volume | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-              </span>
-            </ng-container>
-          </ng-container>
-        </p>
+      <div class=" col-md-9">
+        <amount-cell [data]="block" [fromBlock]="true"></amount-cell>
       </div>
     </ng-container>
   </div>
@@ -91,30 +69,8 @@
       </p>
     </div>
     <ng-container *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <div
-        class=" col-md-9"
-        *ngIf="
-          (block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-          else hideValue
-        "
-      >
-        <p class="mb-0">
-          <span
-            class="d-inline-block"
-            [innerHtml]="
-              block.fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-            "
-          ></span>
-          ꜩ
-          <ng-container *ngIf="isMainnet">
-            <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-              <span class="badge badge-pill badge-primary-light ml-1">
-                {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                {{ block.fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-8' }}
-              </span>
-            </ng-container>
-          </ng-container>
-        </p>
+      <div class=" col-md-9">
+        <amount-cell [data]="block" [showFee]="true"></amount-cell>
       </div>
     </ng-container>
     <ng-template #hideValue>

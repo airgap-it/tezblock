@@ -3,13 +3,21 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { Contract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
-// import { toTransactionsChartDataSource } from './list.component'
+import { Account } from '@tezblock/interfaces/Account'
+import { sort } from '@tezblock/domain/table'
+
+const preprocessBakersData = (bakerData: any[]) =>
+  bakerData.map(bakerDataItem => ({
+    ...bakerDataItem,
+    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
+  }))
 
 export interface State {
+  accounts: TableState<Account>
   blocks: TableState<Block>
   transactions: TableState<Transaction>
   doubleBakings: TableState<Transaction>
@@ -32,17 +40,18 @@ export interface State {
 }
 
 const initialState: State = {
-  blocks: getInitialTableState(),
-  transactions: getInitialTableState(),
-  doubleBakings: getInitialTableState(),
-  doubleEndorsements: getInitialTableState(),
-  proposals: getInitialTableState(),
-  activeBakers: getInitialTableState(),
-  activations: getInitialTableState(),
-  originations: getInitialTableState(),
-  endorsements: getInitialTableState(),
-  delegations: getInitialTableState(),
-  votes: getInitialTableState(),
+  accounts: getInitialTableState({ field: 'balance', direction: 'desc' }),
+  blocks: getInitialTableState(sort('timestamp', 'desc')),
+  transactions: getInitialTableState(sort('block_level', 'desc')),
+  doubleBakings: getInitialTableState(sort('block_level', 'desc')),
+  doubleEndorsements: getInitialTableState(sort('block_level', 'desc')),
+  proposals: getInitialTableState({ field: 'period', direction: 'desc' }),
+  activeBakers: getInitialTableState({ field: 'staking_balance', direction: 'desc' }),
+  activations: getInitialTableState(sort('block_level', 'desc')),
+  originations: getInitialTableState(sort('block_level', 'desc')),
+  endorsements: getInitialTableState(sort('block_level', 'desc')),
+  delegations: getInitialTableState(sort('block_level', 'desc')),
+  votes: getInitialTableState(sort('block_level', 'desc')),
   activationsCountLast24h: undefined,
   originationsCountLast24h: undefined,
   transactionsCountLast24h: undefined,
@@ -88,15 +97,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortBlocksByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortBlocksByKind, (state, { orderBy }) => ({
     ...state,
     blocks: {
       ...state.blocks,
-      sorting: {
-        ...state.blocks.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -132,15 +137,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortTransactionsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
     transactions: {
       ...state.transactions,
-      sorting: {
-        ...state.transactions.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -176,15 +177,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortDoubleBakingsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortDoubleBakingsByKind, (state, { orderBy }) => ({
     ...state,
     doubleBakings: {
       ...state.doubleBakings,
-      sorting: {
-        ...state.doubleBakings.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
   on(actions.loadDoubleEndorsements, state => ({
@@ -219,15 +216,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortDoubleEndorsementsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortDoubleEndorsementsByKind, (state, { orderBy }) => ({
     ...state,
     doubleEndorsements: {
       ...state.doubleEndorsements,
-      sorting: {
-        ...state.doubleEndorsements.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
   on(actions.loadActiveBakers, state => ({
@@ -262,15 +255,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortActiveBakersByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortActiveBakersByKind, (state, { orderBy }) => ({
     ...state,
     activeBakers: {
       ...state.activeBakers,
-      sorting: {
-        ...state.activeBakers.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
   on(actions.loadTotalActiveBakers, state => ({
@@ -335,15 +324,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortProposalsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortProposalsByKind, (state, { orderBy }) => ({
     ...state,
     proposals: {
       ...state.proposals,
-      sorting: {
-        ...state.proposals.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -379,18 +364,13 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortVotesByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortVotesByKind, (state, { orderBy }) => ({
     ...state,
     votes: {
       ...state.votes,
-      sorting: {
-        ...state.votes.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
-
   on(actions.loadEndorsements, state => ({
     ...state,
     endorsements: {
@@ -423,15 +403,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortEndorsementsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortEndorsementsByKind, (state, { orderBy }) => ({
     ...state,
     endorsements: {
       ...state.endorsements,
-      sorting: {
-        ...state.endorsements.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -467,15 +443,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortActivationsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortActivationsByKind, (state, { orderBy }) => ({
     ...state,
     activations: {
       ...state.activations,
-      sorting: {
-        ...state.activations.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -511,15 +483,11 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortOriginationsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortOriginationsByKind, (state, { orderBy }) => ({
     ...state,
     originations: {
       ...state.originations,
-      sorting: {
-        ...state.originations.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
 
@@ -555,18 +523,13 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortDelegationsByKind, (state, { sortingValue, sortingDirection }) => ({
+  on(actions.sortDelegationsByKind, (state, { orderBy }) => ({
     ...state,
     delegations: {
       ...state.delegations,
-      sorting: {
-        ...state.delegations.sorting,
-        direction: sortingDirection,
-        value: sortingValue
-      }
+      orderBy
     }
   })),
-
   on(actions.loadActivationsCountLast24hSucceeded, (state, { activationsCountLast24h }) => ({
     ...state,
     activationsCountLast24h
@@ -627,6 +590,45 @@ export const reducer = createReducer(
         ...state.contracts.pagination,
         currentPage: state.contracts.pagination.currentPage + 1
       }
+    }
+  })),
+  on(actions.loadAccounts, state => ({
+    ...state,
+    accounts: {
+      ...state.accounts,
+      loading: true
+    }
+  })),
+  on(actions.loadAccountsSucceeded, (state, { accounts }) => ({
+    ...state,
+    accounts: {
+      ...state.accounts,
+      data: accounts,
+      loading: false
+    }
+  })),
+  on(actions.loadAccountsFailed, state => ({
+    ...state,
+    accounts: {
+      ...state.accounts,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfAccounts, state => ({
+    ...state,
+    accounts: {
+      ...state.accounts,
+      pagination: {
+        ...state.accounts.pagination,
+        currentPage: state.accounts.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortAccounts, (state, { orderBy }) => ({
+    ...state,
+    accounts: {
+      ...state.accounts,
+      orderBy
     }
   })),
   on(actions.reset, () => initialState)

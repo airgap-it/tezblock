@@ -20,7 +20,6 @@ import { AccountDetailComponent } from './account-detail.component'
 import { BakerTableComponent } from './../../components/baker-table/baker-table.component'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
@@ -65,7 +64,6 @@ describe('AccountDetailComponent', () => {
           BakerTableComponent,
           IdenticonComponent,
           AddressItemComponent,
-          AddressCellComponent,
           AmountCellComponent,
           BlockCellComponent,
           TabbedTableComponent,

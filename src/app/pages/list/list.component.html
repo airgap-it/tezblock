@@ -99,6 +99,9 @@
           <ng-container *ngSwitchCase="'contract'">
             Token Contracts
           </ng-container>
+          <ng-container *ngSwitchCase="'account'">
+            Accounts
+          </ng-container>
         </h5>
         <div class="row">
           <div class="col px-2">
@@ -108,7 +111,8 @@
               [loading]="loading$ | async"
               [pagination]="showLoadMore$ | async"
               (onLoadMore)="loadMore()"
-              (sortingClicked)="sortBy($event)"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
             ></tezblock-table>
           </div>
         </div>

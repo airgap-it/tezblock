@@ -1,11 +1,9 @@
-<ng-template #basicTemplate let-context>
-  {{ context?.data }}
-</ng-template>
+<ng-template #basicTemplate let-context>{{ context?.data }}</ng-template>
 <ng-template #amountTemplate let-context>
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
 </ng-template>
 <ng-template #addressTemplate let-context>
-  <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
+  <address-item [address]="context?.data" [options]="context?.options"></address-item>
 </ng-template>
 <ng-template #percentageTemplate let-context>
   {{ context?.data | percentage }}
@@ -68,27 +66,18 @@
                   <button
                     class="btn btn-link p-0 collapse--btn"
                     [ngClass]="{
-                      'text-primary': sortingDirection.get(column.field) === 'asc' || sortingDirection.get(column.field) === 'desc'
+                      'text-primary': getDirection(column.field) === 'asc' || getDirection(column.field) === 'desc'
                     }"
                     id="sortingColumn"
                   >
                     {{ column.name }}
                   </button>
-                  <button
-                    class="btn btn-link  p-0 collapse--btn"
-                    [ngClass]="{
-                      'btn--ascending': sortingDirection.get(column.field) === 'asc',
-                      'btn--descending': sortingDirection.get(column.field) === 'desc'
-                    }"
-                    id="sortingButton"
-                  >
-                    <ng-container
-                      *ngIf="sortingDirection.get(column.field) !== 'asc' && sortingDirection.get(column.field) !== 'desc'; else arrow"
-                    >
+                  <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
+                    <ng-container *ngIf="!getDirection(column.field); else arrow">
                       <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
                     </ng-container>
                     <ng-template #arrow>
-                      <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                      <fa-icon [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe" class="ml-1"></fa-icon>
                     </ng-template>
                   </button>
                 </th>

@@ -7,7 +7,6 @@ import { MomentModule } from 'ngx-moment'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
 
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
@@ -42,7 +41,6 @@ describe('BlockDetailComponent', () => {
           IdenticonComponent,
           AddressItemComponent,
           AmountCellComponent,
-          AddressCellComponent,
           BlockCellComponent,
           TabbedTableComponent,
           TezblockTableComponent,

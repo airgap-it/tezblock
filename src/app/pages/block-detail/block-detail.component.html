@@ -18,13 +18,13 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'block'"
-              [loading]="transactionsLoading$"
+              [loading]="transactionsLoading$ | async"
               [data]="transactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"
-              (sortingBy)="sortBy($event)"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
             ></tabbed-table>
           </div>
         </div>

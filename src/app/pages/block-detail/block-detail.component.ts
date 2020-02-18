@@ -8,7 +8,7 @@ import { negate, isNil } from 'lodash'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Tab } from '../../components/tabbed-table/tabbed-table.component'
+import { Tab } from '@tezblock/domain/tab'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
@@ -19,7 +19,9 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
-import { OperationTypes, LayoutPages } from '@tezblock/domain/operations'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { updateTabCounts } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
   selector: 'app-block-detail',
@@ -40,7 +42,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   public tabs: Tab[]
 
-  actionType$: Observable<LayoutPages>
+  orderBy$: Observable<OrderBy>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -70,7 +72,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
-    this.actionType$ = this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)).pipe(map(() => LayoutPages.Block))
+    this.orderBy$ = this.store$.select(state => state.blockDetails.orderBy)
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -98,7 +100,12 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
           withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
           switchMap(([action, block, kind]) => timer(refreshRate, refreshRate).pipe(map(() => [block.hash, kind])))
         )
-        .subscribe(([blockHash, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind })))
+        .subscribe(([blockHash, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind }))),
+
+      this.store$
+        .select(state => state.blockDetails.counts)
+        .pipe(filter(counts => !!counts))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
   }
 
@@ -112,8 +119,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.increasePageSize())
   }
 
-  sortBy(data: any) {
-    this.store$.dispatch(actions.sortTransactionsByKind({ sortingValue: data.value, sortingDirection: data.sortingDirection }))
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
   private setTabs(pageId: string) {

@@ -1,6 +1,7 @@
 import { createAction, props } from '@ngrx/store'
 
 import { Baker } from '@tezblock/services/api/api.service'
+import { OrderBy } from '@tezblock/services/base.service'
 
 const featureName = 'Bakers'
 
@@ -10,7 +11,7 @@ export const loadActiveBakersFailed = createAction(`[${featureName}] Load Active
 export const increasePageOfActiveBakers = createAction(`[${featureName}] Increase Page Of Active Bakers`)
 export const sortActiveBakersByKind = createAction(
   `[${featureName}] Sort Active Bakers`,
-  props<{ sortingValue: string; sortingDirection: string }>()
+  props<{ orderBy: OrderBy }>()
 )
 
 export const loadTop24Bakers = createAction(`[${featureName}] Load Top 24 Bakers`)

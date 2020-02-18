@@ -2,6 +2,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { squareBrackets } from '@tezblock/domain/pattern'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) => Column[] } = {
   /* BLOCK */
@@ -21,13 +22,14 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     {
       name: 'Transaction Volume',
       field: 'volume',
-      template: Template.amount
+      template: Template.amount,
+      data: (item: Block) => ({ data: { amount: item.volume, timestamp: item.timestamp } })
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Block) => ({ data: item.fee, options: { showFiatValue: false } })
+      data: (item: Block) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
     },
     {
       name: 'Transactions',
@@ -75,14 +77,14 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Amount',
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.amount, options }),
+        data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
         sortable: true
       },
       {
         name: 'Fees',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         sortable: true
       },
       {
@@ -133,7 +135,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Balance',
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.originatedBalance, options })
+        data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options })
       },
       {
         name: 'Originator',
@@ -155,7 +157,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),
@@ -194,13 +196,13 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Value',
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options })
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options })
       },
       {
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         sortable: true
       },
       {
@@ -297,7 +299,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Reward',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options })
+        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
       },
       {
         name: 'Offender',
@@ -310,7 +312,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Lost Amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options })
+        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -330,7 +332,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Reward',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options })
+        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
       },
       {
         name: 'Offender',
@@ -343,7 +345,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       {
         name: 'Lost Amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options })
+        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -383,11 +385,12 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Proposal',
       field: 'proposal',
       template: Template.hash,
-      data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
+      data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, ''), options: { kind: 'proposal' } })
     },
     {
       name: 'Proposal Hash',
-      field: 'proposal'
+      field: 'proposal',
+      data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, '') })
     },
     {
       name: 'Period',
@@ -420,5 +423,24 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       name: 'Description',
       field: 'description'
     }
-  ]
+  ],
+
+  /* ACCOUNT */
+  [OperationTypes.Account]: () =>
+    [
+      {
+        name: 'Account',
+        field: 'account_id',
+        width: '50%',
+        template: Template.address,
+        data: (item: any) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
+      },
+      {
+        name: 'Balance',
+        field: 'balance',
+        template: Template.amount,
+        data: (item: any) => ({ data: { amount: item.balance } }),
+        sortable: true
+      }
+    ]
 }

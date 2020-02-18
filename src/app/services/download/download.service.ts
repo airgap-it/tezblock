@@ -4,6 +4,8 @@ import * as store from '@ngrx/store'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
 import { NewTransactionService } from '../transaction/new-transaction.service'
+import { Router } from '@angular/router'
+import { ToastrService } from 'ngx-toastr'
 
 @Injectable({
   providedIn: 'root'
@@ -12,15 +14,23 @@ export class DownloadService {
   constructor(
     private readonly store$: store.Store<fromRoot.State>,
     private readonly apiService: ApiService,
-    private readonly newTransactionService: NewTransactionService
+    private readonly newTransactionService: NewTransactionService,
+    private readonly router: Router,
+    private readonly toastrService: ToastrService
   ) {}
 
   public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
+    this.toastrService.show(
+      '<div class="spinner-border spinner-border-sm d-inline-block" role="status"></div><span class="ml-3">Preparing Download</span>',
+      '',
+      {
+        enableHtml: true
+      }
+    )
 
-    console.log('downloading')
     if (layoutPage === 'account') {
       account$.subscribe(account => {
         this.newTransactionService.getAllTransactionsByAddress(account, kind, limit).subscribe(transactions => {
@@ -33,8 +43,9 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
@@ -50,8 +61,9 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
@@ -67,8 +79,9 @@ export class DownloadService {
             const blob = new Blob([csvData], { type: 'text/csv' })
             const url = window.URL.createObjectURL(blob)
             a.href = url
-            a.download = kind + 's.csv'
+            a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
             a.click()
+            this.toastrService.clear()
           }, 1000)
         })
       })
@@ -76,7 +89,7 @@ export class DownloadService {
   }
 
   private ConvertToCSV(objArray: any): string {
-    const array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray
+    const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray
     let str = ''
     let row = ''
     const indexTable: string[] = []
@@ -89,6 +102,7 @@ export class DownloadService {
         index === 'timestamp' ||
         index === 'amount' ||
         index === 'delegatedBalance' ||
+        index === 'originatedBalance' ||
         index === 'fee' ||
         index === 'block_level' ||
         index === 'operation_group_hash' ||
@@ -112,6 +126,18 @@ export class DownloadService {
 
         if (index === 'timestamp') {
           array[i][index] = new Date(array[i][index])
+          line += array[i][index]
+        } else if (index === 'amount') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'fee') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'delegatedBalance') {
+          array[i][index] = array[i][index] / 1000000
+          line += array[i][index]
+        } else if (index === 'originatedBalance') {
+          array[i][index] = array[i][index] / 1000000
           line += array[i][index]
         } else {
           line += array[i][index]
