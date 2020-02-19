@@ -9,7 +9,7 @@
     typeaheadGroupField="type"
     placeholder="Search by Address / Alias / Transaction / Block"
     class="form-control form-control--focus-white"
-    (keydown.enter)="onKeyEnter()"
+    (keydown.enter)="search()"
     (typeaheadOnSelect)="onSelect($event)"
     (mousedown)="onMouseDown()"
   />
