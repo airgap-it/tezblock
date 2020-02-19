@@ -1,6 +1,6 @@
 import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core'
 
-import { getContractByAddress, Contract } from '@tezblock/domain/contract'
+import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contract'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 
@@ -26,7 +26,7 @@ export class AddressItemComponent implements OnInit {
   set address(value: string) {
     if (value !== this._address) {
       this._address = value
-      this.contract = getContractByAddress(value)
+      this.contract = getTokenContractByAddress(value)
     }
   }
   get address(): string {
@@ -57,7 +57,7 @@ export class AddressItemComponent implements OnInit {
 
   formattedAddress: string
 
-  private contract: Contract
+  private contract: TokenContract
 
   constructor(private readonly aliasPipe: AliasPipe, private readonly shortenStringPipe: ShortenStringPipe) {}
 

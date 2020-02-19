@@ -13,7 +13,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Block } from '@tezblock/interfaces/Block'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { getContracts } from '@tezblock/domain/contract'
+import { getTokenContracts } from '@tezblock/domain/contract'
 import { Account } from '@tezblock/interfaces/Account'
 import { toNotNilArray } from '@tezblock/services/fp'
 
@@ -477,21 +477,25 @@ export class ListEffects {
 
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadContracts),
+      ofType(listActions.loadTokenContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
       switchMap(([action, pagination]) => {
-        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
+        const contracts = getTokenContracts(pagination.currentPage * pagination.selectedSize)
+
+        if (!contracts || contracts.total === 0) {
+          return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
+        }
 
         return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
           map(totalSupplies =>
-            listActions.loadContractsSucceeded({
-              contracts: {
+            listActions.loadTokenContractsSucceeded({
+              tokenContracts: {
                 data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
                 total: contracts.total
               }
             })
           ),
-          catchError(error => of(listActions.loadContractsFailed({ error })))
+          catchError(error => of(listActions.loadTokenContractsFailed({ error })))
         )
       })
     )
@@ -499,8 +503,8 @@ export class ListEffects {
 
   increasePageOfContracts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.increasePageOfContracts),
-      map(() => listActions.loadContracts())
+      ofType(listActions.increasePageOfTokenContracts),
+      map(() => listActions.loadTokenContracts())
     )
   )
 
