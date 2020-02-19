@@ -6,7 +6,6 @@
           [latestTransaction$]="latestTx$"
           [blockConfirmations$]="numberOfConfirmations$"
           [amount$]="totalAmount$"
-          [fee$]="totalFee$"
           [fiatInfo$]="fiatCurrencyInfo$"
           [isMainnet]="isMainnet"
         ></transaction-detail-wrapper>
@@ -18,12 +17,13 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'transaction'"
-              [loading]="transactionsLoading$"
+              [loading]="transactionsLoading$ | async"
               [data]="filteredTransactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
             ></tabbed-table>
           </div>
         </div>
@@ -31,12 +31,14 @@
     </ng-container>
     <ng-container *ngIf="isInvalidHash$ | async">
       <div class="card p-3">
-        <h5 class="card-title mb-4">
+        <h5 class="card-title mb-4 d-flex align-items-center">
           Invalid Operation Hash
+          <div class="spinner-grow ml-2 spinner-grow-sm text-primary" role="status"></div>
         </h5>
         <p>
-          This hash is invalid, it might not yet have been included in the blockchain.
+          This hash is currently invalid, it might not yet have been included in the blockchain.
         </p>
+        <p>This page continuously updates to get the latest state.</p>
       </div>
     </ng-container>
   </div>

@@ -1,11 +1,9 @@
-<ng-template #basicTemplate let-context>
-  {{ context?.data }}
-</ng-template>
+<ng-template #basicTemplate let-context>{{ context?.data }}</ng-template>
 <ng-template #amountTemplate let-context>
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
 </ng-template>
 <ng-template #addressTemplate let-context>
-  <address-cell [data]="context?.data" [options]="context?.options"></address-cell>
+  <address-item [address]="context?.data" [options]="context?.options"></address-item>
 </ng-template>
 <ng-template #percentageTemplate let-context>
   {{ context?.data | percentage }}
@@ -62,9 +60,34 @@
       <ng-template #thenTemplate>
         <thead>
           <tr>
-            <th *ngFor="let column of columns" [width]="column.width">
-              {{ column.name }}
-            </th>
+            <ng-container *ngFor="let column of columns">
+              <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
+                <th [width]="column.width" (click)="sorting(column.field)">
+                  <button
+                    class="btn btn-link p-0 collapse--btn"
+                    [ngClass]="{
+                      'text-primary': getDirection(column.field) === 'asc' || getDirection(column.field) === 'desc'
+                    }"
+                    id="sortingColumn"
+                  >
+                    {{ column.name }}
+                  </button>
+                  <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
+                    <ng-container *ngIf="!getDirection(column.field); else arrow">
+                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
+                    </ng-container>
+                    <ng-template #arrow>
+                      <fa-icon [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe" class="ml-1"></fa-icon>
+                    </ng-template>
+                  </button>
+                </th>
+              </ng-container>
+              <ng-template #notSortable>
+                <th [width]="column.width">
+                  {{ column.name }}
+                </th>
+              </ng-template>
+            </ng-container>
             <th *ngIf="expandedRow"></th>
           </tr>
         </thead>
@@ -97,7 +120,7 @@
       </ng-template>
     </table>
     <div class="w-100" [ngClass]="downloadable && enableDownload ? 'pb-2' : 'pb-3'">
-      <ng-container *ngIf="downloadable && enableDownload">
+      <ng-container *ngIf="downloadable && enableDownload && data.length > 0">
         <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
           <small>
             <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>

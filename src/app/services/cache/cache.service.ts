@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
-import { from, Observable } from 'rxjs'
+import { Observable } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 
 export enum CacheKeys {
-  fromCurrentCycle = 'fromCurrentCycle'
+  fromCurrentCycle = 'fromCurrentCycle',
+  currency = 'currency'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -15,8 +16,8 @@ export interface BakerData extends BakerTableRatings {
 }
 
 export interface ByCycleState {
-  cycleNumber: number,
-  myTezosBaker?: TezosBakerResponse,
+  cycleNumber: number
+  myTezosBaker?: TezosBakerResponse
   fromAddress?: {
     [address: string]: {
       bakerData: BakerData
@@ -25,30 +26,35 @@ export interface ByCycleState {
   }
 }
 
+export interface Currency {
+  [currencyName: string]: number
+}
+
 export interface Cache {
   [CacheKeys.fromCurrentCycle]: ByCycleState
+  [CacheKeys.currency]: Currency
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class CacheService {
-  private updateQueue: { [key: string]: ((value: Cache[CacheKeys]) => Cache[CacheKeys])[] } = {}
+  private updateQueue: { [key: string]: ((value: any) => any)[] } = {}
   private isBusy: { [key: string]: boolean } = {}
 
   delete(key: CacheKeys): Observable<undefined> {
     return this.storage.delete(key)
   }
 
-  set(key: CacheKeys, value: Cache[CacheKeys]): Observable<undefined> {
+  set<T>(key: CacheKeys, value: T): Observable<undefined> {
     return this.storage.set(key, value)
   }
 
-  get(key: CacheKeys): Observable<Cache[CacheKeys]> {
-    return <Observable<Cache[CacheKeys]>>this.storage.get(key)
+  get<T>(key: CacheKeys): Observable<T> {
+    return <Observable<T>>this.storage.get(key)
   }
 
-  update(key: CacheKeys, change: (value: Cache[CacheKeys]) => Cache[CacheKeys]) {
+  update<T>(key: CacheKeys, change: (value: T) => T) {
     if (!this.isBusy[key]) {
       this.executeUpdate(key, change).subscribe(() => {
         this.isBusy[key] = false
@@ -64,10 +70,10 @@ export class CacheService {
     this.updateQueue[key] = this.updateQueue[key] ? this.updateQueue[key].concat(change) : [change]
   }
 
-  executeUpdate(key: CacheKeys, change: (value: Cache[CacheKeys]) => Cache[CacheKeys]): Observable<undefined> {
+  executeUpdate<T>(key: CacheKeys, change: (value: T) => T): Observable<undefined> {
     this.isBusy[key] = true
 
-    return this.get(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
+    return this.get<T>(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
   }
 
   constructor(private readonly storage: StorageMap) {

@@ -1,4 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild, ChangeDetectionStrategy } from '@angular/core'
+
+import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
+import { Options } from '@tezblock/components/address-item/address-item.component'
 
 export enum Template {
   address,
@@ -16,8 +19,9 @@ export interface Column {
   name?: string
   field?: string
   width?: string
-  data?: (item: any) => any
+  data?: (item: any) => { data?: any, options?: Options }
   template?: TemplateRef<any> | Template
+  sortable?: boolean | undefined
 }
 
 export interface ExpandedRow<Entity> {
@@ -30,7 +34,8 @@ export const blockAndTxHashColumns: Column[] = [
   {
     name: 'Block',
     field: 'block_level',
-    template: Template.block
+    template: Template.block,
+    sortable: true
   },
   {
     name: 'Tx Hash',
@@ -46,7 +51,8 @@ const satisfyData = (column: Column): Column =>
 @Component({
   selector: 'tezblock-table',
   templateUrl: './tezblock-table.component.html',
-  styleUrls: ['./tezblock-table.component.scss']
+  styleUrls: ['./tezblock-table.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TezblockTableComponent implements OnInit {
   @ViewChild('basicTemplate', { static: true }) basicTemplate: TemplateRef<any>
@@ -80,15 +86,21 @@ export class TezblockTableComponent implements OnInit {
   @Input() expandedRow?: ExpandedRow<any>
 
   @Input()
-  public downloadable?: boolean = false
+  downloadable?: boolean = false
 
   @Input()
-  public enableDownload?: boolean = false
+  enableDownload?: boolean = false
+
+  @Input()
+  orderBy: OrderBy
 
   @Output()
-  public readonly downloadClicked: EventEmitter<void> = new EventEmitter()
+  readonly downloadClicked: EventEmitter<void> = new EventEmitter()
 
   @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
+
+  @Output()
+  readonly onSort: EventEmitter<OrderBy> = new EventEmitter()
 
   private expandedRows: any[] = []
 
@@ -121,8 +133,12 @@ export class TezblockTableComponent implements OnInit {
     this.onLoadMore.emit()
   }
 
-  public downloadCSV() {
+  downloadCSV() {
     this.downloadClicked.emit()
+  }
+
+  sorting(field: string) {
+    this.onSort.emit(getNextOrderBy(this.orderBy, field))
   }
 
   template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {
@@ -152,5 +168,9 @@ export class TezblockTableComponent implements OnInit {
       default:
         return this.basicTemplate
     }
+  }
+
+  getDirection(field: string): Direction {
+    return this.orderBy && this.orderBy.field === field ? this.orderBy.direction : undefined
   }
 }

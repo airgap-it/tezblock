@@ -73,30 +73,12 @@
       </div>
       <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
         <ng-container *ngIf="amount$ | async as amount">
-          <div
-            class="col col-md-9"
-            *ngIf="
-              (amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-              else hideValue
-            "
-          >
-            <p class="mb-0">
-              <span
-                class="d-inline-block"
-                [innerHtml]="
-                  amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-                "
-              ></span>
-              ꜩ
-              <ng-container *ngIf="isMainnet">
-                <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                  <span class="badge badge-pill badge-primary-light ml-1">
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{ amount | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                  </span>
-                </ng-container>
+          <div class="col col-md-9">
+            <ng-container *ngIf="isMainnet">
+              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
+                <amount-cell [data]="latestTransaction"></amount-cell>
               </ng-container>
-            </p>
+            </ng-container>
           </div>
         </ng-container>
       </ng-container>
@@ -115,34 +97,10 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <ng-container *ngIf="fee$ | async as fee">
-          <div
-            class=" col-md-9"
-            *ngIf="
-              (fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true }) > '0';
-              else hideValue
-            "
-          >
-            <p class="mb-0">
-              <span
-                class="d-inline-block"
-                [innerHtml]="
-                  fee | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 10, fontSmall: true, fontColor: true } | safeHtml
-                "
-              ></span>
-              ꜩ
-              <ng-container *ngIf="isMainnet">
-                <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                  <span class="badge badge-pill badge-primary-light ml-1">
-                    {{ 1 | currencySymbol: { currInfo: fiatInfo } }}
-                    {{ fee | currencyConverter: { currInfo: fiatInfo, protocolIdentifier: 'xtz' } | number: '1.0-5' }}
-                  </span>
-                </ng-container>
-              </ng-container>
-            </p>
-          </div>
-        </ng-container>
+      <ng-container *ngIf="amountFromLatestTransactionFee$ | async as amountFromLatestTransactionFee; else loadingTemplate">
+        <div class=" col-md-9">
+          <amount-cell [data]="amountFromLatestTransactionFee"></amount-cell>
+        </div>
       </ng-container>
     </div>
   </div>

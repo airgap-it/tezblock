@@ -27,10 +27,8 @@
                   <address-item
                     class="d-inline-flex"
                     [address]="contract.id"
-                    [showFull]="true"
+                    [options]="{ showFullAddress: true, forceIdenticon: true }"
                     [clickableButton]="false"
-                    [forceIdenticon]="true"
-                    [hideIdenticon]="false"
                   ></address-item>
 
                   <a
@@ -52,7 +50,7 @@
                       *ngIf="hasAlias$ | async"
                       class="d-inline-flex"
                       [address]="contract.id"
-                      [hideIdenticon]="true"
+                      [options]="{ hideIdenticon: true }"
                     ></address-item>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
@@ -62,19 +60,27 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-2 pr-0">
+                <div class="col-md-5">
                   <p class="text-secondary mb-0">Name</p>
                 </div>
-                <div class="col-md-10 pl-sm-0">
+                <div class="col-md-7">
                   <p class="mb-0">{{ contract.name }}</p>
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-2 pr-0">
+                <div class="col-md-5">
                   <p class="text-secondary mb-0">Symbol</p>
                 </div>
-                <div class="col-md-10 pl-sm-0">
+                <div class="col-md-7">
                   <p class="mb-0">{{ contract.symbol }}</p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-5">
+                  <p class="text-secondary mb-0">Total Supply</p>
+                </div>
+                <div class="col-md-7">
+                  <p class="mb-0">{{ contract.totalSupply }} {{ contract.symbol }}</p>
                 </div>
               </div>
             </div>
@@ -108,7 +114,7 @@
               </div>
 
               <div class="row mb-3">
-                <div class=" col-md-5">
+                <div class="col-md-5">
                   <p class="text-secondary mb-0">Social Profiles</p>
                 </div>
                 <div class=" col-md-7">
@@ -135,12 +141,12 @@
           <div class="row">
             <div class="col px-2">
               <tezblock-table
-              [columns]="columns$ | async"
-              [data]="transferOperations$ | async"
-              [loading]="loading$ | async"
-              [pagination]="showLoadMore$ | async"
-              (onLoadMore)="loadMore()"
-            ></tezblock-table>
+                [columns]="columns$ | async"
+                [data]="transferOperations$ | async"
+                [loading]="loading$ | async"
+                [pagination]="showLoadMore$ | async"
+                (onLoadMore)="loadMore()"
+              ></tezblock-table>
             </div>
           </div>
         </div>

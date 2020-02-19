@@ -1,8 +1,9 @@
 import { Component, Input, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 import { Block } from 'src/app/interfaces/Block'
-import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
+import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 @Component({
   selector: 'block-detail-wrapper',
@@ -10,27 +11,32 @@ import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.servi
   styleUrls: ['./block-detail-wrapper.component.scss']
 })
 export class BlockDetailWrapperComponent implements OnInit {
-  public isCollapsed = true
+  isCollapsed = true
 
   @Input()
-  public wrapperBlock$: Observable<Block> | undefined
+  wrapperBlock$: Observable<Block> | undefined
 
   @Input()
-  public fiatInfo$: Observable<CurrencyInfo> | undefined
+  endorsements$: Observable<number> | undefined
 
   @Input()
-  public endorsements$: Observable<number> | undefined
+  confirmations$: Observable<number> | undefined
 
   @Input()
-  public confirmations$: Observable<number> | undefined
+  blockLoading$: Observable<boolean> | undefined
 
-  @Input()
-  public blockLoading$: Observable<boolean> | undefined
+  amountFromBlockVolume$: Observable<AmountData>
+  amountFromBlockFee$: Observable<AmountData>
 
-  @Input()
-  public isMainnet: boolean = true
+  constructor() {}
 
-  constructor(private readonly route: ActivatedRoute) {}
+  ngOnInit() {
+    this.amountFromBlockVolume$ = this.wrapperBlock$.pipe(
+      (map(block => ({ amount: block.volume, timestamp: block.timestamp })))
+    )
 
-  public ngOnInit() {}
+    this.amountFromBlockFee$ = this.wrapperBlock$.pipe(
+      (map(block => ({ amount: block.fee, timestamp: block.timestamp })))
+    )
+  }
 }

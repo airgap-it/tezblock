@@ -1,5 +1,7 @@
 import { IAirGapTransaction } from 'airgap-coin-lib'
 
+import { Data } from '@tezblock/domain/table'
+
 const contracts = require('../../assets/contracts/json/contracts.json')
 
 export enum SocialType {
@@ -21,7 +23,8 @@ export interface Contract {
   name: string
   website: string
   description: string
-  socials: Social[]
+  socials: Social[],
+  totalSupply?: string
 }
 
 export interface ContractOperation extends IAirGapTransaction {
@@ -30,3 +33,10 @@ export interface ContractOperation extends IAirGapTransaction {
 }
 
 export const getContractByAddress = (address: string): Contract => contracts[address]
+
+export const getContracts = (limit: number): Data<Contract> => ({
+  data: Object.keys(contracts)
+    .map(key => ({ ...contracts[key], id: key }))
+    .slice(0, limit),
+  total: Object.keys(contracts).length
+})

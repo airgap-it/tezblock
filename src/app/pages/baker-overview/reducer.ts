@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store'
 
 import * as actions from './actions'
 import { Baker } from '@tezblock/services/api/api.service'
-import { Pagination } from '@tezblock/services/facade/facade'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 
 export const othersBakersLabel = 'Others'
 
@@ -12,32 +12,18 @@ const preprocessBakersData = (bakerData: any[]) =>
     number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
   }))
 
-// TODO import ...
-interface TableState<T> {
-  data: T[]
-  pagination: Pagination
-  loading: boolean
-}
-
-const getInitialTableState = (): TableState<any> => ({
-  data: [],
-  pagination: {
-    currentPage: 1,
-    selectedSize: 10,
-    pageSizes: [5, 10, 20, 50],
-    total: undefined
-  },
-  loading: false
-})
-
 export interface State {
   activeBakers: TableState<Baker>
   top24Bakers: Baker[]
   top24BakersLoading: boolean
 }
+export interface Sorting {
+  direction: string
+  value: string
+}
 
 const initialState: State = {
-  activeBakers: getInitialTableState(),
+  activeBakers: getInitialTableState({ field: 'staking_balance', direction: 'desc' }),
   top24Bakers: undefined,
   top24BakersLoading: false
 }
@@ -119,5 +105,12 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.reset, () => initialState)
+  on(actions.reset, () => initialState),
+  on(actions.sortActiveBakersByKind, (state, { orderBy }) => ({
+    ...state,
+    activeBakers: {
+      ...state.activeBakers,
+      orderBy
+    }
+  }))
 )

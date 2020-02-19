@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { from, of } from 'rxjs'
+import { from, of, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
@@ -10,11 +10,12 @@ import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { NewAccountService } from '@tezblock/services/account/account.service'
-import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
-import { first } from '@tezblock/services/fp'
+import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { get } from 'lodash'
+import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -57,9 +58,14 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.accountDetails.pageSize), this.store$.select(state => state.accountDetails.address)),
-      switchMap(([{ kind }, pageSize, address]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.accountDetails.pageSize),
+        this.store$.select(state => state.accountDetails.address),
+        this.store$.select(state => state.accountDetails.orderBy)
+      ),
+
+      switchMap(([{ kind }, pageSize, address, orderBy]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -72,6 +78,42 @@ export class AccountDetailEffects {
       ofType(actions.increasePageSize),
       withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
+  onSorting$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransactionsByKind),
+      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+      map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
+    )
+  )
+
+  onLoadTransactionLoadCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKind),
+      map(() => actions.loadTransactionsCounts())
+    )
+  )
+
+  loadTransactionsCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsCounts),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        forkJoin(
+          this.apiService.getOperationCount('source', address),
+          this.apiService.getOperationCount('destination', address),
+          this.apiService
+            .getOperationCount('delegate', address)
+            .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
+        ).pipe(
+          map(flatten),
+          map(aggregateOperationCounts),
+          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
+          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
     )
   )
 
@@ -119,7 +161,7 @@ export class AccountDetailEffects {
         ofType(actions.loadBakingBadRatingsSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([action, state]) =>
-          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
@@ -169,7 +211,7 @@ export class AccountDetailEffects {
         ofType(actions.loadTezosBakerRatingSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([{ response, address }, state]) =>
-          this.cacheService.update(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),

@@ -14,7 +14,8 @@ export enum Operation {
   lt = 'lt',
   gt = 'gt',
   isnull = 'isnull',
-  startsWith = 'startsWith'
+  startsWith = 'startsWith',
+  like = 'like'
 }
 
 export interface Predicate {
@@ -25,22 +26,40 @@ export interface Predicate {
   group?: string
 }
 
-export interface Aggregation
-{
-  field: string,
+export interface Aggregation {
+  field: string
   function: 'count' | 'sum'
+}
+
+export type Direction = 'asc' | 'desc'
+
+export interface OrderBy {
+  field: string
+  direction: Direction
 }
 
 export interface Body {
   fields?: string[]
   predicates?: Predicate[]
-  orderBy?: { field: string; direction: string }[]
+  orderBy?: OrderBy[]
   aggregation?: Aggregation[]
   limit?: number
 }
 
-export const andGroup = (pradicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
-  pradicates.map(predicate => ({
+export const getNextOrderBy = (orderBy?: OrderBy, field?: string): OrderBy => {
+  if (!orderBy || orderBy.field !== field) {
+    return { field, direction: 'desc' }
+  }
+
+  if (orderBy.direction === 'desc') {
+    return { ...orderBy, direction: 'asc' }
+  }
+
+  return undefined
+}
+
+export const andGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
+  predicates.map(predicate => ({
     ...predicate,
     operation: predicate.operation || operation,
     group: groupSymbol

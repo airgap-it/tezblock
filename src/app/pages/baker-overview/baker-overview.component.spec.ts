@@ -8,11 +8,10 @@ import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/lo
 import { ChartItemComponent } from '@tezblock/components/chart-item/chart-item.component'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AccountItemComponent } from '@tezblock/components/account-item/account-item.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
-import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
+import { AddressItemComponent } from '@tezblock/components/address-item/address-item.component'
 import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
 import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
 import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
@@ -35,7 +34,7 @@ xdescribe('BakerOverviewComponent', () => {
           TezblockTableComponent,
           IdenticonComponent,
           AccountItemComponent,
-          AddressCellComponent,
+          AddressItemComponent,
           AmountCellComponent,
           BlockCellComponent,
           SymbolCellComponent,

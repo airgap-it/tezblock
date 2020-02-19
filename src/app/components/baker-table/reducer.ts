@@ -2,11 +2,10 @@ import { createReducer, on } from '@ngrx/store'
 import { range } from 'lodash'
 
 import * as actions from './actions'
-import { Pagination } from '@tezblock/services/facade/facade'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { TableState, getInitialTableState, Pagination } from '@tezblock/domain/table'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
@@ -27,8 +26,8 @@ export interface State {
 const initialState: State = {
   accountAddress: undefined,
   currentCycle: undefined,
-  bakingRights: getInitialTableState(5),
-  endorsingRights: getInitialTableState(5),
+  bakingRights: getInitialTableState(undefined, 5),
+  endorsingRights: getInitialTableState(undefined, 5),
   kind: undefined,
   efficiencyLast10Cycles: undefined,
   busy: {

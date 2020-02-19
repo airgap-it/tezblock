@@ -8,7 +8,7 @@ import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.servi
   pure: true
 })
 export class CurrencyConverterPipe implements PipeTransform {
-  public transform(value: number | BigNumber, args?: { currInfo: CurrencyInfo; protocolIdentifier: string }): number {
+  public transform(value: string | number | BigNumber, args?: { currInfo: CurrencyInfo; protocolIdentifier: string }): number {
     if (!BigNumber.isBigNumber(value)) {
       value = new BigNumber(value)
     }
@@ -32,7 +32,6 @@ export class CurrencyConverterPipe implements PipeTransform {
     })
     const amount = new BN(value).shiftedBy(protocol.decimals * -1)
     const result: number = args ? this.transformToCurrency(amount, args.currInfo) : value.toNumber()
-
     return result
     /*
     args ? result = this.transformToCurrency(amount, args.currInfo) : result = value.toNumber() */

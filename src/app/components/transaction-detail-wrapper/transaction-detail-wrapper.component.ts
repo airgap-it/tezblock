@@ -1,13 +1,14 @@
-import { Component, Input } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import BigNumber from 'bignumber.js'
-import { CopyService } from 'src/app/services/copy/copy.service'
-
+import { Component, Input, OnInit } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
+import BigNumber from 'bignumber.js'
 import { ToastrService } from 'ngx-toastr'
 import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
+
+import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
+import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -26,8 +27,8 @@ import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.servi
     ])
   ]
 })
-export class TransactionDetailWrapperComponent {
-  public current: string = 'copyGrey'
+export class TransactionDetailWrapperComponent implements OnInit {
+  public current = 'copyGrey'
 
   @Input()
   public latestTransaction$: Observable<Transaction> | undefined
@@ -39,22 +40,26 @@ export class TransactionDetailWrapperComponent {
   public amount$: Observable<BigNumber> | undefined
 
   @Input()
-  public fee$: Observable<BigNumber> | undefined
-
-  @Input()
   public loading$?: Observable<boolean>
 
   @Input()
   public fiatInfo$: Observable<CurrencyInfo> | undefined
 
   @Input()
-  public isMainnet: boolean = true
+  public isMainnet = true
+
+  amountFromLatestTransactionFee$: Observable<AmountData>
 
   constructor(
-    private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
     private readonly toastrService: ToastrService
   ) {}
+
+  public ngOnInit() {
+    this.amountFromLatestTransactionFee$ = this.latestTransaction$.pipe(
+      map(transition => ({ amount: transition.fee, timestamp: transition.timestamp }))
+    )
+  }
 
   public copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)

@@ -4,11 +4,9 @@
       <div class="card h-100 pt-3">
         <block-detail-wrapper
           [wrapperBlock$]="block$"
-          [fiatInfo$]="fiatCurrencyInfo$"
           [endorsements$]="endorsements$"
           [confirmations$]="numberOfConfirmations$"
           [blockLoading$]="blockLoading$"
-          [isMainnet]="isMainnet"
         ></block-detail-wrapper>
       </div>
 
@@ -18,12 +16,13 @@
             <tabbed-table
               [tabs]="tabs"
               [page]="'block'"
-              [loading]="transactionsLoading$"
+              [loading]="transactionsLoading$ | async"
               [data]="transactions$ | async"
-              [actionType$]="actionType$"
               (tabClicked)="tabSelected($event)"
               (loadMore)="onLoadMore()"
               [downloadable]="true"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
             ></tabbed-table>
           </div>
         </div>

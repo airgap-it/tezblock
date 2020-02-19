@@ -21,7 +21,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { kindToOperationTypes, Tab } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { kindToOperationTypes, Tab } from '@tezblock/domain/tab'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -62,6 +62,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   efficiencyLast10CyclesLoading$: Observable<boolean>
 
   activeDelegations$: Observable<number>
+  isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance: number | undefined
   rewardsExpandedRow: ExpandedRow<ExpTezosRewards>
@@ -189,6 +190,17 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
     this.upcomingRights$ = this.store$.select(state => state.bakerTable.upcomingRights)
     this.upcomingRightsLoading$ = this.store$.select(state => state.bakerTable.busy.upcomingRights)
+    this.isRightsTabAvailable$ = this.store$
+      .select(state => state.bakerTable.upcomingRights)
+      .pipe(
+        map(upcomingRights =>
+          !upcomingRights
+            ? true
+            : this.selectedTab.kind === 'baking_rights'
+            ? upcomingRights.baking !== null
+            : upcomingRights.endorsing !== null
+        )
+      )
 
     this.setupExpandedRows()
     this.setupTables()
@@ -275,7 +287,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: item.payout, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: { amount: item.payout }, options: { showFiatValue: true } })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
@@ -293,12 +305,21 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           { name: 'Age', field: 'estimated_time', template: Template.timestamp },
           { name: 'Level', field: 'level', template: Template.block },
           { name: 'Priority', field: 'priority' },
-          { name: 'Rewards', field: 'rewards', template: Template.amount },
-          { name: 'Fees', field: 'fees', template: Template.amount },
-          { name: 'Deposits', field: 'deposit', template: Template.amount }
+          {
+            name: 'Rewards',
+            field: 'rewards',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: { amount: item.rewards } })
+          },
+          { name: 'Fees', field: 'fees', template: Template.amount, data: (item: BakingRights) => ({ data: { amount: item.fees } }) },
+          {
+            name: 'Deposits',
+            field: 'deposit',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: { amount: item.deposit } })
+          }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }
@@ -315,12 +336,16 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: { amount: item.rewards }, options: { showFiatValue: true } })
           },
-          { name: 'Deposits', field: 'deposit', template: Template.amount }
+          {
+            name: 'Deposits',
+            field: 'deposit',
+            template: Template.amount,
+            data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
+          }
         ],
-        data: item.items,
-        filterCondition: (detail, query) => detail.block_hash === query
+        data: item.items
       }),
       primaryKey: 'cycle'
     }

@@ -47,6 +47,8 @@
               [loading]="loading$ | async"
               [pagination]="showLoadMore$ | async"
               (onLoadMore)="loadMore()"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
             ></tezblock-table>
           </div>
         </div>

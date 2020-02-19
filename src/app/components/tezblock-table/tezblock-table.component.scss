@@ -1,15 +1,21 @@
 ::ng-deep tezblock-table {
-    .table-hover tbody tr.table-extended__active:hover {
-      background-color: transparent;
-    }
+  .table-hover tbody tr.table-extended__active:hover {
+    background-color: transparent;
+  }
+
+  #sortingColumn {
+    color: black;
+  }
+
+  tr td:first-of-type,
+  tr th:first-of-type {
+    padding-left: 16px;
+  }
+
+  @media (max-width: 576px) {
     tr td:first-of-type,
     tr th:first-of-type {
-      padding-left: 16px;
-    }
-    @media (max-width: 576px) {
-      tr td:first-of-type,
-      tr th:first-of-type {
-        padding-left: 0;
-      }
+      padding-left: 0;
     }
   }
+}

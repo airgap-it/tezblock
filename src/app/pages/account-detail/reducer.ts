@@ -10,16 +10,38 @@ import { Balance } from '@tezblock/services/api/api.service'
 import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
+import { Count } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
+import { sort } from '@tezblock/domain/table'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
-  const lastDay = balance && balance.length > 0 ? moment.utc(balance[0].asof).startOf('day') : moment.utc().startOf('day')
-  const missingDays = 30 - (moment.utc().startOf('day').diff(lastDay, 'days') + 1)
-  const missingBalance: Balance[] = range(0, missingDays).map(index => ({
-    balance: 0,
-    asof: moment.utc().add(-29 + index, 'days').valueOf()
-  }))
+  const toDay = (index: number): number =>
+    moment
+      .utc()
+      .add(-29 + index, 'days')
+      .valueOf()
+  const getBalanceFrom = (date: number) => (balanceItem: Balance) =>
+    moment(balanceItem.asof)
+      .startOf('day')
+      .isSame(moment(date).startOf('day'))
+  const getPreviousBalance = (balance: Balance[], date: number) => {
+    const match = balance.find((balanceItem: Balance) =>
+      moment(balanceItem.asof)
+        .startOf('day')
+        .isBefore(moment(date).startOf('day'))
+    )
 
-  return missingBalance.concat(balance)
+    return match ? { ...match, asof: date } : undefined
+  }
+  const attachBalance = (date: number): Balance =>
+    balance.find(getBalanceFrom(date)) || getPreviousBalance(balance, date) || { balance: 0, asof: date }
+
+  return range(0, 30).map(
+    pipe(
+      toDay,
+      attachBalance
+    )
+  )
 }
 
 const ratingNumberToLabel = [
@@ -41,21 +63,27 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
 )
 
 export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
-  bakingRating: response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  bakingRating:
+    response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
 })
 
-export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): actions.BakingRatingResponse => ({
-  bakingRating: response.status === 'success' && response.rating
-  ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
-  : null,
+export const fromMyTezosBakerResponse = (
+  response: MyTezosBakerResponse,
+  state: State,
+  updateFee: boolean
+): actions.BakingRatingResponse => ({
+  bakingRating:
+    response.status === 'success' && response.rating
+      ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
+      : null,
   tezosBakerFee: updateFee ? (response.status === 'success' && response.fee ? parseFloat(response.fee) : null) : state.tezosBakerFee
 })
 
 export interface Busy {
   transactions: boolean
   rewardAmont: boolean
-} 
+}
 
 export interface BakerTableRatings {
   bakingBadRating: string
@@ -68,6 +96,7 @@ export interface State {
   delegatedAccounts: Account[]
   relatedAccounts: Account[]
   transactions: Transaction[]
+  counts: Count[],
   kind: string
   pageSize: number // transactions
   rewardAmont: string
@@ -75,6 +104,7 @@ export interface State {
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
+  orderBy: OrderBy
 }
 
 const initialState: State = {
@@ -83,6 +113,7 @@ const initialState: State = {
   delegatedAccounts: undefined,
   relatedAccounts: undefined,
   transactions: undefined,
+  counts: undefined,
   kind: undefined,
   pageSize: 10,
   rewardAmont: undefined,
@@ -92,7 +123,8 @@ const initialState: State = {
   },
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
-  tezosBakerFee: undefined
+  tezosBakerFee: undefined,
+  orderBy: sort('block_level', 'desc')
 }
 
 export const reducer = createReducer(
@@ -164,6 +196,12 @@ export const reducer = createReducer(
     ...state,
     pageSize: state.pageSize + 10
   })),
+
+  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
+    ...state,
+    orderBy
+  })),
+
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
     balanceFromLast30Days: ensure30Days(balanceFromLast30Days)
@@ -192,6 +230,9 @@ export const reducer = createReducer(
       bakerTableRatings: false
     }
   })),
-
+  on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
+    ...state,
+    counts
+  })),
   on(actions.reset, () => initialState)
 )
