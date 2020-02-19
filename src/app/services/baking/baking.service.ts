@@ -41,7 +41,7 @@ export class BakingService {
 
   delegationInfo: DelegationInfo
 
-  private readonly bakingBadUrl = 'https://api.baking-bad.org/v1/bakers'
+  private readonly bakingBadUrl = 'https://api.baking-bad.org/v2/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
   private readonly efficiencyLast10CyclesUrl = 'https://tezos-nodes.com/api/last10/'
 
@@ -56,7 +56,7 @@ export class BakingService {
   getBakingBadRatings(address: string): Observable<BakingBadResponse> {
     return this.http
       .get<BakingBadResponse>(`${this.bakingBadUrl}/${address}`, {
-        params: { rating: 'true', configs: 'true', insurance: 'true' }
+        params: { configs: 'true', insurance: 'true' }
       })
       .pipe(
         map(response => ({
