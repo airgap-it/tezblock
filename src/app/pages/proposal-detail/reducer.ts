@@ -6,6 +6,7 @@ import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { MetaVotingPeriod } from '@tezblock/domain/vote'
+import { squareBrackets } from '@tezblock/domain/pattern'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
   if (!state.metaVotingPeriods) {
@@ -18,6 +19,9 @@ const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: S
     return { ...match, [property]: metaVotingPeriod[property] }
   })
 }
+
+const processProposal = (proposal: ProposalDto): ProposalDto =>
+  proposal ? { ...proposal, proposal: proposal.proposal.replace(squareBrackets, '') } : proposal
 
 export interface State {
   id: string
@@ -47,7 +51,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadProposalSucceeded, (state, { proposal }) => ({
     ...state,
-    proposal: proposal || null,
+    proposal: processProposal(proposal) || null,
     loadingProposal: false
   })),
   on(actions.loadProposalFailed, state => ({
