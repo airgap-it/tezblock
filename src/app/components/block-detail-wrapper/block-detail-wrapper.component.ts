@@ -12,27 +12,27 @@ import { Block } from 'src/app/interfaces/Block'
   styleUrls: ['./block-detail-wrapper.component.scss']
 })
 export class BlockDetailWrapperComponent implements OnInit {
-  public isCollapsed = true
+  isCollapsed = true
 
   @Input()
-  public wrapperBlock$: Observable<Block> | undefined
+  wrapperBlock$: Observable<Block> | undefined
 
   @Input()
-  public endorsements$: Observable<number> | undefined
+  endorsements$: Observable<number> | undefined
 
   @Input()
-  public confirmations$: Observable<number> | undefined
+  confirmations$: Observable<number> | undefined
 
   @Input()
-  public blockLoading$: Observable<boolean> | undefined
+  blockLoading$: Observable<boolean> | undefined
 
   @Output()
   blockChangeClicked: EventEmitter<string> = new EventEmitter()
 
-  public amountFromBlockVolume$: Observable<AmountData>
-  public amountFromBlockFee$: Observable<AmountData>
+  amountFromBlockVolume$: Observable<AmountData>
+  amountFromBlockFee$: Observable<AmountData>
 
-  public latestBlock$ = this.blockService.getLatest()
+  latestBlock$ = this.blockService.getLatest()
 
   constructor(private readonly blockService: NewBlockService) {}
 
