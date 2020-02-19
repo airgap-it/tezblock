@@ -12,7 +12,6 @@ import { Tab } from '@tezblock/domain/tab'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
 import { BlockService } from '../../services/blocks/blocks.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
@@ -36,8 +35,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   public transactionsLoading$: Observable<boolean>
   public blockLoading$: Observable<boolean>
 
-  public fiatCurrencyInfo$: Observable<CurrencyInfo>
-
   public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
   public tabs: Tab[]
@@ -50,7 +47,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly cryptoPricesService: CryptoPricesService,
     private readonly route: ActivatedRoute,
     private readonly blockService: BlockService,
     private readonly iconPipe: IconPipe,
@@ -62,7 +58,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
     this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
