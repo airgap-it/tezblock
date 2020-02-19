@@ -475,7 +475,7 @@ export class ListEffects {
     )
   )
 
-  loadContracts$ = createEffect(() =>
+  loadTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadTokenContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
@@ -501,10 +501,54 @@ export class ListEffects {
     )
   )
 
-  increasePageOfContracts$ = createEffect(() =>
+  increasePageOfTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfTokenContracts),
       map(() => listActions.loadTokenContracts())
+    )
+  )
+
+  loadContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadContracts),
+      withLatestFrom(
+        this.store$.select(state => state.list.contracts.pagination),
+        this.store$.select(state => state.list.contracts.orderBy).pipe(map(toNotNilArray))
+      ),
+      switchMap(([action, pagination, orderBy]) =>
+        this.baseService
+          .post<Account[]>('accounts', {
+            fields: [],
+            predicates: [
+              {
+                field: 'account_id',
+                operation: Operation.startsWith,
+                set: ['KT'],
+                inverse: false
+              }
+            ],
+            orderBy,
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(contracts => listActions.loadContractsSucceeded({ contracts })),
+            catchError(error => of(listActions.loadContractsFailed({ error })))
+          )
+      )
+    )
+  )
+
+  increasePageOfContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfContracts),
+      map(() => listActions.loadContracts())
+    )
+  )
+
+  sortContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortContracts),
+      map(() => listActions.loadContracts())
     )
   )
 

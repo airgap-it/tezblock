@@ -622,6 +622,13 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.sortContracts, (state, { orderBy }) => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      orderBy
+    }
+  })),
   on(actions.loadAccounts, state => ({
     ...state,
     accounts: {
