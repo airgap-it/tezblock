@@ -22,15 +22,18 @@ export const loadTransactionsByKindSucceeded = createAction(
 )
 export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load Transactions By Kind Failed`, props<{ error: any }>())
 
-export const sortTransactionsByKind = createAction(
-  `[${featureName}] Sort Transactions`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
+
+export const increaseBlock = createAction(`[${featureName}] Increase Block Level`)
+export const decreaseBlock = createAction(`[${featureName}] Decrease Block Level`)
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 
 export const loadTransactionsCounts = createAction(`[${featureName}] Load Transactions Counts`)
-export const loadTransactionsCountsSucceeded = createAction(`[${featureName}] Load Transactions Counts Succeeded`, props<{ counts: Count[] }>())
+export const loadTransactionsCountsSucceeded = createAction(
+  `[${featureName}] Load Transactions Counts Succeeded`,
+  props<{ counts: Count[] }>()
+)
 export const loadTransactionsCountsFailed = createAction(`[${featureName}] Load Transactions Counts Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)
