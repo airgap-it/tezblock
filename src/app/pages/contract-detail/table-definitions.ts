@@ -1,15 +1,13 @@
-import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => Column[] } = {
-  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
     {
       name: 'From',
       field: 'singleFrom',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } }),
-      sortable: false
+      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -21,8 +19,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'singleTo',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } }),
-      sortable: false
+      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
@@ -41,8 +38,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Tx Hash',
       field: 'hash',
-      template: Template.hash,
-      sortable: false
+      template: Template.hash
     }
   ]
 }

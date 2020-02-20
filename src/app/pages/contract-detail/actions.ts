@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store'
 import { TezosTransactionResult } from 'airgap-coin-lib'
 
 import { Contract } from '@tezblock/domain/contract'
+import { OrderBy } from '@tezblock/services/base.service'
 
 const featureName = 'Contract Detail'
 
@@ -14,9 +15,13 @@ export const copyAddressToClipboardSucceeded = createAction(`[${featureName}] Co
 export const resetCopyToClipboardState = createAction(`[${featureName}] Reset Copy To Clipboard State`)
 
 export const loadTransferOperations = createAction(`[${featureName}] Load Transfer Operations`, props<{ contract: Contract }>())
-export const loadTransferOperationsSucceeded = createAction(`[${featureName}] Load Transfer Operations Succeeded`, props<{ transferOperations: TezosTransactionResult }>())
+export const loadTransferOperationsSucceeded = createAction(
+  `[${featureName}] Load Transfer Operations Succeeded`,
+  props<{ transferOperations: TezosTransactionResult }>()
+)
 export const loadTransferOperationsFailed = createAction(`[${featureName}] Load Transfer Operations Failed`, props<{ error: any }>())
 export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
+export const sortTransferOperations = createAction(`[${featureName}] Sort Transfer Operations`, props<{ orderBy: OrderBy }>())
 
 export const showQr = createAction(`[${featureName}] Show Qr`)
 

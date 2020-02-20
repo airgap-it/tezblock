@@ -87,5 +87,12 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.sortTransferOperations, (state, { orderBy }) => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      orderBy
+    }
+  })),
   on(actions.reset, () => initialState)
 )

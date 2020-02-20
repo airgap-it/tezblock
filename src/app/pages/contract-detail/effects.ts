@@ -114,6 +114,14 @@ export class ContractDetailEffects {
     )
   )
 
+  sortTransferOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortTransferOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadTransferOperations({ contract }))
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly aliasPipe: AliasPipe,

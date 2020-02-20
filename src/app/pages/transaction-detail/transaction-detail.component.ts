@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Tab } from '@tezblock/domain/tab'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -21,7 +21,6 @@ import { refreshRate } from '@tezblock/services/facade/facade'
 import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({

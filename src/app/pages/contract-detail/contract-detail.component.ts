@@ -14,9 +14,9 @@ import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
   selector: 'app-contract-detail',
@@ -49,8 +49,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   loading$: Observable<boolean>
   transferOperations$: Observable<ContractOperation[]>
   showLoadMore$: Observable<boolean>
-  columns$: Observable<Column[]>
   current: string = 'copyGrey'
+  tabs: Tab[]
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -99,11 +99,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
-    this.columns$ = combineLatest(this.address$, this.contract$).pipe(
-      filter(([address, contract]) => !!address && !!contract),
-      map(([address, contract]) =>
-        columns[OperationTypes.Transaction]({ pageId: address, showFiatValue: this.isMainnet, symbol: contract.symbol })
-      )
+
+    this.subscriptions.push(
+      combineLatest(this.address$, this.contract$)
+        .pipe(filter(([address, contract]) => !!address && !!contract))
+        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol))
     )
   }
 
@@ -120,7 +120,16 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   }
 
   loadMore() {
+    // TODO
     this.store$.dispatch(actions.loadMoreTransferOperations())
+  }
+
+  tabSelected(kind: string) {
+    // TODO
+  }
+
+  sortBy(orderBy: OrderBy) {
+    // TODO
   }
 
   private getSocial(condition: (social: Social) => boolean): Observable<string> {
@@ -134,5 +143,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           return match ? match.url : null
         })
       )
+  }
+
+  private setTabs(pageId: string, symbol: string) {
+    const showFiatValue = this.isMainnet
+
+    this.tabs = [
+      {
+        title: 'Transfers',
+        active: true,
+        kind: 'transfers',
+        count: null,
+        columns: columns.transfers({ pageId, showFiatValue, symbol })
+      }
+    ]
   }
 }
