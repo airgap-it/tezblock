@@ -80,7 +80,9 @@ import { TezblockTableComponent } from './components/tezblock-table/tezblock-tab
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
 import { BakersEffects } from './pages/baker-overview/effects'
-import { HealthEffects } from './pages/health/effects'
+import { HealthEffects } from './pages/health/effects';
+import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
+import { DashboardLatestContractsEffects } from './pages/dashboard/latest-contracts/effects'
 
 @NgModule({
   imports: [
@@ -126,7 +128,8 @@ import { HealthEffects } from './pages/health/effects'
       ProposalDetailEffects,
       ContractDetailEffects,
       BakersEffects,
-      HealthEffects
+      HealthEffects,
+      DashboardLatestContractsEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -174,7 +177,8 @@ import { HealthEffects } from './pages/health/effects'
     ClientSideTableComponent,
     ContractDetailComponent,
     BakerOverviewComponent,
-    HealthComponent
+    HealthComponent,
+    LatestContractsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

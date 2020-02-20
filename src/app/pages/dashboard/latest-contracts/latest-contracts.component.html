@@ -1,0 +1,18 @@
+<div *ngFor="let contract of contracts$ | async">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-5 col-sm-5 order-0 p-0">
+        <div class="d-block ">
+          <address-item [address]="contract.id" ng-href="#here" (click)="inspectDetail(contract.id)"></address-item>
+        </div>
+      </div>
+      <div class="col-4 col-sm-2 p-0 order-1 order-sm-1">
+        <p class="m-0">{{ contract.totalSupply }}</p>
+      </div>
+      <div class="col-12 col-sm-5 p-0 pt-2 pt-sm-0 d-flex align-items-center order-3 order-sm-2">
+        <p class="m-0">{{ contract.symbol }}</p>
+      </div>
+    </div>
+    <hr />
+  </div>
+</div>
