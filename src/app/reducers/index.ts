@@ -14,7 +14,8 @@ import * as fromContractDetails from '../pages/contract-detail/reducer'
 import * as fromBakers from '../pages/baker-overview/reducer'
 import * as fromHealth from '../pages/health/reducer'
 import * as fromApp from '../app.reducer'
-import * as fromDashboardLatestContracts from '../pages/dashboard/latest-contracts/reducer'
+import * as fromDashboard from '../pages/dashboard/reducer'
+import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer'
 
 export interface State {
   app: fromApp.State
@@ -22,7 +23,8 @@ export interface State {
   bakerTable: fromBakerTable.State
   bakers: fromBakers.State
   blockDetails: fromBlockDetails.State
-  dashboardLatestContracts: fromDashboardLatestContracts.State
+  dashboard: fromDashboard.State
+  dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.State
   endorsementDetails: fromEndorsementDetails.State
   transactionDetails: fromTransactionDetails.State
   proposalDetails: fromProposalDetails.State
@@ -43,7 +45,8 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     bakerTable: fromBakerTable.reducer,
     bakers: fromBakers.reducer,
     blockDetails: fromBlockDetails.reducer,
-    dashboardLatestContracts: fromDashboardLatestContracts.reducer,
+    dashboard: fromDashboard.reducer,
+    dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
     transactionDetails: fromTransactionDetails.reducer,
     proposalDetails: fromProposalDetails.reducer,

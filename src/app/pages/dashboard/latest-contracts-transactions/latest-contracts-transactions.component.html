@@ -1,0 +1,25 @@
+<div *ngFor="let operation of transferOperations$ | async">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-3 col-sm-3 p-0 order-0">
+        <div class="d-block ">
+          <address-item [address]="operation.singleFrom" ng-href="#here" (click)="inspectDetail(operation.singleFrom)"></address-item>
+        </div>
+      </div>
+      <div class="col-3 col-sm-3 p-0 order-1">
+        <div class="d-block ">
+          <address-item [address]="operation.singleTo" ng-href="#here" (click)="inspectDetail(operation.singleTo)"></address-item>
+        </div>
+      </div>
+      <div class="col-3 col-sm-3 p-0 order-2">
+        <div class="d-block ">
+            <amount-cell [data]="{ amount: operation.amount }"></amount-cell>
+        </div>
+      </div>
+      <div class="col-3 col-sm-3 p-0 order-3">
+        <p class="m-0">{{ operation.symbol }}</p>
+      </div>
+    </div>
+    <hr />
+  </div>
+</div>

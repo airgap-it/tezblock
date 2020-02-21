@@ -6,18 +6,17 @@ import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
-import { getContracts } from '@tezblock/domain/contract'
+import { getTokenContracts } from '@tezblock/domain/contract'
 
 @Injectable()
-export class DashboardLatestContractsEffects {
+export class DashboarEffects {
 
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContracts),
       switchMap(() => {
-        const contracts = getContracts(6)
+        const contracts = getTokenContracts(6)
 
         if (!contracts || contracts.total === 0) {
             return of(actions.loadContractsSucceeded({ contracts: [] }))

@@ -82,7 +82,9 @@ import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.co
 import { BakersEffects } from './pages/baker-overview/effects'
 import { HealthEffects } from './pages/health/effects';
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
-import { DashboardLatestContractsEffects } from './pages/dashboard/latest-contracts/effects'
+import { DashboarEffects } from './pages/dashboard/effects';
+import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component'
+import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects'
 
 @NgModule({
   imports: [
@@ -129,7 +131,8 @@ import { DashboardLatestContractsEffects } from './pages/dashboard/latest-contra
       ContractDetailEffects,
       BakersEffects,
       HealthEffects,
-      DashboardLatestContractsEffects
+      DashboarEffects,
+      DashboardLatestContractsTransactionsEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -178,7 +181,8 @@ import { DashboardLatestContractsEffects } from './pages/dashboard/latest-contra
     ContractDetailComponent,
     BakerOverviewComponent,
     HealthComponent,
-    LatestContractsComponent
+    LatestContractsComponent,
+    LatestContractsTransactionsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
