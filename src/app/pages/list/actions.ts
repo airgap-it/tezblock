@@ -4,7 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { Baker } from '@tezblock/services/api/api.service'
 import { Block } from '@tezblock/interfaces/Block'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { Data } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -190,10 +190,16 @@ export const loadOriginationsCountLastXdFailed = createAction(
   props<{ error: any }>()
 )
 
+export const loadTokenContracts = createAction(`[${featureName}] Load Token Contracts`)
+export const loadTokenContractsSucceeded = createAction(`[${featureName}] Load Token Contracts Succeeded`, props<{ tokenContracts: Data<TokenContract> }>())
+export const loadTokenContractsFailed = createAction(`[${featureName}] Load Token Contracts Failed`, props<{ error: any }>())
+export const increasePageOfTokenContracts = createAction(`[${featureName}] Increase Page Of Token Contracts`)
+
 export const loadContracts = createAction(`[${featureName}] Load Contracts`)
-export const loadContractsSucceeded = createAction(`[${featureName}] Load Contracts Succeeded`, props<{ contracts: Data<Contract> }>())
+export const loadContractsSucceeded = createAction(`[${featureName}] Load Contracts Succeeded`, props<{ contracts: Account[] }>())
 export const loadContractsFailed = createAction(`[${featureName}] Load Contracts Failed`, props<{ error: any }>())
 export const increasePageOfContracts = createAction(`[${featureName}] Increase Page Of Contracts`)
+export const sortContracts = createAction(`[${featureName}] Sort Contracts`, props<{ orderBy: OrderBy }>())
 
 export const loadAccounts = createAction(`[${featureName}] Load Accounts`)
 export const loadAccountsSucceeded = createAction(`[${featureName}] Load Accounts Succeeded`, props<{ accounts: Account[] }>())
