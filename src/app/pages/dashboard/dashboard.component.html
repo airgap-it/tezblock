@@ -105,7 +105,7 @@
     </div>
   </div>
   <div class="container p-0 my-5">
-    <div class="row">
+    <div class="row mb-4">
       <div class=" col-lg-6 mb-4 mb-lg-0">
         <div class="card latest py-4 h-100">
           <div class="card-body p-4 ">
@@ -128,6 +128,21 @@
             <transaction-item [data]="transactions$"></transaction-item>
             <button type="button" [routerLink]="['/transaction/list']" class="btn btn-primary-light btn-sm btn-block">
               All Transactions
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class=" col-lg-6 mb-4 mb-lg-0">
+        <div class="card latest py-4 h-100">
+          <div class="card-body p-4 ">
+            <h5 class="card-title mb-4 ">
+              Latest Contracts
+            </h5>
+            <app-latest-contracts></app-latest-contracts>
+            <button type="button" [routerLink]="['/contract/list']" class="btn btn-primary-light btn-sm btn-block">
+              All Contracts
             </button>
           </div>
         </div>
