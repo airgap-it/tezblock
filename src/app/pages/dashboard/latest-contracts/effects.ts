@@ -16,9 +16,8 @@ export class DashboardLatestContractsEffects {
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContracts),
-      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
-      switchMap(([action, pagination]) => {
-        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
+      switchMap(() => {
+        const contracts = getContracts(6)
 
         if (!contracts || contracts.total === 0) {
             return of(actions.loadContractsSucceeded({ contracts: [] }))
