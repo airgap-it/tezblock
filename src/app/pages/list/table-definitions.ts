@@ -443,7 +443,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       sortable: true
     },
     {
-      name: 'Delegate',
+      name: 'Baker',
       field: 'delegate_value',
       template: Template.address
     }
