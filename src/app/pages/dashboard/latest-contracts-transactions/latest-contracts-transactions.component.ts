@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Store } from '@ngrx/store'
+import { Router } from '@angular/router'
 
 import { TokenContract } from '@tezblock/domain/contract'
 import * as fromRoot from '@tezblock/reducers'
@@ -29,13 +30,13 @@ export class LatestContractsTransactionsComponent implements OnInit {
 
   transferOperations$: Observable<actions.CustomContractOperation[]>
 
-  constructor(private readonly store$: Store<fromRoot.State>) {}
+  constructor(private readonly router: Router, private readonly store$: Store<fromRoot.State>) {}
 
   ngOnInit() {
     this.transferOperations$ = this.store$.select(state => state.dashboardLatestContractsTransactions.transferOperations)
   }
 
-  inspectDetail() {
-    //TODO
+  inspectDetail(address: string) {
+    this.router.navigate([`/account/${address}`])
   }
 }
