@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
+import { of, pipe, forkJoin } from 'rxjs'
 import { catchError, delay, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap'
@@ -12,9 +12,58 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getContractByAddress, Contract } from '@tezblock/domain/contract'
+import { getContractByAddress, Contract, ContractOperation } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { get } from '@tezblock/services/fp'
+import { first, get } from '@tezblock/services/fp'
+import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
+
+const transferPredicates = (contractHash: string): Predicate[] => [
+  {
+    field: 'parameters',
+    operation: Operation.like,
+    set: ['"transfer"'],
+    inverse: false
+  },
+  {
+    field: 'kind',
+    operation: Operation.eq,
+    set: ['transaction'],
+    inverse: false
+  },
+  {
+    field: 'destination',
+    operation: Operation.eq,
+    set: [contractHash],
+    inverse: false
+  }
+]
+
+const otherPredicates = (contractHash: string): Predicate[] => [
+  {
+    field: 'parameters',
+    operation: Operation.like,
+    set: ['"transfer"'],
+    inverse: true
+  },
+  {
+    field: 'parameters',
+    operation: Operation.isnull,
+    set: [''],
+    inverse: true
+  },
+  {
+    field: 'kind',
+    operation: Operation.eq,
+    set: ['transaction'],
+    inverse: false
+  },
+  {
+    field: 'destination',
+    operation: Operation.eq,
+    set: [contractHash],
+    inverse: false
+  }
+]
 
 @Injectable()
 export class ContractDetailEffects {
@@ -39,7 +88,7 @@ export class ContractDetailEffects {
   onContractGetOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContractSucceeded),
-      map(({ contract }) => actions.loadTransferOperations({ contract }))
+      map(({ contract }) => actions.loadTransferOperations({ contractHash: contract.id }))
     )
   )
 
@@ -96,21 +145,30 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.cursor)),
-      switchMap(([{ contract }, cursor]) =>
-        this.apiService.getTransferOperationsForContract(contract, cursor).pipe(
-          map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
-          catchError(error => of(actions.loadTransferOperationsFailed({ error })))
-        )
+      withLatestFrom(
+        this.store$.select(state => state.contractDetails.transferOperations.pagination),
+        this.store$.select(state => state.contractDetails.transferOperations.orderBy)
+      ),
+      switchMap(([{ contractHash }, pagination, orderBy]) =>
+        this.baseService
+          .post<ContractOperation[]>('operations', {
+            predicates: transferPredicates(contractHash),
+            orderBy: [orderBy],
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
+            catchError(error => of(actions.loadTransferOperationsFailed({ error })))
+          )
       )
     )
   )
 
-  onPaging$ = createEffect(() =>
+  loadMoreTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMoreTransferOperations),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadTransferOperations({ contract }))
+      map(([action, contract]) => actions.loadTransferOperations({ contractHash: contract.id }))
     )
   )
 
@@ -118,7 +176,138 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.sortTransferOperations),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadTransferOperations({ contract }))
+      map(([action, contract]) => actions.loadTransferOperations({ contractHash: contract.id }))
+    )
+  )
+
+  onLoadOperationsLoadCounts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransferOperations, actions.loadOtherOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadOperationsCount({ contractHash: contract.id }))
+    )
+  )
+
+  loadOperationsCount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadOperationsCount),
+      switchMap(({ contractHash }) =>
+        forkJoin(
+          this.baseService
+            .post<any[]>('operations', {
+              fields: ['destination'],
+              predicates: transferPredicates(contractHash),
+              aggregation: [
+                {
+                  field: 'destination',
+                  function: 'count'
+                }
+              ]
+            })
+            .pipe(
+              map(
+                pipe(
+                  first,
+                  get<any>(item => parseInt(item.count_destination))
+                )
+              )
+            ),
+          this.baseService
+            .post<any[]>('operations', {
+              fields: ['destination'],
+              predicates: otherPredicates(contractHash),
+              aggregation: [
+                {
+                  field: 'destination',
+                  function: 'count'
+                }
+              ]
+            })
+            .pipe(
+              map(
+                pipe(
+                  first,
+                  get<any>(item => parseInt(item.count_destination))
+                )
+              )
+            )
+        ).pipe(
+          map(([transferTotal, otherTotal]) => actions.loadOperationsCountSucceeded({ transferTotal, otherTotal })),
+          catchError(error => of(actions.loadOperationsCountFailed({ error })))
+        )
+      )
+    )
+  )
+
+  loadOtherOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadOtherOperations),
+      withLatestFrom(
+        this.store$.select(state => state.contractDetails.otherOperations.pagination),
+        this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+      ),
+      switchMap(([{ contractHash }, pagination, orderBy]) =>
+        this.baseService
+          .post<ContractOperation[]>('operations', {
+            predicates: otherPredicates(contractHash),
+            orderBy: [orderBy],
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
+            catchError(error => of(actions.loadOtherOperationsFailed({ error })))
+          )
+      )
+    )
+  )
+
+  loadMoreOtherOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadMoreOtherOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadOtherOperations({ contractHash: contract.id }))
+    )
+  )
+
+  sortOtherOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortOtherOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadOtherOperations({ contractHash: contract.id }))
+    )
+  )
+
+  onChangeOperationsTabLoadOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.changeOperationsTab),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([{ currentTabKind }, contract]) =>
+        currentTabKind === actions.OperationTab.transfers
+          ? actions.loadTransferOperations({ contractHash: contract.id })
+          : actions.loadOtherOperations({ contractHash: contract.id })
+      )
+    )
+  )
+
+  loadMore$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadMore),
+      withLatestFrom(this.store$.select(state => state.contractDetails.currentTabKind)),
+      map(([action, currentTabKind]) =>
+        currentTabKind === actions.OperationTab.transfers ? actions.loadMoreTransferOperations() : actions.loadMoreOtherOperations()
+      )
+    )
+  )
+
+  sortOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.sortOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.currentTabKind)),
+      map(([{ orderBy }, currentTabKind]) =>
+        currentTabKind === actions.OperationTab.transfers
+          ? actions.sortTransferOperations({ orderBy })
+          : actions.sortOtherOperations({ orderBy })
+      )
     )
   )
 
@@ -126,6 +315,7 @@ export class ContractDetailEffects {
     private readonly actions$: Actions,
     private readonly aliasPipe: AliasPipe,
     private readonly apiService: ApiService,
+    private readonly baseService: BaseService,
     private readonly copyService: CopyService,
     private readonly modalService: BsModalService,
     private readonly store$: Store<fromRoot.State>,

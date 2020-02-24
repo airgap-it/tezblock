@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { from, Observable, combineLatest } from 'rxjs'
+import { map, filter } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
@@ -11,7 +12,6 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Contract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
-import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { columns } from './table-definitions'
@@ -47,7 +47,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias$: Observable<boolean>
   loading$: Observable<boolean>
-  transferOperations$: Observable<ContractOperation[]>
+  transactions$: Observable<ContractOperation[]>
+  orderBy$: Observable<OrderBy>
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   tabs: Tab[]
@@ -89,10 +90,31 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias$ = this.store$
       .select(state => state.contractDetails.address)
       .pipe(map(address => address && !!this.aliasPipe.transform(address)))
-    this.transferOperations$ = this.store$.select(state => state.contractDetails.transferOperations.data)
-    this.loading$ = this.store$.select(state => state.contractDetails.transferOperations.loading)
+    this.transactions$ = combineLatest(
+      this.store$.select(state => state.contractDetails.currentTabKind),
+      this.store$.select(state => state.contractDetails.transferOperations.data),
+      this.store$.select(state => state.contractDetails.otherOperations.data)
+    ).pipe(
+      map(([currentTabKind, transferOperations, otherOperations]) =>
+        currentTabKind === actions.OperationTab.transfers ? transferOperations : otherOperations
+      )
+    )
+    this.loading$ = combineLatest(
+      this.store$.select(state => state.contractDetails.transferOperations.loading),
+      this.store$.select(state => state.contractDetails.otherOperations.loading)
+    ).pipe(map(([transferOperationsLoading, otherOperationsLoading]) => transferOperationsLoading || otherOperationsLoading))
+    this.orderBy$ = combineLatest(
+      this.store$.select(state => state.contractDetails.currentTabKind),
+      this.store$.select(state => state.contractDetails.transferOperations.orderBy),
+      this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+    ).pipe(
+      map(([currentTabKind, transferOrderBy, otherOrderBy]) =>
+        currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
+      )
+    )
+    this.store$.select(state => state.contractDetails.transferOperations.loading)
     this.showLoadMore$ = combineLatest(
-      this.transferOperations$,
+      this.transactions$,
       this.store$.select(state => state.contractDetails.transferOperations.pagination)
     ).pipe(
       map(([transferOperations, pagination]) =>
@@ -103,7 +125,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol))
+        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol)),
+      combineLatest(
+        this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
+        this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
+      )
+        .pipe(
+          filter(([transferCount, otherCount]) => transferCount !== undefined && otherCount !== undefined),
+          map(([transferCount, otherCount]) => [
+            { key: actions.OperationTab.transfers, count: transferCount },
+            { key: actions.OperationTab.other, count: otherCount }
+          ])
+        )
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
   }
 
@@ -120,16 +154,15 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   }
 
   loadMore() {
-    // TODO
-    this.store$.dispatch(actions.loadMoreTransferOperations())
+    this.store$.dispatch(actions.loadMore())
   }
 
-  tabSelected(kind: string) {
-    // TODO
+  tabSelected(currentTabKind: actions.OperationTab) {
+    setTimeout(() => this.store$.dispatch(actions.changeOperationsTab({ currentTabKind })), 0)
   }
 
   sortBy(orderBy: OrderBy) {
-    // TODO
+    this.store$.dispatch(actions.sortOperations({ orderBy }))
   }
 
   private getSocial(condition: (social: Social) => boolean): Observable<string> {
@@ -152,9 +185,16 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       {
         title: 'Transfers',
         active: true,
-        kind: 'transfers',
+        kind: actions.OperationTab.transfers,
         count: null,
         columns: columns.transfers({ pageId, showFiatValue, symbol })
+      },
+      {
+        title: 'Other',
+        active: true,
+        kind: actions.OperationTab.other,
+        count: null,
+        columns: columns.other({ pageId, showFiatValue, symbol })
       }
     ]
   }

@@ -144,20 +144,13 @@
                 [tabs]="tabs"
                 [page]="'token-contract'"
                 [loading]="loading$ | async"
-                [data]="transferOperations$ | async"
+                [data]="transactions$ | async"
                 (tabClicked)="tabSelected($event)"
                 (loadMore)="loadMore()"
                 [downloadable]="true"
                 (onSort)="sortBy($event)"
                 [orderBy]="orderBy$ | async"
               ></tabbed-table>
-              <!-- <tezblock-table
-                [columns]="columns$ | async"
-                [data]="transferOperations$ | async"
-                [loading]="loading$ | async"
-                [pagination]="showLoadMore$ | async"
-                (onLoadMore)="loadMore()"
-              ></tezblock-table> -->
             </div>
           </div>
         </div>

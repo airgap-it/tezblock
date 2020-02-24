@@ -17,6 +17,8 @@ export interface State {
   contract: Contract
   copyToClipboardState: string
   transferOperations: TableState<ContractOperation>
+  otherOperations: TableState<ContractOperation>
+  currentTabKind: actions.OperationTab
   cursor: TezosTransactionCursor
 }
 
@@ -24,7 +26,15 @@ const initialState: State = {
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
-  transferOperations: getInitialTableState(),
+  transferOperations: getInitialTableState({
+    field: 'block_level',
+    direction: 'desc'
+  }),
+  otherOperations: getInitialTableState({
+    field: 'block_level',
+    direction: 'desc'
+  }),
+  currentTabKind: actions.OperationTab.transfers,
   cursor: undefined
 }
 
@@ -57,19 +67,14 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
-    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation)
-
-    return {
-      ...state,
-      transferOperations: {
-        ...state.transferOperations,
-        data: state.cursor ? state.transferOperations.data.concat(newData) : newData,
-        loading: false
-      },
-      cursor: transferOperations.cursor
+  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      data: transferOperations,
+      loading: false
     }
-  }),
+  })),
   on(actions.loadTransferOperationsFailed, state => ({
     ...state,
     transferOperations: {
@@ -93,6 +98,68 @@ export const reducer = createReducer(
       ...state.transferOperations,
       orderBy
     }
+  })),
+  on(actions.loadOtherOperations, state => ({
+    ...state,
+    otherOperations: {
+      ...state.otherOperations,
+      loading: true
+    }
+  })),
+  on(actions.loadOtherOperationsSucceeded, (state, { otherOperations }) => {
+    return {
+      ...state,
+      otherOperations: {
+        ...state.otherOperations,
+        data: otherOperations,
+        loading: false
+      }
+    }
+  }),
+  on(actions.loadOtherOperationsFailed, state => ({
+    ...state,
+    otherOperations: {
+      ...state.otherOperations,
+      loading: false
+    }
+  })),
+  on(actions.loadMoreOtherOperations, state => ({
+    ...state,
+    otherOperations: {
+      ...state.otherOperations,
+      pagination: {
+        ...state.otherOperations.pagination,
+        currentPage: state.otherOperations.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.sortOtherOperations, (state, { orderBy }) => ({
+    ...state,
+    otherOperations: {
+      ...state.otherOperations,
+      orderBy
+    }
+  })),
+  on(actions.loadOperationsCountSucceeded, (state, { transferTotal, otherTotal }) => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      pagination: {
+        ...state.transferOperations.pagination,
+        total: transferTotal
+      }
+    },
+    otherOperations: {
+      ...state.otherOperations,
+      pagination: {
+        ...state.otherOperations.pagination,
+        total: otherTotal
+      }
+    }
+  })),
+  on(actions.changeOperationsTab, (state, { currentTabKind }) => ({
+    ...state,
+    currentTabKind
   })),
   on(actions.reset, () => initialState)
 )

@@ -4,10 +4,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
   transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
     {
       name: 'From',
-      field: 'singleFrom',
+      field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -16,10 +16,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     },
     {
       name: 'To',
-      field: 'singleTo',
+      field: 'destination',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
@@ -37,7 +37,47 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     },
     {
       name: 'Tx Hash',
-      field: 'hash',
+      field: 'operation_group_hash',
+      template: Template.hash
+    }
+  ],
+  other: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+    {
+      name: 'From',
+      field: 'source',
+      width: '1',
+      template: Template.address,
+      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      field: '',
+      width: '1',
+      template: Template.symbol
+    },
+    {
+      name: 'To',
+      field: 'destination',
+      width: '1',
+      template: Template.address,
+      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Amount',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
+      sortable: true
+    },
+    {
+      name: 'Fee',
+      field: 'fee',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      sortable: true
+    },
+    {
+      name: 'Tx Hash',
+      field: 'operation_group_hash',
       template: Template.hash
     }
   ]
