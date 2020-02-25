@@ -1343,7 +1343,21 @@ export class ApiService {
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'period'],
-          predicates: [{ field: 'proposal', operation: 'eq', set: [id], inverse: false }],
+          predicates: [
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['proposals'],
+              inverse: false
+            },
+            { field: 'proposal', operation: 'like', set: [id], inverse: false }
+          ],
+          orderBy: [
+            {
+              field: 'block_level',
+              direction: 'asc'
+            }
+          ],
           limit: 1
         },
         this.options

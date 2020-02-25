@@ -9,7 +9,6 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
@@ -34,7 +33,6 @@ describe('ContractDetailComponent', () => {
           AddressItemComponent,
           IdenticonComponent,
           TezblockTableComponent,
-          AddressCellComponent,
           AmountCellComponent,
           BlockCellComponent,
           TooltipItemComponent,
