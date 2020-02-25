@@ -17,6 +17,7 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-contract-detail',
@@ -62,7 +63,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly iconPipe: IconPipe
   ) {
     super()
 
@@ -187,13 +189,15 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         active: true,
         kind: actions.OperationTab.transfers,
         count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns.transfers({ pageId, showFiatValue, symbol })
       },
       {
-        title: 'Other',
+        title: 'Other Calls',
         active: true,
         kind: actions.OperationTab.other,
         count: null,
+        icon: this.iconPipe.transform('link'),
         columns: columns.other({ pageId, showFiatValue, symbol })
       }
     ]
