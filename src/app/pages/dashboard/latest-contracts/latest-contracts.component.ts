@@ -5,7 +5,7 @@ import { Router } from '@angular/router'
 
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 
 @Component({
   selector: 'app-latest-contracts',
@@ -14,7 +14,7 @@ import { Contract } from '@tezblock/domain/contract'
 })
 export class LatestContractsComponent implements OnInit {
 
-  contracts$: Observable<Contract[]>
+  contracts$: Observable<TokenContract[]>
 
   constructor(private readonly router: Router, private readonly store$: Store<fromRoot.State>) {
     this.store$.dispatch(actions.loadContracts())
