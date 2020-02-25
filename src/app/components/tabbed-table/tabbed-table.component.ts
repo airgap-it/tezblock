@@ -46,7 +46,10 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   orderBy: OrderBy
 
   @Input()
-  downloadable?: boolean = false
+  downloadable: boolean
+
+  @Input()
+  allEnabled: boolean
 
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()

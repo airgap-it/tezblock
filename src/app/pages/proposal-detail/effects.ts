@@ -61,7 +61,7 @@ export class ProposalDetailEffects {
     )
   )
 
-  onMetaVotingPeriodLoadVotes = createEffect(() =>
+  onMetaVotingPeriodLoadVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriodsSucceeded),
       withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
@@ -115,7 +115,7 @@ export class ProposalDetailEffects {
     )
   )
 
-  loadProposalVotes = createEffect(() =>
+  loadProposalVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(
@@ -317,6 +317,35 @@ export class ProposalDetailEffects {
         )
       )
   }
+
+  loadCurrentVotingPeriod$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCurrentVotingPeriod),
+      switchMap(() =>
+        this.baseService
+          .post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
+            fields: ['meta_voting_period', 'meta_voting_period_position'],
+            orderBy: [
+              {
+                field: 'level',
+                direction: 'desc'
+              }
+            ],
+            limit: 1
+          })
+          .pipe(
+            map(first),
+            map(({ meta_voting_period, meta_voting_period_position }) =>
+              actions.loadCurrentVotingPeriodSucceeded({
+                currentVotingPeriod: meta_voting_period,
+                currentVotingeriodPosition: meta_voting_period_position
+              })
+            ),
+            catchError(error => of(actions.loadVotesFailed({ error })))
+          )
+      )
+    )
+  )
 
   constructor(
     private readonly actions$: Actions,

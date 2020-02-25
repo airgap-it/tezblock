@@ -30,6 +30,8 @@ export interface State {
   periodKind: string
   metaVotingPeriods: MetaVotingPeriod[]
   votes: TableState<Transaction>
+  currentVotingPeriod: number
+  currentVotingeriodPosition: number
 }
 
 const initialState: State = {
@@ -38,7 +40,9 @@ const initialState: State = {
   loadingProposal: false,
   periodKind: undefined,
   metaVotingPeriods: undefined,
-  votes: getInitialTableState()
+  votes: getInitialTableState(),
+  currentVotingPeriod: undefined,
+  currentVotingeriodPosition: undefined
 }
 
 export const reducer = createReducer(
@@ -106,5 +110,15 @@ export const reducer = createReducer(
         currentPage: state.votes.pagination.currentPage + 1
       }
     }
+  })),
+  on(actions.loadCurrentVotingPeriodSucceeded, (state, { currentVotingPeriod, currentVotingeriodPosition }) => ({
+    ...state,
+    currentVotingPeriod,
+    currentVotingeriodPosition
+  })),
+  on(actions.loadCurrentVotingPeriodFailed, state => ({
+    ...state,
+    currentVotingPeriod: null,
+    currentVotingeriodPosition: null
   }))
 )

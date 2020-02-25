@@ -74,6 +74,7 @@
             [page]="'proposal'"
             [loading]="loading$ | async"
             [data]="votes$ | async"
+            [allEnabled]="true"
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
           ></tabbed-table>

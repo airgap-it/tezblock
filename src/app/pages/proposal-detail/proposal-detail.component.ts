@@ -49,6 +49,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.loadProposal({ id }))
         this.store$.dispatch(actions.loadVotes({ periodKind: PeriodKind.Proposal }))
+        this.store$.dispatch(actions.loadCurrentVotingPeriod())
         this.setTabs()
       }),
 
