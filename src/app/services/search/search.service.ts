@@ -9,7 +9,7 @@ import { ApiService } from './../api/api.service'
 import { BlockService } from '../blocks/blocks.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { getContractByAddress } from '@tezblock/domain/contract'
+import { getTokenContractByAddress } from '@tezblock/domain/contract'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -68,7 +68,7 @@ export class SearchService {
     }
 
     // TODO: implement full search by contract
-    const contract = getContractByAddress(_searchTerm)
+    const contract = getTokenContractByAddress(_searchTerm)
     if (contract) {
       processResult([contract], () => {
         this.router.navigateByUrl('/contract/' + _searchTerm)

@@ -12,7 +12,6 @@ import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/lo
 import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
 import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { AddressCellComponent } from 'src/app/components/tezblock-table/address-cell/address-cell.component'
 import { AddressItemComponent } from './../../components/address-item/address-item.component'
 import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
 import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
@@ -38,7 +37,6 @@ describe('ProposalDetailComponent', () => {
           TabbedTableComponent,
           TezblockTableComponent,
           IdenticonComponent,
-          AddressCellComponent,
           AddressItemComponent,
           AmountCellComponent,
           BlockCellComponent,

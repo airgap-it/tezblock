@@ -3,6 +3,7 @@ import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/te
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { squareBrackets } from '@tezblock/domain/pattern'
+import { Account } from '@tezblock/interfaces/Account'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) => Column[] } = {
   /* BLOCK */
@@ -398,8 +399,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     }
   ],
 
-  /* CONTRACT */
-  [OperationTypes.Contract]: () => [
+  /* TOKEN CONTRACT */
+  [OperationTypes.TokenContract]: () => [
     {
       name: 'Token',
       field: 'id',
@@ -425,22 +426,44 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     }
   ],
 
+  /* CONTRACT */
+  [OperationTypes.Contract]: () => [
+    {
+      name: 'Account',
+      field: 'account_id',
+      width: '40%',
+      template: Template.address,
+      data: (item: Account) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
+    },
+    {
+      name: 'Balance',
+      field: 'balance',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.balance } }),
+      sortable: true
+    },
+    {
+      name: 'Baker',
+      field: 'delegate_value',
+      template: Template.address
+    }
+  ],
+
   /* ACCOUNT */
-  [OperationTypes.Account]: () =>
-    [
-      {
-        name: 'Account',
-        field: 'account_id',
-        width: '50%',
-        template: Template.address,
-        data: (item: any) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
-      },
-      {
-        name: 'Balance',
-        field: 'balance',
-        template: Template.amount,
-        data: (item: any) => ({ data: { amount: item.balance } }),
-        sortable: true
-      }
-    ]
+  [OperationTypes.Account]: () => [
+    {
+      name: 'Account',
+      field: 'account_id',
+      width: '50%',
+      template: Template.address,
+      data: (item: any) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
+    },
+    {
+      name: 'Balance',
+      field: 'balance',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.balance } }),
+      sortable: true
+    }
+  ]
 }

@@ -80,6 +80,11 @@ export class ProposalDetailEffects {
           .post<Transaction[]>('operations', {
             predicates: [
               {
+                field: 'kind',
+                operation: Operation.eq,
+                set: ['ballot']
+              },
+              {
                 field: 'proposal',
                 operation: Operation.eq,
                 set: [proposalHash]
@@ -245,6 +250,11 @@ export class ProposalDetailEffects {
       .post<Transaction[]>('operations', {
         fields: ['proposal'],
         predicates: [
+          {
+            field: 'kind',
+            operation: Operation.eq,
+            set: ['ballot']
+          },
           {
             field: 'proposal',
             operation: Operation.eq,
