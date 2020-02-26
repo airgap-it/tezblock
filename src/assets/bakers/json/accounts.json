@@ -32,6 +32,10 @@
     "alias": "TezosTeam",
     "hasLogo": true
   },
+  "tz1YrmJw6Lje27gWqZ94gU9mNavEjkHu1xGc": {
+    "alias": "TezosTeam Payouts",
+    "hasLogo": true
+  },
   "tz1Lc87p6zRaDwzJs9kHvdpm7XzeWE8QTwVB": {
     "alias": "Dash Master",
     "hasLogo": true
@@ -712,6 +716,10 @@
   },
   "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2": {
     "alias": "Binance",
+    "hasLogo": true
+  },
+  "tz1eogbwM5NdoojKEvvSnjYGcJapZgADRK3m": {
+    "alias": "Binance Delegator",
     "hasLogo": true
   },
   "tz1PWCDnz783NNGGQjEFFsHtrcK5yBW4E2rm": {
