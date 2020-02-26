@@ -144,6 +144,24 @@ tezblock-table {
   white-space: nowrap;
 }
 
+/* dashboard components blocks & transactions styling */
+app-latest-contracts-transactions,
+transaction-item {
+  .row {
+    min-height: 52px;
+  }
+  fa-icon {
+    font-size: 24px;
+    transform: scaleX(-1);
+  }
+}
+block-item,
+app-latest-contracts {
+  .row {
+    min-height: 52px;
+  }
+}
+
 @media (max-width: 576px) {
   /* set fon-size on mobile devices to 16px to avoid zooming on input */
   .form-control {

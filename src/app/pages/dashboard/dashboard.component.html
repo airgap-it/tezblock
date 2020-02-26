@@ -107,16 +107,13 @@
   <div class="container p-0 my-5">
     <div class="card py-4 h-100">
       <div class="card-body p-4 ">
-        <h5 class="card-title mb-4 ">
-          Smart Contracts
-        </h5>
         <div class="row">
           <div class="col-lg-6 pr-3 pr-md-5">
             <h5 class="card-title__secondary mb-3 ">
               FA 1.2 Assets
             </h5>
-            <app-latest-contracts></app-latest-contracts>
-            <button type="button" [routerLink]="['/contract/list']" class="btn btn-primary-light btn-sm btn-block">
+            <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
+            <button type="button" [routerLink]="['/token-contract/list']" class="btn btn-primary-light btn-sm btn-block">
               All FA 1.2 Assets
             </button>
           </div>
@@ -124,6 +121,7 @@
             <h5 class="card-title__secondary mb-3 ">
               FA 1.2 Transactions
             </h5>
+            <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
           </div>
         </div>
       </div>
@@ -154,34 +152,6 @@
             <button type="button" [routerLink]="['/transaction/list']" class="btn btn-primary-light btn-sm btn-block">
               All Transactions
             </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="card latest py-4 h-100">
-          <div class="card-body p-4 ">
-            <h5 class="card-title mb-4 ">
-              Latest Contracts
-            </h5>
-            <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
-            <button type="button" [routerLink]="['/contract/list']" class="btn btn-primary-light btn-sm btn-block">
-              All Contracts
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="card latest py-4 h-100">
-          <div class="card-body p-4 ">
-            <h5 class="card-title mb-4 ">
-              Latest Transactions of Contracts
-            </h5>
-            <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
-            <!-- <button type="button" [routerLink]="['/contract/list']" class="btn btn-primary-light btn-sm btn-block">
-              All Transactions of Contracts
-            </button> -->
           </div>
         </div>
       </div>
