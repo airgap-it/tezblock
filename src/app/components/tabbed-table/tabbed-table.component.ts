@@ -26,7 +26,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
       this.updateSelectedTab(selectedTab)
 
-      if (this._tabs.some(tab => tab.count > 0)) {
+      if (!this.disableTabLogic && this._tabs.some(tab => tab.count > 0)) {
         this.setInitTabSelection()
       }
     }
@@ -49,7 +49,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   downloadable: boolean
 
   @Input()
-  allEnabled: boolean
+  disableTabLogic: boolean
 
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()
@@ -84,7 +84,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
         .pipe(
           filter(
             queryParam =>
-              queryParam.has('tab') && isSet(this.selectedTab) /* the case on page start is handled in setInitTabSelection method */
+              queryParam.has('tab') &&
+              (this.disableTabLogic || isSet(this.selectedTab)) /* the case on page start is handled in setInitTabSelection method */
           )
         )
         .subscribe(queryParam => {
@@ -141,6 +142,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
+
+    // TODO: refactor
     this.enableDownload = selectedTab.kind === 'transaction' || selectedTab.kind === 'delegation' || selectedTab.kind === 'origination'
   }
 }

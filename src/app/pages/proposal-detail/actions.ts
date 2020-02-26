@@ -12,9 +12,8 @@ export const loadProposal = createAction(`[${featureName}] Load Proposal`, props
 export const loadProposalSucceeded = createAction(`[${featureName}] Load Proposal Succeeded`, props<{ proposal: ProposalDto }>())
 export const loadProposalFailed = createAction(`[${featureName}] Load Proposal Failed`, props<{ error: any }>())
 
-export const loadVotes = createAction(`[${featureName}] Load Votes`, props<{ periodKind: string }>())
-export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: Transaction[] }>())
-export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
+// startLoadingVotes -> loadMetaVotingPeriods -> loadVotes -> loadVotesTotal
+export const startLoadingVotes = createAction(`[${featureName}] Start Loading Votes`, props<{ periodKind: string }>())
 
 export const loadMetaVotingPeriods = createAction(`[${featureName}] Load Meta Voting Periods`)
 export const loadMetaVotingPeriodsSucceeded = createAction(
@@ -22,6 +21,10 @@ export const loadMetaVotingPeriodsSucceeded = createAction(
   props<{ metaVotingPeriods: MetaVotingPeriod[] }>()
 )
 export const loadMetaVotingPeriodsFailed = createAction(`[${featureName}] Load Meta Voting Periods Failed`, props<{ error: any }>())
+
+export const loadVotes = createAction(`[${featureName}] Load Votes`, props<{ periodKind: string }>())
+export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: Transaction[] }>())
+export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
 
 export const loadVotesTotal = createAction(`[${featureName}] Load Votes Total`)
 export const loadVotesTotalSucceeded = createAction(

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
-import { Observable, from } from 'rxjs'
+import { Observable } from 'rxjs'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
 
@@ -46,11 +46,14 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const id = paramMap.get('id')
+        const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab')
+        this.setTabs(tabTitle)
+
+        const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
 
         this.store$.dispatch(actions.loadProposal({ id }))
-        this.store$.dispatch(actions.loadVotes({ periodKind: PeriodKind.Proposal }))
+        this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
         this.store$.dispatch(actions.loadCurrentVotingPeriod())
-        this.setTabs()
       }),
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
@@ -81,14 +84,14 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   }
 
   tabSelected(periodKind: string) {
-    this.store$.dispatch(actions.loadVotes({ periodKind }))
+    this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
   }
 
-  private setTabs() {
+  private setTabs(selectedTitle: string = 'Proposal') {
     this.tabs = [
       {
         title: 'Proposal',
-        active: true,
+        active: selectedTitle === 'Proposal',
         kind: PeriodKind.Proposal,
         count: undefined,
         icon: this.iconPipe.transform('fileUpload'),
@@ -96,7 +99,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       },
       {
         title: 'Exploration',
-        active: false,
+        active: selectedTitle === 'Exploration',
         kind: PeriodKind.Exploration,
         count: undefined,
         icon: this.iconPipe.transform('binoculars'),
@@ -104,7 +107,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       },
       {
         title: 'Testing',
-        active: false,
+        active: selectedTitle === 'Testing',
         kind: PeriodKind.Testing,
         count: undefined,
         icon: this.iconPipe.transform('hammer'),
@@ -112,7 +115,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       },
       {
         title: 'Promotion',
-        active: false,
+        active: selectedTitle === 'Promotion',
         kind: PeriodKind.Promotion,
         count: undefined,
         icon: this.iconPipe.transform('graduationCap'),

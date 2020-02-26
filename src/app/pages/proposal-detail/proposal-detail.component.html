@@ -74,10 +74,12 @@
             [page]="'proposal'"
             [loading]="loading$ | async"
             [data]="votes$ | async"
-            [allEnabled]="true"
+            [disableTabLogic]="true"
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
-          ></tabbed-table>
+          >
+
+        </tabbed-table>
         </div>
       </div>
     </div>
