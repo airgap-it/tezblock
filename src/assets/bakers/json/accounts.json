@@ -1,4 +1,13 @@
 {
+  "tz1ZcTRk5uxD86EFEn1vvNffWWqJy7q5eVhc": {
+    "alias": "ATEZA",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1TqU5hwh6CtC8Ps5GYBi7YyawvtKLNCbvQ"
+  },
+  "tz1TqU5hwh6CtC8Ps5GYBi7YyawvtKLNCbvQ": {
+    "alias": "ATEZA Payouts",
+    "hasLogo": true
+  },
   "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j": {
     "alias": "XTZ Master",
     "hasLogo": true,
