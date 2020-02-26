@@ -9,10 +9,10 @@
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary ml-1 cursor--pointer"
       tooltip="Displaying value at time of transaction, click to display current value"
-      (click)="tooltipClick(); dayDifference(data.timestamp)"
+      (click)="tooltipClick();"
     >
-      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ historicFiatAmount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      {{ 1 | currencySymbol: { currInfo: historicCurrencyInfo } }}
+      {{ amount | currencyConverter: { currInfo: historicCurrencyInfo, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
     </span>
   </ng-container>
   <ng-container *ngIf="!showOldValue">
@@ -20,7 +20,7 @@
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary-light ml-1 cursor--pointer"
       tooltip="Displaying current value, click to display value at time of transaction"
-      (click)="tooltipClick(); dayDifference(data.timestamp)"
+      (click)="tooltipClick();"
     >
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
       {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}

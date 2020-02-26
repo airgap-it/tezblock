@@ -390,10 +390,25 @@ export class ListComponent extends BaseComponent implements OnInit {
               showLoadMore$
             )
             break
-          case 'contract':
-            const showLoadMoreContracts$ = this.store$
-              .select(state => state.list.contracts)
+          case 'token-contract':
+            const showLoadMoreTokenContracts$ = this.store$
+              .select(state => state.list.tokenContracts)
               .pipe(map(contracts => contracts.data.length < contracts.pagination.total))
+            const loadingTokenContracts$ = this.store$.select(state => state.list.tokenContracts.loading)
+            const tokenContractsData$ = this.store$.select(state => state.list.tokenContracts.data)
+            const tokenContractsOrderBy$ = this.store$.select(state => state.list.tokenContracts.orderBy)
+
+            this.store$.dispatch(actions.loadTokenContracts())
+
+            this.setupTable(
+              columns[OperationTypes.TokenContract]({ showFiatValue: this.isMainnet }),
+              tokenContractsData$,
+              loadingTokenContracts$,
+              tokenContractsOrderBy$,
+              showLoadMoreTokenContracts$
+            )
+            break
+          case 'contract':
             const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
             const contractsData$ = this.store$.select(state => state.list.contracts.data)
             const contractsOrderBy$ = this.store$.select(state => state.list.contracts.orderBy)
@@ -404,8 +419,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
               contractsData$,
               loadingContracts$,
-              contractsOrderBy$,
-              showLoadMoreContracts$
+              contractsOrderBy$
             )
             break
           case 'account':
@@ -459,7 +473,10 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.increasePageOfVotes())
         break
-      case 'contracts':
+      case 'token-contract':
+        this.store$.dispatch(actions.increasePageOfTokenContracts())
+        break
+      case 'contract':
         this.store$.dispatch(actions.increasePageOfContracts())
         break
       case 'account':
@@ -505,6 +522,9 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'account':
         this.store$.dispatch(actions.sortAccounts({ orderBy }))
+        break
+      case 'contract':
+        this.store$.dispatch(actions.sortContracts({ orderBy }))
         break
     }
   }

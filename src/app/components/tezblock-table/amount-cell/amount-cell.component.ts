@@ -1,18 +1,42 @@
-import { Component, Input, OnInit } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { Observable, BehaviorSubject, Subject } from 'rxjs'
+import * as moment from 'moment'
 
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
-import { DayDifferenceService } from '@tezblock/services/day-difference/day-difference.service'
+
+export interface AmountData {
+  amount: number | string
+  timestamp?: number
+}
+
+const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
 
 @Component({
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
-  styleUrls: ['./amount-cell.component.scss']
+  styleUrls: ['./amount-cell.component.scss'],
+  // TODO: on 1st click no change
+  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AmountCellComponent implements OnInit {
-  @Input() data: any
+  @Input()
+  set data(value: AmountData) {
+    if (value !== this._data) {
+      this._data = value
+
+      if (value) {
+        this.enableComparison = dayDifference(this.data.timestamp) >= 1
+        this.amount = this.data.amount
+      }
+    }
+  }
+  get data(): AmountData {
+    return this._data
+  }
+
+  private _data: AmountData
 
   @Input()
   set options(value: any) {
@@ -21,66 +45,42 @@ export class AmountCellComponent implements OnInit {
     }
   }
 
-  @Input() showFee: boolean = false
-
-  @Input() fromBlock?: boolean = false
-
   get options() {
     return this._options === undefined ? { showFiatValue: true } : this._options
   }
 
   private _options = undefined
 
-  public fiatCurrencyInfo$: Observable<CurrencyInfo>
+  fiatCurrencyInfo$: Observable<CurrencyInfo>
 
-  public historicFiatAmount: number
+  historicCurrencyInfo: CurrencyInfo
+  //historicCurrencyInfo$ = new Subject()
 
-  public enableComparison: boolean = false
+  enableComparison = false
 
-  public amount: number | BigNumber
+  amount: number | BigNumber | string
 
-  public tooltipClick() {
-    let daysDifference = this.dayDifference(this.data.timestamp)
-    if (daysDifference >= 1) {
-      let date = new Date(this.data.timestamp)
-      this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
-        let oldValue = new BigNumber(response[1].close)
-        if (this.showFee) {
-          this.amount = new BigNumber(this.data.fee)
-        } else {
-          this.amount = new BigNumber(this.amount)
-        }
+  showOldValue = false
+  //showOldValue$ = new BehaviorSubject(false)
 
-        this.historicFiatAmount = this.amount.multipliedBy(oldValue).toNumber()
-        this.showOldValue = !this.showOldValue
-      })
-    }
-  }
-  public showOldValue: boolean = false
-
-  constructor(
-    private readonly cryptoPricesService: CryptoPricesService,
-    private readonly chartDataService: ChartDataService,
-    private dayDifferenceService: DayDifferenceService
-  ) {
+  constructor(private readonly cryptoPricesService: CryptoPricesService, private readonly chartDataService: ChartDataService) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
 
-  public dayDifference(oldTimestamp: number): number {
-    return this.dayDifferenceService.calcateDayDifference(oldTimestamp)
-  }
+  ngOnInit() {}
 
-  ngOnInit(): void {
-    if (this.data) {
-      const difference = this.dayDifference(this.data.timestamp)
-      this.enableComparison = difference >= 1
-      if (this.fromBlock) {
-        this.amount = this.data.volume
-      } else if (this.showFee) {
-        this.amount = this.data.fee
-      } else {
-        this.amount = this.data.amount
-      }
+  tooltipClick() {
+    if (dayDifference(this.data.timestamp) >= 1) {
+      const date = new Date(this.data.timestamp)
+
+      this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
+        this.historicCurrencyInfo = {
+          symbol: '$',
+          currency: 'USD',
+          price: new BigNumber(response[1].close)
+        }
+        this.showOldValue = !this.showOldValue
+      })
     }
   }
 }

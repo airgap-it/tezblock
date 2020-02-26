@@ -5,7 +5,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { Account } from '@tezblock/interfaces/Account'
 import { sort } from '@tezblock/domain/table'
@@ -34,13 +34,14 @@ export interface State {
   transactionsCountLast24h: number
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
+  tokenContracts: TableState<TokenContract>
+  contracts: TableState<Account>
   transactionsChartData: actions.TransactionChartItem[]
   transactionsChartDatasets: { data: number[]; label: string }[]
-  contracts: TableState<Contract>
 }
 
 const initialState: State = {
-  accounts: getInitialTableState({ field: 'balance', direction: 'desc' }),
+  accounts: getInitialTableState(sort('balance', 'desc')),
   blocks: getInitialTableState(sort('timestamp', 'desc')),
   transactions: getInitialTableState(sort('block_level', 'desc')),
   doubleBakings: getInitialTableState(sort('block_level', 'desc')),
@@ -57,9 +58,10 @@ const initialState: State = {
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
+  tokenContracts: getInitialTableState(),
+  contracts: getInitialTableState(sort('balance', 'desc')),
   transactionsChartData: undefined,
-  transactionsChartDatasets: undefined,
-  contracts: getInitialTableState()
+  transactionsChartDatasets: undefined
 }
 
 export const reducer = createReducer(
@@ -556,6 +558,42 @@ export const reducer = createReducer(
     // TODO: why selecting this data throws error in chart.js ... ?
     //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
   })),
+  on(actions.loadTokenContracts, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      loading: true
+    }
+  })),
+  on(actions.loadTokenContractsSucceeded, (state, { tokenContracts }) => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      data: tokenContracts.data,
+      pagination: {
+        ...state.tokenContracts.pagination,
+        total: tokenContracts.total
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadTokenContractsFailed, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfTokenContracts, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      pagination: {
+        ...state.tokenContracts.pagination,
+        currentPage: state.tokenContracts.pagination.currentPage + 1
+      }
+    }
+  })),
   on(actions.loadContracts, state => ({
     ...state,
     contracts: {
@@ -567,11 +605,7 @@ export const reducer = createReducer(
     ...state,
     contracts: {
       ...state.contracts,
-      data: contracts.data,
-      pagination: {
-        ...state.contracts.pagination,
-        total: contracts.total
-      },
+      data: contracts,
       loading: false
     }
   })),
@@ -590,6 +624,13 @@ export const reducer = createReducer(
         ...state.contracts.pagination,
         currentPage: state.contracts.pagination.currentPage + 1
       }
+    }
+  })),
+  on(actions.sortContracts, (state, { orderBy }) => ({
+    ...state,
+    contracts: {
+      ...state.contracts,
+      orderBy
     }
   })),
   on(actions.loadAccounts, state => ({

@@ -28,14 +28,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: any) => ({ data: item.amount, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
+      data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
       sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
       sortable: true
     },
     {

@@ -9,7 +9,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { Contract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
@@ -37,7 +37,7 @@ import { columns } from './table-definitions'
 })
 export class ContractDetailComponent extends BaseComponent implements OnInit {
   address$: Observable<string>
-  contract$: Observable<Contract>
+  contract$: Observable<TokenContract>
   website$: Observable<string>
   twitter$: Observable<string>
   telegram$: Observable<string>

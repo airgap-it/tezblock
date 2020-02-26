@@ -12,7 +12,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Block } from '@tezblock/interfaces/Block'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { getContracts } from '@tezblock/domain/contract'
+import { getTokenContracts } from '@tezblock/domain/contract'
 import { Account } from '@tezblock/interfaces/Account'
 import { toNotNilArray } from '@tezblock/services/fp'
 
@@ -473,31 +473,79 @@ export class ListEffects {
     )
   )
 
-  loadContracts$ = createEffect(() =>
+  loadTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadContracts),
+      ofType(listActions.loadTokenContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
       switchMap(([action, pagination]) => {
-        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
+        const contracts = getTokenContracts(pagination.currentPage * pagination.selectedSize)
+
+        if (!contracts || contracts.total === 0) {
+          return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
+        }
 
         return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
           map(totalSupplies =>
-            listActions.loadContractsSucceeded({
-              contracts: {
+            listActions.loadTokenContractsSucceeded({
+              tokenContracts: {
                 data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
                 total: contracts.total
               }
             })
           ),
-          catchError(error => of(listActions.loadContractsFailed({ error })))
+          catchError(error => of(listActions.loadTokenContractsFailed({ error })))
         )
       })
+    )
+  )
+
+  increasePageOfTokenContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfTokenContracts),
+      map(() => listActions.loadTokenContracts())
+    )
+  )
+
+  loadContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadContracts),
+      withLatestFrom(
+        this.store$.select(state => state.list.contracts.pagination),
+        this.store$.select(state => state.list.contracts.orderBy).pipe(map(toNotNilArray))
+      ),
+      switchMap(([action, pagination, orderBy]) =>
+        this.baseService
+          .post<Account[]>('accounts', {
+            fields: [],
+            predicates: [
+              {
+                field: 'account_id',
+                operation: Operation.startsWith,
+                set: ['KT'],
+                inverse: false
+              }
+            ],
+            orderBy,
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(contracts => listActions.loadContractsSucceeded({ contracts })),
+            catchError(error => of(listActions.loadContractsFailed({ error })))
+          )
+      )
     )
   )
 
   increasePageOfContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfContracts),
+      map(() => listActions.loadContracts())
+    )
+  )
+
+  sortContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.sortContracts),
       map(() => listActions.loadContracts())
     )
   )
