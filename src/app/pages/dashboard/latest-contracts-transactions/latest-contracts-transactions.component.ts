@@ -35,8 +35,4 @@ export class LatestContractsTransactionsComponent implements OnInit {
   ngOnInit() {
     this.transferOperations$ = this.store$.select(state => state.dashboardLatestContractsTransactions.transferOperations)
   }
-
-  inspectDetail(address: string) {
-    this.router.navigate([`/account/${address}`])
-  }
 }
