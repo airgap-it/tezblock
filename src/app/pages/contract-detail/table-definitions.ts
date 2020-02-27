@@ -4,10 +4,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
   transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
     {
       name: 'From',
-      field: 'source',
+      field: 'singleFrom',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -16,24 +16,24 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     },
     {
       name: 'To',
-      field: 'destination',
+      field: 'singleTo',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
-      sortable: true
+      sortable: false
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
       data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
-      sortable: true
+      sortable: false
     },
     {
       name: 'Tx Hash',

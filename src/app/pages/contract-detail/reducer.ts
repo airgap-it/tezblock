@@ -67,14 +67,19 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => ({
-    ...state,
-    transferOperations: {
-      ...state.transferOperations,
-      data: transferOperations,
-      loading: false
+  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
+    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation)
+
+    return {
+      ...state,
+      transferOperations: {
+        ...state.transferOperations,
+        data: state.cursor ? state.transferOperations.data.concat(newData) : newData,
+        loading: false
+      },
+      cursor: transferOperations.cursor
     }
-  })),
+  }),
   on(actions.loadTransferOperationsFailed, state => ({
     ...state,
     transferOperations: {
@@ -92,13 +97,13 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.sortTransferOperations, (state, { orderBy }) => ({
-    ...state,
-    transferOperations: {
-      ...state.transferOperations,
-      orderBy
-    }
-  })),
+  // on(actions.sortTransferOperations, (state, { orderBy }) => ({
+  //   ...state,
+  //   transferOperations: {
+  //     ...state.transferOperations,
+  //     orderBy
+  //   }
+  // })),
   on(actions.loadOtherOperations, state => ({
     ...state,
     otherOperations: {
