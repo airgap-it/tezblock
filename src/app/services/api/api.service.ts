@@ -1391,6 +1391,7 @@ export class ApiService {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+
     const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
       if (index === 0) {
         return true
@@ -1405,6 +1406,42 @@ export class ApiService {
 
       return false
     }
+    this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 50000
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
+      )
+      .subscribe(delegations => {
+        const dateArray = []
+        for (let day = 29; day >= 0; day--) {
+          const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+          dateArray.push({
+            balance: null,
+            asof: new Date(1000 * 60 * 60 * 24 * priorDate.getDate()).getDate()
+          })
+        }
+        const testresult = delegations.map(delegation => delegation)
+        console.log('test result: ', testresult)
+      })
 
     return this.http
       .post<Balance[]>(
