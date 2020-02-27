@@ -422,15 +422,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               contractsOrderBy$
             )
             break
-          case 'account':
-            const loadingAccounts$ = this.store$.select(state => state.list.accounts.loading)
-            const accountsData$ = this.store$.select(state => state.list.accounts.data)
-            const accountsOrderBy$ = this.store$.select(state => state.list.accounts.orderBy)
 
-            this.store$.dispatch(actions.loadAccounts())
-
-            this.setupTable(columns[OperationTypes.Account](), accountsData$, loadingAccounts$, accountsOrderBy$)
-            break
           default:
             throw new Error('unknown route')
         }
@@ -479,9 +471,6 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'contract':
         this.store$.dispatch(actions.increasePageOfContracts())
         break
-      case 'account':
-        this.store$.dispatch(actions.increasePageOfAccounts())
-        break
     }
   }
 
@@ -520,9 +509,7 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.sortVotesByKind({ orderBy }))
         break
-      case 'account':
-        this.store$.dispatch(actions.sortAccounts({ orderBy }))
-        break
+
       case 'contract':
         this.store$.dispatch(actions.sortContracts({ orderBy }))
         break
