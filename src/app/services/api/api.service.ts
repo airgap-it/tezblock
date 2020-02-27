@@ -1491,7 +1491,7 @@ export class ApiService {
           fields: ['balance', 'asof'],
           predicates: [
             { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
-            { field: 'asof', operation: 'after', set: [thirtyDaysAgo.getTime()], inverse: false }
+            { field: 'asof', operation: 'before', set: [thirtyDaysAgo.getTime()], inverse: false }
           ],
           orderBy: [{ field: 'asof', direction: 'desc' }],
           limit: 1
@@ -1508,7 +1508,11 @@ export class ApiService {
         ),
         map(balances => {
           const copiedBalances = JSON.parse(JSON.stringify(temporaryBalances))
-          copiedBalances[0] = balances[0]
+          if (balances.length === 0) {
+            copiedBalances[0].balance = 0
+          } else {
+            copiedBalances[0] = balances[0]
+          }
 
           let previousBalance = copiedBalances[0].balance
           for (let index = 0; index <= 29; index++) {
