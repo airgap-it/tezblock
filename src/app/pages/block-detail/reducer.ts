@@ -101,5 +101,13 @@ export const reducer = createReducer(
     ...state,
     orderBy
   })),
-  on(actions.reset, () => initialState)
+  on(actions.reset, () => initialState),
+  on(actions.increaseBlock, state => ({
+    ...state,
+    id: (Number(state.id) + 1).toString()
+  })),
+  on(actions.decreaseBlock, state => ({
+    ...state,
+    id: (Number(state.id) - 1).toString()
+  }))
 )

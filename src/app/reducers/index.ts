@@ -9,6 +9,7 @@ import * as fromAccountDetails from '../pages/account-detail/reducer'
 import * as fromBlockDetails from '../pages/block-detail/reducer'
 import * as fromTransactionDetails from '../pages/transaction-detail/reducer'
 import * as fromProposalDetails from '../pages/proposal-detail/reducer'
+import * as fromAccount from '../pages/account-overview/reducer'
 import * as fromBakerTable from '../components/baker-table/reducer'
 import * as fromContractDetails from '../pages/contract-detail/reducer'
 import * as fromBakers from '../pages/baker-overview/reducer'
@@ -19,6 +20,7 @@ import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/la
 
 export interface State {
   app: fromApp.State
+  accountsList: fromAccount.State
   accountDetails: fromAccountDetails.State
   bakerTable: fromBakerTable.State
   bakers: fromBakers.State
@@ -41,6 +43,7 @@ export interface State {
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
     app: fromApp.reducer,
+    accountsList: fromAccount.reducer,
     accountDetails: fromAccountDetails.reducer,
     bakerTable: fromBakerTable.reducer,
     bakers: fromBakers.reducer,

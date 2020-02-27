@@ -31,7 +31,9 @@ import {
   faBinoculars,
   faHammer,
   faGraduationCap,
-  faCircle
+  faCircle,
+  faChevronLeft,
+  faChevronRight
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -72,6 +74,8 @@ export const addFontAwesome = () => {
     faBinoculars,
     faHammer,
     faGraduationCap,
-    faCircle
+    faCircle,
+    faChevronLeft,
+    faChevronRight
   )
 }

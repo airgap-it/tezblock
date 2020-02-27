@@ -5,12 +5,57 @@
         <h5 [ngSwitch]="routeName$ | async" class="card-title mb-3">
           <ng-container *ngSwitchCase="'transaction'">
             Transactions
-            <app-occurrence-statistics
-              kind="Transactions"
-              [count]="transactionsCountLast24h$ | async"
-              [chartDatasets]="transactionsChartDatasets$ | async"
-              [chartLabels]="chartLabels"
-            ></app-occurrence-statistics>
+            <div class="row py-3">
+              <div class="col col-md-3 py-3">
+                <div class="row mb-3">
+                  <div class="col">
+                    <h5 class="card-title__secondary mb-3 ">
+                      Transactions
+                      <small>last 24 hours</small>
+                    </h5>
+                    <h3>
+                      {{ transactionsCountLast24h$ | async }}
+                      <loading-skeleton
+                        *ngIf="(transactionsCountLast24h$ | async) === undefined"
+                        [loadingWidth]="'150px'"
+                      ></loading-skeleton>
+                    </h3>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col">
+                    <h5 class="card-title__secondary mb-3 ">
+                      Transaction Volume
+                      <br />
+                      <small>last 24 hours</small>
+                    </h5>
+                    <h3>
+                      <amount-cell
+                        *ngIf="transactionsTotalXTZ$ | async"
+                        [data]="{ amount: transactionsTotalXTZ$ | async }"
+                        options="{ showFiatValue: false }"
+                      ></amount-cell>
+                      <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
+                    </h3>
+                  </div>
+                </div>
+              </div>
+              <div class="col col-md-9 py-3 chart--container">
+                <h5 class="card-title__secondary mb-3 ">
+                  Transactions
+                  <small>last 7 days</small>
+                </h5>
+                <chart-item
+                  *ngIf="transactionsChartDatasets$ | async"
+                  [datasets]="transactionsChartDatasets$ | async"
+                  [labels]="chartLabels"
+                  [options]="transactionsChartOptions"
+                  chartType="bar"
+                  [colorOptions]="{ gradientFrom: 'rgba(46,91,255,0.09)', borderWidth: 1, colors: [{ backgroundColor: '#2e5bff' }] }"
+                ></chart-item>
+                <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
+              </div>
+            </div>
           </ng-container>
           <ng-container *ngSwitchCase="'block'">
             Blocks
@@ -53,9 +98,6 @@
           </ng-container>
           <ng-container *ngSwitchCase="'token-contract'">
             Token Contracts
-          </ng-container>
-          <ng-container *ngSwitchCase="'account'">
-            Accounts
           </ng-container>
           <ng-container *ngSwitchCase="'contract'">
             Contracts

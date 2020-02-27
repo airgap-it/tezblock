@@ -162,4 +162,12 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
       }
     ]
   }
+
+  changeBlockLevel(direction: string) {
+    if (direction === 'forward') {
+      this.store$.dispatch(actions.increaseBlock())
+    } else {
+      this.store$.dispatch(actions.decreaseBlock())
+    }
+  }
 }
