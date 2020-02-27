@@ -1502,14 +1502,14 @@ export class ApiService {
               })
               previousBalance = delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance
             } else {
-              if (previousBalance) {
+              if (!previousBalance) {
                 dateArray.push({
-                  balance: previousBalance,
+                  balance: null,
                   asof: new Date().setDate(new Date().getDate() - day)
                 })
               } else {
                 dateArray.push({
-                  balance: null,
+                  balance: previousBalance,
                   asof: new Date().setDate(new Date().getDate() - day)
                 })
               }
@@ -1537,6 +1537,65 @@ export class ApiService {
         //       : null
         //   }))
         // })
+      )
+  }
+
+  getEarlierBalance(accountId: string, temporaryBalance: Balance[]): Observable<Balance[]> {
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(new Date().getTime() - thirtyDaysInMilliseconds)
+
+    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      if (current.getDay() !== previous.getDay()) {
+        return true
+      }
+
+      return false
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'after', set: [thirtyDaysAgo.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(
+        map(delegations => delegations.filter(lastItemOfTheDay)),
+        map(delegations =>
+          delegations.map(delegation => ({
+            ...delegation,
+            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(balances => {
+          const copy = JSON.parse(JSON.stringify(temporaryBalance))
+          copy[0] = balances[0]
+
+          let previousBalance = copy[0].balance
+          for (let index = 0; index <= 29; index++) {
+            if (!copy[index].balance && previousBalance) {
+              copy[index].balance = previousBalance
+            } else if (copy[index]) {
+              previousBalance = copy[index].balance
+            }
+          }
+
+          return copy
+        })
       )
   }
 
