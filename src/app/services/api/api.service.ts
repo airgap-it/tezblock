@@ -1430,18 +1430,37 @@ export class ApiService {
         ),
         map(delegations => delegations.sort((a, b) => a.asof - b.asof))
       )
-      .subscribe(delegations => {
-        const dateArray = []
-        for (let day = 29; day >= 0; day--) {
-          const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
-          dateArray.push({
-            balance: null,
-            asof: new Date(1000 * 60 * 60 * 24 * priorDate.getDate()).getDate()
-          })
-        }
-        const testresult = delegations.map(delegation => delegation)
-        console.log('test result: ', testresult)
-      })
+    // .subscribe(delegations => {
+    //   const dateArray: {
+    //     balance: number
+    //     asof: number
+    //   }[] = []
+
+    //   let previousBalance: number
+    //   for (let day = 29; day >= 0; day--) {
+    //     const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+
+    //     if (delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate())) {
+    //       dateArray.push({
+    //         balance: delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance,
+    //         asof: new Date().setDate(new Date().getDate() - day)
+    //       })
+    //       previousBalance = delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance
+    //     } else {
+    //       if (previousBalance) {
+    //         dateArray.push({
+    //           balance: previousBalance,
+    //           asof: new Date().setDate(new Date().getDate() - day)
+    //         })
+    //       } else {
+    //         dateArray.push({
+    //           balance: 0,
+    //           asof: new Date().setDate(new Date().getDate() - day)
+    //         })
+    //       }
+    //     }
+    //   }
+    // })
 
     return this.http
       .post<Balance[]>(
@@ -1465,7 +1484,59 @@ export class ApiService {
             balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
           }))
         ),
-        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
+        map(delegations => delegations.sort((a, b) => a.asof - b.asof)),
+        map(delegations => {
+          const dateArray: {
+            balance: number
+            asof: number
+          }[] = []
+
+          let previousBalance: number
+          for (let day = 29; day >= 0; day--) {
+            const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+
+            if (delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate())) {
+              dateArray.push({
+                balance: delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance,
+                asof: new Date().setDate(new Date().getDate() - day)
+              })
+              previousBalance = delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance
+            } else {
+              if (previousBalance) {
+                dateArray.push({
+                  balance: previousBalance,
+                  asof: new Date().setDate(new Date().getDate() - day)
+                })
+              } else {
+                dateArray.push({
+                  balance: null,
+                  asof: new Date().setDate(new Date().getDate() - day)
+                })
+              }
+            }
+          }
+          return dateArray
+        })
+
+        // map(delegations => {
+        //   const dateArray: {
+        //     balance: number
+        //     asof: number
+        //   }[] = []
+        //   for (let day = 29; day >= 0; day--) {
+        //     // const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+        //     dateArray.push({
+        //       balance: null,
+        //       asof: new Date().setDate(new Date().getDate() - day)
+        //     })
+        //   }
+        //   return dateArray.map(valuePair => ({
+        //     ...valuePair,
+        //     balance: delegations.find(delegation => new Date(delegation.asof).getDate() === new Date(valuePair.asof).getDate())
+        //       ? delegations.find(delegation => new Date(delegation.asof).getDate() === new Date(valuePair.asof).getDate()).balance
+        //       : null
+        //   }))
+        // })
       )
   }
 
