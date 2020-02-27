@@ -1516,9 +1516,9 @@ export class ApiService {
 
           let previousBalance = copiedBalances[0].balance
           for (let index = 0; index <= 29; index++) {
-            if (!copiedBalances[index].balance && previousBalance) {
+            if (!copiedBalances[index].balance && (previousBalance || previousBalance === 0)) {
               copiedBalances[index].balance = previousBalance
-            } else if (copiedBalances[index]) {
+            } else if (copiedBalances[index].balance) {
               previousBalance = copiedBalances[index].balance
             }
           }
