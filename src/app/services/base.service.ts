@@ -116,7 +116,7 @@ export class BaseService {
     }
   }
 
-  public post<T>(url: string, body: Body, isFullUrl = false): Observable<T> {
+  post<T>(url: string, body: Body, isFullUrl = false): Observable<T> {
     const _url = isFullUrl
       ? url
           .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
@@ -126,5 +126,17 @@ export class BaseService {
       : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
 
     return this.httpClient.post<T>(_url, body, this.options)
+  }
+
+  get<T>(url: string, isFullUrl = false): Observable<T> {
+    const _url = isFullUrl
+      ? url
+          .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
+          .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
+          .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
+          .replace(ENVIRONMENT_VAR, this.environmentVariable)
+      : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
+
+    return this.httpClient.get<T>(_url, this.options)
   }
 }

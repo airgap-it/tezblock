@@ -6,6 +6,9 @@ import { ApiService } from '../api/api.service'
 import { BlockService } from '../blocks/blocks.service'
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
 
+const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
+export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
+
 interface CycleServiceState {
   currentCycle: number
   currentBlockLevel: number
@@ -86,8 +89,7 @@ export class CycleService extends Facade<CycleServiceState> {
         const cycleProgress = Math.round(((this._state.currentBlockLevel - cycleStartingBlockLevel) / 4096) * 100)
 
         const remainingBlocks = cycleEndingBlockLevel - this._state.currentBlockLevel
-        const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
-        let totalSeconds = meanBlockTime * remainingBlocks
+        let totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
         let hours = Math.floor(totalSeconds / 3600)
         totalSeconds %= 3600
         const minutes = Math.floor(totalSeconds / 60)

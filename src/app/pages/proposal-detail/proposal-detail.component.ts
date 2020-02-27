@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
-import { Observable } from 'rxjs'
+import { Observable, combineLatest } from 'rxjs'
+import { filter } from 'rxjs/operators'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
 
@@ -13,9 +14,10 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { columns } from './table-definitions'
-import { PeriodKind } from '@tezblock/domain/vote'
+import { PeriodKind, PeriodTimespan } from '@tezblock/domain/vote'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import * as moment from 'moment'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -26,7 +28,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   proposal$: Observable<ProposalDto>
   votes$: Observable<Transaction[]>
   loading$: Observable<boolean>
+  periodsTimespans$: Observable<PeriodTimespan[]>
   tabs: Tab[]
+  now: number = moment.utc().valueOf()
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -46,7 +50,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const id = paramMap.get('id')
-        const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab')
+        const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
         this.setTabs(tabTitle)
 
         const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
@@ -65,7 +69,15 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
               count: metaVotingPeriod.count
             }))
           ))
+      ),
+
+      // REFACTORE this to operate on actions and move to effects
+      combineLatest(
+        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
+        this.store$.select(state => state.proposalDetails.currentVotingPeriod)
       )
+        .pipe(filter(([metaVotingPeriods, currentVotingPeriod]) => !!metaVotingPeriods && !!currentVotingPeriod))
+        .subscribe(() => this.store$.dispatch(actions.loadPeriodsTimespans()))
     )
   }
 
@@ -73,6 +85,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
     this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
     this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
+    this.periodsTimespans$ = this.store$.select(state => state.proposalDetails.periodsTimespans)
   }
 
   copyToClipboard() {

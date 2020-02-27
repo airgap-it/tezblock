@@ -5,7 +5,7 @@ import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { MetaVotingPeriod } from '@tezblock/domain/vote'
+import { MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { get } from '@tezblock/services/fp'
 
@@ -33,6 +33,7 @@ export interface State {
   loadingProposal: boolean
   periodKind: string
   metaVotingPeriods: MetaVotingPeriod[]
+  periodsTimespans: PeriodTimespan[]
   votes: TableState<Transaction>
   currentVotingPeriod: number
   currentVotingeriodPosition: number
@@ -44,6 +45,7 @@ const initialState: State = {
   loadingProposal: false,
   periodKind: undefined,
   metaVotingPeriods: undefined,
+  periodsTimespans: undefined,
   votes: getInitialTableState(),
   currentVotingPeriod: undefined,
   currentVotingeriodPosition: undefined

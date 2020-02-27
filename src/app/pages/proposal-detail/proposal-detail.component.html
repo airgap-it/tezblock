@@ -78,7 +78,17 @@
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
           >
-
+          <ng-container *ngFor="let periodsTimespan of periodsTimespans$ | async">
+            <ng-container *ngIf="periodsTimespan.end < now">
+              Voting period has ended, period was between 2 of February 2020 and 15th of February 2020
+            </ng-container>
+            <ng-container *ngIf="periodsTimespan.start < now && periodsTimespan.end > now">
+              The current period ends on 27th of February 2020
+            </ng-container>
+            <ng-container *ngIf="periodsTimespan.start > now">
+              Voting period will start on ...
+            </ng-container>
+          </ng-container>
         </tabbed-table>
         </div>
       </div>

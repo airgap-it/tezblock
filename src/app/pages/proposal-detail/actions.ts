@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { MetaVotingPeriod } from '@tezblock/domain/vote'
+import { MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
 
 const featureName = 'Proposal Details'
 
@@ -39,5 +39,12 @@ export const loadCurrentVotingPeriodSucceeded = createAction(
   props<{ currentVotingPeriod: number; currentVotingeriodPosition: number }>()
 )
 export const loadCurrentVotingPeriodFailed = createAction(`[${featureName}] Load Current Voting Period Failed`, props<{ error: any }>())
+
+export const loadPeriodsTimespans = createAction(`[${featureName}] Load Periods Timespans`)
+export const loadPeriodsTimespansSucceeded = createAction(
+  `[${featureName}] Load Periods Timespans Succeeded`,
+  props<{ periodsTimespans: PeriodTimespan[] }>()
+)
+export const loadPeriodsTimespansFailed = createAction(`[${featureName}] Load Periods Timespans Failed`, props<{ error: any }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
