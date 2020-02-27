@@ -1406,61 +1406,6 @@ export class ApiService {
 
       return false
     }
-    this.http
-      .post<Balance[]>(
-        this.accountHistoryApiUrl,
-        {
-          fields: ['balance', 'asof'],
-          predicates: [
-            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
-            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
-          ],
-          orderBy: [{ field: 'asof', direction: 'desc' }],
-          limit: 50000
-        },
-        this.options
-      )
-      .pipe(
-        map(delegations => delegations.filter(lastItemOfTheDay)),
-        map(delegations =>
-          delegations.map(delegation => ({
-            ...delegation,
-            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
-          }))
-        ),
-        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
-      )
-    // .subscribe(delegations => {
-    //   const dateArray: {
-    //     balance: number
-    //     asof: number
-    //   }[] = []
-
-    //   let previousBalance: number
-    //   for (let day = 29; day >= 0; day--) {
-    //     const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
-
-    //     if (delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate())) {
-    //       dateArray.push({
-    //         balance: delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance,
-    //         asof: new Date().setDate(new Date().getDate() - day)
-    //       })
-    //       previousBalance = delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance
-    //     } else {
-    //       if (previousBalance) {
-    //         dateArray.push({
-    //           balance: previousBalance,
-    //           asof: new Date().setDate(new Date().getDate() - day)
-    //         })
-    //       } else {
-    //         dateArray.push({
-    //           balance: 0,
-    //           asof: new Date().setDate(new Date().getDate() - day)
-    //         })
-    //       }
-    //     }
-    //   }
-    // })
 
     return this.http
       .post<Balance[]>(
@@ -1477,15 +1422,15 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(delegations => delegations.filter(lastItemOfTheDay)),
-        map(delegations =>
-          delegations.map(delegation => ({
-            ...delegation,
-            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+        map(balances => balances.filter(lastItemOfTheDay)),
+        map(balances =>
+          balances.map(balance => ({
+            ...balance,
+            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
           }))
         ),
-        map(delegations => delegations.sort((a, b) => a.asof - b.asof)),
-        map(delegations => {
+        map(balances => balances.sort((a, b) => a.asof - b.asof)),
+        map(balances => {
           const dateArray: {
             balance: number
             asof: number
@@ -1495,12 +1440,12 @@ export class ApiService {
           for (let day = 29; day >= 0; day--) {
             const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
 
-            if (delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate())) {
+            if (balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate())) {
               dateArray.push({
-                balance: delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance,
+                balance: balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate()).balance,
                 asof: new Date().setDate(new Date().getDate() - day)
               })
-              previousBalance = delegations.find(delegation => new Date(delegation.asof).getDate() === priorDate.getDate()).balance
+              previousBalance = balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate()).balance
             } else {
               if (!previousBalance) {
                 dateArray.push({
@@ -1517,30 +1462,10 @@ export class ApiService {
           }
           return dateArray
         })
-
-        // map(delegations => {
-        //   const dateArray: {
-        //     balance: number
-        //     asof: number
-        //   }[] = []
-        //   for (let day = 29; day >= 0; day--) {
-        //     // const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
-        //     dateArray.push({
-        //       balance: null,
-        //       asof: new Date().setDate(new Date().getDate() - day)
-        //     })
-        //   }
-        //   return dateArray.map(valuePair => ({
-        //     ...valuePair,
-        //     balance: delegations.find(delegation => new Date(delegation.asof).getDate() === new Date(valuePair.asof).getDate())
-        //       ? delegations.find(delegation => new Date(delegation.asof).getDate() === new Date(valuePair.asof).getDate()).balance
-        //       : null
-        //   }))
-        // })
       )
   }
 
-  getEarlierBalance(accountId: string, temporaryBalance: Balance[]): Observable<Balance[]> {
+  getEarlierBalance(accountId: string, temporaryBalances: Balance[]): Observable<Balance[]> {
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(new Date().getTime() - thirtyDaysInMilliseconds)
 
@@ -1574,27 +1499,27 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(delegations => delegations.filter(lastItemOfTheDay)),
-        map(delegations =>
-          delegations.map(delegation => ({
-            ...delegation,
-            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+        map(balances => balances.filter(lastItemOfTheDay)),
+        map(balances =>
+          balances.map(balance => ({
+            ...balance,
+            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
           }))
         ),
         map(balances => {
-          const copy = JSON.parse(JSON.stringify(temporaryBalance))
-          copy[0] = balances[0]
+          const copiedBalances = JSON.parse(JSON.stringify(temporaryBalances))
+          copiedBalances[0] = balances[0]
 
-          let previousBalance = copy[0].balance
+          let previousBalance = copiedBalances[0].balance
           for (let index = 0; index <= 29; index++) {
-            if (!copy[index].balance && previousBalance) {
-              copy[index].balance = previousBalance
-            } else if (copy[index]) {
-              previousBalance = copy[index].balance
+            if (!copiedBalances[index].balance && previousBalance) {
+              copiedBalances[index].balance = previousBalance
+            } else if (copiedBalances[index]) {
+              previousBalance = copiedBalances[index].balance
             }
           }
 
-          return copy
+          return copiedBalances
         })
       )
   }
