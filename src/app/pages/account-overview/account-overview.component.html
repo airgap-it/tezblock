@@ -1,0 +1,46 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <div class="card h-100 pt-3">
+      <div class="card-body p-4">
+        <h5 class="card-title mb-3">
+          Accounts
+        </h5>
+
+        <div class="row pb-5">
+          <div class="col col-12">
+            <h5 class="card-title__secondary mb-3 ">
+              Top 25 Accounts by Balance
+            </h5>
+          </div>
+          <div class="col col-12 d-flex justify-content-center">
+            <ng-container *ngIf="top25ChartDatasets$ | async">
+              <div style="position: relative;">
+                <chart-item
+                  [datasets]="top25ChartDatasets$ | async"
+                  [labels]="top25ChartLabels$ | async"
+                  [options]="top25ChartOptions$ | async"
+                  [colors]="top25ChartColors"
+                  [size]="top25ChartSize$ | async"
+                  chartType="pie"
+                ></chart-item>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col px-2">
+            <tezblock-table
+              [columns]="columns"
+              [data]="data$ | async"
+              [loading]="loading$ | async"
+              [pagination]="showLoadMore$ | async"
+              (onLoadMore)="loadMore()"
+              (onSort)="sortBy($event)"
+              [orderBy]="orderBy$ | async"
+            ></tezblock-table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

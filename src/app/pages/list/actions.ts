@@ -7,6 +7,7 @@ import { Block } from '@tezblock/interfaces/Block'
 import { TokenContract } from '@tezblock/domain/contract'
 import { Data } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
+
 import { OrderBy } from '@tezblock/services/base.service'
 
 export interface TransactionChartItem {
@@ -29,10 +30,7 @@ export const loadTransactionsSucceeded = createAction(
 )
 export const loadTransactionsFailed = createAction(`[${featureName}] Load Transactions Failed`, props<{ error: any }>())
 export const increasePageOfTransactions = createAction(`[${featureName}] Increase Page Of Transactions`)
-export const sortTransactionsByKind = createAction(
-  `[${featureName}] Sort Transactions`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
 export const loadDoubleBakings = createAction(`[${featureName}] Load Double Bakings`)
 export const loadDoubleBakingsSucceeded = createAction(
@@ -41,10 +39,7 @@ export const loadDoubleBakingsSucceeded = createAction(
 )
 export const loadDoubleBakingsFailed = createAction(`[${featureName}] Load Double Bakings Failed`, props<{ error: any }>())
 export const increasePageOfDoubleBakings = createAction(`[${featureName}] Increase Page Of Double Bakings`)
-export const sortDoubleBakingsByKind = createAction(
-  `[${featureName}] Sort Double Bakings`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortDoubleBakingsByKind = createAction(`[${featureName}] Sort Double Bakings`, props<{ orderBy: OrderBy }>())
 
 export const loadDoubleEndorsements = createAction(`[${featureName}] Load Double Endorsements`)
 export const loadDoubleEndorsementsSucceeded = createAction(
@@ -53,19 +48,13 @@ export const loadDoubleEndorsementsSucceeded = createAction(
 )
 export const loadDoubleEndorsementsFailed = createAction(`[${featureName}] Load Double Endorsements Failed`, props<{ error: any }>())
 export const increasePageOfDoubleEndorsements = createAction(`[${featureName}] Increase Page Of Double Endorsements`)
-export const sortDoubleEndorsementsByKind = createAction(
-  `[${featureName}] Sort Double Endorsements`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortDoubleEndorsementsByKind = createAction(`[${featureName}] Sort Double Endorsements`, props<{ orderBy: OrderBy }>())
 
 export const loadActiveBakers = createAction(`[${featureName}] Load Active Bakers`)
 export const loadActiveBakersSucceeded = createAction(`[${featureName}] Load Active Bakers Succeeded`, props<{ activeBakers: Baker[] }>())
 export const loadActiveBakersFailed = createAction(`[${featureName}] Load Active Bakers Failed`, props<{ error: any }>())
 export const increasePageOfActiveBakers = createAction(`[${featureName}] Increase Page Of Active Bakers`)
-export const sortActiveBakersByKind = createAction(
-  `[${featureName}] Sort Active Bakers`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortActiveBakersByKind = createAction(`[${featureName}] Sort Active Bakers`, props<{ orderBy: OrderBy }>())
 
 export const loadTotalActiveBakers = createAction(`[${featureName}] Load Total Active Bakers`)
 export const loadTotalActiveBakersSucceeded = createAction(
@@ -78,10 +67,7 @@ export const loadProposals = createAction(`[${featureName}] Load Proposals`)
 export const loadProposalsSucceeded = createAction(`[${featureName}] Load Proposals Succeeded`, props<{ proposals: ProposalListDto[] }>())
 export const loadProposalsFailed = createAction(`[${featureName}] Load Proposals Failed`, props<{ error: any }>())
 export const increasePageOfProposals = createAction(`[${featureName}] Increase Page Of Proposals`)
-export const sortProposalsByKind = createAction(
-  `[${featureName}] Sort Proposals`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortProposalsByKind = createAction(`[${featureName}] Sort Proposals`, props<{ orderBy: OrderBy }>())
 
 export const loadVotes = createAction(`[${featureName}] Load Votes`)
 export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ votes: any[] }>())
@@ -96,10 +82,7 @@ export const loadEndorsementsSucceeded = createAction(
 )
 export const loadEndorsementsFailed = createAction(`[${featureName}] Load Endorsements Failed`, props<{ error: any }>())
 export const increasePageOfEndorsements = createAction(`[${featureName}] Increase Page Of Endorsements`)
-export const sortEndorsementsByKind = createAction(
-  `[${featureName}] Sort Endorsements`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortEndorsementsByKind = createAction(`[${featureName}] Sort Endorsements`, props<{ orderBy: OrderBy }>())
 
 export const loadTransactionsCountLast24h = createAction(`[${featureName}] Load Transactions Count Last 24h`)
 export const loadTransactionsCountLast24hSucceeded = createAction(
@@ -127,10 +110,7 @@ export const loadActivationsSucceeded = createAction(
 )
 export const loadActivationsFailed = createAction(`[${featureName}] Load Activations Failed`, props<{ error: any }>())
 export const increasePageOfActivations = createAction(`[${featureName}] Increase Page Of Activations`)
-export const sortActivationsByKind = createAction(
-  `[${featureName}] Sort Activations`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortActivationsByKind = createAction(`[${featureName}] Sort Activations`, props<{ orderBy: OrderBy }>())
 
 export const loadOriginationsCountLast24h = createAction(`[${featureName}] Load Originations Count Last 24h`)
 export const loadOriginationsCountLast24hSucceeded = createAction(
@@ -148,10 +128,7 @@ export const loadOriginationsSucceeded = createAction(
 )
 export const loadOriginationsFailed = createAction(`[${featureName}] Load Originations Failed`, props<{ error: any }>())
 export const increasePageOfOriginations = createAction(`[${featureName}] Increase Page Of Originations`)
-export const sortOriginationsByKind = createAction(
-  `[${featureName}] Sort Originations`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortOriginationsByKind = createAction(`[${featureName}] Sort Originations`, props<{ orderBy: OrderBy }>())
 
 export const loadDelegations = createAction(`[${featureName}] Load Delegations`)
 export const loadDelegationsSucceeded = createAction(
@@ -160,10 +137,7 @@ export const loadDelegationsSucceeded = createAction(
 )
 export const loadDelegationsFailed = createAction(`[${featureName}] Load Delegations Failed`, props<{ error: any }>())
 export const increasePageOfDelegations = createAction(`[${featureName}] Increase Page Of Delegations`)
-export const sortDelegationsByKind = createAction(
-  `[${featureName}] Sort Delegations`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortDelegationsByKind = createAction(`[${featureName}] Sort Delegations`, props<{ orderBy: OrderBy }>())
 
 export const loadTransactionsChartData = createAction(`[${featureName}] Load Transactions Chart Data`)
 export const loadTransactionsChartDataSucceeded = createAction(`[${featureName}] Load Transactions Chart Data Succeeded`, props<{ transactionsChartData: TransactionChartItem[] }>())
@@ -199,7 +173,10 @@ export const loadOriginationsCountLastXdFailed = createAction(
 )
 
 export const loadTokenContracts = createAction(`[${featureName}] Load Token Contracts`)
-export const loadTokenContractsSucceeded = createAction(`[${featureName}] Load Token Contracts Succeeded`, props<{ tokenContracts: Data<TokenContract> }>())
+export const loadTokenContractsSucceeded = createAction(
+  `[${featureName}] Load Token Contracts Succeeded`,
+  props<{ tokenContracts: Data<TokenContract> }>()
+)
 export const loadTokenContractsFailed = createAction(`[${featureName}] Load Token Contracts Failed`, props<{ error: any }>())
 export const increasePageOfTokenContracts = createAction(`[${featureName}] Increase Page Of Token Contracts`)
 
@@ -208,11 +185,5 @@ export const loadContractsSucceeded = createAction(`[${featureName}] Load Contra
 export const loadContractsFailed = createAction(`[${featureName}] Load Contracts Failed`, props<{ error: any }>())
 export const increasePageOfContracts = createAction(`[${featureName}] Increase Page Of Contracts`)
 export const sortContracts = createAction(`[${featureName}] Sort Contracts`, props<{ orderBy: OrderBy }>())
-
-export const loadAccounts = createAction(`[${featureName}] Load Accounts`)
-export const loadAccountsSucceeded = createAction(`[${featureName}] Load Accounts Succeeded`, props<{ accounts: Account[] }>())
-export const loadAccountsFailed = createAction(`[${featureName}] Load Accounts Failed`, props<{ error: any }>())
-export const increasePageOfAccounts = createAction(`[${featureName}] Increase Page Of Accounts`)
-export const sortAccounts = createAction(`[${featureName}] Sort Accounts`, props<{ orderBy: OrderBy }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

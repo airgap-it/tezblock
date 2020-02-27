@@ -7,17 +7,10 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
-import { Account } from '@tezblock/interfaces/Account'
 import { sort } from '@tezblock/domain/table'
-
-const preprocessBakersData = (bakerData: any[]) =>
-  bakerData.map(bakerDataItem => ({
-    ...bakerDataItem,
-    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
-  }))
+import { Account } from '@tezblock/interfaces/Account'
 
 export interface State {
-  accounts: TableState<Account>
   blocks: TableState<Block>
   transactions: TableState<Transaction>
   doubleBakings: TableState<Transaction>
@@ -41,7 +34,6 @@ export interface State {
 }
 
 const initialState: State = {
-  accounts: getInitialTableState(sort('balance', 'desc')),
   blocks: getInitialTableState(sort('timestamp', 'desc')),
   transactions: getInitialTableState(sort('block_level', 'desc')),
   doubleBakings: getInitialTableState(sort('block_level', 'desc')),
@@ -630,45 +622,6 @@ export const reducer = createReducer(
     ...state,
     contracts: {
       ...state.contracts,
-      orderBy
-    }
-  })),
-  on(actions.loadAccounts, state => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      loading: true
-    }
-  })),
-  on(actions.loadAccountsSucceeded, (state, { accounts }) => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      data: accounts,
-      loading: false
-    }
-  })),
-  on(actions.loadAccountsFailed, state => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      loading: false
-    }
-  })),
-  on(actions.increasePageOfAccounts, state => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      pagination: {
-        ...state.accounts.pagination,
-        currentPage: state.accounts.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.sortAccounts, (state, { orderBy }) => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
       orderBy
     }
   })),

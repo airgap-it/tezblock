@@ -1,20 +1,21 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, Observable, forkJoin } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
+import { forkJoin, Observable, of } from 'rxjs'
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import * as listActions from './actions'
-import { ApiService } from '@tezblock/services/api/api.service'
-import { BaseService, Operation } from '@tezblock/services/base.service'
+import { getTokenContracts } from '@tezblock/domain/contract'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
-import { Block } from '@tezblock/interfaces/Block'
-import { OperationTypes } from '@tezblock/domain/operations'
-import { getTokenContracts } from '@tezblock/domain/contract'
-import { Account } from '@tezblock/interfaces/Account'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { BaseService, Operation } from '@tezblock/services/base.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { toNotNilArray } from '@tezblock/services/fp'
+import * as listActions from './actions'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -547,50 +548,6 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.sortContracts),
       map(() => listActions.loadContracts())
-    )
-  )
-
-  loadAccounts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.loadAccounts),
-      withLatestFrom(
-        this.store$.select(state => state.list.accounts.pagination),
-        this.store$.select(state => state.list.accounts.orderBy).pipe(map(toNotNilArray))
-      ),
-      switchMap(([action, pagination, orderBy]) =>
-        this.baseService
-          .post<Account[]>('accounts', {
-            fields: [],
-            predicates: [
-              {
-                field: 'account_id',
-                operation: Operation.startsWith,
-                set: ['tz'],
-                inverse: false
-              }
-            ],
-            orderBy,
-            limit: pagination.currentPage * pagination.selectedSize
-          })
-          .pipe(
-            map(accounts => listActions.loadAccountsSucceeded({ accounts })),
-            catchError(error => of(listActions.loadAccountsFailed({ error })))
-          )
-      )
-    )
-  )
-
-  onSortAccounts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.sortAccounts),
-      map(() => listActions.loadAccounts())
-    )
-  )
-
-  increasePageOfAccounts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.increasePageOfAccounts),
-      map(() => listActions.loadAccounts())
     )
   )
 

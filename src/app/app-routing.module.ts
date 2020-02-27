@@ -13,11 +13,13 @@ import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail
 import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component'
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
 import { HealthComponent } from './pages/health/health.component'
+import { AccountOverviewComponent } from './pages/account-overview/account-overview.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'resources/wallets', component: ResourcesWalletsComponent },
   { path: 'baker/list', component: BakerOverviewComponent },
+  { path: 'account/list', component: AccountOverviewComponent },
   { path: ':route/list', component: ListComponent },
   { path: 'block/:id', component: BlockDetailComponent },
   { path: 'account/:id', component: AccountDetailComponent },
