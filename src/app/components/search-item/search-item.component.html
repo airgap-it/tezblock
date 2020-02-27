@@ -12,6 +12,8 @@
     (keydown.enter)="onKeyEnter()"
     (typeaheadOnSelect)="onSelect($event)"
     (mousedown)="onMouseDown()"
+    [typeaheadIsFirstItemActive]="false"
+    [isAnimated]="true"
   />
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit" (click)="search()">
