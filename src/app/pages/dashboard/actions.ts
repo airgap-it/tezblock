@@ -1,5 +1,6 @@
 import { createAction, props } from '@ngrx/store'
 
+import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TokenContract } from '@tezblock/domain/contract'
 
 const featureName = 'Dashboard'

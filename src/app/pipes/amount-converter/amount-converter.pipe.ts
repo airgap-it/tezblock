@@ -1,6 +1,26 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
+
+export const tryGetProtocolByIdentifier = (identifier: string): ICoinProtocol => {
+  try {
+    return getProtocolByIdentifier(identifier)
+  } catch (e) {
+    return undefined
+  }
+}
+
+export const toXTZ = (value: number, protocol: ICoinProtocol): number => {
+  const BN = BigNumber.clone({
+    FORMAT: {
+      decimalSeparator: `.`,
+      groupSeparator: `,`,
+      groupSize: 3
+    }
+  })
+
+  return protocol ? new BN(value).shiftedBy(protocol.decimals * -1).toNumber() : undefined
+}
 
 @Pipe({
   name: 'amountConverter'
@@ -23,11 +43,9 @@ export class AmountConverterPipe implements PipeTransform {
       return ''
     }
 
-    let protocol
+    const protocol: ICoinProtocol = tryGetProtocolByIdentifier(args.protocolIdentifier)
 
-    try {
-      protocol = getProtocolByIdentifier(args.protocolIdentifier)
-    } catch (e) {
+    if (!protocol) {
       return ''
     }
 

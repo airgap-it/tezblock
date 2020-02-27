@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { EffectsModule } from '@ngrx/effects'
 import { StoreModule } from '@ngrx/store'
+import { StorageModule } from '@ngx-pwa/local-storage'
 import { QRCodeModule } from 'angularx-qrcode'
 import { ChartsModule } from 'ng2-charts'
 import { AlertModule, BsDropdownModule, BsModalService, CollapseModule, SortableModule, TooltipModule } from 'ngx-bootstrap'
@@ -16,7 +17,6 @@ import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
-import { StorageModule } from '@ngx-pwa/local-storage'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -80,7 +80,9 @@ import { TezblockTableComponent } from './components/tezblock-table/tezblock-tab
 import { ClientSideTableComponent } from './components/client-side-table/client-side-table.component'
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
 import { BakersEffects } from './pages/baker-overview/effects'
-import { HealthEffects } from './pages/health/effects';
+import { AccountOverviewComponent } from './pages/account-overview/account-overview.component'
+import { AccountsEffects } from './pages/account-overview/effects'
+import { HealthEffects } from './pages/health/effects'
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
 import { DashboarEffects } from './pages/dashboard/effects';
 import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component'
@@ -131,6 +133,7 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
       ContractDetailEffects,
       BakersEffects,
       HealthEffects,
+      AccountsEffects,
       DashboarEffects,
       DashboardLatestContractsTransactionsEffects
     ]),
@@ -181,6 +184,7 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
     ContractDetailComponent,
     BakerOverviewComponent,
     HealthComponent,
+    AccountOverviewComponent,
     LatestContractsComponent,
     LatestContractsTransactionsComponent
   ],
