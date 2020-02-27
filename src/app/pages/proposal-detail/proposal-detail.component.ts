@@ -57,7 +57,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.loadProposal({ id }))
         this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
-        this.store$.dispatch(actions.loadCurrentVotingPeriod())
+        this.store$.dispatch(actions.loadPeriodInfos())
       }),
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
@@ -69,15 +69,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
               count: metaVotingPeriod.count
             }))
           ))
-      ),
-
-      // REFACTORE this to operate on actions and move to effects
-      combineLatest(
-        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-        this.store$.select(state => state.proposalDetails.currentVotingPeriod)
       )
-        .pipe(filter(([metaVotingPeriods, currentVotingPeriod]) => !!metaVotingPeriods && !!currentVotingPeriod))
-        .subscribe(() => this.store$.dispatch(actions.loadPeriodsTimespans()))
     )
   }
 

@@ -36,7 +36,8 @@ export interface State {
   periodsTimespans: PeriodTimespan[]
   votes: TableState<Transaction>
   currentVotingPeriod: number
-  currentVotingeriodPosition: number
+  currentVotingeriodPosition: number,
+  blocksPerVotingPeriod: number
 }
 
 const initialState: State = {
@@ -48,7 +49,8 @@ const initialState: State = {
   periodsTimespans: undefined,
   votes: getInitialTableState(),
   currentVotingPeriod: undefined,
-  currentVotingeriodPosition: undefined
+  currentVotingeriodPosition: undefined,
+  blocksPerVotingPeriod: undefined
 }
 
 export const reducer = createReducer(
@@ -121,12 +123,13 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.loadCurrentVotingPeriodSucceeded, (state, { currentVotingPeriod, currentVotingeriodPosition }) => ({
+  on(actions.loadPeriodInfosSucceeded, (state, { currentVotingPeriod, currentVotingeriodPosition, blocksPerVotingPeriod }) => ({
     ...state,
     currentVotingPeriod,
-    currentVotingeriodPosition
+    currentVotingeriodPosition,
+    blocksPerVotingPeriod
   })),
-  on(actions.loadCurrentVotingPeriodFailed, state => ({
+  on(actions.loadPeriodInfosFailed, state => ({
     ...state,
     currentVotingPeriod: null,
     currentVotingeriodPosition: null

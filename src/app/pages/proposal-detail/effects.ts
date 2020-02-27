@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, pipe, Observable, forkJoin } from 'rxjs'
-import { map, catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
@@ -34,12 +34,22 @@ const getPeriodTimespanQuery = (period: number, direction: Direction): Body => (
   limit: 1
 })
 
-const getStartOfPeriod = (period: number, currentVotingPeriod: number, currentVotingeriodPosition: number, blocksPerVotingPeriod: number): number => {
+const getStartOfPeriod = (
+  period: number,
+  currentVotingPeriod: number,
+  currentVotingeriodPosition: number,
+  blocksPerVotingPeriod: number
+): number => {
   const remainingBlocks = blocksPerVotingPeriod - (currentVotingeriodPosition + 1)
   return null
 }
 
-const getEndOfPeriod = (period: number, currentVotingPeriod: number, currentVotingeriodPosition: number, blocksPerVotingPeriod: number): number => {
+const getEndOfPeriod = (
+  period: number,
+  currentVotingPeriod: number,
+  currentVotingeriodPosition: number,
+  blocksPerVotingPeriod: number
+): number => {
   return null
 }
 
@@ -263,32 +273,45 @@ export class ProposalDetailEffects {
     )
   )
 
-  loadCurrentVotingPeriod$ = createEffect(() =>
+  loadPeriodInfos$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadCurrentVotingPeriod),
+      ofType(actions.loadPeriodInfos),
       switchMap(() =>
-        this.baseService
-          .post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
-            fields: ['meta_voting_period', 'meta_voting_period_position'],
-            orderBy: [
-              {
-                field: 'level',
-                direction: 'desc'
-              }
-            ],
-            limit: 1
-          })
-          .pipe(
-            map(first),
-            map(({ meta_voting_period, meta_voting_period_position }) =>
-              actions.loadCurrentVotingPeriodSucceeded({
-                currentVotingPeriod: meta_voting_period,
-                currentVotingeriodPosition: meta_voting_period_position
-              })
-            ),
-            catchError(error => of(actions.loadVotesFailed({ error })))
-          )
+        forkJoin(
+          this.baseService
+            .post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
+              fields: ['meta_voting_period', 'meta_voting_period_position'],
+              orderBy: [
+                {
+                  field: 'level',
+                  direction: 'desc'
+                }
+              ],
+              limit: 1
+            })
+            .pipe(map(first)),
+          this.baseService
+            .get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true)
+            .pipe(map(response => response.blocks_per_voting_period))
+        ).pipe(
+          map(([{ meta_voting_period, meta_voting_period_position }, blocksPerVotingPeriod]) =>
+            actions.loadPeriodInfosSucceeded({
+              currentVotingPeriod: meta_voting_period,
+              currentVotingeriodPosition: meta_voting_period_position,
+              blocksPerVotingPeriod
+            })
+          ),
+          catchError(error => of(actions.loadVotesFailed({ error })))
+        )
       )
+    )
+  )
+
+  loadPeriodsTimespansTrigger$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadPeriodInfosSucceeded),
+      combineLatest(this.actions$.pipe(ofType(actions.loadMetaVotingPeriodsSucceeded))),
+      map(() => actions.loadPeriodsTimespans())
     )
   )
 
@@ -297,45 +320,37 @@ export class ProposalDetailEffects {
       ofType(actions.loadPeriodsTimespans),
       withLatestFrom(
         this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-        this.store$.select(state => state.proposalDetails.currentVotingPeriod),
-        this.store$.select(state => state.proposalDetails.currentVotingeriodPosition)
+        this.store$.select(state => state.proposalDetails.currentVotingPeriod)
       ),
-      switchMap(([action, metaVotingPeriods, currentVotingPeriod, currentVotingeriodPosition]) =>
-        this.baseService.get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true).pipe(
-          map(response => response.blocks_per_voting_period),
-          switchMap(blocksPerVotingPeriod =>
-            forkJoin(
-              forkJoin(
-                metaVotingPeriods.map(period =>
-                  period.value < currentVotingPeriod
-                    ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc')).pipe(
-                        map(first),
-                        map(get(item => item.timestamp))
-                      )
-                    : period.value === currentVotingPeriod
-                    ? of(null)
-                    : of(getStartOfPeriod(period.value, currentVotingPeriod, currentVotingeriodPosition, blocksPerVotingPeriod))
-                )
-              ),
-              forkJoin(
-                metaVotingPeriods.map(period =>
-                  period.value < currentVotingPeriod
-                    ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
-                        map(first),
-                        map(get(item => item.timestamp))
-                      )
-                    : of(getEndOfPeriod(period.value, currentVotingPeriod, currentVotingeriodPosition, blocksPerVotingPeriod))
-                )
-              )
-            ).pipe(
-              map(response =>
-                actions.loadPeriodsTimespansSucceeded({
-                  periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] })
-                })
-              ),
-              catchError(error => of(actions.loadPeriodsTimespansFailed({ error })))
+      switchMap(([action, metaVotingPeriods, currentVotingPeriod]) =>
+        forkJoin(
+          forkJoin(
+            metaVotingPeriods.map(period =>
+              period.value <= currentVotingPeriod
+                ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc')).pipe(
+                    map(first),
+                    map(get(item => item.timestamp))
+                  )
+                : of(null)
+            )
+          ),
+          forkJoin(
+            metaVotingPeriods.map(period =>
+              period.value < currentVotingPeriod
+                ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
+                    map(first),
+                    map(get(item => item.timestamp))
+                  )
+                : of(null)
             )
           )
+        ).pipe(
+          map(response =>
+            actions.loadPeriodsTimespansSucceeded({
+              periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] })
+            })
+          ),
+          catchError(error => of(actions.loadPeriodsTimespansFailed({ error })))
         )
       )
     )

@@ -137,6 +137,6 @@ export class BaseService {
           .replace(ENVIRONMENT_VAR, this.environmentVariable)
       : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
 
-    return this.httpClient.get<T>(_url, this.options)
+    return this.httpClient.get<T>(_url)
   }
 }
