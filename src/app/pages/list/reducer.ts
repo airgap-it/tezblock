@@ -5,19 +5,12 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
-import { Account } from '@tezblock/interfaces/Account'
 import { sort } from '@tezblock/domain/table'
-
-const preprocessBakersData = (bakerData: any[]) =>
-  bakerData.map(bakerDataItem => ({
-    ...bakerDataItem,
-    number_of_votes: bakerDataItem.staking_balance ? Math.floor(bakerDataItem.staking_balance / (8000 * 1000000)) : null
-  }))
+import { Account } from '@tezblock/interfaces/Account'
 
 export interface State {
-  accounts: TableState<Account>
   blocks: TableState<Block>
   transactions: TableState<Transaction>
   doubleBakings: TableState<Transaction>
@@ -34,12 +27,13 @@ export interface State {
   transactionsCountLast24h: number
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
-  transactionsCountLastXd: number[]
-  contracts: TableState<Contract>
+  tokenContracts: TableState<TokenContract>
+  contracts: TableState<Account>
+  transactionsChartData: actions.TransactionChartItem[]
+  transactionsChartDatasets: { data: number[]; label: string }[]
 }
 
 const initialState: State = {
-  accounts: getInitialTableState({ field: 'balance', direction: 'desc' }),
   blocks: getInitialTableState(sort('timestamp', 'desc')),
   transactions: getInitialTableState(sort('block_level', 'desc')),
   doubleBakings: getInitialTableState(sort('block_level', 'desc')),
@@ -56,8 +50,10 @@ const initialState: State = {
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
-  transactionsCountLastXd: undefined,
-  contracts: getInitialTableState()
+  tokenContracts: getInitialTableState(),
+  contracts: getInitialTableState(sort('balance', 'desc')),
+  transactionsChartData: undefined,
+  transactionsChartDatasets: undefined
 }
 
 export const reducer = createReducer(
@@ -548,9 +544,47 @@ export const reducer = createReducer(
     ...state,
     originationsCountLastXd
   })),
-  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+  on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsCountLastXd
+    transactionsChartData,
+    // TODO: why selecting this data throws error in chart.js ... ?
+    //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
+  })),
+  on(actions.loadTokenContracts, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      loading: true
+    }
+  })),
+  on(actions.loadTokenContractsSucceeded, (state, { tokenContracts }) => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      data: tokenContracts.data,
+      pagination: {
+        ...state.tokenContracts.pagination,
+        total: tokenContracts.total
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadTokenContractsFailed, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      loading: false
+    }
+  })),
+  on(actions.increasePageOfTokenContracts, state => ({
+    ...state,
+    tokenContracts: {
+      ...state.tokenContracts,
+      pagination: {
+        ...state.tokenContracts.pagination,
+        currentPage: state.tokenContracts.pagination.currentPage + 1
+      }
+    }
   })),
   on(actions.loadContracts, state => ({
     ...state,
@@ -563,11 +597,7 @@ export const reducer = createReducer(
     ...state,
     contracts: {
       ...state.contracts,
-      data: contracts.data,
-      pagination: {
-        ...state.contracts.pagination,
-        total: contracts.total
-      },
+      data: contracts,
       loading: false
     }
   })),
@@ -588,42 +618,10 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.loadAccounts, state => ({
+  on(actions.sortContracts, (state, { orderBy }) => ({
     ...state,
-    accounts: {
-      ...state.accounts,
-      loading: true
-    }
-  })),
-  on(actions.loadAccountsSucceeded, (state, { accounts }) => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      data: accounts,
-      loading: false
-    }
-  })),
-  on(actions.loadAccountsFailed, state => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      loading: false
-    }
-  })),
-  on(actions.increasePageOfAccounts, state => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
-      pagination: {
-        ...state.accounts.pagination,
-        currentPage: state.accounts.pagination.currentPage + 1
-      }
-    }
-  })),
-  on(actions.sortAccounts, (state, { orderBy }) => ({
-    ...state,
-    accounts: {
-      ...state.accounts,
+    contracts: {
+      ...state.contracts,
       orderBy
     }
   })),

@@ -9,24 +9,28 @@ import * as fromAccountDetails from '../pages/account-detail/reducer'
 import * as fromBlockDetails from '../pages/block-detail/reducer'
 import * as fromTransactionDetails from '../pages/transaction-detail/reducer'
 import * as fromProposalDetails from '../pages/proposal-detail/reducer'
+import * as fromAccount from '../pages/account-overview/reducer'
 import * as fromBakerTable from '../components/baker-table/reducer'
 import * as fromContractDetails from '../pages/contract-detail/reducer'
 import * as fromBakers from '../pages/baker-overview/reducer'
 import * as fromHealth from '../pages/health/reducer'
 import * as fromApp from '../app.reducer'
+import * as fromDashboardLatestContracts from '../pages/dashboard/latest-contracts/reducer'
 
 export interface State {
   app: fromApp.State
+  accountsList: fromAccount.State
   accountDetails: fromAccountDetails.State
   bakerTable: fromBakerTable.State
   bakers: fromBakers.State
   blockDetails: fromBlockDetails.State
+  dashboardLatestContracts: fromDashboardLatestContracts.State
   endorsementDetails: fromEndorsementDetails.State
   transactionDetails: fromTransactionDetails.State
   proposalDetails: fromProposalDetails.State
-contractDetails: fromContractDetails.State
+  contractDetails: fromContractDetails.State
   list: fromList.State
-health: fromHealth.State
+  health: fromHealth.State
 }
 
 /**
@@ -37,16 +41,18 @@ health: fromHealth.State
 export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>('Root reducers token', {
   factory: () => ({
     app: fromApp.reducer,
+    accountsList: fromAccount.reducer,
     accountDetails: fromAccountDetails.reducer,
     bakerTable: fromBakerTable.reducer,
     bakers: fromBakers.reducer,
     blockDetails: fromBlockDetails.reducer,
+    dashboardLatestContracts: fromDashboardLatestContracts.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
     transactionDetails: fromTransactionDetails.reducer,
     proposalDetails: fromProposalDetails.reducer,
-contractDetails: fromContractDetails.reducer,
+    contractDetails: fromContractDetails.reducer,
     list: fromList.reducer,
-health: fromHealth.reducer
+    health: fromHealth.reducer
   })
 })
 

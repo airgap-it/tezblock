@@ -1,21 +1,21 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, Observable, forkJoin } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
+import { forkJoin, Observable, of } from 'rxjs'
+import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import * as listActions from './actions'
-import { ApiService } from '@tezblock/services/api/api.service'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { BaseService, Operation } from '@tezblock/services/base.service'
+import { getTokenContracts } from '@tezblock/domain/contract'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
-import { Block } from '@tezblock/interfaces/Block'
-import { OperationTypes } from '@tezblock/domain/operations'
-import { getContracts } from '@tezblock/domain/contract'
-import { Account } from '@tezblock/interfaces/Account'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { BaseService, Operation } from '@tezblock/services/base.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { toNotNilArray } from '@tezblock/services/fp'
+import * as listActions from './actions'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -464,36 +464,76 @@ export class ListEffects {
 
   loadTransactionsCountLastXd$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadTransactionsCountLastXd),
+      ofType(listActions.loadTransactionsChartData),
       switchMap(() =>
-        this.getEntitiesSince(getTimestamp7dAgo(), 'transaction').pipe(
-          map(transactions => transactions.map(transaction => transaction.timestamp)),
-          map(transactionsCountLastXd => listActions.loadTransactionsCountLastXdSucceeded({ transactionsCountLastXd })),
-          catchError(error => of(listActions.loadTransactionsCountLastXdFailed({ error })))
+        this.getEntitiesSince(getTimestamp7dAgo(), 'transaction', ['timestamp', 'amount']).pipe(
+          map(transactionsChartData => listActions.loadTransactionsChartDataSucceeded({ transactionsChartData })),
+          catchError(error => of(listActions.loadTransactionsChartDataFailed({ error })))
         )
       )
+    )
+  )
+
+  loadTokenContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTokenContracts),
+      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
+      switchMap(([action, pagination]) => {
+        const contracts = getTokenContracts(pagination.currentPage * pagination.selectedSize)
+
+        if (!contracts || contracts.total === 0) {
+          return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
+        }
+
+        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
+          map(totalSupplies =>
+            listActions.loadTokenContractsSucceeded({
+              tokenContracts: {
+                data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
+                total: contracts.total
+              }
+            })
+          ),
+          catchError(error => of(listActions.loadTokenContractsFailed({ error })))
+        )
+      })
+    )
+  )
+
+  increasePageOfTokenContracts$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.increasePageOfTokenContracts),
+      map(() => listActions.loadTokenContracts())
     )
   )
 
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadContracts),
-      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
-      switchMap(([action, pagination]) => {
-        const contracts = getContracts(pagination.currentPage * pagination.selectedSize)
-
-        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
-          map(totalSupplies =>
-            listActions.loadContractsSucceeded({
-              contracts: {
-                data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
-                total: contracts.total
+      withLatestFrom(
+        this.store$.select(state => state.list.contracts.pagination),
+        this.store$.select(state => state.list.contracts.orderBy).pipe(map(toNotNilArray))
+      ),
+      switchMap(([action, pagination, orderBy]) =>
+        this.baseService
+          .post<Account[]>('accounts', {
+            fields: [],
+            predicates: [
+              {
+                field: 'account_id',
+                operation: Operation.startsWith,
+                set: ['KT'],
+                inverse: false
               }
-            })
-          ),
-          catchError(error => of(listActions.loadContractsFailed({ error })))
-        )
-      })
+            ],
+            orderBy,
+            limit: pagination.currentPage * pagination.selectedSize
+          })
+          .pipe(
+            map(contracts => listActions.loadContractsSucceeded({ contracts })),
+            catchError(error => of(listActions.loadContractsFailed({ error })))
+          )
+      )
     )
   )
 
@@ -504,53 +544,16 @@ export class ListEffects {
     )
   )
 
-  loadAccounts$ = createEffect(() =>
+  sortContracts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadAccounts),
-      withLatestFrom(
-        this.store$.select(state => state.list.accounts.pagination),
-        this.store$.select(state => state.list.accounts.orderBy).pipe(map(toNotNilArray))
-      ),
-      switchMap(([action, pagination, orderBy]) =>
-        this.baseService
-          .post<Account[]>('accounts', {
-            fields: [],
-            predicates: [
-              {
-                field: 'account_id',
-                operation: Operation.startsWith,
-                set: ['tz'],
-                inverse: false
-              }
-            ],
-            orderBy,
-            limit: pagination.currentPage * pagination.selectedSize
-          })
-          .pipe(
-            map(accounts => listActions.loadAccountsSucceeded({ accounts })),
-            catchError(error => of(listActions.loadAccountsFailed({ error })))
-          )
-      )
+      ofType(listActions.sortContracts),
+      map(() => listActions.loadContracts())
     )
   )
 
-  onSortAccounts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.sortAccounts),
-      map(() => listActions.loadAccounts())
-    )
-  )
-
-  increasePageOfAccounts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.increasePageOfAccounts),
-      map(() => listActions.loadAccounts())
-    )
-  )
-
-  private getEntitiesSince(since: number, kind: string): Observable<Transaction[]> {
+  private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
-      fields: ['timestamp'],
+      fields,
       predicates: [
         { field: 'operation_group_hash', operation: Operation.isnull, inverse: true },
         { field: 'kind', operation: Operation.in, set: [kind] },
@@ -565,7 +568,6 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly store$: Store<fromRoot.State>,
-    private readonly blockService: BlockService
+    private readonly store$: Store<fromRoot.State>
   ) {}
 }

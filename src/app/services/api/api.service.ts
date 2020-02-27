@@ -18,7 +18,7 @@ import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation, OrderBy } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 
 export interface OperationCount {
@@ -1381,7 +1381,7 @@ export class ApiService {
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
-  getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
+  getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
     const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTransactions(10, cursor))
@@ -1432,13 +1432,13 @@ export class ApiService {
       )
   }
 
-  getTotalSupplyByContract(contract: Contract): Observable<string> {
+  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
     const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTotalSupply())
   }
 
-  private getFaProtocol(contract: Contract): TezosFAProtocol {
+  private getFaProtocol(contract: TokenContract): TezosFAProtocol {
     return new TezosFAProtocol({
       symbol: contract.symbol,
       name: contract.name,

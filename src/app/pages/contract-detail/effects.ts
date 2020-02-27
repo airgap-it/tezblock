@@ -12,7 +12,7 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getContractByAddress, Contract, ContractOperation } from '@tezblock/domain/contract'
+import { getTokenContractByAddress, TokenContract, ContractOperation } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { first, get } from '@tezblock/services/fp'
 import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
@@ -71,7 +71,7 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadContract),
       switchMap(({ address }) => {
-        const contract = get<Contract>(_contract => ({ ..._contract, id: address }))(getContractByAddress(address))
+        const contract = get<TokenContract>(_contract => ({ ..._contract, id: address }))(getTokenContractByAddress(address))
 
         if (contract) {
           return this.apiService.getTotalSupplyByContract(contract).pipe(

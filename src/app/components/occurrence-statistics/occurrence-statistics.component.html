@@ -1,13 +1,19 @@
 <div class="row py-3">
   <div class="col col-md-3 py-3">
-    <h5 class="card-title__secondary mb-3 ">{{ kind }} last 24 hours</h5>
+    <h5 class="card-title__secondary mb-3 ">
+      {{ kind }}
+      <small>last 24 hours</small>
+    </h5>
     <h3>
       {{ count }}
       <loading-skeleton *ngIf="count === undefined" [loadingWidth]="'150px'"></loading-skeleton>
     </h3>
   </div>
-  <div class="col col-md-9 py-3">
-    <h5 class="card-title__secondary mb-3 ">{{ kind }} last 7 days</h5>
+  <div class="col col-md-9 py-3 chart--container">
+    <h5 class="card-title__secondary mb-3 ">
+      {{ kind }}
+      <small>last 7 days</small>
+    </h5>
     <chart-item
       *ngIf="chartDatasets"
       [datasets]="chartDatasets"

@@ -1,8 +1,7 @@
 import { createAction, props } from '@ngrx/store'
 import { TezosTransactionResult } from 'airgap-coin-lib'
 
-import { Contract, ContractOperation } from '@tezblock/domain/contract'
-import { OrderBy } from '@tezblock/services/base.service'
+import { TokenContract, ContractOperation } from '@tezblock/domain/contract'
 
 const featureName = 'Contract Detail'
 
@@ -12,7 +11,7 @@ export enum OperationTab {
 }
 
 export const loadContract = createAction(`[${featureName}] Load Contract`, props<{ address: string }>())
-export const loadContractSucceeded = createAction(`[${featureName}] Load Contract Succeeded`, props<{ contract: Contract }>())
+export const loadContractSucceeded = createAction(`[${featureName}] Load Contract Succeeded`, props<{ contract: TokenContract }>())
 export const loadContractFailed = createAction(`[${featureName}] Load Contract Failed`, props<{ error: any }>())
 
 export const copyAddressToClipboard = createAction(`[${featureName}] Copy Address To Clipboard`, props<{ address: string }>())
