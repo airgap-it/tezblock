@@ -34,9 +34,10 @@ export interface State {
   transactionsCountLast24h: number
   activationsCountLastXd: number[]
   originationsCountLastXd: number[]
-  transactionsCountLastXd: number[]
   tokenContracts: TableState<TokenContract>
   contracts: TableState<Account>
+  transactionsChartData: actions.TransactionChartItem[]
+  transactionsChartDatasets: { data: number[]; label: string }[]
 }
 
 const initialState: State = {
@@ -57,9 +58,10 @@ const initialState: State = {
   transactionsCountLast24h: undefined,
   activationsCountLastXd: undefined,
   originationsCountLastXd: undefined,
-  transactionsCountLastXd: undefined,
   tokenContracts: getInitialTableState(),
-  contracts: getInitialTableState(sort('balance', 'desc'))
+  contracts: getInitialTableState(sort('balance', 'desc')),
+  transactionsChartData: undefined,
+  transactionsChartDatasets: undefined
 }
 
 export const reducer = createReducer(
@@ -550,9 +552,11 @@ export const reducer = createReducer(
     ...state,
     originationsCountLastXd
   })),
-  on(actions.loadTransactionsCountLastXdSucceeded, (state, { transactionsCountLastXd }) => ({
+  on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsCountLastXd
+    transactionsChartData,
+    // TODO: why selecting this data throws error in chart.js ... ?
+    //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
   })),
   on(actions.loadTokenContracts, state => ({
     ...state,

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, Input, ViewChild } from '@angular/core'
-import { BaseChartDirective } from 'ng2-charts'
+import { BaseChartDirective, Color } from 'ng2-charts'
 import { ChartOptions, ChartSize } from 'chart.js'
 
 export const defaultOptions: ChartOptions = {
@@ -83,6 +83,7 @@ export const defaultOptions: ChartOptions = {
 export interface ColorOptions {
   gradientFrom: string
   borderWidth?: number
+  colors?: any[]
 }
 
 @Component({
@@ -140,17 +141,23 @@ export class ChartItemComponent implements AfterViewInit {
       gradientFill1.addColorStop(0, this.colorOptions.gradientFrom)
       gradientFill1.addColorStop(1, 'rgba(46,91,255,0.24)')
 
-      this.colors[0] = {
-        backgroundColor: gradientFill1,
-        borderColor: gradientStroke1,
-        pointBackgroundColor: gradientStroke1,
-        pointBorderColor: gradientStroke1,
-        pointHoverBackgroundColor: gradientStroke1,
-        pointHoverBorderColor: gradientStroke1,
-        hoverBackgroundColor: navyBlue,
-        hoverBorderColor: navyBlue,
-        borderWidth: this.colorOptions.borderWidth
-      }
+      // setTimeout prevents ExpressionChangedAfterItHasBeenCheckedError,
+      // we are using setTimeout() to defer this code to another Javascript Virtual Machine turn
+      // https://blog.angular-university.io/angular-debugging/
+      setTimeout(() => {
+        this.colors = [{
+          backgroundColor: gradientFill1,
+          borderColor: gradientStroke1,
+          pointBackgroundColor: gradientStroke1,
+          pointBorderColor: gradientStroke1,
+          pointHoverBackgroundColor: gradientStroke1,
+          pointHoverBorderColor: gradientStroke1,
+          hoverBackgroundColor: navyBlue,
+          hoverBorderColor: navyBlue,
+          borderWidth: this.colorOptions.borderWidth
+        }].concat(this.colorOptions.colors || [])
+      });
+      
     }
   }
 }

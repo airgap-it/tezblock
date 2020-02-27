@@ -9,6 +9,11 @@ import { Data } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
 import { OrderBy } from '@tezblock/services/base.service'
 
+export interface TransactionChartItem {
+  timestamp: number
+  amount: number
+}
+
 const featureName = 'List'
 
 export const loadBlocks = createAction(`[${featureName}] Load Blocks`)
@@ -160,6 +165,9 @@ export const sortDelegationsByKind = createAction(
   props<{ orderBy: OrderBy }>()
 )
 
+export const loadTransactionsChartData = createAction(`[${featureName}] Load Transactions Chart Data`)
+export const loadTransactionsChartDataSucceeded = createAction(`[${featureName}] Load Transactions Chart Data Succeeded`, props<{ transactionsChartData: TransactionChartItem[] }>())
+export const loadTransactionsChartDataFailed = createAction(`[${featureName}] Load Transactions Chart Data Failed`, props<{ error: any }>())
 export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
 export const loadTransactionsCountLastXdSucceeded = createAction(
   `[${featureName}] Load Transactions Count Last 30d Succeeded`,

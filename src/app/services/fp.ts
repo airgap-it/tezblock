@@ -13,6 +13,7 @@ export function last<T>(array: T[]) {
 export function get<T>(accessor: (_entity: T) => any) {
   return (entity: T) => (entity ? accessor(entity) : undefined)
 }
+
 export function groupBy<T>(key: string): (array: T[]) =>  { [key: string]: T[] } {
   return function(array: T[]): { [key: string]: T[] } {
     return array.reduce((accumulator, currentItem) => {
