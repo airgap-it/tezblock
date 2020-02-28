@@ -6,7 +6,7 @@
 //   beforeEach(() => TestBed.configureTestingModule({}))
 
 //   it('should be created', () => {
-//     const service: AccountSingleService = TestBed.get(AccountSingleService)
+//     const service: AccountSingleService = TestBed.inject(AccountSingleService)
 //     expect(service).toBeTruthy()
 //   })
 // })

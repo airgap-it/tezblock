@@ -13,7 +13,7 @@ describe('CryptoPricesService', () => {
       .catch(console.error)
   })
   it('should be created', () => {
-    const service: CryptoPricesService = TestBed.get(CryptoPricesService)
+    const service: CryptoPricesService = TestBed.inject(CryptoPricesService)
     expect(service).toBeTruthy()
   })
 })

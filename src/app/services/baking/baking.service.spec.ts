@@ -14,7 +14,7 @@ describe('BakerRatingService', () => {
   })
 
   it('should be created', () => {
-    const service: BakingService = TestBed.get(BakingService)
+    const service: BakingService = TestBed.inject(BakingService)
     expect(service).toBeTruthy()
   })
 })
