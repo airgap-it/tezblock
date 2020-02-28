@@ -13,7 +13,6 @@ import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { PeriodKind, MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
-import { numberOfBlocksToSeconds } from '@tezblock/services/cycle/cycle.service'
 
 const getPeriodTimespanQuery = (period: number, direction: Direction): Body => ({
   fields: ['timestamp'],

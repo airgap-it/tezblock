@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, combineLatest } from 'rxjs'
-import { filter } from 'rxjs/operators'
+import { filter, map } from 'rxjs/operators'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
 
@@ -28,7 +28,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   proposal$: Observable<ProposalDto>
   votes$: Observable<Transaction[]>
   loading$: Observable<boolean>
-  periodsTimespans$: Observable<PeriodTimespan[]>
+  periodTimespan$: Observable<PeriodTimespan>
   tabs: Tab[]
   now: number = moment.utc().valueOf()
 
@@ -77,7 +77,18 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
     this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
     this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
-    this.periodsTimespans$ = this.store$.select(state => state.proposalDetails.periodsTimespans)
+    this.periodTimespan$ = combineLatest(
+      this.store$.select(state => state.proposalDetails.periodKind),
+      this.store$.select(state => state.proposalDetails.periodsTimespans)
+    ).pipe(
+      filter(([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans),
+      map(
+        ([periodKind, periodsTimespans]) =>
+          periodsTimespans[
+            [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
+          ]
+      )
+    )
   }
 
   copyToClipboard() {
