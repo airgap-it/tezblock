@@ -37,7 +37,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     },
     {
       name: 'Tx Hash',
-      field: 'operation_group_hash',
+      field: 'hash',
       template: Template.hash
     }
   ],
