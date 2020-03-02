@@ -1,5 +1,10 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs; let i = index; trackBy: trackByFn" [active]="tab.active" [disabled]="tab.count === 0" (selectTab)="onSelectTab(tab)">
+  <tab
+    *ngFor="let tab of tabs; let i = index; trackBy: trackByFn"
+    [active]="tab.active"
+    [disabled]="tab.count === 0 && !disableTabLogic"
+    (selectTab)="onSelectTab(tab)"
+  >
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -20,6 +25,10 @@
       </span>
     </h6>
   </tab>
+
+  <div class="pl-0 pl-md-3 py-3">
+    <ng-content></ng-content>
+  </div>
 
   <tezblock-table
     [columns]="selectedTab.columns"
