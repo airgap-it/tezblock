@@ -8,6 +8,7 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { getTokenContracts } from '@tezblock/domain/contract'
+import { first } from '@tezblock/services/fp'
 
 @Injectable()
 export class DashboarEffects {
@@ -29,6 +30,19 @@ export class DashboarEffects {
             })
           ),
           catchError(error => of(actions.loadContractsFailed({ error })))
+        )
+      })
+    )
+  )
+
+  loadLatestProposal$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadLatestProposal),
+      switchMap(() => {
+        return this.apiService.getProposals(1).pipe(
+          map(first),
+          map(proposal => actions.loadLatestProposalSucceeded({ proposal })),
+          catchError(error => of(actions.loadLatestProposalFailed({ error })))
         )
       })
     )

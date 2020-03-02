@@ -51,6 +51,7 @@ export class DashboardComponent {
     private readonly store$: Store<fromRoot.State>
   ) {
     this.store$.dispatch(actions.loadContracts())
+    this.store$.dispatch(actions.loadLatestProposal())
 
     this.contracts$ = this.store$.select(state => state.dashboard.contracts)
     this.bakers = Object.keys(accounts)
