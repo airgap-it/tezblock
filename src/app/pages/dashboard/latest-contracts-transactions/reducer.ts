@@ -1,13 +1,14 @@
 import { createReducer, on } from '@ngrx/store'
 
 import * as actions from './actions'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
   transferOperations: boolean
 }
 
 export interface State {
-  transferOperations: actions.CustomContractOperation[]
+  transferOperations: Transaction[]
   busy: Busy
 }
 

@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store'
 import { Router } from '@angular/router'
 
 import { TokenContract } from '@tezblock/domain/contract'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Observable } from 'rxjs'
@@ -28,7 +29,7 @@ export class LatestContractsTransactionsComponent implements OnInit {
   }
   private _contracts: TokenContract[]
 
-  transferOperations$: Observable<actions.CustomContractOperation[]>
+  transferOperations$: Observable<Transaction[]>
 
   constructor(private readonly router: Router, private readonly store$: Store<fromRoot.State>) {}
 
