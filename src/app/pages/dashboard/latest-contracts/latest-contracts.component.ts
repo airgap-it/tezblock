@@ -1,27 +1,22 @@
-import { Component, OnInit } from '@angular/core'
-import { Store } from '@ngrx/store'
-import { Observable } from 'rxjs'
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Router } from '@angular/router'
 
-import * as fromRoot from '@tezblock/reducers'
-import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
 
 @Component({
   selector: 'app-latest-contracts',
   templateUrl: './latest-contracts.component.html',
-  styleUrls: ['./latest-contracts.component.scss']
+  styleUrls: ['./latest-contracts.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LatestContractsComponent implements OnInit {
 
-  contracts$: Observable<TokenContract[]>
+  @Input()
+  contracts: TokenContract[]
 
-  constructor(private readonly router: Router, private readonly store$: Store<fromRoot.State>) {
-    this.store$.dispatch(actions.loadContracts())
-  }
+  constructor(private readonly router: Router) {}
 
   ngOnInit() {
-    this.contracts$ = this.store$.select(state => state.dashboardLatestContracts.contracts)
   }
 
   inspectDetail(contractHash: string) {
