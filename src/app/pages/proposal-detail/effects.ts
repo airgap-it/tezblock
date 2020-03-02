@@ -33,25 +33,6 @@ const getPeriodTimespanQuery = (period: number, direction: Direction): Body => (
   limit: 1
 })
 
-const getStartOfPeriod = (
-  period: number,
-  currentVotingPeriod: number,
-  currentVotingeriodPosition: number,
-  blocksPerVotingPeriod: number
-): number => {
-  const remainingBlocks = blocksPerVotingPeriod - (currentVotingeriodPosition + 1)
-  return null
-}
-
-const getEndOfPeriod = (
-  period: number,
-  currentVotingPeriod: number,
-  currentVotingeriodPosition: number,
-  blocksPerVotingPeriod: number
-): number => {
-  return null
-}
-
 @Injectable()
 export class ProposalDetailEffects {
   getProposal$ = createEffect(() =>
@@ -119,7 +100,6 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(this.store$.select(state => state.proposalDetails.metaVotingPeriods)),
-      filter(([{ periodKind }, metaVotingPeriods]) => !isEmptyPeriodKind(periodKind, metaVotingPeriods)), // TODO: how about refresh, checking new data ?
       map(([{ periodKind }, metaVotingPeriods]) =>
         get<MetaVotingPeriod>(period => period.value)(metaVotingPeriods.find(period => period.periodKind === periodKind))
       ),
@@ -176,7 +156,6 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.proposalDetails.metaVotingPeriods)
       ),
       filter(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) => periodKind === PeriodKind.Proposal),
-      filter(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) => !isEmptyPeriodKind(periodKind, metaVotingPeriods)), // TODO: how about refresh, checking new data ?
       switchMap(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) =>
         this.baseService
           .post<Transaction[]>('operations', {
@@ -212,15 +191,6 @@ export class ProposalDetailEffects {
             )
           )
       )
-    )
-  )
-
-  loadEmptyVotes$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadVotes),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.metaVotingPeriods)),
-      filter(([{ periodKind }, metaVotingPeriods]) => isEmptyPeriodKind(periodKind, metaVotingPeriods)), // TODO: how about refresh, checking new data ?
-      map(() => actions.loadVotesSucceeded({ votes: [] }))
     )
   )
 
