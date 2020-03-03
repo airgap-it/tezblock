@@ -13,6 +13,7 @@ import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { PeriodKind, MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
+import { meanBlockTime } from '@tezblock/services/cycle/cycle.service'
 
 const getPeriodTimespanQuery = (period: number, direction: Direction): Body => ({
   fields: ['timestamp'],
@@ -308,7 +309,7 @@ export class ProposalDetailEffects {
               period.value < currentVotingPeriod
                 ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
                     map(first),
-                    map(get(item => item.timestamp))
+                    map(get(item => item.timestamp ? item.timestamp + (meanBlockTime/* seconds */ * 1000) : item.timestamp))
                   )
                 : of(null)
             )

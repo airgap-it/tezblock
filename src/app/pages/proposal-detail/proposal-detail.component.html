@@ -79,16 +79,16 @@
             (loadMore)="onLoadMore()"
           >
             <ng-container *ngIf="periodTimespan$ | async as periodTimespan">
-              <ng-container *ngIf="periodTimespan.end < now">
+              <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
                 <strong>
                   Voting period has ended, period was between {{ periodTimespan.start | amDateFormat: 'LL' }} and
                   {{ periodTimespan.end | amDateFormat: 'LL' }}
                 </strong>
               </ng-container>
-              <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now">
+              <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
                 <strong>The current period ends on {{ periodTimespan.end | amDateFormat: 'LL' }}</strong>
               </ng-container>
-              <ng-container *ngIf="periodTimespan.start > now">
+              <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
                 Voting period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}
               </ng-container>
             </ng-container>
