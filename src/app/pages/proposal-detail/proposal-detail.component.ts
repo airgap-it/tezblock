@@ -57,7 +57,6 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.loadProposal({ id }))
         this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
-        this.store$.dispatch(actions.loadPeriodInfos())
       }),
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(

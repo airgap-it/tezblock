@@ -33,17 +33,10 @@ export const loadVotesTotalSucceeded = createAction(
 )
 export const loadVotesTotalFailed = createAction(`[${featureName}] Load Votes Total Failed`, props<{ error: any }>())
 
-export const loadPeriodInfos = createAction(`[${featureName}] Load Period Infos`)
-export const loadPeriodInfosSucceeded = createAction(
-  `[${featureName}] Load Period Infos Succeeded`,
-  props<{ currentVotingPeriod: number; currentVotingeriodPosition: number, blocksPerVotingPeriod: number }>()
-)
-export const loadPeriodInfosFailed = createAction(`[${featureName}] Load Period Infos Failed`, props<{ error: any }>())
-
 export const loadPeriodsTimespans = createAction(`[${featureName}] Load Periods Timespans`)
 export const loadPeriodsTimespansSucceeded = createAction(
   `[${featureName}] Load Periods Timespans Succeeded`,
-  props<{ periodsTimespans: PeriodTimespan[] }>()
+  props<{ periodsTimespans: PeriodTimespan[], blocksPerVotingPeriod: number }>()
 )
 export const loadPeriodsTimespansFailed = createAction(`[${featureName}] Load Periods Timespans Failed`, props<{ error: any }>())
 

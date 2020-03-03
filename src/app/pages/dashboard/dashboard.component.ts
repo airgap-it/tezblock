@@ -1,8 +1,9 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable, Subscription } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { $enum } from "ts-enum-util"
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
@@ -13,6 +14,8 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
+import { squareBrackets } from '@tezblock/domain/pattern'
+import { PeriodTimespan, PeriodKind } from '@tezblock/domain/vote'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -41,6 +44,10 @@ export class DashboardComponent {
   priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   priceChartLabels$: Observable<string[]>
   contracts$: Observable<TokenContract[]>
+  proposalHash$: Observable<string>
+  currentPeriodTimespan$: Observable<PeriodTimespan>
+  currentPeriodKind$: Observable<string>
+  currentPeriodIndex$: Observable<number>
 
   constructor(
     private readonly blocksService: BlockService,
@@ -79,6 +86,19 @@ export class DashboardComponent {
     )
     this.priceChartLabels$ = this.cryptoPricesService.historicData$.pipe(
       map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
+    )
+    this.proposalHash$ = this.store$.select(state => state.dashboard.proposal).pipe(
+      filter(proposal => !!proposal),
+      map(proposal => proposal.proposal.replace(squareBrackets, ''))
+    )
+    this.currentPeriodTimespan$ = this.store$.select(state => state.dashboard.currentPeriodTimespan)
+    this.currentPeriodKind$ = this.store$.select(state => state.app.latestBlock).pipe(
+      filter(latestBlock => !!latestBlock),
+      map(latestBlock => $enum(PeriodKind).getKeyOrThrow(latestBlock.period_kind))
+    )
+    this.currentPeriodIndex$ = this.store$.select(state => state.app.latestBlock).pipe(
+      filter(latestBlock => !!latestBlock),
+      map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
     )
   }
 

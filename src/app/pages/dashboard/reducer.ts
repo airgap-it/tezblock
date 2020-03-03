@@ -3,24 +3,30 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
+import { first } from '@tezblock/services/fp'
 
 interface Busy {
     contracts: boolean
     proposal: boolean
+    currentPeriodTimespan: boolean
 }
 
 export interface State {
   contracts: TokenContract[],
   proposal: ProposalListDto,
+  currentPeriodTimespan: PeriodTimespan,
   busy: Busy
 }
 
 const initialState: State = {
   contracts: undefined,
   proposal: undefined,
+  currentPeriodTimespan: undefined,
   busy: {
       contracts: false,
-      proposal: false
+      proposal: false,
+      currentPeriodTimespan: false
   }
 }
 
@@ -71,6 +77,30 @@ export const reducer = createReducer(
       proposal: false
     }
   })),
+
+  on(actions.loadCurrentPeriodTimespan, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      currentPeriodTimespan: true
+    }
+  })),
+  on(actions.loadCurrentPeriodTimespanSucceeded, (state, { currentPeriodTimespan, blocksPerVotingPeriod }) => ({
+    ...state,
+    currentPeriodTimespan: first(fillMissingPeriodTimespans([currentPeriodTimespan], blocksPerVotingPeriod)),
+    busy: {
+      ...state.busy,
+      currentPeriodTimespan: false
+    }
+  })),
+  on(actions.loadCurrentPeriodTimespanFailed, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      currentPeriodTimespan: false
+    }
+  })),
+
   on(actions.reset, () => initialState)
 )
 
