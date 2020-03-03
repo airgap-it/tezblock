@@ -26,33 +26,56 @@
       <div class="container p-0">
         <div class="row justify-content-lg-between">
           <div class="col-md-6 col-lg-4">
-            <h5 class="card-title__secondary mb-3 ">
-              Current Cycle
-            </h5>
-            <div class="container p-0">
-              <div class="row mb-2">
-                <div class="col">
-                  <p class="m-0">Cycle {{ currentCycle$ | async }}</p>
+            <div class="mb-4">
+              <h5 class="card-title__secondary mb-3 ">
+                Current Cycle
+              </h5>
+              <div class="container p-0">
+                <div class="row mb-2">
+                  <div class="col">
+                    <p class="m-0">Cycle {{ currentCycle$ | async }}</p>
+                  </div>
+                  <div class="col">
+                    <ng-container *ngIf="cycleStartingBlockLevel$">
+                      <p class="text-right text-secondary m-0 ">
+                        {{ cycleStartingBlockLevel$ | async }} -
+                        {{ cycleEndingBlockLevel$ | async }}
+                      </p>
+                    </ng-container>
+                  </div>
                 </div>
-                <div class="col">
-                  <ng-container *ngIf="cycleStartingBlockLevel$">
-                    <p class="text-right text-secondary m-0 ">
-                      {{ cycleStartingBlockLevel$ | async }} -
-                      {{ cycleEndingBlockLevel$ | async }}
-                    </p>
-                  </ng-container>
+              </div>
+              <progressbar [value]="cycleProgress$ | async" style="height:6px"></progressbar>
+              <div class="mt-2 container">
+                <div class="row">
+                  <div class="col p-0">
+                    <p class="m-0">{{ cycleProgress$ | async }}%</p>
+                  </div>
+                  <div class="col p-0">
+                    <div class="float-right">
+                      <p class="m-0">{{ remainingTime$ | async }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <progressbar [value]="cycleProgress$ | async" style="height:6px"></progressbar>
+            <h5 class="card-title__secondary mb-3">
+              Governance
+            </h5>
+            <!--TODO: {{currenPeriod}} {{currentPeriodEndTime}} -->
+            <p>Proposal Period until March 5</p>
+            <!--TODO: percentage of current governance process, same as number of current period in percentage -->
+            <progressbar [value]="25" style="height:6px" class="my-2"></progressbar>
             <div class="mt-2 container">
               <div class="row">
                 <div class="col p-0">
-                  <p class="m-0">{{ cycleProgress$ | async }}%</p>
+                  <!--TODO: Protocol Hash with alias -->
+                  <button type="button" class="btn btn-link p-0" ng-href="#here">Carthage 2.0</button>
                 </div>
                 <div class="col p-0">
                   <div class="float-right">
-                    <p class="m-0">{{ remainingTime$ | async }}</p>
+                    <!--TODO: number of currenet period -->
+                    <p class="m-0">1 of 4</p>
                   </div>
                 </div>
               </div>
