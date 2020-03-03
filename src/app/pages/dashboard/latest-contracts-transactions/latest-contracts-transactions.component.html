@@ -1,0 +1,29 @@
+<div *ngFor="let operation of transferOperations$ | async">
+  <div class="container">
+    <div class="row">
+      <div class="col-6 col-sm-3 pl-0 order-2 order-sm-0">
+        <div class="d-block pt-2 pt-sm-0">
+          <app-hash-cell [data]="operation.operation_group_hash"></app-hash-cell>
+          <p class="m-0 small text-secondary" tooltip="{{ operation.timestamp / 1000 | amFromUnix }}">
+            {{ operation.timestamp | amTimeAgo }}
+          </p>
+        </div>
+      </div>
+      <div class="col-2 col-sm-1 d-flex align-items-center order-0 order-sm-2">
+        <fa-icon [icon]="'levelDownAlt' | iconPipe" class="ml-1 text-primary-light"></fa-icon>
+      </div>
+      <div class="col-10 col-sm-5 pl-0 order-1 order-sm-3">
+        <div class="d-block ">
+          <div class="mb-1">
+            <address-item [address]="operation.source"></address-item>
+          </div>
+          <address-item [address]="operation.destination"></address-item>
+        </div>
+      </div>
+      <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
+        <p class="m-0">{{ operation.amount }} {{ operation.symbol }}</p>
+      </div>
+    </div>
+    <hr />
+  </div>
+</div>

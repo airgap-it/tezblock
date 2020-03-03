@@ -6,12 +6,11 @@ import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { getTokenContracts } from '@tezblock/domain/contract'
 
 @Injectable()
-export class DashboardLatestContractsEffects {
+export class DashboarEffects {
 
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(

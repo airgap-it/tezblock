@@ -2,15 +2,11 @@ import { createReducer, on } from '@ngrx/store'
 import { TezosTransactionCursor, IAirGapTransaction } from 'airgap-coin-lib'
 
 import * as actions from './actions'
-import { TokenContract, ContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 
-const airGapTransactionToContractOperation = (airGapTransaction: IAirGapTransaction): ContractOperation => ({
-  ...airGapTransaction,
-  singleFrom: first(airGapTransaction.from),
-  singleTo: first(airGapTransaction.to)
-})
+
 
 export interface State {
   address: string

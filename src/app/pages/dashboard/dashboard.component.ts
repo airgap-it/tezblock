@@ -2,6 +2,7 @@ import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable, Subscription } from 'rxjs'
 import { map } from 'rxjs/operators'
+import { Store } from '@ngrx/store'
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
@@ -9,6 +10,9 @@ import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/
 import { CycleService } from '../../services/cycle/cycle.service'
 import { TransactionService } from '../../services/transaction/transaction.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './actions'
+import { TokenContract } from '@tezblock/domain/contract'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -18,32 +22,37 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
-  public blocks$: Observable<Object>
-  public transactions$: Observable<Object>
-  public currentCycle$: Observable<number>
-  public cycleProgress$: Observable<number>
-  public cycleStartingBlockLevel$: Observable<number>
-  public cycleEndingBlockLevel$: Observable<number>
-  public remainingTime$: Observable<string>
-  public subscription: Subscription
+  blocks$: Observable<Object>
+  transactions$: Observable<Object>
+  currentCycle$: Observable<number>
+  cycleProgress$: Observable<number>
+  cycleStartingBlockLevel$: Observable<number>
+  cycleEndingBlockLevel$: Observable<number>
+  remainingTime$: Observable<string>
+  subscription: Subscription
 
-  public fiatInfo$: Observable<CurrencyInfo>
-  public cryptoInfo$: Observable<CurrencyInfo>
-  public percentage$: Observable<number>
-  public historicData$: Observable<MarketDataSample[]>
+  fiatInfo$: Observable<CurrencyInfo>
+  cryptoInfo$: Observable<CurrencyInfo>
+  percentage$: Observable<number>
+  historicData$: Observable<MarketDataSample[]>
 
-  public bakers: string[]
+  bakers: string[]
 
-  public priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
-  public priceChartLabels$: Observable<string[]>
+  priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  priceChartLabels$: Observable<string[]>
+  contracts$: Observable<TokenContract[]>
 
   constructor(
     private readonly blocksService: BlockService,
     private readonly transactionService: TransactionService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly cycleService: CycleService,
-    private readonly chainNetworkService: ChainNetworkService
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly store$: Store<fromRoot.State>
   ) {
+    this.store$.dispatch(actions.loadContracts())
+
+    this.contracts$ = this.store$.select(state => state.dashboard.contracts)
     this.bakers = Object.keys(accounts)
     this.blocks$ = this.blocksService.list$
 
@@ -72,13 +81,13 @@ export class DashboardComponent {
     )
   }
 
-  public ngOnDestroy() {
+  ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe()
     }
   }
 
-  public isMainnet() {
+  isMainnet() {
     const selectedNetwork = this.chainNetworkService.getNetwork()
     return selectedNetwork === TezosNetwork.MAINNET
   }
