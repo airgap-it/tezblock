@@ -136,7 +136,7 @@ export class AccountDetailEffects {
     )
   )
 
-  laodExtraBalance$ = createEffect(() =>
+  loadExtraBalance$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExtraBalance),
       withLatestFrom(
