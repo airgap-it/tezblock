@@ -1440,12 +1440,14 @@ export class ApiService {
           for (let day = 29; day >= 0; day--) {
             const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
 
-            if (balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate())) {
+            const foundBalance = balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate())
+
+            if (foundBalance) {
               dateArray.push({
-                balance: balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate()).balance,
+                balance: foundBalance.balance,
                 asof: new Date().setDate(new Date().getDate() - day)
               })
-              previousBalance = balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate()).balance
+              previousBalance = foundBalance.balance
             } else {
               if (!previousBalance) {
                 dateArray.push({
