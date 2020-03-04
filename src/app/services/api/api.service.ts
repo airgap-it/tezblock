@@ -1449,17 +1449,10 @@ export class ApiService {
               })
               previousBalance = foundBalance.balance
             } else {
-              if (!previousBalance) {
-                dateArray.push({
-                  balance: null,
-                  asof: new Date().setDate(new Date().getDate() - day)
-                })
-              } else {
-                dateArray.push({
-                  balance: previousBalance,
-                  asof: new Date().setDate(new Date().getDate() - day)
-                })
-              }
+              dateArray.push({
+                balance: previousBalance ? previousBalance : null,
+                asof: new Date().setDate(new Date().getDate() - day)
+              })
             }
           }
           return dateArray
@@ -1479,11 +1472,7 @@ export class ApiService {
       const current = new Date(value.asof)
       const previous = new Date(array[index - 1].asof)
 
-      if (current.getDay() !== previous.getDay()) {
-        return true
-      }
-
-      return false
+      return current.getDay() !== previous.getDay()
     }
 
     return this.http
