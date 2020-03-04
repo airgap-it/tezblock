@@ -71,16 +71,10 @@
           <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in this transaction.'"></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <ng-container *ngIf="amount$ | async as amount">
+      <ng-container *ngIf="amount$ | async as amount; else loadingTemplate">
           <div class="col col-md-9">
-            <ng-container *ngIf="isMainnet">
-              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                <amount-cell [data]="latestTransaction"></amount-cell>
-              </ng-container>
-            </ng-container>
+            <amount-cell [data]="{ amount: amount }" [options]="{ showFiatValue: isMainnet }"></amount-cell>
           </div>
-        </ng-container>
       </ng-container>
       <ng-template #hideValue>
         <div class="col col-md-9">
