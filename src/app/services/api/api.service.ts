@@ -1392,7 +1392,7 @@ export class ApiService {
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
 
-    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
       if (index === 0) {
         return true
       }
@@ -1422,7 +1422,7 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(balances => balances.filter(lastItemOfTheDay)),
+        map(balances => balances.filter(isLastItemOfTheMonth)),
         map(balances =>
           balances.map(balance => ({
             ...balance,
@@ -1464,7 +1464,7 @@ export class ApiService {
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(new Date().getTime() - thirtyDaysInMilliseconds)
 
-    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
       if (index === 0) {
         return true
       }
@@ -1490,7 +1490,7 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(balances => balances.filter(lastItemOfTheDay)),
+        map(balances => balances.filter(isLastItemOfTheMonth)),
         map(balances =>
           balances.map(balance => ({
             ...balance,
