@@ -53,6 +53,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   tabs: Tab[]
+  forceIdenticon$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -123,6 +124,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
+    this.forceIdenticon$ = this.contract$.pipe(map(contract => !!contract && contract.id.startsWith('KT')))
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
