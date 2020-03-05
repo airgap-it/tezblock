@@ -5,6 +5,7 @@ const proposals: { [key: string]: { alias: string } } = require('../../assets/pr
 export interface ProposalListDto {
   count_operation_group_hash: string
   proposal: string
+  period: number
 }
 
 export interface ProposalDto {

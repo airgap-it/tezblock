@@ -1,9 +1,9 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable, Subscription } from 'rxjs'
-import { map, filter } from 'rxjs/operators'
+import { map, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
-import { $enum } from "ts-enum-util"
+import { $enum } from 'ts-enum-util'
 
 import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
@@ -87,19 +87,28 @@ export class DashboardComponent {
     this.priceChartLabels$ = this.cryptoPricesService.historicData$.pipe(
       map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
     )
-    this.proposalHash$ = this.store$.select(state => state.dashboard.proposal).pipe(
-      filter(proposal => !!proposal),
-      map(proposal => proposal.proposal.replace(squareBrackets, ''))
-    )
+    this.proposalHash$ = this.store$
+      .select(state => state.dashboard.proposal)
+      .pipe(
+        withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),
+        filter(([proposal, currentVotingPeriod]) => !!proposal && !!currentVotingPeriod),
+        map(([proposal, currentVotingPeriod]) =>
+          proposal.period === currentVotingPeriod ? proposal.proposal.replace(squareBrackets, '') : null
+        )
+      )
     this.currentPeriodTimespan$ = this.store$.select(state => state.dashboard.currentPeriodTimespan)
-    this.currentPeriodKind$ = this.store$.select(state => state.app.latestBlock).pipe(
-      filter(latestBlock => !!latestBlock),
-      map(latestBlock => $enum(PeriodKind).getKeyOrThrow(latestBlock.period_kind))
-    )
-    this.currentPeriodIndex$ = this.store$.select(state => state.app.latestBlock).pipe(
-      filter(latestBlock => !!latestBlock),
-      map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
-    )
+    this.currentPeriodKind$ = this.store$
+      .select(state => state.app.latestBlock)
+      .pipe(
+        filter(latestBlock => !!latestBlock),
+        map(latestBlock => $enum(PeriodKind).getKeyOrThrow(latestBlock.period_kind))
+      )
+    this.currentPeriodIndex$ = this.store$
+      .select(state => state.app.latestBlock)
+      .pipe(
+        filter(latestBlock => !!latestBlock),
+        map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
+      )
   }
 
   ngOnDestroy() {
