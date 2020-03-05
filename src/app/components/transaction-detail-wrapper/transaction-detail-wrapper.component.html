@@ -91,9 +91,9 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="totalFee !== undefined; else loadingTemplate">
+      <ng-container *ngIf="amountFromLatestTransactionFee$ | async as amountFromLatestTransactionFee; else loadingTemplate">
         <div class=" col-md-9">
-          <amount-cell [data]="{ amount: totalFee }"></amount-cell>
+          <amount-cell [data]="amountFromLatestTransactionFee"></amount-cell>
         </div>
       </ng-container>
     </div>

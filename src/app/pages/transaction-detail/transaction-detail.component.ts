@@ -38,7 +38,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   fiatCurrencyInfo$: Observable<CurrencyInfo>
   numberOfConfirmations$: Observable<number>
   totalAmount$: Observable<number>
-  totalFee$: Observable<number>
+  // totalFee$: Observable<number>
   transactionsLoading$: Observable<boolean>
   transactions$: Observable<Transaction[]>
   filteredTransactions$: Observable<Transaction[]>
@@ -66,7 +66,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.transactions$ = this.store$.select(state => state.transactionDetails.transactions).pipe(filter(negate(isNil)))
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.store$.select(state => state.transactionDetails.totalAmount)
-    this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
+    // this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))

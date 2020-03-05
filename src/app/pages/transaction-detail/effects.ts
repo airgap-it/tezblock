@@ -82,7 +82,7 @@ export class TransactionDetailEffects {
   onLoadTransactionsByHashLoadTotalAmountAndFee$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByHash),
-      switchMap(() => [actions.loadTransactionsTotalAmount(), actions.loadTransactionsTotalFee()])
+      switchMap(() => [actions.loadTransactionsTotalAmount()/*, actions.loadTransactionsTotalFee()*/])
     )
   )
 

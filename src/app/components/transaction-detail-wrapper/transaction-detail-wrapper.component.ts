@@ -39,8 +39,8 @@ export class TransactionDetailWrapperComponent implements OnInit {
   @Input()
   public totalAmount: number | undefined
 
-  @Input()
-  public totalFee: number | undefined
+  // @Input()
+  // public totalFee: number | undefined
 
   @Input()
   public loading$?: Observable<boolean>
