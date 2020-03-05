@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
+import { of, pipe } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { BaseService, Operation } from '@tezblock/services/base.service'
+import { first, get } from '@tezblock/services/fp'
 
 import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
@@ -77,9 +79,96 @@ export class TransactionDetailEffects {
     )
   )
 
+  onLoadTransactionsByHashLoadTotalAmountAndFee$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByHash),
+      switchMap(() => [actions.loadTransactionsTotalAmount(), actions.loadTransactionsTotalFee()])
+    )
+  )
+
+  loadTransactionsTotalAmount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsTotalAmount),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
+      switchMap(([action, address]) =>
+        this.baseService
+          .post<any[]>('operations', {
+            fields: ['amount'],
+            predicates: [
+              {
+                field: 'operation_group_hash',
+                operation: Operation.eq,
+                set: [address],
+                inverse: false
+              },
+              {
+                field: 'kind',
+                operation: Operation.eq,
+                set: ['transaction']
+              }
+            ],
+            aggregation: [
+              {
+                field: 'amount',
+                function: 'sum'
+              }
+            ]
+          })
+          .pipe(
+            map(
+              pipe(
+                first,
+                get<any>(item => parseInt(item.sum_amount))
+              )
+            ),
+            map(totalAmount => actions.loadTransactionsTotalAmountSucceeded({ totalAmount })),
+            catchError(error => of(actions.loadTransactionsTotalAmountFailed({ error })))
+          )
+      )
+    )
+  )
+
+  loadTransactionsTotalFee$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsTotalFee),
+      withLatestFrom(this.store$.select(state => state.transactionDetails.transactionHash)),
+      switchMap(([action, address]) =>
+        this.baseService
+          .post<any[]>('operations', {
+            fields: ['fee'],
+            predicates: [
+              {
+                field: 'operation_group_hash',
+                operation: Operation.eq,
+                set: [address],
+                inverse: false
+              }
+            ],
+            aggregation: [
+              {
+                field: 'fee',
+                function: 'sum'
+              }
+            ]
+          })
+          .pipe(
+            map(
+              pipe(
+                first,
+                get<any>(item => parseInt(item.sum_fee))
+              )
+            ),
+            map(totalFee => actions.loadTransactionsTotalFeeSucceeded({ totalFee })),
+            catchError(error => of(actions.loadTransactionsTotalFeeFailed({ error })))
+          )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
+    private readonly baseService: BaseService,
     private readonly blockService: NewBlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
