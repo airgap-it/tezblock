@@ -5,7 +5,7 @@
         <transaction-detail-wrapper
           [latestTransaction$]="latestTx$"
           [blockConfirmations$]="numberOfConfirmations$"
-          [amount$]="totalAmount$"
+          [totalAmount]="totalAmount$ | async"
           [fiatInfo$]="fiatCurrencyInfo$"
           [isMainnet]="isMainnet"
         ></transaction-detail-wrapper>
