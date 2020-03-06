@@ -6,7 +6,7 @@ describe('CacheService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));
 
   it('should be created', () => {
-    const service: CacheService = TestBed.get(CacheService);
+    const service: CacheService = TestBed.inject(CacheService);
     expect(service).toBeTruthy();
   });
 });
