@@ -13,7 +13,7 @@ describe('ChartDataService', () => {
   })
 
   it('should be created', () => {
-    const service: ChartDataService = TestBed.get(ChartDataService)
+    const service: ChartDataService = TestBed.inject(ChartDataService)
     expect(service).toBeTruthy()
   })
 })

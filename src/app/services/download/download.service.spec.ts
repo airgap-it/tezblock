@@ -7,7 +7,7 @@
 //   beforeEach(() => TestBed.configureTestingModule({}));
 
 //   it('should be created', () => {
-//     const service: DownloadService = TestBed.get(DownloadService);
+//     const service: DownloadService = TestBed.inject(DownloadService);
 //     expect(service).toBeTruthy();
 //   });
 // });

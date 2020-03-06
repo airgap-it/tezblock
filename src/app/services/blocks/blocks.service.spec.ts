@@ -16,7 +16,7 @@ describe('BlocksService', () => {
   })
 
   it('should be created', () => {
-    const service: BlockService = TestBed.get(BlockService)
+    const service: BlockService = TestBed.inject(BlockService)
     expect(service).toBeTruthy()
   })
 })

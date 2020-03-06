@@ -1,4 +1,13 @@
 {
+  "tz1ZcTRk5uxD86EFEn1vvNffWWqJy7q5eVhc": {
+    "alias": "ATEZA",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1TqU5hwh6CtC8Ps5GYBi7YyawvtKLNCbvQ"
+  },
+  "tz1TqU5hwh6CtC8Ps5GYBi7YyawvtKLNCbvQ": {
+    "alias": "ATEZA Payouts",
+    "hasLogo": true
+  },
   "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j": {
     "alias": "XTZ Master",
     "hasLogo": true,
@@ -334,6 +343,11 @@
   },
   "tz1WCd2jm4uSt4vntk4vSuUWoZQGhLcDuR9q": {
     "alias": "Happy Tezos",
+    "hasLogo": true,
+    "hasPayoutAddress": "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW"
+  },
+  "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW": {
+    "alias": "Happy Tezos Payout",
     "hasLogo": true
   },
   "tz1WJpSCYdQE9merfftanA8eFsqUPTpwAt8a": {
@@ -773,6 +787,10 @@
   },
   "tz1gfArv665EUkSg2ojMBzcbfwuPxAvqPvjo": {
     "alias": "Kraken",
+    "hasLogo": true
+  },
+  "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
+    "alias": "Staker",
     "hasLogo": true
   }
 }

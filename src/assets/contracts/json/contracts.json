@@ -1,1 +1,22 @@
-{}
+{
+  "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
+    "symbol": "STKR",
+    "name": "Staker",
+    "website": "http://www.stakerdao.com/",
+    "description": "The Staker token is the governance token for the StakerDAO ecosystem.  STKR holders participate in StakerDAO decision making and elect the Staker Council.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "http://www.stakerdao.com/"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/stakerdao"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/stakerdao"
+      }
+    ]
+  }
+}

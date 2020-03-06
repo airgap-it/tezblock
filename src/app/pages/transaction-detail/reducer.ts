@@ -19,6 +19,9 @@ export interface State {
   pageSize: number // transactions
   busy: Busy
   orderBy: OrderBy
+  totalAmount: number
+  totalFee: number
+
 }
 
 export interface Sorting {
@@ -35,7 +38,9 @@ const initialState: State = {
   busy: {
     transactions: false
   },
-  orderBy: sort('block_level', 'desc')
+  orderBy: sort('block_level', 'desc'),
+  totalAmount: undefined,
+  totalFee: undefined
 }
 
 export const reducer = createReducer(
@@ -79,6 +84,22 @@ export const reducer = createReducer(
   on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
     orderBy
+  })),
+  on(actions.loadTransactionsTotalAmountSucceeded, (state, { totalAmount }) => ({
+    ...state,
+    totalAmount
+  })),
+  on(actions.loadTransactionsTotalAmountFailed, state => ({
+    ...state,
+    totalAmount: null
+  })),
+  on(actions.loadTransactionsTotalFeeSucceeded, (state, { totalFee }) => ({
+    ...state,
+    totalFee
+  })),
+  on(actions.loadTransactionsTotalFeeFailed, state => ({
+    ...state,
+    totalFee: null
   })),
   on(actions.reset, () => initialState)
 )

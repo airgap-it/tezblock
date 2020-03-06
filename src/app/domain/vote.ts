@@ -11,7 +11,7 @@ export interface VotingPeriod {
 export enum PeriodKind {
   Proposal = 'proposal',
   Exploration = 'testing_vote',
-  Testing = 'none',
+  Testing = 'testing',
   Promotion = 'promotion_vote'
 }
 
@@ -19,4 +19,9 @@ export interface MetaVotingPeriod {
   periodKind: PeriodKind
   value?: number
   count?: number
+}
+
+export interface PeriodTimespan {
+  start: number
+  end: number
 }

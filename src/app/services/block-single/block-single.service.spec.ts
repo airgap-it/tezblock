@@ -12,7 +12,7 @@ describe('BlockSingleService', () => {
       .catch(console.error)
   })
   it('should be created', () => {
-    const service: BlockSingleService = TestBed.get(BlockSingleService)
+    const service: BlockSingleService = TestBed.inject(BlockSingleService)
     expect(service).toBeTruthy()
   })
 })
