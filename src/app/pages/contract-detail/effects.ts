@@ -85,6 +85,26 @@ export class ContractDetailEffects {
     )
   )
 
+  onLoadContractLoadAccount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContract),
+      map(({ address }) => actions.loadAccount({ address }))
+    )
+  )
+
+  loadAccount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccount),
+      switchMap(({ address }) =>
+        this.apiService.getAccountById(address).pipe(
+          map(first),
+          map(account => actions.loadAccountSucceeded({ account })),
+          catchError(error => of(actions.loadAccountFailed({ error })))
+        )
+      )
+    )
+  )
+
   onContractGetOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContractSucceeded),
@@ -297,7 +317,7 @@ export class ContractDetailEffects {
       map(([{ orderBy }, currentTabKind]) =>
         // currentTabKind === actions.OperationTab.transfers
         //   ? actions.sortTransferOperations({ orderBy }) :
-          actions.sortOtherOperations({ orderBy })
+        actions.sortOtherOperations({ orderBy })
       )
     )
   )

@@ -1,14 +1,13 @@
 import { createReducer, on } from '@ngrx/store'
-import { TezosTransactionCursor, IAirGapTransaction } from 'airgap-coin-lib'
+import { TezosTransactionCursor } from 'airgap-coin-lib'
 
 import * as actions from './actions'
 import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
-import { first } from '@tezblock/services/fp'
-
-
+import { Account } from '@tezblock/interfaces/Account'
 
 export interface State {
+  account: Account
   address: string
   contract: TokenContract
   copyToClipboardState: string
@@ -19,6 +18,7 @@ export interface State {
 }
 
 const initialState: State = {
+  account: undefined,
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
@@ -161,6 +161,14 @@ export const reducer = createReducer(
   on(actions.changeOperationsTab, (state, { currentTabKind }) => ({
     ...state,
     currentTabKind
+  })),
+  on(actions.loadAccountSucceeded, (state, { account }) => ({
+    ...state,
+    account
+  })),
+  on(actions.loadAccountFailed, (state, { error }) => ({
+    ...state,
+    account: null
   })),
   on(actions.reset, () => initialState)
 )

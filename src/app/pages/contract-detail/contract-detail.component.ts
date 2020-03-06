@@ -18,6 +18,7 @@ import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Account } from '@tezblock/interfaces/Account'
 
 @Component({
   selector: 'app-contract-detail',
@@ -53,6 +54,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   tabs: Tab[]
+  manager$: Observable<string>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -122,6 +124,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       map(([transferOperations, pagination]) =>
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
+    )
+    this.manager$ = this.store$.select(state => state.contractDetails.account).pipe(
+      filter(negate(isNil)),
+      map((account: Account) => account.manager)
     )
 
     this.subscriptions.push(
