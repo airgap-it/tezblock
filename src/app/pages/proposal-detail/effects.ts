@@ -12,6 +12,7 @@ import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { PeriodKind } from '@tezblock/domain/vote'
+import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()
 export class ProposalDetailEffects {
@@ -20,7 +21,14 @@ export class ProposalDetailEffects {
       ofType(actions.loadProposal),
       switchMap(({ id }) =>
         this.apiService.getProposal(id).pipe(
-          map(proposal => actions.loadProposalSucceeded({ proposal })),
+          map(proposal => {
+            const match = proposals[id]
+
+            return actions.loadProposalSucceeded({ proposal: {
+              ...proposal,
+              discussionLink: match ? match.discussionLink : undefined
+            } })
+          }),
           catchError(error => of(actions.loadProposalFailed({ error })))
         )
       )
