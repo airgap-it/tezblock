@@ -37,7 +37,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({
+        data: { amount: item.fee, timestamp: item.timestamp },
+        options: { showFiatValue: true, maxDigits: 8 }
+      }),
       sortable: true
     },
     {
@@ -101,7 +104,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({
+        data: { amount: item.fee, timestamp: item.timestamp },
+        options: { showFiatValue: true, maxDigits: 8 }
+      }),
       sortable: true
     },
     {
@@ -158,7 +164,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({
+        data: { amount: item.fee, timestamp: item.timestamp },
+        options: { showFiatValue: true, maxDigits: 8 }
+      }),
       sortable: false
     },
     {
@@ -207,7 +216,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({
+        data: { amount: item.fee, timestamp: item.timestamp },
+        options: { showFiatValue: true, maxDigits: 8 }
+      }),
       sortable: true
     },
     {

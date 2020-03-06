@@ -1,6 +1,6 @@
 <span
   class="d-inline-block"
-  [innerHtml]="amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
+  [innerHtml]="amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: options.maxDigits || 6, fontSmall: true, fontColor: true } | safeHtml"
 ></span>
 {{ options?.symbol || 'ꜩ' }}
 <ng-container *ngIf="enableComparison; else noComparison">

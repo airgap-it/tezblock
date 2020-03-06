@@ -93,7 +93,7 @@
       </div>
       <ng-container *ngIf="amountFromLatestTransactionFee$ | async as amountFromLatestTransactionFee; else loadingTemplate">
         <div class=" col-md-9">
-          <amount-cell [data]="amountFromLatestTransactionFee"></amount-cell>
+          <amount-cell [data]="amountFromLatestTransactionFee" [options]="{ showFiatValue: true, maxDigits: 8 }"></amount-cell>
         </div>
       </ng-container>
     </div>
