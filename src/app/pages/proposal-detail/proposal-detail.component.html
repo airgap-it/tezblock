@@ -74,9 +74,29 @@
             [page]="'proposal'"
             [loading]="loading$ | async"
             [data]="votes$ | async"
+            [disableTabLogic]="true"
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
-          ></tabbed-table>
+          >
+            <ng-container *ngIf="periodTimespan$ | async as periodTimespan">
+              <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
+                <div class="pl-0 pl-md-3 py-3">
+                  <strong>
+                    Voting period has ended, period was between {{ periodTimespan.start | amDateFormat: 'LL' }} and
+                    {{ periodTimespan.end | amDateFormat: 'LL' }}
+                  </strong>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
+                <div class="pl-0 pl-md-3 py-3">
+                  <strong>The current period ends on {{ periodTimespan.end | amDateFormat: 'LL' }}</strong>
+                </div>
+              </ng-container>
+              <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
+                <div class="pl-0 pl-md-3 py-3">Voting period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}</div>
+              </ng-container>
+            </ng-container>
+          </tabbed-table>
         </div>
       </div>
     </div>
