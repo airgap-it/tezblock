@@ -72,9 +72,9 @@
         </p>
       </div>
       <ng-container *ngIf="totalAmount !== undefined; else loadingTemplate">
-          <div class="col col-md-9">
-            <amount-cell [data]="{ amount: totalAmount }" [options]="{ showFiatValue: isMainnet }"></amount-cell>
-          </div>
+        <div class="col col-md-9">
+          <amount-cell [data]="{ amount: totalAmount }" [options]="{ showFiatValue: isMainnet, maxDigits: 8 }"></amount-cell>
+        </div>
       </ng-container>
       <ng-template #hideValue>
         <div class="col col-md-9">

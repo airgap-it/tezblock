@@ -30,7 +30,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({
+        data: { amount: item.amount, timestamp: item.timestamp },
+        options: { showFiatValue: true, maxDigits: 8 }
+      }),
       sortable: true
     },
     {
