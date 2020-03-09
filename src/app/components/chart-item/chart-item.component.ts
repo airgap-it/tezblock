@@ -145,19 +145,20 @@ export class ChartItemComponent implements AfterViewInit {
       // we are using setTimeout() to defer this code to another Javascript Virtual Machine turn
       // https://blog.angular-university.io/angular-debugging/
       setTimeout(() => {
-        this.colors = [{
-          backgroundColor: gradientFill1,
-          borderColor: gradientStroke1,
-          pointBackgroundColor: gradientStroke1,
-          pointBorderColor: gradientStroke1,
-          pointHoverBackgroundColor: gradientStroke1,
-          pointHoverBorderColor: gradientStroke1,
-          hoverBackgroundColor: navyBlue,
-          hoverBorderColor: navyBlue,
-          borderWidth: this.colorOptions.borderWidth
-        }].concat(this.colorOptions.colors || [])
-      });
-      
+        this.colors = [
+          {
+            backgroundColor: gradientFill1,
+            borderColor: gradientStroke1,
+            pointBackgroundColor: gradientStroke1,
+            pointBorderColor: gradientStroke1,
+            pointHoverBackgroundColor: gradientStroke1,
+            pointHoverBorderColor: gradientStroke1,
+            hoverBackgroundColor: navyBlue,
+            hoverBorderColor: navyBlue,
+            borderWidth: this.colorOptions.borderWidth
+          }
+        ].concat(this.colorOptions.colors || [])
+      })
     }
   }
 }

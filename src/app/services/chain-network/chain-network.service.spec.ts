@@ -6,7 +6,7 @@
 //   beforeEach(() => TestBed.configureTestingModule({}))
 
 //   it('should be created', () => {
-//     const service: ChainNetworkService = TestBed.get(ChainNetworkService)
+//     const service: ChainNetworkService = TestBed.inject(ChainNetworkService)
 //     expect(service).toBeTruthy()
 //   })
 // })

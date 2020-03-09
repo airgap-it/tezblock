@@ -29,7 +29,10 @@ export const loadTransactionsByKindSucceeded = createAction(
 export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load Transactions By Kind Failed`, props<{ error: any }>())
 
 export const loadTransactionsCounts = createAction(`[${featureName}] Load Transactions Counts`)
-export const loadTransactionsCountsSucceeded = createAction(`[${featureName}] Load Transactions Counts Succeeded`, props<{ counts: Count[] }>())
+export const loadTransactionsCountsSucceeded = createAction(
+  `[${featureName}] Load Transactions Counts Succeeded`,
+  props<{ counts: Count[] }>()
+)
 export const loadTransactionsCountsFailed = createAction(`[${featureName}] Load Transactions Counts Failed`, props<{ error: any }>())
 
 export const loadAccount = createAction(`[${featureName}] Load Account`, props<{ address: string }>())
@@ -49,6 +52,10 @@ export const loadBalanceForLast30DaysSucceeded = createAction(
 )
 export const loadBalanceForLast30DaysFailed = createAction(`[${featureName}] Load Balance For Last 30 Days Failed`, props<{ error: any }>())
 
+export const loadExtraBalance = createAction(`[${featureName}] Load Extra Balance`, props<{ temporaryBalance: Balance[] }>())
+export const loadExtraBalanceSucceeded = createAction(`[${featureName}] Load Extra Balance Succeeded`, props<{ extraBalance: Balance[] }>())
+export const loadExtraBalanceFailed = createAction(`[${featureName}] Load Extra Balance Failed`, props<{ error: any }>())
+
 export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`)
 export const loadBakingBadRatingsSucceeded = createAction(
   `[${featureName}] Load Baking Bad Ratings Succeeded`,
@@ -66,10 +73,7 @@ export const loadTezosBakerRatingSucceeded = createAction(
 )
 export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Tezos Baker Rating Failed`, props<{ error: any }>())
 
-export const sortTransactionsByKind = createAction(
-  `[${featureName}] Sort Transactions`,
-  props<{ orderBy: OrderBy }>()
-)
+export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

@@ -109,6 +109,7 @@ export interface State {
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
   orderBy: OrderBy
+  temporaryBalance: Balance[]
 }
 
 const initialState: State = {
@@ -128,7 +129,8 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  orderBy: sort('block_level', 'desc')
+  orderBy: sort('block_level', 'desc'),
+  temporaryBalance: undefined
 }
 
 export const reducer = createReducer(
@@ -209,6 +211,15 @@ export const reducer = createReducer(
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
     balanceFromLast30Days: ensure30Days(balanceFromLast30Days)
+  })),
+  on(actions.loadExtraBalance, (state, { temporaryBalance }) => ({
+    ...state,
+    temporaryBalance: temporaryBalance
+  })),
+  on(actions.loadExtraBalanceSucceeded, (state, { extraBalance }) => ({
+    ...state,
+    balanceFromLast30Days: ensure30Days(extraBalance),
+    temporaryBalance: undefined
   })),
   on(actions.loadBakingBadRatingsSucceeded, (state, { response }) => ({
     ...state,

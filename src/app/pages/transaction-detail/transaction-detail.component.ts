@@ -7,7 +7,7 @@ import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Tab } from '@tezblock/domain/tab'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -21,7 +21,6 @@ import { refreshRate } from '@tezblock/services/facade/facade'
 import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 
 @Component({
@@ -38,8 +37,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   latestTx$: Observable<Transaction>
   fiatCurrencyInfo$: Observable<CurrencyInfo>
   numberOfConfirmations$: Observable<number>
-  totalAmount$: Observable<BigNumber>
-  // totalFee$: Observable<BigNumber>
+  totalAmount$: Observable<number>
+  // totalFee$: Observable<number>
   transactionsLoading$: Observable<boolean>
   transactions$: Observable<Transaction[]>
   filteredTransactions$: Observable<Transaction[]>
@@ -66,8 +65,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
     this.transactions$ = this.store$.select(state => state.transactionDetails.transactions).pipe(filter(negate(isNil)))
     this.latestTx$ = this.transactions$.pipe(map(first))
-    this.totalAmount$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.amount), new BigNumber(0))))
-    // this.totalFee$ = this.transactions$.pipe(map(transactions => transactions.reduce((pv, cv) => pv.plus(cv.fee), new BigNumber(0))))
+    this.totalAmount$ = this.store$.select(state => state.transactionDetails.totalAmount)
+    // this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))

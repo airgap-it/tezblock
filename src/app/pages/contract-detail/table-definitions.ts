@@ -1,15 +1,13 @@
-import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => Column[] } = {
-  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
     {
       name: 'From',
       field: 'singleFrom',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } }),
-      sortable: false
+      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -21,8 +19,47 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'singleTo',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } }),
+      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Amount',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
       sortable: false
+    },
+    {
+      name: 'Fee',
+      field: 'fee',
+      template: Template.amount,
+      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      sortable: false
+    },
+    {
+      name: 'Tx Hash',
+      field: 'hash',
+      template: Template.hash
+    }
+  ],
+  other: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+    {
+      name: 'From',
+      field: 'source',
+      width: '1',
+      template: Template.address,
+      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      field: '',
+      width: '1',
+      template: Template.symbol
+    },
+    {
+      name: 'To',
+      field: 'destination',
+      width: '1',
+      template: Template.address,
+      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
@@ -40,9 +77,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     },
     {
       name: 'Tx Hash',
-      field: 'hash',
-      template: Template.hash,
-      sortable: false
+      field: 'operation_group_hash',
+      template: Template.hash
     }
   ]
 }

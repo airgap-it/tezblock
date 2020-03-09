@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { from, Observable, combineLatest } from 'rxjs'
+import { map, filter } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
@@ -11,12 +12,12 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
-import { map, filter } from 'rxjs/operators'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
+import { Tab, updateTabCounts } from '@tezblock/domain/tab'
+import { OrderBy } from '@tezblock/services/base.service'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
 @Component({
   selector: 'app-contract-detail',
@@ -47,10 +48,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias$: Observable<boolean>
   loading$: Observable<boolean>
-  transferOperations$: Observable<ContractOperation[]>
+  transactions$: Observable<ContractOperation[]>
+  orderBy$: Observable<OrderBy>
   showLoadMore$: Observable<boolean>
-  columns$: Observable<Column[]>
   current: string = 'copyGrey'
+  tabs: Tab[]
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -61,7 +63,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly iconPipe: IconPipe
   ) {
     super()
 
@@ -89,21 +92,54 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias$ = this.store$
       .select(state => state.contractDetails.address)
       .pipe(map(address => address && !!this.aliasPipe.transform(address)))
-    this.transferOperations$ = this.store$.select(state => state.contractDetails.transferOperations.data)
-    this.loading$ = this.store$.select(state => state.contractDetails.transferOperations.loading)
+    this.transactions$ = combineLatest(
+      this.store$.select(state => state.contractDetails.currentTabKind),
+      this.store$.select(state => state.contractDetails.transferOperations.data),
+      this.store$.select(state => state.contractDetails.otherOperations.data)
+    ).pipe(
+      map(([currentTabKind, transferOperations, otherOperations]) =>
+        currentTabKind === actions.OperationTab.transfers ? transferOperations : otherOperations
+      )
+    )
+    this.loading$ = combineLatest(
+      this.store$.select(state => state.contractDetails.transferOperations.loading),
+      this.store$.select(state => state.contractDetails.otherOperations.loading)
+    ).pipe(map(([transferOperationsLoading, otherOperationsLoading]) => transferOperationsLoading || otherOperationsLoading))
+    this.orderBy$ = combineLatest(
+      this.store$.select(state => state.contractDetails.currentTabKind),
+      this.store$.select(state => state.contractDetails.transferOperations.orderBy),
+      this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+    ).pipe(
+      map(([currentTabKind, transferOrderBy, otherOrderBy]) =>
+        currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
+      )
+    )
+    this.store$.select(state => state.contractDetails.transferOperations.loading)
     this.showLoadMore$ = combineLatest(
-      this.transferOperations$,
+      this.transactions$,
       this.store$.select(state => state.contractDetails.transferOperations.pagination)
     ).pipe(
       map(([transferOperations, pagination]) =>
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
-    this.columns$ = combineLatest(this.address$, this.contract$).pipe(
-      filter(([address, contract]) => !!address && !!contract),
-      map(([address, contract]) =>
-        columns[OperationTypes.Transaction]({ pageId: address, showFiatValue: this.isMainnet, symbol: contract.symbol })
+
+    this.subscriptions.push(
+      combineLatest(this.address$, this.contract$)
+        .pipe(filter(([address, contract]) => !!address && !!contract))
+        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol)),
+      combineLatest(
+        this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
+        this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
       )
+        .pipe(
+          filter(([transferCount, otherCount]) => transferCount !== undefined && otherCount !== undefined),
+          map(([transferCount, otherCount]) => [
+            { key: actions.OperationTab.transfers, count: transferCount },
+            { key: actions.OperationTab.other, count: otherCount }
+          ])
+        )
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
   }
 
@@ -120,7 +156,15 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   }
 
   loadMore() {
-    this.store$.dispatch(actions.loadMoreTransferOperations())
+    this.store$.dispatch(actions.loadMore())
+  }
+
+  tabSelected(currentTabKind: actions.OperationTab) {
+    setTimeout(() => this.store$.dispatch(actions.changeOperationsTab({ currentTabKind })), 0)
+  }
+
+  sortBy(orderBy: OrderBy) {
+    this.store$.dispatch(actions.sortOperations({ orderBy }))
   }
 
   private getSocial(condition: (social: Social) => boolean): Observable<string> {
@@ -134,5 +178,28 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           return match ? match.url : null
         })
       )
+  }
+
+  private setTabs(pageId: string, symbol: string) {
+    const showFiatValue = this.isMainnet
+
+    this.tabs = [
+      {
+        title: 'Transfers',
+        active: true,
+        kind: actions.OperationTab.transfers,
+        count: null,
+        icon: this.iconPipe.transform('exchangeAlt'),
+        columns: columns.transfers({ pageId, showFiatValue, symbol })
+      },
+      {
+        title: 'Other Calls',
+        active: true,
+        kind: actions.OperationTab.other,
+        count: null,
+        icon: this.iconPipe.transform('link'),
+        columns: columns.other({ pageId, showFiatValue, symbol })
+      }
+    ]
   }
 }

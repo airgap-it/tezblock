@@ -21,7 +21,7 @@
 //   })
 
 //   it('should be created', () => {
-//     const service: CycleService = TestBed.get(CycleService)
+//     const service: CycleService = TestBed.inject(CycleService)
 //     expect(service).toBeTruthy()
 //   })
 // })

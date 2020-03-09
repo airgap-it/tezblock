@@ -21,7 +21,7 @@ describe('AppEffects', () => {
       })
     )
 
-    effects = TestBed.get<EndorsementDetailEffects>(EndorsementDetailEffects)
+    effects = TestBed.inject<EndorsementDetailEffects>(EndorsementDetailEffects)
   })
 
   it('should be created', () => {

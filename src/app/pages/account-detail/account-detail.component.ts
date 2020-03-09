@@ -33,6 +33,7 @@ import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
+import { ChartOptions } from 'chart.js'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -76,7 +77,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  @ViewChild('transactions', { static: false }) transactions: ElementRef
+  @ViewChild('transactions') transactions: ElementRef
 
   bakerTableInfos: any
   bakerTableRatings$: Observable<BakerTableRatings>
@@ -126,6 +127,85 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
+
+  public balanceChartOptions: ChartOptions = {
+    responsive: true,
+    layout: {
+      padding: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+      }
+    },
+    animation: {
+      duration: 1250 // general animation time
+    },
+    hover: {
+      animationDuration: 250, // duration of animations when hovering an item
+      intersect: false,
+      mode: 'x-axis'
+    },
+    responsiveAnimationDuration: 0, // animation duration after a resize
+    legend: {
+      display: false
+    },
+    scales: {
+      yAxes: [
+        {
+          display: false,
+          gridLines: {
+            display: false
+          }
+        }
+      ],
+      xAxes: [
+        {
+          display: false,
+          gridLines: {
+            display: false
+          }
+        }
+      ]
+    },
+    elements: {
+      point: {
+        radius: 1
+      },
+      line: {
+        tension: 0 // disables bezier curves
+      }
+    },
+
+    tooltips: {
+      mode: 'x-axis',
+      intersect: false,
+      displayColors: false, // removes color box and label
+
+      callbacks: {
+        title: function(data) {
+          if (data[0].label.includes(':')) {
+            return data[0].label.slice(0, -3)
+          } else {
+            return data[0].label
+          }
+        },
+        label: function(data, labels): string {
+          if (Number(data.value) % 1 !== 0) {
+            let value = parseFloat(data.value).toFixed(2)
+            if (labels.datasets[0].label === 'Balance') {
+              return value + ' ꜩ'
+            } else {
+              return '$' + value
+            }
+          } else {
+            return data.value
+          }
+        }
+      }
+    },
+    spanGaps: true
+  }
 
   constructor(
     private readonly actions$: Actions,
