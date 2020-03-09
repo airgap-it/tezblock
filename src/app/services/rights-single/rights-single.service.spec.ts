@@ -14,7 +14,7 @@ describe('RightsSingleService', () => {
   })
 
   it('should be created', () => {
-    const service: RightsSingleService = TestBed.get(RightsSingleService)
+    const service: RightsSingleService = TestBed.inject(RightsSingleService)
     expect(service).toBeTruthy()
   })
 })

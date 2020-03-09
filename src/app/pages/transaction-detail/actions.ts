@@ -29,4 +29,12 @@ export const sortTransactionsByKind = createAction(
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 
+export const loadTransactionsTotalAmount = createAction(`[${featureName}] Load Transactions Total Amount`)
+export const loadTransactionsTotalAmountSucceeded = createAction(`[${featureName}] Load Transactions Total Amount Succeeded`, props<{ totalAmount: number }>())
+export const loadTransactionsTotalAmountFailed = createAction(`[${featureName}] Load Transactions Total Amount Failed`, props<{ error: any }>())
+
+export const loadTransactionsTotalFee = createAction(`[${featureName}] Load Transactions Total Fee`)
+export const loadTransactionsTotalFeeSucceeded = createAction(`[${featureName}] Load Transactions Total Fee Succeeded`, props<{ totalFee: number }>())
+export const loadTransactionsTotalFeeFailed = createAction(`[${featureName}] Load Transactions Total Fee Failed`, props<{ error: any }>())
+
 export const reset = createAction(`[${featureName}] Reset`)

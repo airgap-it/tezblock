@@ -16,7 +16,7 @@ describe('RewardSingleService', () => {
   })
 
   it('should be created', () => {
-    const service: RewardSingleService = TestBed.get(RewardSingleService)
+    const service: RewardSingleService = TestBed.inject(RewardSingleService)
     expect(service).toBeTruthy()
   })
 })

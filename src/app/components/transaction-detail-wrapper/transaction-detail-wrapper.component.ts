@@ -37,7 +37,10 @@ export class TransactionDetailWrapperComponent implements OnInit {
   public blockConfirmations$: Observable<number> | undefined
 
   @Input()
-  public amount$: Observable<BigNumber> | undefined
+  public totalAmount: number | undefined
+
+  // @Input()
+  // public totalFee: number | undefined
 
   @Input()
   public loading$?: Observable<boolean>

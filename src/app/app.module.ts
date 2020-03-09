@@ -190,26 +190,6 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
-  entryComponents: [
-    BlockItemComponent,
-    IdenticonComponent,
-    TransactionItemComponent,
-    ListComponent,
-    AccountItemComponent,
-    AddressItemComponent,
-    QrModalComponent,
-    TelegramModalComponent,
-    QrItemComponent,
-    BlockCellComponent,
-    PlainValueCellComponent,
-    AmountCellComponent,
-    TimestampCellComponent,
-    HashCellComponent,
-    SymbolCellComponent,
-    ChartItemComponent,
-    ExtendTableCellComponent,
-    ModalCellComponent
-  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

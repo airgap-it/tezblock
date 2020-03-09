@@ -77,7 +77,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  @ViewChild('transactions', { static: false }) transactions: ElementRef
+  @ViewChild('transactions') transactions: ElementRef
 
   bakerTableInfos: any
   bakerTableRatings$: Observable<BakerTableRatings>
