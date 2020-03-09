@@ -28,7 +28,7 @@ export class AmountCellComponent implements OnInit {
 
       if (value) {
         this.enableComparison = dayDifference(this.data.timestamp) >= 1
-        this.amount = this.data.amount
+        this.amount = this.data.amount || 0
       }
     }
   }
