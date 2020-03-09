@@ -46,8 +46,16 @@ export class DashboardLatestContractsTransactionsEffects {
           )
         ).pipe(
           map(response => flatten(response)),
-          switchMap(transferOperations =>
-            this.baseService
+          switchMap(transferOperations => {
+            if (transferOperations.length === 0) {
+              return of(
+                actions.loadTransferOperationsSucceeded({
+                  transferOperations: []
+                })
+              )
+            }
+
+            return this.baseService
               .post<Transaction[]>('operations', {
                 predicates: transferOperations.map((operation, index) => ({
                   field: 'operation_group_hash',
@@ -66,7 +74,7 @@ export class DashboardLatestContractsTransactionsEffects {
                 ),
                 catchError(error => of(actions.loadTransferOperationsFailed({ error })))
               )
-          )
+          })
         )
       )
     )
