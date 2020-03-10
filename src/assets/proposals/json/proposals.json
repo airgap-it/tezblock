@@ -1,23 +1,30 @@
 {
   "Pt24m4xiPbLDhVgVfABUjirbmda3yohdN82Sp9FeuAXJ4eV9otd": {
-    "alias": "Athens A"
+    "alias": "Athens A",
+    "discussionLink": "https://forum.tezosagora.org/t/athens-a-pt24m4xip/29"
   },
   "Psd1ynUBhMZAeajwcZJAeq5NrxorM6UCU4GJqxZ7Bx2e9vUWB6z": {
-    "alias": "Athens B"
+    "alias": "Athens B",
+    "discussionLink": "https://forum.tezosagora.org/t/athens-b-psd1ynubh/33"
   },
   "PtdRxBHvc91c2ea2evV6wkoqnzW7TadTg9aqS9jAn2GbcPGtumD": {
-    "alias": "Brest A"
+    "alias": "Brest A",
+    "discussionLink": "https://forum.tezosagora.org/t/brest-a-ptdrxbhv/34"
   },
   "PsBABY5nk4JhdEv1N1pZbt6m6ccB9BfNqa23iKZcHBh23jmRS9f": {
-    "alias": "Babylon"
+    "alias": "Babylon",
+    "discussionLink": "https://forum.tezosagora.org/t/babylon-psbaby5nk/1171"
   },
   "PsBABY5HQTSkA4297zNHfsZNKtxULfL18y95qb3m53QJiXGmrbU": {
-    "alias": "Babylon 2.0"
+    "alias": "Babylon 2.0",
+    "discussionLink": "https://forum.tezosagora.org/t/babylon-2-0-1-psbabym1/1311"
   },
   "PtCarthavAMoXqbjBPVgDCRd5LgT7qqKWUPXnYii3xCaHRBMfHH": {
-    "alias": "Carthage"
+    "alias": "Carthage",
+    "discussionLink": "https://forum.tezosagora.org/t/carthage-ptcarthav/1466"
   },
   "PsCARTHAGazKbHtnKfLzQg3kms52kSRpgnDY982a9oYsSXRLQEb": {
-    "alias": "Carthage 2.0"
+    "alias": "Carthage 2.0",
+    "discussionLink": "https://forum.tezosagora.org/t/carthage-2-0-pscarthag/1497"
   }
 }
