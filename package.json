@@ -74,6 +74,7 @@
     "ngx-moment": "^3.5.0",
     "ngx-toastr": "^10.0.4",
     "rxjs": "^6.5.4",
+    "ts-enum-util": "^4.0.1",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },

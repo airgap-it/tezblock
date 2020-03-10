@@ -26,33 +26,59 @@
       <div class="container p-0">
         <div class="row justify-content-lg-between">
           <div class="col-md-6 col-lg-4">
-            <h5 class="card-title__secondary mb-3 ">
-              Current Cycle
-            </h5>
-            <div class="container p-0">
-              <div class="row mb-2">
-                <div class="col">
-                  <p class="m-0">Cycle {{ currentCycle$ | async }}</p>
+            <div class="mb-4">
+              <h5 class="card-title__secondary mb-3 ">
+                Current Cycle
+              </h5>
+              <div class="container p-0">
+                <div class="row mb-2">
+                  <div class="col">
+                    <p class="m-0">Cycle {{ currentCycle$ | async }}</p>
+                  </div>
+                  <div class="col">
+                    <ng-container *ngIf="cycleStartingBlockLevel$">
+                      <p class="text-right text-secondary m-0 ">
+                        {{ cycleStartingBlockLevel$ | async }} -
+                        {{ cycleEndingBlockLevel$ | async }}
+                      </p>
+                    </ng-container>
+                  </div>
                 </div>
-                <div class="col">
-                  <ng-container *ngIf="cycleStartingBlockLevel$">
-                    <p class="text-right text-secondary m-0 ">
-                      {{ cycleStartingBlockLevel$ | async }} -
-                      {{ cycleEndingBlockLevel$ | async }}
-                    </p>
-                  </ng-container>
+              </div>
+              <progressbar [value]="cycleProgress$ | async" style="height:6px"></progressbar>
+              <div class="mt-2 container">
+                <div class="row">
+                  <div class="col p-0">
+                    <p class="m-0">{{ cycleProgress$ | async }}%</p>
+                  </div>
+                  <div class="col p-0">
+                    <div class="float-right">
+                      <p class="m-0">{{ remainingTime$ | async }}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <progressbar [value]="cycleProgress$ | async" style="height:6px"></progressbar>
+            <h5 class="card-title__secondary mb-3">
+              Governance
+            </h5>
+            <p>{{ currentPeriodKind$ | async }} Period until {{ (currentPeriodTimespan$ | async)?.end | amDateFormat: 'LL' }}</p>
+            <progressbar [value]="25 * (currentPeriodIndex$ | async)" style="height:6px" class="my-2"></progressbar>
             <div class="mt-2 container">
               <div class="row">
-                <div class="col p-0">
-                  <p class="m-0">{{ cycleProgress$ | async }}%</p>
+                <div class="col-9 p-0">
+                  <app-hash-cell
+                    *ngIf="proposalHash$ | async as proposalHash"
+                    [data]="proposalHash"
+                    [options]="{ kind: 'proposal' }"
+                  ></app-hash-cell>
+                  <ng-container *ngIf="(proposalHash$ | async) === null">
+                    <p class="text-secondary m-0">No Proposal submitted yet.</p>
+                  </ng-container>
                 </div>
-                <div class="col p-0">
+                <div class="col col-3 p-0">
                   <div class="float-right">
-                    <p class="m-0">{{ remainingTime$ | async }}</p>
+                    <p class="m-0">{{ currentPeriodIndex$ | async }} of 4</p>
                   </div>
                 </div>
               </div>

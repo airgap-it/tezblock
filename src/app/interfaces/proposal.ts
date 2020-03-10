@@ -5,6 +5,7 @@ export const proposals: { [key: string]: { alias: string; discussionLink?: strin
 export interface ProposalListDto {
   count_operation_group_hash: string
   proposal: string
+  period: number
 }
 
 export interface ProposalDto {

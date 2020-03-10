@@ -14,3 +14,10 @@ export const loadLatestBlockFailed = createAction(`[${featureName}] Load LatestB
 export const loadFirstBlockOfCycle = createAction(`[${featureName}] Load First Block Of Cycle`, props<{ cycle: number }>())
 export const loadFirstBlockOfCycleSucceeded = createAction(`[${featureName}] Load First Block Of Cycle Succeeded`, props<{ firstBlockOfCycle: Block }>())
 export const loadFirstBlockOfCycleFailed = createAction(`[${featureName}] Load First Block Of Cycle Failed`, props<{ error: any }>())
+
+export const loadPeriodInfos = createAction(`[${featureName}] Load Period Infos`)
+export const loadPeriodInfosSucceeded = createAction(
+  `[${featureName}] Load Period Infos Succeeded`,
+  props<{ currentVotingPeriod: number; currentVotingeriodPosition: number, blocksPerVotingPeriod: number }>()
+)
+export const loadPeriodInfosFailed = createAction(`[${featureName}] Load Period Infos Failed`, props<{ error: any }>())
