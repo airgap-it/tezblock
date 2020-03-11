@@ -47,4 +47,5 @@ export interface Transaction {
   voting_period?: string
   burn?: string
   symbol?: string
+  baker?: string
 }

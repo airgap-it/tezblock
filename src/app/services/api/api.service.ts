@@ -938,6 +938,25 @@ export class ApiService {
     )
   }
 
+  getBlocksOfIds(blockIds: number[]): Observable<Block[]> {
+    const limit = blockIds.length
+    return this.http.post<Block[]>(
+      this.blocksApiUrl,
+      {
+        predicates: [
+          {
+            field: 'level',
+            operation: 'in',
+            set: blockIds,
+            inverse: false
+          }
+        ],
+        limit: limit
+      },
+      this.options
+    )
+  }
+
   getBlockByHash(hash: string): Observable<Block[]> {
     return this.http.post<Block[]>(
       this.blocksApiUrl,

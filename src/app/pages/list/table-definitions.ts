@@ -289,6 +289,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     [
       {
         name: 'Baker',
+        field: 'baker',
         template: Template.address
       },
       {

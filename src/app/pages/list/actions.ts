@@ -41,11 +41,17 @@ export const loadDoubleBakingsFailed = createAction(`[${featureName}] Load Doubl
 export const increasePageOfDoubleBakings = createAction(`[${featureName}] Increase Page Of Double Bakings`)
 export const sortDoubleBakingsByKind = createAction(`[${featureName}] Sort Double Bakings`, props<{ orderBy: OrderBy }>())
 
+export const loadBlockDataForDBE = createAction(
+  `[${featureName}] Load Block Data For Double Baking Evidence`,
+  props<{ doubleBakings: Transaction[] }>()
+)
+
 export const loadDoubleEndorsements = createAction(`[${featureName}] Load Double Endorsements`)
 export const loadDoubleEndorsementsSucceeded = createAction(
   `[${featureName}] Load Double Endorsements Succeeded`,
   props<{ doubleEndorsements: Transaction[] }>()
 )
+
 export const loadDoubleEndorsementsFailed = createAction(`[${featureName}] Load Double Endorsements Failed`, props<{ error: any }>())
 export const increasePageOfDoubleEndorsements = createAction(`[${featureName}] Increase Page Of Double Endorsements`)
 export const sortDoubleEndorsementsByKind = createAction(`[${featureName}] Sort Double Endorsements`, props<{ orderBy: OrderBy }>())
@@ -140,7 +146,10 @@ export const increasePageOfDelegations = createAction(`[${featureName}] Increase
 export const sortDelegationsByKind = createAction(`[${featureName}] Sort Delegations`, props<{ orderBy: OrderBy }>())
 
 export const loadTransactionsChartData = createAction(`[${featureName}] Load Transactions Chart Data`)
-export const loadTransactionsChartDataSucceeded = createAction(`[${featureName}] Load Transactions Chart Data Succeeded`, props<{ transactionsChartData: TransactionChartItem[] }>())
+export const loadTransactionsChartDataSucceeded = createAction(
+  `[${featureName}] Load Transactions Chart Data Succeeded`,
+  props<{ transactionsChartData: TransactionChartItem[] }>()
+)
 export const loadTransactionsChartDataFailed = createAction(`[${featureName}] Load Transactions Chart Data Failed`, props<{ error: any }>())
 export const loadTransactionsCountLastXd = createAction(`[${featureName}] Load Transactions Count Last 30d`)
 export const loadTransactionsCountLastXdSucceeded = createAction(

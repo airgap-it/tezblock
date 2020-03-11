@@ -178,6 +178,16 @@ export const reducer = createReducer(
       orderBy
     }
   })),
+
+  on(actions.loadBlockDataForDBE, (state, { doubleBakings }) => ({
+    ...state,
+    doubleBakings: {
+      ...state.doubleBakings,
+      temporaryData: doubleBakings,
+      loading: true
+    }
+  })),
+
   on(actions.loadDoubleEndorsements, state => ({
     ...state,
     doubleEndorsements: {
@@ -546,7 +556,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsChartData,
+    transactionsChartData
     // TODO: why selecting this data throws error in chart.js ... ?
     //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
   })),

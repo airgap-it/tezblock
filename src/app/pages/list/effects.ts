@@ -209,9 +209,39 @@ export class ListEffects {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
           .pipe(
-            map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
+            map((doubleBakings: Transaction[]) => {
+              return listActions.loadBlockDataForDBE({ doubleBakings })
+            }),
             catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
           )
+      })
+    )
+  )
+
+  getDoubleBakingsBlockData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadBlockDataForDBE),
+      withLatestFrom(this.store$.select(state => state.list.doubleBakings.temporaryData)),
+      switchMap(([action, temporaryData]) => {
+        const blockIds = []
+        temporaryData.forEach(doubleBaking => {
+          blockIds.push(doubleBaking.block_level)
+        })
+        return this.apiService.getBlocksOfIds(blockIds).pipe(
+          map((blocks: Block[]) => {
+            let doubleBakings = JSON.parse(JSON.stringify(temporaryData))
+
+            doubleBakings.map(doubleBaking => {
+              const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
+
+              doubleBaking.baker = additionalData.baker
+              return doubleBaking
+            })
+
+            return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
+          }),
+          catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+        )
       })
     )
   )
@@ -239,7 +269,7 @@ export class ListEffects {
       ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'], orderBy)
           .pipe(
             map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
             catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
