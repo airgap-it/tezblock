@@ -551,6 +551,14 @@ export class ListEffects {
     )
   )
 
+  foo$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactionsSucceeded),
+      switchMap(({ transactions }) => this.apiService.getErrorsForOperations(transactions))
+    ),
+    { dispatch: false }
+  )
+
   private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {
     return this.baseService.post<Transaction[]>('operations', {
       fields,

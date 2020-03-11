@@ -25,3 +25,50 @@ export enum OperationTypes {
   Contract = 'contract',
   Account = 'account'
 }
+
+export interface OperationError {
+  kind: string
+  id: string
+  contract?: string
+  balance?: string
+  amount?: string
+}
+
+export interface RPCContent {
+  metadata?: {
+    internal_operation_results?: {
+      result: {
+        errors?: OperationError[]
+      }
+    }[]
+    operation_result?: {
+      errors: OperationError[]
+    }
+  }
+}
+
+export interface RPCBlocksOpertions {
+  hash: string
+  contents?: RPCContent[]
+}
+
+export interface OperationErrorsById {
+  id: string
+  error: OperationError[]
+}
+
+export interface OperationErrorMessage {
+  title: string
+  description: string
+}
+
+const errorMessages: { [key: string]: OperationErrorMessage } = {
+  cannot_pay_storage_fee: {
+    title: 'Cannot pay storage fees',
+    description: 'The storage fee is higher than the contract balance'
+  },
+  balance_too_low: {
+    title: 'Balance too low',
+    description: 'An operation tried to spend {{amount}} ꜩ while the contract has only {{balance}} ꜩ'
+  }
+}

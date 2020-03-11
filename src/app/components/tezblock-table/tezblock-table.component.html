@@ -94,7 +94,7 @@
         <tbody>
           <ng-container *ngIf="data">
             <ng-container *ngFor="let item of data; let i = index">
-              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
+              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)" [tooltip]="">
                 <td *ngFor="let column of columns; trackBy: trackByFn">
                   <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
                 </td>
