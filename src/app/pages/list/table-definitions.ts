@@ -402,7 +402,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
   /* TOKEN CONTRACT */
   [OperationTypes.TokenContract]: () => [
     {
-      name: 'Token',
+      name: 'Asset',
       field: 'id',
       template: Template.address
     },
