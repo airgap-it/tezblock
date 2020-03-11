@@ -51,6 +51,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   disableTabLogic: boolean
 
+  @Input()
+  noDataLabel: string
+
   @Output()
   tabClicked: EventEmitter<KindType> = new EventEmitter()
 

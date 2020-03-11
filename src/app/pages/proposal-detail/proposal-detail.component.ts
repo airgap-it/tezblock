@@ -5,6 +5,8 @@ import { Observable, combineLatest } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
+import { isNil, negate } from 'lodash'
+import { $enum } from 'ts-enum-util'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CopyService } from 'src/app/services/copy/copy.service'
@@ -16,7 +18,8 @@ import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { columns } from './table-definitions'
 import { PeriodKind, PeriodTimespan } from '@tezblock/domain/vote'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import * as moment from 'moment'
 
 @Component({
@@ -31,6 +34,8 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   periodTimespan$: Observable<PeriodTimespan>
   tabs: Tab[]
   now: number = moment.utc().valueOf()
+  noDataLabel$: Observable<string>
+  periodKind$: Observable<string>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -39,6 +44,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     private readonly activatedRoute: ActivatedRoute,
+    private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
     private readonly store$: Store<fromRoot.State>,
@@ -88,6 +94,20 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
           ]
       )
     )
+    this.noDataLabel$ = this.store$
+      .select(state => state.proposalDetails.proposal)
+      .pipe(
+        filter(negate(isNil)),
+        map(
+          (proposal: ProposalDto) => `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+        )
+      )
+    this.periodKind$ = this.store$
+      .select(state => state.proposalDetails.periodKind)
+      .pipe(
+        filter(negate(isNil)),
+        map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
+      )
   }
 
   copyToClipboard() {
@@ -126,7 +146,8 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Testing,
         count: undefined,
         icon: this.iconPipe.transform('hammer'),
-        columns
+        columns,
+        emptySign: '-'
       },
       {
         title: 'Promotion',

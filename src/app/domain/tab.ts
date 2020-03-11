@@ -16,6 +16,7 @@ export interface Tab {
   kind: KindType
   icon?: string[]
   columns?: Column[]
+  emptySign?: string
 }
 
 export interface Count {
