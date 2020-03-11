@@ -5,6 +5,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 export interface Busy {
   block: boolean
@@ -29,7 +30,7 @@ const initialState: State = {
   transactions: undefined,
   counts: undefined,
   transactionsLoadedByBlockHash: undefined,
-  kind: undefined,
+  kind: OperationTypes.Transaction,
   pageSize: 10,
   busy: {
     block: false,
