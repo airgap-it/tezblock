@@ -46,17 +46,15 @@ export class IdenticonComponent implements OnInit {
       return
     }
 
-    const _value = value.toLowerCase()
-
     if (accounts.hasOwnProperty(value) && accounts[value].hasLogo && !this.displayIdenticonNotLogo) {
       this.identicon = `assets/bakers/img/${value}.png`
     } else {
-      if (_value.startsWith('ak_')) {
+      if (value.startsWith('ak_')) {
         this.identicon = createIcon({ seed: value }).toDataURL()
-      } else if (_value.startsWith('tz') || _value.startsWith('kt')) {
+      } else if (value.startsWith('tz') || value.startsWith('kt')) {
         this.identicon = createIcon({ seed: `0${this.b582int(value)}`, spotcolor: '#000' }).toDataURL()
       } else {
-        this.identicon = toDataUrl(_value)
+        this.identicon = toDataUrl(value)
       }
     }
   }
