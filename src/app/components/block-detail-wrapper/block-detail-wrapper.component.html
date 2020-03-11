@@ -15,7 +15,7 @@
     <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
       {{ block.level }}
       <ng-container *ngIf="confirmations$ | async as confirmations">
-        <span *ngIf="confirmations > 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
+        <span *ngIf="confirmations >= 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
       </ng-container>
       <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel('backward')">
         <fa-icon [icon]="'chevronLeft' | iconPipe" class="text-secondary"></fa-icon>
