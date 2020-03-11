@@ -28,11 +28,12 @@ export class BlockDetailEffects {
   getTransactionsOnBlockLoaded$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBlockSucceeded),
-      withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash]) =>
-        actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction })
-      )
+      map(([{ block }, transactionsLoadedByBlockHash, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: kind }))
     )
   )
 
