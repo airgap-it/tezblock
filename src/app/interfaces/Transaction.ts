@@ -46,4 +46,5 @@ export interface Transaction {
   votes?: number
   voting_period?: string
   burn?: string
+  symbol?: string
 }

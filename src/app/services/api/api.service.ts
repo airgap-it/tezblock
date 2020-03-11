@@ -18,7 +18,7 @@ import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation, OrderBy } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
-import { Contract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 
 export interface OperationCount {
@@ -1381,7 +1381,7 @@ export class ApiService {
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
-  getTransferOperationsForContract(contract: Contract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
+  getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
     const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTransactions(10, cursor))
@@ -1391,7 +1391,8 @@ export class ApiService {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
     const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
-    const lastItemOfTheDay = (value: Balance, index: number, array: Balance[]) => {
+
+    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
       if (index === 0) {
         return true
       }
@@ -1421,24 +1422,110 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(delegations => delegations.filter(lastItemOfTheDay)),
-        map(delegations =>
-          delegations.map(delegation => ({
-            ...delegation,
-            balance: delegation.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+        map(balances => balances.filter(isLastItemOfTheMonth)),
+        map(balances =>
+          balances.map(balance => ({
+            ...balance,
+            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
           }))
         ),
-        map(delegations => delegations.sort((a, b) => a.asof - b.asof))
+        map(balances => balances.sort((a, b) => a.asof - b.asof)),
+        map(balances => {
+          const dateArray: {
+            balance: number
+            asof: number
+          }[] = []
+
+          let previousBalance: number
+          for (let day = 29; day >= 0; day--) {
+            const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+
+            const foundBalance = balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate())
+
+            if (foundBalance) {
+              dateArray.push({
+                balance: foundBalance.balance,
+                asof: new Date().setDate(new Date().getDate() - day)
+              })
+              previousBalance = foundBalance.balance
+            } else {
+              dateArray.push({
+                balance: previousBalance ? previousBalance : null,
+                asof: new Date().setDate(new Date().getDate() - day)
+              })
+            }
+          }
+          return dateArray
+        })
       )
   }
 
-  getTotalSupplyByContract(contract: Contract): Observable<string> {
+  getEarlierBalance(accountId: string, temporaryBalances: Balance[]): Observable<Balance[]> {
+    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(new Date().getTime() - thirtyDaysInMilliseconds)
+
+    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
+      if (index === 0) {
+        return true
+      }
+
+      const current = new Date(value.asof)
+      const previous = new Date(array[index - 1].asof)
+
+      return current.getDay() !== previous.getDay()
+    }
+
+    return this.http
+      .post<Balance[]>(
+        this.accountHistoryApiUrl,
+        {
+          fields: ['balance', 'asof'],
+          predicates: [
+            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
+            { field: 'asof', operation: 'before', set: [thirtyDaysAgo.getTime()], inverse: false }
+          ],
+          orderBy: [{ field: 'asof', direction: 'desc' }],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(
+        map(balances => balances.filter(isLastItemOfTheMonth)),
+        map(balances =>
+          balances.map(balance => ({
+            ...balance,
+            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+          }))
+        ),
+        map(balances => {
+          const copiedBalances = JSON.parse(JSON.stringify(temporaryBalances))
+          if (balances.length === 0) {
+            copiedBalances[0].balance = 0
+          } else {
+            copiedBalances[0] = balances[0]
+          }
+
+          let previousBalance = copiedBalances[0].balance
+          for (let index = 0; index <= 29; index++) {
+            if (!copiedBalances[index].balance && (previousBalance || previousBalance === 0)) {
+              copiedBalances[index].balance = previousBalance
+            } else if (copiedBalances[index].balance) {
+              previousBalance = copiedBalances[index].balance
+            }
+          }
+
+          return copiedBalances
+        })
+      )
+  }
+
+  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
     const protocol = this.getFaProtocol(contract)
 
     return from(protocol.getTotalSupply())
   }
 
-  private getFaProtocol(contract: Contract): TezosFAProtocol {
+  private getFaProtocol(contract: TokenContract): TezosFAProtocol {
     return new TezosFAProtocol({
       symbol: contract.symbol,
       name: contract.name,

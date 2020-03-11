@@ -26,7 +26,7 @@
                   <address-item
                     class="d-inline-flex"
                     [address]="account.account_id"
-                    [options]="{ forceIdenticon: true, showFullAddress: true, hideIdenticon: !hasLogo }"
+                    [options]="{ showFullAddress: true, forceIdenticon: true, hideIdenticon: !hasLogo }"
                     [clickableButton]="false"
                   ></address-item>
 
@@ -343,7 +343,11 @@
                       <small>last 30 days</small>
                     </h5>
                     <ng-container *ngIf="balanceChartDatasets$ | async">
-                      <chart-item [datasets]="balanceChartDatasets$ | async" [labels]="balanceChartLabels$ | async"></chart-item>
+                      <chart-item
+                        [datasets]="balanceChartDatasets$ | async"
+                        [labels]="balanceChartLabels$ | async"
+                        [options]="balanceChartOptions"
+                      ></chart-item>
                     </ng-container>
                   </div>
                 </div>

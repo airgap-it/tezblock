@@ -1,25 +1,30 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { Observable, of } from 'rxjs'
+import { Observable, of, pipe } from 'rxjs'
 import { filter, map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
-import { range } from 'lodash'
+import { range, negate, isNil } from 'lodash'
 import * as moment from 'moment'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { toArray } from '@tezblock/services/fp'
+import { toArray, groupBy } from '@tezblock/services/fp'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
+import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
 
 const noOfDays = 7
+const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
+const protocol = tryGetProtocolByIdentifier('xtz')
 
 const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
@@ -27,6 +32,34 @@ const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
+const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
+  const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
+    data.map(item => ({
+      diffInDays: moment().diff(moment(item.timestamp), 'days'),
+      amount: item.amount
+    }))
+  const sum = (data: { [key: string]: { diffInDays: number; amount: number }[] }): number[] =>
+    range(0, noOfDays).map(index => {
+      const match = data[index]
+
+      return match ? match.map(item => item.amount).reduce((a, b) => a + b) : 0
+    })
+  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
+
+  return pipe(
+    toDiffsInDays,
+    groupBy('diffInDays'),
+    sum,
+    amountToXTZ
+  )(data)
+}
+
+export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
+  data: actions.TransactionChartItem[]
+): { data: number[]; label: string }[] => [
+  { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
+  { data: toAmountPerDay(data), label: amountLabel }
+]
 const timestampsToChartDataSource = (label: string) => (timestamps: number[]): { data: number[]; label: string } => ({
   data: timestampsToCountsPerDay(timestamps),
   label: label
@@ -44,11 +77,14 @@ export class ListComponent extends BaseComponent implements OnInit {
   showLoadMore$: Observable<boolean>
   orderBy$: Observable<OrderBy>
   activationsCountLast24h$: Observable<number>
-  originationsCountLast24h$: Observable<number>
-  transactionsCountLast24h$: Observable<number>
   activationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  originationsCountLast24h$: Observable<number>
   originationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  transactionsCountLast24h$: Observable<number>
   transactionsChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  transactionsChartOptions: ChartOptions
+  transactionsTotalXTZ$: Observable<number>
+
   routeName$: Observable<string>
 
   readonly chartLabels: string[] = range(0, noOfDays).map(index =>
@@ -95,23 +131,46 @@ export class ListComponent extends BaseComponent implements OnInit {
 
             break
           case 'transaction':
+            this.transactionsChartOptions = {
+              ...defaultOptions,
+              tooltips: {
+                callbacks: {
+                  label: (tooltipItem: ChartTooltipItem, data: ChartData) => {
+                    const label: string = data.datasets[tooltipItem.datasetIndex].label
+                    const value = parseInt(data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].toString())
+                      .toString()
+                      .replace(thousandSeparator, ',')
+                    const valueLabel = tooltipItem.datasetIndex === 0 ? value : `${value}K ꜩ`
+
+                    return `${label}: ${valueLabel}`
+                  }
+                }
+              }
+            }
             this.subscriptions.push(
               getRefresh([
                 this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hSucceeded)),
                 this.actions$.pipe(ofType(actions.loadTransactionsCountLast24hFailed))
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsCountLast24h())),
               getRefresh([
-                this.actions$.pipe(ofType(actions.loadTransactionsCountLastXdSucceeded)),
-                this.actions$.pipe(ofType(actions.loadTransactionsCountLastXdFailed))
-              ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsCountLastXd()))
+                this.actions$.pipe(ofType(actions.loadTransactionsChartDataSucceeded)),
+                this.actions$.pipe(ofType(actions.loadTransactionsChartDataFailed))
+              ]).subscribe(() => this.store$.dispatch(actions.loadTransactionsChartData()))
             )
             this.transactionsCountLast24h$ = this.store$.select(state => state.list.transactionsCountLast24h)
-            this.transactionsChartDatasets$ = this.store$
-              .select(state => state.list.transactionsCountLastXd)
+            this.transactionsChartDatasets$ =
+              //this.store$.select(state => state.list.transactionsChartDatasets)
+              this.store$
+                .select(state => state.list.transactionsChartData)
+                .pipe(
+                  filter(Array.isArray),
+                  map(toTransactionsChartDataSource('Transactions', 'Volume'))
+                )
+            this.transactionsTotalXTZ$ = this.store$
+              .select(state => state.list.transactionsChartData)
               .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource(`Transactions`)),
-                map(toArray)
+                filter(negate(isNil)),
+                map(transactionsChartData => transactionsChartData.map(item => item.amount).reduce((a, b) => a + b))
               )
             const transactionLoading$ = this.store$.select(state => state.list.transactions.loading)
             const transactionData$ = this.store$.select(state => state.list.transactions.data)
@@ -145,7 +204,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               .select(state => state.list.activationsCountLastXd)
               .pipe(
                 filter(Array.isArray),
-                map(timestampsToChartDataSource(`Activations`)),
+                map(timestampsToChartDataSource('Activations')),
                 map(toArray)
               )
             const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
@@ -180,7 +239,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               .select(state => state.list.originationsCountLastXd)
               .pipe(
                 filter(Array.isArray),
-                map(timestampsToChartDataSource(`Originations`)),
+                map(timestampsToChartDataSource('Originations')),
                 map(toArray)
               )
             const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
@@ -331,10 +390,25 @@ export class ListComponent extends BaseComponent implements OnInit {
               showLoadMore$
             )
             break
-          case 'contract':
-            const showLoadMoreContracts$ = this.store$
-              .select(state => state.list.contracts)
+          case 'token-contract':
+            const showLoadMoreTokenContracts$ = this.store$
+              .select(state => state.list.tokenContracts)
               .pipe(map(contracts => contracts.data.length < contracts.pagination.total))
+            const loadingTokenContracts$ = this.store$.select(state => state.list.tokenContracts.loading)
+            const tokenContractsData$ = this.store$.select(state => state.list.tokenContracts.data)
+            const tokenContractsOrderBy$ = this.store$.select(state => state.list.tokenContracts.orderBy)
+
+            this.store$.dispatch(actions.loadTokenContracts())
+
+            this.setupTable(
+              columns[OperationTypes.TokenContract]({ showFiatValue: this.isMainnet }),
+              tokenContractsData$,
+              loadingTokenContracts$,
+              tokenContractsOrderBy$,
+              showLoadMoreTokenContracts$
+            )
+            break
+          case 'contract':
             const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
             const contractsData$ = this.store$.select(state => state.list.contracts.data)
             const contractsOrderBy$ = this.store$.select(state => state.list.contracts.orderBy)
@@ -345,19 +419,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
               contractsData$,
               loadingContracts$,
-              contractsOrderBy$,
-              showLoadMoreContracts$
+              contractsOrderBy$
             )
             break
-          case 'account':
-            const loadingAccounts$ = this.store$.select(state => state.list.accounts.loading)
-            const accountsData$ = this.store$.select(state => state.list.accounts.data)
-            const accountsOrderBy$ = this.store$.select(state => state.list.accounts.orderBy)
 
-            this.store$.dispatch(actions.loadAccounts())
-
-            this.setupTable(columns[OperationTypes.Account](), accountsData$, loadingAccounts$, accountsOrderBy$)
-            break
           default:
             throw new Error('unknown route')
         }
@@ -400,11 +465,11 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.increasePageOfVotes())
         break
-      case 'contracts':
-        this.store$.dispatch(actions.increasePageOfContracts())
+      case 'token-contract':
+        this.store$.dispatch(actions.increasePageOfTokenContracts())
         break
-      case 'account':
-        this.store$.dispatch(actions.increasePageOfAccounts())
+      case 'contract':
+        this.store$.dispatch(actions.increasePageOfContracts())
         break
     }
   }
@@ -444,8 +509,9 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.sortVotesByKind({ orderBy }))
         break
-      case 'account':
-        this.store$.dispatch(actions.sortAccounts({ orderBy }))
+
+      case 'contract':
+        this.store$.dispatch(actions.sortContracts({ orderBy }))
         break
     }
   }

@@ -5,35 +5,23 @@ export interface BakingBadResponse {
   estimatedRoi?: number
   logo?: string
   name?: string
-  rating?: Rating
   site?: string
   stakingBalance?: number
   stakingCapacity?: number
   status?: string
+  payoutAccuracy: string
 }
 
 export interface Config {
   address: string
   fee: FeeByCycle[]
-  minBalance: number
+  minDelegation: number
   minPayout: number
   payoutDelay: number
   payoutFee: number
   payoutPeriod: number
   payoutRatio: number
   rewardStruct: number
-}
-
-export interface Rating {
-  actualRoi: number
-  address: string
-  avgRolls: number
-  delegator: string
-  fromCycle: number
-  prevRoi: number
-  sharedConfig: string
-  status: number
-  toCycle: number
 }
 
 export interface FeeByCycle {

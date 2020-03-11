@@ -173,7 +173,7 @@ const initialState: Wallet[] = [
   },
   {
     title: 'Galleon',
-    description: `Galleon a smart wallet for Tezos. Galleon is a deployment of Tezori, an open source wallet framework for Tezos, supporting both software and hardware wallets in eight languages on Mac, Windows, and Linux.`,
+    description: `Galleon is a smart wallet for Tezos. Galleon is a deployment of Tezori, an open source wallet framework for Tezos, supporting both software and hardware wallets in eight languages on Mac, Windows and Linux.`,
     logo: 'galleon.png',
     socials: [
       {
@@ -211,7 +211,7 @@ const initialState: Wallet[] = [
   },
   {
     title: 'Kukai',
-    description: `One of the first Tezos wallet with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in our wallet.`,
+    description: `One of the first Tezos wallets with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in their wallet.`,
     logo: 'kukai.png',
     socials: [
       {
@@ -299,13 +299,45 @@ const initialState: Wallet[] = [
     downloadLink: 'https://app.magnumwallet.co'
   },
   {
+    title: 'paytomat',
+    description: `paytomat is a non-custodial wallet that brings financial services that modern customers eager. From exchanging assets, to referral programs, to trading BEP-2 tokens or accessing dApps and games, paytomat supports over 14 cryptocurrencies and covers all of a user's wants and needs in one single app.`,
+    logo: 'paytomat.png',
+    socials: [
+      {
+        type: SocialType.website,
+        url: 'https://paytomat.com/en/'
+      },
+      {
+        type: SocialType.twitter,
+        url: 'https://twitter.com/paytomat'
+      },
+
+      { type: SocialType.telegram, url: 'https://t.me/paytomat' },
+      {
+        type: SocialType.medium,
+        url: 'https://medium.com/paytomat'
+      },
+      { type: SocialType.github, url: 'https://github.com/Paytomat' }
+    ],
+    platforms: [
+      {
+        name: PlatformName.Android,
+        icon: 'android',
+        url: 'https://play.google.com/store/apps/details?id=com.paytomat'
+      },
+      { name: PlatformName.iOS, icon: 'apple', url: 'https://apps.apple.com/app/apple-store/id1415300709?mt=8' }
+    ],
+    features: ['reliable', 'decentralized', 'convenient'],
+    downloadLink: 'https://paytomat.com/en/wallet/'
+  },
+  {
     title: 'simplestaking.com',
     description: `Safe way to store & stake Tezos. Desktop & Web wallet with Trezor support.`,
     logo: 'simplestaking.png',
     socials: [
       {
         type: SocialType.website,
-        url: 'https://simplestkaing.com'
+        url: 'https://simplestaking.com'
       },
       {
         type: SocialType.twitter,

@@ -28,22 +28,20 @@ export class BlockDetailEffects {
   getTransactionsOnBlockLoaded$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBlockSucceeded),
-      withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash]) =>
-        actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction })
-      )
+      map(([{ block }, transactionsLoadedByBlockHash, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: kind }))
     )
   )
 
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(
-        this.store$.select(state => state.blockDetails.pageSize),
-        this.store$.select(state => state.blockDetails.orderBy)
-      ),
-      switchMap(([{ blockHash, kind }, pageSize, orderBy ]) =>
+      withLatestFrom(this.store$.select(state => state.blockDetails.pageSize), this.store$.select(state => state.blockDetails.orderBy)),
+      switchMap(([{ blockHash, kind }, pageSize, orderBy]) =>
         this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
@@ -57,6 +55,22 @@ export class BlockDetailEffects {
       ofType(actions.increasePageSize),
       withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
+    )
+  )
+
+  onIncreaseBlock$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.increaseBlock),
+      withLatestFrom(this.store$.select(state => state.blockDetails)),
+      map(([action, block]) => actions.loadBlock({ id: block.id }))
+    )
+  )
+
+  onDecreaseBlock$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.decreaseBlock),
+      withLatestFrom(this.store$.select(state => state.blockDetails)),
+      map(([action, block]) => actions.loadBlock({ id: block.id }))
     )
   )
 

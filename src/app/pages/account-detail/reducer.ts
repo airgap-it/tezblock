@@ -64,7 +64,11 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
 
 export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
   bakingRating:
-    response.status === 'success' && ratingNumberToLabel[response.rating.status] ? ratingNumberToLabel[response.rating.status] : null,
+    response.status === 'success' && response.payoutAccuracy
+      ? response.payoutAccuracy !== 'no_data'
+        ? response.payoutAccuracy
+        : null
+      : null,
   tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
 })
 
@@ -96,7 +100,7 @@ export interface State {
   delegatedAccounts: Account[]
   relatedAccounts: Account[]
   transactions: Transaction[]
-  counts: Count[],
+  counts: Count[]
   kind: string
   pageSize: number // transactions
   rewardAmont: string
@@ -105,6 +109,7 @@ export interface State {
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
   orderBy: OrderBy
+  temporaryBalance: Balance[]
 }
 
 const initialState: State = {
@@ -124,7 +129,8 @@ const initialState: State = {
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  orderBy: sort('block_level', 'desc')
+  orderBy: sort('block_level', 'desc'),
+  temporaryBalance: undefined
 }
 
 export const reducer = createReducer(
@@ -205,6 +211,15 @@ export const reducer = createReducer(
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
     balanceFromLast30Days: ensure30Days(balanceFromLast30Days)
+  })),
+  on(actions.loadExtraBalance, (state, { temporaryBalance }) => ({
+    ...state,
+    temporaryBalance: temporaryBalance
+  })),
+  on(actions.loadExtraBalanceSucceeded, (state, { extraBalance }) => ({
+    ...state,
+    balanceFromLast30Days: ensure30Days(extraBalance),
+    temporaryBalance: undefined
   })),
   on(actions.loadBakingBadRatingsSucceeded, (state, { response }) => ({
     ...state,

@@ -5,8 +5,9 @@ import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { MetaVotingPeriod } from '@tezblock/domain/vote'
+import { MetaVotingPeriod, PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
 import { squareBrackets } from '@tezblock/domain/pattern'
+import { get } from '@tezblock/services/fp'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
   if (!state.metaVotingPeriods) {
@@ -23,12 +24,16 @@ const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: S
 const processProposal = (proposal: ProposalDto): ProposalDto =>
   proposal ? { ...proposal, proposal: proposal.proposal.replace(squareBrackets, '') } : proposal
 
+export const isEmptyPeriodKind = (periodKind: string, metaVotingPeriods: MetaVotingPeriod[] = []): boolean =>
+  get<MetaVotingPeriod>(period => period.count)(metaVotingPeriods.find(period => period.periodKind === periodKind)) === 0
+
 export interface State {
   id: string
   proposal: ProposalDto
   loadingProposal: boolean
   periodKind: string
   metaVotingPeriods: MetaVotingPeriod[]
+  periodsTimespans: PeriodTimespan[]
   votes: TableState<Transaction>
 }
 
@@ -38,6 +43,7 @@ const initialState: State = {
   loadingProposal: false,
   periodKind: undefined,
   metaVotingPeriods: undefined,
+  periodsTimespans: undefined,
   votes: getInitialTableState()
 }
 
@@ -58,6 +64,10 @@ export const reducer = createReducer(
     ...state,
     proposal: null,
     loadingProposal: false
+  })),
+  on(actions.startLoadingVotes, (state, { periodKind }) => ({
+    ...state,
+    periodKind
   })),
   on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
     ...state,
@@ -106,5 +116,9 @@ export const reducer = createReducer(
         currentPage: state.votes.pagination.currentPage + 1
       }
     }
+  })),
+  on(actions.loadPeriodsTimespansSucceeded, (state, { periodsTimespans, blocksPerVotingPeriod }) => ({
+    ...state,
+    periodsTimespans: fillMissingPeriodTimespans(periodsTimespans, blocksPerVotingPeriod)
   }))
 )

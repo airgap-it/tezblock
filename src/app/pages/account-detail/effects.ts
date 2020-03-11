@@ -123,10 +123,34 @@ export class AccountDetailEffects {
       withLatestFrom(this.store$.select(state => state.accountDetails.address)),
       switchMap(([action, accountAddress]) =>
         this.apiService.getBalanceForLast30Days(accountAddress).pipe(
-          map(balanceFromLast30Days => actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })),
+          map(balanceFromLast30Days => {
+            if (balanceFromLast30Days[0].balance === null) {
+              return actions.loadExtraBalance({ temporaryBalance: balanceFromLast30Days })
+            } else {
+              return actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })
+            }
+          }),
           catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
         )
       )
+    )
+  )
+
+  loadExtraBalance$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadExtraBalance),
+      withLatestFrom(
+        this.store$.select(state => state.accountDetails.address),
+        this.store$.select(state => state.accountDetails.temporaryBalance)
+      ),
+      switchMap(([action, accountAddress, temporaryBalance]) => {
+        return this.apiService.getEarlierBalance(accountAddress, temporaryBalance).pipe(
+          map(extraBalance => {
+            return actions.loadExtraBalanceSucceeded({ extraBalance })
+          }),
+          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
+        )
+      })
     )
   )
 

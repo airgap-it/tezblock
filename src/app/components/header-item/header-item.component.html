@@ -159,8 +159,13 @@
                         </li>
 
                         <li role="menuitem">
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/token-contract/list']">
+                            FA 1.2 Assets
+                          </a>
+                        </li>
+                        <li role="menuitem">
                           <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/contract/list']">
-                            FA 1.2 Tokens
+                            Contracts
                           </a>
                         </li>
                       </ul>
@@ -213,7 +218,6 @@
                   </ul>
                 </span>
               </li>
-              <!-- TODO: unhide if switch works  -->
               <li class="nav-item dropdown pl-2 pl-sm-0">
                 <span class="d-block" dropdown [triggers]="triggers" #dp3="bs-dropdown">
                   <a

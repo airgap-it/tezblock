@@ -6,7 +6,7 @@
 //   beforeEach(() => TestBed.configureTestingModule({}))
 
 //   it('should be created', () => {
-//     const service: Facade = TestBed.get(Facade)
+//     const service: Facade = TestBed.inject(Facade)
 //     expect(service).toBeTruthy()
 //   })
 // })

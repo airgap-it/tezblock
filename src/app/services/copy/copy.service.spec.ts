@@ -13,7 +13,7 @@ describe('CopyService', () => {
       .catch(console.error)
   })
   it('should be created', () => {
-    const service: CopyService = TestBed.get(CopyService)
+    const service: CopyService = TestBed.inject(CopyService)
     expect(service).toBeTruthy()
   })
 })

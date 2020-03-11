@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { createIcon } from '@download/blockies'
 import { BigNumber } from 'bignumber.js'
 import { toDataUrl } from 'myetherwallet-blockies'
@@ -10,23 +10,38 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   templateUrl: 'identicon.html',
   styleUrls: ['./identicon.scss']
 })
-export class IdenticonComponent {
-  public hasBakerIcon: boolean = false
-  public bakerIconUrl: string = ''
-  public displayIdenticonNotLogo: boolean = false
+export class IdenticonComponent implements OnInit {
+  hasBakerIcon: boolean = false
+  bakerIconUrl: string = ''
+  displayIdenticonNotLogo: boolean = false
 
-  public identicon: string = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // transparent
+  identicon: string = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // transparent
 
   @Input()
-  public sizeLarge: boolean = false
+  sizeLarge: boolean = false
 
   @Input()
   set forceIdenticon(value: boolean) {
     this.displayIdenticonNotLogo = value
   }
 
-  @Input()
-  set address(value: string) {
+  @Input() address: string
+
+  ngOnInit() {
+    this.setIdenticon(this.address)
+  }
+
+  private b582int(val: string): string {
+    let rv = new BigNumber(0)
+    const alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    for (let i = 0; i < val.length; i++) {
+      rv = rv.plus(new BigNumber(alpha.indexOf(val[val.length - 1 - i])).multipliedBy(new BigNumber(alpha.length).exponentiatedBy(i)))
+    }
+
+    return rv.toString(16)
+  }
+
+  private setIdenticon(value: string) {
     if (!value) {
       return
     }
@@ -39,18 +54,8 @@ export class IdenticonComponent {
       } else if (value.startsWith('tz') || value.startsWith('kt')) {
         this.identicon = createIcon({ seed: `0${this.b582int(value)}`, spotcolor: '#000' }).toDataURL()
       } else {
-        this.identicon = toDataUrl(value.toLowerCase())
+        this.identicon = toDataUrl(value)
       }
     }
-  }
-
-  private b582int(val: string): string {
-    let rv = new BigNumber(0)
-    const alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
-    for (let i = 0; i < val.length; i++) {
-      rv = rv.plus(new BigNumber(alpha.indexOf(val[val.length - 1 - i])).multipliedBy(new BigNumber(alpha.length).exponentiatedBy(i)))
-    }
-
-    return rv.toString(16)
   }
 }
