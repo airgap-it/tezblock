@@ -1,13 +1,16 @@
 import { Injectable } from '@angular/core'
-import { BehaviorSubject, combineLatest } from 'rxjs'
+import { combineLatest } from 'rxjs'
 import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators'
 
 import { ApiService } from '../api/api.service'
 import { BlockService } from '../blocks/blocks.service'
 import { distinctPagination, Facade, Pagination } from '../facade/facade'
 
-export const meanBlockTime = 60.846710205078125 // 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
+export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
+
+export const meanBlockTimeFromPeriod = 60.846710205078125 // Pascal's suspicious calculation from period length
+export const numberOfBlocksToSecondsFromPeriod = (numberOfBlocks: number): number => meanBlockTimeFromPeriod * numberOfBlocks
 
 interface CycleServiceState {
   currentCycle: number

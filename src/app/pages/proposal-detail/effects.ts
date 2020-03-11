@@ -14,7 +14,7 @@ import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
-import { meanBlockTime } from '@tezblock/services/cycle/cycle.service'
+import { meanBlockTimeFromPeriod } from '@tezblock/services/cycle/cycle.service'
 import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()
@@ -266,7 +266,7 @@ export class ProposalDetailEffects {
               period.value < currentVotingPeriod
                 ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
                     map(first),
-                    map(get(item => item.timestamp ? item.timestamp + (meanBlockTime/* seconds */ * 1000) : item.timestamp))
+                    map(get(item => item.timestamp ? item.timestamp + (meanBlockTimeFromPeriod/* seconds */ * 1000) : item.timestamp))
                   )
                 : of(null)
             )

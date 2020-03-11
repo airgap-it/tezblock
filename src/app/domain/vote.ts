@@ -1,4 +1,4 @@
-import { numberOfBlocksToSeconds } from '@tezblock/services/cycle/cycle.service'
+import { numberOfBlocksToSecondsFromPeriod } from '@tezblock/services/cycle/cycle.service'
 import { Operation, Direction, Body } from '@tezblock/services/base.service'
 
 export interface VotingInfo {
@@ -31,7 +31,7 @@ export interface PeriodTimespan {
 
 export const fillMissingPeriodTimespans = (periodsTimespans: PeriodTimespan[], blocksPerVotingPeriod: number) => {
   const fromPeriod = (value: number, periodsBetween: number): number =>
-    value + numberOfBlocksToSeconds(blocksPerVotingPeriod) * 1000 * periodsBetween
+    value + numberOfBlocksToSecondsFromPeriod(blocksPerVotingPeriod) * 1000 * periodsBetween
 
   const getFromPrevious = (index: number, array: PeriodTimespan[], isStart: boolean, originIndex: number): number => {
     if (index < 0) {
