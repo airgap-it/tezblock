@@ -13,7 +13,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 import { toNotNilArray } from '@tezblock/services/fp'
 import * as listActions from './actions'
 
@@ -233,8 +233,15 @@ export class ListEffects {
 
             doubleBakings.map(doubleBaking => {
               const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
+              /* const calculatedReward = await this.rewardService
+                .calculateRewards(additionalData.baker, doubleBaking.cycle)
+                .then(response => response.bakingRewards)
+                */
+
+              // doubleBaking.baker = additionalData.baker
 
               doubleBaking.baker = additionalData.baker
+
               return doubleBaking
             })
 
@@ -598,6 +605,7 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly rewardService: RewardService
   ) {}
 }

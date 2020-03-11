@@ -65,7 +65,7 @@ export class RewardService {
     )
   }
 
-  getRewardAmont(accountAddress: string, bakerAddress: string): Observable<string> {
+  getRewardAmount(accountAddress: string, bakerAddress: string): Observable<string> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
       switchMap(currentCycle =>
         from(this.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
@@ -77,7 +77,7 @@ export class RewardService {
                 return match ? match.payout : null
               }),
               // when passing error in throwError then error is not catched later .. ?
-              catchError(error => throwError(`getRewardAmont(${accountAddress}, ${bakerAddress})`))
+              catchError(error => throwError(`getRewardAmount(${accountAddress}, ${bakerAddress})`))
             )
           )
         )
@@ -96,7 +96,7 @@ export class RewardService {
       return this.pendingPromises.get(key)
     } else {
       const promise = this.protocol.calculateRewards(address, cycle).then(result => {
-        this.calculatedRewardsMap.set(key, result) 
+        this.calculatedRewardsMap.set(key, result)
         this.pendingPromises.delete(key)
         return result
       })
