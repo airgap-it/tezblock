@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
 import { forkJoin, Observable, of } from 'rxjs'
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
+import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -46,7 +46,10 @@ export class ListEffects {
   getBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadBlocks),
-      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.blocks.pagination),
+        this.store$.select(state => state.list.blocks.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
@@ -353,7 +356,10 @@ export class ListEffects {
   getVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadVotes),
-      withLatestFrom(this.store$.select(state => state.list.votes.pagination), this.store$.select(state => state.list.votes.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.votes.pagination),
+        this.store$.select(state => state.list.votes.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], orderBy)
@@ -551,12 +557,24 @@ export class ListEffects {
     )
   )
 
-  foo$ = createEffect(() =>
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadTransactionsSucceeded),
-      switchMap(({ transactions }) => this.apiService.getErrorsForOperations(transactions))
-    ),
-    { dispatch: false }
+      filter(({ transactions }) => transactions.some(transaction => transaction.status !== 'applied')),
+      map(({ transactions }) => listActions.loadTransactionsErrors({ transactions }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => listActions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(listActions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
+    )
   )
 
   private getEntitiesSince(since: number, kind: string, fields: string[] = ['timestamp']): Observable<Transaction[]> {

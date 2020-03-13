@@ -1563,7 +1563,7 @@ export class ApiService {
 
           return {
             id: operation.operation_group_hash,
-            error: match.length > 0 ? flatten(flatten(match.map(item => item.contents.map(contentToErrors)))) : null
+            errors: match.length > 0 ? flatten(match.map(item => flatten(item.contents.map(contentToErrors)))) : null
           }
         })
       ),

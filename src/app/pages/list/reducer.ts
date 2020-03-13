@@ -9,6 +9,7 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { sort } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
+import { first } from '@tezblock/services/fp'
 
 export interface State {
   blocks: TableState<Block>
@@ -623,6 +624,20 @@ export const reducer = createReducer(
     contracts: {
       ...state.contracts,
       orderBy
+    }
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transactions: {
+      ...state.transactions,
+      data: state.transactions.data.map(transaction => {
+        const match = operationErrorsById.find(error => error.id === transaction.operation_group_hash)
+
+        return {
+          ...transaction,
+          errors: match ? match.errors : null
+        }
+      })
     }
   })),
   on(actions.reset, () => initialState)

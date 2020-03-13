@@ -1,3 +1,5 @@
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+
 export enum OperationTypes {
   Transaction = 'transaction',
   Delegation = 'delegation',
@@ -52,23 +54,43 @@ export interface RPCBlocksOpertions {
   contents?: RPCContent[]
 }
 
-export interface OperationErrorsById {
-  id: string
-  error: OperationError[]
-}
-
 export interface OperationErrorMessage {
   title: string
   description: string
 }
 
-const errorMessages: { [key: string]: OperationErrorMessage } = {
-  cannot_pay_storage_fee: {
-    title: 'Cannot pay storage fees',
-    description: 'The storage fee is higher than the contract balance'
-  },
-  balance_too_low: {
-    title: 'Balance too low',
-    description: 'An operation tried to spend {{amount}} ꜩ while the contract has only {{balance}} ꜩ'
+export interface OperationErrorsById {
+  id: string
+  errors: OperationError[]
+}
+
+export const operationErrorToMessage = (
+  operationError: OperationError,
+  amountConverterPipe: AmountConverterPipe
+): OperationErrorMessage => {
+  const amountConverterArgs = {
+    protocolIdentifier: 'xtz',
+    maxDigits: 6,
+    fontSmall: true,
+    fontColor: true
+  }
+
+  if (operationError.id.indexOf('balance_too_low') !== -1) {
+    return {
+      title: 'Balance too low',
+      description: `An operation tried to spend ${operationError.amount} ꜩ while the contract has only ${operationError.balance} ꜩ`
+    }
+  }
+
+  if (operationError.id.indexOf('cannot_pay_storage_fee') !== -1) {
+    return {
+      title: 'Cannot pay storage fees',
+      description: 'The storage fee is higher than the contract balance'
+    }
+  }
+
+  return {
+    title: operationError.id,
+    description: undefined
   }
 }

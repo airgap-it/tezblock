@@ -86,7 +86,8 @@ import { HealthEffects } from './pages/health/effects'
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
 import { DashboarEffects } from './pages/dashboard/effects';
 import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component'
-import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects'
+import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects';
+import { TransactionErrorsComponent } from './components/transaction-errors/transaction-errors.component'
 
 @NgModule({
   imports: [
@@ -186,7 +187,8 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
     HealthComponent,
     AccountOverviewComponent,
     LatestContractsComponent,
-    LatestContractsTransactionsComponent
+    LatestContractsTransactionsComponent,
+    TransactionErrorsComponent
   ],
 
   providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
