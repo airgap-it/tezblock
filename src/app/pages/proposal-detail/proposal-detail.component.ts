@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, combineLatest } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
+import { filter, map, withLatestFrom } from 'rxjs/operators'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
 import { isNil, negate } from 'lodash'
@@ -97,9 +97,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.noDataLabel$ = this.store$
       .select(state => state.proposalDetails.proposal)
       .pipe(
-        filter(negate(isNil)),
+        withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
+        filter(([proposal, periodKind]) => !!proposal && periodKind === PeriodKind.Testing),
         map(
-          (proposal: ProposalDto) => `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+          ([proposal, periodKind]) => `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
         )
       )
     this.periodKind$ = this.store$
