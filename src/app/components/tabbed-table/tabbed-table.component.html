@@ -2,7 +2,7 @@
   <tab
     *ngFor="let tab of tabs; let i = index; trackBy: trackByFn"
     [active]="tab.active"
-    [disabled]="tab.count === 0 && !disableTabLogic"
+    [disabled]="tab.disabled()"
     (selectTab)="onSelectTab(tab)"
   >
     <ng-template tabHeading>

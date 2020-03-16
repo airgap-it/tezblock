@@ -6,6 +6,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { DownloadService } from '@tezblock/services/download/download.service'
 import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { first } from '@tezblock/services/fp'
 
 @Component({
   selector: 'tabbed-table',
@@ -20,13 +21,13 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
   set tabs(value: Tab[]) {
     if (value !== null && value !== this._tabs) {
-      const selectedTab = value.find(tab => tab.active)
+      const selectedTab = value.find(tab => tab.active) || first(value)
 
       this._tabs = value
 
       this.updateSelectedTab(selectedTab)
 
-      if (!this.disableTabLogic && this._tabs.some(tab => tab.count > 0)) {
+      if (this.selectedTab.disabled() && this._tabs.some(tab => tab.count > 0)) {
         this.setInitTabSelection()
       }
     }
@@ -80,21 +81,11 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    const isSet = (tab: Tab) => tab && this.tabs.find(_tab => _tab.title === tab.title).count !== null
-
     this.subscriptions.push(
-      this.activatedRoute.queryParamMap
-        .pipe(
-          filter(
-            queryParam =>
-              queryParam.has('tab') &&
-              (this.disableTabLogic || isSet(this.selectedTab)) /* the case on page start is handled in setInitTabSelection method */
-          )
-        )
-        .subscribe(queryParam => {
-          const selectedTab = this.tabs.find(compareTabWith(queryParam.get('tab')))
-          this.selectTab(selectedTab)
-        })
+      this.activatedRoute.queryParamMap.pipe(filter(queryParam => queryParam.has('tab'))).subscribe(queryParam => {
+        const selectedTab = this.tabs.find(compareTabWith(queryParam.get('tab')))
+        this.selectTab(selectedTab)
+      })
     )
   }
 
@@ -106,7 +97,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const firstTabWithData = this.tabs.find(hasData)
     const selectedTab = tabFromQuery || firstTabWithData
 
-    if (selectedTab && (!this.selectedTab || selectedTab.title !== this.selectedTab.title)) {
+    if (selectedTab) {
       this.selectTab(selectedTab)
     }
   }

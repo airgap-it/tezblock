@@ -124,41 +124,46 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         title: 'Transactions',
         active: true,
         kind: 'transaction',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Delegations',
         active: false,
         kind: 'delegation',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Originations',
         active: false,
         kind: 'origination',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Endorsements',
         active: false,
         kind: 'endorsement',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Activations',
         active: false,
         kind: 'activate_account',
-        count: 0,
+        count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       }
     ]
   }
