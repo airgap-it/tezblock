@@ -559,18 +559,28 @@ export class ListEffects {
 
   onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadTransactionsSucceeded),
-      filter(({ transactions }) => transactions.some(transaction => transaction.status !== 'applied')),
-      map(({ transactions }) => listActions.loadTransactionsErrors({ transactions }))
+      ofType(
+        listActions.loadTransactionsSucceeded,
+        // listActions.loadActivationsSucceeded,
+        listActions.loadOriginationsSucceeded,
+        listActions.loadDelegationsSucceeded,
+        // listActions.loadDoubleBakingsSucceeded,
+        // listActions.loadDoubleEndorsementsSucceeded,
+        // listActions.loadVotesSucceeded,
+        // listActions.loadEndorsementsSucceeded
+      ),
+      map(action => [action[Object.keys(action).filter(key => key !== 'type')[0]], action.type]),
+      filter(([transactions, actionType]) => transactions.some(transaction => transaction.status !== 'applied')),
+      map(([transactions, actionType]) => listActions.loadTransactionsErrors({ transactions, actionType }))
     )
   )
 
   loadTransactionsErrors$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadTransactionsErrors),
-      switchMap(({ transactions }) =>
+      switchMap(({ transactions, actionType }) =>
         this.apiService.getErrorsForOperations(transactions).pipe(
-          map(operationErrorsById => listActions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          map(operationErrorsById => listActions.loadTransactionsErrorsSucceeded({ operationErrorsById, actionType })),
           catchError(error => of(listActions.loadTransactionsErrorsFailed({ error })))
         )
       )

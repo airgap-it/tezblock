@@ -1,7 +1,16 @@
-<span
-  class="d-inline-block"
-  [innerHtml]="amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true } | safeHtml"
-></span>
+<span class="d-inline-block">
+  <ng-container *ngIf="amountPipedTrailingChars; else noDecimals">
+    <span class="d-flex align-items-baseline">
+      {{ amountPipedLeadingChars }}.
+      <span [ngStyle]="fontSmall ? { 'font-size':'90%' } : null" [ngClass]="{ 'text-muted': fontColor }">
+        {{ amountPipedTrailingChars }}
+      </span>
+    </span>
+  </ng-container>
+  <ng-template #noDecimals>
+    {{ amountPipedLeadingChars }}
+  </ng-template>
+</span>
 {{ options?.symbol || 'ꜩ' }}
 <ng-container *ngIf="enableComparison; else noComparison">
   <ng-container *ngIf="showOldValue">
@@ -9,7 +18,7 @@
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary ml-1 cursor--pointer"
       tooltip="Displaying value at time of transaction, click to display current value"
-      (click)="tooltipClick();"
+      (click)="tooltipClick()"
     >
       {{ 1 | currencySymbol: { currInfo: historicCurrencyInfo } }}
       {{ amount | currencyConverter: { currInfo: historicCurrencyInfo, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
@@ -20,7 +29,7 @@
       *ngIf="options?.showFiatValue"
       class="badge badge-pill badge-primary-light ml-1 cursor--pointer"
       tooltip="Displaying current value, click to display value at time of transaction"
-      (click)="tooltipClick();"
+      (click)="tooltipClick()"
     >
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
       {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}

@@ -68,13 +68,7 @@
                   *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
-                    <span
-                      class="d-inline-block"
-                      [innerHtml]="
-                        account.balance | amountConverter: { protocolIdentifier: 'xtz', fontSmall: true, fontColor: true } | safeHtml
-                      "
-                    ></span>
-                    ꜩ
+                    <amount-cell [data]="{ amount: account.balance }" [options]="{ showFiatValue: false }"></amount-cell>
                   </h5>
                 </div>
                 <ng-template #hideValue>
@@ -211,15 +205,7 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <span
-                        class="d-inline-block"
-                        [innerHtml]="
-                          delegatedAmount
-                            | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 6, fontSmall: true, fontColor: true }
-                            | safeHtml
-                        "
-                      ></span>
-                      ꜩ
+                      <amount-cell [data]="{ amount: delegatedAmount }" [options]="{ showFiatValue: false }"></amount-cell>
                       <ng-container *ngIf="isMainnet">
                         <span class="badge badge-pill badge-primary-light ml-1">
                           {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }

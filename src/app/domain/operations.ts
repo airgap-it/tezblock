@@ -78,7 +78,10 @@ export const operationErrorToMessage = (
   if (operationError.id.indexOf('balance_too_low') !== -1) {
     return {
       title: 'Balance too low',
-      description: `An operation tried to spend ${operationError.amount} ꜩ while the contract has only ${operationError.balance} ꜩ`
+      description: `An operation tried to spend ${amountConverterPipe.transform(
+        operationError.amount,
+        amountConverterArgs
+      )} ꜩ while the contract has only ${amountConverterPipe.transform(operationError.balance, amountConverterArgs)} ꜩ`
     }
   }
 
