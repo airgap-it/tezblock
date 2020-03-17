@@ -17,6 +17,7 @@ export class AppComponent {
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
     this.store$.dispatch(actions.loadLatestBlock())
+    this.store$.dispatch(actions.loadPeriodInfos())
   }
 
   public navigate(entity: string) {

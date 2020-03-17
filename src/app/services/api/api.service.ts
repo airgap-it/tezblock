@@ -1584,7 +1584,12 @@ export class ApiService {
       baseApiUrl: this.environmentUrls.conseilUrl,
       baseApiKey: this.environmentUrls.conseilApiKey,
       baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork()
+      network: this.chainNetworkService.getNetwork(),
+      feeDefaults: {
+        low: '0',
+        medium: '0',
+        high: '0'
+      }
     })
   }
 }

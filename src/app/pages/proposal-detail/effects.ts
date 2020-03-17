@@ -7,32 +7,15 @@ import { Store } from '@ngrx/store'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
+import * as appActions from '@tezblock/app.actions'
 import { isEmptyPeriodKind } from './reducer'
-import { BaseService, Operation, Direction, Body, ENVIRONMENT_URL } from '@tezblock/services/base.service'
+import { BaseService, Operation } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { PeriodKind, MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
-import { meanBlockTime } from '@tezblock/services/cycle/cycle.service'
-
-const getPeriodTimespanQuery = (period: number, direction: Direction): Body => ({
-  fields: ['timestamp'],
-  predicates: [
-    {
-      field: 'meta_voting_period',
-      operation: Operation.eq,
-      set: [period],
-      inverse: false
-    }
-  ],
-  orderBy: [
-    {
-      field: 'level',
-      direction
-    }
-  ],
-  limit: 1
-})
+import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
+import { meanBlockTimeFromPeriod } from '@tezblock/services/cycle/cycle.service'
+import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()
 export class ProposalDetailEffects {
@@ -41,7 +24,14 @@ export class ProposalDetailEffects {
       ofType(actions.loadProposal),
       switchMap(({ id }) =>
         this.apiService.getProposal(id).pipe(
-          map(proposal => actions.loadProposalSucceeded({ proposal })),
+          map(proposal => {
+            const match = proposals[id]
+
+            return actions.loadProposalSucceeded({ proposal: {
+              ...proposal,
+              discussionLink: match ? match.discussionLink : undefined
+            } })
+          }),
           catchError(error => of(actions.loadProposalFailed({ error })))
         )
       )
@@ -243,44 +233,10 @@ export class ProposalDetailEffects {
     )
   )
 
-  loadPeriodInfos$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadPeriodInfos),
-      switchMap(() =>
-        forkJoin(
-          this.baseService
-            .post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
-              fields: ['meta_voting_period', 'meta_voting_period_position'],
-              orderBy: [
-                {
-                  field: 'level',
-                  direction: 'desc'
-                }
-              ],
-              limit: 1
-            })
-            .pipe(map(first)),
-          this.baseService
-            .get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true)
-            .pipe(map(response => response.blocks_per_voting_period))
-        ).pipe(
-          map(([{ meta_voting_period, meta_voting_period_position }, blocksPerVotingPeriod]) =>
-            actions.loadPeriodInfosSucceeded({
-              currentVotingPeriod: meta_voting_period,
-              currentVotingeriodPosition: meta_voting_period_position,
-              blocksPerVotingPeriod
-            })
-          ),
-          catchError(error => of(actions.loadVotesFailed({ error })))
-        )
-      )
-    )
-  )
-
   loadPeriodsTimespansTrigger$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadPeriodInfosSucceeded),
-      combineLatest(this.actions$.pipe(ofType(actions.loadMetaVotingPeriodsSucceeded))),
+      ofType(actions.loadMetaVotingPeriodsSucceeded),
+      combineLatest(this.actions$.pipe(ofType(appActions.loadPeriodInfosSucceeded))),
       map(() => actions.loadPeriodsTimespans())
     )
   )
@@ -290,9 +246,10 @@ export class ProposalDetailEffects {
       ofType(actions.loadPeriodsTimespans),
       withLatestFrom(
         this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-        this.store$.select(state => state.proposalDetails.currentVotingPeriod)
+        this.store$.select(state => state.app.currentVotingPeriod),
+        this.store$.select(state => state.app.blocksPerVotingPeriod)
       ),
-      switchMap(([action, metaVotingPeriods, currentVotingPeriod]) =>
+      switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) =>
         forkJoin(
           forkJoin(
             metaVotingPeriods.map(period =>
@@ -309,7 +266,7 @@ export class ProposalDetailEffects {
               period.value < currentVotingPeriod
                 ? this.baseService.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
                     map(first),
-                    map(get(item => item.timestamp ? item.timestamp + (meanBlockTime/* seconds */ * 1000) : item.timestamp))
+                    map(get(item => item.timestamp ? item.timestamp + (meanBlockTimeFromPeriod/* seconds */ * 1000) : item.timestamp))
                   )
                 : of(null)
             )
@@ -317,7 +274,8 @@ export class ProposalDetailEffects {
         ).pipe(
           map(response =>
             actions.loadPeriodsTimespansSucceeded({
-              periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] })
+              periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),
+              blocksPerVotingPeriod
             })
           ),
           catchError(error => of(actions.loadPeriodsTimespansFailed({ error })))
