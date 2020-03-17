@@ -83,14 +83,14 @@ export const operationErrorToMessage = (
       description: `An operation tried to spend ${amountConverterPipe.transform(
         operationError.amount,
         amountConverterArgs
-      )} ꜩ while the contract has only ${amountConverterPipe.transform(operationError.balance, amountConverterArgs)} ꜩ`
+      )} ꜩ while the account has only ${amountConverterPipe.transform(operationError.balance, amountConverterArgs)} ꜩ`
     }
   }
 
   if (operationError.id.indexOf('cannot_pay_storage_fee') !== -1) {
     return {
       title: 'Cannot pay storage fees',
-      description: 'The storage fee is higher than the contract balance'
+      description: 'The storage fee is higher than the account balance'
     }
   }
 

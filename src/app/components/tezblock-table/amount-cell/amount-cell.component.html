@@ -2,7 +2,7 @@
   <ng-container *ngIf="amountPipedTrailingChars; else noDecimals">
     <span class="d-flex align-items-baseline">
       {{ amountPipedLeadingChars }}.
-      <span [ngStyle]="fontSmall ? { 'font-size':'90%' } : null" [ngClass]="{ 'text-muted': fontColor }">
+      <span [ngStyle]="fontSmall ? { 'font-size': '90%' } : null" [ngClass]="{ 'text-muted': fontColor }">
         {{ amountPipedTrailingChars }}
       </span>
     </span>
@@ -19,6 +19,7 @@
       class="badge badge-pill badge-primary ml-1 cursor--pointer"
       tooltip="Displaying value at time of transaction, click to display current value"
       (click)="tooltipClick()"
+      [adaptivePosition]="false"
     >
       {{ 1 | currencySymbol: { currInfo: historicCurrencyInfo } }}
       {{ amount | currencyConverter: { currInfo: historicCurrencyInfo, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
@@ -30,6 +31,7 @@
       class="badge badge-pill badge-primary-light ml-1 cursor--pointer"
       tooltip="Displaying current value, click to display value at time of transaction"
       (click)="tooltipClick()"
+      [adaptivePosition]="false"
     >
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
       {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
