@@ -1,4 +1,6 @@
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { TableState } from '@tezblock/domain/table'
 
 export enum OperationTypes {
   Transaction = 'transaction',
@@ -97,3 +99,18 @@ export const operationErrorToMessage = (
     description: undefined
   }
 }
+
+export const getTransactionsWithErrors = (
+  operationErrorsById: OperationErrorsById[],
+  tableState: TableState<Transaction>
+): TableState<Transaction> => ({
+  ...tableState,
+  data: tableState.data.map(transaction => {
+    const match = operationErrorsById.find(error => error.id === transaction.operation_group_hash)
+
+    return {
+      ...transaction,
+      errors: match ? match.errors : null
+    }
+  })
+})

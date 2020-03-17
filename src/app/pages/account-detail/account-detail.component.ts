@@ -34,6 +34,7 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -112,7 +113,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  transactions$: Observable<any[]>
+  transactions$: Observable<Transaction[]>
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
@@ -254,8 +255,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
-    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
+    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
@@ -271,7 +272,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         filter(Array.isArray),
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
-    this.orderBy$ = this.store$.select(state => state.accountDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -280,7 +281,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.setTabs(address)
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
@@ -324,12 +324,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-      ])
+      combineLatest(
+        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
+        getRefresh([
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
+        ])
+      )
         .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
-        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind: kind || OperationTypes.Transaction }))),
 
       this.account$
         .pipe(

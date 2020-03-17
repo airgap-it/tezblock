@@ -11,8 +11,9 @@ import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
-import { OrderBy } from '@tezblock/services/base.service'
-import { sort } from '@tezblock/domain/table'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+
+import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>
@@ -85,7 +86,6 @@ export const fromMyTezosBakerResponse = (
 })
 
 export interface Busy {
-  transactions: boolean
   rewardAmont: boolean
 }
 
@@ -99,16 +99,14 @@ export interface State {
   account: Account
   delegatedAccounts: Account[]
   relatedAccounts: Account[]
-  transactions: Transaction[]
+  transactions: TableState<Transaction>
   counts: Count[]
   kind: string
-  pageSize: number // transactions
   rewardAmont: string
   busy: Busy
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
-  orderBy: OrderBy
   temporaryBalance: Balance[]
 }
 
@@ -117,19 +115,16 @@ const initialState: State = {
   account: undefined,
   delegatedAccounts: undefined,
   relatedAccounts: undefined,
-  transactions: undefined,
+  transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   kind: undefined,
-  pageSize: 10,
   rewardAmont: undefined,
   busy: {
-    transactions: false,
     rewardAmont: false
   },
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  orderBy: sort('block_level', 'desc'),
   temporaryBalance: undefined
 }
 
@@ -178,36 +173,43 @@ export const reducer = createReducer(
   on(actions.loadTransactionsByKind, (state, { kind }) => ({
     ...state,
     kind,
-    busy: {
-      ...state.busy,
-      transactions: true
+    transactions: {
+      ...state.transactions,
+      loading: true
     }
   })),
   on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
     ...state,
-    transactions: data,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      data,
+      loading: false
     }
   })),
   on(actions.loadTransactionsByKindFailed, state => ({
     ...state,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      loading: false
     }
   })),
   on(actions.increasePageSize, state => ({
     ...state,
-    pageSize: state.pageSize + 10
+    transactions: {
+      ...state.transactions,
+      pagination: {
+        ...state.transactions.pagination,
+        currentPage: state.transactions.pagination.currentPage + 1
+      }
+    }
   })),
-
   on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
-    orderBy
+    transactions: {
+      ...state.transactions,
+      orderBy
+    }
   })),
-
   on(actions.loadBalanceForLast30DaysSucceeded, (state, { balanceFromLast30Days }) => ({
     ...state,
     balanceFromLast30Days: ensure30Days(balanceFromLast30Days)
@@ -248,6 +250,10 @@ export const reducer = createReducer(
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
     counts
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
   })),
   on(actions.reset, () => initialState)
 )

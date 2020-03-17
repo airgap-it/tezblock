@@ -9,23 +9,8 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { sort } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
-import { OperationErrorsById } from '@tezblock/domain/operations'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 import { first } from '@tezblock/services/fp'
-
-const getTransactionsWithErrors = (
-  operationErrorsById: OperationErrorsById[],
-  tableState: TableState<Transaction>
-): TableState<Transaction> => ({
-  ...tableState,
-  data: tableState.data.map(transaction => {
-    const match = operationErrorsById.find(error => error.id === transaction.operation_group_hash)
-
-    return {
-      ...transaction,
-      errors: match ? match.errors : null
-    }
-  })
-})
 
 export interface State {
   blocks: TableState<Block>

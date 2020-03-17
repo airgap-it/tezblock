@@ -82,7 +82,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         field: 'delegatedBalance',
         template: Template.amount,
         data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
-        sortable: true
+        sortable: false // delegatedBalance is joined property from accounts
       }
     ].concat(<any>blockAndTxHashColumns),
 

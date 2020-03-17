@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import BigNumber from 'bignumber.js'
 import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
 import { map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
@@ -62,15 +61,15 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
   ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
-    this.transactions$ = this.store$.select(state => state.transactionDetails.transactions).pipe(filter(negate(isNil)))
+    this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.transactions.loading)
+    this.transactions$ = this.store$.select(state => state.transactionDetails.transactions.data).pipe(filter(negate(isNil)))
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.store$.select(state => state.transactionDetails.totalAmount)
     // this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
-    this.orderBy$ = this.store$.select(state => state.transactionDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.transactionDetails.transactions.orderBy)
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
