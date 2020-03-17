@@ -85,25 +85,24 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
       }),
 
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadVotesSucceeded)),
-        this.actions$.pipe(ofType(actions.loadVotesFailed))
-      ]).pipe(
-        withLatestFrom(
-          this.store$.select(state => state.proposalDetails.periodKind),
-          this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-          this.store$.select(state => state.app.currentVotingPeriod)
-        ),
-        filter(([refreshNo, periodKind, metaVotingPeriods, currentVotingPeriod]) => {
-          if (!metaVotingPeriods || !currentVotingPeriod) {
-            return false
-          }
+      getRefresh([this.actions$.pipe(ofType(actions.loadVotesSucceeded)), this.actions$.pipe(ofType(actions.loadVotesFailed))])
+        .pipe(
+          withLatestFrom(
+            this.store$.select(state => state.proposalDetails.periodKind),
+            this.store$.select(state => state.proposalDetails.metaVotingPeriods),
+            this.store$.select(state => state.app.currentVotingPeriod)
+          ),
+          filter(([refreshNo, periodKind, metaVotingPeriods, currentVotingPeriod]) => {
+            if (!metaVotingPeriods || !currentVotingPeriod) {
+              return false
+            }
 
-          const currentPeriod = metaVotingPeriods.find(period => period.value === currentVotingPeriod)
+            const currentPeriod = metaVotingPeriods.find(period => period.value === currentVotingPeriod)
 
-          return currentPeriod && currentPeriod.periodKind === periodKind
-        })
-      ).subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
+            return currentPeriod && currentPeriod.periodKind === periodKind
+          })
+        )
+        .subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
     )
   }
 
@@ -124,12 +123,14 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.noDataLabel$ = this.store$
-      .select(state => state.proposalDetails.proposal)
+      .select(state => state.proposalDetails.periodKind)
       .pipe(
-        withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
-        filter(([proposal, periodKind]) => !!proposal && periodKind === PeriodKind.Testing),
-        map(
-          ([proposal, periodKind]) => `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+        withLatestFrom(this.store$.select(state => state.proposalDetails.proposal)),
+        filter(([periodKind, proposal]) => !!proposal),
+        map(([periodKind, proposal]) =>
+          periodKind === PeriodKind.Testing
+            ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+            : undefined
         )
       )
     this.periodKind$ = this.store$
