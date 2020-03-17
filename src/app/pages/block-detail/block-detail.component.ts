@@ -58,16 +58,16 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
+    this.transactionsLoading$ = this.store$.select(state => state.blockDetails.transactions.loading)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
-    this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
+    this.transactions$ = this.store$.select(state => state.blockDetails.transactions.data).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
-    this.orderBy$ = this.store$.select(state => state.blockDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.blockDetails.transactions.orderBy)
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
