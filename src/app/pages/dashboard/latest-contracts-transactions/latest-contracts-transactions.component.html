@@ -5,9 +5,9 @@
         <div class="row">
           <div class="col-6 col-sm-3 pl-0 order-2 order-sm-0">
             <div class="d-block pt-2 pt-sm-0">
-              <app-hash-cell [data]="operation.operation_group_hash"></app-hash-cell>
-              <p class="m-0 small text-secondary" tooltip="{{ operation.timestamp / 1000 | amFromUnix }}">
-                {{ operation.timestamp | amTimeAgo }}
+              <app-hash-cell [data]="operation.hash"></app-hash-cell>
+              <p class="m-0 small text-secondary" tooltip="{{ operation.timestamp | amFromUnix }}">
+                {{ operation.timestamp * 1000 | amTimeAgo }}
               </p>
             </div>
           </div>
@@ -17,9 +17,9 @@
           <div class="col-10 col-sm-5 pl-0 order-1 order-sm-3">
             <div class="d-block ">
               <div class="mb-1">
-                <address-item [address]="operation.source"></address-item>
+                <address-item [address]="operation.singleFrom"></address-item>
               </div>
-              <address-item [address]="operation.destination"></address-item>
+              <address-item [address]="operation.singleTo"></address-item>
             </div>
           </div>
           <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
