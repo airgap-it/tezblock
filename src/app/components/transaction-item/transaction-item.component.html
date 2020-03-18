@@ -6,8 +6,8 @@
           <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(transaction.operation_group_hash)">
             {{ transaction.operation_group_hash | shortenString }}
           </button>
-          <p class="m-0 small text-secondary" tooltip="{{ transaction.timestamp / 1000 | amFromUnix }}">
-            {{ transaction.timestamp | amTimeAgo }}
+          <p class="m-0 small text-secondary">
+            <app-timestamp-cell [data]="transaction.timestamp"></app-timestamp-cell>
           </p>
         </div>
       </div>

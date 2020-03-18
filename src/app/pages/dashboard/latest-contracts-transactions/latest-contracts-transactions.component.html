@@ -6,8 +6,8 @@
           <div class="col-6 col-sm-3 pl-0 order-2 order-sm-0">
             <div class="d-block pt-2 pt-sm-0">
               <app-hash-cell [data]="operation.operation_group_hash"></app-hash-cell>
-              <p class="m-0 small text-secondary" tooltip="{{ operation.timestamp / 1000 | amFromUnix }}">
-                {{ operation.timestamp | amTimeAgo }}
+              <p class="m-0 small text-secondary">
+                <app-timestamp-cell [data]="operation.timestamp"></app-timestamp-cell>
               </p>
             </div>
           </div>

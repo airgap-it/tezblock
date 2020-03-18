@@ -6,7 +6,9 @@
           <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(block.level)">
             {{ block.level }}
           </button>
-          <p class="m-0 small text-secondary">{{ block.timestamp | amTimeAgo }}</p>
+          <p class="m-0 small text-secondary">
+            <app-timestamp-cell [data]="block.timestamp"></app-timestamp-cell>
+          </p>
         </div>
       </div>
       <div class="col-4 col-sm-2 p-0 order-1 order-sm-1">
