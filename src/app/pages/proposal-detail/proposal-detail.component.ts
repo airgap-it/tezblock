@@ -77,7 +77,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
       combineLatest(
         this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
-        this.store$.select(state => state.app.currentVotingPeriod).pipe(filter(negate(isNil)))
+        this.store$.select(state => state.proposalDetails.proposal)
+      ).pipe(
+        filter(([paramMap, proposal]) => !!proposal)
       ).subscribe(() => {
         const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
         const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal

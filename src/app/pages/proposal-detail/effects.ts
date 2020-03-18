@@ -8,7 +8,6 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as appActions from '@tezblock/app.actions'
-import { isEmptyPeriodKind } from './reducer'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
@@ -52,9 +51,9 @@ export class ProposalDetailEffects {
       ofType(actions.loadMetaVotingPeriods),
       withLatestFrom(
         this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.app.currentVotingPeriod)
+        this.store$.select(state => state.proposalDetails.proposal)
       ),
-      switchMap(([action, proposalHash, currentVotingPeriod]) =>
+      switchMap(([action, proposalHash, proposal]) =>
         forkJoin(
           // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
           this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
@@ -66,7 +65,7 @@ export class ProposalDetailEffects {
               metaVotingPeriods: [
                 {
                   periodKind: PeriodKind.Proposal,
-                  value: metaVotingPeriodCounts[0] ? metaVotingPeriodCounts[0] - 1 : currentVotingPeriod /* TODO: CONFIRM */
+                  value: metaVotingPeriodCounts[0] ? metaVotingPeriodCounts[0] - 1 : proposal.period
                 },
                 { periodKind: PeriodKind.Exploration, value: metaVotingPeriodCounts[0] },
                 { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
