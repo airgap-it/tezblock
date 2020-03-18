@@ -88,19 +88,44 @@ export class ContractDetailEffects {
   onLoadContractLoadAccount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContract),
-      map(({ address }) => actions.loadAccount({ address }))
+      map(({ address }) => actions.loadManagerAddress({ address }))
     )
   )
 
   loadAccount$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadAccount),
+      ofType(actions.loadManagerAddress),
       switchMap(({ address }) =>
-        this.apiService.getAccountById(address).pipe(
-          map(first),
-          map(account => actions.loadAccountSucceeded({ account })),
-          catchError(error => of(actions.loadAccountFailed({ error })))
-        )
+        this.baseService
+          .post<{ source: string }[]>('operations', {
+            fields: ['source'],
+            predicates: [
+              {
+                field: 'kind',
+                operation: Operation.eq,
+                set: ['origination'],
+                inverse: false
+              },
+              {
+                field: 'originated_contracts',
+                operation: Operation.eq,
+                set: [address],
+                inverse: false
+              }
+            ],
+            orderBy: [
+              {
+                field: 'block_level',
+                direction: 'desc'
+              }
+            ],
+            limit: 1
+          })
+          .pipe(
+            map(first),
+            map(({ source }) => actions.loadManagerAddressSucceeded({ manager: source })),
+            catchError(error => of(actions.loadManagerAddressFailed({ error })))
+          )
       )
     )
   )

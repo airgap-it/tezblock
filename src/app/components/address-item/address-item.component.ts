@@ -27,6 +27,7 @@ export class AddressItemComponent implements OnInit {
     if (value !== this._address) {
       this._address = value
       this.contract = getTokenContractByAddress(value)
+      this.formattedAddress = this.getFormattedAddress()
     }
   }
   get address(): string {
@@ -34,7 +35,21 @@ export class AddressItemComponent implements OnInit {
   }
   private _address: string
 
-  @Input() options: Options
+  @Input()
+  set options(value: Options) {
+    if (value !== this._options) {
+      this._options = value
+      if (this.address) {
+        this.formattedAddress = this.getFormattedAddress()
+      }
+    }
+  }
+
+  get options(): Options {
+    return this._options
+  }
+
+  private _options: Options
 
   @Input()
   set clickableButton(value: boolean) {
@@ -47,10 +62,6 @@ export class AddressItemComponent implements OnInit {
   }
   private _clickableButton: boolean | undefined
 
-  get clickable(): boolean {
-    return this.options && this.options.pageId ? this.options.pageId !== this.address : true
-  }
-
   get path(): string {
     return `/${this.contract ? 'contract' : 'account'}`
   }
@@ -59,11 +70,13 @@ export class AddressItemComponent implements OnInit {
 
   private contract: TokenContract
 
+  private get clickable(): boolean {
+    return this.options && this.options.pageId ? this.options.pageId !== this.address : true
+  }
+
   constructor(private readonly aliasPipe: AliasPipe, private readonly shortenStringPipe: ShortenStringPipe) {}
 
-  ngOnInit() {
-    this.formattedAddress = this.getFormattedAddress()
-  }
+  ngOnInit() {}
 
   private getFormattedAddress() {
     const getAliasOrShorten = () => this.aliasPipe.transform(this.address) || this.shortenStringPipe.transform(this.address)

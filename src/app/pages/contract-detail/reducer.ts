@@ -4,10 +4,9 @@ import { TezosTransactionCursor } from 'airgap-coin-lib'
 import * as actions from './actions'
 import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
-import { Account } from '@tezblock/interfaces/Account'
 
 export interface State {
-  account: Account
+  manager: string
   address: string
   contract: TokenContract
   copyToClipboardState: string
@@ -18,7 +17,7 @@ export interface State {
 }
 
 const initialState: State = {
-  account: undefined,
+  manager: undefined,
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
@@ -162,13 +161,13 @@ export const reducer = createReducer(
     ...state,
     currentTabKind
   })),
-  on(actions.loadAccountSucceeded, (state, { account }) => ({
+  on(actions.loadManagerAddressSucceeded, (state, { manager }) => ({
     ...state,
-    account
+    manager
   })),
-  on(actions.loadAccountFailed, (state, { error }) => ({
+  on(actions.loadManagerAddressFailed, (state, { error }) => ({
     ...state,
-    account: null
+    manager: null
   })),
   on(actions.reset, () => initialState)
 )

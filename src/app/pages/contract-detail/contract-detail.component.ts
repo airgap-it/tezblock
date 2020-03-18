@@ -125,10 +125,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
-    this.manager$ = this.store$.select(state => state.contractDetails.account).pipe(
-      filter(negate(isNil)),
-      map((account: Account) => account.manager)
-    )
+    this.manager$ = this.store$.select(state => state.contractDetails.manager)
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
