@@ -4,8 +4,8 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
-import { OrderBy } from '@tezblock/services/base.service'
-import { sort } from '@tezblock/domain/table'
+import { sort, TableState, getInitialTableState } from '@tezblock/domain/table'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 
 export interface Busy {
   transactions: boolean
@@ -13,12 +13,9 @@ export interface Busy {
 
 export interface State {
   transactionHash: string
-  transactions: Transaction[]
+  transactions: TableState<Transaction>
   counts: Count[]
   latestBlock: Block
-  pageSize: number // transactions
-  busy: Busy
-  orderBy: OrderBy
   totalAmount: number
   totalFee: number
 
@@ -31,14 +28,9 @@ export interface Sorting {
 
 const initialState: State = {
   transactionHash: undefined,
-  transactions: undefined,
+  transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   latestBlock: undefined,
-  pageSize: 10,
-  busy: {
-    transactions: false
-  },
-  orderBy: sort('block_level', 'desc'),
   totalAmount: undefined,
   totalFee: undefined
 }
@@ -48,25 +40,25 @@ export const reducer = createReducer(
   on(actions.loadTransactionsByHash, (state, { transactionHash }) => ({
     ...state,
     transactionHash,
-    busy: {
-      ...state.busy,
-      transactions: true
+    transactions: {
+      ...state.transactions,
+      loading: true
     }
   })),
   on(actions.loadTransactionsByHashSucceeded, (state, { data }) => ({
     ...state,
-    transactions: data,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      data,
+      loading: false
     }
   })),
   on(actions.loadTransactionsByHashFailed, state => ({
     ...state,
-    transactions: null,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      data: null,
+      loading: false
     }
   })),
   on(actions.loadLatestBlockSucceeded, (state, { latestBlock }) => ({
@@ -75,7 +67,13 @@ export const reducer = createReducer(
   })),
   on(actions.increasePageSize, state => ({
     ...state,
-    pageSize: state.pageSize + 10
+    transactions: {
+      ...state.transactions,
+      pagination: {
+        ...state.transactions.pagination,
+        currentPage: state.transactions.pagination.currentPage + 1
+      }
+    }
   })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
@@ -83,7 +81,10 @@ export const reducer = createReducer(
   })),
   on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
     ...state,
-    orderBy
+    transactions: {
+      ...state.transactions,
+      orderBy
+    }
   })),
   on(actions.loadTransactionsTotalAmountSucceeded, (state, { totalAmount }) => ({
     ...state,
@@ -100,6 +101,10 @@ export const reducer = createReducer(
   on(actions.loadTransactionsTotalFeeFailed, state => ({
     ...state,
     totalFee: null
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
   })),
   on(actions.reset, () => initialState)
 )
