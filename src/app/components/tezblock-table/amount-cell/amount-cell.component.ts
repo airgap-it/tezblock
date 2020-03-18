@@ -16,7 +16,7 @@ const dayDifference = (value: number): number => moment().diff(moment(value), 'd
 @Component({
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
-  styleUrls: ['./amount-cell.component.scss'],
+  styleUrls: ['./amount-cell.component.scss']
   // TODO: on 1st click no change
   // changeDetection: ChangeDetectionStrategy.OnPush
 })
@@ -72,14 +72,16 @@ export class AmountCellComponent implements OnInit {
   tooltipClick() {
     if (dayDifference(this.data.timestamp) >= 1) {
       const date = new Date(this.data.timestamp)
-
+      console.log('old v before: ', this.showOldValue)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
         this.historicCurrencyInfo = {
           symbol: '$',
           currency: 'USD',
           price: new BigNumber(response[1].close)
         }
+
         this.showOldValue = !this.showOldValue
+        console.log('old v after: ', this.showOldValue)
       })
     }
   }
