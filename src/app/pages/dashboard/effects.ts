@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, forkJoin } from 'rxjs'
+import { from, of, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
@@ -67,10 +67,7 @@ export class DashboarEffects {
       switchMap(([action, currentVotingPeriod, blocksPerVotingPeriod]) =>
         this.baseService
           .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(currentVotingPeriod, 'asc'))
-          .pipe(
-            map(first),
-            map(get(item => item.timestamp))
-          )
+          .pipe(map(first), map(get(item => item.timestamp)))
           .pipe(
             map(response =>
               actions.loadCurrentPeriodTimespanSucceeded({
@@ -80,6 +77,52 @@ export class DashboarEffects {
             ),
             catchError(error => of(actions.loadCurrentPeriodTimespanFailed({ error })))
           )
+      )
+    )
+  )
+
+  loadTransactions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactions),
+      switchMap(() => {
+        return this.apiService.getLatestTransactions(6, ['transaction']).pipe(
+          map(transactions => actions.loadTransactionsSucceeded({ transactions })),
+          catchError(error => of(actions.loadTransactionsFailed({ error })))
+        )
+      })
+    )
+  )
+
+  loadBlocks$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBlocks),
+      switchMap(() =>
+        this.apiService.getLatestBlocks(6).pipe(
+          switchMap(blocksData =>
+            from(
+              this.apiService.getAdditionalBlockField(
+                blocksData.map(block => block.level),
+                'amount',
+                'sum',
+                6
+              )
+            ).pipe(
+              map((volums: any[]) => {
+                const blocks = blocksData.map(block => {
+                  const match = volums.find(volume => volume.block_level === block.level)
+
+                  return {
+                    ...block,
+                    volume: match ? match.sum_amount : 0
+                  }
+                })
+
+                return actions.loadBlocksSucceeded({ blocks })
+              }),
+              catchError(error => of(actions.loadBlocksFailed({ error })))
+            )
+          )
+        )
       )
     )
   )

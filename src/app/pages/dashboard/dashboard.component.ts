@@ -1,21 +1,24 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Observable, Subscription } from 'rxjs'
+import { Observable } from 'rxjs'
 import { map, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
+import { Actions, ofType } from '@ngrx/effects'
 
-import { BlockService } from '../../services/blocks/blocks.service'
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { CycleService } from '../../services/cycle/cycle.service'
-import { TransactionService } from '../../services/transaction/transaction.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { PeriodTimespan, PeriodKind } from '@tezblock/domain/vote'
+import { getRefresh } from '@tezblock/domain/synchronization'
+import { BaseComponent } from '@tezblock/components/base.component'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Block } from '@tezblock/interfaces/Block'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -24,15 +27,14 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
-  blocks$: Observable<Object>
-  transactions$: Observable<Object>
+export class DashboardComponent extends BaseComponent {
+  blocks$: Observable<Block[]>
+  transactions$: Observable<Transaction[]>
   currentCycle$: Observable<number>
   cycleProgress$: Observable<number>
   cycleStartingBlockLevel$: Observable<number>
   cycleEndingBlockLevel$: Observable<number>
   remainingTime$: Observable<string>
-  subscription: Subscription
 
   fiatInfo$: Observable<CurrencyInfo>
   cryptoInfo$: Observable<CurrencyInfo>
@@ -50,21 +52,20 @@ export class DashboardComponent {
   currentPeriodIndex$: Observable<number>
 
   constructor(
-    private readonly blocksService: BlockService,
-    private readonly transactionService: TransactionService,
+    private readonly actions$: Actions,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly cycleService: CycleService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
+    super()
     this.store$.dispatch(actions.loadContracts())
     this.store$.dispatch(actions.loadLatestProposal())
 
     this.contracts$ = this.store$.select(state => state.dashboard.contracts)
     this.bakers = Object.keys(accounts)
-    this.blocks$ = this.blocksService.list$
-
-    this.transactions$ = this.transactionService.list$
+    this.blocks$ = this.store$.select(state => state.dashboard.blocks)
+    this.transactions$ = this.store$.select(state => state.dashboard.transactions)
 
     this.currentCycle$ = this.cycleService.currentCycle$
     this.cycleProgress$ = this.cycleService.cycleProgress$
@@ -77,8 +78,6 @@ export class DashboardComponent {
     this.historicData$ = this.cryptoPricesService.historicData$
     this.percentage$ = this.cryptoPricesService.growthPercentage$
 
-    this.transactionService.setPageSize(6)
-    this.blocksService.setPageSize(6)
     this.isMainnet()
 
     this.priceChartDatasets$ = this.cryptoPricesService.historicData$.pipe(
@@ -109,12 +108,18 @@ export class DashboardComponent {
         filter(latestBlock => !!latestBlock),
         map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
       )
-  }
 
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe()
-    }
+    this.subscriptions.push(
+      getRefresh([
+        this.actions$.pipe(ofType(actions.loadTransactionsSucceeded)),
+        this.actions$.pipe(ofType(actions.loadTransactionsFailed))
+      ]).subscribe(() => this.store$.dispatch(actions.loadTransactions())),
+
+      getRefresh([
+        this.actions$.pipe(ofType(actions.loadBlocksSucceeded)),
+        this.actions$.pipe(ofType(actions.loadBlocksFailed))
+      ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
+    )
   }
 
   isMainnet() {
