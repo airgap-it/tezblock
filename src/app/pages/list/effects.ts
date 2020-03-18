@@ -46,7 +46,10 @@ export class ListEffects {
   getBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadBlocks),
-      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.blocks.pagination),
+        this.store$.select(state => state.list.blocks.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
@@ -231,18 +234,26 @@ export class ListEffects {
           map((blocks: Block[]) => {
             let doubleBakings = JSON.parse(JSON.stringify(temporaryData))
 
-            doubleBakings.map(doubleBaking => {
+            doubleBakings.map(async doubleBaking => {
               const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
-              /* const calculatedReward = await this.rewardService
+
+              const calculatedrewards = await this.rewardService
                 .calculateRewards(additionalData.baker, doubleBaking.cycle)
                 .then(response => response.bakingRewards)
-                */
+
+              return Promise.all(calculatedrewards).then(response => {
+                return { ...doubleBaking, baker: additionalData.baker, reward: response.join('') }
+              })
 
               // doubleBaking.baker = additionalData.baker
 
-              doubleBaking.baker = additionalData.baker
+              // doubleBaking.reward = calculatedReward
 
-              return doubleBaking
+              // return {
+              //   ...doubleBaking,
+              //   baker: additionalData.baker,
+              //   reward: calculatedReward
+              // }
             })
 
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
@@ -390,7 +401,10 @@ export class ListEffects {
   getVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadVotes),
-      withLatestFrom(this.store$.select(state => state.list.votes.pagination), this.store$.select(state => state.list.votes.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.votes.pagination),
+        this.store$.select(state => state.list.votes.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], orderBy)
