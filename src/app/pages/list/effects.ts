@@ -234,26 +234,14 @@ export class ListEffects {
           map((blocks: Block[]) => {
             let doubleBakings = JSON.parse(JSON.stringify(temporaryData))
 
-            doubleBakings.map(async doubleBaking => {
+            doubleBakings = doubleBakings.map(doubleBaking => {
               const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
 
-              const calculatedrewards = await this.rewardService
-                .calculateRewards(additionalData.baker, doubleBaking.cycle)
-                .then(response => response.bakingRewards)
-
-              return Promise.all(calculatedrewards).then(response => {
-                return { ...doubleBaking, baker: additionalData.baker, reward: response.join('') }
+              const calculatedReward = this.rewardService.calculateRewards(additionalData.baker, doubleBaking.cycle).then(response => {
+                return response.bakingRewards
               })
 
-              // doubleBaking.baker = additionalData.baker
-
-              // doubleBaking.reward = calculatedReward
-
-              // return {
-              //   ...doubleBaking,
-              //   baker: additionalData.baker,
-              //   reward: calculatedReward
-              // }
+              return { ...doubleBaking, baker: additionalData.baker, reward: calculatedReward }
             })
 
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
