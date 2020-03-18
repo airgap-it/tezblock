@@ -792,5 +792,9 @@
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "alias": "Staker",
     "hasLogo": true
+  },
+  "tz1WcCGBxxPq61ddkp8X7vYMrWsBFMCxe5RD": {
+    "alias": "FightCovid",
+    "hasLogo": true
   }
 }
