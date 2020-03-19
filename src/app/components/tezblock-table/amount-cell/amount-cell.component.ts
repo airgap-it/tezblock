@@ -97,13 +97,13 @@ export class AmountCellComponent implements OnInit {
   tooltipClick() {
     if (dayDifference(this.data.timestamp) >= 1) {
       const date = new Date(this.data.timestamp)
-
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
         this.historicCurrencyInfo = {
           symbol: '$',
           currency: 'USD',
           price: new BigNumber(response[1].close)
         }
+
         this.showOldValue = !this.showOldValue
       })
     }
