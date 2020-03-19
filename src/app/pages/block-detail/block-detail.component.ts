@@ -11,7 +11,6 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Tab } from '@tezblock/domain/tab'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
-import { BlockService } from '../../services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
@@ -21,6 +20,8 @@ import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { getRefresh } from '@tezblock/domain/synchronization'
 
 @Component({
   selector: 'app-block-detail',
@@ -47,8 +48,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
-    private readonly blockService: BlockService,
     private readonly iconPipe: IconPipe,
     public readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
@@ -62,8 +63,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
     this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
-    this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
-    this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
+    this.endorsements$ = this.block$.pipe(switchMap(block => this.apiService.getEndorsedSlotsCount(block.hash)))
+    this.numberOfConfirmations$ = combineLatest([this.store$.select(state => state.blockDetails.latestBlock), this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
@@ -86,13 +87,21 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(id => this.store$.dispatch(actions.loadBlock({ id }))),
 
+      getRefresh([
+        this.actions$.pipe(ofType(actions.loadLatestBlockSucceeded)),
+        this.actions$.pipe(ofType(actions.loadLatestBlockFailed))
+      ]).subscribe(() => this.store$.dispatch(actions.loadLatestBlock())),
+
       // refresh transactions
       merge(
         this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
         this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
       )
         .pipe(
-          withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+          withLatestFrom(
+            this.store$.select(state => state.blockDetails.block),
+            this.store$.select(state => state.blockDetails.kind)
+          ),
           switchMap(([action, block, kind]) => timer(refreshRate, refreshRate).pipe(map(() => [block.hash, kind])))
         )
         .subscribe(([blockHash, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind }))),

@@ -4,7 +4,7 @@ import { from, of, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
-import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
@@ -262,6 +262,6 @@ export class AccountDetailEffects {
     private readonly cacheService: CacheService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly transactionService: NewTransactionService
+    private readonly transactionService: TransactionService
   ) {}
 }

@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 
-import { NewTransactionService } from './new-transaction.service';
+import { TransactionService } from './transaction.service';
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('NewTransactionService', () => {
+describe('TransactionService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()
@@ -12,7 +12,7 @@ describe('NewTransactionService', () => {
   });
 
   it('should be created', () => {
-    const service: NewTransactionService = TestBed.inject(NewTransactionService);
+    const service: TransactionService = TestBed.inject(TransactionService);
     expect(service).toBeTruthy();
   });
 });

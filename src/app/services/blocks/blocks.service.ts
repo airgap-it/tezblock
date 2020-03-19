@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { combineLatest, from, Observable } from 'rxjs'
+import { combineLatest, from, forkJoin, Observable, of } from 'rxjs'
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
 
 import { Block } from '../../interfaces/Block'
@@ -140,41 +140,56 @@ export class BlockService extends Facade<BlockServiceState> {
 export class NewBlockService {
   constructor(private readonly apiService: ApiService) {}
 
-  getById(level: string): Observable<Block> {
-    return this.apiService.getBlockById(level).pipe(switchMap(blocks => from(this.getAdditionalBlockData(blocks, 1)).pipe(map(first))))
+  getById(level: string, fields?: string[]): Observable<Block> {
+    return this.apiService.getBlockById(level).pipe(
+      switchMap(blocks => this.getAdditionalBlockData(blocks, 1, fields)),
+      map(first)
+    )
   }
 
-  getLatest(): Observable<Block> {
-    return this.apiService
-      .getLatestBlocks(1)
-      .pipe(switchMap((blocks: Block[]) => from(this.getAdditionalBlockData(blocks, 1)).pipe(map(first))))
+  getLatest(fields?: string[]): Observable<Block> {
+    return this.apiService.getLatestBlocks(1).pipe(
+      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, 1, fields)),
+      map(first)
+    )
   }
 
-  private async getAdditionalBlockData(blocks: Block[], limit: number): Promise<Block[]> {
+  getLatestBlocks(limit: number, fields?: string[]): Observable<Block[]> {
+    return this.apiService.getLatestBlocks(limit).pipe(
+      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, 1, fields))
+    )
+  }
+
+  private getAdditionalBlockData(blocks: Block[], limit: number, fields?: string[]): Observable<Block[]> {
     const blockRange = blocks.map(blocksList => blocksList.level)
-    const amountPromise = this.getAdditionalBlockField<ConseilAmountSum>(blockRange, 'amount', 'sum', limit)
-    const feePromise = this.getAdditionalBlockField<ConseilFeeSum>(blockRange, 'fee', 'sum', limit)
-    const operationGroupPromise = this.getAdditionalBlockField<ConseilCount>(blockRange, 'operation_group_hash', 'count', limit)
+    const isField = (fieldName: string): boolean => fields && fields.some(field => field === fieldName)
+    const getAmounts = isField('volume')
+      ? this.getAdditionalBlockField<ConseilAmountSum>(blockRange, 'amount', 'sum', limit)
+      : of<ConseilAmountSum[]>([])
+    const getFees = isField('fee') ? this.getAdditionalBlockField<ConseilFeeSum>(blockRange, 'fee', 'sum', limit) : of<ConseilFeeSum[]>([])
+    const getCounts = isField('txcount')
+      ? this.getAdditionalBlockField<ConseilCount>(blockRange, 'operation_group_hash', 'count', limit)
+      : of<ConseilCount[]>([])
 
-    return new Promise((resolve, reject) => {
-      Promise.all([amountPromise, feePromise, operationGroupPromise])
-        .then(([amounts, fees, operations]: [ConseilAmountSum[], ConseilFeeSum[], ConseilCount[]]) => {
-          blocks.forEach(block => {
-            const blockAmount = amounts.find((amount: ConseilAmountSum) => amount.block_level === block.level)
-            const blockFee = fees.find((fee: ConseilFeeSum) => fee.block_level === block.level)
-            const blockOperations = operations.find((operation: ConseilCount) => operation.block_level === block.level)
-            block.volume = blockAmount ? blockAmount.sum_amount : 0
-            block.fee = blockFee ? blockFee.sum_fee : 0
-            block.txcount = blockOperations ? blockOperations.count_operation_group_hash : '0'
-          })
+    return forkJoin([getAmounts, getFees, getCounts]).pipe(
+      map(([amounts, fees, counts]) =>
+        blocks.map(block => {
+          const blockAmount = amounts.find((amount: ConseilAmountSum) => amount.block_level === block.level)
+          const blockFee = fees.find((fee: ConseilFeeSum) => fee.block_level === block.level)
+          const blockOperations = counts.find((operation: ConseilCount) => operation.block_level === block.level)
 
-          resolve(blocks)
+          return {
+            ...block,
+            volume: blockAmount ? blockAmount.sum_amount : 0,
+            fee: blockFee ? blockFee.sum_fee : 0,
+            txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
+          }
         })
-        .catch(reject)
-    })
+      )
+    )
   }
 
-  private getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
-    return this.apiService.getAdditionalBlockField(blockRange, field, operation, limit)
+  private getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
+    return from(this.apiService.getAdditionalBlockField<T>(blockRange, field, operation, limit))
   }
 }

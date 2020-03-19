@@ -60,7 +60,6 @@ import { TransactionDetailComponent } from './pages/transaction-detail/transacti
 import { PipesModule } from './pipes/pipes.module'
 import { metaReducers, ROOT_REDUCERS } from './reducers'
 import { BakingService } from './services/baking/baking.service'
-import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
@@ -189,7 +188,7 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
     LatestContractsTransactionsComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
+  providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

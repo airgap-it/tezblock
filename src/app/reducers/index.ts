@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core'
-import { Action, ActionReducer, ActionReducerMap, combineReducers, createSelector, MetaReducer, Store } from '@ngrx/store'
+import { Action, ActionReducer, ActionReducerMap, createSelector, MetaReducer, Store } from '@ngrx/store'
 import { take } from 'rxjs/operators'
 
 import { environment } from '../../environments/environment'
@@ -87,23 +87,15 @@ export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
 
 export const blockDetails = {
-  id: createSelector(
-    selectBlockDetails,
-    state => state.id
-  ),
-  block: createSelector(
-    selectBlockDetails,
-    state => state.block
-  )
+  id: createSelector(selectBlockDetails, state => state.id),
+  block: createSelector(selectBlockDetails, state => state.block)
 }
 
 export const app = {
-  currentCycle: createSelector(
-    selectApp,
-    fromApp.currentCycleSelector
-  ),
-  currentBlockLevel: createSelector(
-    selectApp,
-    fromApp.currentBlockLevelSelector
-  )
+  currentCycle: createSelector(selectApp, fromApp.currentCycleSelector),
+  currentBlockLevel: createSelector(selectApp, fromApp.currentBlockLevelSelector),
+  cycleStartingBlockLevel: createSelector(selectApp, fromApp.cycleStartingBlockLevelSelector),
+  cycleEndingBlockLevel: createSelector(selectApp, fromApp.cycleEndingBlockLevelSelector),
+  cycleProgress: createSelector(selectApp, fromApp.cycleProgressSelector),
+  remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector)
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { of, concat } from 'rxjs'
+import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
 import { ApiService } from '../api/api.service'
@@ -18,7 +18,7 @@ const kindToFieldsMap = {
 @Injectable({
   providedIn: 'root'
 })
-export class NewTransactionService {
+export class TransactionService {
   constructor(private readonly apiService: ApiService) {}
 
   getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy) {

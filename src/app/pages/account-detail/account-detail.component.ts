@@ -21,7 +21,6 @@ import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { CycleService } from '@tezblock/services/cycle/cycle.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -128,7 +127,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
 
-  public balanceChartOptions: ChartOptions = {
+  balanceChartOptions: ChartOptions = {
     responsive: true,
     layout: {
       padding: {
@@ -221,8 +220,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>,
-    private readonly cycleService: CycleService
+    private readonly store$: Store<fromRoot.State>
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -253,7 +251,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
-    this.remainingTime$ = this.cycleService.remainingTime$
+    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
     this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(

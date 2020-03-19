@@ -12,6 +12,7 @@ import * as appActions from '@tezblock/app.actions'
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
+import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -97,31 +98,9 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadBlocks),
       switchMap(() =>
-        this.apiService.getLatestBlocks(6).pipe(
-          switchMap(blocksData =>
-            from(
-              this.apiService.getAdditionalBlockField(
-                blocksData.map(block => block.level),
-                'amount',
-                'sum',
-                6
-              )
-            ).pipe(
-              map((volums: any[]) => {
-                const blocks = blocksData.map(block => {
-                  const match = volums.find(volume => volume.block_level === block.level)
-
-                  return {
-                    ...block,
-                    volume: match ? match.sum_amount : 0
-                  }
-                })
-
-                return actions.loadBlocksSucceeded({ blocks })
-              }),
-              catchError(error => of(actions.loadBlocksFailed({ error })))
-            )
-          )
+        this.blockService.getLatestBlocks(6, ['volume']).pipe(
+          map(blocks => actions.loadBlocksSucceeded({ blocks })),
+          catchError(error => of(actions.loadBlocksFailed({ error })))
         )
       )
     )
@@ -131,6 +110,7 @@ export class DashboarEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
+    private readonly blockService: NewBlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

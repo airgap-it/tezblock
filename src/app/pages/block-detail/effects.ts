@@ -40,7 +40,10 @@ export class BlockDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.blockDetails.pageSize), this.store$.select(state => state.blockDetails.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.pageSize),
+        this.store$.select(state => state.blockDetails.orderBy)
+      ),
       switchMap(([{ blockHash, kind }, pageSize, orderBy]) =>
         this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
@@ -53,7 +56,10 @@ export class BlockDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.block),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
     )
   )
@@ -77,7 +83,10 @@ export class BlockDetailEffects {
   onSorting$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.sortTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.block),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
     )
   )
@@ -98,6 +107,18 @@ export class BlockDetailEffects {
           map(aggregateOperationCounts),
           map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
           catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  loadLatestBlock$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadLatestBlock),
+      switchMap(() =>
+        this.blockService.getLatest().pipe(
+          map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
+          catchError(error => of(actions.loadLatestBlockFailed({ error })))
         )
       )
     )

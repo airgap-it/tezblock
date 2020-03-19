@@ -1,4 +1,4 @@
-import { numberOfBlocksToSecondsFromPeriod } from '@tezblock/services/cycle/cycle.service'
+import { numberOfBlocksToSecondsFromPeriod } from '@tezblock/app.reducer'
 import { Operation, Direction, Body } from '@tezblock/services/base.service'
 
 export interface VotingInfo {

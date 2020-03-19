@@ -8,7 +8,6 @@ import { Actions, ofType } from '@ngrx/effects'
 
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { CycleService } from '../../services/cycle/cycle.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
@@ -54,7 +53,6 @@ export class DashboardComponent extends BaseComponent {
   constructor(
     private readonly actions$: Actions,
     private readonly cryptoPricesService: CryptoPricesService,
-    private readonly cycleService: CycleService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -67,11 +65,11 @@ export class DashboardComponent extends BaseComponent {
     this.blocks$ = this.store$.select(state => state.dashboard.blocks)
     this.transactions$ = this.store$.select(state => state.dashboard.transactions)
 
-    this.currentCycle$ = this.cycleService.currentCycle$
-    this.cycleProgress$ = this.cycleService.cycleProgress$
-    this.cycleStartingBlockLevel$ = this.cycleService.cycleStartingBlockLevel$
-    this.cycleEndingBlockLevel$ = this.cycleService.cycleEndingBlockLevel$
-    this.remainingTime$ = this.cycleService.remainingTime$
+    this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
+    this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress)
+    this.cycleStartingBlockLevel$ = this.store$.select(fromRoot.app.cycleStartingBlockLevel)
+    this.cycleEndingBlockLevel$ = this.store$.select(fromRoot.app.cycleEndingBlockLevel)
+    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
 
     this.fiatInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.cryptoInfo$ = this.cryptoPricesService.cryptoCurrencyInfo$
