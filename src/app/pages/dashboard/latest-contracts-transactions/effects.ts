@@ -12,25 +12,13 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { flatten } from '@tezblock/services/fp'
-import { airGapTransactionToContractOperation } from '@tezblock/domain/contract'
-import { Transaction } from '@tezblock/interfaces/Transaction'
+import { airGapTransactionToContractOperation, ContractOperation } from '@tezblock/domain/contract'
 
-const toCustomContractOperations = (data: TezosTransactionResult, symbol: string): actions.CustomContractOperation[] =>
+const toContractOperations = (data: TezosTransactionResult, symbol: string): ContractOperation[] =>
   data.transactions.map(transaction => ({
     ...airGapTransactionToContractOperation(transaction),
     symbol
   }))
-
-const fillAmountAndSymbol = (opearations: Transaction[], airgapOperations: actions.CustomContractOperation[]): Transaction[] =>
-  opearations.map(operation => {
-    const match = airgapOperations.find(airgapOperation => airgapOperation.hash === operation.operation_group_hash)
-
-    return {
-      ...operation,
-      amount: match ? parseFloat(match.amount) : operation.amount,
-      symbol: match ? match.symbol : operation.symbol
-    }
-  })
 
 @Injectable()
 export class DashboardLatestContractsTransactionsEffects {
@@ -42,39 +30,16 @@ export class DashboardLatestContractsTransactionsEffects {
           contracts.map(contract =>
             this.apiService
               .getTransferOperationsForContract(contract)
-              .pipe(map(result => toCustomContractOperations(result, contract.symbol).slice(0, 3)))
+              .pipe(map(result => toContractOperations(result, contract.symbol).slice(0, 3)))
           )
         ).pipe(
           map(response => flatten(response)),
-          switchMap(transferOperations => {
-            if (transferOperations.length === 0) {
-              return of(
-                actions.loadTransferOperationsSucceeded({
-                  transferOperations: []
-                })
-              )
-            }
-
-            return this.baseService
-              .post<Transaction[]>('operations', {
-                predicates: transferOperations.map((operation, index) => ({
-                  field: 'operation_group_hash',
-                  operation: Operation.eq,
-                  set: [operation.hash],
-                  inverse: false,
-                  group: `A${index}`
-                })),
-                orderBy: [sort('block_level', 'desc')]
-              })
-              .pipe(
-                map(transactions =>
-                  actions.loadTransferOperationsSucceeded({
-                    transferOperations: fillAmountAndSymbol(transactions.slice(0, 6), transferOperations)
-                  })
-                ),
-                catchError(error => of(actions.loadTransferOperationsFailed({ error })))
-              )
-          })
+          map(transferOperations =>
+            actions.loadTransferOperationsSucceeded({
+              transferOperations: transferOperations.slice(0, 6)
+            })
+          ),
+          catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
     )

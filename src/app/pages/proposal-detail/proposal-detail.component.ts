@@ -2,9 +2,11 @@ import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, combineLatest } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
+import { filter, map, withLatestFrom } from 'rxjs/operators'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
+import { isNil, negate } from 'lodash'
+import { $enum } from 'ts-enum-util'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CopyService } from 'src/app/services/copy/copy.service'
@@ -14,10 +16,13 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { columns } from './table-definitions'
-import { PeriodKind, PeriodTimespan } from '@tezblock/domain/vote'
+import { PeriodKind, PeriodTimespan, MetaVotingPeriod } from '@tezblock/domain/vote'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import * as moment from 'moment'
+import { get } from '@tezblock/services/fp'
+import { getRefresh } from '@tezblock/domain/synchronization'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -31,6 +36,8 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   periodTimespan$: Observable<PeriodTimespan>
   tabs: Tab[]
   now: number = moment.utc().valueOf()
+  noDataLabel$: Observable<string>
+  periodKind$: Observable<string>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -39,6 +46,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     private readonly activatedRoute: ActivatedRoute,
+    private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
     private readonly store$: Store<fromRoot.State>,
@@ -53,10 +61,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
         this.setTabs(tabTitle)
 
-        const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
-
         this.store$.dispatch(actions.loadProposal({ id }))
-        this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
       }),
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
@@ -68,7 +73,38 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
               count: metaVotingPeriod.count
             }))
           ))
-      )
+      ),
+
+      combineLatest(
+        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
+        this.store$.select(state => state.proposalDetails.proposal)
+      ).pipe(
+        filter(([paramMap, proposal]) => !!proposal)
+      ).subscribe(() => {
+        const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
+        const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
+
+        this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
+      }),
+
+      getRefresh([this.actions$.pipe(ofType(actions.loadVotesSucceeded)), this.actions$.pipe(ofType(actions.loadVotesFailed))])
+        .pipe(
+          withLatestFrom(
+            this.store$.select(state => state.proposalDetails.periodKind),
+            this.store$.select(state => state.proposalDetails.metaVotingPeriods),
+            this.store$.select(state => state.app.currentVotingPeriod)
+          ),
+          filter(([refreshNo, periodKind, metaVotingPeriods, currentVotingPeriod]) => {
+            if (!metaVotingPeriods || !currentVotingPeriod) {
+              return false
+            }
+
+            const currentPeriod = metaVotingPeriods.find(period => period.value === currentVotingPeriod)
+
+            return currentPeriod && currentPeriod.periodKind === periodKind
+          })
+        )
+        .subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
     )
   }
 
@@ -88,6 +124,23 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
           ]
       )
     )
+    this.noDataLabel$ = this.store$
+      .select(state => state.proposalDetails.periodKind)
+      .pipe(
+        withLatestFrom(this.store$.select(state => state.proposalDetails.proposal)),
+        filter(([periodKind, proposal]) => !!proposal),
+        map(([periodKind, proposal]) =>
+          periodKind === PeriodKind.Testing
+            ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+            : undefined
+        )
+      )
+    this.periodKind$ = this.store$
+      .select(state => state.proposalDetails.periodKind)
+      .pipe(
+        filter(negate(isNil)),
+        map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
+      )
   }
 
   copyToClipboard() {
@@ -110,7 +163,8 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Proposal,
         count: undefined,
         icon: this.iconPipe.transform('fileUpload'),
-        columns: columns.filter(column => column.field !== 'ballot')
+        columns: columns.filter(column => column.field !== 'ballot'),
+        disabled: () => false
       },
       {
         title: 'Exploration',
@@ -118,7 +172,19 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Exploration,
         count: undefined,
         icon: this.iconPipe.transform('binoculars'),
-        columns
+        columns,
+        disabled: () => {
+          const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
+
+          if (!metaVotingPeriods) {
+            return true
+          }
+
+          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Exploration)
+
+          const result = !period || get<MetaVotingPeriod>(period => !period.value)(period)
+          return result
+        }
       },
       {
         title: 'Testing',
@@ -126,7 +192,19 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Testing,
         count: undefined,
         icon: this.iconPipe.transform('hammer'),
-        columns
+        columns,
+        emptySign: '-',
+        disabled: () => {
+          const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
+
+          if (!metaVotingPeriods) {
+            return true
+          }
+
+          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Testing)
+
+          return !period || get<MetaVotingPeriod>(period => !period.value)(period)
+        }
       },
       {
         title: 'Promotion',
@@ -134,7 +212,18 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Promotion,
         count: undefined,
         icon: this.iconPipe.transform('graduationCap'),
-        columns
+        columns,
+        disabled: () => {
+          const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
+
+          if (!metaVotingPeriods) {
+            return true
+          }
+
+          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Promotion)
+
+          return !period || get<MetaVotingPeriod>(period => !period.value)(period)
+        }
       }
     ]
   }

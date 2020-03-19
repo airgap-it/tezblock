@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { from, of, forkJoin } from 'rxjs'
-import { map, catchError, switchMap, tap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, filter, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import { TransactionService } from '@tezblock/services/transaction/transaction.service'
@@ -59,13 +59,13 @@ export class AccountDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
       withLatestFrom(
-        this.store$.select(state => state.accountDetails.pageSize),
+        this.store$.select(state => state.accountDetails.transactions.pagination),
         this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.orderBy)
+        this.store$.select(state => state.accountDetails.transactions.orderBy)
       ),
 
-      switchMap(([{ kind }, pageSize, address, orderBy]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, orderBy).pipe(
+      switchMap(([{ kind }, pagination, address, orderBy]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -252,6 +252,26 @@ export class AccountDetailEffects {
         )
       ),
     { dispatch: false }
+  )
+
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKindSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
+    )
   )
 
   constructor(

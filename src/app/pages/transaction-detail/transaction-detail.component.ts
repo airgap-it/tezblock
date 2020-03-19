@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import BigNumber from 'bignumber.js'
 import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
 import { map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
@@ -62,15 +61,15 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
   ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.busy.transactions)
-    this.transactions$ = this.store$.select(state => state.transactionDetails.transactions).pipe(filter(negate(isNil)))
+    this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.transactions.loading)
+    this.transactions$ = this.store$.select(state => state.transactionDetails.transactions.data).pipe(filter(negate(isNil)))
     this.latestTx$ = this.transactions$.pipe(map(first))
     this.totalAmount$ = this.store$.select(state => state.transactionDetails.totalAmount)
     // this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions)
       .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
-    this.orderBy$ = this.store$.select(state => state.transactionDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.transactionDetails.transactions.orderBy)
 
     // Update the active "tab" of the table
     this.filteredTransactions$ = combineLatest([this.transactions$, this.kind$]).pipe(
@@ -136,49 +135,55 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         title: 'Transactions',
         active: true,
         kind: 'transaction',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Delegations',
         active: false,
         kind: 'delegation',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Originations',
         active: false,
         kind: 'origination',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Reveals',
         active: false,
         kind: 'reveal',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('eye'),
-        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Activations',
         active: false,
         kind: 'activate_account',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Votes',
         active: false,
         kind: ['ballot', 'proposals'],
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue })
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }),
+        disabled: function() { return !this.count }
       }
     ]
   }

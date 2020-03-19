@@ -6,6 +6,7 @@ import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/acco
 import { Balance } from '@tezblock/services/api/api.service'
 import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { OperationErrorsById } from '@tezblock/domain/operations'
 
 export interface BakingRatingResponse {
   bakingRating: string
@@ -76,5 +77,12 @@ export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Te
 export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
+
+export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[] }>())
+export const loadTransactionsErrorsSucceeded = createAction(
+  `[${featureName}] Load Transactions Errors Succeeded`,
+  props<{ operationErrorsById: OperationErrorsById[] }>()
+)
+export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)
