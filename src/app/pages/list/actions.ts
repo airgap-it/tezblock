@@ -7,8 +7,8 @@ import { Block } from '@tezblock/interfaces/Block'
 import { TokenContract } from '@tezblock/domain/contract'
 import { Data } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
-
 import { OrderBy } from '@tezblock/services/base.service'
+import { OperationErrorsById } from '@tezblock/domain/operations'
 
 export interface TransactionChartItem {
   timestamp: number
@@ -185,5 +185,12 @@ export const loadContractsSucceeded = createAction(`[${featureName}] Load Contra
 export const loadContractsFailed = createAction(`[${featureName}] Load Contracts Failed`, props<{ error: any }>())
 export const increasePageOfContracts = createAction(`[${featureName}] Increase Page Of Contracts`)
 export const sortContracts = createAction(`[${featureName}] Sort Contracts`, props<{ orderBy: OrderBy }>())
+
+export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[], actionType: string }>())
+export const loadTransactionsErrorsSucceeded = createAction(
+  `[${featureName}] Load Transactions Errors Succeeded`,
+  props<{ operationErrorsById: OperationErrorsById[], actionType: string }>()
+)
+export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

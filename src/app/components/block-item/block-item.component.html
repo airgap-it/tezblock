@@ -18,12 +18,7 @@
         <address-item [address]="block.baker" ng-href="#here" (click)="inspectDetail(block.baker)"></address-item>
       </div>
       <div class="col-3 col-sm-2 p-0 d-flex align-items-center order-2 order-sm-3">
-        <span
-          [innerHtml]="
-            block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 4, fontSmall: true, fontColor: true } | safeHtml
-          "
-        ></span>
-        &nbsp;ꜩ
+        <amount-cell [data]="{ amount: block.volume }" [options]="{ showFiatValue: false, maxDigits: 4 }"></amount-cell>
       </div>
     </div>
     <hr />

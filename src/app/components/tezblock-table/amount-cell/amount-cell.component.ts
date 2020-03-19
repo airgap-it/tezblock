@@ -5,6 +5,7 @@ import * as moment from 'moment'
 import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 
 export interface AmountData {
   amount: number | string
@@ -29,6 +30,7 @@ export class AmountCellComponent implements OnInit {
       if (value) {
         this.enableComparison = dayDifference(this.data.timestamp) >= 1
         this.amount = this.data.amount || 0
+        this.setAmountPiped()
       }
     }
   }
@@ -42,6 +44,10 @@ export class AmountCellComponent implements OnInit {
   set options(value: any) {
     if (value !== this._options) {
       this._options = value
+
+      if (this.amount) {
+        this.setAmountPiped()
+      }
     }
   }
 
@@ -60,10 +66,29 @@ export class AmountCellComponent implements OnInit {
 
   amount: number | BigNumber | string
 
+  amountPipedLeadingChars: string
+  amountPipedTrailingChars: string
+
+  get fontColor(): boolean {
+    return this.options.fontColor === undefined ? true : this.options.fontColor
+  }
+
+  get fontSmall(): boolean {
+    return this.options.fontSmall === undefined ? true : this.options.fontSmall
+  }
+
+  get maxDigits(): number {
+    return this.options.maxDigits === undefined ? 6 : this.options.maxDigits
+  }
+
   showOldValue = false
   //showOldValue$ = new BehaviorSubject(false)
 
-  constructor(private readonly cryptoPricesService: CryptoPricesService, private readonly chartDataService: ChartDataService) {
+  constructor(
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly cryptoPricesService: CryptoPricesService,
+    private readonly chartDataService: ChartDataService
+  ) {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
   }
 
@@ -82,5 +107,19 @@ export class AmountCellComponent implements OnInit {
         this.showOldValue = !this.showOldValue
       })
     }
+  }
+
+  private setAmountPiped() {
+    const amountPiped = this.amountConverterPipe
+      .transform(this.amount, {
+        protocolIdentifier: 'xtz',
+        maxDigits: this.maxDigits,
+        fontSmall: this.fontSmall,
+        fontColor: this.fontColor
+      })
+      .split('.')
+
+    this.amountPipedLeadingChars = amountPiped[0]
+    this.amountPipedTrailingChars = amountPiped[1]
   }
 }
