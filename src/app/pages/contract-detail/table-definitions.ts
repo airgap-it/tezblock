@@ -36,6 +36,13 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
+      name: 'Age',
+      field: 'timestamp',
+      template: Template.timestamp,
+      data: (item: any) => ({ data: item.timestamp * 1000 }),
+      sortable: true
+    },
+    {
       name: 'Tx Hash',
       field: 'hash',
       template: Template.hash
@@ -73,6 +80,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'fee',
       template: Template.amount,
       data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      sortable: true
+    },
+    {
+      name: 'Age',
+      field: 'timestamp',
+      template: Template.timestamp,
       sortable: true
     },
     {
