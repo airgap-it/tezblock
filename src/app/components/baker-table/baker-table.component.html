@@ -118,12 +118,12 @@
                   Frozen Balance
                 </h5>
                 <h5>
-                  <ng-container *ngIf="!frozenBalance; else deposits">
-                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                  </ng-container>
-                  <ng-template #deposits>
+                  <ng-template *ngIf="frozenBalance$ | async as frozenBalance; else noFrozenBalance">
                     <amount-cell [data]="{ amount: frozenBalance }" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                   </ng-template>
+                  <ng-container #noFrozenBalance>
+                    <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
+                  </ng-container>
                 </h5>
               </div>
 

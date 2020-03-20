@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { combineLatest, Observable, EMPTY } from 'rxjs'
+import { combineLatest, from, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -9,7 +9,6 @@ import { Actions, ofType } from '@ngrx/effects'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
-import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
@@ -62,7 +61,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   activeDelegations$: Observable<number>
   isRightsTabAvailable$: Observable<boolean>
 
-  frozenBalance: number | undefined
+  frozenBalance$: Observable<number>
   rewardsExpandedRow: ExpandedRow<Reward>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
@@ -130,7 +129,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     private readonly actions$: Actions,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly accountService: AccountService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly apiService: ApiService,
     private readonly store$: Store<fromRoot.State>
@@ -148,7 +146,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
-        this.frozenBalance = await this.accountService.getFrozen(accountAddress)
+        this.frozenBalance$ = from(this.apiService.getFrozenBalance(accountAddress))
       })
     )
   }

@@ -11,7 +11,6 @@ import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
@@ -41,7 +40,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
-  providers: [RightsSingleService], //TODO: refactor and remove this last single service
   animations: [
     trigger('changeBtnColor', [
       state(
@@ -95,7 +93,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isCollapsed: boolean = true
 
-  rights$: Observable<Object> = new Observable()
   current: string = 'copyGrey'
 
   tabs: Tab[]
@@ -219,7 +216,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -230,7 +226,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   async ngOnInit() {
     this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
-    this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.Handset, Breakpoints.Small])
@@ -281,7 +276,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
-        this.rightsSingleService.updateAddress(address)
 
         if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
           this.hasAlias = true
