@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { forkJoin, of } from 'rxjs'
+import { of } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
-import { OperationTypes } from '@tezblock/domain/operations'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
@@ -149,7 +148,7 @@ export class BlockDetailEffects {
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
-    private readonly blockService: NewBlockService,
+    private readonly blockService: BlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

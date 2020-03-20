@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { from, of, forkJoin } from 'rxjs'
+import { of, forkJoin } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
-import { BaseService, Operation } from '@tezblock/services/base.service'
+import { BaseService } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as appActions from '@tezblock/app.actions'
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -110,7 +110,7 @@ export class DashboarEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly blockService: NewBlockService,
+    private readonly blockService: BlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

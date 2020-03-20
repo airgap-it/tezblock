@@ -11,7 +11,7 @@ import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 
 @Injectable()
 export class AppEffects {
@@ -116,7 +116,7 @@ export class AppEffects {
   constructor(
     private readonly actions$: Actions,
     private readonly baseService: BaseService,
-    private readonly blockService: NewBlockService,
+    private readonly blockService: BlockService,
     private readonly cacheService: CacheService,
     private readonly store$: Store<fromRoot.State>
   ) {}

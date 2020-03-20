@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http'
 import { Component, OnInit } from '@angular/core'
 import { Block } from '@tezblock/interfaces/Block'
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export interface ProtocolConstantResponse {
@@ -62,7 +62,7 @@ export class ProtocolConstantComponent implements OnInit {
   constructor(
     private readonly http: HttpClient,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly blockService: NewBlockService
+    private readonly blockService: BlockService
   ) {
     this.getData()
   }

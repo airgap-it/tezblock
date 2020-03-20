@@ -1,16 +1,12 @@
 import { Injectable } from '@angular/core'
 import { TezosProtocol, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { forkJoin, from, Observable, of, throwError } from 'rxjs'
+import { forkJoin, from, Observable, throwError } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { range } from 'lodash'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/services/facade/facade'
-import { Payout } from '@tezblock/interfaces/Payout'
-
-export interface ExpTezosRewards extends TezosRewards {
-  payouts: Payout[]
-}
+import { Reward } from '@tezblock/domain/reward'
 
 @Injectable({
   providedIn: 'root'
@@ -36,18 +32,15 @@ export class RewardService {
 
   getLastCycles(pagination: Pagination): Observable<number[]> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
-      map(currentCycle => {
-        const startIndex = pagination.currentPage * pagination.selectedSize
-        const endIndex = startIndex + pagination.selectedSize
-
-        return range(startIndex, endIndex)
+      map(currentCycle =>
+        range(0, pagination.currentPage * pagination.selectedSize)
           .map(index => currentCycle - (index + 1))
           .filter(cycle => cycle >= 7)
-      })
+      )
     )
   }
 
-  getRewards(address: string, pagination: Pagination): Observable<ExpTezosRewards[]> {
+  getRewards(address: string, pagination: Pagination): Observable<Reward[]> {
     return this.getLastCycles(pagination).pipe(
       switchMap(cycles =>
         forkJoin(
@@ -85,7 +78,7 @@ export class RewardService {
     )
   }
 
-  public async calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
+  async calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
     const key = `${address}${cycle}`
 
     if (this.calculatedRewardsMap.has(key)) {
@@ -96,7 +89,7 @@ export class RewardService {
       return this.pendingPromises.get(key)
     } else {
       const promise = this.protocol.calculateRewards(address, cycle).then(result => {
-        this.calculatedRewardsMap.set(key, result) 
+        this.calculatedRewardsMap.set(key, result)
         this.pendingPromises.delete(key)
         return result
       })

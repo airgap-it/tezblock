@@ -3,7 +3,7 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { Block } from 'src/app/interfaces/Block'
 
 @Component({
@@ -34,7 +34,7 @@ export class BlockDetailWrapperComponent implements OnInit {
 
   latestBlock$ = this.blockService.getLatest()
 
-  constructor(private readonly blockService: NewBlockService) {}
+  constructor(private readonly blockService: BlockService) {}
 
   public ngOnInit() {
     this.amountFromBlockVolume$ = this.wrapperBlock$.pipe(map(block => ({ amount: block.volume, timestamp: block.timestamp })))

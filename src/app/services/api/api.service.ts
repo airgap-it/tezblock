@@ -1222,8 +1222,8 @@ export class ApiService {
     })
   }
 
-  getDelegatedAccountsList(tzAddress: string): Observable<any> {
-    return this.http.post(
+  getDelegatedAccountsList(tzAddress: string): Observable<any[]> {
+    return this.http.post<any[]>(
       this.accountsApiUrl,
       {
         fields: ['account_id', 'manager', 'delegate_value', 'balance'],

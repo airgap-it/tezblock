@@ -4,16 +4,14 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { Actions, ofType } from '@ngrx/effects'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
-import { AccountSingleService } from './../../services/account-single/account-single.service'
 import { AccountService } from './../../services/account/account.service'
 import { ApiService } from './../../services/api/api.service'
-import { RewardSingleService, Reward } from './../../services/reward-single/reward-single.service'
-import { Payout } from '@tezblock/interfaces/Payout'
-import { ExpTezosRewards } from '@tezblock/services/reward/reward.service'
+import { Reward, Payout } from '@tezblock/domain/reward'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -22,6 +20,7 @@ import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { kindToOperationTypes, Tab } from '@tezblock/domain/tab'
+import { getRefresh } from '@tezblock/domain/synchronization'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -40,8 +39,7 @@ const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
 @Component({
   selector: 'baker-table',
   templateUrl: './baker-table.component.html',
-  styleUrls: ['./baker-table.component.scss'],
-  providers: [AccountSingleService, RewardSingleService]
+  styleUrls: ['./baker-table.component.scss']
 })
 export class BakerTableComponent extends BaseComponent implements OnInit {
   @ViewChild('expandedRowTemplate', { static: true }) expandedRowTemplate: TemplateRef<any>
@@ -65,7 +63,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance: number | undefined
-  rewardsExpandedRow: ExpandedRow<ExpTezosRewards>
+  rewardsExpandedRow: ExpandedRow<Reward>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
@@ -129,12 +127,11 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private endorsingRightsExpandedRow: ExpandedRow<AggregatedEndorsingRights>
 
   constructor(
+    private readonly actions$: Actions,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly accountService: AccountService,
-    private readonly accountSingleService: AccountSingleService,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly rewardSingleService: RewardSingleService,
     private readonly apiService: ApiService,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -151,8 +148,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
-        this.rewardSingleService.updateAddress(accountAddress)
-        this.accountSingleService.setAddress(accountAddress)
         this.frozenBalance = await this.accountService.getFrozen(accountAddress)
       })
     )
@@ -175,7 +170,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         })
       )
 
-    this.rewards$ = combineLatest(this.rewardSingleService.rewards$, this.bakerFee$).pipe(
+    this.rewards$ = combineLatest(this.store$.select(state => state.bakerTable.rewards.data), this.bakerFee$).pipe(
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
       map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
     )
@@ -183,9 +178,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
     ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
-    this.rewardsLoading$ = this.rewardSingleService.loading$
-    this.accountLoading$ = this.accountSingleService.loading$
-    this.activeDelegations$ = this.accountSingleService.activeDelegations$
+    this.rewardsLoading$ = this.store$.select(state => state.bakerTable.rewards.loading)
+    this.accountLoading$ = this.store$.select(state => state.bakerTable.busy.activeDelegations)
+    this.activeDelegations$ = this.store$.select(state => state.bakerTable.activeDelegations)
     this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
     this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
     this.upcomingRights$ = this.store$.select(state => state.bakerTable.upcomingRights)
@@ -204,6 +199,29 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
     this.setupExpandedRows()
     this.setupTables()
+
+    this.subscriptions.push(
+      this.route.paramMap
+        .pipe(
+          filter(paramMap => !!paramMap.get('id')),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadActiveDelegationsSucceeded)),
+              this.actions$.pipe(ofType(actions.loadActiveDelegationsFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(actions.loadActiveDelegations())),
+
+      this.route.paramMap
+        .pipe(
+          filter(paramMap => !!paramMap.get('id')),
+          switchMap(() =>
+            getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(actions.loadRewards()))
+    )
   }
 
   selectTab(selectedTab: Tab) {
@@ -248,12 +266,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  loadMoreRights(): void {
+  loadMoreRights() {
     this.store$.dispatch(actions.increaseRightsPageSize())
   }
 
-  loadMoreRewards(): void {
-    this.rewardSingleService.loadMore()
+  loadMoreRewards() {
+    this.store$.dispatch(actions.increaseRewardsPageSize())
   }
 
   private updateSelectedTab(selectedTab: Tab) {
@@ -275,7 +293,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private setupExpandedRows() {
     this.rewardsExpandedRow = {
       template: this.expandedRowTemplate,
-      getContext: (item: ExpTezosRewards) => ({
+      getContext: (item: Reward) => ({
         columns: [
           {
             name: 'Delegator Account',
