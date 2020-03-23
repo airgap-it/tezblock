@@ -1,9 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import BigNumber from 'bignumber.js'
 import { ToastrService } from 'ngx-toastr'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 
 import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
@@ -25,51 +22,71 @@ import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amou
       ),
       transition('copyGrey =>copyTick', [animate(250, style({ transform: 'rotateY(360deg) scale(1.3)', backgroundColor: 'lightgreen' }))])
     ])
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionDetailWrapperComponent implements OnInit {
-  public current = 'copyGrey'
+  current = 'copyGrey'
 
   @Input()
-  public latestTransaction$: Observable<Transaction> | undefined
-
-  @Input()
-  public blockConfirmations$: Observable<number> | undefined
-
-  @Input()
-  public amount$: Observable<BigNumber> | undefined
-
-  @Input()
-  public loading$?: Observable<boolean>
-
-  @Input()
-  public fiatInfo$: Observable<CurrencyInfo> | undefined
-
-  @Input()
-  public isMainnet = true
-
-  amountFromLatestTransactionFee$: Observable<AmountData>
-
-  constructor(
-    private readonly copyService: CopyService,
-    private readonly toastrService: ToastrService
-  ) {}
-
-  public ngOnInit() {
-    this.amountFromLatestTransactionFee$ = this.latestTransaction$.pipe(
-      map(transition => ({ amount: transition.fee, timestamp: transition.timestamp }))
-    )
+  set latestTransaction(value: Transaction) {
+    if (value !== this._latestTransaction) {
+      this._latestTransaction = value
+      this.setDependings()
+    }
   }
 
-  public copyToClipboard(val: string) {
+  get latestTransaction() {
+    return this._latestTransaction
+  }
+
+  private _latestTransaction: Transaction
+
+  @Input()
+  blockConfirmations: number
+
+  @Input()
+  totalAmount: number
+
+  // @Input()
+  //  totalFee: number | undefined
+
+  @Input()
+  loading: boolean
+
+  @Input()
+  fiatInfo: CurrencyInfo
+
+  @Input()
+  isMainnet = true
+
+  amountFromLatestTransactionFee: AmountData
+
+  statusLabel: string
+
+  constructor(private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
+
+  ngOnInit() {}
+
+  copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
   }
 
-  public changeState(address: string) {
+  changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
+  }
+
+  private setDependings() {
+    if (!this.latestTransaction) {
+      return
+    }
+
+    this.amountFromLatestTransactionFee = { amount: this.latestTransaction.fee, timestamp: this.latestTransaction.timestamp }
+    this.statusLabel =
+      ['failed', 'backtracked', 'skipped'].indexOf(this.latestTransaction.status) !== -1 ? this.latestTransaction.status : null
   }
 }

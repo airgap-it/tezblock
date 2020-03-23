@@ -2,6 +2,9 @@
   <div class="card-body p-4">
     <h5 class="card-title mb-4 ">
       Transaction Details
+      <span *ngIf="statusLabel" class="badge badge-pill badge-primary-light ml-1 cursor--pointer">
+        {{ statusLabel | titlecase }}
+      </span>
     </h5>
     <div class="row mb-3">
       <div class="col-md-3">
@@ -12,7 +15,7 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+      <div class=" col-md-9" *ngIf="latestTransaction; else loadingTemplate">
         <p class="mb-0">
           {{ latestTransaction.operation_group_hash }}
           <a
@@ -40,10 +43,10 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+      <div class=" col-md-9" *ngIf="latestTransaction; else loadingTemplate">
         <button type="button" class="btn btn-link p-0" ng-href="#here" [routerLink]="['/block', latestTransaction.block_level]">
           {{ latestTransaction.block_level }}
-          <span *ngIf="blockConfirmations$ | async as blockConfirmations" class="text-secondary ml-1">
+          <span *ngIf="blockConfirmations" class="text-secondary ml-1">
             {{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}
           </span>
         </button>
@@ -58,7 +61,7 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
+      <div class=" col-md-9" *ngIf="latestTransaction; else loadingTemplate">
         <p class="mb-0">
           {{ latestTransaction.timestamp | amTimeAgo }}
           <span class="text-secondary">({{ latestTransaction.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
@@ -71,16 +74,10 @@
           <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in this transaction.'"></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="latestTransaction$ | async as latestTransaction; else loadingTemplate">
-        <ng-container *ngIf="amount$ | async as amount">
-          <div class="col col-md-9">
-            <ng-container *ngIf="isMainnet">
-              <ng-container *ngIf="fiatInfo$ | async as fiatInfo">
-                <amount-cell [data]="latestTransaction"></amount-cell>
-              </ng-container>
-            </ng-container>
-          </div>
-        </ng-container>
+      <ng-container *ngIf="totalAmount !== undefined; else loadingTemplate">
+        <div class="col col-md-9">
+          <amount-cell [data]="{ amount: totalAmount }" [options]="{ showFiatValue: isMainnet, maxDigits: 8 }"></amount-cell>
+        </div>
       </ng-container>
       <ng-template #hideValue>
         <div class="col col-md-9">
@@ -97,9 +94,9 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="amountFromLatestTransactionFee$ | async as amountFromLatestTransactionFee; else loadingTemplate">
+      <ng-container *ngIf="amountFromLatestTransactionFee; else loadingTemplate">
         <div class=" col-md-9">
-          <amount-cell [data]="amountFromLatestTransactionFee"></amount-cell>
+          <amount-cell [data]="amountFromLatestTransactionFee" [options]="{ showFiatValue: true, maxDigits: 8 }"></amount-cell>
         </div>
       </ng-container>
     </div>

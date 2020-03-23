@@ -9,6 +9,8 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { Block } from '@tezblock/interfaces/Block'
 import { sort } from '@tezblock/domain/table'
 import { Account } from '@tezblock/interfaces/Account'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import { first } from '@tezblock/services/fp'
 
 export interface State {
   blocks: TableState<Block>
@@ -546,7 +548,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsChartDataSucceeded, (state, { transactionsChartData }) => ({
     ...state,
-    transactionsChartData,
+    transactionsChartData
     // TODO: why selecting this data throws error in chart.js ... ?
     //transactionsChartDatasets: toTransactionsChartDataSource('Transactions', 'Total XTZ')(transactionsChartData)
   })),
@@ -624,6 +626,24 @@ export const reducer = createReducer(
       ...state.contracts,
       orderBy
     }
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById, actionType }) => ({
+    ...state,
+    ...(actionType === actions.loadTransactionsSucceeded.type
+      ? { transactions: getTransactionsWithErrors(operationErrorsById, state.transactions) }
+      : actionType === actions.loadActivationsSucceeded.type
+      ? { activations: getTransactionsWithErrors(operationErrorsById, state.activations) }
+      : actionType === actions.loadOriginationsSucceeded.type
+      ? { originations: getTransactionsWithErrors(operationErrorsById, state.originations) }
+      : actionType === actions.loadDelegationsSucceeded.type
+      ? { delegations: getTransactionsWithErrors(operationErrorsById, state.delegations) }
+      : actionType === actions.loadDoubleEndorsementsSucceeded.type
+      ? { doubleEndorsements: getTransactionsWithErrors(operationErrorsById, state.doubleEndorsements) }
+      : actionType === actions.loadVotesSucceeded.type
+      ? { votes: getTransactionsWithErrors(operationErrorsById, state.votes) }
+      : actionType === actions.loadEndorsementsSucceeded.type
+      ? { endorsements: getTransactionsWithErrors(operationErrorsById, state.endorsements) }
+      : null)
   })),
   on(actions.reset, () => initialState)
 )

@@ -1,17 +1,20 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, pipe, Observable, forkJoin } from 'rxjs'
-import { map, catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
+import * as appActions from '@tezblock/app.actions'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { PeriodKind } from '@tezblock/domain/vote'
+import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
+import { meanBlockTimeFromPeriod } from '@tezblock/services/cycle/cycle.service'
+import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()
 export class ProposalDetailEffects {
@@ -20,16 +23,25 @@ export class ProposalDetailEffects {
       ofType(actions.loadProposal),
       switchMap(({ id }) =>
         this.apiService.getProposal(id).pipe(
-          map(proposal => actions.loadProposalSucceeded({ proposal })),
+          map(proposal => {
+            const match = proposals[id]
+
+            return actions.loadProposalSucceeded({
+              proposal: {
+                ...proposal,
+                discussionLink: match ? match.discussionLink : undefined
+              }
+            })
+          }),
           catchError(error => of(actions.loadProposalFailed({ error })))
         )
       )
     )
   )
 
-  onLoadVotesLoadMetaVotingPeriod$ = createEffect(() =>
+  onStartLoadingVotesLoadMetaVotingPeriod$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadVotes),
+      ofType(actions.startLoadingVotes),
       map(() => actions.loadMetaVotingPeriods())
     )
   )
@@ -37,21 +49,27 @@ export class ProposalDetailEffects {
   loadMetaVotingPeriod$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriods),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
-      switchMap(([action, proposalHash]) =>
+      withLatestFrom(
+        this.store$.select(state => state.proposalDetails.id),
+        this.store$.select(state => state.proposalDetails.proposal)
+      ),
+      switchMap(([action, proposalHash, proposal]) =>
         forkJoin(
           // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
           this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
-          // this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
+          this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
           this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion)
         ).pipe(
           map(metaVotingPeriodCounts =>
             actions.loadMetaVotingPeriodsSucceeded({
               metaVotingPeriods: [
-                { periodKind: PeriodKind.Proposal, value: null },
+                {
+                  periodKind: PeriodKind.Proposal,
+                  value: metaVotingPeriodCounts[0] ? metaVotingPeriodCounts[0] - 1 : proposal.period
+                },
                 { periodKind: PeriodKind.Exploration, value: metaVotingPeriodCounts[0] },
-                { periodKind: PeriodKind.Testing, value: null },
-                { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[1] }
+                { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
+                { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] }
               ]
             })
           ),
@@ -61,22 +79,36 @@ export class ProposalDetailEffects {
     )
   )
 
-  onMetaVotingPeriodLoadVotes = createEffect(() =>
+  onMetaVotingPeriodLoadVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriodsSucceeded),
       withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
-      map(([{ metaVotingPeriods }, periodKind]) => {
-        const match = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === periodKind)
+      filter(
+        ([{ metaVotingPeriods }, periodKind]) =>
+          periodKind === PeriodKind.Proposal ||
+          !!get<MetaVotingPeriod>(period => period.value)(
+            metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === periodKind)
+          )
+      ),
+      map(([{ metaVotingPeriods }, periodKind]) => actions.loadVotes({ periodKind }))
+    )
+  )
 
-        return match.value
-      }),
-      filter(metaVotingPeriod => !!metaVotingPeriod),
+  loadVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadVotes),
       withLatestFrom(
+        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
         this.store$.select(state => state.proposalDetails.id),
         this.store$.select(state => state.proposalDetails.votes.pagination)
       ),
-      switchMap(([metaVotingPeriod, proposalHash, pagination]) =>
-        this.baseService
+      filter(([{ periodKind }]) => periodKind !== PeriodKind.Proposal),
+      switchMap(([{ periodKind }, metaVotingPeriods, proposalHash, pagination]) => {
+        const metaVotingPeriod = get<MetaVotingPeriod>(period => period.value)(
+          metaVotingPeriods.find(period => period.periodKind === periodKind)
+        )
+
+        return this.baseService
           .post<Transaction[]>('operations', {
             predicates: [
               {
@@ -111,20 +143,20 @@ export class ProposalDetailEffects {
               )
             )
           )
-      )
+      })
     )
   )
 
-  loadProposalVotes = createEffect(() =>
+  loadProposalVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.periodKind),
         this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.votes.pagination)
+        this.store$.select(state => state.proposalDetails.votes.pagination),
+        this.store$.select(state => state.proposalDetails.metaVotingPeriods)
       ),
-      filter(([action, periodKind, proposalHash, pagination]) => periodKind === PeriodKind.Proposal),
-      switchMap(([action, periodKind, proposalHash, pagination]) =>
+      filter(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) => periodKind === PeriodKind.Proposal),
+      switchMap(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) =>
         this.baseService
           .post<Transaction[]>('operations', {
             fields: [],
@@ -165,7 +197,6 @@ export class ProposalDetailEffects {
   onMetaVotingPeriodLoadVotesTotal$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriodsSucceeded),
-      filter(({ metaVotingPeriods: metaVotingPeriod }) => !!metaVotingPeriod),
       map(() => actions.loadVotesTotal())
     )
   )
@@ -178,7 +209,9 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.proposalDetails.metaVotingPeriods)
       ),
       switchMap(([action, proposalHash, metaVotingPeriods]) => {
-        const _metaVotingPeriods = metaVotingPeriods.filter(metaVotingPeriod => !!metaVotingPeriod.value)
+        const _metaVotingPeriods = metaVotingPeriods.filter(
+          metaVotingPeriod => !!metaVotingPeriod.value && metaVotingPeriod.periodKind !== PeriodKind.Proposal
+        )
 
         return forkJoin(
           [this.getProposalVotesCount(proposalHash)].concat(
@@ -206,6 +239,58 @@ export class ProposalDetailEffects {
       ofType(actions.increasePageSize),
       withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
       map(([action, periodKind]) => actions.loadVotes({ periodKind }))
+    )
+  )
+
+  loadPeriodsTimespansTrigger$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadMetaVotingPeriodsSucceeded),
+      combineLatest(this.actions$.pipe(ofType(appActions.loadPeriodInfosSucceeded))),
+      map(() => actions.loadPeriodsTimespans())
+    )
+  )
+
+  loadPeriodsTimespans$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadPeriodsTimespans),
+      withLatestFrom(
+        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
+        this.store$.select(state => state.app.currentVotingPeriod),
+        this.store$.select(state => state.app.blocksPerVotingPeriod)
+      ),
+      switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) =>
+        forkJoin(
+          forkJoin(
+            metaVotingPeriods.map(period =>
+              period.value <= currentVotingPeriod
+                ? this.baseService
+                    .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc'))
+                    .pipe(map(first), map(get(item => item.timestamp)))
+                : of(null)
+            )
+          ),
+          forkJoin(
+            metaVotingPeriods.map(period =>
+              period.value < currentVotingPeriod
+                ? this.baseService
+                    .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc'))
+                    .pipe(
+                      map(first),
+                      map(get(item => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
+                    )
+                : of(null)
+            )
+          )
+        ).pipe(
+          map(response =>
+            actions.loadPeriodsTimespansSucceeded({
+              periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),
+              blocksPerVotingPeriod
+            })
+          ),
+          catchError(error => of(actions.loadPeriodsTimespansFailed({ error })))
+        )
+      )
     )
   )
 

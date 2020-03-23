@@ -1,5 +1,10 @@
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs; let i = index; trackBy: trackByFn" [active]="tab.active" [disabled]="tab.count === 0" (selectTab)="onSelectTab(tab)">
+  <tab
+    *ngFor="let tab of tabs; let i = index; trackBy: trackByFn"
+    [active]="tab.active"
+    [disabled]="tab.disabled()"
+    (selectTab)="onSelectTab(tab)"
+  >
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -8,7 +13,7 @@
         <fa-icon *ngIf="tab.icon" [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
       </button>
       <span class="badge badge-pill d-none d-sm-inline-block" [ngClass]="tab.active ? 'badge-primary' : 'badge-primary-light'">
-        {{ tab.count || 0 }}
+        {{ tab.count || tab.emptySign || 0 }}
       </span>
     </ng-template>
     <h6 class="pt-3 mr-1 d-sm-none">
@@ -16,10 +21,12 @@
         {{ tab.title }}
       </span>
       <span class="badge badge-pill badge-primary">
-        {{ tab.count || 0 }}
+        {{ tab.count || tab.emptySign || 0 }}
       </span>
     </h6>
   </tab>
+
+  <ng-content></ng-content>
 
   <tezblock-table
     [columns]="selectedTab.columns"
@@ -32,5 +39,6 @@
     [enableDownload]="enableDownload"
     (onSort)="sortTransactions($event)"
     [orderBy]="orderBy"
+    [noDataLabel]="noDataLabel"
   ></tezblock-table>
 </tabset>

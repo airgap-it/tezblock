@@ -94,6 +94,9 @@ export class TezblockTableComponent implements OnInit {
   @Input()
   orderBy: OrderBy
 
+  @Input()
+  noDataLabel: string
+
   @Output()
   readonly downloadClicked: EventEmitter<void> = new EventEmitter()
 

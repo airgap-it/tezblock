@@ -28,23 +28,29 @@ export class BlockDetailEffects {
   getTransactionsOnBlockLoaded$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBlockSucceeded),
-      withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash]) =>
-        actions.loadTransactionsByKind({ blockHash: block.hash, kind: OperationTypes.Transaction })
-      )
+      map(([{ block }, transactionsLoadedByBlockHash, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: kind }))
     )
   )
 
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.blockDetails.pageSize), this.store$.select(state => state.blockDetails.orderBy)),
-      switchMap(([{ blockHash, kind }, pageSize, orderBy]) =>
-        this.apiService.getTransactionsByField(blockHash, 'block_hash', kind, pageSize, orderBy).pipe(
-          map(data => actions.loadTransactionsByKindSucceeded({ data })),
-          catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-        )
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.transactions.pagination),
+        this.store$.select(state => state.blockDetails.transactions.orderBy)
+      ),
+      switchMap(([{ blockHash, kind }, pagination, orderBy]) =>
+        this.apiService
+          .getTransactionsByField(blockHash, 'block_hash', kind, pagination.currentPage * pagination.selectedSize, orderBy)
+          .pipe(
+            map(data => actions.loadTransactionsByKindSucceeded({ data })),
+            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+          )
       )
     )
   )
@@ -52,7 +58,10 @@ export class BlockDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.block),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
     )
   )
@@ -76,7 +85,10 @@ export class BlockDetailEffects {
   onSorting$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.sortTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.block),
+        this.store$.select(state => state.blockDetails.kind)
+      ),
       map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
     )
   )
@@ -97,6 +109,26 @@ export class BlockDetailEffects {
           map(aggregateOperationCounts),
           map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
           catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKindSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
         )
       )
     )

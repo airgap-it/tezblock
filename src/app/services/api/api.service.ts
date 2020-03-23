@@ -4,7 +4,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, filter } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from '@tezblock/interfaces/BakingRights'
@@ -14,12 +14,13 @@ import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { distinctFilter, first, get, groupBy, last } from '@tezblock/services/fp'
+import { distinctFilter, first, get, groupBy, last, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate, Operation, OrderBy } from '../base.service'
+import { Predicate, Operation } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
+import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 
 export interface OperationCount {
   [key: string]: string
@@ -1525,6 +1526,53 @@ export class ApiService {
     return from(protocol.getTotalSupply())
   }
 
+  getErrorsForOperations(operations: Transaction[]): Observable<OperationErrorsById[]> {
+    const distinctBlockLevels = operations.map(operation => operation.block_level).filter(distinctFilter)
+    const contentWithError = (content: RPCContent): boolean =>
+      _.get(content, 'metadata.operation_result.errors') ||
+      get<{ result: { errors?: OperationError[] } }[]>(internal_operation_results =>
+        internal_operation_results.some(internal_operation_result => !!internal_operation_result.result.errors)
+      )(_.get(content, 'metadata.internal_operation_results'))
+    const hasError = (rpcBlocksOpertions: RPCBlocksOpertions): boolean =>
+      rpcBlocksOpertions.contents && rpcBlocksOpertions.contents.some(contentWithError)
+    const contentToErrors = (content: RPCContent): OperationError[] =>
+      content.metadata
+        ? (_.get(content, 'metadata.operation_result.errors') || []).concat(
+            content.metadata.internal_operation_results
+              ? flatten(
+                  content.metadata.internal_operation_results
+                    .filter(internal_operation_result => !!internal_operation_result.result.errors)
+                    .map(internal_operation_result => internal_operation_result.result.errors)
+                )
+              : []
+          )
+        : []
+
+    return forkJoin(
+      distinctBlockLevels.map(blockLevel =>
+        this.http.get<any[]>(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}/operations`)
+      )
+    ).pipe(
+      map<any[][][], any[][]>(flatten), //forkJoin
+      map(flatten), //http.get
+      map((rpcBlocksOpertions: RPCBlocksOpertions[]) =>
+        operations.map(operation => {
+          const match = rpcBlocksOpertions.filter(
+            rpcBlocksOpertion => rpcBlocksOpertion.hash === operation.operation_group_hash && hasError(rpcBlocksOpertion)
+          )
+
+          return {
+            id: operation.operation_group_hash,
+            errors: match.length > 0 ? flatten(match.map(item => flatten(item.contents.map(contentToErrors)))) : null
+          }
+        })
+      ),
+      map(x => {
+        return x //TODO remove this map
+      })
+    )
+  }
+
   private getFaProtocol(contract: TokenContract): TezosFAProtocol {
     return new TezosFAProtocol({
       symbol: contract.symbol,
@@ -1536,7 +1584,12 @@ export class ApiService {
       baseApiUrl: this.environmentUrls.conseilUrl,
       baseApiKey: this.environmentUrls.conseilApiKey,
       baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork()
+      network: this.chainNetworkService.getNetwork(),
+      feeDefaults: {
+        low: '0',
+        medium: '0',
+        high: '0'
+      }
     })
   }
 }

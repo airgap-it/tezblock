@@ -4,6 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { OperationErrorsById } from '@tezblock/domain/operations'
 
 const featureName = 'Transaction Detail'
 
@@ -28,5 +29,20 @@ export const sortTransactionsByKind = createAction(
 )
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
+
+export const loadTransactionsTotalAmount = createAction(`[${featureName}] Load Transactions Total Amount`)
+export const loadTransactionsTotalAmountSucceeded = createAction(`[${featureName}] Load Transactions Total Amount Succeeded`, props<{ totalAmount: number }>())
+export const loadTransactionsTotalAmountFailed = createAction(`[${featureName}] Load Transactions Total Amount Failed`, props<{ error: any }>())
+
+export const loadTransactionsTotalFee = createAction(`[${featureName}] Load Transactions Total Fee`)
+export const loadTransactionsTotalFeeSucceeded = createAction(`[${featureName}] Load Transactions Total Fee Succeeded`, props<{ totalFee: number }>())
+export const loadTransactionsTotalFeeFailed = createAction(`[${featureName}] Load Transactions Total Fee Failed`, props<{ error: any }>())
+
+export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[] }>())
+export const loadTransactionsErrorsSucceeded = createAction(
+  `[${featureName}] Load Transactions Errors Succeeded`,
+  props<{ operationErrorsById: OperationErrorsById[] }>()
+)
+export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

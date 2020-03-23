@@ -34,6 +34,7 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -77,7 +78,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
   private _bakerAddress: string | undefined
 
-  @ViewChild('transactions', { static: false }) transactions: ElementRef
+  @ViewChild('transactions') transactions: ElementRef
 
   bakerTableInfos: any
   bakerTableRatings$: Observable<BakerTableRatings>
@@ -112,7 +113,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  transactions$: Observable<any[]>
+  transactions$: Observable<Transaction[]>
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
@@ -254,8 +255,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
-    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
+    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
@@ -271,7 +272,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         filter(Array.isArray),
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
-    this.orderBy$ = this.store$.select(state => state.accountDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -280,7 +281,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.setTabs(address)
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
         this.store$.dispatch(actions.loadBalanceForLast30Days())
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
@@ -324,12 +324,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-      ])
+      combineLatest(
+        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
+        getRefresh([
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
+        ])
+      )
         .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
-        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind: kind || OperationTypes.Transaction }))),
 
       this.account$
         .pipe(
@@ -450,49 +453,100 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         title: 'Transactions',
         active: true,
         kind: 'transaction',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Delegations',
         active: false,
         kind: 'delegation',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Originations',
         active: false,
         kind: 'origination',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Endorsements',
         active: false,
         kind: 'endorsement',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Votes',
         active: false,
         kind: 'ballot',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
 
     this.bakerTabs = [
-      { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
-      { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
-      { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
-      { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
+      {
+        title: 'Baker Overview',
+        active: true,
+        kind: 'baker_overview',
+        count: undefined,
+        icon: this.iconPipe.transform('hatChef'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Baking Rights',
+        active: false,
+        kind: 'baking_rights',
+        count: undefined,
+        icon: this.iconPipe.transform('breadLoaf'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Endorsing Rights',
+        active: false,
+        kind: 'endorsing_rights',
+        count: undefined,
+        icon: this.iconPipe.transform('stamp'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Rewards',
+        active: false,
+        kind: 'rewards',
+        count: undefined,
+        icon: this.iconPipe.transform('coin'),
+        disabled: function() {
+          return !this.count
+        }
+      }
     ]
   }
 }

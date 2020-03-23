@@ -191,17 +191,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         title: 'Transfers',
         active: true,
         kind: actions.OperationTab.transfers,
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol })
+        columns: columns.transfers({ pageId, showFiatValue, symbol }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Other Calls',
         active: true,
         kind: actions.OperationTab.other,
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol })
+        columns: columns.other({ pageId, showFiatValue, symbol }),
+        disabled: function() { return !this.count }
       }
     ]
   }

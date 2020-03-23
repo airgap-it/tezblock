@@ -12,7 +12,7 @@ describe('NewTransactionService', () => {
   });
 
   it('should be created', () => {
-    const service: NewTransactionService = TestBed.get(NewTransactionService);
+    const service: NewTransactionService = TestBed.inject(NewTransactionService);
     expect(service).toBeTruthy();
   });
 });

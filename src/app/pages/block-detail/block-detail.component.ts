@@ -58,16 +58,16 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.transactionsLoading$ = this.store$.select(state => state.blockDetails.busy.transactions)
+    this.transactionsLoading$ = this.store$.select(state => state.blockDetails.transactions.loading)
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
-    this.transactions$ = this.store$.select(state => state.blockDetails.transactions).pipe(filter(negate(isNil)))
+    this.transactions$ = this.store$.select(state => state.blockDetails.transactions.data).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
-    this.orderBy$ = this.store$.select(state => state.blockDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.blockDetails.transactions.orderBy)
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -124,41 +124,46 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         title: 'Transactions',
         active: true,
         kind: 'transaction',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Delegations',
         active: false,
         kind: 'delegation',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Originations',
         active: false,
         kind: 'origination',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Endorsements',
         active: false,
         kind: 'endorsement',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Activations',
         active: false,
         kind: 'activate_account',
-        count: 0,
+        count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() { return !this.count }
       }
     ]
   }
