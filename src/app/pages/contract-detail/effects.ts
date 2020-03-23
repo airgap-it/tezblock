@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, pipe, forkJoin } from 'rxjs'
+import { of } from 'rxjs'
 import { catchError, delay, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap'
@@ -12,58 +12,10 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getTokenContractByAddress, TokenContract, ContractOperation } from '@tezblock/domain/contract'
+import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { first, get } from '@tezblock/services/fp'
-import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
-
-const transferPredicates = (contractHash: string): Predicate[] => [
-  {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
-    inverse: false
-  },
-  {
-    field: 'kind',
-    operation: Operation.eq,
-    set: ['transaction'],
-    inverse: false
-  },
-  {
-    field: 'destination',
-    operation: Operation.eq,
-    set: [contractHash],
-    inverse: false
-  }
-]
-
-const otherPredicates = (contractHash: string): Predicate[] => [
-  {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
-    inverse: true
-  },
-  {
-    field: 'parameters',
-    operation: Operation.isnull,
-    set: [''],
-    inverse: true
-  },
-  {
-    field: 'kind',
-    operation: Operation.eq,
-    set: ['transaction'],
-    inverse: false
-  },
-  {
-    field: 'destination',
-    operation: Operation.eq,
-    set: [contractHash],
-    inverse: false
-  }
-]
+import { get } from '@tezblock/services/fp'
+import { ContractService } from '@tezblock/services/contract/contract.service'
 
 @Injectable()
 export class ContractDetailEffects {
@@ -92,40 +44,14 @@ export class ContractDetailEffects {
     )
   )
 
-  loadAccount$ = createEffect(() =>
+  loadManagerAddress$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadManagerAddress),
       switchMap(({ address }) =>
-        this.baseService
-          .post<{ source: string }[]>('operations', {
-            fields: ['source'],
-            predicates: [
-              {
-                field: 'kind',
-                operation: Operation.eq,
-                set: ['origination'],
-                inverse: false
-              },
-              {
-                field: 'originated_contracts',
-                operation: Operation.eq,
-                set: [address],
-                inverse: false
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: 1
-          })
-          .pipe(
-            map(first),
-            map(({ source }) => actions.loadManagerAddressSucceeded({ manager: source })),
-            catchError(error => of(actions.loadManagerAddressFailed({ error })))
-          )
+        this.contractService.loadManagerAddress(address).pipe(
+          map(manager => actions.loadManagerAddressSucceeded({ manager })),
+          catchError(error => of(actions.loadManagerAddressFailed({ error })))
+        )
       )
     )
   )
@@ -228,47 +154,8 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadOperationsCount),
       switchMap(({ contractHash }) =>
-        forkJoin(
-          this.baseService
-            .post<any[]>('operations', {
-              fields: ['destination'],
-              predicates: transferPredicates(contractHash),
-              aggregation: [
-                {
-                  field: 'destination',
-                  function: 'count'
-                }
-              ]
-            })
-            .pipe(
-              map(
-                pipe(
-                  first,
-                  get<any>(item => parseInt(item.count_destination))
-                )
-              )
-            ),
-          this.baseService
-            .post<any[]>('operations', {
-              fields: ['destination'],
-              predicates: otherPredicates(contractHash),
-              aggregation: [
-                {
-                  field: 'destination',
-                  function: 'count'
-                }
-              ]
-            })
-            .pipe(
-              map(
-                pipe(
-                  first,
-                  get<any>(item => parseInt(item.count_destination))
-                )
-              )
-            )
-        ).pipe(
-          map(([transferTotal, otherTotal]) => actions.loadOperationsCountSucceeded({ transferTotal, otherTotal })),
+        this.contractService.loadOperationsCount(contractHash).pipe(
+          map(({ transferTotal, otherTotal }) => actions.loadOperationsCountSucceeded({ transferTotal, otherTotal })),
           catchError(error => of(actions.loadOperationsCountFailed({ error })))
         )
       )
@@ -283,16 +170,10 @@ export class ContractDetailEffects {
         this.store$.select(state => state.contractDetails.otherOperations.orderBy)
       ),
       switchMap(([{ contractHash }, pagination, orderBy]) =>
-        this.baseService
-          .post<ContractOperation[]>('operations', {
-            predicates: otherPredicates(contractHash),
-            orderBy: [orderBy],
-            limit: pagination.currentPage * pagination.selectedSize
-          })
-          .pipe(
-            map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
-            catchError(error => of(actions.loadOtherOperationsFailed({ error })))
-          )
+        this.contractService.loadOtherOperations(contractHash, orderBy, pagination.currentPage * pagination.selectedSize).pipe(
+          map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
+          catchError(error => of(actions.loadOtherOperationsFailed({ error })))
+        )
       )
     )
   )
@@ -351,7 +232,7 @@ export class ContractDetailEffects {
     private readonly actions$: Actions,
     private readonly aliasPipe: AliasPipe,
     private readonly apiService: ApiService,
-    private readonly baseService: BaseService,
+    private readonly contractService: ContractService,
     private readonly copyService: CopyService,
     private readonly modalService: BsModalService,
     private readonly store$: Store<fromRoot.State>,
