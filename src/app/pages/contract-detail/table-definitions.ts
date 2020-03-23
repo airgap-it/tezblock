@@ -43,6 +43,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
+      name: 'Block',
+      field: 'blockHeight',
+      template: Template.block,
+      sortable: true
+    },
+    {
       name: 'Tx Hash',
       field: 'hash',
       template: Template.hash
@@ -86,6 +92,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
+      sortable: true
+    },
+    {
+      name: 'Block',
+      field: 'block_level',
+      template: Template.block,
       sortable: true
     },
     {
