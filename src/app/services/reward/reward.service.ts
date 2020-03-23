@@ -5,7 +5,7 @@ import { map, switchMap, catchError } from 'rxjs/operators'
 import { range } from 'lodash'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { Pagination } from '@tezblock/services/facade/facade'
+import { Pagination } from '@tezblock/domain/table'
 import { Reward } from '@tezblock/domain/reward'
 
 @Injectable({

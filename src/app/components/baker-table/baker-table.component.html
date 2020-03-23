@@ -121,9 +121,9 @@
                   <ng-template *ngIf="frozenBalance$ | async as frozenBalance; else noFrozenBalance">
                     <amount-cell [data]="{ amount: frozenBalance }" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                   </ng-template>
-                  <ng-container #noFrozenBalance>
+                  <ng-template #noFrozenBalance>
                     <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
-                  </ng-container>
+                  </ng-template>
                 </h5>
               </div>
 

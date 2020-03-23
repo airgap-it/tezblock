@@ -7,7 +7,7 @@ import { $enum } from 'ts-enum-util'
 import { Actions, ofType } from '@ngrx/effects'
 
 import { MarketDataSample } from '../../services/chartdata/chartdata.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
+import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
@@ -52,7 +52,6 @@ export class DashboardComponent extends BaseComponent {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly cryptoPricesService: CryptoPricesService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
@@ -71,17 +70,17 @@ export class DashboardComponent extends BaseComponent {
     this.cycleEndingBlockLevel$ = this.store$.select(fromRoot.app.cycleEndingBlockLevel)
     this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
 
-    this.fiatInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
-    this.cryptoInfo$ = this.cryptoPricesService.cryptoCurrencyInfo$
-    this.historicData$ = this.cryptoPricesService.historicData$
-    this.percentage$ = this.cryptoPricesService.growthPercentage$
+    this.fiatInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
+    this.cryptoInfo$ = this.store$.select(state => state.app.cryptoCurrencyInfo)
+    this.historicData$ = this.store$.select(state => state.app.cryptoHistoricData)
+    this.percentage$ = this.store$.select(fromRoot.app.currencyGrowthPercentage)
 
     this.isMainnet()
 
-    this.priceChartDatasets$ = this.cryptoPricesService.historicData$.pipe(
+    this.priceChartDatasets$ = this.historicData$.pipe(
       map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }])
     )
-    this.priceChartLabels$ = this.cryptoPricesService.historicData$.pipe(
+    this.priceChartLabels$ = this.historicData$.pipe(
       map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
     )
     this.proposalHash$ = this.store$

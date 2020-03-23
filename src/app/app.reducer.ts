@@ -1,8 +1,11 @@
 import { createReducer, on } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
+import BigNumber from 'bignumber.js'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
+import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
@@ -17,6 +20,9 @@ export interface State {
   currentVotingPeriod: number
   currentVotingeriodPosition: number
   blocksPerVotingPeriod: number
+  fiatCurrencyInfo: CurrencyInfo
+  cryptoCurrencyInfo: CurrencyInfo
+  cryptoHistoricData: MarketDataSample[]
 }
 
 const initialState: State = {
@@ -25,7 +31,18 @@ const initialState: State = {
   navigationHistory: [],
   currentVotingPeriod: undefined,
   currentVotingeriodPosition: undefined,
-  blocksPerVotingPeriod: undefined
+  blocksPerVotingPeriod: undefined,
+  cryptoCurrencyInfo: {
+    symbol: 'BTC',
+    currency: 'BTC',
+    price: new BigNumber(0)
+  },
+  fiatCurrencyInfo: {
+    symbol: '$',
+    currency: 'USD',
+    price: new BigNumber(0)
+  },
+  cryptoHistoricData: []
 }
 
 export const reducer = createReducer(
@@ -53,6 +70,21 @@ export const reducer = createReducer(
     currentVotingPeriod: null,
     currentVotingeriodPosition: null,
     blocksPerVotingPeriod: null
+  })),
+  on(actions.loadCryptoPriceSucceeded, (state, { fiatPrice, cryptoPrice }) => ({
+    ...state,
+    fiatCurrencyInfo: {
+      ...state.fiatCurrencyInfo,
+      price: fiatPrice
+    },
+    cryptoCurrencyInfo: {
+      ...state.cryptoCurrencyInfo,
+      price: cryptoPrice
+    }
+  })),
+  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
+    ...state,
+    cryptoHistoricData
   }))
 )
 
@@ -82,3 +114,25 @@ export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
     ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
     : undefined
+export const currencyGrowthPercentageSelector = (state: State): number => {
+  const startingPrice = state.cryptoHistoricData
+  const priceNow = state.fiatCurrencyInfo.price
+
+  if (!startingPrice || startingPrice.length === 0) {
+    return 0
+  }
+
+  if (!startingPrice[0].open) {
+    return 0
+  }
+
+  if (!priceNow) {
+    return 0
+  }
+
+  return priceNow
+    .minus(startingPrice[0].open)
+    .multipliedBy(100)
+    .dividedBy(startingPrice[0].open)
+    .toNumber()
+}

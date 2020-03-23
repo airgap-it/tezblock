@@ -1,11 +1,13 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Observable, BehaviorSubject, Subject } from 'rxjs'
 import * as moment from 'moment'
+import { Store } from '@ngrx/store'
 
-import { CryptoPricesService, CurrencyInfo } from '../../../services/crypto-prices/crypto-prices.service'
+import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import BigNumber from 'bignumber.js'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import * as fromRoot from '@tezblock/reducers'
 
 export interface AmountData {
   amount: number | string
@@ -86,10 +88,10 @@ export class AmountCellComponent implements OnInit {
 
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
-    private readonly cryptoPricesService: CryptoPricesService,
-    private readonly chartDataService: ChartDataService
+    private readonly chartDataService: ChartDataService,
+    private readonly store$: Store<fromRoot.State>
   ) {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
   }
 
   ngOnInit() {}

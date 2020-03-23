@@ -15,7 +15,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { refreshRate } from '@tezblock/services/facade/facade'
+import { refreshRate } from '@tezblock/domain/synchronization'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'

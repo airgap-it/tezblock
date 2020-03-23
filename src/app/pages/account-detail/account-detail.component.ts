@@ -19,7 +19,7 @@ import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
+import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -27,7 +27,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { refreshRate } from '@tezblock/services/facade/facade'
+import { refreshRate } from '@tezblock/domain/synchronization'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -210,7 +210,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-    private readonly cryptoPricesService: CryptoPricesService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
@@ -224,7 +223,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
