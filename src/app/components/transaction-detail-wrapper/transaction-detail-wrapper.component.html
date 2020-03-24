@@ -6,6 +6,11 @@
         {{ statusLabel | titlecase }}
       </span>
     </h5>
+    <div *ngIf="error" class="row mb-3">
+      <div class="col-md-12">
+        <strong>{{ error.title }}</strong> {{ error.description }}
+      </div>
+    </div>
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
