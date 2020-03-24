@@ -176,7 +176,7 @@ export class BakerTableEffects {
 
   loadActiveDelegations$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadActiveDelegationsFailed),
+      ofType(actions.loadActiveDelegations),
       withLatestFrom(this.store$.select(state => state.accountDetails.address)),
       switchMap(([action, accountAddress]) =>
         this.apiService.getDelegatedAccountsList(accountAddress).pipe(

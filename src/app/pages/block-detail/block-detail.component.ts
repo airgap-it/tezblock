@@ -29,16 +29,17 @@ import { getRefresh } from '@tezblock/domain/synchronization'
   styleUrls: ['./block-detail.component.scss']
 })
 export class BlockDetailComponent extends BaseComponent implements OnInit {
-  public endorsements$: Observable<number> = new Observable()
+  endorsements$: Observable<number> = new Observable()
 
-  public block$: Observable<Block> = new Observable()
-  public transactions$: Observable<Transaction[]>
-  public transactionsLoading$: Observable<boolean>
-  public blockLoading$: Observable<boolean>
+  block$: Observable<Block>
+  latestBlock$: Observable<Block>
+  transactions$: Observable<Transaction[]>
+  transactionsLoading$: Observable<boolean>
+  blockLoading$: Observable<boolean>
 
-  public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
+  numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
-  public tabs: Tab[]
+  tabs: Tab[]
 
   orderBy$: Observable<OrderBy>
 
@@ -51,7 +52,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
     private readonly iconPipe: IconPipe,
-    public readonly chainNetworkService: ChainNetworkService,
+    readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -63,6 +64,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
     this.transactions$ = this.store$.select(state => state.blockDetails.transactions.data).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
+    this.latestBlock$ = this.store$.select(state => state.blockDetails.latestBlock)
     this.endorsements$ = this.block$.pipe(switchMap(block => this.apiService.getEndorsedSlotsCount(block.hash)))
     this.numberOfConfirmations$ = combineLatest([this.store$.select(state => state.blockDetails.latestBlock), this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
@@ -136,7 +138,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Delegations',
@@ -145,7 +149,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Originations',
@@ -154,7 +160,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Endorsements',
@@ -163,7 +171,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Activations',
@@ -172,7 +182,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
         columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
   }

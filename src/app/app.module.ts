@@ -9,8 +9,12 @@ import { StoreModule } from '@ngrx/store'
 import { StorageModule } from '@ngx-pwa/local-storage'
 import { QRCodeModule } from 'angularx-qrcode'
 import { ChartsModule } from 'ng2-charts'
-import { AlertModule, BsDropdownModule, BsModalService, CollapseModule, SortableModule, TooltipModule } from 'ngx-bootstrap'
-import { ModalModule } from 'ngx-bootstrap/modal'
+import { AlertModule } from 'ngx-bootstrap/alert'
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown'
+import { CollapseModule } from 'ngx-bootstrap/collapse'
+import { SortableModule } from 'ngx-bootstrap/sortable'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
+import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { TabsModule } from 'ngx-bootstrap/tabs'
@@ -118,7 +122,7 @@ import { TransactionErrorsComponent } from './components/transaction-errors/tran
       metaReducers,
       runtimeChecks: {
         strictStateImmutability: true,
-        strictActionImmutability: true
+        strictActionImmutability: false // true is default (see comment in baker-table)
       }
     }),
     EffectsModule.forRoot([

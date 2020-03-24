@@ -1006,7 +1006,7 @@ export class ApiService {
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
     const group = groupBy('cycle')
 
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
       switchMap(cycles => {
         const minLevel = cycleToLevel(last(cycles))
         const maxLevel = cycleToLevel(first(cycles) + 1)
@@ -1101,7 +1101,7 @@ export class ApiService {
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
     const group = groupBy('cycle')
 
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
       switchMap(cycles => {
         const minLevel = cycleToLevel(last(cycles))
         const maxLevel = cycleToLevel(first(cycles) + 1)
@@ -1194,32 +1194,30 @@ export class ApiService {
       .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
-  getFrozenBalance(tzAddress: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<any[]>(
-          this.delegatesApiUrl,
-          {
-            predicates: [
-              {
-                field: 'pkh',
-                operation: 'eq',
-                set: [tzAddress],
-                inverse: false
-              }
-            ]
-          },
-          this.options
-        )
-        .subscribe(result => {
-          resolve(
-            pipe<any[], any, number>(
-              first,
-              get(_first => _first.frozen_balance)
-            )(result)
+  getFrozenBalance(tzAddress: string): Observable<number> {
+    return this.http
+      .post<any[]>(
+        this.delegatesApiUrl,
+        {
+          predicates: [
+            {
+              field: 'pkh',
+              operation: 'eq',
+              set: [tzAddress],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(
+          pipe<any[], any, number>(
+            first,
+            get(_first => _first.frozen_balance)
           )
-        })
-    })
+        )
+      )
   }
 
   getDelegatedAccountsList(tzAddress: string): Observable<any[]> {

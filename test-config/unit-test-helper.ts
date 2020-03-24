@@ -4,7 +4,7 @@ import { TestModuleMetadata } from '@angular/core/testing'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { RouterTestingModule } from '@angular/router/testing'
 import { MomentModule } from 'ngx-moment'
-import { TooltipModule } from 'ngx-bootstrap'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { Store } from '@ngrx/store'
 
 import { storeMock } from 'test-config/mocks'

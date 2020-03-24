@@ -140,13 +140,14 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.route.paramMap.subscribe(async paramMap => {
         const accountAddress = paramMap.get('id')
+
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
         this.store$.dispatch(actions.loadBakingRights())
         this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
-        this.frozenBalance$ = from(this.apiService.getFrozenBalance(accountAddress))
+        this.frozenBalance$ = this.apiService.getFrozenBalance(accountAddress)
       })
     )
   }
@@ -168,7 +169,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         })
       )
 
-    this.rewards$ = combineLatest(this.store$.select(state => state.bakerTable.rewards.data), this.bakerFee$).pipe(
+    this.rewards$ = combineLatest(
+      this.store$.select(state => state.bakerTable.rewards.data),
+      this.bakerFee$
+    ).pipe(
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
       map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
     )
@@ -211,6 +215,21 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(actions.loadActiveDelegations())),
 
+      /* TODO: strange error on page transition: account-detail -> account-detail
+        "3 errors occurred during unsubscription:
+        1) TypeError: Cannot assign to read only property 'eventTask' of object '[object Object]'
+        2) TypeError: Cannot assign to read only property 'eventTask' of object '[object Object]'
+        3) TypeError: Cannot assign to read only property 'macroTask' of object '[object Object]'"
+
+        SOLVED BY: ( https://github.com/ngrx/platform/issues/664 )
+        StoreModule.forRoot(ROOT_REDUCERS, {
+          metaReducers,
+          runtimeChecks: {
+            strictStateImmutability: true,
+            strictActionImmutability: false // true is default <----------------------------- !!!
+          }
+        }),
+      */
       this.route.paramMap
         .pipe(
           filter(paramMap => !!paramMap.get('id')),

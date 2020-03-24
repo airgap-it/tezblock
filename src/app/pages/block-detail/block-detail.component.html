@@ -3,10 +3,11 @@
     <ng-container *ngIf="block$ | async; else noBlock">
       <div class="card h-100 pt-3">
         <block-detail-wrapper
-          [wrapperBlock$]="block$"
-          [endorsements$]="endorsements$"
-          [confirmations$]="numberOfConfirmations$"
-          [blockLoading$]="blockLoading$"
+          [wrapperBlock]="block$ | async"
+          [endorsements]="endorsements$ | async"
+          [confirmations]="numberOfConfirmations$ | async"
+          [blockLoading]="blockLoading$ | async"
+          [latestBlock]="latestBlock$ | async"
           (blockChangeClicked)="changeBlockLevel($event)"
         ></block-detail-wrapper>
       </div>

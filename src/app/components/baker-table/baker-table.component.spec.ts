@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { TabsModule, TabsetConfig } from 'ngx-bootstrap'
+import { TabsModule, TabsetConfig } from 'ngx-bootstrap/tabs'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { ChartsModule } from 'ng2-charts'

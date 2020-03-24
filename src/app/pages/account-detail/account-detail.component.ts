@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
-import { BsModalService } from 'ngx-bootstrap'
+import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge } from 'rxjs'
 import { delay, map, filter, withLatestFrom } from 'rxjs/operators'

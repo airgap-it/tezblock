@@ -14,7 +14,7 @@ export interface Busy {
 export interface State {
   id: string
   block: Block
-latestBlock: Block
+  latestBlock: Block
   transactions: TableState<Transaction>
   counts: Count[]
   transactionsLoadedByBlockHash: string
@@ -26,7 +26,7 @@ const initialState: State = {
   id: undefined,
   block: undefined,
   transactions: getInitialTableState(),
-latestBlock: undefined,
+  latestBlock: undefined,
 
   counts: undefined,
   transactionsLoadedByBlockHash: undefined,

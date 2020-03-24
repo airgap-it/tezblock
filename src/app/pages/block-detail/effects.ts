@@ -16,7 +16,7 @@ export class BlockDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadBlock),
       switchMap(({ id }) =>
-        this.blockService.getById(id).pipe(
+        this.blockService.getById(id, ['volume', 'fee']).pipe(
           map(block => actions.loadBlockSucceeded({ block })),
           catchError(error => of(actions.loadBlockFailed({ error })))
         )
