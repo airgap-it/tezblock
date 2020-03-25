@@ -229,6 +229,15 @@ export const reducer = createReducer(
       orderBy
     }
   })),
+
+  on(actions.loadBlockDataForDEE, (state, { doubleEndorsements }) => ({
+    ...state,
+    doubleEndorsements: {
+      ...state.doubleEndorsements,
+      temporaryData: doubleEndorsements,
+      loading: true
+    }
+  })),
   on(actions.loadActiveBakers, state => ({
     ...state,
     activeBakers: {

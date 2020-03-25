@@ -52,6 +52,11 @@ export const loadDoubleEndorsementsSucceeded = createAction(
   props<{ doubleEndorsements: Transaction[] }>()
 )
 
+export const loadBlockDataForDEE = createAction(
+  `[${featureName}] Load Block Data For Double Endorsement Evidence`,
+  props<{ doubleEndorsements: Transaction[] }>()
+)
+
 export const loadDoubleEndorsementsFailed = createAction(`[${featureName}] Load Double Endorsements Failed`, props<{ error: any }>())
 export const increasePageOfDoubleEndorsements = createAction(`[${featureName}] Increase Page Of Double Endorsements`)
 export const sortDoubleEndorsementsByKind = createAction(`[${featureName}] Sort Double Endorsements`, props<{ orderBy: OrderBy }>())
@@ -195,10 +200,13 @@ export const loadContractsFailed = createAction(`[${featureName}] Load Contracts
 export const increasePageOfContracts = createAction(`[${featureName}] Increase Page Of Contracts`)
 export const sortContracts = createAction(`[${featureName}] Sort Contracts`, props<{ orderBy: OrderBy }>())
 
-export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[], actionType: string }>())
+export const loadTransactionsErrors = createAction(
+  `[${featureName}] Load Transactions Errors`,
+  props<{ transactions: Transaction[]; actionType: string }>()
+)
 export const loadTransactionsErrorsSucceeded = createAction(
   `[${featureName}] Load Transactions Errors Succeeded`,
-  props<{ operationErrorsById: OperationErrorsById[], actionType: string }>()
+  props<{ operationErrorsById: OperationErrorsById[]; actionType: string }>()
 )
 export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 

@@ -286,9 +286,51 @@ export class ListEffects {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'], orderBy)
           .pipe(
-            map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+            map((doubleEndorsements: Transaction[]) => {
+              return listActions.loadBlockDataForDEE({ doubleEndorsements })
+            }),
             catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
           )
+      })
+    )
+  )
+
+  getDoubleEndorsementsBlockData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadBlockDataForDEE),
+      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.temporaryData)),
+      switchMap(([action, temporaryData]) => {
+        const blockIds = []
+        temporaryData.forEach(doubleEndorsement => {
+          blockIds.push(doubleEndorsement.block_level)
+        })
+
+        return this.apiService.getBlocksOfIds(blockIds).pipe(
+          map((blocks: Block[]) => {
+            let doubleEndorsements: Transaction[] = JSON.parse(JSON.stringify(temporaryData))
+
+            doubleEndorsements = doubleEndorsements.map(doubleEndorsement => {
+              const additionalData = blocks.find(block => block.level === doubleEndorsement.block_level)
+
+              return { ...doubleEndorsement, baker: additionalData.baker }
+            })
+
+            return doubleEndorsements
+          }),
+          switchMap(doubleEndorsements => {
+            const doubleEndosementPromise: Promise<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
+              return this.rewardService.calculateRewards(doubleEndorsement.baker, doubleEndorsement.cycle).then(rewardsResponse => {
+                return { ...doubleEndorsement, reward: rewardsResponse.endorsingRewards }
+              })
+            })
+
+            return Promise.all(doubleEndosementPromise)
+          }),
+          map(doubleEndorsements => {
+            return listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })
+          }),
+          catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+        )
       })
     )
   )

@@ -51,4 +51,5 @@ export interface Transaction {
   symbol?: string
   baker?: string
   errors?: OperationError[]
+  reward?: string
 }
