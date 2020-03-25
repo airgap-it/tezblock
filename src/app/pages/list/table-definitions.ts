@@ -302,10 +302,11 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
         name: 'Reward',
         field: 'reward',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: { amount: item.reward, timestamp: item.timestamp }, options })
       },
       {
         name: 'Offender',
+        field: 'offender',
         template: Template.address
       },
       {

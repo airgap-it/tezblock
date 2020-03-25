@@ -230,20 +230,29 @@ export class ListEffects {
         temporaryData.forEach(doubleBaking => {
           blockIds.push(doubleBaking.block_level)
         })
+
         return this.apiService.getBlocksOfIds(blockIds).pipe(
           map((blocks: Block[]) => {
-            let doubleBakings = JSON.parse(JSON.stringify(temporaryData))
+            let doubleBakings: Transaction[] = JSON.parse(JSON.stringify(temporaryData))
 
             doubleBakings = doubleBakings.map(doubleBaking => {
               const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
 
-              const calculatedReward = this.rewardService.calculateRewards(additionalData.baker, doubleBaking.cycle).then(response => {
-                return response.bakingRewards
-              })
-
-              return { ...doubleBaking, baker: additionalData.baker, reward: calculatedReward }
+              return { ...doubleBaking, baker: additionalData.baker }
             })
 
+            return doubleBakings
+          }),
+          switchMap(doubleBakings => {
+            const doubleBakingPromise: Promise<Transaction>[] = doubleBakings.map(doubleBaking => {
+              return this.rewardService.calculateRewards(doubleBaking.baker, doubleBaking.cycle).then(rewardsResponse => {
+                return { ...doubleBaking, reward: rewardsResponse.bakingRewards }
+              })
+            })
+
+            return Promise.all(doubleBakingPromise)
+          }),
+          map(doubleBakings => {
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
           }),
           catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
@@ -596,7 +605,7 @@ export class ListEffects {
         listActions.loadTransactionsSucceeded,
         // listActions.loadActivationsSucceeded,
         listActions.loadOriginationsSucceeded,
-        listActions.loadDelegationsSucceeded,
+        listActions.loadDelegationsSucceeded
         // listActions.loadDoubleBakingsSucceeded,
         // listActions.loadDoubleEndorsementsSucceeded,
         // listActions.loadVotesSucceeded,
