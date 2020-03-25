@@ -76,21 +76,27 @@
             </div>
           </div>
 
-          <div *ngIf="proposal.description" class="row mb-3">
+          <div *ngIf="proposal.description" class="row">
             <div class="col-md-12">
               <button
                 type="button"
-                class="btn btn-link p-0 collapse--btn mb-3"
+                class="btn btn-link p-0 collapse--btn"
                 (click)="isCollapsed = !isCollapsed"
                 [attr.aria-expanded]="!isCollapsed"
                 aria-controls="collapseBasic"
                 [ngClass]="{ 'btn--rotated': !isCollapsed }"
               >
-                <span>{{ isCollapsed ? 'More' : 'Less' }}</span>
+                <span>{{ isCollapsed ? 'More Proposal' : 'Less Proposal' }}</span>
                 Details
                 <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
               </button>
-              <div [innerHtml]="proposal.description | safeHtml" id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true" class="description"></div>
+              <div
+                [innerHtml]="proposal.description | safeHtml"
+                id="collapseBasic"
+                [collapse]="isCollapsed"
+                [isAnimated]="true"
+                class="description mt-3"
+              ></div>
             </div>
           </div>
         </div>
