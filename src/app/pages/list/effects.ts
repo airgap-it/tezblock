@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
 import { forkJoin, Observable, of } from 'rxjs'
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
+import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -587,6 +587,36 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.sortContracts),
       map(() => listActions.loadContracts())
+    )
+  )
+
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(
+        listActions.loadTransactionsSucceeded,
+        // listActions.loadActivationsSucceeded,
+        listActions.loadOriginationsSucceeded,
+        listActions.loadDelegationsSucceeded,
+        // listActions.loadDoubleBakingsSucceeded,
+        // listActions.loadDoubleEndorsementsSucceeded,
+        // listActions.loadVotesSucceeded,
+        // listActions.loadEndorsementsSucceeded
+      ),
+      map(action => [action[Object.keys(action).filter(key => key !== 'type')[0]], action.type]),
+      filter(([transactions, actionType]) => transactions.some(transaction => transaction.status !== 'applied')),
+      map(([transactions, actionType]) => listActions.loadTransactionsErrors({ transactions, actionType }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactionsErrors),
+      switchMap(({ transactions, actionType }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => listActions.loadTransactionsErrorsSucceeded({ operationErrorsById, actionType })),
+          catchError(error => of(listActions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
     )
   )
 

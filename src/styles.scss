@@ -62,7 +62,9 @@ $nav-tabs-link-active-bg: none;
 $navbar-light-toggler-border-color: transparent;
 $navbar-toggler-font-size: 14px;
 $input-btn-focus-box-shadow: none;
-$tooltip-bg: map_get($theme-colors, 'secondary');
+$tooltip-bg: #fff;
+$tooltip-color: #000;
+$tooltip-border-radius: 0;
 $list-group-item-padding-y: 0.25rem;
 $list-group-item-padding-x: 0;
 $modal-header-border-color: transparent;
@@ -171,5 +173,10 @@ app-latest-contracts {
 /* width only encloses conent, used for ion-tooltip positioning */
 .width--fit-content {
   width: fit-content;
+}
+/* additional tooltip styling */
+.tooltip-inner {
+  text-align: left !important;
+  box-shadow: 0 0 12px 4px rgba(46, 91, 255, 0.12);
 }
 @import '../node_modules/bootstrap/scss/bootstrap';

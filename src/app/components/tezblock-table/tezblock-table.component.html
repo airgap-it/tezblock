@@ -77,7 +77,10 @@
                       <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
                     </ng-container>
                     <ng-template #arrow>
-                      <fa-icon [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe" class="ml-1"></fa-icon>
+                      <fa-icon
+                        [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe"
+                        class="ml-1"
+                      ></fa-icon>
                     </ng-template>
                   </button>
                 </th>
@@ -94,7 +97,19 @@
         <tbody>
           <ng-container *ngIf="data">
             <ng-container *ngFor="let item of data; let i = index">
-              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
+              <ng-template #tooltipTemplate>
+                <ng-container *ngIf="item.errors as errors">
+                  <app-transaction-errors [errors]="errors"></app-transaction-errors>
+                </ng-container>
+              </ng-template>
+              <tr
+                *ngIf="!!item.errors; else noError"
+                class="table-danger"
+                (click)="expand(item)"
+                [tooltip]="tooltipTemplate"
+                placement="bottom"
+                [adaptivePosition]="false"
+              >
                 <td *ngFor="let column of columns; trackBy: trackByFn">
                   <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
                 </td>
@@ -102,6 +117,16 @@
                   <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
                 </td>
               </tr>
+              <ng-template #noError>
+                <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
+                  <td *ngFor="let column of columns; trackBy: trackByFn">
+                    <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
+                  </td>
+                  <td *ngIf="expandedRow">
+                    <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
+                  </td>
+                </tr>
+              </ng-template>
               <tr *ngIf="isExpanded(item)" class="table-extended__active">
                 <td colspan="10" class="py-3 px-0">
                   <ng-container
@@ -115,7 +140,7 @@
       </ng-template>
       <ng-template #elseTemplate>
         <thead width="180">
-          <tr><th>No Transactions</th></tr>
+          <tr><th>{{ noDataLabel || 'No Transactions' }}</th></tr>
         </thead>
       </ng-template>
     </table>

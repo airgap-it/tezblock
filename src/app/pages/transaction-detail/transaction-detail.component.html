@@ -3,10 +3,10 @@
     <ng-container *ngIf="latestTx$ | async">
       <div class="card h-100 pt-3 mb-">
         <transaction-detail-wrapper
-          [latestTransaction$]="latestTx$"
-          [blockConfirmations$]="numberOfConfirmations$"
+          [latestTransaction]="latestTx$ | async"
+          [blockConfirmations]="numberOfConfirmations$ | async"
           [totalAmount]="totalAmount$ | async"
-          [fiatInfo$]="fiatCurrencyInfo$"
+          [fiatInfo]="fiatCurrencyInfo$ | async"
           [isMainnet]="isMainnet"
         ></transaction-detail-wrapper>
       </div>
