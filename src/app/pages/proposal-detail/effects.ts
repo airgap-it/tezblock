@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, pipe, Observable, forkJoin } from 'rxjs'
 import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { HttpClient } from '@angular/common/http'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
@@ -18,6 +19,7 @@ import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()
 export class ProposalDetailEffects {
+
   getProposal$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadProposal),
@@ -36,6 +38,13 @@ export class ProposalDetailEffects {
           catchError(error => of(actions.loadProposalFailed({ error })))
         )
       )
+    )
+  )
+
+  onLoadedProposalLoadDescription$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadProposalSucceeded),
+      map(() => actions.loadProposalDescription())
     )
   )
 
@@ -294,6 +303,19 @@ export class ProposalDetailEffects {
     )
   )
 
+  loadProposalDescription$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadProposalDescription),
+      withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
+      switchMap(([action, id]) =>
+        this.httpClient.get(`../../assets/proposals/descriptions/${id}.html`, { responseType: 'text' }).pipe(
+          map(description => actions.loadProposalDescriptionSucceeded({ description })),
+          catchError(error => of(actions.loadProposalDescriptionFailed({ error })))
+        )
+      )
+    )
+  )
+
   private getMetaVotingPeriod(proposalHash: string, periodKind: string): Observable<number> {
     return this.baseService
       .post<Block[]>('blocks', {
@@ -407,6 +429,7 @@ export class ProposalDetailEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
+    private readonly httpClient: HttpClient,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

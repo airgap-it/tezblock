@@ -12,6 +12,7 @@ export interface ProposalDto {
   proposal: string
   period: number
   discussionLink?: string
+  description?: string
 }
 
 export const toAlias = (name: string): string => {
