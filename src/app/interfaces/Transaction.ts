@@ -52,4 +52,7 @@ export interface Transaction {
   baker?: string
   errors?: OperationError[]
   reward?: string
+  offender?: string
+  lostAmount?: string
+  denouncedLevel?: number
 }

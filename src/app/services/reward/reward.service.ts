@@ -7,9 +7,16 @@ import { range } from 'lodash'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/services/facade/facade'
 import { Payout } from '@tezblock/interfaces/Payout'
+import { HttpClient } from '@angular/common/http'
 
 export interface ExpTezosRewards extends TezosRewards {
   payouts: Payout[]
+}
+
+export interface DoubleEvidence {
+  lostAmount: string
+  denouncedBlockLevel: number
+  offender: string
 }
 
 @Injectable({
@@ -21,7 +28,7 @@ export class RewardService {
   private calculatedRewardsMap = new Map<String, TezosRewards>()
   private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
-  constructor(private readonly chainNetworkService: ChainNetworkService) {
+  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly http: HttpClient) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
 
@@ -33,6 +40,7 @@ export class RewardService {
       environmentUrls.conseilApiKey
     )
   }
+  environmentUrls = this.chainNetworkService.getEnvironment()
 
   getLastCycles(pagination: Pagination): Observable<number[]> {
     return from(this.protocol.fetchCurrentCycle()).pipe(
@@ -103,5 +111,37 @@ export class RewardService {
       this.pendingPromises.set(key, promise)
       return promise
     }
+  }
+
+  getDoubleBakingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {
+    return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
+      map((response: any) => {
+        const denouncedBlockLevel = response.operations[2][0].contents[0].bh1.level
+        const lostAmount: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'rewards'
+        ).change
+        const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'rewards'
+        ).delegate
+
+        return { lostAmount: lostAmount, denouncedBlockLevel: denouncedBlockLevel, offender: offender }
+      })
+    )
+  }
+
+  getDoubleEndorsingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {
+    return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
+      map((response: any) => {
+        const denouncedBlockLevel = response.operations[2][0].contents[0].op1.operations.level
+        const lostAmount: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'rewards'
+        ).change
+        const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'rewards'
+        ).delegate
+
+        return { lostAmount: lostAmount, denouncedBlockLevel: denouncedBlockLevel, offender: offender }
+      })
+    )
   }
 }

@@ -311,12 +311,14 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Denounced Level',
+        field: 'denouncedLevel',
         template: Template.block
       },
       {
         name: 'Lost Amount',
+        field: 'lostAmount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: { amount: item.lostAmount, timestamp: item.timestamp }, options })
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -347,12 +349,14 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Denounced Level',
+        field: 'denouncedLevel',
         template: Template.block
       },
       {
         name: 'Lost Amount',
+        field: 'lostAmount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: { amount: item.lostAmount, timestamp: item.timestamp }, options })
       }
     ].concat(<any>blockAndTxHashColumns),
 

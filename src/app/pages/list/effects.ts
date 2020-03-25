@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
-import { forkJoin, Observable, of } from 'rxjs'
+import { forkJoin, Observable, of, combineLatest } from 'rxjs'
 import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
@@ -252,6 +252,21 @@ export class ListEffects {
 
             return Promise.all(doubleBakingPromise)
           }),
+          switchMap(doubleBakings => {
+            const doubleBakingObservable: Observable<Transaction>[] = doubleBakings.map(doubleBaking => {
+              return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level).pipe(
+                map(additionalData => {
+                  return {
+                    ...doubleBaking,
+                    offender: additionalData.offender,
+                    lostAmount: additionalData.lostAmount,
+                    denouncedLevel: additionalData.denouncedBlockLevel
+                  }
+                })
+              )
+            })
+            return combineLatest(doubleBakingObservable)
+          }),
           map(doubleBakings => {
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
           }),
@@ -325,6 +340,21 @@ export class ListEffects {
             })
 
             return Promise.all(doubleEndosementPromise)
+          }),
+          switchMap(doubleEndorsements => {
+            const doubleEndorsementObservable: Observable<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
+              return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level).pipe(
+                map(additionalData => {
+                  return {
+                    ...doubleEndorsement,
+                    offender: additionalData.offender,
+                    lostAmount: additionalData.lostAmount,
+                    denouncedLevel: additionalData.denouncedBlockLevel
+                  }
+                })
+              )
+            })
+            return combineLatest(doubleEndorsementObservable)
           }),
           map(doubleEndorsements => {
             return listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })
