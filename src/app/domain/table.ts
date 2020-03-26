@@ -3,7 +3,7 @@ import { OrderBy, Direction } from '@tezblock/services/base.service'
 export interface Pagination {
   currentPage: number
   selectedSize: number
-  pageSizes: [number, number, number, number]
+  pageSizes?: [number, number, number, number]
   total?: number
 }
 

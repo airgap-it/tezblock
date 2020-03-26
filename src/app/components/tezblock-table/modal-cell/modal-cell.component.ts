@@ -1,5 +1,5 @@
 import { Component, TemplateRef, OnInit, Input } from '@angular/core'
-import { BsModalService, BsModalRef } from 'ngx-bootstrap'
+import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal'
 
 @Component({
   selector: 'app-modal-cell',

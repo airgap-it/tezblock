@@ -11,16 +11,17 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Tab } from '@tezblock/domain/tab'
 import { Block } from '../../interfaces/Block'
 import { Transaction } from '../../interfaces/Transaction'
-import { BlockService } from '../../services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { refreshRate } from '@tezblock/services/facade/facade'
+import { refreshRate } from '@tezblock/domain/synchronization'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { getRefresh } from '@tezblock/domain/synchronization'
 
 @Component({
   selector: 'app-block-detail',
@@ -28,16 +29,17 @@ import { OrderBy } from '@tezblock/services/base.service'
   styleUrls: ['./block-detail.component.scss']
 })
 export class BlockDetailComponent extends BaseComponent implements OnInit {
-  public endorsements$: Observable<number> = new Observable()
+  endorsements$: Observable<number> = new Observable()
 
-  public block$: Observable<Block> = new Observable()
-  public transactions$: Observable<Transaction[]>
-  public transactionsLoading$: Observable<boolean>
-  public blockLoading$: Observable<boolean>
+  block$: Observable<Block>
+  latestBlock$: Observable<Block>
+  transactions$: Observable<Transaction[]>
+  transactionsLoading$: Observable<boolean>
+  blockLoading$: Observable<boolean>
 
-  public numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
+  numberOfConfirmations$: Observable<number> = new BehaviorSubject(0)
 
-  public tabs: Tab[]
+  tabs: Tab[]
 
   orderBy$: Observable<OrderBy>
 
@@ -47,10 +49,10 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
-    private readonly blockService: BlockService,
     private readonly iconPipe: IconPipe,
-    public readonly chainNetworkService: ChainNetworkService,
+    readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -62,8 +64,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
     this.transactions$ = this.store$.select(state => state.blockDetails.transactions.data).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
-    this.endorsements$ = this.block$.pipe(switchMap(block => this.blockService.getEndorsedSlotsCount(block.hash)))
-    this.numberOfConfirmations$ = combineLatest([this.blockService.latestBlock$, this.block$]).pipe(
+    this.latestBlock$ = this.store$.select(state => state.blockDetails.latestBlock)
+    this.endorsements$ = this.block$.pipe(switchMap(block => this.apiService.getEndorsedSlotsCount(block.hash)))
+    this.numberOfConfirmations$ = combineLatest([this.store$.select(state => state.blockDetails.latestBlock), this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
@@ -86,13 +89,21 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(id => this.store$.dispatch(actions.loadBlock({ id }))),
 
+      getRefresh([
+        this.actions$.pipe(ofType(actions.loadLatestBlockSucceeded)),
+        this.actions$.pipe(ofType(actions.loadLatestBlockFailed))
+      ]).subscribe(() => this.store$.dispatch(actions.loadLatestBlock())),
+
       // refresh transactions
       merge(
         this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
         this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
       )
         .pipe(
-          withLatestFrom(this.store$.select(state => state.blockDetails.block), this.store$.select(state => state.blockDetails.kind)),
+          withLatestFrom(
+            this.store$.select(state => state.blockDetails.block),
+            this.store$.select(state => state.blockDetails.kind)
+          ),
           switchMap(([action, block, kind]) => timer(refreshRate, refreshRate).pipe(map(() => [block.hash, kind])))
         )
         .subscribe(([blockHash, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ blockHash, kind }))),
@@ -127,7 +138,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Delegations',
@@ -136,7 +149,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Originations',
@@ -145,7 +160,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Endorsements',
@@ -154,7 +171,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Activations',
@@ -163,7 +182,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
         columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
   }

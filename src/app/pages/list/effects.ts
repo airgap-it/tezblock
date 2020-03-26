@@ -13,7 +13,6 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { toNotNilArray } from '@tezblock/services/fp'
 import * as listActions from './actions'
 

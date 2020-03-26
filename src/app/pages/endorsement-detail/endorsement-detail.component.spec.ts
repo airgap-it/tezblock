@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { MomentModule } from 'ngx-moment'
 import { Actions } from '@ngrx/effects'
-import { TooltipModule } from 'ngx-bootstrap'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { EMPTY } from 'rxjs'
 
 import { UnitHelper } from 'test-config/unit-test-helper'

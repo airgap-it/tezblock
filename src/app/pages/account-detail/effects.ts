@@ -4,12 +4,12 @@ import { from, of, forkJoin } from 'rxjs'
 import { map, catchError, filter, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
-import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { NewAccountService } from '@tezblock/services/account/account.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
@@ -275,13 +275,13 @@ export class AccountDetailEffects {
   )
 
   constructor(
-    private readonly accountService: NewAccountService,
+    private readonly accountService: AccountService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly transactionService: NewTransactionService
+    private readonly transactionService: TransactionService
   ) {}
 }

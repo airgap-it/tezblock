@@ -1,5 +1,7 @@
 import { createAction, props } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
+import BigNumber from 'bignumber.js'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import { Block } from '@tezblock/interfaces/Block'
 
@@ -21,3 +23,24 @@ export const loadPeriodInfosSucceeded = createAction(
   props<{ currentVotingPeriod: number; currentVotingeriodPosition: number, blocksPerVotingPeriod: number }>()
 )
 export const loadPeriodInfosFailed = createAction(`[${featureName}] Load Period Infos Failed`, props<{ error: any }>())
+
+export const loadCryptoPriceFromCache = createAction(`[${featureName}] Load Crypto Price From Cache`)
+export const loadCryptoPriceFromCacheSucceeded = createAction(
+  `[${featureName}] Load Crypto Price From Cache Succeeded`,
+  props<{ fiatPrice: BigNumber, cryptoPrice: BigNumber }>()
+)
+export const loadCryptoPriceFromCacheFailed = createAction(`[${featureName}] Load Crypto Price From Cache Failed`, props<{ error: any }>())
+
+export const loadCryptoPrice = createAction(`[${featureName}] Load Crypto Price`)
+export const loadCryptoPriceSucceeded = createAction(
+  `[${featureName}] Load Crypto Price Succeeded`,
+  props<{ fiatPrice: BigNumber, cryptoPrice: BigNumber }>()
+)
+export const loadCryptoPriceFailed = createAction(`[${featureName}] Load Crypto Price Failed`, props<{ error: any }>())
+
+export const loadCryptoHistoricData = createAction(`[${featureName}] Load Crypto Historic Data`)
+export const loadCryptoHistoricDataSucceeded = createAction(
+  `[${featureName}] Load Crypto Historic Data Succeeded`,
+  props<{ cryptoHistoricData: MarketDataSample[] }>()
+)
+export const loadCryptoHistoricDataFailed = createAction(`[${featureName}] Load Crypto Historic Data Failed`, props<{ error: any }>())

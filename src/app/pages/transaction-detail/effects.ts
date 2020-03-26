@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
@@ -189,7 +189,7 @@ export class TransactionDetailEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly blockService: NewBlockService,
+    private readonly blockService: BlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

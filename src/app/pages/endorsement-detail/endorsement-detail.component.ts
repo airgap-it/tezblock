@@ -5,7 +5,7 @@ import { Observable, timer } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import { BaseComponent } from '@tezblock/components/base.component'
-import { refreshRate } from '@tezblock/services/facade/facade'
+import { refreshRate } from '@tezblock/domain/synchronization'
 import { CopyService } from 'src/app/services/copy/copy.service'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'

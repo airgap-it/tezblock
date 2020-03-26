@@ -13,7 +13,7 @@ import { first, get } from '@tezblock/services/fp'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
-import { meanBlockTimeFromPeriod } from '@tezblock/services/cycle/cycle.service'
+import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
 import { proposals } from '@tezblock/interfaces/proposal'
 
 @Injectable()

@@ -1,5 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { TooltipModule } from 'ngx-bootstrap'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 
 import { HealthComponent } from './health.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
