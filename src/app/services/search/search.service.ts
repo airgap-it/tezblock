@@ -6,7 +6,6 @@ import { StorageMap } from '@ngx-pwa/local-storage'
 import { negate, isNil } from 'lodash'
 
 import { ApiService } from './../api/api.service'
-import { BlockService } from '../blocks/blocks.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractByAddress } from '@tezblock/domain/contract'
@@ -19,7 +18,6 @@ const previousSearchesKey = 'previousSearches'
 })
 export class SearchService {
   constructor(
-    private readonly blockService: BlockService,
     private readonly apiService: ApiService,
     private readonly router: Router,
     private readonly storage: StorageMap
@@ -103,7 +101,7 @@ export class SearchService {
               this.router.navigateByUrl('/transaction/' + _searchTerm)
             })
           ),
-        merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
+        merge(this.apiService.getBlockByHash(_searchTerm), this.apiService.getBlockById(_searchTerm))
           .pipe(
             map(first),
             filter(negate(isNil))

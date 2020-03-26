@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 
-import { Facade } from '../facade/facade'
 import { Wallet, SocialType, PlatformName } from '../../interfaces/Wallet'
 
-const initialState: Wallet[] = [
+const wallets: Wallet[] = [
   {
     title: 'AirGap',
     description: `With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your XTZ with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.`,
@@ -428,12 +427,10 @@ const initialState: Wallet[] = [
 @Injectable({
   providedIn: 'root'
 })
-export class WalletService extends Facade<Wallet[]> {
-  constructor() {
-    super(initialState)
-  }
+export class WalletService {
+  constructor() {}
 
   get(): Observable<Wallet[]> {
-    return this.state$
+    return of(wallets)
   }
 }

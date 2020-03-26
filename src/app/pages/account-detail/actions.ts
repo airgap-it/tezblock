@@ -57,7 +57,7 @@ export const loadExtraBalance = createAction(`[${featureName}] Load Extra Balanc
 export const loadExtraBalanceSucceeded = createAction(`[${featureName}] Load Extra Balance Succeeded`, props<{ extraBalance: Balance[] }>())
 export const loadExtraBalanceFailed = createAction(`[${featureName}] Load Extra Balance Failed`, props<{ error: any }>())
 
-export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`)
+export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`, props<{ address: string }>())
 export const loadBakingBadRatingsSucceeded = createAction(
   `[${featureName}] Load Baking Bad Ratings Succeeded`,
   props<{ response: BakingRatingResponse }>()

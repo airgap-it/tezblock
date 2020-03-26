@@ -4,6 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TokenContract } from '@tezblock/domain/contract'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { PeriodTimespan } from '@tezblock/domain/vote'
+import { Block } from '@tezblock/interfaces/Block'
 
 const featureName = 'Dashboard'
 
@@ -21,5 +22,13 @@ export const loadCurrentPeriodTimespanSucceeded = createAction(
   props<{ currentPeriodTimespan: PeriodTimespan, blocksPerVotingPeriod: number }>()
 )
 export const loadCurrentPeriodTimespanFailed = createAction(`[${featureName}] Load CurrenyPeriodTimespan Failed`, props<{ error: any }>())
+
+export const loadTransactions = createAction(`[${featureName}] Load Transactions`)
+export const loadTransactionsSucceeded = createAction(`[${featureName}] Load Transactions Succeeded`, props<{ transactions: Transaction[] }>())
+export const loadTransactionsFailed = createAction(`[${featureName}] Load Transactions Failed`, props<{ error: any }>())
+
+export const loadBlocks = createAction(`[${featureName}] Load Blocks`)
+export const loadBlocksSucceeded = createAction(`[${featureName}] Load Blocks Succeeded`, props<{ blocks: Block[] }>())
+export const loadBlocksFailed = createAction(`[${featureName}] Load Blocks Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

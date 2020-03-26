@@ -14,8 +14,15 @@ import { get } from '@tezblock/services/fp'
 import { get as _get } from 'lodash'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
-interface Efficiency {
-  [address: string]: number
+interface TezosNodesApiResponse {
+  name: string
+  address: string
+  efficiency_last10cycle: number
+  freespace: number
+  last_endoresment: string
+  last_baking: string
+  next_endoresment: string
+  next_baking: string
 }
 
 type Moment = moment.Moment
@@ -43,7 +50,8 @@ export class BakingService {
 
   private readonly bakingBadUrl = 'https://api.baking-bad.org/v2/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
-  private readonly efficiencyLast10CyclesUrl = 'https://tezos-nodes.com/api/last10/'
+  private readonly efficiencyLast10CyclesUrl = 'https://api.tezos-nodes.com/v1/baker/'
+  private readonly airgapCorsProxy = 'https://cors-proxy.airgap.prod.gke.papers.tech/proxy?url='
 
   constructor(
     private readonly cacheService: CacheService,
@@ -163,6 +171,8 @@ export class BakingService {
   }
 
   getEfficiencyLast10Cycles(address: string): Observable<number> {
-    return this.http.get<Efficiency>(`${this.efficiencyLast10CyclesUrl}${address}`).pipe(map(get(efficiency => efficiency[address])))
+    return this.http
+      .get<TezosNodesApiResponse>(`${this.airgapCorsProxy}${this.efficiencyLast10CyclesUrl}${address}`)
+      .pipe(map(response => response.efficiency_last10cycle))
   }
 }

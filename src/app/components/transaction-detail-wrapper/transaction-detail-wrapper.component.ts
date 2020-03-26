@@ -6,6 +6,9 @@ import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
+import { first } from '@tezblock/services/fp'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -64,7 +67,17 @@ export class TransactionDetailWrapperComponent implements OnInit {
 
   statusLabel: string
 
-  constructor(private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
+  get error(): OperationErrorMessage {
+    return this.latestTransaction && this.latestTransaction.errors
+      ? operationErrorToMessage(first(this.latestTransaction.errors), this.amountConverterPipe)
+      : null
+  }
+
+  constructor(
+    private readonly amountConverterPipe: AmountConverterPipe,
+    private readonly copyService: CopyService,
+    private readonly toastrService: ToastrService
+  ) {}
 
   ngOnInit() {}
 

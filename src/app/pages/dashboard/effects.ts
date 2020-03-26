@@ -5,13 +5,14 @@ import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
-import { BaseService, Operation } from '@tezblock/services/base.service'
+import { BaseService } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as appActions from '@tezblock/app.actions'
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -67,10 +68,7 @@ export class DashboarEffects {
       switchMap(([action, currentVotingPeriod, blocksPerVotingPeriod]) =>
         this.baseService
           .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(currentVotingPeriod, 'asc'))
-          .pipe(
-            map(first),
-            map(get(item => item.timestamp))
-          )
+          .pipe(map(first), map(get(item => item.timestamp)))
           .pipe(
             map(response =>
               actions.loadCurrentPeriodTimespanSucceeded({
@@ -84,10 +82,35 @@ export class DashboarEffects {
     )
   )
 
+  loadTransactions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactions),
+      switchMap(() => {
+        return this.apiService.getLatestTransactions(6, ['transaction']).pipe(
+          map(transactions => actions.loadTransactionsSucceeded({ transactions })),
+          catchError(error => of(actions.loadTransactionsFailed({ error })))
+        )
+      })
+    )
+  )
+
+  loadBlocks$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBlocks),
+      switchMap(() =>
+        this.blockService.getLatestBlocks(6, ['volume']).pipe(
+          map(blocks => actions.loadBlocksSucceeded({ blocks })),
+          catchError(error => of(actions.loadBlocksFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
+    private readonly blockService: BlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

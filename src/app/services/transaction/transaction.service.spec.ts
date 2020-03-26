@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing'
+import { TestBed } from '@angular/core/testing';
 
-import { TransactionService } from './transaction.service'
+import { TransactionService } from './transaction.service';
 import { UnitHelper } from 'test-config/unit-test-helper'
 
 describe('TransactionService', () => {
@@ -9,11 +9,10 @@ describe('TransactionService', () => {
     unitHelper = new UnitHelper()
 
     TestBed.configureTestingModule(unitHelper.testBed({ providers: [] }))
-      .compileComponents()
-      .catch(console.error)
-  })
+  });
+
   it('should be created', () => {
-    const service: TransactionService = TestBed.inject(TransactionService)
-    expect(service).toBeTruthy()
-  })
-})
+    const service: TransactionService = TestBed.inject(TransactionService);
+    expect(service).toBeTruthy();
+  });
+});

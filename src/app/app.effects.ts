@@ -3,14 +3,17 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, combineLatest, forkJoin } from 'rxjs'
 import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
-import { isNil, negate } from 'lodash'
+import { get, isNil, negate } from 'lodash'
+import BigNumber from 'bignumber.js'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
-import { first, get } from '@tezblock/services/fp'
+import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { ByCycleState, CacheService, CacheKeys, Currency } from '@tezblock/services/cache/cache.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 @Injectable()
 export class AppEffects {
@@ -18,22 +21,10 @@ export class AppEffects {
     this.actions$.pipe(
       ofType(actions.loadLatestBlock),
       switchMap(() =>
-        // replacement for: apiService.getLatestBlocks
-        this.baseService
-          .post<Block[]>('blocks', {
-            orderBy: [
-              {
-                field: 'timestamp',
-                direction: 'desc'
-              }
-            ],
-            limit: 1
-          })
-          .pipe(
-            map(first),
-            map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
-            catchError(error => of(actions.loadLatestBlockFailed({ error })))
-          )
+        this.blockService.getLatest().pipe(
+          map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
+          catchError(error => of(actions.loadLatestBlockFailed({ error })))
+        )
       )
     )
   )
@@ -50,7 +41,9 @@ export class AppEffects {
       combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<ByCycleState>(CacheKeys.fromCurrentCycle)).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
-          this.cacheService.set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle }).subscribe(() => {})
+          this.cacheService
+            .set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
+            .subscribe(() => {})
         })
       ),
     { dispatch: false }
@@ -122,10 +115,88 @@ export class AppEffects {
     )
   )
 
+  loadCryptoPriceFromCache$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCryptoPriceFromCache),
+      withLatestFrom(
+        this.store$.select(state => state.app.cryptoCurrencyInfo),
+        this.store$.select(state => state.app.fiatCurrencyInfo)
+      ),
+      switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
+        this.cacheService.get<Currency>(CacheKeys.currency).pipe(
+          map(currency => {
+            const fiatCurrency = get(currency, fiatCurrencyInfo.currency)
+            const cryptoCurrency = get(currency, cryptoCurrencyInfo.currency)
+            const fiatPrice = new BigNumber(fiatCurrency)
+            const cryptoPrice = new BigNumber(cryptoCurrency)
+
+            return actions.loadCryptoPriceFromCacheSucceeded({ fiatPrice, cryptoPrice })
+          }),
+          catchError(error => of(actions.loadCryptoPriceFromCacheFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onLoadedFromCacheSetCryptoPrices$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCryptoPriceFromCacheSucceeded),
+      map(({ fiatPrice, cryptoPrice }) => actions.loadCryptoPriceSucceeded({ fiatPrice, cryptoPrice }))
+    )
+  )
+
+  loadCryptoPrice$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCryptoPrice),
+      withLatestFrom(
+        this.store$.select(state => state.app.cryptoCurrencyInfo),
+        this.store$.select(state => state.app.fiatCurrencyInfo)
+      ),
+      switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
+        this.cacheService.get<Currency>(CacheKeys.currency).pipe(
+          switchMap(currency =>
+            this.cryptoPricesService.getCryptoPrices('xtz', [fiatCurrencyInfo.currency, cryptoCurrencyInfo.currency]).pipe(
+              map(prices => {
+                const fiatCurrency = get(prices, fiatCurrencyInfo.currency) || get(currency, fiatCurrencyInfo.currency)
+                const cryptoCurrency = get(prices, cryptoCurrencyInfo.currency) || get(currency, cryptoCurrencyInfo.currency)
+                const fiatPrice = new BigNumber(fiatCurrency)
+                const cryptoPrice = new BigNumber(cryptoCurrency)
+
+                return actions.loadCryptoPriceSucceeded({ fiatPrice, cryptoPrice })
+              }),
+              catchError(error => {
+                const fiatCurrency = get(currency, fiatCurrencyInfo.currency)
+                const cryptoCurrency = get(currency, cryptoCurrencyInfo.currency)
+                const fiatPrice = new BigNumber(fiatCurrency)
+                const cryptoPrice = new BigNumber(cryptoCurrency)
+
+                return of(actions.loadCryptoPriceSucceeded({ fiatPrice, cryptoPrice }))
+              })
+            )
+          )
+        )
+      )
+    )
+  )
+
+  loadCryptoHistoricData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCryptoHistoricData),
+      switchMap(() =>
+        this.cryptoPricesService.getHistoricCryptoPrices(24, new Date(), 'USD', 'XTZ').pipe(
+          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
+          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly baseService: BaseService,
+    private readonly blockService: BlockService,
     private readonly cacheService: CacheService,
+    private readonly cryptoPricesService: CryptoPricesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

@@ -14,6 +14,7 @@ export interface Busy {
 export interface State {
   id: string
   block: Block
+  latestBlock: Block
   transactions: TableState<Transaction>
   counts: Count[]
   transactionsLoadedByBlockHash: string
@@ -25,6 +26,8 @@ const initialState: State = {
   id: undefined,
   block: undefined,
   transactions: getInitialTableState(),
+  latestBlock: undefined,
+
   counts: undefined,
   transactionsLoadedByBlockHash: undefined,
   kind: OperationTypes.Transaction,
@@ -58,6 +61,10 @@ export const reducer = createReducer(
       ...state.busy,
       block: false
     }
+  })),
+  on(actions.loadLatestBlockSucceeded, (state, { latestBlock }) => ({
+    ...state,
+    latestBlock
   })),
   on(actions.loadTransactionsByKind, (state, { blockHash, kind }) => ({
     ...state,

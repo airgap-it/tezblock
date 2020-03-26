@@ -1,7 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { Store } from '@ngrx/store'
-import { ModalModule, TabsetConfig, TabsModule, TooltipModule } from 'ngx-bootstrap'
+import { ModalModule } from 'ngx-bootstrap/modal'
+import { TabsetConfig, TabsModule } from 'ngx-bootstrap/tabs'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
 

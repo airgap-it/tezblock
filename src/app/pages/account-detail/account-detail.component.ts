@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
-import { BsModalService } from 'ngx-bootstrap'
+import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge } from 'rxjs'
 import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
@@ -11,7 +11,6 @@ import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
@@ -20,8 +19,7 @@ import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { CycleService } from '@tezblock/services/cycle/cycle.service'
+import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -29,7 +27,6 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -42,7 +39,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
-  providers: [RightsSingleService], //TODO: refactor and remove this last single service
   animations: [
     trigger('changeBtnColor', [
       state(
@@ -96,7 +92,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isCollapsed: boolean = true
 
-  rights$: Observable<Object> = new Observable()
   current: string = 'copyGrey'
 
   tabs: Tab[]
@@ -129,7 +124,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
 
-  public balanceChartOptions: ChartOptions = {
+  balanceChartOptions: ChartOptions = {
     responsive: true,
     layout: {
       padding: {
@@ -214,25 +209,21 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-    private readonly cryptoPricesService: CryptoPricesService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>,
-    private readonly cycleService: CycleService
+    private readonly store$: Store<fromRoot.State>
   ) {
     super()
     this.store$.dispatch(actions.reset())
   }
 
   async ngOnInit() {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
-    this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.Handset, Breakpoints.Small])
@@ -254,7 +245,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
-    this.remainingTime$ = this.cycleService.remainingTime$
+    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
     this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
     this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
@@ -280,10 +271,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.setTabs(address)
         this.store$.dispatch(actions.reset())
-        this.store$.dispatch(actions.loadAccount({ address }))
         this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
-        this.rightsSingleService.updateAddress(address)
 
         if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
           this.hasAlias = true
@@ -321,11 +310,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           map(paramMap => paramMap.get('id')),
           filter(negate(isNil)),
           switchMap(address =>
-            merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed))).pipe(
-              delay(refreshRate),
-              withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-              map(([action, address]) => address)
-            )
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadAccountSucceeded)),
+              this.actions$.pipe(ofType(actions.loadAccountFailed))
+            ]).pipe(map(refreshIndex => address))
           )
         )
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
@@ -381,7 +369,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.is_baker = true
     })
 
-    this.store$.dispatch(actions.loadBakingBadRatings())
+    this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
   }
 

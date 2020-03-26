@@ -1,73 +1,105 @@
 import { Injectable } from '@angular/core'
-import { combineLatest } from 'rxjs'
-import { distinctUntilChanged, map, switchMap } from 'rxjs/operators'
+import { of } from 'rxjs'
+import { map, switchMap } from 'rxjs/operators'
 
-import { Transaction } from '../../interfaces/Transaction'
 import { ApiService } from '../api/api.service'
-import { distinctPagination, distinctTransactionArray, Facade, Pagination } from '../facade/facade'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { andGroup, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 
-interface TransactionServiceState {
-  transactions: Transaction[]
-  kindList: Array<string>
-  pagination: Pagination
-  loading: boolean
-}
-
-const initialState: TransactionServiceState = {
-  transactions: [],
-  kindList: ['transaction'],
-  pagination: {
-    currentPage: 1,
-    selectedSize: 6,
-    pageSizes: [5, 10, 20, 50]
-  },
-  loading: true
+const kindToFieldsMap = {
+  transaction: ['source', 'destination'],
+  delegation: ['source', 'delegate'],
+  origination: ['source'],
+  endorsement: ['delegate'],
+  ballot: ['source'],
+  proposals: ['source']
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class TransactionService extends Facade<TransactionServiceState> {
-  public list$ = this.state$.pipe(
-    map(state => state.transactions),
-    distinctUntilChanged(distinctTransactionArray)
-  )
-  public kindList$ = this.state$.pipe(
-    map(state => state.kindList),
-    distinctUntilChanged()
-  )
-  public pagination$ = this.state$.pipe(
-    map(state => state.pagination),
-    distinctUntilChanged(distinctPagination)
-  )
-  public loading$ = this.state$.pipe(map(state => state.loading))
+export class TransactionService {
+  constructor(private readonly apiService: ApiService) {}
 
-  constructor(private readonly apiService: ApiService) {
-    super(initialState)
+  getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy) {
+    const fields = kindToFieldsMap[kind]
+    const idNotNullPredicate = {
+      field: 'operation_group_hash',
+      operation: Operation.isnull,
+      inverse: true
+    }
 
-    combineLatest([this.pagination$, this.kindList$, this.timer$])
-      .pipe(
-        switchMap(([pagination, kindList, _]) => {
-          return this.apiService.getLatestTransactions(pagination.selectedSize * pagination.currentPage, kindList)
-        })
+    // it was applied to transactions with kind ballot ...
+    const preprocess = (transactions: Transaction[]) =>
+      transactions.map(transaction => ({
+        ...transaction,
+        proposal: transaction.proposal ? transaction.proposal.slice(1, transaction.proposal.length - 1) : transaction.proposal
+      }))
+    const predicates: Predicate[] = []
+
+    predicates.push(
+      ...[].concat(
+        ...fields.map((field, index) =>
+          andGroup([{ field, set: [address] }, { field: 'kind', set: [kind] }, idNotNullPredicate], `A${index}`)
+        )
       )
-      .subscribe(transactions => {
-        this.updateState({ ...this._state, transactions, loading: false })
-      })
-  }
+    )
 
-  public updateKind(kindList: Array<string>) {
-    this.updateState({ ...this._state, kindList, loading: true })
-  }
+    if (kind === 'delegation') {
+      predicates.push(
+        ...andGroup([{ field: 'delegate', set: [address] }, { field: 'kind', set: ['origination'] }, idNotNullPredicate], 'B')
+      )
+    }
 
-  public loadMore() {
-    const pagination = { ...this._state.pagination, currentPage: this._state.pagination.currentPage + 1 }
+    if (kind === 'ballot') {
+      predicates.push(
+        ...[].concat(
+          ...kindToFieldsMap.proposals.map((field, index) =>
+            andGroup([{ field, set: [address] }, { field: 'kind', set: ['proposals'] }, idNotNullPredicate], `C${index}`)
+          )
+        )
+      )
+    }
 
-    this.updateState({ ...this._state, pagination, loading: true })
-  }
+    return this.apiService.getTransactionsByPredicates(predicates, limit, orderBy).pipe(
+      // map(preprocess),
+      switchMap(transactions => {
+        const sources: string[] = transactions.map(transaction => transaction.source)
 
-  public setPageSize(selectedSize: number) {
-    const pagination = { ...this._state.pagination, selectedSize }
-    this.updateState({ ...this._state, pagination, loading: true })
+        if (kind === 'delegation' && sources.length > 0) {
+          return this.apiService.getAccountsByIds(sources).pipe(
+            map(delegators =>
+              transactions.map(transaction => {
+                const match = delegators.find(delegator => delegator.account_id === transaction.source)
+
+                return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+              })
+            )
+          )
+        }
+
+        return of(transactions)
+      }),
+      switchMap(transactions => {
+        if (kind === 'origination') {
+          const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
+
+          if (originatedSources.length > 0) {
+            this.apiService.getAccountsByIds(originatedSources).pipe(
+              map(originators =>
+                transactions.map(transaction => {
+                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
+
+                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
+                })
+              )
+            )
+          }
+        }
+
+        return of(transactions)
+      }),
+      switchMap(transactions => this.apiService.addVoteData(transactions))
+    )
   }
 }
