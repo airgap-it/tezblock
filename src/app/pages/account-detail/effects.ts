@@ -120,9 +120,8 @@ export class AccountDetailEffects {
   loadBalanceForLast30Days$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBalanceForLast30Days),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-      switchMap(([action, accountAddress]) =>
-        this.apiService.getBalanceForLast30Days(accountAddress).pipe(
+      switchMap(({ address }) =>
+        this.apiService.getBalanceForLast30Days(address).pipe(
           map(balanceFromLast30Days => {
             if (balanceFromLast30Days[0].balance === null) {
               return actions.loadExtraBalance({ temporaryBalance: balanceFromLast30Days })

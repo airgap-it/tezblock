@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge } from 'rxjs'
-import { delay, map, filter, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -281,7 +281,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.setTabs(address)
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadBalanceForLast30Days())
+        this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
         this.rightsSingleService.updateAddress(address)
 
@@ -292,6 +292,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       }),
+
       combineLatest([
         this.store$.select(state => state.accountDetails.address),
         this.store$.select(state => state.accountDetails.delegatedAccounts)
@@ -315,11 +316,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       }),
 
       // refresh account
-      merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed)))
+      this.activatedRoute.paramMap
         .pipe(
-          delay(refreshRate),
-          withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-          map(([action, address]) => address)
+          map(paramMap => paramMap.get('id')),
+          filter(negate(isNil)),
+          switchMap(address =>
+            merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed))).pipe(
+              delay(refreshRate),
+              withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+              map(([action, address]) => address)
+            )
+          )
         )
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 

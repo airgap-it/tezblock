@@ -46,7 +46,7 @@ export const loadDelegatedAccountsSucceeded = createAction(
 )
 export const loadDelegatedAccountsFailed = createAction(`[${featureName}] Load Delegated Accounts Failed`, props<{ error: any }>())
 
-export const loadBalanceForLast30Days = createAction(`[${featureName}] Load Balance For Last 30 Days`)
+export const loadBalanceForLast30Days = createAction(`[${featureName}] Load Balance For Last 30 Days`, props<{ address: string }>())
 export const loadBalanceForLast30DaysSucceeded = createAction(
   `[${featureName}] Load Balance For Last 30 Days Succeeded`,
   props<{ balanceFromLast30Days: Balance[] }>()
