@@ -63,14 +63,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   relatedAccounts$: Observable<Account[]>
   delegatedAmount: number | undefined
 
-  get bakerAddress(): string | undefined {
-    return this._bakerAddress
-  }
   set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.store$.dispatch(actions.loadTezosBakerRating({ address: value, updateFee: true }))
     }
+  }
+  get bakerAddress(): string | undefined {
+    return this._bakerAddress
   }
   private _bakerAddress: string | undefined
 
@@ -269,8 +269,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.reset()
         this.setTabs(address)
-        this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
 
@@ -282,27 +282,27 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       }),
 
-      combineLatest([
-        this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.delegatedAccounts)
-      ]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
-        if (!delegatedAccounts) {
-          this.delegatedAccountAddress = undefined
+      this.store$
+        .select(state => state.accountDetails.delegatedAccounts)
+        .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
+        .subscribe(delegatedAccounts => {
+          if (!delegatedAccounts) {
+            this.delegatedAccountAddress = undefined
 
-          return
-        }
+            return
+          }
 
-        if (delegatedAccounts.length > 0) {
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
-          this.delegatedAmount = delegatedAccounts[0].balance
-          this.setRewardAmont()
+          if (delegatedAccounts.length > 0) {
+            this.delegatedAccountAddress = delegatedAccounts[0].account_id
+            this.bakerAddress = delegatedAccounts[0].delegate_value
+            this.delegatedAmount = delegatedAccounts[0].balance
+            this.setRewardAmont()
 
-          return
-        }
+            return
+          }
 
-        this.delegatedAccountAddress = ''
-      }),
+          this.delegatedAccountAddress = ''
+        }),
 
       // refresh account
       this.activatedRoute.paramMap
@@ -543,5 +543,21 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       }
     ]
+  }
+
+  // TODO: this function should be introduced to every page with self navigation
+  // Also consider that actions.reset triggers selects 
+  private reset() {
+    this.store$.dispatch(actions.reset())
+    this.delegatedAccountAddress = undefined
+    this.delegatedAmount = undefined
+    this._bakerAddress = undefined
+    this.bakerTableInfos = undefined
+    this.hasAlias = undefined
+    this.hasLogo = undefined
+    this.isCollapsed = true
+    this.is_baker = false
+    this.rewardAmountSetFor = { account: undefined, baker: undefined }
+    this.scrolledToTransactions = false
   }
 }
