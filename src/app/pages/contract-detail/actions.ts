@@ -15,6 +15,10 @@ export const loadContract = createAction(`[${featureName}] Load Contract`, props
 export const loadContractSucceeded = createAction(`[${featureName}] Load Contract Succeeded`, props<{ contract: TokenContract }>())
 export const loadContractFailed = createAction(`[${featureName}] Load Contract Failed`, props<{ error: any }>())
 
+export const loadManagerAddress = createAction(`[${featureName}] Load Manager Address`, props<{ address: string }>())
+export const loadManagerAddressSucceeded = createAction(`[${featureName}] Load Manager Address Succeeded`, props<{ manager: string }>())
+export const loadManagerAddressFailed = createAction(`[${featureName}] Load Manager Address Failed`, props<{ error: any }>())
+
 export const copyAddressToClipboard = createAction(`[${featureName}] Copy Address To Clipboard`, props<{ address: string }>())
 export const copyAddressToClipboardSucceeded = createAction(`[${featureName}] Copy Address To Clipboard Succeeded`)
 export const resetCopyToClipboardState = createAction(`[${featureName}] Reset Copy To Clipboard State`)
