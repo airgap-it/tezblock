@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge } from 'rxjs'
-import { delay, map, filter, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -27,7 +27,6 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { refreshRate } from '@tezblock/domain/synchronization'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -64,14 +63,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   relatedAccounts$: Observable<Account[]>
   delegatedAmount: number | undefined
 
-  get bakerAddress(): string | undefined {
-    return this._bakerAddress
-  }
   set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.store$.dispatch(actions.loadTezosBakerRating({ address: value, updateFee: true }))
     }
+  }
+  get bakerAddress(): string | undefined {
+    return this._bakerAddress
   }
   private _bakerAddress: string | undefined
 
@@ -270,10 +269,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.reset()
         this.setTabs(address)
-        this.store$.dispatch(actions.reset())
-        this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadBalanceForLast30Days())
+        this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
 
         if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
@@ -283,34 +281,40 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       }),
-      combineLatest([
-        this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.delegatedAccounts)
-      ]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
-        if (!delegatedAccounts) {
-          this.delegatedAccountAddress = undefined
 
-          return
-        }
+      this.store$
+        .select(state => state.accountDetails.delegatedAccounts)
+        .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
+        .subscribe(delegatedAccounts => {
+          if (!delegatedAccounts) {
+            this.delegatedAccountAddress = undefined
 
-        if (delegatedAccounts.length > 0) {
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
-          this.delegatedAmount = delegatedAccounts[0].balance
-          this.setRewardAmont()
+            return
+          }
 
-          return
-        }
+          if (delegatedAccounts.length > 0) {
+            this.delegatedAccountAddress = delegatedAccounts[0].account_id
+            this.bakerAddress = delegatedAccounts[0].delegate_value
+            this.delegatedAmount = delegatedAccounts[0].balance
+            this.setRewardAmont()
 
-        this.delegatedAccountAddress = ''
-      }),
+            return
+          }
+
+          this.delegatedAccountAddress = ''
+        }),
 
       // refresh account
-      merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed)))
+      this.activatedRoute.paramMap
         .pipe(
-          delay(refreshRate),
-          withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-          map(([action, address]) => address)
+          map(paramMap => paramMap.get('id')),
+          filter(negate(isNil)),
+          switchMap(address =>
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadAccountSucceeded)),
+              this.actions$.pipe(ofType(actions.loadAccountFailed))
+            ]).pipe(map(refreshIndex => address))
+          )
         )
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
@@ -365,7 +369,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.is_baker = true
     })
 
-    this.store$.dispatch(actions.loadBakingBadRatings())
+    this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
   }
 
@@ -539,5 +543,21 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       }
     ]
+  }
+
+  // TODO: this function should be introduced to every page with self navigation
+  // Also consider that actions.reset triggers selects 
+  private reset() {
+    this.store$.dispatch(actions.reset())
+    this.delegatedAccountAddress = undefined
+    this.delegatedAmount = undefined
+    this._bakerAddress = undefined
+    this.bakerTableInfos = undefined
+    this.hasAlias = undefined
+    this.hasLogo = undefined
+    this.isCollapsed = true
+    this.is_baker = false
+    this.rewardAmountSetFor = { account: undefined, baker: undefined }
+    this.scrolledToTransactions = false
   }
 }

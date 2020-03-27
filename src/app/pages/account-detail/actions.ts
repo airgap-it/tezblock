@@ -46,7 +46,7 @@ export const loadDelegatedAccountsSucceeded = createAction(
 )
 export const loadDelegatedAccountsFailed = createAction(`[${featureName}] Load Delegated Accounts Failed`, props<{ error: any }>())
 
-export const loadBalanceForLast30Days = createAction(`[${featureName}] Load Balance For Last 30 Days`)
+export const loadBalanceForLast30Days = createAction(`[${featureName}] Load Balance For Last 30 Days`, props<{ address: string }>())
 export const loadBalanceForLast30DaysSucceeded = createAction(
   `[${featureName}] Load Balance For Last 30 Days Succeeded`,
   props<{ balanceFromLast30Days: Balance[] }>()
@@ -57,7 +57,7 @@ export const loadExtraBalance = createAction(`[${featureName}] Load Extra Balanc
 export const loadExtraBalanceSucceeded = createAction(`[${featureName}] Load Extra Balance Succeeded`, props<{ extraBalance: Balance[] }>())
 export const loadExtraBalanceFailed = createAction(`[${featureName}] Load Extra Balance Failed`, props<{ error: any }>())
 
-export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`)
+export const loadBakingBadRatings = createAction(`[${featureName}] Load Baking Bad Ratings`, props<{ address: string }>())
 export const loadBakingBadRatingsSucceeded = createAction(
   `[${featureName}] Load Baking Bad Ratings Succeeded`,
   props<{ response: BakingRatingResponse }>()
