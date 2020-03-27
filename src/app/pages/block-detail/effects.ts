@@ -118,18 +118,6 @@ export class BlockDetailEffects {
     )
   )
 
-  loadLatestBlock$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadLatestBlock),
-      switchMap(() =>
-        this.blockService.getLatest().pipe(
-          map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
-          catchError(error => of(actions.loadLatestBlockFailed({ error })))
-        )
-      )
-    )
-  )
-
   changeBlock$ = createEffect(
     () =>
       this.actions$.pipe(

@@ -56,7 +56,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
-    this.store$.dispatch(actions.reset())
   }
 
   ngOnInit() {
@@ -64,9 +63,12 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.blockLoading$ = this.store$.select(state => state.blockDetails.busy.block)
     this.transactions$ = this.store$.select(state => state.blockDetails.transactions.data).pipe(filter(negate(isNil)))
     this.block$ = this.store$.select(state => state.blockDetails.block)
-    this.latestBlock$ = this.store$.select(state => state.blockDetails.latestBlock)
-    this.endorsements$ = this.block$.pipe(switchMap(block => this.apiService.getEndorsedSlotsCount(block.hash)))
-    this.numberOfConfirmations$ = combineLatest([this.store$.select(state => state.blockDetails.latestBlock), this.block$]).pipe(
+    this.latestBlock$ = this.store$.select(state => state.app.latestBlock)
+    this.endorsements$ = this.block$.pipe(
+      filter(negate(isNil)),
+      switchMap(block => this.apiService.getEndorsedSlotsCount(block.hash))
+    )
+    this.numberOfConfirmations$ = combineLatest([this.store$.select(state => state.app.latestBlock), this.block$]).pipe(
       filter(([latestBlock, block]) => !!latestBlock && !!block),
       map(([latestBlock, block]) => latestBlock.level - block.level)
     )
@@ -76,6 +78,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
       this.route.paramMap.subscribe(paramMap => {
         const id: string = paramMap.get('id')
 
+        this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadBlock({ id }))
         this.setTabs(id)
       }),
@@ -88,11 +91,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
           map(([action, id]) => id)
         )
         .subscribe(id => this.store$.dispatch(actions.loadBlock({ id }))),
-
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadLatestBlockSucceeded)),
-        this.actions$.pipe(ofType(actions.loadLatestBlockFailed))
-      ]).subscribe(() => this.store$.dispatch(actions.loadLatestBlock())),
 
       // refresh transactions
       merge(
