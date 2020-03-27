@@ -12,10 +12,6 @@ export const loadBlock = createAction(`[${featureName}] Load Block`, props<{ id:
 export const loadBlockSucceeded = createAction(`[${featureName}] Load Block Succeeded`, props<{ block: Block }>())
 export const loadBlockFailed = createAction(`[${featureName}] Load Block Failed`, props<{ error: any }>())
 
-export const loadLatestBlock = createAction(`[${featureName}] Load Latest Block`)
-export const loadLatestBlockSucceeded = createAction(`[${featureName}] Load Latest Block Succeeded`, props<{ latestBlock: Block }>())
-export const loadLatestBlockFailed = createAction(`[${featureName}] Load Latest Block Failed`, props<{ error: any }>())
-
 // TODO: remove block argument when it'll be in store
 export const loadTransactionsByKind = createAction(
   `[${featureName}] Load Transactions By Kind`,
@@ -29,8 +25,7 @@ export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load 
 
 export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
-export const increaseBlock = createAction(`[${featureName}] Increase Block Level`)
-export const decreaseBlock = createAction(`[${featureName}] Decrease Block Level`)
+export const changeBlock = createAction(`[${featureName}] Change Block`, props<{ change: number }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 

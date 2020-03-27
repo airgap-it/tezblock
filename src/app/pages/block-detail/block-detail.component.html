@@ -8,7 +8,7 @@
           [confirmations]="numberOfConfirmations$ | async"
           [blockLoading]="blockLoading$ | async"
           [latestBlock]="latestBlock$ | async"
-          (blockChangeClicked)="changeBlockLevel($event)"
+          (blockChangeClicked)="changeBlock($event)"
         ></block-detail-wrapper>
       </div>
 

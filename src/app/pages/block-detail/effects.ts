@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of } from 'rxjs'
 import { map, catchError, switchMap, withLatestFrom, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { Router } from '@angular/router'
 
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
@@ -65,22 +66,6 @@ export class BlockDetailEffects {
     )
   )
 
-  onIncreaseBlock$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.increaseBlock),
-      withLatestFrom(this.store$.select(state => state.blockDetails)),
-      map(([action, block]) => actions.loadBlock({ id: block.id }))
-    )
-  )
-
-  onDecreaseBlock$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.decreaseBlock),
-      withLatestFrom(this.store$.select(state => state.blockDetails)),
-      map(([action, block]) => actions.loadBlock({ id: block.id }))
-    )
-  )
-
   onSorting$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.sortTransactionsByKind),
@@ -133,22 +118,21 @@ export class BlockDetailEffects {
     )
   )
 
-  loadLatestBlock$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadLatestBlock),
-      switchMap(() =>
-        this.blockService.getLatest().pipe(
-          map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
-          catchError(error => of(actions.loadLatestBlockFailed({ error })))
-        )
-      )
-    )
+  changeBlock$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(actions.changeBlock),
+        withLatestFrom(this.store$.select(state => state.blockDetails.id)),
+        map(([{ change }, address]) => this.router.navigate([`/block/${Number(address) + change}`]))
+      ),
+    { dispatch: false }
   )
 
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly blockService: BlockService,
+    private readonly router: Router,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }
