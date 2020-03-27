@@ -14,8 +14,10 @@ export interface Tab {
   active: boolean
   count: number
   kind: KindType
+  disabled: () => boolean,
   icon?: string[]
   columns?: Column[]
+  emptySign?: string
 }
 
 export interface Count {

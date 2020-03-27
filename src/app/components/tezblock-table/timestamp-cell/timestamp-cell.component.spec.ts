@@ -1,4 +1,4 @@
-import { TooltipModule } from 'ngx-bootstrap'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 
 import { TimestampCellComponent } from './timestamp-cell.component'

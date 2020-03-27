@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, pipe } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
+import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
@@ -30,11 +30,11 @@ export class TransactionDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTransactionsByHash),
       withLatestFrom(
-        this.store$.select(state => state.transactionDetails.pageSize),
-        this.store$.select(state => state.accountDetails.orderBy)
+        this.store$.select(state => state.transactionDetails.transactions.pagination),
+        this.store$.select(state => state.transactionDetails.transactions.orderBy)
       ),
-      switchMap(([{ transactionHash }, pageSize, orderBy]) =>
-        this.apiService.getTransactionsById(transactionHash, pageSize, orderBy).pipe(
+      switchMap(([{ transactionHash }, pagination, orderBy]) =>
+        this.apiService.getTransactionsById(transactionHash, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map(data => actions.loadTransactionsByHashSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
         )
@@ -82,7 +82,7 @@ export class TransactionDetailEffects {
   onLoadTransactionsByHashLoadTotalAmountAndFee$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByHash),
-      switchMap(() => [actions.loadTransactionsTotalAmount()/*, actions.loadTransactionsTotalFee()*/])
+      switchMap(() => [actions.loadTransactionsTotalAmount() /*, actions.loadTransactionsTotalFee()*/])
     )
   )
 
@@ -165,11 +165,31 @@ export class TransactionDetailEffects {
     )
   )
 
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByHashSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly blockService: NewBlockService,
+    private readonly blockService: BlockService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

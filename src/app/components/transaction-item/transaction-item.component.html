@@ -6,8 +6,8 @@
           <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(transaction.operation_group_hash)">
             {{ transaction.operation_group_hash | shortenString }}
           </button>
-          <p class="m-0 small text-secondary" tooltip="{{ transaction.timestamp / 1000 | amFromUnix }}">
-            {{ transaction.timestamp | amTimeAgo }}
+          <p class="m-0 small text-secondary">
+            <app-timestamp-cell [data]="transaction.timestamp"></app-timestamp-cell>
           </p>
         </div>
       </div>
@@ -23,12 +23,7 @@
         </div>
       </div>
       <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
-        <span
-          [innerHtml]="
-            transaction.amount | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 4, fontSmall: true, fontColor: true } | safeHtml
-          "
-        ></span>
-        &nbsp;ꜩ
+        <amount-cell [data]="{ amount: transaction.amount }" [options]="{ showFiatValue: false, maxDigits: 4 }"></amount-cell>
       </div>
     </div>
     <hr />

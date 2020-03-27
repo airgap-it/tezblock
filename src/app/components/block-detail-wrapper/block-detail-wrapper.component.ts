@@ -3,7 +3,6 @@ import { Observable } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { NewBlockService } from '@tezblock/services/blocks/blocks.service'
 import { Block } from 'src/app/interfaces/Block'
 
 @Component({
@@ -15,34 +14,36 @@ export class BlockDetailWrapperComponent implements OnInit {
   isCollapsed = true
 
   @Input()
-  wrapperBlock$: Observable<Block> | undefined
+  wrapperBlock: Block
 
   @Input()
-  endorsements$: Observable<number> | undefined
+  endorsements: number
 
   @Input()
-  confirmations$: Observable<number> | undefined
+  confirmations: number
 
   @Input()
-  blockLoading$: Observable<boolean> | undefined
+  blockLoading: boolean
+
+  @Input()
+  latestBlock: Block
 
   @Output()
-  blockChangeClicked: EventEmitter<string> = new EventEmitter()
+  blockChangeClicked: EventEmitter<number> = new EventEmitter()
 
-  amountFromBlockVolume$: Observable<AmountData>
-  amountFromBlockFee$: Observable<AmountData>
-
-  latestBlock$ = this.blockService.getLatest()
-
-  constructor(private readonly blockService: NewBlockService) {}
-
-  public ngOnInit() {
-    this.amountFromBlockVolume$ = this.wrapperBlock$.pipe(map(block => ({ amount: block.volume, timestamp: block.timestamp })))
-
-    this.amountFromBlockFee$ = this.wrapperBlock$.pipe(map(block => ({ amount: block.fee, timestamp: block.timestamp })))
+  get amountFromBlockVolume(): AmountData {
+    return this.wrapperBlock ? { amount: this.wrapperBlock.volume, timestamp: this.wrapperBlock.timestamp } : undefined
   }
 
-  changeBlockLevel(direction: string) {
-    this.blockChangeClicked.emit(direction)
+  get amountFromBlockFee(): AmountData {
+    return this.wrapperBlock ? { amount: this.wrapperBlock.fee, timestamp: this.wrapperBlock.timestamp } : undefined
+  }
+
+  constructor() {}
+
+  ngOnInit() {}
+
+  changeBlockLevel(change: number) {
+    this.blockChangeClicked.emit(change)
   }
 }

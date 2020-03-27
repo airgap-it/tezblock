@@ -1,17 +1,16 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
-import { BsModalService } from 'ngx-bootstrap'
+import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, merge } from 'rxjs'
-import { delay, map, filter, withLatestFrom } from 'rxjs/operators'
+import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
-import { RightsSingleService } from './../../services/rights-single/rights-single.service'
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
@@ -20,8 +19,7 @@ import { AliasPipe } from '../../pipes/alias/alias.pipe'
 import { AccountService } from '../../services/account/account.service'
 import { BakingService } from '../../services/baking/baking.service'
 import { CopyService } from '../../services/copy/copy.service'
-import { CryptoPricesService, CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { CycleService } from '@tezblock/services/cycle/cycle.service'
+import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -29,11 +27,11 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { Busy, BakerTableRatings } from './reducer'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { refreshRate } from '@tezblock/services/facade/facade'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -41,7 +39,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
   selector: 'app-account-detail',
   templateUrl: './account-detail.component.html',
   styleUrls: ['./account-detail.component.scss'],
-  providers: [RightsSingleService], //TODO: refactor and remove this last single service
   animations: [
     trigger('changeBtnColor', [
       state(
@@ -66,14 +63,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   relatedAccounts$: Observable<Account[]>
   delegatedAmount: number | undefined
 
-  get bakerAddress(): string | undefined {
-    return this._bakerAddress
-  }
   set bakerAddress(value: string | undefined) {
     if (value !== this._bakerAddress) {
       this._bakerAddress = value
       this.store$.dispatch(actions.loadTezosBakerRating({ address: value, updateFee: true }))
     }
+  }
+  get bakerAddress(): string | undefined {
+    return this._bakerAddress
   }
   private _bakerAddress: string | undefined
 
@@ -95,7 +92,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isCollapsed: boolean = true
 
-  rights$: Observable<Object> = new Observable()
   current: string = 'copyGrey'
 
   tabs: Tab[]
@@ -112,7 +108,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  transactions$: Observable<any[]>
+  transactions$: Observable<Transaction[]>
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
@@ -128,7 +124,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
 
-  public balanceChartOptions: ChartOptions = {
+  balanceChartOptions: ChartOptions = {
     responsive: true,
     layout: {
       padding: {
@@ -213,25 +209,21 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-    private readonly cryptoPricesService: CryptoPricesService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
-    private readonly rightsSingleService: RightsSingleService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>,
-    private readonly cycleService: CycleService
+    private readonly store$: Store<fromRoot.State>
   ) {
     super()
     this.store$.dispatch(actions.reset())
   }
 
   async ngOnInit() {
-    this.fiatCurrencyInfo$ = this.cryptoPricesService.fiatCurrencyInfo$
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
-    this.rights$ = this.rightsSingleService.rights$
     this.account$ = this.store$.select(state => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.Handset, Breakpoints.Small])
@@ -253,9 +245,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
-    this.remainingTime$ = this.cycleService.remainingTime$
-    this.transactions$ = this.store$.select(state => state.accountDetails.transactions).pipe(filter(negate(isNil)))
-    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.busy.transactions)
+    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
+    this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
+    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
@@ -271,19 +263,16 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         filter(Array.isArray),
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
-    this.orderBy$ = this.store$.select(state => state.accountDetails.orderBy)
+    this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
 
+        this.reset()
         this.setTabs(address)
-        this.store$.dispatch(actions.reset())
-        this.store$.dispatch(actions.loadAccount({ address }))
-        this.store$.dispatch(actions.loadTransactionsByKind({ kind: OperationTypes.Transaction }))
-        this.store$.dispatch(actions.loadBalanceForLast30Days())
+        this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
-        this.rightsSingleService.updateAddress(address)
 
         if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
           this.hasAlias = true
@@ -292,44 +281,53 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
       }),
-      combineLatest([
-        this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.delegatedAccounts)
-      ]).subscribe(([address, delegatedAccounts]: [string, Account[]]) => {
-        if (!delegatedAccounts) {
-          this.delegatedAccountAddress = undefined
 
-          return
-        }
+      this.store$
+        .select(state => state.accountDetails.delegatedAccounts)
+        .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
+        .subscribe(delegatedAccounts => {
+          if (!delegatedAccounts) {
+            this.delegatedAccountAddress = undefined
 
-        if (delegatedAccounts.length > 0) {
-          this.delegatedAccountAddress = delegatedAccounts[0].account_id
-          this.bakerAddress = delegatedAccounts[0].delegate_value
-          this.delegatedAmount = delegatedAccounts[0].balance
-          this.setRewardAmont()
+            return
+          }
 
-          return
-        }
+          if (delegatedAccounts.length > 0) {
+            this.delegatedAccountAddress = delegatedAccounts[0].account_id
+            this.bakerAddress = delegatedAccounts[0].delegate_value
+            this.delegatedAmount = delegatedAccounts[0].balance
+            this.setRewardAmont()
 
-        this.delegatedAccountAddress = ''
-      }),
+            return
+          }
+
+          this.delegatedAccountAddress = ''
+        }),
 
       // refresh account
-      merge(this.actions$.pipe(ofType(actions.loadAccountSucceeded)), this.actions$.pipe(ofType(actions.loadAccountFailed)))
+      this.activatedRoute.paramMap
         .pipe(
-          delay(refreshRate),
-          withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-          map(([action, address]) => address)
+          map(paramMap => paramMap.get('id')),
+          filter(negate(isNil)),
+          switchMap(address =>
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadAccountSucceeded)),
+              this.actions$.pipe(ofType(actions.loadAccountFailed))
+            ]).pipe(map(refreshIndex => address))
+          )
         )
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
-        this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
-      ])
+      combineLatest(
+        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
+        getRefresh([
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
+          this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
+        ])
+      )
         .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
-        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind }))),
+        .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind: kind || OperationTypes.Transaction }))),
 
       this.account$
         .pipe(
@@ -371,7 +369,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.is_baker = true
     })
 
-    this.store$.dispatch(actions.loadBakingBadRatings())
+    this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
   }
 
@@ -450,49 +448,116 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         title: 'Transactions',
         active: true,
         kind: 'transaction',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Delegations',
         active: false,
         kind: 'delegation',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Originations',
         active: false,
         kind: 'origination',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Endorsements',
         active: false,
         kind: 'endorsement',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Votes',
         active: false,
         kind: 'ballot',
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet })
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
 
     this.bakerTabs = [
-      { title: 'Baker Overview', active: true, kind: 'baker_overview', count: null, icon: this.iconPipe.transform('hatChef') },
-      { title: 'Baking Rights', active: false, kind: 'baking_rights', count: null, icon: this.iconPipe.transform('breadLoaf') },
-      { title: 'Endorsing Rights', active: false, kind: 'endorsing_rights', count: null, icon: this.iconPipe.transform('stamp') },
-      { title: 'Rewards', active: false, kind: 'rewards', count: null, icon: this.iconPipe.transform('coin') }
+      {
+        title: 'Baker Overview',
+        active: true,
+        kind: 'baker_overview',
+        count: undefined,
+        icon: this.iconPipe.transform('hatChef'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Baking Rights',
+        active: false,
+        kind: 'baking_rights',
+        count: undefined,
+        icon: this.iconPipe.transform('breadLoaf'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Endorsing Rights',
+        active: false,
+        kind: 'endorsing_rights',
+        count: undefined,
+        icon: this.iconPipe.transform('stamp'),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Rewards',
+        active: false,
+        kind: 'rewards',
+        count: undefined,
+        icon: this.iconPipe.transform('coin'),
+        disabled: function() {
+          return !this.count
+        }
+      }
     ]
+  }
+
+  // TODO: this function should be introduced to every page with self navigation
+  // Also consider that actions.reset triggers selects 
+  private reset() {
+    this.store$.dispatch(actions.reset())
+    this.delegatedAccountAddress = undefined
+    this.delegatedAmount = undefined
+    this._bakerAddress = undefined
+    this.bakerTableInfos = undefined
+    this.hasAlias = undefined
+    this.hasLogo = undefined
+    this.isCollapsed = true
+    this.is_baker = false
+    this.rewardAmountSetFor = { account: undefined, baker: undefined }
+    this.scrolledToTransactions = false
   }
 }

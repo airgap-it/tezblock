@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { TooltipModule } from 'ngx-bootstrap'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { MomentModule } from 'ngx-moment'
 import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { UnitHelper } from 'test-config/unit-test-helper'

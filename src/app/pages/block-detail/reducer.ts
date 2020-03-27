@@ -4,39 +4,33 @@ import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
-import { OrderBy } from '@tezblock/services/base.service'
-import { OperationTypes } from '@tezblock/domain/operations'
+import { getTransactionsWithErrors, OperationTypes } from '@tezblock/domain/operations'
+import { getInitialTableState, TableState } from '@tezblock/domain/table'
 
 export interface Busy {
   block: boolean
-  transactions: boolean
 }
 
 export interface State {
   id: string
   block: Block
-  transactions: Transaction[]
+  transactions: TableState<Transaction>
   counts: Count[]
   transactionsLoadedByBlockHash: string
   kind: string
-  pageSize: number // transactions
   busy: Busy
-  orderBy: OrderBy
 }
 
 const initialState: State = {
   id: undefined,
   block: undefined,
-  transactions: undefined,
+  transactions: getInitialTableState(),
   counts: undefined,
   transactionsLoadedByBlockHash: undefined,
   kind: OperationTypes.Transaction,
-  pageSize: 10,
   busy: {
-    block: false,
-    transactions: false
-  },
-  orderBy: undefined
+    block: false
+  }
 }
 
 export const reducer = createReducer(
@@ -70,29 +64,35 @@ export const reducer = createReducer(
     blockHash,
     kind,
     transactionsLoadedByBlockHash: blockHash,
-    busy: {
-      ...state.busy,
-      transactions: true
+    transactions: {
+      ...state.transactions,
+      loading: true
     }
   })),
   on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
     ...state,
-    transactions: data,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      data,
+      loading: false
     }
   })),
   on(actions.loadTransactionsByKindFailed, state => ({
     ...state,
-    busy: {
-      ...state.busy,
-      transactions: false
+    transactions: {
+      ...state.transactions,
+      loading: false
     }
   })),
   on(actions.increasePageSize, state => ({
     ...state,
-    pageSize: state.pageSize + 10
+    transactions: {
+      ...state.transactions,
+      pagination: {
+        ...state.transactions.pagination,
+        currentPage: state.transactions.pagination.currentPage + 1
+      }
+    }
   })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
@@ -103,12 +103,8 @@ export const reducer = createReducer(
     orderBy
   })),
   on(actions.reset, () => initialState),
-  on(actions.increaseBlock, state => ({
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
-    id: (Number(state.id) + 1).toString()
-  })),
-  on(actions.decreaseBlock, state => ({
-    ...state,
-    id: (Number(state.id) - 1).toString()
+    transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
   }))
 )

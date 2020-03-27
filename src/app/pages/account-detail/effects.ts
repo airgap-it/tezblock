@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { from, of, forkJoin } from 'rxjs'
-import { map, catchError, switchMap, tap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, filter, switchMap, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
-import { NewTransactionService } from '@tezblock/services/transaction/new-transaction.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { NewAccountService } from '@tezblock/services/account/account.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
@@ -59,13 +59,13 @@ export class AccountDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
       withLatestFrom(
-        this.store$.select(state => state.accountDetails.pageSize),
+        this.store$.select(state => state.accountDetails.transactions.pagination),
         this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.orderBy)
+        this.store$.select(state => state.accountDetails.transactions.orderBy)
       ),
 
-      switchMap(([{ kind }, pageSize, address, orderBy]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pageSize, orderBy).pipe(
+      switchMap(([{ kind }, pagination, address, orderBy]) =>
+        this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -120,9 +120,8 @@ export class AccountDetailEffects {
   loadBalanceForLast30Days$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBalanceForLast30Days),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-      switchMap(([action, accountAddress]) =>
-        this.apiService.getBalanceForLast30Days(accountAddress).pipe(
+      switchMap(({ address }) =>
+        this.apiService.getBalanceForLast30Days(address).pipe(
           map(balanceFromLast30Days => {
             if (balanceFromLast30Days[0].balance === null) {
               return actions.loadExtraBalance({ temporaryBalance: balanceFromLast30Days })
@@ -158,18 +157,19 @@ export class AccountDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadBakingBadRatings),
       withLatestFrom(this.store$.select(state => state.accountDetails)),
-      switchMap(([action, state]) =>
+      switchMap(([{ address }, state]) =>
         this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
           switchMap(currentCycleCache => {
-            const bakingBadRating = get(currentCycleCache, `fromAddress[${state.address}].bakerData.bakingBadRating`)
-            const tezosBakerFee = get(currentCycleCache, `fromAddress[${state.address}].tezosBakerFee`)
+            const bakingBadRating = get(currentCycleCache, `fromAddress[${address}].bakerData.bakingBadRating`)
+            const tezosBakerFee = get(currentCycleCache, `fromAddress[${address}].tezosBakerFee`)
 
-            if (bakingBadRating !== undefined && tezosBakerFee !== undefined) {
+            // bug was reported so now I compare to undefined OR null, not only undefined
+            if (bakingBadRating && tezosBakerFee) {
               return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
             }
 
             return this.bakingService
-              .getBakingBadRatings(state.address)
+              .getBakingBadRatings(address)
               .pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
           }),
           map(response => actions.loadBakingBadRatingsSucceeded({ response })),
@@ -214,7 +214,8 @@ export class AccountDetailEffects {
             const tezosBakerRating = get(currentCycleCache, `fromAddress[${state.address}].bakerData.tezosBakerRating`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${state.address}].tezosBakerFee`)
 
-            if (tezosBakerRating !== undefined && tezosBakerFee !== undefined) {
+            // bug was reported so now I compare to undefined OR null, not only undefined
+            if (tezosBakerRating && tezosBakerFee) {
               return of(<actions.BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
             }
 
@@ -254,14 +255,34 @@ export class AccountDetailEffects {
     { dispatch: false }
   )
 
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsByKindSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
-    private readonly accountService: NewAccountService,
+    private readonly accountService: AccountService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly transactionService: NewTransactionService
+    private readonly transactionService: TransactionService
   ) {}
 }

@@ -18,6 +18,7 @@ import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Account } from '@tezblock/interfaces/Account'
 
 @Component({
   selector: 'app-contract-detail',
@@ -53,6 +54,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   tabs: Tab[]
+  manager$: Observable<string>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -123,6 +125,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
+    this.manager$ = this.store$.select(state => state.contractDetails.manager)
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
@@ -188,17 +191,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         title: 'Transfers',
         active: true,
         kind: actions.OperationTab.transfers,
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol })
+        columns: columns.transfers({ pageId, showFiatValue, symbol }),
+        disabled: function() { return !this.count }
       },
       {
         title: 'Other Calls',
         active: true,
         kind: actions.OperationTab.other,
-        count: null,
+        count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol })
+        columns: columns.other({ pageId, showFiatValue, symbol }),
+        disabled: function() { return !this.count }
       }
     ]
   }

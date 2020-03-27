@@ -1,0 +1,106 @@
+<p>
+  Includes Emmy+, delegatable tz1 addresses, Michelson upgrades to improve compilation from high-level languages, hardened governance
+  mechanisms, and more. Refines Babylon 1 to ease transition for bakers and developers using custom signers.
+</p>
+<h5>Features</h5>
+<p>
+  After receiving feedback on the Babylon 1 proposal, Nomadic Labs, Cryptium Labs, and the Marigold team proposed a new tweaked version of
+  the proposal: Babylon 2. The tweak should make integration easier for bakers and developers: in particular, the representations for
+  endorsements are less likely to break custom signers.
+</p>
+<p>Otherwise, Babylon 2.0’s changes to Tezos match Babylon 1, including:</p>
+<ul>
+  <li>A new variant of our consensus algorithm, Emmy+, that is both more robust and simpler to analyze</li>
+  <li>
+    New Michelson features which assist Tezos smart contract developers and designers of higher-level languages (e.g. SmartPy, LIGO,
+    Lorentz)
+    <ul>
+      <li>
+        The changes made to Michelson in this proposal intend to simplify smart contract development by making the code of complex contracts
+        simpler and cleaner.
+      </li>
+    </ul>
+  </li>
+
+  <li>
+    An account rehaul that establishes a clear distinction between accounts (tz1, tz2, and tz3) and smart contracts (KT1)
+    <ul>
+      <li>
+        Makes implicit accounts (i.e. tz1, tz2, and tz3 accounts) able to delegate and KT1s are for contracts
+      </li>
+    </ul>
+    <ul>
+      <li>
+        Replaces KT1 accounts with formally verified KT1 script (with same semantic)
+      </li>
+    </ul>
+  </li>
+  <li>
+    Refinements to the quorum formula and a new 5% proposal quorum
+
+    <ul>
+      <li>
+        A Proposal will require 5% support in the Proposal Period to proceed to the Exploration Vote Period
+      </li>
+    </ul>
+    <ul>
+      <li>
+        The Quorum floor will be set to 20% and a Quorum cap set to 70%
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h5 class="pb-3">Explanation Posts</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://blog.nomadic-labs.com/babylon-proposal-injected.html">
+      Babylon: Proposal Injected! from Nomadic Labs, Cryptium Labs, and Marigold
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://blog.nomadic-labs.com/emmy-an-improved-consensus-algorithm.html">
+      Emmy+: an improved consensus algorithm from Nomadic Labs
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://medium.com/cryptium/on-babylon2-0-1-58058d9d2106">
+      Details about Babylon 2.0.1, which patches minor performance bugs in Babylon 2.0
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://blog.nomadic-labs.com/michelson-updates-in-005.html">
+      Michelson updates in 005 from Nomadic Labs
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://medium.com/cryptium/meanwhile-at-cryptium-labs-1-part-ii-607227fc6d65">
+      On Quorum Caps: Meanwhile at Cryptium Labs #1 Part II from Cryptium Labs
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://www.reddit.com/r/tezos/comments/c3n49r/reading_list_prepare_for_the_upcoming_proposal/">
+      Cryptium’s reading list to prepare for Babylon
+    </a>
+  </li>
+</ul>
+
+<h5 class="pb-3">Migration Resources</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://blog.nomadic-labs.com/babylon-update-instructions-for-delegation-wallet-developers.html">
+      Critical update instructions for wallet developers about delegation from Nomadic Labs
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/005_babylon.html">
+      Protocol 005_PsBabyM1 Babylon
+    </a>
+  </li>
+</ul>
+
+<h5>Invoice</h5>
+<p>
+  500 ꜩ to a multisig at
+  <a href="https://tezblock.io/account/KT1DUfaMfTRZZkvZAYQT5b3byXnvqoAykc43">KT1DUfaMfTRZZkvZAYQT5b3byXnvqoAykc43</a>
+</p>

@@ -14,6 +14,7 @@ import { BaseService, Body, Operation } from '@tezblock/services/base.service'
 import { first } from '@tezblock/services/fp'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { get } from 'lodash'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 
 @Injectable()
 export class BakerTableEffects {
@@ -173,12 +174,49 @@ export class BakerTableEffects {
     )
   )
 
+  loadActiveDelegations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadActiveDelegations),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, accountAddress]) =>
+        this.apiService.getDelegatedAccountsList(accountAddress).pipe(
+          map(activeDelegations => actions.loadActiveDelegationsSucceeded({ activeDelegations: activeDelegations.length })),
+          catchError(error => of(actions.loadActiveDelegationsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  loadRewards$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadRewards),
+      withLatestFrom(
+        this.store$.select(state => state.bakerTable.accountAddress),
+        this.store$.select(state => state.bakerTable.rewards.pagination)
+      ),
+      switchMap(([action, accountAddress, pagination]) =>
+        this.rewardService.getRewards(accountAddress, pagination).pipe(
+          map(rewards => actions.loadRewardsSucceeded({ rewards })),
+          catchError(error => of(actions.loadRewardsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onPagingLoadRewards$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.increaseRewardsPageSize),
+      map(() => actions.loadRewards())
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
+    private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

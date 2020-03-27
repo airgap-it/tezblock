@@ -1,3 +1,5 @@
+import { OperationError } from '@tezblock/domain/operations'
+
 export interface Transaction {
   secret?: any // TODO: any (loads of)
   storage_size?: any
@@ -47,4 +49,5 @@ export interface Transaction {
   voting_period?: string
   burn?: string
   symbol?: string
+  errors?: OperationError[]
 }

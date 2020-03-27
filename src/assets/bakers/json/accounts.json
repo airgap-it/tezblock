@@ -796,5 +796,13 @@
   "tz1WcCGBxxPq61ddkp8X7vYMrWsBFMCxe5RD": {
     "alias": "FightCovid",
     "hasLogo": true
+  },
+  "tz1STeamwbp68THcny9zk3LsbG3H36DMvbRK": {
+    "alias": "StakingTeam",
+    "hasLogo": true
+  },
+  "tz1egoxWxfhwm94YrK5nB5BdyBjnEVm2kSzx": {
+    "alias": "HitBTC",
+    "hasLogo": true
   }
 }

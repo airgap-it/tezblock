@@ -120,5 +120,12 @@ export const reducer = createReducer(
   on(actions.loadPeriodsTimespansSucceeded, (state, { periodsTimespans, blocksPerVotingPeriod }) => ({
     ...state,
     periodsTimespans: fillMissingPeriodTimespans(periodsTimespans, blocksPerVotingPeriod)
+  })),
+  on(actions.loadProposalDescriptionSucceeded, (state, { description }) => ({
+    ...state,
+    proposal: {
+      ...state.proposal,
+      description
+    }
   }))
 )

@@ -9,8 +9,12 @@ import { StoreModule } from '@ngrx/store'
 import { StorageModule } from '@ngx-pwa/local-storage'
 import { QRCodeModule } from 'angularx-qrcode'
 import { ChartsModule } from 'ng2-charts'
-import { AlertModule, BsDropdownModule, BsModalService, CollapseModule, SortableModule, TooltipModule } from 'ngx-bootstrap'
-import { ModalModule } from 'ngx-bootstrap/modal'
+import { AlertModule } from 'ngx-bootstrap/alert'
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown'
+import { CollapseModule } from 'ngx-bootstrap/collapse'
+import { SortableModule } from 'ngx-bootstrap/sortable'
+import { TooltipModule } from 'ngx-bootstrap/tooltip'
+import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 import { PaginationModule } from 'ngx-bootstrap/pagination'
 import { ProgressbarModule } from 'ngx-bootstrap/progressbar'
 import { TabsModule } from 'ngx-bootstrap/tabs'
@@ -60,7 +64,6 @@ import { TransactionDetailComponent } from './pages/transaction-detail/transacti
 import { PipesModule } from './pipes/pipes.module'
 import { metaReducers, ROOT_REDUCERS } from './reducers'
 import { BakingService } from './services/baking/baking.service'
-import { BlockService } from './services/blocks/blocks.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
@@ -86,7 +89,8 @@ import { HealthEffects } from './pages/health/effects'
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
 import { DashboarEffects } from './pages/dashboard/effects';
 import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component'
-import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects'
+import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects';
+import { TransactionErrorsComponent } from './components/transaction-errors/transaction-errors.component'
 
 @NgModule({
   imports: [
@@ -118,7 +122,7 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
       metaReducers,
       runtimeChecks: {
         strictStateImmutability: true,
-        strictActionImmutability: true
+        strictActionImmutability: false // true is default (see comment in baker-table)
       }
     }),
     EffectsModule.forRoot([
@@ -186,10 +190,11 @@ import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/l
     HealthComponent,
     AccountOverviewComponent,
     LatestContractsComponent,
-    LatestContractsTransactionsComponent
+    LatestContractsTransactionsComponent,
+    TransactionErrorsComponent
   ],
 
-  providers: [BakingService, BlockService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
+  providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],
   bootstrap: [AppComponent]
 })
 export class AppModule {

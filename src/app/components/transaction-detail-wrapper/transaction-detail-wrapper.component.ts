@@ -1,14 +1,14 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import BigNumber from 'bignumber.js'
 import { ToastrService } from 'ngx-toastr'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 
 import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
+import { first } from '@tezblock/services/fp'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -25,54 +25,81 @@ import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amou
       ),
       transition('copyGrey =>copyTick', [animate(250, style({ transform: 'rotateY(360deg) scale(1.3)', backgroundColor: 'lightgreen' }))])
     ])
-  ]
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TransactionDetailWrapperComponent implements OnInit {
-  public current = 'copyGrey'
+  current = 'copyGrey'
 
   @Input()
-  public latestTransaction$: Observable<Transaction> | undefined
+  set latestTransaction(value: Transaction) {
+    if (value !== this._latestTransaction) {
+      this._latestTransaction = value
+      this.setDependings()
+    }
+  }
+
+  get latestTransaction() {
+    return this._latestTransaction
+  }
+
+  private _latestTransaction: Transaction
 
   @Input()
-  public blockConfirmations$: Observable<number> | undefined
+  blockConfirmations: number
 
   @Input()
-  public totalAmount: number | undefined
+  totalAmount: number
 
   // @Input()
-  // public totalFee: number | undefined
+  //  totalFee: number | undefined
 
   @Input()
-  public loading$?: Observable<boolean>
+  loading: boolean
 
   @Input()
-  public fiatInfo$: Observable<CurrencyInfo> | undefined
+  fiatInfo: CurrencyInfo
 
   @Input()
-  public isMainnet = true
+  isMainnet = true
 
-  amountFromLatestTransactionFee$: Observable<AmountData>
+  amountFromLatestTransactionFee: AmountData
+
+  statusLabel: string
+
+  get error(): OperationErrorMessage {
+    return this.latestTransaction && this.latestTransaction.errors
+      ? operationErrorToMessage(first(this.latestTransaction.errors), this.amountConverterPipe)
+      : null
+  }
 
   constructor(
+    private readonly amountConverterPipe: AmountConverterPipe,
     private readonly copyService: CopyService,
     private readonly toastrService: ToastrService
   ) {}
 
-  public ngOnInit() {
-    this.amountFromLatestTransactionFee$ = this.latestTransaction$.pipe(
-      map(transition => ({ amount: transition.fee, timestamp: transition.timestamp }))
-    )
-  }
+  ngOnInit() {}
 
-  public copyToClipboard(val: string) {
+  copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
   }
 
-  public changeState(address: string) {
+  changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {
       this.current = 'copyGrey'
     }, 1500)
     this.toastrService.success('has been copied to clipboard', address)
+  }
+
+  private setDependings() {
+    if (!this.latestTransaction) {
+      return
+    }
+
+    this.amountFromLatestTransactionFee = { amount: this.latestTransaction.fee, timestamp: this.latestTransaction.timestamp }
+    this.statusLabel =
+      ['failed', 'backtracked', 'skipped'].indexOf(this.latestTransaction.status) !== -1 ? this.latestTransaction.status : null
   }
 }

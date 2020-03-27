@@ -25,11 +25,19 @@ export class IdenticonComponent implements OnInit {
     this.displayIdenticonNotLogo = value
   }
 
-  @Input() address: string
-
-  ngOnInit() {
-    this.setIdenticon(this.address)
+  @Input()
+  set address(value: string) {
+    if (value !== this._address) {
+      this._address = value
+      this.setIdenticon(value)
+    }
   }
+  get address(): string {
+    return this._address
+  }
+  private _address: string
+
+  ngOnInit() {}
 
   private b582int(val: string): string {
     let rv = new BigNumber(0)

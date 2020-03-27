@@ -3,7 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
 import { forkJoin, Observable, of } from 'rxjs'
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
+import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -13,7 +13,6 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
-import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { toNotNilArray } from '@tezblock/services/fp'
 import * as listActions from './actions'
 
@@ -46,7 +45,10 @@ export class ListEffects {
   getBlocks$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadBlocks),
-      withLatestFrom(this.store$.select(state => state.list.blocks.pagination), this.store$.select(state => state.list.blocks.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.blocks.pagination),
+        this.store$.select(state => state.list.blocks.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService.getLatestBlocksWithData(pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map((blocks: Block[]) => listActions.loadBlocksSucceeded({ blocks })),
@@ -353,7 +355,10 @@ export class ListEffects {
   getVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadVotes),
-      withLatestFrom(this.store$.select(state => state.list.votes.pagination), this.store$.select(state => state.list.votes.orderBy)),
+      withLatestFrom(
+        this.store$.select(state => state.list.votes.pagination),
+        this.store$.select(state => state.list.votes.orderBy)
+      ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['ballot', 'proposals'], orderBy)
@@ -548,6 +553,36 @@ export class ListEffects {
     this.actions$.pipe(
       ofType(listActions.sortContracts),
       map(() => listActions.loadContracts())
+    )
+  )
+
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(
+        listActions.loadTransactionsSucceeded,
+        // listActions.loadActivationsSucceeded,
+        listActions.loadOriginationsSucceeded,
+        listActions.loadDelegationsSucceeded,
+        // listActions.loadDoubleBakingsSucceeded,
+        // listActions.loadDoubleEndorsementsSucceeded,
+        // listActions.loadVotesSucceeded,
+        // listActions.loadEndorsementsSucceeded
+      ),
+      map(action => [action[Object.keys(action).filter(key => key !== 'type')[0]], action.type]),
+      filter(([transactions, actionType]) => transactions.some(transaction => transaction.status !== 'applied')),
+      map(([transactions, actionType]) => listActions.loadTransactionsErrors({ transactions, actionType }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadTransactionsErrors),
+      switchMap(({ transactions, actionType }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => listActions.loadTransactionsErrorsSucceeded({ operationErrorsById, actionType })),
+          catchError(error => of(listActions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
     )
   )
 

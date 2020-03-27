@@ -75,6 +75,30 @@
               </div>
             </div>
           </div>
+
+          <div *ngIf="proposal.description" class="row">
+            <div class="col-md-12">
+              <button
+                type="button"
+                class="btn btn-link p-0 collapse--btn"
+                (click)="isCollapsed = !isCollapsed"
+                [attr.aria-expanded]="!isCollapsed"
+                aria-controls="collapseBasic"
+                [ngClass]="{ 'btn--rotated': !isCollapsed }"
+              >
+                <span>{{ isCollapsed ? 'More Proposal' : 'Less Proposal' }}</span>
+                Details
+                <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+              </button>
+              <div
+                [innerHtml]="proposal.description | safeHtml"
+                id="collapseBasic"
+                [collapse]="isCollapsed"
+                [isAnimated]="true"
+                class="description mt-3"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -90,6 +114,7 @@
             [loading]="loading$ | async"
             [data]="votes$ | async"
             [disableTabLogic]="true"
+            [noDataLabel]="noDataLabel$ | async"
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
           >
@@ -97,18 +122,20 @@
               <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
                 <div class="pl-0 pl-md-3 py-3">
                   <strong>
-                    Voting period has ended, period was between {{ periodTimespan.start | amDateFormat: 'LL' }} and
+                    {{ periodKind$ | async }} period has ended, period was between {{ periodTimespan.start | amDateFormat: 'LL' }} and
                     {{ periodTimespan.end | amDateFormat: 'LL' }}
                   </strong>
                 </div>
               </ng-container>
               <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
                 <div class="pl-0 pl-md-3 py-3">
-                  <strong>The current period ends on {{ periodTimespan.end | amDateFormat: 'LL' }}</strong>
+                  <strong>The current {{ periodKind$ | async }} period ends on {{ periodTimespan.end | amDateFormat: 'LL' }}</strong>
                 </div>
               </ng-container>
               <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
-                <div class="pl-0 pl-md-3 py-3">Voting period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}</div>
+                <div class="pl-0 pl-md-3 py-3">
+                  {{ periodKind$ | async }} period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}
+                </div>
               </ng-container>
             </ng-container>
           </tabbed-table>

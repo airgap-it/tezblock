@@ -6,7 +6,9 @@
           <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(block.level)">
             {{ block.level }}
           </button>
-          <p class="m-0 small text-secondary">{{ block.timestamp | amTimeAgo }}</p>
+          <p class="m-0 small text-secondary">
+            <app-timestamp-cell [data]="block.timestamp"></app-timestamp-cell>
+          </p>
         </div>
       </div>
       <div class="col-4 col-sm-2 p-0 order-1 order-sm-1">
@@ -16,12 +18,7 @@
         <address-item [address]="block.baker" ng-href="#here" (click)="inspectDetail(block.baker)"></address-item>
       </div>
       <div class="col-3 col-sm-2 p-0 d-flex align-items-center order-2 order-sm-3">
-        <span
-          [innerHtml]="
-            block.volume | amountConverter: { protocolIdentifier: 'xtz', maxDigits: 4, fontSmall: true, fontColor: true } | safeHtml
-          "
-        ></span>
-        &nbsp;ꜩ
+        <amount-cell [data]="{ amount: block.volume }" [options]="{ showFiatValue: false, maxDigits: 4 }"></amount-cell>
       </div>
     </div>
     <hr />

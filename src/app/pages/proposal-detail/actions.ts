@@ -36,8 +36,15 @@ export const loadVotesTotalFailed = createAction(`[${featureName}] Load Votes To
 export const loadPeriodsTimespans = createAction(`[${featureName}] Load Periods Timespans`)
 export const loadPeriodsTimespansSucceeded = createAction(
   `[${featureName}] Load Periods Timespans Succeeded`,
-  props<{ periodsTimespans: PeriodTimespan[], blocksPerVotingPeriod: number }>()
+  props<{ periodsTimespans: PeriodTimespan[]; blocksPerVotingPeriod: number }>()
 )
 export const loadPeriodsTimespansFailed = createAction(`[${featureName}] Load Periods Timespans Failed`, props<{ error: any }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
+
+export const loadProposalDescription = createAction(`[${featureName}] Load Proposal Description`)
+export const loadProposalDescriptionSucceeded = createAction(
+  `[${featureName}] Load Proposal Description Succeeded`,
+  props<{ description: string }>()
+)
+export const loadProposalDescriptionFailed = createAction(`[${featureName}] Load Proposal Description Failed`, props<{ error: any }>())

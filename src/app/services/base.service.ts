@@ -105,7 +105,7 @@ export class BaseService {
   protected readonly environmentVariable: string
   protected readonly options: Options
 
-  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly httpClient: HttpClient) {
+  constructor(protected readonly chainNetworkService: ChainNetworkService, protected readonly httpClient: HttpClient) {
     this.environmentUrls = this.chainNetworkService.getEnvironment()
     this.environmentVariable = this.chainNetworkService.getEnvironmentVariable()
     this.options = {
