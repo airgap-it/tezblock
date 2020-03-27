@@ -38,6 +38,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   now: number = moment.utc().valueOf()
   noDataLabel$: Observable<string>
   periodKind$: Observable<string>
+  isCollapsed = true
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
