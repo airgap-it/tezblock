@@ -29,7 +29,7 @@ export class BlockDetailWrapperComponent implements OnInit {
   latestBlock: Block
 
   @Output()
-  blockChangeClicked: EventEmitter<string> = new EventEmitter()
+  blockChangeClicked: EventEmitter<number> = new EventEmitter()
 
   get amountFromBlockVolume(): AmountData {
     return this.wrapperBlock ? { amount: this.wrapperBlock.volume, timestamp: this.wrapperBlock.timestamp } : undefined
@@ -43,7 +43,7 @@ export class BlockDetailWrapperComponent implements OnInit {
 
   ngOnInit() {}
 
-  changeBlockLevel(direction: string) {
-    this.blockChangeClicked.emit(direction)
+  changeBlockLevel(change: number) {
+    this.blockChangeClicked.emit(change)
   }
 }

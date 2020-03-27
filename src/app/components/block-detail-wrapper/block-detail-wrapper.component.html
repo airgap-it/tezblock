@@ -17,14 +17,14 @@
       <ng-container *ngIf="confirmations">
         <span *ngIf="confirmations >= 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
       </ng-container>
-      <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel('backward')">
+      <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel(-1)">
         <fa-icon [icon]="'chevronLeft' | iconPipe" class="text-secondary"></fa-icon>
       </button>
       <ng-container *ngIf="latestBlock">
         <button
           *ngIf="latestBlock.level > wrapperBlock.level"
           class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
-          (click)="changeBlockLevel('forward')"
+          (click)="changeBlockLevel(1)"
         >
           <fa-icon [icon]="'chevronRight' | iconPipe" class="text-secondary"></fa-icon>
         </button>

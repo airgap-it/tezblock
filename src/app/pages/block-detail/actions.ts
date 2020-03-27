@@ -29,8 +29,7 @@ export const loadTransactionsByKindFailed = createAction(`[${featureName}] Load 
 
 export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
-export const increaseBlock = createAction(`[${featureName}] Increase Block Level`)
-export const decreaseBlock = createAction(`[${featureName}] Decrease Block Level`)
+export const changeBlock = createAction(`[${featureName}] Change Block`, props<{ change: number }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
 
