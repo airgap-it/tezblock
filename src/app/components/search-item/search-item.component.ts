@@ -11,6 +11,7 @@ import { SearchService } from 'src/app/services/search/search.service'
 import { SearchOption } from 'src/app/services/search/model'
 import { flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
 import { searchTokenContracts } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const toPreviousOption = value => ({ name: value, type: 'Recent History' })
 
@@ -38,6 +39,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly searchService: SearchService
   ) {
     super()
@@ -63,7 +65,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
           this.apiService.getTransactionHashesStartingWith(token),
           this.apiService.getAccountsStartingWith(token),
           this.apiService.getBlockHashesStartingWith(token),
-          of(searchTokenContracts(token))
+          of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))
         ).pipe(
           filter(isNotEmptyArray),
           map(partialOptions => (options = options.concat(partialOptions)))

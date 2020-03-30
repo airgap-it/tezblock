@@ -15,6 +15,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { toNotNilArray } from '@tezblock/services/fp'
 import * as listActions from './actions'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const getTimestamp24hAgo = (): number =>
   moment()
@@ -484,7 +485,7 @@ export class ListEffects {
       ofType(listActions.loadTokenContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
       switchMap(([action, pagination]) => {
-        const contracts = getTokenContracts(pagination.currentPage * pagination.selectedSize)
+        const contracts = getTokenContracts(this.chainNetworkService.getNetwork(), pagination.currentPage * pagination.selectedSize)
 
         if (!contracts || contracts.total === 0) {
           return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
@@ -562,7 +563,7 @@ export class ListEffects {
         listActions.loadTransactionsSucceeded,
         // listActions.loadActivationsSucceeded,
         listActions.loadOriginationsSucceeded,
-        listActions.loadDelegationsSucceeded,
+        listActions.loadDelegationsSucceeded
         // listActions.loadDoubleBakingsSucceeded,
         // listActions.loadDoubleEndorsementsSucceeded,
         // listActions.loadVotesSucceeded,
@@ -603,6 +604,7 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

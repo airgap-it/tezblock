@@ -10,6 +10,7 @@ import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractBy } from '@tezblock/domain/contract'
 import { SearchOptionType } from './model'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -18,7 +19,12 @@ const previousSearchesKey = 'previousSearches'
   providedIn: 'root'
 })
 export class SearchService {
-  constructor(private readonly apiService: ApiService, private readonly router: Router, private readonly storage: StorageMap) {}
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly router: Router,
+    private readonly storage: StorageMap
+  ) {}
 
   // TODO: now contract is looked first, is it OK (what if searchTerm matches account and contract ?)
   processSearchSelection(searchTerm: string, type?: string): Observable<boolean> {
@@ -63,7 +69,7 @@ export class SearchService {
     }
 
     // TODO: implement full search by contract
-    const contract = getTokenContractBy(trimmedSearchTerm)
+    const contract = getTokenContractBy(trimmedSearchTerm, this.chainNetworkService.getNetwork())
     if (contract && (!type || type === SearchOptionType.faContract)) {
       processResult([contract], () => this.router.navigateByUrl('/contract/' + contract.id))
     } else {
