@@ -1,4 +1,5 @@
 import { IAirGapTransaction } from 'airgap-coin-lib'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { Data } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
@@ -25,6 +26,7 @@ export interface TokenContract {
   website: string
   description: string
   socials: Social[],
+  tezosNetwork?: TezosNetwork[],
   totalSupply?: string
 }
 
