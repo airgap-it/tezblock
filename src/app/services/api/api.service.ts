@@ -21,6 +21,7 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
+import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 
 export interface OperationCount {
   [key: string]: string
@@ -480,12 +481,12 @@ export class ApiService {
     )
   }
 
-  getAccountsStartingWith(id: string): Observable<Object[]> {
-    const result: Object[] = []
+  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+    const result: SearchOption[] = []
 
     Object.keys(accounts).forEach(account => {
       if (accounts[account] && accounts[account].alias && accounts[account].alias.toLowerCase().startsWith(id.toLowerCase())) {
-        result.push({ name: accounts[account].alias, type: 'Bakers' })
+        result.push({ name: accounts[account].alias, type: SearchOptionType.baker })
       }
     })
 
@@ -510,7 +511,7 @@ export class ApiService {
         .pipe(
           map(accounts =>
             accounts.map(account => {
-              return { name: account.account_id, type: 'Accounts' }
+              return { name: account.account_id, type: SearchOptionType.account }
             })
           )
         )
@@ -519,7 +520,7 @@ export class ApiService {
     return of(result)
   }
 
-  getTransactionHashesStartingWith(id: string): Observable<Object[]> {
+  getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -540,13 +541,13 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.operation_group_hash, type: 'Transactions' }
+            return { name: item.operation_group_hash, type: SearchOptionType.transaction }
           })
         )
       )
   }
 
-  getBlockHashesStartingWith(id: string): Observable<Object[]> {
+  getBlockHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -567,7 +568,7 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.hash, type: 'Blocks' }
+            return { name: item.hash, type: SearchOptionType.block }
           })
         )
       )

@@ -3,8 +3,9 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 
 import { Data } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
+import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 
-const tokenContracts = require('../../assets/contracts/json/contracts.json')
+export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
 export enum SocialType {
   website = 'website',
@@ -49,3 +50,50 @@ export const airGapTransactionToContractOperation = (airGapTransaction: IAirGapT
   singleFrom: first(airGapTransaction.from),
   singleTo: first(airGapTransaction.to)
 })
+
+export const searchTokenContracts = (searchTerm: string): SearchOption[] => {
+  if (!searchTerm) {
+    return []
+  }
+
+  const type = SearchOptionType.faContract
+  const tokenContractByAddress = getTokenContractByAddress(searchTerm)
+
+  return Object.keys(tokenContracts)
+    .filter(key => tokenContracts[key].name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
+    .map(key => ({
+      name: tokenContracts[key].name,
+      type
+    }))
+    .concat(
+      tokenContractByAddress
+        ? [
+            {
+              name: tokenContractByAddress.name,
+              type
+            }
+          ]
+        : []
+    )
+}
+
+export const getTokenContractBy = (searchTerm: string): TokenContract => {
+  if (!searchTerm) {
+    return undefined
+  }
+
+  const tokenContractByAddress = getTokenContractByAddress(searchTerm)
+
+  return first(
+    Object.keys(tokenContracts)
+      .filter(key => tokenContracts[key].name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
+      .map(
+        key =>
+          <TokenContract>{
+            ...tokenContracts[key],
+            id: key
+          }
+      )
+      .concat(tokenContractByAddress ? [tokenContractByAddress] : [])
+  )
+}
