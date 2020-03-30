@@ -138,6 +138,13 @@
                 </div>
               </ng-container>
             </ng-container>
+            <ng-container *ngIf="(yayRolls$ | async) !== undefined">
+              <div class="pl-0 pl-md-3 py-3">
+                {{ yayRolls$ | async }} ({{ yayRollsPercentage$ | async }}%) In Favor {{ nayRolls$ | async }} ({{
+                  nayRollsPercentage$ | async
+                }}%) Against {{ passRolls$ | async }} ({{ passRollsPercentage$ | async }}%) Pass
+              </div>
+            </ng-container>
           </tabbed-table>
         </div>
       </div>

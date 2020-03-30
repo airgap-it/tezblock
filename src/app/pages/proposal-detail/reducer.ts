@@ -8,6 +8,7 @@ import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { MetaVotingPeriod, PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { get } from '@tezblock/services/fp'
+import { DivisionOfVotes } from '@tezblock/services/proposal/proposal.service'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
   if (!state.metaVotingPeriods) {
@@ -35,6 +36,7 @@ export interface State {
   metaVotingPeriods: MetaVotingPeriod[]
   periodsTimespans: PeriodTimespan[]
   votes: TableState<Transaction>
+  divisionOfVotes: DivisionOfVotes[]
 }
 
 const initialState: State = {
@@ -44,7 +46,8 @@ const initialState: State = {
   periodKind: undefined,
   metaVotingPeriods: undefined,
   periodsTimespans: undefined,
-  votes: getInitialTableState()
+  votes: getInitialTableState(),
+  divisionOfVotes: undefined
 }
 
 export const reducer = createReducer(
@@ -127,5 +130,21 @@ export const reducer = createReducer(
       ...state.proposal,
       description
     }
+  })),
+  on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
+    ...state,
+    divisionOfVotes
+  })),
+  on(actions.loadDivisionOfVotesFailed, state => ({
+    ...state,
+    divisionOfVotes: null
   }))
 )
+
+export const yayRollsSelector = (state: State): number => (state.divisionOfVotes ? state.divisionOfVotes.map(x => x.max_yay_rolls).reduce((a, b) => a + b) : undefined)
+export const nayRollsSelector = (state: State): number => (state.divisionOfVotes ? state.divisionOfVotes.map(x => x.max_nay_rolls).reduce((a, b) => a + b) : undefined)
+export const passRollsSelector = (state: State): number => (state.divisionOfVotes ? state.divisionOfVotes.map(x => x.max_pass_rolls).reduce((a, b) => a + b) : undefined)
+const allRollsSelector = (state: State): number => yayRollsSelector(state) + nayRollsSelector(state) + passRollsSelector(state)
+export const yayRollsPercentageSelector = (state: State): number => Math.round((yayRollsSelector(state) / allRollsSelector(state)) * 100)
+export const nayRollsPercentageSelector = (state: State): number => Math.round((nayRollsSelector(state) / allRollsSelector(state)) * 100)
+export const passRollsPercentageSelector = (state: State): number => Math.round((passRollsSelector(state) / allRollsSelector(state)) * 100)

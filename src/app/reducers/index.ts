@@ -85,10 +85,20 @@ export const getState = (store: Store<State>): State => {
 
 export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
+export const selectProposalDetails = (state: State) => state.proposalDetails
 
 export const blockDetails = {
   id: createSelector(selectBlockDetails, state => state.id),
   block: createSelector(selectBlockDetails, state => state.block)
+}
+
+export const proposalDetails = {
+  yayRolls: createSelector(selectProposalDetails, fromProposalDetails.yayRollsSelector),
+  nayRolls: createSelector(selectProposalDetails, fromProposalDetails.nayRollsSelector),
+  passRolls: createSelector(selectProposalDetails, fromProposalDetails.passRollsSelector),
+  yayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.yayRollsPercentageSelector),
+  nayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.nayRollsPercentageSelector),
+  passRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.passRollsPercentageSelector)
 }
 
 export const app = {

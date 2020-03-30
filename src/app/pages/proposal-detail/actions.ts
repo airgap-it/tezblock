@@ -3,6 +3,7 @@ import { createAction, props } from '@ngrx/store'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
+import { DivisionOfVotes } from '@tezblock/services/proposal/proposal.service'
 
 const featureName = 'Proposal Details'
 
@@ -48,3 +49,10 @@ export const loadProposalDescriptionSucceeded = createAction(
   props<{ description: string }>()
 )
 export const loadProposalDescriptionFailed = createAction(`[${featureName}] Load Proposal Description Failed`, props<{ error: any }>())
+
+export const loadDivisionOfVotes = createAction(`[${featureName}] Load Division Of Votes`)
+export const loadDivisionOfVotesSucceeded = createAction(
+  `[${featureName}] Load Division Of Votes Succeeded`,
+  props<{ divisionOfVotes: DivisionOfVotes[] }>()
+)
+export const loadDivisionOfVotesFailed = createAction(`[${featureName}] Load Division Of Votes Failed`, props<{ error: any }>())

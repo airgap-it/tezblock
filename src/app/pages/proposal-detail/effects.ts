@@ -1,25 +1,21 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, pipe, Observable, forkJoin } from 'rxjs'
+import { of } from 'rxjs'
 import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
-import { HttpClient } from '@angular/common/http'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import * as appActions from '@tezblock/app.actions'
-import { BaseService, Operation } from '@tezblock/services/base.service'
-import { first, get } from '@tezblock/services/fp'
-import { Block } from '@tezblock/interfaces/Block'
+import { get } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
-import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
+import { PeriodKind, MetaVotingPeriod } from '@tezblock/domain/vote'
 import { proposals } from '@tezblock/interfaces/proposal'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
 export class ProposalDetailEffects {
-
   getProposal$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadProposal),
@@ -63,25 +59,8 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.proposalDetails.proposal)
       ),
       switchMap(([action, proposalHash, proposal]) =>
-        forkJoin(
-          // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
-          this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
-          this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
-          this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion)
-        ).pipe(
-          map(metaVotingPeriodCounts =>
-            actions.loadMetaVotingPeriodsSucceeded({
-              metaVotingPeriods: [
-                {
-                  periodKind: PeriodKind.Proposal,
-                  value: metaVotingPeriodCounts[0] ? metaVotingPeriodCounts[0] - 1 : proposal.period
-                },
-                { periodKind: PeriodKind.Exploration, value: metaVotingPeriodCounts[0] },
-                { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
-                { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] }
-              ]
-            })
-          ),
+        this.proposalService.getMetaVotingPeriods(proposalHash, proposal).pipe(
+          map(metaVotingPeriods => actions.loadMetaVotingPeriodsSucceeded({ metaVotingPeriods })),
           catchError(error => of(actions.loadMetaVotingPeriodsFailed({ error })))
         )
       )
@@ -113,45 +92,10 @@ export class ProposalDetailEffects {
       ),
       filter(([{ periodKind }]) => periodKind !== PeriodKind.Proposal),
       switchMap(([{ periodKind }, metaVotingPeriods, proposalHash, pagination]) => {
-        const metaVotingPeriod = get<MetaVotingPeriod>(period => period.value)(
-          metaVotingPeriods.find(period => period.periodKind === periodKind)
+        return this.proposalService.getVotes(periodKind, metaVotingPeriods, proposalHash, pagination).pipe(
+          map(votes => actions.loadVotesSucceeded({ votes })),
+          catchError(error => of(actions.loadVotesFailed({ error })))
         )
-
-        return this.baseService
-          .post<Transaction[]>('operations', {
-            predicates: [
-              {
-                field: 'kind',
-                operation: Operation.eq,
-                set: ['ballot']
-              },
-              {
-                field: 'proposal',
-                operation: Operation.eq,
-                set: [proposalHash]
-              },
-              {
-                field: 'period',
-                operation: Operation.eq,
-                set: [metaVotingPeriod]
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: pagination.currentPage * pagination.selectedSize
-          })
-          .pipe(
-            switchMap((votes: Transaction[]) =>
-              this.apiService.addVoteData(votes).pipe(
-                map(votes => actions.loadVotesSucceeded({ votes })),
-                catchError(error => of(actions.loadVotesFailed({ error })))
-              )
-            )
-          )
       })
     )
   )
@@ -161,44 +105,18 @@ export class ProposalDetailEffects {
       ofType(actions.loadVotes),
       withLatestFrom(
         this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.votes.pagination),
-        this.store$.select(state => state.proposalDetails.metaVotingPeriods)
+        this.store$.select(state => state.proposalDetails.votes.pagination)
       ),
-      filter(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) => periodKind === PeriodKind.Proposal),
-      switchMap(([{ periodKind }, proposalHash, pagination, metaVotingPeriods]) =>
-        this.baseService
-          .post<Transaction[]>('operations', {
-            fields: [],
-            predicates: [
-              {
-                field: 'kind',
-                operation: Operation.eq,
-                set: ['proposals'],
-                inverse: false
-              },
-              {
-                field: 'proposal',
-                operation: Operation.like,
-                set: [proposalHash],
-                inverse: false
-              }
-            ],
-            orderBy: [
-              {
-                field: 'block_level',
-                direction: 'desc'
-              }
-            ],
-            limit: pagination.currentPage * pagination.selectedSize
-          })
-          .pipe(
-            switchMap((votes: Transaction[]) =>
-              this.apiService.addVoteData(votes).pipe(
-                map(votes => actions.loadVotesSucceeded({ votes })),
-                catchError(error => of(actions.loadVotesFailed({ error })))
-              )
+      filter(([{ periodKind }, proposalHash, pagination]) => periodKind === PeriodKind.Proposal),
+      switchMap(([{ periodKind }, proposalHash, pagination]) =>
+        this.proposalService.getProposalVotes(proposalHash, pagination).pipe(
+          switchMap((votes: Transaction[]) =>
+            this.apiService.addVoteData(votes).pipe(
+              map(votes => actions.loadVotesSucceeded({ votes })),
+              catchError(error => of(actions.loadVotesFailed({ error })))
             )
           )
+        )
       )
     )
   )
@@ -217,29 +135,12 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.proposalDetails.id),
         this.store$.select(state => state.proposalDetails.metaVotingPeriods)
       ),
-      switchMap(([action, proposalHash, metaVotingPeriods]) => {
-        const _metaVotingPeriods = metaVotingPeriods.filter(
-          metaVotingPeriod => !!metaVotingPeriod.value && metaVotingPeriod.periodKind !== PeriodKind.Proposal
-        )
-
-        return forkJoin(
-          [this.getProposalVotesCount(proposalHash)].concat(
-            _metaVotingPeriods.map(metaVotingPeriod => this.getMetaVotingPeriodCount(proposalHash, metaVotingPeriod.value))
-          )
-        ).pipe(
-          map(counts =>
-            actions.loadVotesTotalSucceeded({
-              metaVotingPeriods: [
-                {
-                  ...metaVotingPeriods[0],
-                  count: counts[0]
-                }
-              ].concat(_metaVotingPeriods.map((metaVotingPeriod, index) => ({ ...metaVotingPeriod, count: counts[index + 1] })))
-            })
-          ),
+      switchMap(([action, proposalHash, metaVotingPeriods]) =>
+        this.proposalService.getVotesTotal(proposalHash, metaVotingPeriods).pipe(
+          map(metaVotingPeriods => actions.loadVotesTotalSucceeded({ metaVotingPeriods })),
           catchError(error => of(actions.loadVotesTotalFailed({ error })))
         )
-      })
+      )
     )
   )
 
@@ -268,32 +169,10 @@ export class ProposalDetailEffects {
         this.store$.select(state => state.app.blocksPerVotingPeriod)
       ),
       switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) =>
-        forkJoin(
-          forkJoin(
-            metaVotingPeriods.map(period =>
-              period.value <= currentVotingPeriod
-                ? this.baseService
-                    .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc'))
-                    .pipe(map(first), map(get(item => item.timestamp)))
-                : of(null)
-            )
-          ),
-          forkJoin(
-            metaVotingPeriods.map(period =>
-              period.value < currentVotingPeriod
-                ? this.baseService
-                    .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc'))
-                    .pipe(
-                      map(first),
-                      map(get(item => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
-                    )
-                : of(null)
-            )
-          )
-        ).pipe(
-          map(response =>
+        this.proposalService.getPeriodsTimespans(metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod).pipe(
+          map(({ periodsTimespans, blocksPerVotingPeriod }) =>
             actions.loadPeriodsTimespansSucceeded({
-              periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),
+              periodsTimespans,
               blocksPerVotingPeriod
             })
           ),
@@ -308,7 +187,7 @@ export class ProposalDetailEffects {
       ofType(actions.loadProposalDescription),
       withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
       switchMap(([action, id]) =>
-        this.httpClient.get(`../../assets/proposals/descriptions/${id}.html`, { responseType: 'text' }).pipe(
+        this.proposalService.getProposalDescription(id).pipe(
           map(description => actions.loadProposalDescriptionSucceeded({ description })),
           catchError(error => of(actions.loadProposalDescriptionFailed({ error })))
         )
@@ -316,120 +195,32 @@ export class ProposalDetailEffects {
     )
   )
 
-  private getMetaVotingPeriod(proposalHash: string, periodKind: string): Observable<number> {
-    return this.baseService
-      .post<Block[]>('blocks', {
-        fields: ['meta_voting_period'],
-        predicates: [
-          {
-            field: 'active_proposal',
-            operation: Operation.eq,
-            set: [proposalHash],
-            inverse: false
-          },
-          {
-            field: 'period_kind',
-            operation: Operation.eq,
-            set: [periodKind],
-            inverse: false
-          }
-        ],
-        orderBy: [
-          {
-            field: 'level',
-            direction: 'desc'
-          }
-        ],
-        limit: 1
-      })
-      .pipe(
-        map(
-          pipe(
-            first,
-            get<Block>(block => block.meta_voting_period)
-          )
-        )
-      )
-  }
+  onLoadedProposalLoadDivisionOfVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadProposal),
+      map(() => actions.loadDivisionOfVotes())
+    )
+  )
 
-  private getMetaVotingPeriodCount(proposalHash: string, metaVotingPeriod: number): Observable<number> {
-    return this.baseService
-      .post<Transaction[]>('operations', {
-        fields: ['proposal'],
-        predicates: [
-          {
-            field: 'kind',
-            operation: Operation.eq,
-            set: ['ballot']
-          },
-          {
-            field: 'proposal',
-            operation: Operation.eq,
-            set: [proposalHash]
-          },
-          {
-            field: 'period',
-            operation: Operation.eq,
-            set: [metaVotingPeriod]
-          }
-        ],
-        aggregation: [
-          {
-            field: 'proposal',
-            function: 'count'
-          }
-        ]
-      })
-      .pipe(
-        map(
-          pipe(
-            first,
-            get<any>(item => parseInt(item.count_proposal))
-          )
+  loadDivisionOfVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadDivisionOfVotes),
+      withLatestFrom(
+        this.store$.select(state => state.proposalDetails.id)
+      ),
+      switchMap(([action, proposalHash]) =>
+        this.proposalService.getDivisionOfVotes(proposalHash).pipe(
+          map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
+          catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
         )
       )
-  }
-
-  private getProposalVotesCount(proposalHash: string): Observable<number> {
-    return this.baseService
-      .post<Transaction[]>('operations', {
-        fields: ['proposal'],
-        predicates: [
-          {
-            field: 'kind',
-            operation: Operation.eq,
-            set: ['proposals'],
-            inverse: false
-          },
-          {
-            field: 'proposal',
-            operation: Operation.like,
-            set: [proposalHash],
-            inverse: false
-          }
-        ],
-        aggregation: [
-          {
-            field: 'proposal',
-            function: 'count'
-          }
-        ]
-      })
-      .pipe(
-        map(
-          pipe(
-            first,
-            get<any>(item => parseInt(item.count_proposal))
-          )
-        )
-      )
-  }
+    )
+  )
 
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
-    private readonly baseService: BaseService,
-    private readonly httpClient: HttpClient,
+    private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }
