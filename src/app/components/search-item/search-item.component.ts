@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { Observable, race } from 'rxjs'
+import { Observable, of, pipe, merge } from 'rxjs'
 import { debounceTime, switchMap, take, map, filter } from 'rxjs/operators'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
 import { FormControl } from '@angular/forms'
@@ -8,6 +8,10 @@ import { BaseComponent } from '../base.component'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { TypeAheadObject } from '@tezblock/interfaces/TypeAheadObject'
 import { SearchService } from 'src/app/services/search/search.service'
+import { SearchOption } from 'src/app/services/search/model'
+import { flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
+import { searchTokenContracts } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const toPreviousOption = value => ({ name: value, type: 'Recent History' })
 
@@ -23,7 +27,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   // ngx-bootstrap is weak, so walkaround: https://stackoverflow.com/questions/50840415/typeahead-on-reactive-forms-typeahead-doesnt-show-up
   dataEmitter: EventEmitter<any[]> = new EventEmitter<any[]>()
   searchControl: FormControl
-  dataSource$: Observable<any>
+  dataSource$: Observable<SearchOption[]>
   get dataSourceSnapshot(): any[] {
     return this._dataSourceSnapshot || []
   }
@@ -33,13 +37,20 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   private _dataSourceSnapshot: any[]
   private isValueChangedBySelect = false
 
-  constructor(private readonly apiService: ApiService, private readonly searchService: SearchService) {
+  constructor(
+    private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly searchService: SearchService
+  ) {
     super()
   }
 
   ngOnInit() {
     const initialSearchGreaterThanOneCharacter = value => (this._dataSourceSnapshot ? true : value && value.length > 1)
-    const takeFromArray = (count: number) => (data: any[]) => data.slice(0, count)
+    const takeFromEach = (countPerType: number) => (groupedOptions: { [key: string]: SearchOption[] }): SearchOption[] =>
+      flatten(Object.keys(groupedOptions).map(key => groupedOptions[key].slice(0, countPerType)))
+    const narrowOptions = (countPerType: number) =>
+      pipe<SearchOption[], { [key: string]: SearchOption[] }, SearchOption[]>(groupBy('type'), takeFromEach(countPerType))
 
     this.searchControl = new FormControl('')
 
@@ -47,22 +58,32 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       debounceTime(500), // breaks typeahead somehow ... :/, thats why dataEmitter is introduced (handy for previous feature)
       filter(initialSearchGreaterThanOneCharacter),
       filter(this.skipValueSetBySelects.bind(this)),
-      switchMap(token =>
-        race([
+      switchMap(token => {
+        let options: SearchOption[] = []
+
+        return merge(
           this.apiService.getTransactionHashesStartingWith(token),
           this.apiService.getAccountsStartingWith(token),
-          this.apiService.getBlockHashesStartingWith(token)
-        ])
-      )
+          this.apiService.getBlockHashesStartingWith(token),
+          of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))
+        ).pipe(
+          filter(isNotEmptyArray),
+          map(partialOptions => (options = options.concat(partialOptions)))
+        )
+      })
     )
 
     this.dataSource$
       .pipe(
-        map(takeFromArray(5)),
+        map(x => {
+          const foo = narrowOptions(5)(x)
+
+          return foo
+        }),
         switchMap(data =>
           this.searchService.getPreviousSearches().pipe(
             map(previousSearches => {
-              const value = this.searchControl.value ? this.searchControl.value.toLowerCase() : null
+              const value = get<any>(value => value.toLowerCase())(this.searchControl.value)
               const matches = previousSearches
                 .filter(previousItem => (value ? previousItem.toLowerCase().indexOf(value) !== -1 : false))
                 .filter(previousItem => !data.some(dataItem => dataItem.name === previousItem))
@@ -94,20 +115,25 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     this.search(this.searchControl.value)
   }
 
-  search(searchTerm?: string) {
+  search(searchTerm?: string, type?: string) {
     const value = searchTerm || this.searchControl.value
 
+    if (!value) {
+      return
+    }
+
     this.onSearch.emit(value)
-    this.searchService.search(value).subscribe(succeeded => {
-      if (succeeded) {
+    this.searchService
+      .processSearchSelection(value, type)
+      .pipe(filter(succeeded => succeeded))
+      .subscribe(() => {
         this.isValueChangedBySelect = true
         this.searchControl.setValue('')
-      }
-    })
+      })
   }
 
   onSelect(e: TypeaheadMatch) {
-    this.search(e.value)
+    this.search(e.value, e.item.type)
     this.searchService.updatePreviousSearches(e.value)
   }
 
