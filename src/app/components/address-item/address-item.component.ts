@@ -3,6 +3,7 @@ import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core
 import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contract'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export interface Options {
   pageId?: string | number
@@ -26,7 +27,7 @@ export class AddressItemComponent implements OnInit {
   set address(value: string) {
     if (value !== this._address) {
       this._address = value
-      this.contract = getTokenContractByAddress(value)
+      this.contract = getTokenContractByAddress(value, this.chainNetworkService.getNetwork())
       this.formattedAddress = this.getFormattedAddress()
     }
   }
@@ -74,7 +75,7 @@ export class AddressItemComponent implements OnInit {
     return this.options && this.options.pageId ? this.options.pageId !== this.address : true
   }
 
-  constructor(private readonly aliasPipe: AliasPipe, private readonly shortenStringPipe: ShortenStringPipe) {}
+  constructor(private readonly aliasPipe: AliasPipe, private readonly chainNetworkService: ChainNetworkService, private readonly shortenStringPipe: ShortenStringPipe) {}
 
   ngOnInit() {}
 

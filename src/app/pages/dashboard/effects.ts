@@ -13,6 +13,7 @@ import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
@@ -21,7 +22,7 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadContracts),
       switchMap(() => {
-        const contracts = getTokenContracts(6)
+        const contracts = getTokenContracts(this.chainNetworkService.getNetwork(), 6)
 
         if (!contracts || contracts.total === 0) {
           return of(actions.loadContractsSucceeded({ contracts: [] }))
@@ -125,6 +126,7 @@ export class DashboarEffects {
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>
   ) {}

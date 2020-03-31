@@ -12,10 +12,10 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contract'
+import { getTokenContractByAddress } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { get } from '@tezblock/services/fp'
 import { ContractService } from '@tezblock/services/contract/contract.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 @Injectable()
 export class ContractDetailEffects {
@@ -23,7 +23,7 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadContract),
       switchMap(({ address }) => {
-        const contract = get<TokenContract>(_contract => ({ ..._contract, id: address }))(getTokenContractByAddress(address))
+        const contract = getTokenContractByAddress(address, this.chainNetworkService.getNetwork())
 
         if (contract) {
           return this.apiService.getTotalSupplyByContract(contract).pipe(
@@ -232,6 +232,7 @@ export class ContractDetailEffects {
     private readonly actions$: Actions,
     private readonly aliasPipe: AliasPipe,
     private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly contractService: ContractService,
     private readonly copyService: CopyService,
     private readonly modalService: BsModalService,
