@@ -82,6 +82,13 @@
                   </div>
                 </div>
               </div>
+              <div *ngIf="(yayRolls$ | async) !== undefined" class="row">
+                <div class="col-12 p-0 text-secondary">
+                  {{ yayRolls$ | async }} ({{ yayRollsPercentage$ | async }}%) In Favor {{ nayRolls$ | async }} ({{
+                    nayRollsPercentage$ | async
+                  }}%) Against {{ passRolls$ | async }} ({{ passRollsPercentage$ | async }}%) Pass
+                </div>
+              </div>
             </div>
           </div>
           <ng-container *ngIf="isMainnet()">

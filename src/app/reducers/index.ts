@@ -86,10 +86,20 @@ export const getState = (store: Store<State>): State => {
 export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
 export const selectProposalDetails = (state: State) => state.proposalDetails
+export const selectDashboard = (state: State) => state.dashboard
 
 export const blockDetails = {
   id: createSelector(selectBlockDetails, state => state.id),
   block: createSelector(selectBlockDetails, state => state.block)
+}
+
+export const dashboard = {
+  yayRolls: createSelector(selectDashboard, fromDashboard.yayRollsSelector),
+  nayRolls: createSelector(selectDashboard, fromDashboard.nayRollsSelector),
+  passRolls: createSelector(selectDashboard, fromDashboard.passRollsSelector),
+  yayRollsPercentage: createSelector(selectDashboard, fromDashboard.yayRollsPercentageSelector),
+  nayRollsPercentage: createSelector(selectDashboard, fromDashboard.nayRollsPercentageSelector),
+  passRollsPercentage: createSelector(selectDashboard, fromDashboard.passRollsPercentageSelector)
 }
 
 export const proposalDetails = {

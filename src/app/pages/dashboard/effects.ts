@@ -13,6 +13,7 @@ import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -106,11 +107,25 @@ export class DashboarEffects {
     )
   )
 
+  loadDivisionOfVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadDivisionOfVotes),
+      withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),
+      switchMap(([action, votingPeriod]) =>
+        this.proposalService.getDivisionOfVotes({ votingPeriod }).pipe(
+          map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
+          catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
+    private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

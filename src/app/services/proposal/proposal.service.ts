@@ -27,6 +27,14 @@ export interface DivisionOfVotes {
   max_level: number
 }
 
+export const _yayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_yay_rolls).reduce((a, b) => a + b, 0) : undefined)
+export const _nayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_nay_rolls).reduce((a, b) => a + b, 0) : undefined)
+export const _passRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_pass_rolls).reduce((a, b) => a + b, 0) : undefined)
+const allRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => _yayRollsSelector(divisionOfVotes) + _nayRollsSelector(divisionOfVotes) + _passRollsSelector(divisionOfVotes)
+export const _yayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_yayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 100) : 0
+export const _nayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_nayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 100) : 0
+export const _passRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_passRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 100) : 0
+
 @Injectable({
   providedIn: 'root'
 })

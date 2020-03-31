@@ -7,6 +7,15 @@ import { PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vot
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import {
+  DivisionOfVotes,
+  _yayRollsSelector,
+  _nayRollsSelector,
+  _passRollsSelector,
+  _yayRollsPercentageSelector,
+  _nayRollsPercentageSelector,
+  _passRollsPercentageSelector
+} from '@tezblock/services/proposal/proposal.service'
 
 interface Busy {
   blocks: boolean
@@ -22,6 +31,7 @@ export interface State {
   proposal: ProposalListDto
   transactions: Transaction[]
   currentPeriodTimespan: PeriodTimespan
+  divisionOfVotes: DivisionOfVotes[]
   busy: Busy
 }
 
@@ -31,6 +41,7 @@ const initialState: State = {
   proposal: undefined,
   currentPeriodTimespan: undefined,
   transactions: undefined,
+  divisionOfVotes: undefined,
   busy: {
     blocks: false,
     contracts: false,
@@ -155,5 +166,20 @@ export const reducer = createReducer(
       blocks: false
     }
   })),
+  on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
+    ...state,
+    divisionOfVotes
+  })),
+  on(actions.loadDivisionOfVotesFailed, state => ({
+    ...state,
+    divisionOfVotes: null
+  })),
   on(actions.reset, () => initialState)
 )
+
+export const yayRollsSelector = (state: State): number => _yayRollsSelector(state.divisionOfVotes)
+export const nayRollsSelector = (state: State): number => _nayRollsSelector(state.divisionOfVotes)
+export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
+export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
+export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)
+export const passRollsPercentageSelector = (state: State): number => _passRollsPercentageSelector(state.divisionOfVotes)
