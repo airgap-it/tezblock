@@ -50,7 +50,7 @@ export const loadProposalDescriptionSucceeded = createAction(
 )
 export const loadProposalDescriptionFailed = createAction(`[${featureName}] Load Proposal Description Failed`, props<{ error: any }>())
 
-export const loadDivisionOfVotes = createAction(`[${featureName}] Load Division Of Votes`)
+export const loadDivisionOfVotes = createAction(`[${featureName}] Load Division Of Votes`, props<{ votingPeriod: number }>())
 export const loadDivisionOfVotesSucceeded = createAction(
   `[${featureName}] Load Division Of Votes Succeeded`,
   props<{ divisionOfVotes: DivisionOfVotes[] }>()

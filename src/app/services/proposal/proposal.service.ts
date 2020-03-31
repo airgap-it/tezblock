@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { of, pipe, Observable, forkJoin } from 'rxjs'
 import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import { BaseService, Operation } from '@tezblock/services/base.service'
+import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
@@ -178,7 +178,33 @@ export class ProposalService extends BaseService {
     return this.httpClient.get(`../../../assets/proposals/descriptions/${id}.html`, { responseType: 'text' })
   }
 
-  getDivisionOfVotes(proposalHash: string): Observable<DivisionOfVotes[]> {
+  getDivisionOfVotes(arg: { proposalHash?: string; votingPeriod?: number }): Observable<DivisionOfVotes[]> {
+    const predicates: Predicate[] = []
+      .concat(
+        arg.proposalHash
+          ? [
+              {
+                field: 'proposal_hash',
+                operation: Operation.eq,
+                set: [arg.proposalHash],
+                inverse: false
+              }
+            ]
+          : []
+      )
+      .concat(
+        arg.votingPeriod
+          ? [
+              {
+                field: 'voting_period',
+                operation: Operation.eq,
+                set: [arg.votingPeriod],
+                inverse: false
+              }
+            ]
+          : []
+      )
+
     return this.post<DivisionOfVotes[]>('governance', {
       fields: [
         'voting_period',
@@ -192,14 +218,7 @@ export class ProposalService extends BaseService {
         'nay_count',
         'nay_rolls'
       ],
-      predicates: [
-        {
-          field: 'proposal_hash',
-          operation: Operation.eq,
-          set: [proposalHash],
-          inverse: false
-        }
-      ],
+      predicates,
       orderBy: [{ field: 'max_level', direction: 'desc' }],
       aggregation: [
         { field: 'level', function: 'max' },

@@ -195,21 +195,26 @@ export class ProposalDetailEffects {
     )
   )
 
-  onLoadedProposalLoadDivisionOfVotes$ = createEffect(() =>
+  onLoadVotesLoadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadProposal),
-      map(() => actions.loadDivisionOfVotes())
+      ofType(actions.loadVotes),
+      withLatestFrom(this.store$.select(state => state.proposalDetails.metaVotingPeriods)),
+      map(([{ periodKind }, metaVotingPeriods]) => {
+        const votingPeriod = get<MetaVotingPeriod>(metaVotingPeriod => metaVotingPeriod.value)(
+          metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === periodKind)
+        )
+
+        return actions.loadDivisionOfVotes({ votingPeriod })
+      })
     )
   )
 
   loadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadDivisionOfVotes),
-      withLatestFrom(
-        this.store$.select(state => state.proposalDetails.id)
-      ),
-      switchMap(([action, proposalHash]) =>
-        this.proposalService.getDivisionOfVotes(proposalHash).pipe(
+      withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
+      switchMap(([{ votingPeriod }, proposalHash]) =>
+        this.proposalService.getDivisionOfVotes({ proposalHash, votingPeriod }).pipe(
           map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
           catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
         )
