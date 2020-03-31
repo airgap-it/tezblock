@@ -8,7 +8,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 export class ChainNetworkService implements OnInit {
   private chainName: TezosNetwork
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET
-  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.BABYLONNET, TezosNetwork.CARTHAGENET]
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.CARTHAGENET]
 
   constructor() {
     const origin = new URL(location.href).origin
