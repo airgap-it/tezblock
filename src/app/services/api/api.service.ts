@@ -21,6 +21,7 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
+import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 
 export interface OperationCount {
   [key: string]: string
@@ -480,12 +481,12 @@ export class ApiService {
     )
   }
 
-  getAccountsStartingWith(id: string): Observable<Object[]> {
-    const result: Object[] = []
+  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+    const result: SearchOption[] = []
 
     Object.keys(accounts).forEach(account => {
       if (accounts[account] && accounts[account].alias && accounts[account].alias.toLowerCase().startsWith(id.toLowerCase())) {
-        result.push({ name: accounts[account].alias, type: 'Bakers' })
+        result.push({ name: accounts[account].alias, type: SearchOptionType.baker })
       }
     })
 
@@ -510,7 +511,7 @@ export class ApiService {
         .pipe(
           map(accounts =>
             accounts.map(account => {
-              return { name: account.account_id, type: 'Accounts' }
+              return { name: account.account_id, type: SearchOptionType.account }
             })
           )
         )
@@ -519,7 +520,7 @@ export class ApiService {
     return of(result)
   }
 
-  getTransactionHashesStartingWith(id: string): Observable<Object[]> {
+  getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -540,13 +541,13 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.operation_group_hash, type: 'Transactions' }
+            return { name: item.operation_group_hash, type: SearchOptionType.transaction }
           })
         )
       )
   }
 
-  getBlockHashesStartingWith(id: string): Observable<Object[]> {
+  getBlockHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -567,7 +568,7 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.hash, type: 'Blocks' }
+            return { name: item.hash, type: SearchOptionType.block }
           })
         )
       )
@@ -1025,7 +1026,7 @@ export class ApiService {
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
     const group = groupBy('cycle')
 
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
       switchMap(cycles => {
         const minLevel = cycleToLevel(last(cycles))
         const maxLevel = cycleToLevel(first(cycles) + 1)
@@ -1120,7 +1121,7 @@ export class ApiService {
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
     const group = groupBy('cycle')
 
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 0 }).pipe(
+    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
       switchMap(cycles => {
         const minLevel = cycleToLevel(last(cycles))
         const maxLevel = cycleToLevel(first(cycles) + 1)
@@ -1213,36 +1214,34 @@ export class ApiService {
       .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
-  getFrozenBalance(tzAddress: string): Promise<number> {
-    return new Promise((resolve, reject) => {
-      this.http
-        .post<any[]>(
-          this.delegatesApiUrl,
-          {
-            predicates: [
-              {
-                field: 'pkh',
-                operation: 'eq',
-                set: [tzAddress],
-                inverse: false
-              }
-            ]
-          },
-          this.options
-        )
-        .subscribe(result => {
-          resolve(
-            pipe<any[], any, number>(
-              first,
-              get(_first => _first.frozen_balance)
-            )(result)
+  getFrozenBalance(tzAddress: string): Observable<number> {
+    return this.http
+      .post<any[]>(
+        this.delegatesApiUrl,
+        {
+          predicates: [
+            {
+              field: 'pkh',
+              operation: 'eq',
+              set: [tzAddress],
+              inverse: false
+            }
+          ]
+        },
+        this.options
+      )
+      .pipe(
+        map(
+          pipe<any[], any, number>(
+            first,
+            get(_first => _first.frozen_balance)
           )
-        })
-    })
+        )
+      )
   }
 
-  getDelegatedAccountsList(tzAddress: string): Observable<any> {
-    return this.http.post(
+  getDelegatedAccountsList(tzAddress: string): Observable<any[]> {
+    return this.http.post<any[]>(
       this.accountsApiUrl,
       {
         fields: ['account_id', 'manager', 'delegate_value', 'balance'],

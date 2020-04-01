@@ -90,14 +90,14 @@
                 <h5 class="card-title__secondary mb-3 ">
                   Circulating Supply
                 </h5>
-                <h3>828,609,553 ꜩ</h3>
+                <h3>830,326,787 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 Market Cap
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('828609553').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('830326787').toFormat(0) }}</h3>
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
@@ -134,7 +134,7 @@
     <div class="card py-4 h-100">
       <div class="card-body p-4 ">
         <div class="row">
-          <div class="col-lg-6 pr-3 pr-md-5">
+          <div class="col-lg-6 pr-3 pr-md-5 pb-5 pb-md-0">
             <h5 class="card-title__secondary mb-3 ">
               Latest FA 1.2 Assets
             </h5>

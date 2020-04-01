@@ -76,6 +76,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   data$: Observable<Object>
   showLoadMore$: Observable<boolean>
   orderBy$: Observable<OrderBy>
+  noDataLabel: string
   activationsCountLast24h$: Observable<number>
   activationsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   originationsCountLast24h$: Observable<number>
@@ -84,7 +85,6 @@ export class ListComponent extends BaseComponent implements OnInit {
   transactionsChartDatasets$: Observable<{ data: number[]; label: string }[]>
   transactionsChartOptions: ChartOptions
   transactionsTotalXTZ$: Observable<number>
-
   routeName$: Observable<string>
 
   readonly chartLabels: string[] = range(0, noOfDays).map(index =>
@@ -405,7 +405,8 @@ export class ListComponent extends BaseComponent implements OnInit {
               tokenContractsData$,
               loadingTokenContracts$,
               tokenContractsOrderBy$,
-              showLoadMoreTokenContracts$
+              showLoadMoreTokenContracts$,
+              'No Contracts'
             )
             break
           case 'contract':
@@ -419,7 +420,9 @@ export class ListComponent extends BaseComponent implements OnInit {
               columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
               contractsData$,
               loadingContracts$,
-              contractsOrderBy$
+              contractsOrderBy$,
+              null,
+              'No Contracts'
             )
             break
 
@@ -509,7 +512,6 @@ export class ListComponent extends BaseComponent implements OnInit {
       case 'vote':
         this.store$.dispatch(actions.sortVotesByKind({ orderBy }))
         break
-
       case 'contract':
         this.store$.dispatch(actions.sortContracts({ orderBy }))
         break
@@ -521,12 +523,14 @@ export class ListComponent extends BaseComponent implements OnInit {
     data$: Observable<Object>,
     loading$: Observable<boolean>,
     orderBy$: Observable<OrderBy>,
-    showLoadMore$?: Observable<boolean>
+    showLoadMore$?: Observable<boolean>,
+    noDataLabel?: string
   ) {
     this.columns = columns
     this.data$ = data$
     this.loading$ = loading$
     this.orderBy$ = orderBy$
     this.showLoadMore$ = showLoadMore$ || of(true)
+    this.noDataLabel = noDataLabel
   }
 }

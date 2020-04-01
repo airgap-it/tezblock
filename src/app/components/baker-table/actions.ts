@@ -2,6 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
+import { Reward } from '@tezblock/domain/reward'
 
 export interface LevelInTime {
   estimated_time: number
@@ -57,6 +58,21 @@ export const loadUpcomingRightsSucceeded = createAction(
   props<{ upcomingRights: UpcomingRights }>()
 )
 export const loadUpcomingRightsFailed = createAction(`[${featureName}] Load Upcoming Rights Failed`, props<{ error: any }>())
+
+export const loadActiveDelegations = createAction(`[${featureName}] Load Active Delegations`)
+export const loadActiveDelegationsSucceeded = createAction(
+  `[${featureName}] Load Active Delegations Succeeded`,
+  props<{ activeDelegations: number }>()
+)
+export const loadActiveDelegationsFailed = createAction(`[${featureName}] Load Active Delegations Failed`, props<{ error: any }>())
+
+export const loadRewards = createAction(`[${featureName}] Load Rewards`)
+export const loadRewardsSucceeded = createAction(
+  `[${featureName}] Load Rewards Succeeded`,
+  props<{ rewards: Reward[] }>()
+)
+export const loadRewardsFailed = createAction(`[${featureName}] Load Rewards Failed`, props<{ error: any }>())
+export const increaseRewardsPageSize = createAction(`[${featureName}] Change Rewards Page Size`)
 
 export const increaseRightsPageSize = createAction(`[${featureName}] Change Rights Page Size`)
 

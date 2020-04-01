@@ -307,11 +307,10 @@
         </div>
       </div>
 
-      <!-- TODO: replace is_baker with: account.is_baker when api will work -->
       <div class="pt-5">
         <div class="card">
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
-            <ng-container *ngIf="is_baker">
+            <ng-container *ngIf="account.is_baker">
               <baker-table
                 [tabs]="bakerTabs"
                 [page]="'account'"
@@ -320,7 +319,7 @@
                 [bakerFee$]="tezosBakerFee$"
               ></baker-table>
             </ng-container>
-            <ng-container *ngIf="!is_baker || bakerTabs[0].active">
+            <ng-container *ngIf="!account.is_baker || bakerTabs[0].active">
               <div class="container px-3 chart__container">
                 <div class="row">
                   <div class="col-md-6 col-lg-4 px-0 px-sm-3">
