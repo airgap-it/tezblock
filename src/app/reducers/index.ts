@@ -98,8 +98,7 @@ export const dashboard = {
   nayRolls: createSelector(selectDashboard, fromDashboard.nayRollsSelector),
   passRolls: createSelector(selectDashboard, fromDashboard.passRollsSelector),
   yayRollsPercentage: createSelector(selectDashboard, fromDashboard.yayRollsPercentageSelector),
-  nayRollsPercentage: createSelector(selectDashboard, fromDashboard.nayRollsPercentageSelector),
-  passRollsPercentage: createSelector(selectDashboard, fromDashboard.passRollsPercentageSelector)
+  nayRollsPercentage: createSelector(selectDashboard, fromDashboard.nayRollsPercentageSelector)
 }
 
 export const proposalDetails = {
@@ -107,8 +106,7 @@ export const proposalDetails = {
   nayRolls: createSelector(selectProposalDetails, fromProposalDetails.nayRollsSelector),
   passRolls: createSelector(selectProposalDetails, fromProposalDetails.passRollsSelector),
   yayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.yayRollsPercentageSelector),
-  nayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.nayRollsPercentageSelector),
-  passRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.passRollsPercentageSelector)
+  nayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.nayRollsPercentageSelector)
 }
 
 export const app = {

@@ -14,8 +14,7 @@ import {
   _nayRollsSelector,
   _passRollsSelector,
   _yayRollsPercentageSelector,
-  _nayRollsPercentageSelector,
-  _passRollsPercentageSelector
+  _nayRollsPercentageSelector
 } from '@tezblock/services/proposal/proposal.service'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
@@ -154,4 +153,3 @@ export const nayRollsSelector = (state: State): number => _nayRollsSelector(stat
 export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
 export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
 export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)
-export const passRollsPercentageSelector = (state: State): number => _passRollsPercentageSelector(state.divisionOfVotes)

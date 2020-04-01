@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Observable } from 'rxjs'
+import { combineLatest, Observable } from 'rxjs'
 import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
@@ -56,7 +56,7 @@ export class DashboardComponent extends BaseComponent {
   passRolls$: Observable<number>
   yayRollsPercentage$: Observable<number>
   nayRollsPercentage$: Observable<number>
-  passRollsPercentage$: Observable<number>
+  showRolls$: Observable<boolean>
 
   constructor(
     private readonly actions$: Actions,
@@ -115,7 +115,17 @@ export class DashboardComponent extends BaseComponent {
     this.passRolls$ = this.store$.select(fromRoot.dashboard.passRolls)
     this.yayRollsPercentage$ = this.store$.select(fromRoot.dashboard.yayRollsPercentage)
     this.nayRollsPercentage$ = this.store$.select(fromRoot.dashboard.nayRollsPercentage)
-    this.passRollsPercentage$ = this.store$.select(fromRoot.dashboard.passRollsPercentage)
+    this.showRolls$ = combineLatest(
+      this.store$.select(state => state.app.latestBlock),
+      this.yayRolls$
+    ).pipe(
+      map(
+        ([latestBlock, yayRolls]) =>
+          latestBlock &&
+          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(latestBlock.period_kind) !== -1 &&
+          yayRolls !== undefined
+      )
+    )
 
     this.subscriptions.push(
       getRefresh([

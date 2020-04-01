@@ -82,11 +82,11 @@
                   </div>
                 </div>
               </div>
-              <div *ngIf="(yayRolls$ | async) !== undefined" class="row">
+              <div *ngIf="showRolls$ | async" class="row">
                 <div class="col-12 p-0 text-secondary">
                   {{ yayRolls$ | async }} ({{ yayRollsPercentage$ | async }}%) In Favor {{ nayRolls$ | async }} ({{
                     nayRollsPercentage$ | async
-                  }}%) Against {{ passRolls$ | async }} ({{ passRollsPercentage$ | async }}%) Pass
+                  }}%) Against {{ passRolls$ | async }} Pass
                 </div>
               </div>
             </div>
