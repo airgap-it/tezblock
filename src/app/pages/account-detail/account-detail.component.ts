@@ -539,7 +539,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   // TODO: this function should be introduced to every page with self navigation
-  // Also consider that actions.reset triggers selects 
+  // Also consider that actions.reset triggers selects
   private reset() {
     this.store$.dispatch(actions.reset())
     this.delegatedAccountAddress = undefined
@@ -549,7 +549,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
-    this.is_baker = false
+    // this.is_baker = false //commented out just so it compiles
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }
