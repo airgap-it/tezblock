@@ -549,7 +549,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
-    // this.is_baker = false //commented out just so it compiles
+    this.is_baker = false
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }
