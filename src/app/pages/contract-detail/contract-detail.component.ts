@@ -14,6 +14,7 @@ import { TokenContract, Social, SocialType, ContractOperation } from '@tezblock/
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -55,6 +56,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   current: string = 'copyGrey'
   tabs: Tab[]
   manager$: Observable<string>
+  conventer$: Observable<Conventer>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -126,6 +128,15 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
+    this.conventer$ = this.contract$.pipe(
+      map(contract => {
+        if (isNil(contract) || isNil(contract.decimals)) {
+          return null
+        }
+
+        return (amount: any) => (amount / Math.pow(10, contract.decimals)).toString()
+      })
+    )
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)

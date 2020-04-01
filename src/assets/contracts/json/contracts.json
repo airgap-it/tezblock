@@ -18,7 +18,8 @@
         "url": "https://medium.com/stakerdao"
       }
     ],
-    "tezosNetwork": ["mainnet"]
+    "tezosNetwork": ["mainnet"],
+    "decimals": 0
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "symbol": "TZBTC",
@@ -31,6 +32,7 @@
         "url": "http://www.tzbtc.io/"
       }
     ],
-    "tezosNetwork": ["mainnet"]
+    "tezosNetwork": ["mainnet"],
+    "decimals": 8
   }
 }

@@ -31,6 +31,7 @@ export interface TokenContract {
   socials: Social[]
   tezosNetwork?: TezosNetwork[]
   totalSupply?: string
+  decimals?: number
 }
 
 export interface ContractOperation extends IAirGapTransaction {
