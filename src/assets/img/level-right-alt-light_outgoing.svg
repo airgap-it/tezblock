@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="25px" height="12px" viewBox="0 0 25 12" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>level-right-alt-light</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M16.8699019,-2.4468926 L13.6305319,-5.4468926 C13.0849069,-5.95206448 12.2627569,-5.95206448 11.7171319,-5.4468926 L8.4777169,-2.4468926 C7.4965369,-1.53836135 8.1040369,0.174216771 9.4344169,0.174216771 L11.8638319,0.174216771 L11.8638319,16.4867168 L7.6338319,16.4867168 C7.49061363,16.4867032 7.35326016,16.5459741 7.2520069,16.6514824 C6.8258269,17.6666386 6.7731019,18.1742168 7.0938319,18.1742168 L12.4038319,18.1742168 C13.0003069,18.1742168 13.4838319,17.6705449 13.4838319,17.0492168 L13.4838319,0.174216771 L15.9132019,0.174216771 C17.2430419,0.174216771 17.8514419,-1.53803323 16.8699019,-2.4468926 Z M9.4338319,-1.32578323 L12.6738319,-4.32578323 L15.9138319,-1.32578323 L9.4338319,-1.32578323 Z" id="path-1"></path>
+    </defs>
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="content-/-transaction-large" transform="translate(-230.000000, -14.000000)">
+            <g id="level-right-alt-light" transform="translate(230.000000, 14.000000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <use id="Mask" fill="#000" fill-rule="nonzero" transform="translate(12.120531, 6.174223) rotate(90.000000) translate(-12.120531, -6.174223) " xlink:href="#path-1"></use>
+            </g>
+        </g>
+    </g>
+</svg>
