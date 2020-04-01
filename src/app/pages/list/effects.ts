@@ -244,21 +244,22 @@ export class ListEffects {
 
             return doubleBakings
           }),
-          switchMap(doubleBakings => {
-            const doubleBakingPromise: Promise<Transaction>[] = doubleBakings.map(doubleBaking => {
-              return this.rewardService.calculateRewards(doubleBaking.baker, doubleBaking.cycle).then(rewardsResponse => {
-                return { ...doubleBaking, reward: rewardsResponse.bakingRewards }
-              })
-            })
+          // switchMap(doubleBakings => {
+          //   const doubleBakingPromise: Promise<Transaction>[] = doubleBakings.map(doubleBaking => {
+          //     return this.rewardService.calculateRewards(doubleBaking.baker, doubleBaking.cycle).then(rewardsResponse => {
+          //       return { ...doubleBaking, reward: rewardsResponse.bakingRewards }
+          //     })
+          //   })
 
-            return Promise.all(doubleBakingPromise)
-          }),
+          //   return Promise.all(doubleBakingPromise)
+          // }),
           switchMap(doubleBakings => {
             const doubleBakingObservable: Observable<Transaction>[] = doubleBakings.map(doubleBaking => {
               return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level).pipe(
                 map(additionalData => {
                   return {
                     ...doubleBaking,
+                    reward: additionalData.bakerReward,
                     offender: additionalData.offender,
                     lostAmount: additionalData.lostAmount,
                     denouncedLevel: additionalData.denouncedBlockLevel
@@ -333,21 +334,22 @@ export class ListEffects {
 
             return doubleEndorsements
           }),
-          switchMap(doubleEndorsements => {
-            const doubleEndosementPromise: Promise<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
-              return this.rewardService.calculateRewards(doubleEndorsement.baker, doubleEndorsement.cycle).then(rewardsResponse => {
-                return { ...doubleEndorsement, reward: rewardsResponse.endorsingRewards }
-              })
-            })
+          // switchMap(doubleEndorsements => {
+          //   const doubleEndosementPromise: Promise<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
+          //     return this.rewardService.calculateRewards(doubleEndorsement.baker, doubleEndorsement.cycle).then(rewardsResponse => {
+          //       return { ...doubleEndorsement, reward: rewardsResponse.endorsingRewards }
+          //     })
+          //   })
 
-            return Promise.all(doubleEndosementPromise)
-          }),
+          //   return Promise.all(doubleEndosementPromise)
+          // }),
           switchMap(doubleEndorsements => {
             const doubleEndorsementObservable: Observable<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
               return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level).pipe(
                 map(additionalData => {
                   return {
                     ...doubleEndorsement,
+                    reward: additionalData.bakerReward,
                     offender: additionalData.offender,
                     lostAmount: additionalData.lostAmount,
                     denouncedLevel: additionalData.denouncedBlockLevel

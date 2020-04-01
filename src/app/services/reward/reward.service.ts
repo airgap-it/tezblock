@@ -13,6 +13,7 @@ export interface DoubleEvidence {
   lostAmount: string
   denouncedBlockLevel: number
   offender: string
+  bakerReward: string
 }
 
 @Injectable({
@@ -110,14 +111,33 @@ export class RewardService {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
         const denouncedBlockLevel = response.operations[2][0].contents[0].bh1.level
-        const lostAmount: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'rewards'
-        ).change
+
+        const depositsArray = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'deposits'
+        )
+
+        let totalLostAmount = 0
+        response.operations[2][0].contents[0].metadata.balance_updates.forEach(balanceUpdate => {
+          if (balanceUpdate.category === 'rewards' && balanceUpdate.delegate === depositsArray.delegate) {
+            totalLostAmount += Number(balanceUpdate.change)
+          }
+        })
+
+        const deposits = Number(depositsArray.change)
+        const bakerReward = (deposits / -2).toString()
+
+        totalLostAmount += deposits
+
         const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'rewards'
+          balanceArray => balanceArray.category === 'deposits'
         ).delegate
 
-        return { lostAmount: lostAmount, denouncedBlockLevel: denouncedBlockLevel, offender: offender }
+        return {
+          lostAmount: totalLostAmount.toString(),
+          denouncedBlockLevel: denouncedBlockLevel,
+          offender: offender,
+          bakerReward: bakerReward
+        }
       })
     )
   }
@@ -125,15 +145,34 @@ export class RewardService {
   getDoubleEndorsingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
-        const denouncedBlockLevel = response.operations[2][0].contents[0].op1.operations.level
-        const lostAmount: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'rewards'
-        ).change
+        const denouncedBlockLevel = response.operations[2][0].contents[0].op2.operations.level
+
+        const depositsArray = response.operations[2][0].contents[0].metadata.balance_updates.find(
+          balanceArray => balanceArray.category === 'deposits'
+        )
+
+        let totalLostAmount = 0
+        response.operations[2][0].contents[0].metadata.balance_updates.forEach(balanceUpdate => {
+          if (balanceUpdate.category === 'rewards' && balanceUpdate.delegate === depositsArray.delegate) {
+            totalLostAmount += Number(balanceUpdate.change)
+          }
+        })
+
+        const deposits = Number(depositsArray.change)
+        const bakerReward = (deposits / -2).toString()
+
+        totalLostAmount += deposits
+
         const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'rewards'
+          balanceArray => balanceArray.category === 'deposits'
         ).delegate
 
-        return { lostAmount: lostAmount, denouncedBlockLevel: denouncedBlockLevel, offender: offender }
+        return {
+          lostAmount: totalLostAmount.toString(),
+          denouncedBlockLevel: denouncedBlockLevel,
+          offender: offender,
+          bakerReward: bakerReward
+        }
       })
     )
   }
