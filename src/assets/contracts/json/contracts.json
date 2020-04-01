@@ -19,5 +19,18 @@
       }
     ],
     "tezosNetwork": ["mainnet"]
+  },
+  "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
+    "symbol": "TZBTC",
+    "name": "TZBTC",
+    "website": "http://www.tzbtc.io/",
+    "description": "TZBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "http://www.tzbtc.io/"
+      }
+    ],
+    "tezosNetwork": ["mainnet"]
   }
 }
