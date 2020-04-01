@@ -8,9 +8,6 @@ import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { HttpClient } from '@angular/common/http'
 import { Pagination } from '@tezblock/domain/table'
 import { Reward } from '@tezblock/domain/reward'
-export interface ExpTezosRewards extends TezosRewards {
-  payouts: Payout[]
-}
 
 export interface DoubleEvidence {
   lostAmount: string
