@@ -22,10 +22,10 @@
     "decimals": 0
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
-    "symbol": "TZBTC",
-    "name": "TZBTC",
+    "symbol": "tzBTC",
+    "name": "tzBTC",
     "website": "http://www.tzbtc.io/",
-    "description": "TZBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
+    "description": "tzBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
     "socials": [
       {
         "type": "website",
