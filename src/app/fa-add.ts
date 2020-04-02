@@ -33,7 +33,10 @@ import {
   faGraduationCap,
   faCircle,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faThumbsUp,
+  faThumbsDown,
+  faHandRock
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -76,6 +79,9 @@ export const addFontAwesome = () => {
     faGraduationCap,
     faCircle,
     faChevronLeft,
-    faChevronRight
+    faChevronRight,
+    faThumbsUp,
+    faThumbsDown,
+    faHandRock
   )
 }
