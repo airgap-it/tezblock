@@ -54,8 +54,12 @@ export class IdenticonComponent implements OnInit {
       return
     }
 
-    if (accounts.hasOwnProperty(value) && accounts[value].hasLogo && !this.displayIdenticonNotLogo) {
-      this.identicon = `assets/bakers/img/${value}.png`
+    const displayLogo: boolean = accounts.hasOwnProperty(value) && accounts[value].hasLogo && !this.displayIdenticonNotLogo
+
+    if (displayLogo) {
+      const logoReference = accounts[value].logoReference || value
+
+      this.identicon = `assets/bakers/img/${logoReference}.png`
     } else {
       if (value.startsWith('ak_')) {
         this.identicon = createIcon({ seed: value }).toDataURL()

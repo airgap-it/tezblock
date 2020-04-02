@@ -88,12 +88,14 @@
   },
   "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ": {
     "alias": "AirGap",
+    "accountType": "baker",
     "hasLogo": true,
     "hasPayoutAddress": "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9"
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
     "alias": "AirGap Payout KT",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ"
   },
   "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9": {
     "alias": "AirGap Payout",
