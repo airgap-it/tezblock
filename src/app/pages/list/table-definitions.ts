@@ -413,10 +413,10 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       template: Template.address,
       data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
     },
-    {
-      name: 'Symbol',
-      field: 'symbol'
-    },
+    // {
+    //   name: 'Symbol',
+    //   field: 'symbol'
+    // },
     {
       name: 'Total Supply',
       field: 'totalSupply',
