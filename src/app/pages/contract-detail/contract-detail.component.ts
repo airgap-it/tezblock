@@ -10,7 +10,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
+import { getConventer, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
@@ -128,15 +128,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
-    this.conventer$ = this.contract$.pipe(
-      map(contract => {
-        if (isNil(contract) || isNil(contract.decimals)) {
-          return null
-        }
-
-        return (amount: any) => (amount / Math.pow(10, contract.decimals)).toString()
-      })
-    )
+    this.conventer$ = this.contract$.pipe(map(getConventer))
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
@@ -205,7 +197,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns.transfers({ pageId, showFiatValue, symbol }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Other Calls',
@@ -214,7 +208,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns.other({ pageId, showFiatValue, symbol }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
   }

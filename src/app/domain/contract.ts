@@ -6,6 +6,7 @@ import { Data } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get } from '@tezblock/services/fp'
+import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -115,4 +116,12 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
       .data.filter(tokenContract => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
       .concat(tokenContractByAddress ? [tokenContractByAddress] : [])
   )
+}
+
+export const getConventer = (contract: TokenContract): Conventer => {
+  if (isNil(contract) || isNil(contract.decimals)) {
+    return null
+  }
+
+  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toString()
 }
