@@ -93,7 +93,8 @@
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
     "alias": "AirGap Payout KT",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ"
   },
   "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9": {
     "alias": "AirGap Payout",
@@ -791,7 +792,8 @@
   },
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "alias": "Staker",
-    "hasLogo": true
+    "hasLogo": true,
+    "accountType": "contract"
   },
   "tz1WcCGBxxPq61ddkp8X7vYMrWsBFMCxe5RD": {
     "alias": "FightCovid",
