@@ -13,7 +13,6 @@ const accounts = require('../../../assets/bakers/json/accounts.json')
 export class IdenticonComponent implements OnInit {
   hasBakerIcon: boolean = false
   bakerIconUrl: string = ''
-  displayIdenticonNotLogo: boolean = false
 
   identicon: string = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // transparent
 
@@ -22,14 +21,21 @@ export class IdenticonComponent implements OnInit {
 
   @Input()
   set forceIdenticon(value: boolean) {
-    this.displayIdenticonNotLogo = value
+    if (value !== this._forceIdenticon) {
+      this._forceIdenticon = value
+      this.setIdenticon()
+    }
   }
+  get forceIdenticon(): boolean {
+    return this._forceIdenticon
+  }
+  private _forceIdenticon: boolean = false
 
   @Input()
   set address(value: string) {
     if (value !== this._address) {
       this._address = value
-      this.setIdenticon(value)
+      this.setIdenticon()
     }
   }
   get address(): string {
@@ -49,20 +55,22 @@ export class IdenticonComponent implements OnInit {
     return rv.toString(16)
   }
 
-  private setIdenticon(value: string) {
-    if (!value) {
+  private setIdenticon() {
+    const address = this.address
+
+    if (!address) {
       return
     }
 
-    if (accounts.hasOwnProperty(value) && accounts[value].hasLogo && !this.displayIdenticonNotLogo) {
-      this.identicon = `assets/bakers/img/${value}.png`
+    if (accounts.hasOwnProperty(address) && accounts[address].hasLogo && !this._forceIdenticon) {
+      this.identicon = `assets/bakers/img/${address}.png`
     } else {
-      if (value.startsWith('ak_')) {
-        this.identicon = createIcon({ seed: value }).toDataURL()
-      } else if (value.startsWith('tz') || value.startsWith('kt')) {
-        this.identicon = createIcon({ seed: `0${this.b582int(value)}`, spotcolor: '#000' }).toDataURL()
+      if (address.startsWith('ak_')) {
+        this.identicon = createIcon({ seed: address }).toDataURL()
+      } else if (address.startsWith('tz') || address.startsWith('kt')) {
+        this.identicon = createIcon({ seed: `0${this.b582int(address)}`, spotcolor: '#000' }).toDataURL()
       } else {
-        this.identicon = toDataUrl(value)
+        this.identicon = toDataUrl(address)
       }
     }
   }
