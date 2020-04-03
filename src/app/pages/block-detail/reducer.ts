@@ -103,14 +103,6 @@ export const reducer = createReducer(
     orderBy
   })),
   on(actions.reset, () => initialState),
-  on(actions.increaseBlock, state => ({
-    ...state,
-    id: (Number(state.id) + 1).toString()
-  })),
-  on(actions.decreaseBlock, state => ({
-    ...state,
-    id: (Number(state.id) - 1).toString()
-  })),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
     transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)

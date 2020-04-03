@@ -147,6 +147,10 @@ export const reducer = createReducer(
     delegatedAccounts: accounts.delegated,
     relatedAccounts: accounts.related
   })),
+  on(actions.loadDelegatedAccountsFailed, state => ({
+    ...state,
+    delegatedAccounts: null
+  })),
   on(actions.loadRewardAmont, state => ({
     ...state,
     busy: {

@@ -1,0 +1,16 @@
+::ng-deep app-proposal-detail {
+  /* TODO: find better fix so that tooltips are not cut off when collapse is shown */
+  .collapse.show {
+    overflow: visible !important;
+  }
+  .rounded-circle {
+    font-size: 0.6rem;
+  }
+
+  .btn--rotated fa-icon svg {
+    transform: rotate(-180deg);
+  }
+  fa-icon svg {
+    transition: 0.5s ease-in-out;
+  }
+}

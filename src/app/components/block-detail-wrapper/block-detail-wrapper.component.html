@@ -12,19 +12,19 @@
       </p>
     </div>
 
-    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      {{ block.level }}
-      <ng-container *ngIf="confirmations$ | async as confirmations">
+    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      {{ wrapperBlock.level }}
+      <ng-container *ngIf="confirmations">
         <span *ngIf="confirmations >= 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
       </ng-container>
-      <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel('backward')">
+      <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel(-1)">
         <fa-icon [icon]="'chevronLeft' | iconPipe" class="text-secondary"></fa-icon>
       </button>
-      <ng-container *ngIf="latestBlock$ | async as latestBlock">
+      <ng-container *ngIf="latestBlock">
         <button
-          *ngIf="latestBlock.level > block.level"
+          *ngIf="latestBlock.level > wrapperBlock.level"
           class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
-          (click)="changeBlockLevel('forward')"
+          (click)="changeBlockLevel(1)"
         >
           <fa-icon [icon]="'chevronRight' | iconPipe" class="text-secondary"></fa-icon>
         </button>
@@ -42,8 +42,8 @@
         <tooltip-item [title]="'Baker'" [tooltip]="'A Baker takes part in the validation of the network.'"></tooltip-item>
       </p>
     </div>
-    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-      <address-item [address]="block.baker" ng-href="#here"></address-item>
+    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <address-item [address]="wrapperBlock.baker"></address-item>
     </div>
   </div>
   <div class="row mb-3">
@@ -52,10 +52,10 @@
         <tooltip-item [title]="'Timestamp'" [tooltip]="'The date an time at which a block was created.'"></tooltip-item>
       </p>
     </div>
-    <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
+    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
       <p class="mb-0">
-        {{ block.timestamp | amTimeAgo }}
-        <span class="text-secondary">({{ block.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
+        {{ wrapperBlock.timestamp | amTimeAgo }}
+        <span class="text-secondary">({{ wrapperBlock.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
       </p>
     </div>
   </div>
@@ -65,7 +65,7 @@
         <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in transactions for this block.'"></tooltip-item>
       </p>
     </div>
-    <ng-container *ngIf="amountFromBlockVolume$ | async as amountFromBlockVolume; else loadingTemplate">
+    <ng-container *ngIf="amountFromBlockVolume; else loadingTemplate">
       <div class=" col-md-9">
         <amount-cell [data]="amountFromBlockVolume"></amount-cell>
       </div>
@@ -80,7 +80,7 @@
         ></tooltip-item>
       </p>
     </div>
-    <ng-container *ngIf="amountFromBlockFee$ | async as amountFromBlockFee; else loadingTemplate">
+    <ng-container *ngIf="amountFromBlockFee; else loadingTemplate">
       <div class=" col-md-9">
         <amount-cell [data]="amountFromBlockFee"></amount-cell>
       </div>
@@ -113,10 +113,10 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="blockLoading$ | async; then loadingTemplate; else loaded"></ng-container>
+      <ng-container *ngIf="blockLoading; then loadingTemplate; else loaded"></ng-container>
       <ng-template #loaded>
         <div class=" col-md-9">
-          <p class="mb-0">{{ endorsements$ | async }}</p>
+          <p class="mb-0">{{ endorsements }}</p>
         </div>
       </ng-template>
     </div>
@@ -131,8 +131,8 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.meta_cycle }}</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.meta_cycle }}</p>
       </div>
     </div>
     <div class="row mb-3">
@@ -141,24 +141,24 @@
           <tooltip-item [title]="'Cycle Position'" [tooltip]="'The position in number of blocks out of 4095 blocks.'"></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.meta_cycle_position }} of 4095</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.meta_cycle_position }} of 4095</p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">Block Hash</p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.hash }}</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.hash }}</p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">Signature</p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.signature }}</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.signature }}</p>
       </div>
     </div>
     <div class="row mb-3">
@@ -172,8 +172,8 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.fitness }}</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.fitness }}</p>
       </div>
     </div>
     <div class="row mb-3">
@@ -185,8 +185,8 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock$ | async as block; else loadingTemplate">
-        <p class="mb-0">{{ block.protocol }}</p>
+      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">{{ wrapperBlock.protocol }}</p>
       </div>
     </div>
   </div>

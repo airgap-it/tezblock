@@ -75,6 +75,30 @@
               </div>
             </div>
           </div>
+
+          <div *ngIf="proposal.description" class="row">
+            <div class="col-md-12">
+              <button
+                type="button"
+                class="btn btn-link p-0 collapse--btn"
+                (click)="isCollapsed = !isCollapsed"
+                [attr.aria-expanded]="!isCollapsed"
+                aria-controls="collapseBasic"
+                [ngClass]="{ 'btn--rotated': !isCollapsed }"
+              >
+                <span>{{ isCollapsed ? 'More Proposal' : 'Less Proposal' }}</span>
+                Details
+                <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+              </button>
+              <div
+                [innerHtml]="proposal.description | safeHtml"
+                id="collapseBasic"
+                [collapse]="isCollapsed"
+                [isAnimated]="true"
+                class="description mt-3"
+              ></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -109,7 +133,9 @@
                 </div>
               </ng-container>
               <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
-                <div class="pl-0 pl-md-3 py-3">{{ periodKind$ | async }} period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}</div>
+                <div class="pl-0 pl-md-3 py-3">
+                  {{ periodKind$ | async }} period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}
+                </div>
               </ng-container>
             </ng-container>
           </tabbed-table>

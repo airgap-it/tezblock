@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core'
 import * as store from '@ngrx/store'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
-import { NewTransactionService } from '../transaction/new-transaction.service'
+import { TransactionService } from '../transaction/transaction.service'
 import { Router } from '@angular/router'
 import { ToastrService } from 'ngx-toastr'
 
@@ -14,7 +14,7 @@ export class DownloadService {
   constructor(
     private readonly store$: store.Store<fromRoot.State>,
     private readonly apiService: ApiService,
-    private readonly newTransactionService: NewTransactionService,
+    private readonly newTransactionService: TransactionService,
     private readonly router: Router,
     private readonly toastrService: ToastrService
   ) {}

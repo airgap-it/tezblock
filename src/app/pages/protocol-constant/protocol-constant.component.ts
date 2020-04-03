@@ -70,8 +70,8 @@ export class ProtocolConstantComponent implements OnInit {
   ngOnInit() {}
 
   public getData() {
-    this.blockService.getLatest(1).subscribe((blocks: Block[]) => {
-      const blockId = blocks[0].level
+    this.blockService.getLatest().subscribe((block: Block) => {
+      const blockId = block.level
 
       return new Promise(resolve => {
         this.http
@@ -93,6 +93,7 @@ export class ProtocolConstantComponent implements OnInit {
               resolve({ status: 'error' })
             }
           })
+
         this.http
           .get(`${this.rpcUrl}/chains/main/blocks/${blockId}/minimal_valid_time?[priority=0]&[endorsing_power=32]`)
           .subscribe((response: any) => {

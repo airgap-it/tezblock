@@ -16,7 +16,7 @@
 
           <div class="pt-2 d-none d-sm-block" *ngIf="!isMinimized">
             <span class="badge badge-pill badge-light">
-              Cycle {{ currentCycle | async }}: {{ cycleProgress | async }}% {{ remainingTime | async }}
+              Cycle {{ currentCycle$ | async }}: {{ cycleProgress$ | async }}% {{ remainingTime$ | async }}
             </span>
           </div>
         </div>
@@ -246,13 +246,6 @@
                         (click)="changeNetwork(networks.MAINNET); dp3.hide()"
                       >
                         mainnet
-                      </a>
-                      <a
-                        class="dropdown-item"
-                        [ngClass]="selectedNetwork === networks.BABYLONNET ? 'active' : ''"
-                        (click)="changeNetwork(networks.BABYLONNET); dp3.hide()"
-                      >
-                        babylonnet
                       </a>
                       <a
                         class="dropdown-item"

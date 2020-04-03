@@ -5,28 +5,38 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
 import { first } from '@tezblock/services/fp'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Block } from '@tezblock/interfaces/Block'
 
 interface Busy {
-    contracts: boolean
-    proposal: boolean
-    currentPeriodTimespan: boolean
+  blocks: boolean
+  contracts: boolean
+  proposal: boolean
+  currentPeriodTimespan: boolean
+  transactions: boolean
 }
 
 export interface State {
-  contracts: TokenContract[],
-  proposal: ProposalListDto,
-  currentPeriodTimespan: PeriodTimespan,
+  blocks: Block[]
+  contracts: TokenContract[]
+  proposal: ProposalListDto
+  transactions: Transaction[]
+  currentPeriodTimespan: PeriodTimespan
   busy: Busy
 }
 
 const initialState: State = {
+  blocks: undefined,
   contracts: undefined,
   proposal: undefined,
   currentPeriodTimespan: undefined,
+  transactions: undefined,
   busy: {
-      contracts: false,
-      proposal: false,
-      currentPeriodTimespan: false
+    blocks: false,
+    contracts: false,
+    proposal: false,
+    currentPeriodTimespan: false,
+    transactions: false
   }
 }
 
@@ -36,23 +46,23 @@ export const reducer = createReducer(
   on(actions.loadContracts, state => ({
     ...state,
     busy: {
-        ...state.busy,
-        contracts: true
+      ...state.busy,
+      contracts: true
     }
   })),
   on(actions.loadContractsSucceeded, (state, { contracts }) => ({
     ...state,
     contracts,
     busy: {
-        ...state.busy,
-        contracts: false
+      ...state.busy,
+      contracts: false
     }
   })),
   on(actions.loadContractsFailed, state => ({
     ...state,
     busy: {
-        ...state.busy,
-        contracts: false
+      ...state.busy,
+      contracts: false
     }
   })),
   on(actions.loadLatestProposal, state => ({
@@ -77,7 +87,6 @@ export const reducer = createReducer(
       proposal: false
     }
   })),
-
   on(actions.loadCurrentPeriodTimespan, state => ({
     ...state,
     busy: {
@@ -100,10 +109,51 @@ export const reducer = createReducer(
       currentPeriodTimespan: false
     }
   })),
-
+  on(actions.loadTransactions, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      transactions: true
+    }
+  })),
+  on(actions.loadTransactionsSucceeded, (state, { transactions }) => ({
+    ...state,
+    transactions,
+    busy: {
+      ...state.busy,
+      transactions: false
+    }
+  })),
+  on(actions.loadTransactionsFailed, state => ({
+    ...state,
+    transactions: null,
+    busy: {
+      ...state.busy,
+      transactions: false
+    }
+  })),
+  on(actions.loadBlocks, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      blocks: true
+    }
+  })),
+  on(actions.loadBlocksSucceeded, (state, { blocks }) => ({
+    ...state,
+    blocks,
+    busy: {
+      ...state.busy,
+      blocks: false
+    }
+  })),
+  on(actions.loadBlocksFailed, state => ({
+    ...state,
+    blocks: null,
+    busy: {
+      ...state.busy,
+      blocks: false
+    }
+  })),
   on(actions.reset, () => initialState)
 )
-
-// TODO: merge with:
-// feat/proposal-detail--introduce-time-concept
-// feat/dashboard--last-fa-1.2-contract-transactions

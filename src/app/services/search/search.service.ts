@@ -6,10 +6,11 @@ import { StorageMap } from '@ngx-pwa/local-storage'
 import { negate, isNil } from 'lodash'
 
 import { ApiService } from './../api/api.service'
-import { BlockService } from '../blocks/blocks.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { getTokenContractByAddress } from '@tezblock/domain/contract'
+import { getTokenContractBy } from '@tezblock/domain/contract'
+import { SearchOptionType } from './model'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
@@ -19,14 +20,14 @@ const previousSearchesKey = 'previousSearches'
 })
 export class SearchService {
   constructor(
-    private readonly blockService: BlockService,
     private readonly apiService: ApiService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router,
     private readonly storage: StorageMap
   ) {}
 
-  // TODO: Very hacky, we need to do that better once we know if we build our own API endpoint or conseil will add something.
-  public search(searchTerm: string): Observable<boolean> {
+  // TODO: now contract is looked first, is it OK (what if searchTerm matches account and contract ?)
+  processSearchSelection(searchTerm: string, type?: string): Observable<boolean> {
     const subscriptions: Subscription[] = []
     const unsubscribe = () => subscriptions.forEach(subscription => subscription.unsubscribe())
     const trimmedSearchTerm = searchTerm.trim()
@@ -68,30 +69,18 @@ export class SearchService {
     }
 
     // TODO: implement full search by contract
-    const contract = getTokenContractByAddress(_searchTerm)
-    if (contract) {
-      processResult([contract], () => {
-        this.router.navigateByUrl('/contract/' + _searchTerm)
-      })
+    const contract = getTokenContractBy(trimmedSearchTerm, this.chainNetworkService.getNetwork())
+    if (contract && (!type || type === SearchOptionType.faContract)) {
+      processResult([contract], () => this.router.navigateByUrl('/contract/' + contract.id))
     } else {
       subscriptions.push(
         this.apiService
           .getAccountById(_searchTerm)
-          .pipe(
-            map(first),
-            filter(negate(isNil))
-          )
-          .subscribe(account =>
-            processResult(account, () => {
-              this.router.navigateByUrl('/account/' + _searchTerm)
-            })
-          ),
+          .pipe(map(first), filter(negate(isNil)))
+          .subscribe(account => processResult(account, () => this.router.navigateByUrl('/account/' + _searchTerm))),
         this.apiService
           .getTransactionsById(_searchTerm, 1)
-          .pipe(
-            map(first),
-            filter(negate(isNil))
-          )
+          .pipe(map(first), filter(negate(isNil)))
           .subscribe(transaction =>
             processResult(transaction, (transaction: Transaction) => {
               if (transaction.kind === 'endorsement') {
@@ -103,16 +92,9 @@ export class SearchService {
               this.router.navigateByUrl('/transaction/' + _searchTerm)
             })
           ),
-        merge(this.blockService.getByHash(_searchTerm), this.blockService.getById(_searchTerm))
-          .pipe(
-            map(first),
-            filter(negate(isNil))
-          )
-          .subscribe(block =>
-            processResult(block, () => {
-              this.router.navigateByUrl('/block/' + block.level)
-            })
-          )
+        merge(this.apiService.getBlockByHash(_searchTerm), this.apiService.getBlockById(_searchTerm))
+          .pipe(map(first), filter(negate(isNil)))
+          .subscribe(block => processResult(block, () => this.router.navigateByUrl('/block/' + block.level)))
       )
     }
 

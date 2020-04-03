@@ -6,10 +6,12 @@ import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState, Pagination } from '@tezblock/domain/table'
+import { Reward } from '@tezblock/domain/reward'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
   upcomingRights: boolean
+  activeDelegations: boolean
 }
 
 export interface State {
@@ -17,10 +19,12 @@ export interface State {
   currentCycle: number
   bakingRights: TableState<AggregatedBakingRights>
   endorsingRights: TableState<AggregatedEndorsingRights>
-  kind: string,
-  efficiencyLast10Cycles: number,
-  busy: Busy,
+  kind: string
+  efficiencyLast10Cycles: number
+  busy: Busy
   upcomingRights: actions.UpcomingRights
+  activeDelegations: number
+  rewards: TableState<Reward>
 }
 
 const initialState: State = {
@@ -32,9 +36,12 @@ const initialState: State = {
   efficiencyLast10Cycles: undefined,
   busy: {
     efficiencyLast10Cycles: false,
-    upcomingRights: false
+    upcomingRights: false,
+    activeDelegations: false
   },
-  upcomingRights: undefined
+  upcomingRights: undefined,
+  activeDelegations: undefined,
+  rewards: getInitialTableState(undefined, 3)
 }
 
 const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
@@ -191,6 +198,60 @@ export const reducer = createReducer(
     busy: {
       ...state.busy,
       upcomingRights: false
+    }
+  })),
+  on(actions.loadActiveDelegations, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      activeDelegations: true
+    }
+  })),
+  on(actions.loadActiveDelegationsSucceeded, (state, { activeDelegations }) => ({
+    ...state,
+    activeDelegations,
+    busy: {
+      ...state.busy,
+      activeDelegations: false
+    }
+  })),
+  on(actions.loadActiveDelegationsFailed, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      activeDelegations: false
+    }
+  })),
+  on(actions.loadRewards, state => ({
+    ...state,
+    rewards: {
+      ...state.rewards,
+      loading: true
+    }
+  })),
+  on(actions.loadRewardsSucceeded, (state, { rewards }) => ({
+    ...state,
+    rewards: {
+      ...state.rewards,
+      data: rewards,
+      loading: false
+    }
+  })),
+  on(actions.loadRewardsFailed, state => ({
+    ...state,
+    rewards: {
+      ...state.rewards,
+      loading: true
+    }
+  })),
+  on(actions.increaseRewardsPageSize, state => ({
+    ...state,
+    rewards: {
+      ...state.rewards,
+      pagination: {
+        ...state.rewards.pagination,
+        currentPage: state.rewards.pagination.currentPage + 1
+      }
     }
   })),
   on(actions.reset, () => initialState)
