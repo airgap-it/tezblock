@@ -482,15 +482,16 @@ export class ApiService {
   }
 
   getAccountsStartingWith(id: string): Observable<SearchOption[]> {
-    const result: SearchOption[] = []
+    const bakers: SearchOption[] = Object.keys(accounts)
+      .map(key => accounts[key])
+      .filter(
+        account =>
+          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
+          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
+      )
+      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
 
-    Object.keys(accounts).forEach(account => {
-      if (accounts[account] && accounts[account].alias && accounts[account].alias.toLowerCase().startsWith(id.toLowerCase())) {
-        result.push({ name: accounts[account].alias, type: SearchOptionType.baker })
-      }
-    })
-
-    if (result.length === 0) {
+    if (bakers.length === 0) {
       return this.http
         .post<Account[]>(
           this.accountsApiUrl,
@@ -509,15 +510,23 @@ export class ApiService {
           this.options
         )
         .pipe(
-          map(accounts =>
-            accounts.map(account => {
-              return { name: account.account_id, type: SearchOptionType.account }
-            })
+          map(_accounts =>
+            _accounts
+              .filter(account => {
+                const isContract = Object.keys(accounts)
+                  .map(key => ({ ...accounts[key], id: key }))
+                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
+
+                return !isContract
+              })
+              .map(account => {
+                return { name: account.account_id, type: SearchOptionType.account }
+              })
           )
         )
     }
 
-    return of(result)
+    return of(bakers)
   }
 
   getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
