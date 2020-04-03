@@ -38,6 +38,8 @@ export interface TokenContract {
 export interface ContractOperation extends IAirGapTransaction {
   singleFrom: string
   singleTo: string
+  symbol?: string
+  decimals?: number
 }
 
 const networkCondition = (tezosNetwork: TezosNetwork) => (tokenContract: TokenContract): boolean => {
@@ -118,7 +120,7 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
   )
 }
 
-export const getConventer = (contract: TokenContract): Conventer => {
+export const getConventer = (contract: { decimals?: number }): Conventer => {
   if (isNil(contract) || isNil(contract.decimals)) {
     return null
   }
