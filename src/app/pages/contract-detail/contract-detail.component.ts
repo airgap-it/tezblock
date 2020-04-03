@@ -133,7 +133,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol)),
+        .subscribe(([address, contract]) => this.setTabs(address, contract)),
       combineLatest(
         this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
         this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
@@ -186,7 +186,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
   }
 
-  private setTabs(pageId: string, symbol: string) {
+  private setTabs(pageId: string, contract: TokenContract) {
     const showFiatValue = this.isMainnet
 
     this.tabs = [
@@ -196,7 +196,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.transfers,
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol }),
+        columns: columns.transfers({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
         disabled: function() {
           return !this.count
         }
@@ -207,7 +207,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.other,
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol }),
+        columns: columns.other({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
         disabled: function() {
           return !this.count
         }

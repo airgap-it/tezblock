@@ -123,5 +123,8 @@ export const getConventer = (contract: TokenContract): Conventer => {
     return null
   }
 
-  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toString()
+  // https://stackoverflow.com/questions/3612744/remove-insignificant-trailing-zeros-from-a-number
+  const noInsignificantTrailingZeros = /([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/
+
+  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros,'$1')
 }
