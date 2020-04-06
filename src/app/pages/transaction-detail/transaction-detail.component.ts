@@ -67,7 +67,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     // this.totalFee$ = this.store$.select(state => state.transactionDetails.totalFee)
     this.isInvalidHash$ = this.store$
       .select(state => state.transactionDetails.transactions.data)
-      .pipe(map(transactions => transactions === null || (Array.isArray(transactions) && transactions.length === 0)))
+      .pipe(map(transactions => transactions === null))
     this.orderBy$ = this.store$.select(state => state.transactionDetails.transactions.orderBy)
 
     // Update the active "tab" of the table
