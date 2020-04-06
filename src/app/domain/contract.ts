@@ -6,6 +6,7 @@ import { Data } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get } from '@tezblock/services/fp'
+import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -31,11 +32,14 @@ export interface TokenContract {
   socials: Social[]
   tezosNetwork?: TezosNetwork[]
   totalSupply?: string
+  decimals?: number
 }
 
 export interface ContractOperation extends IAirGapTransaction {
   singleFrom: string
   singleTo: string
+  symbol?: string
+  decimals?: number
 }
 
 const networkCondition = (tezosNetwork: TezosNetwork) => (tokenContract: TokenContract): boolean => {
@@ -114,4 +118,15 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
       .data.filter(tokenContract => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
       .concat(tokenContractByAddress ? [tokenContractByAddress] : [])
   )
+}
+
+export const getConventer = (contract: { decimals?: number }): Conventer => {
+  if (isNil(contract) || isNil(contract.decimals)) {
+    return null
+  }
+
+  // https://stackoverflow.com/questions/3612744/remove-insignificant-trailing-zeros-from-a-number
+  const noInsignificantTrailingZeros = /([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/
+
+  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros,'$1')
 }
