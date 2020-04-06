@@ -48,6 +48,10 @@ export class BlockService {
   }
 
   private getAdditionalBlockData(blocks: Block[], limit: number, fields?: string[]): Observable<Block[]> {
+    if (!blocks || blocks.length === 0) {
+      return of([])
+    }
+
     const blockRange = blocks.map(blocksList => blocksList.level)
     const isField = (fieldName: string): boolean => fields && fields.some(field => field === fieldName)
     const getAmounts = isField('volume')
