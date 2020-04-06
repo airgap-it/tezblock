@@ -49,6 +49,12 @@ export const columns: {
       sortable: true
     },
     {
+      name: 'Block',
+      field: 'blockHeight',
+      template: Template.block,
+      sortable: true
+    },
+    {
       name: 'Tx Hash',
       field: 'hash',
       template: Template.hash
@@ -95,6 +101,12 @@ export const columns: {
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
+      sortable: true
+    },
+    {
+      name: 'Block',
+      field: 'block_level',
+      template: Template.block,
       sortable: true
     },
     {
