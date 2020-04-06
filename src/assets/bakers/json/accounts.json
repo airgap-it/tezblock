@@ -6,7 +6,9 @@
   },
   "tz1TqU5hwh6CtC8Ps5GYBi7YyawvtKLNCbvQ": {
     "alias": "ATEZA Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1ZcTRk5uxD86EFEn1vvNffWWqJy7q5eVhc",
+    "accountType": "account"
   },
   "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j": {
     "alias": "XTZ Master",
@@ -15,7 +17,9 @@
   },
   "tz1XTZM55hF7g98CzY88MXWhmK8QioGXHtuY": {
     "alias": "XTZ Master Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1KfEsrtDaA1sX7vdM4qmEPWuSytuqCDp5j",
+    "accountType": "account"
   },
   "tz1KtvGSYU5hdKD288a1koTBURWYuADJGrLE": {
     "alias": "Ø Crypto Pool",
@@ -43,7 +47,9 @@
   },
   "tz1YrmJw6Lje27gWqZ94gU9mNavEjkHu1xGc": {
     "alias": "TezosTeam Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1LLNkQK4UQV6QcFShiXJ2vT2ELw449MzAA",
+    "accountType": "account"
   },
   "tz1Lc87p6zRaDwzJs9kHvdpm7XzeWE8QTwVB": {
     "alias": "Dash Master",
@@ -56,11 +62,15 @@
   },
   "KT1JjzGWesNFaHv9iyBwLBzLyTpTZ3HeBf7o": {
     "alias": "PayTezos Payouts KT",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC",
+    "accountType": "account"
   },
   "tz1c9HEyZdAWXZCLE7h3KcZCyykjZr7VY3QM": {
     "alias": "PayTezos Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC",
+    "accountType": "account"
   },
   "tz1LesY3S4wfe15SNm1W3qJmQzWxLqVjTruH": {
     "alias": "Xtez",
@@ -68,7 +78,7 @@
   },
   "tz1Lh9jeLSWDHYy8AshvG2dpNQseDaHg7cms": {
     "alias": "TezosSpanish",
-    "hasLogo": false
+    "hasLogo": true
   },
   "tz1Lhf4J9Qxoe3DZ2nfe8FGDnvVj7oKjnMY6": {
     "alias": "Tez Baker",
@@ -93,11 +103,15 @@
   },
   "KT1Vp4KUG1n1HrFEDxUNvNskwc1Msh7NRbhd": {
     "alias": "AirGap Payout KT",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ",
+    "accountType": "account"
   },
   "tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9": {
     "alias": "AirGap Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1MJx9vhaNRSimcuXPK2rW4fLccQnDAnVKJ",
+    "accountType": "account"
   },
   "tz1MQJPGNMijnXnVoBENFz9rUhaPt3S7rWoz": {
     "alias": "Tezmania",
@@ -299,7 +313,9 @@
   },
   "tz1MR42UxXgFmxsP4iVEF8e8a7q17TPLicpt": {
     "alias": "Tezetetic Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1VceyYUpq1gk5dtp6jXQRtCtY8hm5DKt72",
+    "accountType": "account"
   },
   "tz1Vd1rXpV8hTHbFXCXN3c3qzCsgcU5BZw1e": {
     "alias": "Tz Node",
@@ -348,7 +364,9 @@
   },
   "tz1acsihTQWHEnxxNz7EEsBDLMTztoZQE9SW": {
     "alias": "Happy Tezos Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1WCd2jm4uSt4vntk4vSuUWoZQGhLcDuR9q",
+    "accountType": "account"
   },
   "tz1WJpSCYdQE9merfftanA8eFsqUPTpwAt8a": {
     "alias": "Tezos China",
@@ -505,7 +523,9 @@
   },
   "tz1Kn5Dyir12f7NafEztgooypotBkE92mKDr": {
     "alias": "Tezos Hot Bakery Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1bLwpPfr3xqy1gWBF4sGvv8bLJyPHR11kx",
+    "accountType": "account"
   },
   "tz1bakeKFwqmtLBzghw8CFnqFvRxLj849Vfg": {
     "alias": "Tez Milk",
@@ -550,7 +570,9 @@
   },
   "tz1Y2ufHak4AcisVazSS1ymGgv4HAmFGagh5": {
     "alias": "MyTezosBaking Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8",
+    "accountType": "account"
   },
   "tz1djEKk6j1FqigTgbRsunbnY9BB7qsn1aAQ": {
     "alias": "Tezos Ninja",
@@ -571,7 +593,9 @@
   },
   "tz1cNARmnRRrvZgspPr2rSTUWq5xtGTuKuHY": {
     "alias": "Cryptium Labs Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8",
+    "accountType": "account"
   },
   "tz1eFXLaCUcKbhXkLBGUGMGNY9tKHjWGG25V": {
     "alias": "Tezos Node Spain",
@@ -608,7 +632,9 @@
   },
   "tz1gs78wrxS34XhGPECmN5fABKpEuhUGwAXS": {
     "alias": "Stakery Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1go7f6mEQfT2xX2LuHAqgnRGN6c2zHPf5c",
+    "accountType": "account"
   },
   "tz1hAYfexyzPGG6RhZZMpDvAHifubsbb6kgn": {
     "alias": "Tezos Suisse",
@@ -664,31 +690,38 @@
   },
   "tz3bvNMQ95vfAYtG8193ymshqjSvmxiCUuR5": {
     "alias": "Foundation Baker 2",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3RB4aoyjov4KEVRbuhvQ1CKJgBJMWhaeB8": {
     "alias": "Foundation Baker 3",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3bTdwZinP8U1JmSweNzVKhmwafqWmFWRfk": {
     "alias": "Foundation Baker 4",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3NExpXn9aPNZPorRE4SdjJ2RGrfbJgMAaV": {
     "alias": "Foundation Baker 5",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3UoffC7FG7zfpmvmjUmUeAaHvzdcUvAj6r": {
     "alias": "Foundation Baker 6",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3WMqdzXqRWXwyvj5Hp2H7QEepaUuS7vd9K": {
     "alias": "Foundation Baker 7",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3VEZ4k6a4Wx42iyev6i2aVAptTRLEAivNN": {
     "alias": "Foundation Baker 8",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz3RDC3Jdn4j15J7bBHZd29EUee9gVB1CxD9"
   },
   "tz3adcvQaKXTCg12zbninqo3q8ptKKtDFTLv": {
     "alias": "Tezzigator",
@@ -709,11 +742,15 @@
   },
   "tz1Ywgcavxq9D6hL32Q2AQWHAux9MrWqGoZC": {
     "alias": "StakeNow Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1g8vkmcde6sWKaG2NN9WKzCkDM6Rziq194",
+    "accountType": "account"
   },
   "tz1Zrqm4TkJwqTxm5TiyVFh6taXG4Wrq7tko": {
     "alias": "Bake’n’Rolls Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB",
+    "accountType": "account"
   },
   "tz1gg5bjopPcr9agjamyu9BbXKLibNc2rbAq": {
     "alias": "hodl.farm",
@@ -722,7 +759,9 @@
   },
   "tz1hodLFy8YDHtf1qJ3XH1gCyeXfwWEitkj9": {
     "alias": "hodl.farm Payouts",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1gg5bjopPcr9agjamyu9BbXKLibNc2rbAq",
+    "accountType": "account"
   },
   "tz1RSWMYKGAykpizFteowByYMueCYv9TMn1L": {
     "alias": "Tezos Alliance",
@@ -734,7 +773,9 @@
   },
   "tz1eogbwM5NdoojKEvvSnjYGcJapZgADRK3m": {
     "alias": "Binance Delegator",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2",
+    "accountType": "account"
   },
   "tz1PWCDnz783NNGGQjEFFsHtrcK5yBW4E2rm": {
     "alias": "Melange",
@@ -779,7 +820,9 @@
   },
   "tz1hxtCEcD7idQJEDiJEq37vBkoRcwF6KC2X": {
     "alias": "TezoShop Payout",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1V3yg82mcrPJbegqVCPn6bC8w1CSTRp3f8",
+    "accountType": "account"
   },
   "tz1Q8QkSBS63ZQnH3fBTiAMPes9R666Rn6Sc": {
     "alias": "YieldWallet",
@@ -791,11 +834,13 @@
   },
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "alias": "Staker",
-    "hasLogo": true
+    "hasLogo": true,
+    "accountType": "contract"
   },
   "tz1WcCGBxxPq61ddkp8X7vYMrWsBFMCxe5RD": {
     "alias": "FightCovid",
-    "hasLogo": true
+    "hasLogo": true,
+    "accountType": "account"
   },
   "tz1STeamwbp68THcny9zk3LsbG3H36DMvbRK": {
     "alias": "StakingTeam",
