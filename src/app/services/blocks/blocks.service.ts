@@ -29,25 +29,25 @@ export class BlockService {
 
   getById(level: string, fields?: string[]): Observable<Block> {
     return this.apiService.getBlockById(level).pipe(
-      switchMap(blocks => this.getAdditionalBlockData(blocks, 1, fields)),
+      switchMap(blocks => this.getAdditionalBlockData(blocks, fields)),
       map(first)
     )
   }
 
   getLatest(fields?: string[]): Observable<Block> {
     return this.apiService.getLatestBlocks(1).pipe(
-      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, 1, fields)),
+      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, fields)),
       map(first)
     )
   }
 
   getLatestBlocks(limit: number, fields?: string[]): Observable<Block[]> {
     return this.apiService.getLatestBlocks(limit).pipe(
-      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, 1, fields))
+      switchMap((blocks: Block[]) => this.getAdditionalBlockData(blocks, fields))
     )
   }
 
-  private getAdditionalBlockData(blocks: Block[], limit: number, fields?: string[]): Observable<Block[]> {
+  private getAdditionalBlockData(blocks: Block[], fields?: string[]): Observable<Block[]> {
     if (!blocks || blocks.length === 0) {
       return of([])
     }
@@ -55,11 +55,11 @@ export class BlockService {
     const blockRange = blocks.map(blocksList => blocksList.level)
     const isField = (fieldName: string): boolean => fields && fields.some(field => field === fieldName)
     const getAmounts = isField('volume')
-      ? this.getAdditionalBlockField<ConseilAmountSum>(blockRange, 'amount', 'sum', limit)
+      ? this.getAdditionalBlockField<ConseilAmountSum>(blockRange, 'amount', 'sum')
       : of<ConseilAmountSum[]>([])
-    const getFees = isField('fee') ? this.getAdditionalBlockField<ConseilFeeSum>(blockRange, 'fee', 'sum', limit) : of<ConseilFeeSum[]>([])
+    const getFees = isField('fee') ? this.getAdditionalBlockField<ConseilFeeSum>(blockRange, 'fee', 'sum') : of<ConseilFeeSum[]>([])
     const getCounts = isField('txcount')
-      ? this.getAdditionalBlockField<ConseilCount>(blockRange, 'operation_group_hash', 'count', limit)
+      ? this.getAdditionalBlockField<ConseilCount>(blockRange, 'operation_group_hash', 'count')
       : of<ConseilCount[]>([])
 
     return forkJoin([getAmounts, getFees, getCounts]).pipe(
@@ -80,7 +80,7 @@ export class BlockService {
     )
   }
 
-  private getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
-    return from(this.apiService.getAdditionalBlockField<T>(blockRange, field, operation, limit))
+  private getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Observable<T[]> {
+    return from(this.apiService.getAdditionalBlockField<T>(blockRange, field, operation))
   }
 }
