@@ -2,15 +2,17 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { from, Observable, combineLatest } from 'rxjs'
-import { map, filter } from 'rxjs/operators'
+import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Actions, ofType } from '@ngrx/effects'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { getConventer, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
+import * as appActions from '@tezblock/app.actions'
+import { getConventer, getCurrencyConverterPipeArgs, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
@@ -19,7 +21,8 @@ import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Account } from '@tezblock/interfaces/Account'
+import { getRefresh } from '@tezblock/domain/synchronization'
+import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 
 @Component({
   selector: 'app-contract-detail',
@@ -63,6 +66,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   }
 
   constructor(
+    private readonly actions$: Actions,
     private readonly accountService: AccountService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly aliasPipe: AliasPipe,
@@ -131,9 +135,13 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.conventer$ = this.contract$.pipe(map(getConventer))
 
     this.subscriptions.push(
-      combineLatest(this.address$, this.contract$)
+      combineLatest(
+        this.address$,
+        this.contract$,
+        this.store$.select(state => state.app.exchangeRates)
+      )
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract]) => this.setTabs(address, contract)),
+        .subscribe(([address, contract, exchangeRates]) => this.setTabs(address, contract, exchangeRates)),
       combineLatest(
         this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
         this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
@@ -145,7 +153,19 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
             { key: actions.OperationTab.other, count: otherCount }
           ])
         )
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+
+      this.contract$
+        .pipe(
+          filter(contract => contract && ['tzBTC', 'BTC'].includes(contract.symbol)),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(x => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 
@@ -186,7 +206,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
   }
 
-  private setTabs(pageId: string, contract: TokenContract) {
+  private setTabs(pageId: string, contract: TokenContract, exchangeRates: ExchangeRates) {
     const showFiatValue = this.isMainnet
 
     this.tabs = [
@@ -196,7 +216,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.transfers,
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
+        columns: columns.transfers({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract), currencyConverterPipeArgs: getCurrencyConverterPipeArgs(contract, exchangeRates) }),
         disabled: function() {
           return !this.count
         }
@@ -207,7 +227,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.other,
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
+        columns: columns.other({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract), currencyConverterPipeArgs: getCurrencyConverterPipeArgs(contract, exchangeRates) }),
         disabled: function() {
           return !this.count
         }

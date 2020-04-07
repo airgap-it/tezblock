@@ -1,12 +1,16 @@
 import { IAirGapTransaction } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { negate, isNil } from 'lodash'
+import { negate, isNil, get } from 'lodash'
+import BigNumber from 'bignumber.js'
 
 import { Data } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { get } from '@tezblock/services/fp'
+import { get as fpGet } from '@tezblock/services/fp'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { Currency } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -51,7 +55,7 @@ const networkCondition = (tezosNetwork: TezosNetwork) => (tokenContract: TokenCo
 }
 
 export const getTokenContractByAddress = (address: string, tezosNetwork: TezosNetwork): TokenContract =>
-  get<TokenContract>(tokenContract => {
+  fpGet<TokenContract>(tokenContract => {
     const isInNetwork = networkCondition(tezosNetwork)
 
     return isInNetwork(tokenContract)
@@ -128,5 +132,22 @@ export const getConventer = (contract: { decimals?: number }): Conventer => {
   // https://stackoverflow.com/questions/3612744/remove-insignificant-trailing-zeros-from-a-number
   const noInsignificantTrailingZeros = /([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/
 
-  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros,'$1')
+  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros, '$1')
+}
+
+export const isContractInBTC = (contract: { symbol: string }): boolean => ['tzBTC', 'BTC'].includes(contract.symbol)
+
+export const getCurrencyConverterPipeArgs = (contract: TokenContract, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
+  if (isNil(contract) || !isContractInBTC(contract) || !get(exchangeRates, `${Currency.BTC}.${Currency.USD}`)) {
+    return null
+  }
+
+  return {
+    currInfo: {
+      symbol: '$',
+      currency: 'USD',
+      price: new BigNumber(exchangeRates[Currency.BTC][Currency.USD])
+    },
+    protocolIdentifier: 'BTC'
+  }
 }

@@ -3,12 +3,17 @@ import { getProtocolByIdentifier } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 
+export interface CurrencyConverterPipeArgs {
+  currInfo: CurrencyInfo
+  protocolIdentifier: string
+}
+
 @Pipe({
   name: 'currencyConverter',
   pure: true
 })
 export class CurrencyConverterPipe implements PipeTransform {
-  public transform(value: string | number | BigNumber, args?: { currInfo: CurrencyInfo; protocolIdentifier: string }): number {
+  public transform(value: string | number | BigNumber, args?: CurrencyConverterPipeArgs): number {
     if (!BigNumber.isBigNumber(value)) {
       value = new BigNumber(value)
     }
@@ -18,6 +23,8 @@ export class CurrencyConverterPipe implements PipeTransform {
     try {
       if (args) {
         protocol = getProtocolByIdentifier(args.protocolIdentifier)
+      } else {
+        return 0
       }
     } catch (e) {
       return 0

@@ -34,13 +34,13 @@
       [adaptivePosition]="false"
     >
       {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      {{ amount | currencyConverter: (currencyConverterPipeArgs$ | async) | number: '1.0-2' }}
     </span>
   </ng-container>
 </ng-container>
 <ng-template #noComparison>
   <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
     {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-    {{ amount | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+    {{ amount | currencyConverter: (currencyConverterPipeArgs$ | async) | number: '1.0-2' }}
   </span>
 </ng-template>

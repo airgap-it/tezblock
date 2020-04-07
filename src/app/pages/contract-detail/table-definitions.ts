@@ -1,10 +1,23 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 
 export const columns: {
-  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => Column[]
+  [key: string]: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+    conventer: Conventer
+    currencyConverterPipeArgs: CurrencyConverterPipeArgs
+  }) => Column[]
 } = {
-  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => [
+  transfers: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+    conventer: Conventer
+    currencyConverterPipeArgs: CurrencyConverterPipeArgs
+  }) => [
     {
       name: 'From',
       field: 'singleFrom',
@@ -30,7 +43,12 @@ export const columns: {
       template: Template.amount,
       data: (item: any) => ({
         data: { amount: item.amount },
-        options: { showFiatValue: options.showFiatValue, symbol: options.symbol, conventer: options.conventer }
+        options: {
+          showFiatValue: options.showFiatValue,
+          symbol: options.symbol,
+          conventer: options.conventer,
+          currencyConverterPipeArgs: options.currencyConverterPipeArgs
+        }
       }),
       sortable: false
     },
@@ -54,7 +72,13 @@ export const columns: {
       template: Template.hash
     }
   ],
-  other: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => [
+  other: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+    conventer: Conventer
+    currencyConverterPipeArgs: CurrencyConverterPipeArgs
+  }) => [
     {
       name: 'From',
       field: 'source',
@@ -80,7 +104,12 @@ export const columns: {
       template: Template.amount,
       data: (item: any) => ({
         data: { amount: item.amount },
-        options: { showFiatValue: options.showFiatValue, symbol: options.symbol, conventer: options.conventer }
+        options: {
+          showFiatValue: options.showFiatValue,
+          symbol: options.symbol,
+          conventer: options.conventer,
+          currencyConverterPipeArgs: options.currencyConverterPipeArgs
+        }
       }),
       sortable: true
     },

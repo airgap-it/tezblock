@@ -33,6 +33,7 @@
       }
     ],
     "tezosNetwork": ["mainnet"],
-    "decimals": 8
+    "decimals": 8,
+    "showFiatValue": true
   }
 }

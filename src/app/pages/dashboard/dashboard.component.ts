@@ -11,6 +11,7 @@ import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
+import * as appActions from '@tezblock/app.actions'
 import { TokenContract } from '@tezblock/domain/contract'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { PeriodTimespan, PeriodKind } from '@tezblock/domain/vote'
@@ -77,12 +78,8 @@ export class DashboardComponent extends BaseComponent {
 
     this.isMainnet()
 
-    this.priceChartDatasets$ = this.historicData$.pipe(
-      map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }])
-    )
-    this.priceChartLabels$ = this.historicData$.pipe(
-      map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
-    )
+    this.priceChartDatasets$ = this.historicData$.pipe(map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }]))
+    this.priceChartLabels$ = this.historicData$.pipe(map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString())))
     this.proposalHash$ = this.store$
       .select(state => state.dashboard.proposal)
       .pipe(
@@ -115,7 +112,11 @@ export class DashboardComponent extends BaseComponent {
       getRefresh([
         this.actions$.pipe(ofType(actions.loadBlocksSucceeded)),
         this.actions$.pipe(ofType(actions.loadBlocksFailed))
-      ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
+      ]).subscribe(() => this.store$.dispatch(actions.loadBlocks())),
+
+      this.actions$
+        .pipe(ofType(appActions.loadPeriodInfosSucceeded))
+        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan()))
     )
   }
 

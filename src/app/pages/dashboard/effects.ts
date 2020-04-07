@@ -52,13 +52,6 @@ export class DashboarEffects {
     )
   )
 
-  onPeriodInfoLoadCurrentPeriodTimespan$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(appActions.loadPeriodInfosSucceeded),
-      map(() => actions.loadCurrentPeriodTimespan())
-    )
-  )
-
   loadCurrentPeriodTimespan$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadCurrentPeriodTimespan),

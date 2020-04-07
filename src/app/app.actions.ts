@@ -38,6 +38,13 @@ export const loadCryptoPriceSucceeded = createAction(
 )
 export const loadCryptoPriceFailed = createAction(`[${featureName}] Load Crypto Price Failed`, props<{ error: any }>())
 
+export const loadExchangeRate = createAction(`[${featureName}] Load Exchange Rate`, props<{ from: string, to: string }>())
+export const loadExchangeRateSucceeded = createAction(
+  `[${featureName}] Load Exchange Rate Succeeded`,
+  props<{ from: string, to: string, price: number }>()
+)
+export const loadExchangeRateFailed = createAction(`[${featureName}] Load Exchange Rate Failed`, props<{ error: any }>())
+
 export const loadCryptoHistoricData = createAction(`[${featureName}] Load Crypto Historic Data`)
 export const loadCryptoHistoricDataSucceeded = createAction(
   `[${featureName}] Load Crypto Historic Data Succeeded`,

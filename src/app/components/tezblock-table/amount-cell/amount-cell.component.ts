@@ -1,13 +1,17 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
-import { Observable, BehaviorSubject, Subject } from 'rxjs'
+import { Observable, BehaviorSubject, of, merge, combineLatest } from 'rxjs'
+import { filter, map } from 'rxjs/operators'
 import * as moment from 'moment'
 import { Store } from '@ngrx/store'
+import BigNumber from 'bignumber.js'
+import { negate, isNil } from 'lodash'
 
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
-import BigNumber from 'bignumber.js'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import * as fromRoot from '@tezblock/reducers'
+import { get } from '@tezblock/services/fp'
 
 export interface AmountData {
   amount: number | string
@@ -52,6 +56,8 @@ export class AmountCellComponent implements OnInit {
       if (this.amount) {
         this.setAmountPiped()
       }
+
+      this.fromOptionsCurrencyConverterPipeArgs.next(get<any>(_value => _value.currencyConverterPipeArgs)(value))
     }
   }
 
@@ -62,6 +68,8 @@ export class AmountCellComponent implements OnInit {
   get conventer(): Conventer {
     return this.options.conventer || this.defaultConventer.bind(this)
   }
+
+  currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
 
   private _options = undefined
 
@@ -92,15 +100,23 @@ export class AmountCellComponent implements OnInit {
   showOldValue = false
   //showOldValue$ = new BehaviorSubject(false)
 
+  private fromOptionsCurrencyConverterPipeArgs = new BehaviorSubject<CurrencyConverterPipeArgs>(null)
+
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly chartDataService: ChartDataService,
     private readonly store$: Store<fromRoot.State>
-  ) {
-    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
-  }
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
+    this.currencyConverterPipeArgs$ = combineLatest(
+      this.fromOptionsCurrencyConverterPipeArgs,
+      this.fiatCurrencyInfo$.pipe(
+        map(currInfo => currInfo ? ({ currInfo, protocolIdentifier: 'xtz' }) : null)
+      )
+    ).pipe(map(([fromOptions, xtz]) => fromOptions || xtz))
+  }
 
   tooltipClick() {
     if (dayDifference(this.data.timestamp) >= 1) {

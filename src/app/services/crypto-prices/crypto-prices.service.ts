@@ -5,7 +5,7 @@ import * as cryptocompare from 'cryptocompare'
 import { Observable, from } from 'rxjs'
 import { tap } from 'rxjs/operators'
 
-import { CacheService, CacheKeys, Currency } from '@tezblock/services/cache/cache.service'
+import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 
 export interface CurrencyInfo {
   symbol: string
@@ -13,21 +13,30 @@ export interface CurrencyInfo {
   price: BigNumber
 }
 
+export enum Currency {
+  BTC = 'BTC',
+  USD = 'USD',
+  XTZ = 'XTZ'
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class CryptoPricesService {
-  
   constructor(private readonly cacheService: CacheService) {}
 
   getCryptoPrices(protocolIdentifier: string, baseSymbols = ['USD', 'BTC']): Observable<{ [key: string]: number }> {
-    return from(<Promise<{ [key: string]: number }>>cryptocompare.price(protocolIdentifier.toUpperCase(), baseSymbols)).pipe(
-      tap(prices => {
-        const change = baseSymbols
-          .map(baseSymbol => ({ [baseSymbol]: prices[baseSymbol] }))
-          .reduce((accumulator, currentValue) => ({ ...currentValue, ...accumulator }), {})
+    const fromCurrency = protocolIdentifier.toUpperCase()
 
-        this.cacheService.update<Currency>(CacheKeys.currency, value => ({ ...value, ...change }))
+    return from(<Promise<{ [key: string]: number }>>cryptocompare.price(fromCurrency, baseSymbols)).pipe(
+      tap(prices => {
+        const change: ExchangeRates = {
+          [fromCurrency]: baseSymbols
+            .map(baseSymbol => ({ [baseSymbol]: prices[baseSymbol] }))
+            .reduce((accumulator, currentValue) => ({ ...currentValue, ...accumulator }), {})
+        }
+
+        this.cacheService.update<ExchangeRates>(CacheKeys.exchangeRates, value => ({ ...value, ...change }))
       })
     )
   }
@@ -45,4 +54,8 @@ export class CryptoPricesService {
       })
     )
   }
+
+  // getCryptoPrice(protocolIdentifier: string, baseSymbol: string): Observable<{ [key: string]: number }> {
+  //   return from(<Promise<{ [key: string]: number }>>cryptocompare.price(protocolIdentifier.toUpperCase(), [baseSymbol]))
+  // }
 }
