@@ -110,6 +110,7 @@
               [data]="data$ | async"
               [loading]="loading$ | async"
               [pagination]="showLoadMore$ | async"
+              [noDataLabel]="noDataLabel"
               (onLoadMore)="loadMore()"
               (onSort)="sortBy($event)"
               [orderBy]="orderBy$ | async"

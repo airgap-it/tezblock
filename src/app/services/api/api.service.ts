@@ -21,6 +21,7 @@ import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
+import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 
 export interface OperationCount {
   [key: string]: string
@@ -480,16 +481,17 @@ export class ApiService {
     )
   }
 
-  getAccountsStartingWith(id: string): Observable<Object[]> {
-    const result: Object[] = []
+  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+    const bakers: SearchOption[] = Object.keys(accounts)
+      .map(key => accounts[key])
+      .filter(
+        account =>
+          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
+          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
+      )
+      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
 
-    Object.keys(accounts).forEach(account => {
-      if (accounts[account] && accounts[account].alias && accounts[account].alias.toLowerCase().startsWith(id.toLowerCase())) {
-        result.push({ name: accounts[account].alias, type: 'Bakers' })
-      }
-    })
-
-    if (result.length === 0) {
+    if (bakers.length === 0) {
       return this.http
         .post<Account[]>(
           this.accountsApiUrl,
@@ -508,18 +510,26 @@ export class ApiService {
           this.options
         )
         .pipe(
-          map(accounts =>
-            accounts.map(account => {
-              return { name: account.account_id, type: 'Accounts' }
-            })
+          map(_accounts =>
+            _accounts
+              .filter(account => {
+                const isContract = Object.keys(accounts)
+                  .map(key => ({ ...accounts[key], id: key }))
+                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
+
+                return !isContract
+              })
+              .map(account => {
+                return { name: account.account_id, type: SearchOptionType.account }
+              })
           )
         )
     }
 
-    return of(result)
+    return of(bakers)
   }
 
-  getTransactionHashesStartingWith(id: string): Observable<Object[]> {
+  getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -540,13 +550,13 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.operation_group_hash, type: 'Transactions' }
+            return { name: item.operation_group_hash, type: SearchOptionType.transaction }
           })
         )
       )
   }
 
-  getBlockHashesStartingWith(id: string): Observable<Object[]> {
+  getBlockHashesStartingWith(id: string): Observable<SearchOption[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -567,7 +577,7 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.hash, type: 'Blocks' }
+            return { name: item.hash, type: SearchOptionType.block }
           })
         )
       )
@@ -771,7 +781,7 @@ export class ApiService {
       )
   }
 
-  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
+  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Promise<T[]> {
     let headers
     if (field === 'operation_group_hash') {
       // then we only care about spend transactions
@@ -800,8 +810,7 @@ export class ApiService {
             field,
             function: operation
           }
-        ],
-        limit
+        ]
       }
     } else {
       headers = {
@@ -824,8 +833,7 @@ export class ApiService {
             field,
             function: operation
           }
-        ],
-        limit
+        ]
       }
     }
 

@@ -118,9 +118,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
-  //TODO: remove when api will be fixed
-  is_baker = false
-
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
 
@@ -233,7 +230,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
       map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
-      // map(toString)
     )
     this.isRewardAmountMinusFeeBusy$ = combineLatest(
       this.store$.select(state => state.accountDetails.busy.rewardAmont),
@@ -348,8 +344,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   getBakingInfos(address: string) {
-    this.is_baker = false
-
     this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
@@ -365,8 +359,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         : {
             payoutAddress
           }
-
-      this.is_baker = true
     })
 
     this.store$.dispatch(actions.loadBakingBadRatings({ address }))
@@ -546,7 +538,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   // TODO: this function should be introduced to every page with self navigation
-  // Also consider that actions.reset triggers selects 
+  // Also consider that actions.reset triggers selects
   private reset() {
     this.store$.dispatch(actions.reset())
     this.delegatedAccountAddress = undefined
@@ -556,7 +548,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
-    this.is_baker = false
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }
