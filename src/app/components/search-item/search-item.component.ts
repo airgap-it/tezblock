@@ -63,7 +63,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
         return merge(
           this.apiService.getTransactionHashesStartingWith(token),
-          this.apiService.getAccountsStartingWith(token),
+          this.apiService.getAccountsStartingWith(token), // or bakers .. TODO: separate to look for both
           this.apiService.getBlockHashesStartingWith(token),
           of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))
         ).pipe(
@@ -75,11 +75,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
     this.dataSource$
       .pipe(
-        map(x => {
-          const foo = narrowOptions(5)(x)
-
-          return foo
-        }),
+        map(narrowOptions(5)),
         switchMap(data =>
           this.searchService.getPreviousSearches().pipe(
             map(previousSearches => {

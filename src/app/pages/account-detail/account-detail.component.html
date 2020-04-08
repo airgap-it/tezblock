@@ -259,7 +259,7 @@
                       <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
                         <amount-cell
                           *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
-                          [data]="rewardAmountMinusFee"
+                          [data]="{ amount: rewardAmountMinusFee }"
                         ></amount-cell>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available

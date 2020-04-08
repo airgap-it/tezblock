@@ -10,10 +10,11 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
+import { getConventer, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { columns } from './table-definitions'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -55,6 +56,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   current: string = 'copyGrey'
   tabs: Tab[]
   manager$: Observable<string>
+  conventer$: Observable<Conventer>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -126,11 +128,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
+    this.conventer$ = this.contract$.pipe(map(getConventer))
 
     this.subscriptions.push(
       combineLatest(this.address$, this.contract$)
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract]) => this.setTabs(address, contract.symbol)),
+        .subscribe(([address, contract]) => this.setTabs(address, contract)),
       combineLatest(
         this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
         this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
@@ -183,7 +186,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
   }
 
-  private setTabs(pageId: string, symbol: string) {
+  private setTabs(pageId: string, contract: TokenContract) {
     const showFiatValue = this.isMainnet
 
     this.tabs = [
@@ -193,8 +196,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.transfers,
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol }),
-        disabled: function() { return !this.count }
+        columns: columns.transfers({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Other Calls',
@@ -202,8 +207,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         kind: actions.OperationTab.other,
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol }),
-        disabled: function() { return !this.count }
+        columns: columns.other({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract) }),
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
   }

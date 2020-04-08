@@ -1,7 +1,10 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
-export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => Column[] } = {
-  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+export const columns: {
+  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => Column[]
+} = {
+  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => [
     {
       name: 'From',
       field: 'singleFrom',
@@ -25,7 +28,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
+      data: (item: any) => ({
+        data: { amount: item.amount },
+        options: { showFiatValue: options.showFiatValue, symbol: options.symbol, conventer: options.conventer }
+      }),
       sortable: false
     },
     {
@@ -43,12 +49,18 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
+      name: 'Block',
+      field: 'blockHeight',
+      template: Template.block,
+      sortable: true
+    },
+    {
       name: 'Tx Hash',
       field: 'hash',
       template: Template.hash
     }
   ],
-  other: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+  other: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer }) => [
     {
       name: 'From',
       field: 'source',
@@ -72,7 +84,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.amount }, options: { showFiatValue: options.showFiatValue, symbol: options.symbol } }),
+      data: (item: any) => ({
+        data: { amount: item.amount },
+        options: { showFiatValue: options.showFiatValue, symbol: options.symbol, conventer: options.conventer }
+      }),
       sortable: true
     },
     {
@@ -86,6 +101,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
+      sortable: true
+    },
+    {
+      name: 'Block',
+      field: 'block_level',
+      template: Template.block,
       sortable: true
     },
     {

@@ -230,7 +230,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
       map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
-      // map(toString)
     )
     this.isRewardAmountMinusFeeBusy$ = combineLatest(
       this.store$.select(state => state.accountDetails.busy.rewardAmont),
@@ -539,7 +538,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   // TODO: this function should be introduced to every page with self navigation
-  // Also consider that actions.reset triggers selects 
+  // Also consider that actions.reset triggers selects
   private reset() {
     this.store$.dispatch(actions.reset())
     this.delegatedAccountAddress = undefined
