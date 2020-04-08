@@ -84,7 +84,12 @@
                     <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
                     <amount-cell
                       [data]="{ amount: contract.totalSupply }"
-                      [options]="{ symbol: contract.symbol, conventer: conventer$ | async, showFiatValue: contract.showFiatValue || false }"
+                      [options]="{
+                        symbol: contract.symbol,
+                        conventer: conventer$ | async,
+                        currencyConverterPipeArgs: currencyConverterPipeArgs$ | async,
+                        showFiatValue: showFiatValue$ | async
+                      }"
                     ></amount-cell>
                   </p>
                 </div>

@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
+import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 export interface CurrencyConverterPipeArgs {
   currInfo: CurrencyInfo
@@ -18,17 +18,11 @@ export class CurrencyConverterPipe implements PipeTransform {
       value = new BigNumber(value)
     }
 
-    let protocol
-
-    try {
-      if (args) {
-        protocol = getProtocolByIdentifier(args.protocolIdentifier)
-      } else {
-        return 0
-      }
-    } catch (e) {
-      return 0
+    if (!args) {
+      return null
     }
+
+    const protocol: { decimals: number } = tryGetProtocolByIdentifier(args.protocolIdentifier) || { decimals: 0 }
 
     const BN = BigNumber.clone({
       FORMAT: {
@@ -38,8 +32,8 @@ export class CurrencyConverterPipe implements PipeTransform {
       }
     })
     const amount = new BN(value).shiftedBy(protocol.decimals * -1)
-    const result: number = args ? this.transformToCurrency(amount, args.currInfo) : value.toNumber()
-    return result
+
+    return this.transformToCurrency(amount, args.currInfo)
     /*
     args ? result = this.transformToCurrency(amount, args.currInfo) : result = value.toNumber() */
   }

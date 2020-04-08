@@ -11,6 +11,7 @@ import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amoun
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { Currency } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { isInBTC } from '@tezblock/domain/airgap'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -135,10 +136,10 @@ export const getConventer = (contract: { decimals?: number }): Conventer => {
   return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros, '$1')
 }
 
-export const isContractInBTC = (contract: { symbol: string }): boolean => ['tzBTC', 'BTC'].includes(contract.symbol)
 
-export const getCurrencyConverterPipeArgs = (contract: TokenContract, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
-  if (isNil(contract) || !isContractInBTC(contract) || !get(exchangeRates, `${Currency.BTC}.${Currency.USD}`)) {
+
+export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
+  if (isNil(contract) || !isInBTC(contract.symbol) || !get(exchangeRates, `${Currency.BTC}.${Currency.USD}`)) {
     return null
   }
 

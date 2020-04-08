@@ -12,6 +12,7 @@ import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-con
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import * as fromRoot from '@tezblock/reducers'
 import { get } from '@tezblock/services/fp'
+import { isInBTC } from '@tezblock/domain/airgap'
 
 export interface AmountData {
   amount: number | string
@@ -68,7 +69,6 @@ export class AmountCellComponent implements OnInit {
   get conventer(): Conventer {
     return this.options.conventer || this.defaultConventer.bind(this)
   }
-
   currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
 
   private _options = undefined
@@ -97,6 +97,11 @@ export class AmountCellComponent implements OnInit {
     return this.options.maxDigits === undefined ? 6 : this.options.maxDigits
   }
 
+  // temporary solution: ask how to utilizy existing maxDigits but doesn't used by fiatValue
+  get precision(): number {
+    return isInBTC(get<any>(options => options.symbol)(this.options)) ? 8 : 2
+  }
+
   showOldValue = false
   //showOldValue$ = new BehaviorSubject(false)
 
@@ -110,10 +115,12 @@ export class AmountCellComponent implements OnInit {
 
   ngOnInit() {
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
+
+    // TODO: this is bad: for a split of a second always is visible fiatCurrencyInfo$ conversion
     this.currencyConverterPipeArgs$ = combineLatest(
       this.fromOptionsCurrencyConverterPipeArgs,
       this.fiatCurrencyInfo$.pipe(
-        map(currInfo => currInfo ? ({ currInfo, protocolIdentifier: 'xtz' }) : null)
+        map(currInfo => (currInfo && this.isPotancialyXTZSymbol() ? { currInfo, protocolIdentifier: 'xtz' } : null))
       )
     ).pipe(map(([fromOptions, xtz]) => fromOptions || xtz))
   }
@@ -147,5 +154,9 @@ export class AmountCellComponent implements OnInit {
       fontSmall: this.fontSmall,
       fontColor: this.fontColor
     })
+  }
+
+  private isPotancialyXTZSymbol(): boolean {
+    return !(this.options && this.options.symbol)
   }
 }

@@ -8,17 +8,26 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { Actions, ofType } from '@ngrx/effects'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import * as appActions from '@tezblock/app.actions'
-import { getConventer, getCurrencyConverterPipeArgs, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
+import {
+  getConventer,
+  getCurrencyConverterPipeArgs,
+  TokenContract,
+  Social,
+  SocialType,
+  ContractOperation
+} from '@tezblock/domain/contract'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { columns } from './table-definitions'
-import { Tab, updateTabCounts } from '@tezblock/domain/tab'
+import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { getRefresh } from '@tezblock/domain/synchronization'
@@ -57,9 +66,34 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   orderBy$: Observable<OrderBy>
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
-  tabs: Tab[]
+  tabs: Tab[] = [
+    {
+      title: 'Transfers',
+      active: true,
+      kind: actions.OperationTab.transfers,
+      count: undefined,
+      icon: this.iconPipe.transform('exchangeAlt'),
+      columns: undefined,
+      disabled: function() {
+        return !this.count
+      }
+    },
+    {
+      title: 'Other Calls',
+      active: true,
+      kind: actions.OperationTab.other,
+      count: undefined,
+      icon: this.iconPipe.transform('link'),
+      columns: undefined,
+      disabled: function() {
+        return !this.count
+      }
+    }
+  ]
   manager$: Observable<string>
   conventer$: Observable<Conventer>
+  currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
+  showFiatValue$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -133,27 +167,31 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
     this.conventer$ = this.contract$.pipe(map(getConventer))
+    this.currencyConverterPipeArgs$ = combineLatest(
+      this.contract$,
+      this.store$.select(state => state.app.exchangeRates)
+    ).pipe(map(([contract, exchangeRates]) => getCurrencyConverterPipeArgs(contract, exchangeRates)))
+    this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
 
     this.subscriptions.push(
       combineLatest(
         this.address$,
         this.contract$,
-        this.store$.select(state => state.app.exchangeRates)
-      )
-        .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract, exchangeRates]) => this.setTabs(address, contract, exchangeRates)),
-      combineLatest(
-        this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
-        this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
-      )
-        .pipe(
-          filter(([transferCount, otherCount]) => transferCount !== undefined && otherCount !== undefined),
+        this.currencyConverterPipeArgs$,
+        combineLatest(
+          this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
+          this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
+        ).pipe(
           map(([transferCount, otherCount]) => [
             { key: actions.OperationTab.transfers, count: transferCount },
             { key: actions.OperationTab.other, count: otherCount }
           ])
         )
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+      )
+        .pipe(filter(([address, contract]) => !!address && !!contract))
+        .subscribe(([address, contract, currencyConverterPipeArgs, counts]) =>
+          this.updateTabs(address, contract, currencyConverterPipeArgs, counts)
+        ),
 
       this.contract$
         .pipe(
@@ -206,32 +244,34 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
   }
 
-  private setTabs(pageId: string, contract: TokenContract, exchangeRates: ExchangeRates) {
-    const showFiatValue = this.isMainnet
+  private updateTabs(pageId: string, contract: TokenContract, currencyConverterPipeArgs: CurrencyConverterPipeArgs, counts: Count[]) {
+    const showFiatValue = isConvertableToUSD(contract.symbol)
 
     this.tabs = [
       {
-        title: 'Transfers',
-        active: true,
-        kind: actions.OperationTab.transfers,
-        count: undefined,
-        icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns.transfers({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract), currencyConverterPipeArgs: getCurrencyConverterPipeArgs(contract, exchangeRates) }),
-        disabled: function() {
-          return !this.count
-        }
+        ...this.tabs[0],
+        columns: columns.transfers({
+          pageId,
+          showFiatValue,
+          symbol: contract.symbol,
+          conventer: getConventer(contract),
+          currencyConverterPipeArgs
+        })
       },
       {
-        title: 'Other Calls',
-        active: true,
-        kind: actions.OperationTab.other,
-        count: undefined,
-        icon: this.iconPipe.transform('link'),
-        columns: columns.other({ pageId, showFiatValue, symbol: contract.symbol, conventer: getConventer(contract), currencyConverterPipeArgs: getCurrencyConverterPipeArgs(contract, exchangeRates) }),
-        disabled: function() {
-          return !this.count
-        }
+        ...this.tabs[1],
+        columns: columns.other({
+          pageId,
+          showFiatValue,
+          symbol: contract.symbol,
+          conventer: getConventer(contract),
+          currencyConverterPipeArgs
+        })
       }
     ]
+
+    if (counts.every(count => count.count !== undefined)) {
+      this.tabs = updateTabCounts(this.tabs, counts)
+    }
   }
 }

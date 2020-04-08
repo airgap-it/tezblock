@@ -19,8 +19,9 @@ import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
-import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
+import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
