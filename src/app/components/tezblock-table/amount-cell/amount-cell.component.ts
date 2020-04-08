@@ -14,6 +14,8 @@ export interface AmountData {
   timestamp?: number
 }
 
+export type Conventer = (amount: any) => string
+
 const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
 
 @Component({
@@ -55,6 +57,10 @@ export class AmountCellComponent implements OnInit {
 
   get options() {
     return this._options === undefined ? { showFiatValue: true } : this._options
+  }
+
+  get conventer(): Conventer {
+    return this.options.conventer || this.defaultConventer.bind(this)
   }
 
   private _options = undefined
@@ -112,16 +118,18 @@ export class AmountCellComponent implements OnInit {
   }
 
   private setAmountPiped() {
-    const amountPiped = this.amountConverterPipe
-      .transform(this.amount, {
-        protocolIdentifier: 'xtz',
-        maxDigits: this.maxDigits,
-        fontSmall: this.fontSmall,
-        fontColor: this.fontColor
-      })
-      .split('.')
+    const amountPiped = this.conventer(this.amount).split('.')
 
     this.amountPipedLeadingChars = amountPiped[0]
     this.amountPipedTrailingChars = amountPiped[1]
+  }
+
+  private defaultConventer(amount: any): string {
+    return this.amountConverterPipe.transform(amount, {
+      protocolIdentifier: 'xtz',
+      maxDigits: this.maxDigits,
+      fontSmall: this.fontSmall,
+      fontColor: this.fontColor
+    })
   }
 }

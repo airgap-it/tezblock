@@ -230,7 +230,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
       map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
-      // map(toString)
     )
     this.isRewardAmountMinusFeeBusy$ = combineLatest(
       this.store$.select(state => state.accountDetails.busy.rewardAmont),
