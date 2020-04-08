@@ -17,7 +17,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         field: 'applied',
         width: '1',
         template: Template.symbol,
-        data: (item: Transaction) => ({ data: item.outgoing, options: { showFullAddress: false, pageId: options.pageId } })
+        data: (item: Transaction) => ({ data: item.outgoing })
       },
       {
         name: 'To',
@@ -61,7 +61,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         field: 'applied',
         width: '1',
         template: Template.symbol,
-        data: (item: Transaction) => ({ data: item.outgoing, options: { showFullAddress: false, pageId: options.pageId } })
+        data: (item: Transaction) => ({ data: item.outgoing })
       },
       {
         name: 'Baker',

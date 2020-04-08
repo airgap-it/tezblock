@@ -100,7 +100,7 @@ export class TransactionService {
         return of(transactions)
       }),
       switchMap(transactions => this.apiService.addVoteData(transactions)),
-      switchMap(transactions => {
+      map(transactions => {
         transactions = transactions.map(transaction => {
           // to determine if outgoing or not in order to later assign correct symbol in symbol-cell
           return {
@@ -108,7 +108,7 @@ export class TransactionService {
             outgoing: transaction.source === address
           }
         })
-        return of(transactions)
+        return transactions
       })
     )
   }
