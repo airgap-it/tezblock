@@ -34,7 +34,7 @@ import {
   faCircle,
   faChevronLeft,
   faChevronRight
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
   library.add(
