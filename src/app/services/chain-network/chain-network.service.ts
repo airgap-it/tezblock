@@ -16,9 +16,6 @@ export class ChainNetworkService implements OnInit {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET
         break
-      case environment.babylonnet.targetUrl:
-        this.chainName = TezosNetwork.BABYLONNET
-        break
       case environment.carthagenet.targetUrl:
         this.chainName = TezosNetwork.CARTHAGENET
         break
@@ -32,8 +29,6 @@ export class ChainNetworkService implements OnInit {
     switch (chainName) {
       case TezosNetwork.MAINNET:
         return environment.mainnet
-      case TezosNetwork.BABYLONNET:
-        return environment.babylonnet
       case TezosNetwork.CARTHAGENET:
         return environment.carthagenet
       default:
