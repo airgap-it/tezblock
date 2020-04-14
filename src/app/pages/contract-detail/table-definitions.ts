@@ -1,6 +1,5 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 
 export const columns: {
   [key: string]: (options: {
@@ -8,7 +7,6 @@ export const columns: {
     showFiatValue: boolean
     symbol: string
     conventer: Conventer
-    currencyConverterPipeArgs: CurrencyConverterPipeArgs
   }) => Column[]
 } = {
   transfers: (options: {
@@ -16,7 +14,6 @@ export const columns: {
     showFiatValue: boolean
     symbol: string
     conventer: Conventer
-    currencyConverterPipeArgs: CurrencyConverterPipeArgs
   }) => [
     {
       name: 'From',
@@ -46,8 +43,7 @@ export const columns: {
         options: {
           showFiatValue: options.showFiatValue,
           symbol: options.symbol,
-          conventer: options.conventer,
-          currencyConverterPipeArgs: options.currencyConverterPipeArgs
+          conventer: options.conventer
         }
       }),
       sortable: false
@@ -77,7 +73,6 @@ export const columns: {
     showFiatValue: boolean
     symbol: string
     conventer: Conventer
-    currencyConverterPipeArgs: CurrencyConverterPipeArgs
   }) => [
     {
       name: 'From',
@@ -107,8 +102,7 @@ export const columns: {
         options: {
           showFiatValue: options.showFiatValue,
           symbol: options.symbol,
-          conventer: options.conventer,
-          currencyConverterPipeArgs: options.currencyConverterPipeArgs
+          conventer: options.conventer
         }
       }),
       sortable: true

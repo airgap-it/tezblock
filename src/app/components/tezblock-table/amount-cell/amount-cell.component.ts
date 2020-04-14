@@ -1,10 +1,9 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
-import { Observable, BehaviorSubject, of, merge, combineLatest } from 'rxjs'
-import { filter, map } from 'rxjs/operators'
+import { Observable, BehaviorSubject } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 import * as moment from 'moment'
 import { Store } from '@ngrx/store'
 import BigNumber from 'bignumber.js'
-import { negate, isNil } from 'lodash'
 
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
@@ -13,6 +12,7 @@ import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/cu
 import * as fromRoot from '@tezblock/reducers'
 import { get } from '@tezblock/services/fp'
 import { isInBTC } from '@tezblock/domain/airgap'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 export interface AmountData {
   amount: number | string
@@ -58,7 +58,7 @@ export class AmountCellComponent implements OnInit {
         this.setAmountPiped()
       }
 
-      this.fromOptionsCurrencyConverterPipeArgs.next(get<any>(_value => _value.currencyConverterPipeArgs)(value))
+      this.options$.next(value)
     }
   }
 
@@ -105,11 +105,12 @@ export class AmountCellComponent implements OnInit {
   showOldValue = false
   //showOldValue$ = new BehaviorSubject(false)
 
-  private fromOptionsCurrencyConverterPipeArgs = new BehaviorSubject<CurrencyConverterPipeArgs>(null)
+  private options$ = new BehaviorSubject<any>(null)
 
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly chartDataService: ChartDataService,
+    private readonly cryptoPricesService: CryptoPricesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 
@@ -117,12 +118,9 @@ export class AmountCellComponent implements OnInit {
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
 
     // TODO: this is bad: for a split of a second always is visible fiatCurrencyInfo$ conversion
-    this.currencyConverterPipeArgs$ = combineLatest(
-      this.fromOptionsCurrencyConverterPipeArgs,
-      this.fiatCurrencyInfo$.pipe(
-        map(currInfo => (currInfo && this.isPotancialyXTZSymbol() ? { currInfo, protocolIdentifier: 'xtz' } : null))
-      )
-    ).pipe(map(([fromOptions, xtz]) => fromOptions || xtz))
+    this.currencyConverterPipeArgs$ = this.options$.pipe(
+      switchMap(options => this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)))
+    )
   }
 
   tooltipClick() {
@@ -154,9 +152,5 @@ export class AmountCellComponent implements OnInit {
       fontSmall: this.fontSmall,
       fontColor: this.fontColor
     })
-  }
-
-  private isPotancialyXTZSymbol(): boolean {
-    return !(this.options && this.options.symbol)
   }
 }

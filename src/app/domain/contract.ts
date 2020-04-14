@@ -10,8 +10,7 @@ import { get as fpGet } from '@tezblock/services/fp'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
-import { Currency } from '@tezblock/services/crypto-prices/crypto-prices.service'
-import { isInBTC } from '@tezblock/domain/airgap'
+import { Currency, isInBTC } from '@tezblock/domain/airgap'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 

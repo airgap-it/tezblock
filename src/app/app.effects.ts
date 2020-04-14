@@ -13,7 +13,8 @@ import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
-import { CryptoPricesService, Currency } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { Currency } from '@tezblock/domain/airgap'
 
 @Injectable()
 export class AppEffects {

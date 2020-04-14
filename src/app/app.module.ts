@@ -90,7 +90,9 @@ import { LatestContractsComponent } from './pages/dashboard/latest-contracts/lat
 import { DashboarEffects } from './pages/dashboard/effects';
 import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component'
 import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects';
-import { TransactionErrorsComponent } from './components/transaction-errors/transaction-errors.component'
+import { TransactionErrorsComponent } from './components/transaction-errors/transaction-errors.component';
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 
 @NgModule({
   imports: [
@@ -139,7 +141,8 @@ import { TransactionErrorsComponent } from './components/transaction-errors/tran
       HealthEffects,
       AccountsEffects,
       DashboarEffects,
-      DashboardLatestContractsTransactionsEffects
+      DashboardLatestContractsTransactionsEffects,
+      TokenContractOverviewEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -191,7 +194,8 @@ import { TransactionErrorsComponent } from './components/transaction-errors/tran
     AccountOverviewComponent,
     LatestContractsComponent,
     LatestContractsTransactionsComponent,
-    TransactionErrorsComponent
+    TransactionErrorsComponent,
+    TokenContractOverviewComponent
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService],

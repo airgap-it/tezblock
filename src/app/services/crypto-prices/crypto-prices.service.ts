@@ -3,9 +3,14 @@ import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 import { Observable, from } from 'rxjs'
-import { tap } from 'rxjs/operators'
+import { filter, map, tap } from 'rxjs/operators'
+import { Store } from '@ngrx/store'
+import { isNil, negate } from 'lodash'
 
 import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
+import * as fromRoot from '@tezblock/reducers'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract'
 
 export interface CurrencyInfo {
   symbol: string
@@ -13,17 +18,11 @@ export interface CurrencyInfo {
   price: BigNumber
 }
 
-export enum Currency {
-  BTC = 'BTC',
-  USD = 'USD',
-  XTZ = 'XTZ'
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class CryptoPricesService {
-  constructor(private readonly cacheService: CacheService) {}
+  constructor(private readonly cacheService: CacheService, private readonly store$: Store<fromRoot.State>) {}
 
   getCryptoPrices(protocolIdentifier: string, baseSymbols = ['USD', 'BTC']): Observable<{ [key: string]: number }> {
     const fromCurrency = protocolIdentifier.toUpperCase()
@@ -55,7 +54,18 @@ export class CryptoPricesService {
     )
   }
 
-  // getCryptoPrice(protocolIdentifier: string, baseSymbol: string): Observable<{ [key: string]: number }> {
-  //   return from(<Promise<{ [key: string]: number }>>cryptocompare.price(protocolIdentifier.toUpperCase(), [baseSymbol]))
-  // }
+  getCurrencyConverterArgs(symbol: string): Observable<CurrencyConverterPipeArgs> {
+    if (!symbol) {
+      return this.store$
+        .select(state => state.app.fiatCurrencyInfo)
+        .pipe(
+          filter(negate(isNil)),
+          map(currInfo => ({ currInfo, protocolIdentifier: 'xtz' }))
+        )
+    }
+
+    return this.store$
+      .select(state => state.app.exchangeRates)
+      .pipe(map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates)))
+  }
 }

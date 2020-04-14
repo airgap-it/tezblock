@@ -8,14 +8,12 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { Actions, ofType } from '@ngrx/effects'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import * as appActions from '@tezblock/app.actions'
 import {
   getConventer,
-  getCurrencyConverterPipeArgs,
   TokenContract,
   Social,
   SocialType,
@@ -31,7 +29,6 @@ import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { getRefresh } from '@tezblock/domain/synchronization'
-import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 
 @Component({
   selector: 'app-contract-detail',
@@ -92,7 +89,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   ]
   manager$: Observable<string>
   conventer$: Observable<Conventer>
-  currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
   showFiatValue$: Observable<boolean>
 
   get isMainnet(): boolean {
@@ -167,17 +163,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
     this.conventer$ = this.contract$.pipe(map(getConventer))
-    this.currencyConverterPipeArgs$ = combineLatest(
-      this.contract$,
-      this.store$.select(state => state.app.exchangeRates)
-    ).pipe(map(([contract, exchangeRates]) => getCurrencyConverterPipeArgs(contract, exchangeRates)))
     this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
 
     this.subscriptions.push(
       combineLatest(
         this.address$,
         this.contract$,
-        this.currencyConverterPipeArgs$,
         combineLatest(
           this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
           this.store$.select(state => state.contractDetails.otherOperations.pagination.total)
@@ -189,8 +180,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
       )
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract, currencyConverterPipeArgs, counts]) =>
-          this.updateTabs(address, contract, currencyConverterPipeArgs, counts)
+        .subscribe(([address, contract, counts]) =>
+          this.updateTabs(address, contract, counts)
         ),
 
       this.contract$
@@ -203,7 +194,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
             ])
           )
         )
-        .subscribe(x => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 
@@ -244,7 +235,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
   }
 
-  private updateTabs(pageId: string, contract: TokenContract, currencyConverterPipeArgs: CurrencyConverterPipeArgs, counts: Count[]) {
+  private updateTabs(pageId: string, contract: TokenContract, counts: Count[]) {
     const showFiatValue = isConvertableToUSD(contract.symbol)
 
     this.tabs = [
@@ -254,8 +245,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           pageId,
           showFiatValue,
           symbol: contract.symbol,
-          conventer: getConventer(contract),
-          currencyConverterPipeArgs
+          conventer: getConventer(contract)
         })
       },
       {
@@ -264,8 +254,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           pageId,
           showFiatValue,
           symbol: contract.symbol,
-          conventer: getConventer(contract),
-          currencyConverterPipeArgs
+          conventer: getConventer(contract)
         })
       }
     ]

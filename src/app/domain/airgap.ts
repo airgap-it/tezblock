@@ -1,5 +1,11 @@
 import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
 
+export enum Currency {
+  BTC = 'BTC',
+  USD = 'USD',
+  XTZ = 'XTZ'
+}
+
 const convertSymbol = (symbol: string): string => {
   switch (symbol) {
     // case 'tzBTC':
