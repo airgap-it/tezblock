@@ -8,16 +8,13 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 export class ChainNetworkService implements OnInit {
   private chainName: TezosNetwork
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET
-  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.BABYLONNET, TezosNetwork.CARTHAGENET]
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.CARTHAGENET]
 
   constructor() {
     const origin = new URL(location.href).origin
     switch (origin) {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET
-        break
-      case environment.babylonnet.targetUrl:
-        this.chainName = TezosNetwork.BABYLONNET
         break
       case environment.carthagenet.targetUrl:
         this.chainName = TezosNetwork.CARTHAGENET
@@ -32,8 +29,6 @@ export class ChainNetworkService implements OnInit {
     switch (chainName) {
       case TezosNetwork.MAINNET:
         return environment.mainnet
-      case TezosNetwork.BABYLONNET:
-        return environment.babylonnet
       case TezosNetwork.CARTHAGENET:
         return environment.carthagenet
       default:

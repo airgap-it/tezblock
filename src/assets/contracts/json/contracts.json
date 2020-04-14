@@ -18,6 +18,21 @@
         "url": "https://medium.com/stakerdao"
       }
     ],
-    "tezosNetwork": ["mainnet"]
+    "tezosNetwork": ["mainnet"],
+    "decimals": 0
+  },
+  "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
+    "symbol": "tzBTC",
+    "name": "tzBTC",
+    "website": "http://www.tzbtc.io/",
+    "description": "tzBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "http://www.tzbtc.io/"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 8
   }
 }

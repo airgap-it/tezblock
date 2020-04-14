@@ -6,6 +6,7 @@ import { Block } from '@tezblock/interfaces/Block'
 import { Count } from '@tezblock/domain/tab'
 import { sort, TableState, getInitialTableState } from '@tezblock/domain/table'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import { isNotEmptyArray } from '@tezblock/services/fp'
 
 export interface Busy {
   transactions: boolean
@@ -49,7 +50,7 @@ export const reducer = createReducer(
     ...state,
     transactions: {
       ...state.transactions,
-      data,
+      data: isNotEmptyArray(data) ? data : null,
       loading: false
     }
   })),

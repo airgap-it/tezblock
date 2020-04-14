@@ -4,6 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { Account } from '@tezblock/interfaces/Account'
+import { getConventer, TokenContract } from '@tezblock/domain/contract'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) => Column[] } = {
   /* BLOCK */
@@ -412,13 +413,18 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       template: Template.address,
       data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
     },
-    {
-      name: 'Symbol',
-      field: 'symbol'
-    },
+    // {
+    //   name: 'Symbol',
+    //   field: 'symbol'
+    // },
     {
       name: 'Total Supply',
-      field: 'totalSupply'
+      field: 'totalSupply',
+      template: Template.amount,
+      data: (item: TokenContract) => ({
+        data: { amount: item.totalSupply },
+        options: { symbol: item.symbol, conventer: getConventer(item), showFiatValue: false }
+      })
     },
     {
       name: 'Description',

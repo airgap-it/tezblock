@@ -59,6 +59,7 @@ export class IconPipe implements PipeTransform {
     let coin: IconName = 'coin'
     let hatChef: IconName = 'hat-chef'
     let infoCircle: IconName = 'info-circle'
+    let breadLoaf: IconName = 'bread-loaf'
     if (!environment.proFontAwesomeAvailable) {
       prefix = 'fas'
       handReceiving = 'handshake'
@@ -67,6 +68,7 @@ export class IconPipe implements PipeTransform {
       coin = 'coins'
       hatChef = 'list-alt'
       infoCircle = 'info'
+      breadLoaf = 'bread-slice'
     }
     this.iconNameMap = {
       bell: { prefix, iconName: 'bell' },
@@ -94,7 +96,7 @@ export class IconPipe implements PipeTransform {
       android: { prefix: 'fab', iconName: 'android' },
       caretUp: { prefix, iconName: 'caret-up' },
       caretDown: { prefix, iconName: 'caret-down' },
-      breadLoaf: { prefix, iconName: 'bread-loaf' },
+      breadLoaf: { prefix, iconName: breadLoaf },
       coin: { prefix, iconName: coin },
       hatChef: { prefix, iconName: hatChef },
       infoCircle: { prefix, iconName: infoCircle },

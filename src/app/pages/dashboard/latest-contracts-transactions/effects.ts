@@ -1,23 +1,22 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, forkJoin, from } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
+import { of, forkJoin } from 'rxjs'
+import { map, catchError, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { TezosTransactionResult } from 'airgap-coin-lib'
 import { BaseService } from '@tezblock/services/base.service'
-import { Operation } from '@tezblock/services/base.service'
-import { sort } from '@tezblock/domain/table'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { flatten } from '@tezblock/services/fp'
-import { airGapTransactionToContractOperation, ContractOperation } from '@tezblock/domain/contract'
+import { airGapTransactionToContractOperation, ContractOperation, TokenContract } from '@tezblock/domain/contract'
 
-const toContractOperations = (data: TezosTransactionResult, symbol: string): ContractOperation[] =>
+const toContractOperations = (data: TezosTransactionResult, contract: TokenContract): ContractOperation[] =>
   data.transactions.map(transaction => ({
     ...airGapTransactionToContractOperation(transaction),
-    symbol
+    symbol: contract.symbol,
+    decimals: contract.decimals
   }))
 
 @Injectable()
@@ -30,7 +29,7 @@ export class DashboardLatestContractsTransactionsEffects {
           contracts.map(contract =>
             this.apiService
               .getTransferOperationsForContract(contract)
-              .pipe(map(result => toContractOperations(result, contract.symbol).slice(0, 3)))
+              .pipe(map(result => toContractOperations(result, contract).slice(0, 3)))
           )
         ).pipe(
           map(response => flatten(response)),

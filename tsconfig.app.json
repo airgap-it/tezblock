@@ -12,5 +12,8 @@
   ],
   "include": [
     "src/**/*.d.ts"
+  ],
+  "exclude": [
+    "src/app/fa-add.excluded.ts"
   ]
 }
