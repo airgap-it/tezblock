@@ -50,4 +50,5 @@ export interface Transaction {
   burn?: string
   symbol?: string
   errors?: OperationError[]
+  outgoing?: boolean
 }
