@@ -2,12 +2,12 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { faGithub, faMedium, faTelegram, faTwitter, faAndroid, faApple } from '@fortawesome/free-brands-svg-icons'
 import {
   faBell,
-  faVoteYea,
+  faBoxBallot,
   faCopy,
   faExchangeAlt,
   faEye,
-  faSeedling,
-  faHandshake,
+  faHandHoldingSeedling,
+  faHandReceiving,
   faLevelDownAlt,
   faLevelUpAlt,
   faLink,
@@ -20,8 +20,10 @@ import {
   faLaptop,
   faCaretUp,
   faCaretDown,
-  faBreadSlice,
+  faBreadLoaf,
+  faCoin,
   faCoins,
+  faHatChef,
   faListAlt,
   faInfoCircle,
   faDownload,
@@ -32,7 +34,7 @@ import {
   faCircle,
   faChevronLeft,
   faChevronRight
-} from '@fortawesome/free-solid-svg-icons'
+} from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
   library.add(
@@ -45,11 +47,11 @@ export const addFontAwesome = () => {
     faQrcode,
     faSearch,
     faExchangeAlt,
-    faHandshake,
+    faHandReceiving,
     faLink,
     faStamp,
-    faVoteYea,
-    faSeedling,
+    faBoxBallot,
+    faHandHoldingSeedling,
     faEye,
     faGithub,
     faMedium,
@@ -61,8 +63,10 @@ export const addFontAwesome = () => {
     faGlobe,
     faCaretUp,
     faCaretDown,
-    faBreadSlice,
+    faBreadLoaf,
+    faCoin,
     faCoins,
+    faHatChef,
     faListAlt,
     faInfoCircle,
     faDownload,

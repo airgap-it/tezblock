@@ -7,7 +7,7 @@
 </ng-template>
 
 <tabset *ngIf="tabs && tabs.length > 0" class="w-100">
-  <tab *ngFor="let tab of tabs" [active]="tab.active" (selectTab)="selectTab(tab)">
+  <tab *ngFor="let tab of tabs" [active]="tab.active" (selectTab)="selectTab(tab)" [disabled]="isTabDisabled(tab)">
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
@@ -320,6 +320,16 @@
         [expandedRow]="rewardsExpandedRow"
         [pagination]="true"
         (onLoadMore)="loadMoreRewards()"
+      ></tezblock-table>
+    </ng-container>
+
+    <ng-container *ngIf="tab.kind === 'ballot'">
+      <tezblock-table
+        [columns]="tab.columns"
+        [data]="votes$ | async"
+        [loading]="votesLoading$ | async"
+        [pagination]="true"
+        (onLoadMore)="loadMoreVotes()"
       ></tezblock-table>
     </ng-container>
 

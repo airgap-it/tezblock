@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
 import * as moment from 'moment'
@@ -27,8 +27,6 @@ const dayDifference = (value: number): number => moment().diff(moment(value), 'd
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
   styleUrls: ['./amount-cell.component.scss']
-  // TODO: on 1st click no change
-  // changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AmountCellComponent implements OnInit {
   @Input()
@@ -76,7 +74,6 @@ export class AmountCellComponent implements OnInit {
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
   historicCurrencyInfo: CurrencyInfo
-  //historicCurrencyInfo$ = new Subject()
 
   enableComparison = false
 
@@ -103,13 +100,13 @@ export class AmountCellComponent implements OnInit {
   }
 
   showOldValue = false
-  //showOldValue$ = new BehaviorSubject(false)
 
   private options$ = new BehaviorSubject<any>(null)
 
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly chartDataService: ChartDataService,
+    private cdRef: ChangeDetectorRef,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
@@ -132,6 +129,7 @@ export class AmountCellComponent implements OnInit {
           currency: 'USD',
           price: new BigNumber(response[1].close)
         }
+        this.cdRef.markForCheck()
 
         this.showOldValue = !this.showOldValue
       })

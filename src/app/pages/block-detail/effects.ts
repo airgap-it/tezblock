@@ -32,7 +32,7 @@ export class BlockDetailEffects {
         this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash),
         this.store$.select(state => state.blockDetails.kind)
       ),
-      filter(([{ block }, transactionsLoadedByBlockHash]) => block.hash !== transactionsLoadedByBlockHash),
+      filter(([{ block }, transactionsLoadedByBlockHash]) => block && block.hash !== transactionsLoadedByBlockHash),
       map(([{ block }, transactionsLoadedByBlockHash, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: kind }))
     )
   )

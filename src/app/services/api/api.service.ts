@@ -781,7 +781,7 @@ export class ApiService {
       )
   }
 
-  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit: number): Promise<T[]> {
+  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Promise<T[]> {
     let headers
     if (field === 'operation_group_hash') {
       // then we only care about spend transactions
@@ -810,8 +810,7 @@ export class ApiService {
             field,
             function: operation
           }
-        ],
-        limit
+        ]
       }
     } else {
       headers = {
@@ -834,8 +833,7 @@ export class ApiService {
             field,
             function: operation
           }
-        ],
-        limit
+        ]
       }
     }
 
