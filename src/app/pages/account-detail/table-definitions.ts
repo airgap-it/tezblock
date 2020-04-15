@@ -1,7 +1,7 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Options } from '@tezblock/components/address-item/address-item.component'
+import { Options } from '@tezblock/services/alias/alias.service'
 
 export const columns: { [key: string]: (options: Options) => Column[] } = {
   [OperationTypes.Transaction]: (options: Options) =>

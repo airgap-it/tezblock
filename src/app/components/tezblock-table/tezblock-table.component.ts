@@ -1,7 +1,17 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild, ChangeDetectionStrategy } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef,
+  TrackByFunction,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core'
 
 import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
-import { Options } from '@tezblock/components/address-item/address-item.component'
+import { Options } from '@tezblock/services/alias/alias.service'
 
 export enum Template {
   address,
@@ -19,7 +29,7 @@ export interface Column {
   name?: string
   field?: string
   width?: string
-  data?: (item: any) => { data?: any, options?: Options }
+  data?: (item: any) => { data?: any; options?: Options }
   template?: TemplateRef<any> | Template
   sortable?: boolean | undefined
 }
