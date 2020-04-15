@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+
+<url>
+  <loc>https://tezblock.io/</loc>
+  <changefreq>monthly</changefreq>
+  <priority>1</priority>
+</url>
+
+<url>
+  <loc>https://tezblock.io/transaction/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/activation/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/origination/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/account/list/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/baker/list/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/block/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/endorsement/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/delegation/list/</loc>
+  <changefreq>hourly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/vote/list/</loc>
+  <changefreq>weekly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/proposal/list/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/token-contract/list/</loc>
+  <changefreq>weekly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/contract/list/</loc>
+  <changefreq>weekly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/double-baking/list/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/double-endorsement/list/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/resources/wallets/</loc>
+  <changefreq>monthly</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/constants/</loc>
+  <changefreq>daily</changefreq>
+</url>
+
+<url>
+  <loc>https://tezblock.io/health/</loc>
+  <changefreq>daily</changefreq>
+</url>
+
+</urlset>
+
