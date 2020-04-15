@@ -7,6 +7,7 @@ import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState, Pagination } from '@tezblock/domain/table'
 import { Reward } from '@tezblock/domain/reward'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
@@ -25,6 +26,7 @@ export interface State {
   upcomingRights: actions.UpcomingRights
   activeDelegations: number
   rewards: TableState<Reward>
+  votes: TableState<Transaction>
 }
 
 const initialState: State = {
@@ -41,7 +43,8 @@ const initialState: State = {
   },
   upcomingRights: undefined,
   activeDelegations: undefined,
-  rewards: getInitialTableState(undefined, 3)
+  rewards: getInitialTableState(undefined, 3),
+  votes: getInitialTableState()
 }
 
 const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
@@ -241,7 +244,7 @@ export const reducer = createReducer(
     ...state,
     rewards: {
       ...state.rewards,
-      loading: true
+      loading: false
     }
   })),
   on(actions.increaseRewardsPageSize, state => ({
@@ -251,6 +254,38 @@ export const reducer = createReducer(
       pagination: {
         ...state.rewards.pagination,
         currentPage: state.rewards.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.loadVotes, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: true
+    }
+  })),
+  on(actions.loadVotesSucceeded, (state, { data }) => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      data,
+      loading: false
+    }
+  })),
+  on(actions.loadVotesFailed, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      loading: false
+    }
+  })),
+  on(actions.increaseVotesPageSize, state => ({
+    ...state,
+    votes: {
+      ...state.votes,
+      pagination: {
+        ...state.votes.pagination,
+        currentPage: state.votes.pagination.currentPage + 1
       }
     }
   })),

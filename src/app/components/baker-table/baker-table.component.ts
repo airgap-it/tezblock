@@ -18,8 +18,9 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { kindToOperationTypes, Tab } from '@tezblock/domain/tab'
+import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { first } from '@tezblock/services/fp'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -54,6 +55,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
   upcomingRights$: Observable<actions.UpcomingRights>
   upcomingRightsLoading$: Observable<boolean>
+  votes$: Observable<Transaction[]>
+  votesLoading$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
@@ -99,9 +102,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   @Input() ratings: any
 
   @Input() bakerFee$: Observable<number>
-
-  @Output()
-  readonly overviewTabClicked: EventEmitter<string> = new EventEmitter()
 
   rewardsColumns: Column[]
   rewardsFields: string[]
@@ -198,6 +198,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             : upcomingRights.endorsing !== null
         )
       )
+    this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
+    this.votesLoading$ = this.store$.select(state => state.bakerTable.votes.loading)
 
     this.setupExpandedRows()
     this.setupTables()
@@ -237,14 +239,23 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
           )
         )
-        .subscribe(() => this.store$.dispatch(actions.loadRewards()))
+        .subscribe(() => this.store$.dispatch(actions.loadRewards())),
+
+      // using account-detail functionality
+      this.store$
+        .select(state => state.accountDetails.counts)
+        .pipe(filter(counts => !!counts))
+        .subscribe(this.updateVotesCount.bind(this))
     )
   }
 
   selectTab(selectedTab: Tab) {
     this.store$.dispatch(actions.kindChanged({ kind: kindToOperationTypes(selectedTab.kind) }))
     this.updateSelectedTab(selectedTab)
-    this.overviewTabClicked.emit(kindToOperationTypes(selectedTab.kind))
+
+    if (selectedTab.kind === 'ballot' /* votes */) {
+      this.store$.dispatch(actions.loadVotes())
+    }
   }
 
   getTabCount(tabs: Tab[]) {
@@ -289,6 +300,18 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   loadMoreRewards() {
     this.store$.dispatch(actions.increaseRewardsPageSize())
+  }
+
+  loadMoreVotes() {
+    this.store$.dispatch(actions.increaseVotesPageSize())
+  }
+
+  isTabDisabled(tab: Tab) {
+    if (tab.kind !== 'ballot') {
+      return false
+    }
+
+    return tab.disabled()
   }
 
   private updateSelectedTab(selectedTab: Tab) {
@@ -384,5 +407,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       }),
       primaryKey: 'cycle'
     }
+  }
+
+  private updateVotesCount(counts: Count[]) {
+    const votesTab = this.tabs.find(tab => tab.kind === 'ballot')
+    const updatedTab = first(updateTabCounts([votesTab], counts))
+
+    votesTab.count = updatedTab.count
   }
 }

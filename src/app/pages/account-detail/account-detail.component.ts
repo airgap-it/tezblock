@@ -480,17 +480,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         disabled: function() {
           return !this.count
         }
-      },
-      {
-        title: 'Votes',
-        active: false,
-        kind: 'ballot',
-        count: undefined,
-        icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() {
-          return !this.count
-        }
       }
     ]
 
@@ -533,6 +522,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         icon: this.iconPipe.transform('coin'),
         disabled: function() {
           return !this.count
+        }
+      },
+      {
+        title: 'Votes',
+        active: false,
+        kind: 'ballot',
+        count: undefined,
+        icon: this.iconPipe.transform('boxBallot'),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return this.count === 0
         }
       }
     ]
