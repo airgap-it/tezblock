@@ -22,6 +22,7 @@ import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-block-detail',
@@ -43,6 +44,10 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   orderBy$: Observable<OrderBy>
 
+  get blockLevel(): string {
+    return this.activatedRoute.snapshot.params.id
+  }
+
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
@@ -53,7 +58,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title,
+    private readonly activatedRoute: ActivatedRoute
   ) {
     super()
   }
@@ -111,6 +118,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
+    this.titleService.setTitle('Tezos Block: ' + this.blockLevel + ' - tezblock')
   }
 
   tabSelected(kind: string) {

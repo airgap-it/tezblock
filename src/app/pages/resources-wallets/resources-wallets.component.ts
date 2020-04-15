@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core'
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs'
 
-import { WalletService } from "../../services/wallet/wallet.service";
-import { Wallet } from "../../interfaces/Wallet";
+import { WalletService } from '../../services/wallet/wallet.service'
+import { Wallet } from '../../interfaces/Wallet'
+import { Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-resources-wallets',
@@ -10,11 +11,13 @@ import { Wallet } from "../../interfaces/Wallet";
   styleUrls: ['./resources-wallets.component.scss']
 })
 export class ResourcesWalletsComponent implements OnInit {
-  constructor(private walletService: WalletService) {}
+  constructor(private walletService: WalletService, private titleService: Title) {}
 
   get wallets$(): Observable<Wallet[]> {
-    return this.walletService.get();
+    return this.walletService.get()
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.titleService.setTitle('Tezos Wallets - tezblock')
+  }
 }

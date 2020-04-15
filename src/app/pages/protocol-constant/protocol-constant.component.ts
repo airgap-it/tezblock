@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core'
 import { Block } from '@tezblock/interfaces/Block'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { Title } from '@angular/platform-browser'
 
 export interface ProtocolConstantResponse {
   proof_of_work_nonce_size: number
@@ -62,12 +63,15 @@ export class ProtocolConstantComponent implements OnInit {
   constructor(
     private readonly http: HttpClient,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly blockService: BlockService
+    private readonly blockService: BlockService,
+    private titleService: Title
   ) {
     this.getData()
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.titleService.setTitle('Tezos Constants - tezblock')
+  }
 
   public getData() {
     this.blockService.getLatest().subscribe((block: Block) => {

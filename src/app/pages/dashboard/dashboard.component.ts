@@ -18,6 +18,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { Title } from '@angular/platform-browser'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -53,7 +54,8 @@ export class DashboardComponent extends BaseComponent {
   constructor(
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title
   ) {
     super()
     this.store$.dispatch(actions.loadContracts())
@@ -77,12 +79,8 @@ export class DashboardComponent extends BaseComponent {
 
     this.isMainnet()
 
-    this.priceChartDatasets$ = this.historicData$.pipe(
-      map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }])
-    )
-    this.priceChartLabels$ = this.historicData$.pipe(
-      map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString()))
-    )
+    this.priceChartDatasets$ = this.historicData$.pipe(map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }]))
+    this.priceChartLabels$ = this.historicData$.pipe(map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString())))
     this.proposalHash$ = this.store$
       .select(state => state.dashboard.proposal)
       .pipe(
@@ -117,6 +115,7 @@ export class DashboardComponent extends BaseComponent {
         this.actions$.pipe(ofType(actions.loadBlocksFailed))
       ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
     )
+    this.titleService.setTitle('tezblock - Tezos block explorer')
   }
 
   isMainnet() {

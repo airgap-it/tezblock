@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { Observable } from 'rxjs'
 
@@ -7,6 +7,7 @@ import * as actions from './actions'
 import { BlockStatus } from '@tezblock/services/health/health.service'
 import { map } from 'rxjs/operators'
 import * as moment from 'moment'
+import { Title } from '@angular/platform-browser'
 
 const isOlderThan4Mins = (time: moment.Moment): boolean => {
   const fourMinutesOld = moment().add(-4, 'minutes')
@@ -20,13 +21,12 @@ const isOlderThan4Mins = (time: moment.Moment): boolean => {
   styleUrls: ['./health.component.scss']
 })
 export class HealthComponent implements OnInit {
-
   latestNodeBlock$: Observable<any>
   isNodeUp$: Observable<boolean>
   latestConseilBlock$: Observable<BlockStatus>
   isConseilUp$: Observable<boolean>
 
-  constructor(private readonly store$: Store<fromRoot.State>) {
+  constructor(private readonly store$: Store<fromRoot.State>, private titleService: Title) {
     this.store$.dispatch(actions.loadLatestNodeBlock())
     this.store$.dispatch(actions.loadLatestConseilBlock())
   }
@@ -40,6 +40,6 @@ export class HealthComponent implements OnInit {
     this.isConseilUp$ = this.latestConseilBlock$.pipe(
       map(latestConseilBlock => latestConseilBlock && !isOlderThan4Mins(moment(latestConseilBlock.timestamp, 'YYYY-MM-DD')))
     )
+    this.titleService.setTitle('Health - tezblock')
   }
-
 }

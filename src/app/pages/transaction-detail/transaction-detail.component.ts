@@ -21,6 +21,8 @@ import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Title } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -30,6 +32,10 @@ import { OrderBy } from '@tezblock/services/base.service'
 export class TransactionDetailComponent extends BaseComponent implements OnInit {
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
+  get transactionHash(): string {
+    return this.activatedRoute.snapshot.params.id
   }
 
   tabs: Tab[]
@@ -52,7 +58,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly copyService: CopyService,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly activatedRoute: ActivatedRoute,
+    private titleService: Title,
+    private aliasService: AliasService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -108,6 +117,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
+    this.titleService.setTitle('Tezos Operation: ' + this.aliasService.getFormattedAddress(this.transactionHash) + ' - tezblock')
   }
 
   copyToClipboard(val: string) {
@@ -137,7 +147,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Delegations',
@@ -146,7 +158,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Originations',
@@ -155,7 +169,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Reveals',
@@ -164,7 +180,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('eye'),
         columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Activations',
@@ -173,7 +191,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
         columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       },
       {
         title: 'Votes',
@@ -182,7 +202,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
         columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }),
-        disabled: function() { return !this.count }
+        disabled: function() {
+          return !this.count
+        }
       }
     ]
   }

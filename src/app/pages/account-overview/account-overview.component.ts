@@ -14,6 +14,7 @@ import { filter, map } from 'rxjs/operators'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { Title } from '@angular/platform-browser'
 
 const labelsParams = {
   display: true,
@@ -78,7 +79,8 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private readonly shortenStringPipe: ShortenStringPipe
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private titleService: Title
   ) {
     super()
   }
@@ -123,6 +125,8 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
       .pipe(map(breakpointState => breakpointState.matches))
     this.top25ChartOptions$ = this.isMobile$.pipe(map(this.getOptions.bind(this)))
     this.top25ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 800, height: 500 })))
+
+    this.titleService.setTitle('Tezos Accounts - tezblock')
   }
   public loadMore() {
     this.store$.dispatch(actions.increasePageOfAccounts())

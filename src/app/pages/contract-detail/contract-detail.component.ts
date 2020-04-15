@@ -20,6 +20,8 @@ import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Account } from '@tezblock/interfaces/Account'
+import { Title } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
   selector: 'app-contract-detail',
@@ -58,6 +60,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   manager$: Observable<string>
   conventer$: Observable<Conventer>
 
+  get contractAddress(): string {
+    return this.activatedRoute.snapshot.params.id
+  }
+
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
@@ -68,7 +74,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private titleService: Title,
+    private aliasService: AliasService
   ) {
     super()
 
@@ -147,6 +155,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
+    this.titleService.setTitle('Tezos Contract: ' + this.aliasService.getFormattedAddress(this.contractAddress) + ' - tezblock')
   }
 
   showQr() {

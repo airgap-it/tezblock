@@ -21,6 +21,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
 import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Title } from '@angular/platform-browser'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
@@ -46,12 +47,7 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
     })
   const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
 
-  return pipe(
-    toDiffsInDays,
-    groupBy('diffInDays'),
-    sum,
-    amountToXTZ
-  )(data)
+  return pipe(toDiffsInDays, groupBy('diffInDays'), sum, amountToXTZ)(data)
 }
 
 export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
@@ -105,7 +101,8 @@ export class ListComponent extends BaseComponent implements OnInit {
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -113,7 +110,9 @@ export class ListComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
-
+    this.route.paramMap.subscribe(paramMap => {
+      this.titleService.setTitle('Tezos ' + paramMap.get('route').replace(/^\w/, c => c.toUpperCase()) + 's' + ' - tezblock')
+    })
     this.routeName$.subscribe(routeName => {
       try {
         switch (routeName) {
@@ -162,10 +161,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               //this.store$.select(state => state.list.transactionsChartDatasets)
               this.store$
                 .select(state => state.list.transactionsChartData)
-                .pipe(
-                  filter(Array.isArray),
-                  map(toTransactionsChartDataSource('Transactions', 'Volume'))
-                )
+                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume')))
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(
@@ -202,11 +198,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.activationsCountLast24h$ = this.store$.select(state => state.list.activationsCountLast24h)
             this.activationsChartDatasets$ = this.store$
               .select(state => state.list.activationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Activations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Activations')), map(toArray))
             const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
             const activationsData$ = this.store$.select(state => state.list.activations.data)
             const activationsOrderBy$ = this.store$.select(state => state.list.activations.orderBy)
@@ -237,11 +229,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.originationsCountLast24h$ = this.store$.select(state => state.list.originationsCountLast24h)
             this.originationsChartDatasets$ = this.store$
               .select(state => state.list.originationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Originations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Originations')), map(toArray))
             const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
             const originationsData$ = this.store$.select(state => state.list.originations.data)
             const originationsOrderBy$ = this.store$.select(state => state.list.originations.orderBy)
