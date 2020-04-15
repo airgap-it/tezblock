@@ -84,6 +84,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
+  is_baker: boolean | undefined
 
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
