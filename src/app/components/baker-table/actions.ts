@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store'
+import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
@@ -78,6 +79,10 @@ export const loadVotes = createAction(`[${featureName}] Load Votes`)
 export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ data: Transaction[] }>())
 export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
 export const increaseVotesPageSize = createAction(`[${featureName}] Change Votes Page Size`)
+
+export const loadBakerReward = createAction(`[${featureName}] Load Baker Rewards`, props<{ baker: string, cycle: number }>())
+export const loadBakerRewardSucceeded = createAction(`[${featureName}] Load Baker Rewards Succeeded`, props<{ cycle: number, bakerReward: TezosPayoutInfo }>())
+export const loadBakerRewardFailed = createAction(`[${featureName}] Load Baker Rewards Failed`, props<{ cycle: number, error: any }>())
 
 export const kindChanged = createAction(`[${featureName}] Kind Changed`, props<{ kind: string }>())
 

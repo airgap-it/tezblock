@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { combineLatest, from, Observable, EMPTY } from 'rxjs'
+import { TezosNetwork, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -21,6 +21,7 @@ import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-tab
 import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
+import { toClientsideDataScource } from '@tezblock/domain/table'
 
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
@@ -43,6 +44,7 @@ const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
 })
 export class BakerTableComponent extends BaseComponent implements OnInit {
   @ViewChild('expandedRowTemplate', { static: true }) expandedRowTemplate: TemplateRef<any>
+  @ViewChild('rewardsExpandedRowHeaderTemplate', { static: true }) rewardsExpandedRowHeaderTemplate: TemplateRef<any>
   private _tabs: Tab[] | undefined = []
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
@@ -52,6 +54,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   accountLoading$: Observable<boolean>
 
   rewards$: Observable<Reward[]>
+  bakerReward$: Observable<{ [key: string]: TezosPayoutInfo }>
+  isBakerRewardBusy$: Observable<{ [key: string]: boolean }>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
   upcomingRights$: Observable<actions.UpcomingRights>
   upcomingRightsLoading$: Observable<boolean>
@@ -176,6 +180,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
       map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
     )
+    this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
+    this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
@@ -314,6 +320,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     return tab.disabled()
   }
 
+  onRowExpanded(reward: Reward) {
+    const { baker, cycle } = reward
+
+    this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
+  }
+
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
@@ -339,18 +351,19 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Delegator Account',
             field: 'delegator',
             template: Template.address,
-            data: (item: Payout) => ({ data: item.delegator, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: item.delegator })
           },
           {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: { amount: item.payout }, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: { amount: item.payout } })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
-        data: item.payouts,
-        filterCondition: (detail, query) => detail.delegator === query
+        dataSource: toClientsideDataScource(item.payouts, (detail, query) => detail.delegator === query),
+        headerTemplate: this.rewardsExpandedRowHeaderTemplate,
+        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
       }),
       primaryKey: 'cycle'
     }
@@ -377,7 +390,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: BakingRights) => ({ data: { amount: item.deposit } })
           }
         ],
-        data: item.items
+        dataSource: toClientsideDataScource(item.items)
       }),
       primaryKey: 'cycle'
     }
@@ -403,7 +416,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
           }
         ],
-        data: item.items
+        dataSource: toClientsideDataScource(item.items)
       }),
       primaryKey: 'cycle'
     }

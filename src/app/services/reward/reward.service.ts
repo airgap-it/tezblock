@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { TezosProtocol, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { forkJoin, from, Observable, throwError } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { range } from 'lodash'
@@ -87,14 +87,21 @@ export class RewardService {
 
     if (this.pendingPromises.has(key)) {
       return this.pendingPromises.get(key)
-    } else {
-      const promise = this.protocol.calculateRewards(address, cycle).then(result => {
-        this.calculatedRewardsMap.set(key, result)
-        this.pendingPromises.delete(key)
-        return result
-      })
-      this.pendingPromises.set(key, promise)
-      return promise
     }
+
+    const promise = this.protocol.calculateRewards(address, cycle).then(result => {
+      this.calculatedRewardsMap.set(key, result)
+      this.pendingPromises.delete(key)
+      return result
+    })
+    this.pendingPromises.set(key, promise)
+
+    return promise
+  }
+
+  getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
+    return from(this.calculateRewards(address, cycle)).pipe(
+      switchMap(rewards => from(this.protocol.calculatePayout(address, rewards)))
+    )
   }
 }
