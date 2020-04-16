@@ -170,7 +170,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       )
 
     this.rewards$ = combineLatest(
-      this.store$.select(state => state.bakerTable.rewards.data),
+      this.store$.select(state => state.bakerTable.rewards.data).pipe(map(data => data || [])),
       this.bakerFee$
     ).pipe(
       filter(([rewards, bakerFee]) => bakerFee !== undefined),
