@@ -8,7 +8,7 @@ import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
-  currency = 'currency'
+  exchangeRates = 'exchangeRates'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -26,13 +26,15 @@ export interface ByCycleState {
   }
 }
 
-export interface Currency {
-  [currencyName: string]: number
+export interface ExchangeRates {
+  [currencyName: string]: {
+    [currencyName: string]: number
+  }
 }
 
 export interface Cache {
   [CacheKeys.fromCurrentCycle]: ByCycleState
-  [CacheKeys.currency]: Currency
+  [CacheKeys.exchangeRates]: ExchangeRates
 }
 
 @Injectable({

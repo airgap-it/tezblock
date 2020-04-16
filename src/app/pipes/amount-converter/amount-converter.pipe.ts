@@ -1,15 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { isNil } from 'lodash'
 
-export const tryGetProtocolByIdentifier = (identifier: string): ICoinProtocol => {
-  try {
-    return getProtocolByIdentifier(identifier)
-  } catch (e) {
-    return undefined
-  }
-}
+import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 export const toXTZ = (value: number, protocol: ICoinProtocol): number => {
   const BN = BigNumber.clone({
@@ -87,11 +81,7 @@ export class AmountConverterPipe implements PipeTransform {
       return ''
     }
 
-    const protocol: ICoinProtocol = tryGetProtocolByIdentifier(args.protocolIdentifier)
-
-    if (!protocol) {
-      return ''
-    }
+    const protocol: { decimals: number } = tryGetProtocolByIdentifier(args.protocolIdentifier) || { decimals: 0 }
 
     const BN = BigNumber.clone({
       FORMAT: {

@@ -14,8 +14,8 @@
 <ng-template #blockTemplate let-context>
   <app-block-cell [data]="context?.data"></app-block-cell>
 </ng-template>
-<ng-template #symbolTemplate>
-  <app-symbol-cell></app-symbol-cell>
+<ng-template #symbolTemplate let-context>
+  <app-symbol-cell [data]="context?.data"></app-symbol-cell>
 </ng-template>
 <ng-template #hashTemplate let-context>
   <app-hash-cell [data]="context?.data" [options]="context?.options"></app-hash-cell>
@@ -140,7 +140,9 @@
       </ng-template>
       <ng-template #elseTemplate>
         <thead width="180">
-          <tr><th>{{ noDataLabel || 'No Transactions' }}</th></tr>
+          <tr>
+            <th>{{ noDataLabel || 'No Transactions' }}</th>
+          </tr>
         </thead>
       </ng-template>
     </table>

@@ -15,6 +15,7 @@ import { first } from '@tezblock/services/fp'
 import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { get } from 'lodash'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 
 @Injectable()
 export class BakerTableEffects {
@@ -210,6 +211,32 @@ export class BakerTableEffects {
     )
   )
 
+  loadVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadVotes),
+      withLatestFrom(
+        this.store$.select(state => state.bakerTable.votes.pagination),
+        this.store$.select(state => state.bakerTable.accountAddress),
+        this.store$.select(state => state.bakerTable.votes.orderBy)
+      ),
+      switchMap(([action, pagination, address, orderBy]) =>
+        this.transactionService
+          .getAllTransactionsByAddress(address, 'ballot', pagination.currentPage * pagination.selectedSize, orderBy)
+          .pipe(
+            map(data => actions.loadVotesSucceeded({ data })),
+            catchError(error => of(actions.loadVotesFailed({ error })))
+          )
+      )
+    )
+  )
+
+  onPagingLoadVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.increaseVotesPageSize),
+      map(() => actions.loadVotes())
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
@@ -217,6 +244,7 @@ export class BakerTableEffects {
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
     private readonly rewardService: RewardService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly transactionService: TransactionService
   ) {}
 }
