@@ -5,6 +5,8 @@ import * as actions from './actions'
 import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 
+const addSymbol = (symbol: string) => (contractOperation: ContractOperation) => ({ ...contractOperation, symbol })
+
 export interface State {
   manager: string
   address: string
@@ -63,7 +65,7 @@ export const reducer = createReducer(
     }
   })),
   on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
-    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation)
+    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation).map(addSymbol(state.contract.symbol))
 
     return {
       ...state,
@@ -107,11 +109,13 @@ export const reducer = createReducer(
     }
   })),
   on(actions.loadOtherOperationsSucceeded, (state, { otherOperations }) => {
+    const data = otherOperations.map(addSymbol(state.contract.symbol))
+
     return {
       ...state,
       otherOperations: {
         ...state.otherOperations,
-        data: otherOperations,
+        data,
         loading: false
       }
     }

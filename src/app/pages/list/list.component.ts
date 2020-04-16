@@ -19,8 +19,9 @@ import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
-import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
+import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
@@ -390,25 +391,6 @@ export class ListComponent extends BaseComponent implements OnInit {
               showLoadMore$
             )
             break
-          case 'token-contract':
-            const showLoadMoreTokenContracts$ = this.store$
-              .select(state => state.list.tokenContracts)
-              .pipe(map(contracts => contracts.data.length < contracts.pagination.total))
-            const loadingTokenContracts$ = this.store$.select(state => state.list.tokenContracts.loading)
-            const tokenContractsData$ = this.store$.select(state => state.list.tokenContracts.data)
-            const tokenContractsOrderBy$ = this.store$.select(state => state.list.tokenContracts.orderBy)
-
-            this.store$.dispatch(actions.loadTokenContracts())
-
-            this.setupTable(
-              columns[OperationTypes.TokenContract]({ showFiatValue: this.isMainnet }),
-              tokenContractsData$,
-              loadingTokenContracts$,
-              tokenContractsOrderBy$,
-              showLoadMoreTokenContracts$,
-              'No Contracts'
-            )
-            break
           case 'contract':
             const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
             const contractsData$ = this.store$.select(state => state.list.contracts.data)
@@ -467,9 +449,6 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'vote':
         this.store$.dispatch(actions.increasePageOfVotes())
-        break
-      case 'token-contract':
-        this.store$.dispatch(actions.increasePageOfTokenContracts())
         break
       case 'contract':
         this.store$.dispatch(actions.increasePageOfContracts())

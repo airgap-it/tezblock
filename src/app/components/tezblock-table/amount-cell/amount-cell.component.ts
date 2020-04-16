@@ -1,13 +1,18 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core'
-import { Observable } from 'rxjs'
+import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
+import { Observable, BehaviorSubject } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
 import * as moment from 'moment'
 import { Store } from '@ngrx/store'
+import BigNumber from 'bignumber.js'
 
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
-import BigNumber from 'bignumber.js'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import * as fromRoot from '@tezblock/reducers'
+import { get } from '@tezblock/services/fp'
+import { isInBTC } from '@tezblock/domain/airgap'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 export interface AmountData {
   amount: number | string
@@ -50,6 +55,8 @@ export class AmountCellComponent implements OnInit {
       if (this.amount) {
         this.setAmountPiped()
       }
+
+      this.options$.next(value)
     }
   }
 
@@ -60,6 +67,7 @@ export class AmountCellComponent implements OnInit {
   get conventer(): Conventer {
     return this.options.conventer || this.defaultConventer.bind(this)
   }
+  currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
 
   private _options = undefined
 
@@ -86,18 +94,31 @@ export class AmountCellComponent implements OnInit {
     return this.options.maxDigits === undefined ? 6 : this.options.maxDigits
   }
 
+  // temporary solution: ask how to utilizy existing maxDigits but doesn't used by fiatValue
+  get precision(): number {
+    return isInBTC(get<any>(options => options.symbol)(this.options)) ? 8 : 2
+  }
+
   showOldValue = false
+
+  private options$ = new BehaviorSubject<any>(null)
 
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly chartDataService: ChartDataService,
-    private readonly store$: Store<fromRoot.State>,
-    private cdRef: ChangeDetectorRef
-  ) {
-    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
-  }
+    private cdRef: ChangeDetectorRef,
+    private readonly cryptoPricesService: CryptoPricesService,
+    private readonly store$: Store<fromRoot.State>
+  ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
+
+    // TODO: this is bad: for a split of a second always is visible fiatCurrencyInfo$ conversion
+    this.currencyConverterPipeArgs$ = this.options$.pipe(
+      switchMap(options => this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)))
+    )
+  }
 
   tooltipClick() {
     if (dayDifference(this.data.timestamp) >= 1) {
