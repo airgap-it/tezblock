@@ -11,7 +11,7 @@ const convertSymbol = (symbol: string): string => {
     // case 'tzBTC':
     //   return 'xtz-btc'
     case 'STKR':
-      return 'stkr' // xtz ?
+      return 'xtz'
     case 'BTC':
     case 'tzBTC':
       return 'btc'
