@@ -8,5 +8,5 @@ export enum SearchOptionType {
   account = 'Accounts',
   baker = 'Bakers',
   block = 'Blocks',
-  faContract = 'FA 1.2 Assets'
+  faContract = 'Asset Smart Contracts'
 }
