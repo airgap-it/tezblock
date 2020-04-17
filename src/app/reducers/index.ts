@@ -17,6 +17,7 @@ import * as fromHealth from '../pages/health/reducer'
 import * as fromApp from '../app.reducer'
 import * as fromDashboard from '../pages/dashboard/reducer'
 import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer'
+import * as fromTokenContractOveview from '../pages/token-contract-overview/reducer'
 
 export interface State {
   app: fromApp.State
@@ -28,6 +29,7 @@ export interface State {
   dashboard: fromDashboard.State
   dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.State
   endorsementDetails: fromEndorsementDetails.State
+  tokenContractOveview: fromTokenContractOveview.State
   transactionDetails: fromTransactionDetails.State
   proposalDetails: fromProposalDetails.State
   contractDetails: fromContractDetails.State
@@ -51,6 +53,7 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     dashboard: fromDashboard.reducer,
     dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
+    tokenContractOveview: fromTokenContractOveview.reducer,
     transactionDetails: fromTransactionDetails.reducer,
     proposalDetails: fromProposalDetails.reducer,
     contractDetails: fromContractDetails.reducer,

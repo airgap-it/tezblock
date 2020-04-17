@@ -14,12 +14,14 @@ import { ContractDetailComponent } from './pages/contract-detail/contract-detail
 import { BakerOverviewComponent } from './pages/baker-overview/baker-overview.component'
 import { HealthComponent } from './pages/health/health.component'
 import { AccountOverviewComponent } from './pages/account-overview/account-overview.component'
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
   { path: 'resources/wallets', component: ResourcesWalletsComponent },
   { path: 'baker/list', component: BakerOverviewComponent },
   { path: 'account/list', component: AccountOverviewComponent },
+  { path: 'token-contract/list', component: TokenContractOverviewComponent },
   { path: ':route/list', component: ListComponent },
   { path: 'block/:id', component: BlockDetailComponent },
   { path: 'account/:id', component: AccountDetailComponent },

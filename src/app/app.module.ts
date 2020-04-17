@@ -92,6 +92,8 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 
 @NgModule({
   imports: [
@@ -140,7 +142,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
       HealthEffects,
       AccountsEffects,
       DashboarEffects,
-      DashboardLatestContractsTransactionsEffects
+      DashboardLatestContractsTransactionsEffects,
+      TokenContractOverviewEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true })
   ],
@@ -192,7 +195,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
     AccountOverviewComponent,
     LatestContractsComponent,
     LatestContractsTransactionsComponent,
-    TransactionErrorsComponent
+    TransactionErrorsComponent,
+    TokenContractOverviewComponent
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],

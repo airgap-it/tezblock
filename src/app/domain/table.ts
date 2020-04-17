@@ -17,7 +17,7 @@ export interface TableState<T> {
 }
 
 export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): TableState<any> => ({
-  data: [],
+  data: undefined,
   pagination: {
     currentPage: 1,
     selectedSize,

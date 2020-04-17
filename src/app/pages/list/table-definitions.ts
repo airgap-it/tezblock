@@ -400,38 +400,6 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     }
   ],
 
-  /* TOKEN CONTRACT */
-  [OperationTypes.TokenContract]: () => [
-    {
-      name: 'Asset',
-      field: 'id',
-      template: Template.address
-    },
-    {
-      name: 'Contract Address',
-      field: 'id',
-      template: Template.address,
-      data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
-    },
-    // {
-    //   name: 'Symbol',
-    //   field: 'symbol'
-    // },
-    {
-      name: 'Total Supply',
-      field: 'totalSupply',
-      template: Template.amount,
-      data: (item: TokenContract) => ({
-        data: { amount: item.totalSupply },
-        options: { symbol: item.symbol, conventer: getConventer(item), showFiatValue: false }
-      })
-    },
-    {
-      name: 'Description',
-      field: 'description'
-    }
-  ],
-
   /* CONTRACT */
   [OperationTypes.Contract]: () => [
     {

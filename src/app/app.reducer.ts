@@ -6,12 +6,23 @@ import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 
 export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
 
 export const meanBlockTimeFromPeriod = 60.846710205078125 // Pascal's suspicious calculation from period length
 export const numberOfBlocksToSecondsFromPeriod = (numberOfBlocks: number): number => meanBlockTimeFromPeriod * numberOfBlocks
+
+const updateExchangeRates = (from: string, to: string, price: number, exchangeRates: ExchangeRates): ExchangeRates => {
+  return {
+    ...exchangeRates,
+    [from]: {
+      ...exchangeRates[from],
+      [to]: price
+    }
+  }
+}
 
 export interface State {
   firstBlockOfCurrentCycle: Block
@@ -20,8 +31,16 @@ export interface State {
   currentVotingPeriod: number
   currentVotingeriodPosition: number
   blocksPerVotingPeriod: number
-  fiatCurrencyInfo: CurrencyInfo
+
+  exchangeRates: ExchangeRates
+
+  // TODO: refactor there 2 properties ( I suppose these are prices XTZ -> BTC & USD ), and now BTC -> USD is added
+  // move into exchangeRate
+  // XTZ -> BTC
   cryptoCurrencyInfo: CurrencyInfo
+
+  // XTZ -> USD
+  fiatCurrencyInfo: CurrencyInfo
   cryptoHistoricData: MarketDataSample[]
 }
 
@@ -32,6 +51,7 @@ const initialState: State = {
   currentVotingPeriod: undefined,
   currentVotingeriodPosition: undefined,
   blocksPerVotingPeriod: undefined,
+  exchangeRates: {},
   cryptoCurrencyInfo: {
     symbol: 'BTC',
     currency: 'BTC',
@@ -81,6 +101,10 @@ export const reducer = createReducer(
       ...state.cryptoCurrencyInfo,
       price: cryptoPrice
     }
+  })),
+  on(actions.loadExchangeRateSucceeded, (state, { from, to, price }) => ({
+    ...state,
+    exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
   })),
   on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
     ...state,
