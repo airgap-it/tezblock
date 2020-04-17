@@ -1,9 +1,8 @@
-import { Component, Input, OnInit, TemplateRef, ChangeDetectorRef } from '@angular/core'
+import { Component, Input, OnInit, TemplateRef } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
-import { filter, map, pairwise, switchMap } from 'rxjs/operators'
-import { isNil, negate } from 'lodash'
+import { filter, switchMap } from 'rxjs/operators'
 
 import { DataSource, Pagination } from '@tezblock/domain/table'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
@@ -26,73 +25,40 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
 
   data$: Observable<any[]>
 
-  // Upon subscription BehaviorSubject returns the last value of the subject. A regular observable only triggers when it receives an onnext
   pagination$ = new BehaviorSubject<Pagination>(undefined)
   filterTerm: FormControl
-  filter$ = new BehaviorSubject<string>(undefined)
+  
+  private filter$ = new BehaviorSubject<string>(undefined)
+  private previousPagination: Pagination
 
-  constructor(private readonly changeDetectorRef: ChangeDetectorRef) {
+  constructor() {
     super()
   }
 
   ngOnInit() {
     this.filterTerm = new FormControl('')
 
-    const foo$ = combineLatest(
-      this.pagination$.pipe(
-        pairwise(),
-        filter(([previous, current]) => get<Pagination>(p => p.currentPage)(previous) !== get<Pagination>(p => p.currentPage)(current)),
-        map(([previous, current]) => current)
-      ),
-      this.filter$
-    )
-
-    // const foo1$ = combineLatest(
-    //   this.pagination$.pipe(
-    //     pairwise(),
-    //     filter(([previous, current]) => {
-    //       const a = get<Pagination>(p => p.currentPage)(previous)
-    //       const b = get<Pagination>(p => p.currentPage)(current)
-
-    //       return a !== b
-    //     }),
-    //     map(([previous, current]) => current)
-    //   ),
-    //   this.filter$
-    // )
-
-    const foo2$ = combineLatest(this.pagination$.pipe(filter(negate(isNil))), this.filter$)
-
     this.data$ =
-      // foo2$: triggers 2 times (looks like subscribers increased this number ...) ... : /
-      foo2$.pipe(
+      combineLatest(
+        this.pagination$.pipe(
+          // this elegant approach doesn't work ( html binding seems not subscribing to data$ with this, but in code .subscribe(..) does.. )
+          // pairwise(),
+          // filter(([previous, current]) => get<Pagination>(p => p.currentPage)(previous) !== get<Pagination>(p => p.currentPage)(current)),
+          // map(([previous, current]) => current)
+          filter(pagination => {
+            const result = get<Pagination>(p => p.currentPage)(pagination) !== get<Pagination>(p => p.currentPage)(this.previousPagination)
+            this.previousPagination = pagination
+  
+            return result
+          }),
+        ),
+        this.filter$
+      ).pipe(
         switchMap(([pagination, filter]) => {
           return this.dataSource.get(pagination, filter)
         })
       )
 
-    foo2$.subscribe(x => {
-      console.log(`>>> foo2$: ${x}`)
-    })
-
-    foo$.subscribe(x => {
-      console.log(`>>> foo$: ${x}`)
-    })
-
-    // this.pagination$.subscribe(x => {
-    //   console.log(`>>> pagination$: ${x}`)
-    //   // this.changeDetectorRef.markForCheck()
-    // })
-
-    // this.pagination$.pipe(
-    //   pairwise(),
-    //   filter(([previous, current]) => get<Pagination>(p => p.currentPage)(previous) !== get<Pagination>(p => p.currentPage)(current)),
-    //   map(([previous, current]) => current)
-    // ).subscribe(x => {
-    //   console.log(`>>> pagination$.pipe(...): ${x}`)
-    // })
-
-    //this.pagination$.next(null)
     this.subscriptions.push(
       this.dataSource.getTotal().subscribe(total => {
         this.pagination$.next({
@@ -108,7 +74,7 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
     this.pagination$.next({
       selectedSize: 10,
       currentPage: event.page,
-      total: this.pagination$.value.total
+      total: this.pagination$.getValue().total
     })
   }
 
@@ -120,7 +86,7 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.dataSource.getTotal(filter).subscribe(total => {
         this.pagination$.next({
-          ...this.pagination$.value,
+          ...this.pagination$.getValue(),
           total
         })
       })

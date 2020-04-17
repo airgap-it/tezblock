@@ -241,9 +241,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.route.paramMap
         .pipe(
           filter(paramMap => !!paramMap.get('id')),
-          switchMap(() =>
-            getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
-          )
+          // TODO: uncomment
+          // switchMap(() =>
+          //   getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
+          // )
         )
         .subscribe(() => this.store$.dispatch(actions.loadRewards())),
 
