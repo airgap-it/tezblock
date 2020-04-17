@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosNetwork, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
@@ -21,8 +21,9 @@ import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-tab
 import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
-import { toClientsideDataScource } from '@tezblock/domain/table'
+import { toClientsideDataScource, DataSource, Pagination } from '@tezblock/domain/table'
 
+// TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
     ...reward,
@@ -53,7 +54,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<Reward[]>
+  rewards$: Observable<TezosRewards[]>
   bakerReward$: Observable<{ [key: string]: TezosPayoutInfo }>
   isBakerRewardBusy$: Observable<{ [key: string]: boolean }>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
@@ -69,7 +70,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance$: Observable<number>
-  rewardsExpandedRow: ExpandedRow<Reward>
+  rewardsExpandedRow: ExpandedRow<TezosRewards>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
@@ -173,13 +174,14 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         })
       )
 
-    this.rewards$ = combineLatest(
-      this.store$.select(state => state.bakerTable.rewards.data),
-      this.bakerFee$
-    ).pipe(
-      filter(([rewards, bakerFee]) => bakerFee !== undefined),
-      map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
-    )
+    this.rewards$ = this.store$.select(state => state.bakerTable.rewards.data)
+    // combineLatest(
+    //   this.store$.select(state => state.bakerTable.rewards.data),
+    //   this.bakerFee$
+    // ).pipe(
+    //   filter(([rewards, bakerFee]) => bakerFee !== undefined),
+    //   map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
+    // )
     this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
     this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
     this.rightsLoading$ = combineLatest(
@@ -241,10 +243,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       this.route.paramMap
         .pipe(
           filter(paramMap => !!paramMap.get('id')),
-          // TODO: uncomment
-          // switchMap(() =>
-          //   getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
-          // )
+          switchMap(() =>
+            getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
+          )
         )
         .subscribe(() => this.store$.dispatch(actions.loadRewards())),
 
@@ -321,7 +322,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     return tab.disabled()
   }
 
-  onRowExpanded(reward: Reward) {
+  onRowExpanded(reward: TezosRewards) {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
@@ -346,7 +347,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private setupExpandedRows() {
     this.rewardsExpandedRow = {
       template: this.expandedRowTemplate,
-      getContext: (item: Reward) => ({
+      getContext: (item: TezosRewards) => ({
         columns: [
           {
             name: 'Delegator Account',
@@ -362,7 +363,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
-        dataSource: toClientsideDataScource(item.payouts, (detail, query) => detail.delegator === query),
+        dataSource: this.getRewardsInnerDataSource(item.cycle),
         headerTemplate: this.rewardsExpandedRowHeaderTemplate,
         headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
       }),
@@ -428,5 +429,32 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const updatedTab = first(updateTabCounts([votesTab], counts))
 
     votesTab.count = updatedTab.count
+  }
+
+  private getRewardsInnerDataSource(cycle: number): DataSource<TezosPayoutInfo> {
+    return {
+      get: (pagination: Pagination, filter?: any) => {
+        this.store$.dispatch(actions.loadPayouts({ cycle, filter }))
+
+        return this.store$
+          .select(state => state.bakerTable.payouts)
+          .pipe(
+            map(payouts => {
+              const startItem = (pagination.currentPage - 1) * pagination.selectedSize
+              const endItem = pagination.currentPage * pagination.selectedSize
+
+              return payouts[cycle] ? payouts[cycle].slice(startItem, endItem) : undefined
+            })
+          )
+      },
+      getTotal: (filter?: any) => {
+        this.store$.dispatch(actions.loadPayouts({ cycle, filter }))
+
+        return this.store$
+          .select(state => state.bakerTable.payouts)
+          .pipe(map(payouts => (payouts[cycle] ? payouts[cycle].length : undefined)))
+      },
+      isFilterable: true
+    }
   }
 }

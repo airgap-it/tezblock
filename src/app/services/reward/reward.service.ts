@@ -6,7 +6,6 @@ import { range } from 'lodash'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/domain/table'
-import { Reward } from '@tezblock/domain/reward'
 
 @Injectable({
   providedIn: 'root'
@@ -40,22 +39,23 @@ export class RewardService {
     )
   }
 
-  getRewards(address: string, pagination: Pagination): Observable<Reward[]> {
+  getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
     return this.getLastCycles(pagination).pipe(
       switchMap(cycles =>
         forkJoin(
           cycles.map(cycle =>
-            from(this.calculateRewards(address, cycle)).pipe(
-              switchMap(rewards =>
-                from(this.protocol.calculatePayouts(rewards, 0, rewards.delegatedContracts.length)).pipe(
-                  map(payouts => ({ ...rewards, payouts }))
-                )
-              )
-            )
+            from(this.calculateRewards(address, cycle))
           )
         )
       )
     )
+  }
+
+  getRewardsPayouts(rewards: TezosRewards, filter: string): Observable<TezosPayoutInfo[]> {
+    const filterCondition = (address: string) => (filter ? address.toLowerCase().indexOf(filter.toLowerCase()) !== -1 : true)
+    const addresses = rewards.delegatedContracts.filter(filterCondition)
+
+    return from(this.protocol.calculatePayouts(rewards, addresses))
   }
 
   getRewardAmont(accountAddress: string, bakerAddress: string): Observable<string> {
@@ -100,8 +100,6 @@ export class RewardService {
   }
 
   getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
-    return from(this.calculateRewards(address, cycle)).pipe(
-      switchMap(rewards => from(this.protocol.calculatePayout(address, rewards)))
-    )
+    return from(this.calculateRewards(address, cycle)).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
   }
 }

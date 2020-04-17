@@ -1,9 +1,8 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
-import { Reward } from '@tezblock/domain/reward'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 export interface LevelInTime {
@@ -69,9 +68,13 @@ export const loadActiveDelegationsSucceeded = createAction(
 export const loadActiveDelegationsFailed = createAction(`[${featureName}] Load Active Delegations Failed`, props<{ error: any }>())
 
 export const loadRewards = createAction(`[${featureName}] Load Rewards`)
-export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: Reward[] }>())
+export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: TezosRewards[] }>())
 export const loadRewardsFailed = createAction(`[${featureName}] Load Rewards Failed`, props<{ error: any }>())
 export const increaseRewardsPageSize = createAction(`[${featureName}] Change Rewards Page Size`)
+
+export const loadPayouts = createAction(`[${featureName}] Load Payouts`, props<{ cycle: number, filter: string }>())
+export const loadPayoutsSucceeded = createAction(`[${featureName}] Load Payouts Succeeded`, props<{ cycle: number, payouts: TezosPayoutInfo[] }>())
+export const loadPayoutsFailed = createAction(`[${featureName}] Load Payouts Failed`, props<{ cycle: number, error: any }>())
 
 export const increaseRightsPageSize = createAction(`[${featureName}] Change Rights Page Size`)
 
