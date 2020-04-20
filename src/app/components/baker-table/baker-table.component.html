@@ -20,7 +20,7 @@
           <address-item [address]="bakerReward.delegator"></address-item>
         </td>
         <td>
-          <amount-cell [data]="bakerReward.payout"></amount-cell>
+          <amount-cell [data]="{ amount: bakerReward.payout }"></amount-cell>
         </td>
         <td>
           {{ bakerReward.share | percentage }}
