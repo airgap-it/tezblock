@@ -163,11 +163,11 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       .pipe(
         switchMap(kind => {
           if (kind === OperationTypes.BakingRights) {
-            return this.store$.select(state => state.bakerTable.bakingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.bakingRights.data)
           }
 
           if (kind === OperationTypes.EndorsingRights) {
-            return this.store$.select(state => state.bakerTable.endorsingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.endorsingRights.data)
           }
 
           return EMPTY
