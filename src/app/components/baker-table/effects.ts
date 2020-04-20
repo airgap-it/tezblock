@@ -4,6 +4,7 @@ import { forkJoin, of } from 'rxjs'
 import { map, catchError, switchMap, tap, withLatestFrom, delay, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
+import { isNil, negate } from 'lodash'
 
 import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
@@ -61,9 +62,10 @@ export class BakerTableEffects {
 
   loadCurrentCycleThenRights$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadCurrentCycleThenRights), //TODO: I have current cycle in store
+      ofType(actions.loadCurrentCycleThenRights),
       switchMap(() =>
-        this.apiService.getCurrentCycle().pipe(
+        this.store$.select(fromRoot.app.currentCycle).pipe(
+          filter(negate(isNil)),
           map(currentCycle => actions.loadCurrentCycleThenRightsSucceeded({ currentCycle })),
           catchError(error => of(actions.loadBakingRightsFailed({ error })))
         )
