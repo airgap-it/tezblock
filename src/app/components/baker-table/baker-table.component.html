@@ -1,13 +1,26 @@
 <ng-template #rewardsExpandedRowHeaderTemplate let-context>
-  <div style="margin: 0px 0px 10px 16px;">
+  <div class="table-responsive mb-3">
     <loading-skeleton *ngIf="(context | async) === undefined" [loadingWidth]="'50%'"></loading-skeleton>
-    <table *ngIf="context | async as bakerReward">
+    <table class="table table-hover" *ngIf="context | async as bakerReward">
+      <thead>
+        <tr>
+          <th>
+            Baker Account
+          </th>
+          <th>
+            Payout
+          </th>
+          <th>
+            Share
+          </th>
+        </tr>
+      </thead>
       <tr>
         <td>
           <address-item [address]="bakerReward.delegator"></address-item>
         </td>
         <td>
-          <amount-cell [data]="bakerReward.payout"></amount-cell>
+          <amount-cell [data]="{ amount: bakerReward.payout }"></amount-cell>
         </td>
         <td>
           {{ bakerReward.share | percentage }}

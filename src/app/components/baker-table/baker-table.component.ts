@@ -22,6 +22,7 @@ import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/dom
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { toClientsideDataScource, DataSource, Pagination } from '@tezblock/domain/table'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -132,10 +133,11 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly apiService: ApiService,
+    private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -434,25 +436,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private getRewardsInnerDataSource(cycle: number): DataSource<TezosPayoutInfo> {
     return {
       get: (pagination: Pagination, filter?: any) => {
-        this.store$.dispatch(actions.loadPayouts({ cycle, filter }))
+        const rewards = fromRoot.getState(this.store$).bakerTable.rewards.data.find(_reward => _reward.cycle === cycle)
 
-        return this.store$
-          .select(state => state.bakerTable.payouts)
-          .pipe(
-            map(payouts => {
-              const startItem = (pagination.currentPage - 1) * pagination.selectedSize
-              const endItem = pagination.currentPage * pagination.selectedSize
-
-              return payouts[cycle] ? payouts[cycle].slice(startItem, endItem) : undefined
-            })
-          )
-      },
-      getTotal: (filter?: any) => {
-        this.store$.dispatch(actions.loadPayouts({ cycle, filter }))
-
-        return this.store$
-          .select(state => state.bakerTable.payouts)
-          .pipe(map(payouts => (payouts[cycle] ? payouts[cycle].length : undefined)))
+        return this.rewardService.getRewardsPayouts(rewards, pagination, filter)
       },
       isFilterable: true
     }
