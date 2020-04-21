@@ -230,7 +230,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
     this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
       map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
-      // map(toString)
     )
     this.isRewardAmountMinusFeeBusy$ = combineLatest(
       this.store$.select(state => state.accountDetails.busy.rewardAmont),
@@ -480,17 +479,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         disabled: function() {
           return !this.count
         }
-      },
-      {
-        title: 'Votes',
-        active: false,
-        kind: 'ballot',
-        count: undefined,
-        icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
-        disabled: function() {
-          return !this.count
-        }
       }
     ]
 
@@ -534,12 +522,23 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         disabled: function() {
           return !this.count
         }
+      },
+      {
+        title: 'Votes',
+        active: false,
+        kind: 'ballot',
+        count: undefined,
+        icon: this.iconPipe.transform('boxBallot'),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return this.count === 0
+        }
       }
     ]
   }
 
   // TODO: this function should be introduced to every page with self navigation
-  // Also consider that actions.reset triggers selects 
+  // Also consider that actions.reset triggers selects
   private reset() {
     this.store$.dispatch(actions.reset())
     this.delegatedAccountAddress = undefined

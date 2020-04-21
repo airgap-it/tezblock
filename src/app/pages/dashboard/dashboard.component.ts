@@ -139,6 +139,10 @@ export class DashboardComponent extends BaseComponent {
       ]).subscribe(() => this.store$.dispatch(actions.loadBlocks())),
 
       this.actions$
+        .pipe(ofType(appActions.loadPeriodInfosSucceeded))
+        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan())),
+
+	this.actions$
         .pipe(
           ofType(appActions.loadPeriodInfosSucceeded),
           switchMap(() =>

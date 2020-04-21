@@ -16,13 +16,7 @@ export const environment = {
     conseilApiKey: 'CARTHAGENET_CONSEIL_API_KEY',
     targetUrl: 'CARTHAGENET_TARGET_URL'
   },
-
-  babylonnet: {
-    rpcUrl: 'BABYLONNET_RPC_URL',
-    conseilUrl: 'BABYLONNET_CONSEIL_URL',
-    conseilApiKey: 'BABYLONNET_CONSEIL_API_KEY',
-    targetUrl: 'BABYLONNET_TARGET_URL'
-  },
+  googleAnalyticsKey: undefined,
   proFontAwesomeAvailable: false
 }
 

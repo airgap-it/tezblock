@@ -5,7 +5,12 @@
         <address-item [address]="contract.id" ng-href="#here" (click)="inspectDetail(contract.id)"></address-item>
       </div>
       <div class="col-6 p-0">
-        <p class="m-0">{{ contract.totalSupply }} {{ contract.symbol }}</p>
+        <p class="m-0">
+          <amount-cell
+            [data]="{ amount: contract.totalSupply }"
+            [options]="{ symbol: contract.symbol, conventer: getConventer(contract), showFiatValue: false }"
+          ></amount-cell>
+        </p>
       </div>
     </div>
     <hr />

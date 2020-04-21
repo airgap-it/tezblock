@@ -53,13 +53,6 @@ export class DashboarEffects {
     )
   )
 
-  onPeriodInfoLoadCurrentPeriodTimespan$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(appActions.loadPeriodInfosSucceeded),
-      map(() => actions.loadCurrentPeriodTimespan())
-    )
-  )
-
   loadCurrentPeriodTimespan$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadCurrentPeriodTimespan),
@@ -100,7 +93,7 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadBlocks),
       switchMap(() =>
-        this.blockService.getLatestBlocks(6, ['volume']).pipe(
+        this.blockService.getLatestBlocks(6, ['volume', 'txcount']).pipe(
           map(blocks => actions.loadBlocksSucceeded({ blocks })),
           catchError(error => of(actions.loadBlocksFailed({ error })))
         )

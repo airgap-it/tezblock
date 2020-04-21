@@ -80,7 +80,17 @@
                   <p class="text-secondary mb-0">Total Supply</p>
                 </div>
                 <div class="col-md-7">
-                  <p class="mb-0">{{ contract.totalSupply }} {{ contract.symbol }}</p>
+                  <p class="mb-0">
+                    <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
+                    <amount-cell
+                      [data]="{ amount: contract.totalSupply }"
+                      [options]="{
+                        symbol: contract.symbol,
+                        conventer: conventer$ | async,
+                        showFiatValue: showFiatValue$ | async
+                      }"
+                    ></amount-cell>
+                  </p>
                 </div>
               </div>
               <div class="row mb-3">
