@@ -5,7 +5,7 @@ import * as actions from './actions'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState, Pagination } from '@tezblock/domain/table'
+import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
@@ -13,7 +13,6 @@ interface Busy {
   upcomingRights: boolean
   activeDelegations: boolean
   bakerReward: { [key: string]: boolean }
-  payouts: { [key: string]: boolean }
 }
 
 export interface State {
@@ -27,7 +26,6 @@ export interface State {
   upcomingRights: actions.UpcomingRights
   activeDelegations: number
   rewards: TableState<TezosRewards>
-  payouts: { [key: string]: TezosPayoutInfo[] }
   bakerReward: { [key: string]: TezosPayoutInfo }
   votes: TableState<Transaction>
 }
@@ -43,13 +41,11 @@ const initialState: State = {
     efficiencyLast10Cycles: false,
     upcomingRights: false,
     activeDelegations: false,
-    bakerReward: {},
-    payouts: {}
+    bakerReward: {}
   },
   upcomingRights: undefined,
   activeDelegations: undefined,
   rewards: getInitialTableState(undefined, 3),
-  payouts: {},
   bakerReward: {},
   votes: getInitialTableState()
 }
@@ -301,44 +297,6 @@ export const reducer = createReducer(
       ...state.busy,
       bakerReward: {
         ...state.busy.bakerReward,
-        [cycle]: false
-      }
-    }
-  })),
-  on(actions.loadPayouts, (state, { cycle }) => ({
-    ...state,
-    busy: {
-      ...state.busy,
-      payouts: {
-        ...state.busy.payouts,
-        [cycle]: true
-      }
-    }
-  })),
-  on(actions.loadPayoutsSucceeded, (state, { cycle, payouts }) => ({
-    ...state,
-    payouts: {
-      ...state.payouts,
-      [cycle]: payouts
-    },
-    busy: {
-      ...state.busy,
-      payouts: {
-        ...state.busy.payouts,
-        [cycle]: false
-      }
-    }
-  })),
-  on(actions.loadPayoutsFailed, (state, { cycle }) => ({
-    ...state,
-    payouts: {
-      ...state.payouts,
-      [cycle]: null
-    },
-    busy: {
-      ...state.busy,
-      payouts: {
-        ...state.busy.payouts,
         [cycle]: false
       }
     }

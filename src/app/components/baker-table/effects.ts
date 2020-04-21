@@ -211,26 +211,6 @@ export class BakerTableEffects {
     )
   )
 
-  loadPayouts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadPayouts),
-      withLatestFrom(
-        this.store$.select(state => state.bakerTable.rewards),
-        this.store$.select(state => state.bakerTable.payouts),
-        this.store$.select(state => state.bakerTable.busy)
-      ),
-      filter(([{ cycle, filter }, rewards, payouts, busy]) => !payouts[cycle]),
-      switchMap(([{ cycle, filter }, rewards]) => {
-        const reward = rewards.data.find(_reward => _reward.cycle === cycle)
-
-        return this.rewardService.getRewardsPayouts(reward, filter).pipe(
-          map(payouts => actions.loadPayoutsSucceeded({ cycle, payouts })),
-          catchError(error => of(actions.loadPayoutsFailed({ cycle, error })))
-        )
-      })
-    )
-  )
-
   loadVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadVotes),

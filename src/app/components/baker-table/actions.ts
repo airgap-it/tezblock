@@ -72,10 +72,6 @@ export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards 
 export const loadRewardsFailed = createAction(`[${featureName}] Load Rewards Failed`, props<{ error: any }>())
 export const increaseRewardsPageSize = createAction(`[${featureName}] Change Rewards Page Size`)
 
-export const loadPayouts = createAction(`[${featureName}] Load Payouts`, props<{ cycle: number, filter: string }>())
-export const loadPayoutsSucceeded = createAction(`[${featureName}] Load Payouts Succeeded`, props<{ cycle: number, payouts: TezosPayoutInfo[] }>())
-export const loadPayoutsFailed = createAction(`[${featureName}] Load Payouts Failed`, props<{ cycle: number, error: any }>())
-
 export const increaseRightsPageSize = createAction(`[${featureName}] Change Rights Page Size`)
 
 export const loadVotes = createAction(`[${featureName}] Load Votes`)

@@ -28,7 +28,7 @@ export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): Tabl
   orderBy
 })
 
-export interface Data<T> {
+export interface Pageable<T> {
   data: T[]
   total: number
 }
@@ -36,8 +36,7 @@ export interface Data<T> {
 export const sort = (field: string, direction: Direction): OrderBy => ({ field, direction })
 
 export interface DataSource<T> {
-  get: (pagination: Pagination, filter?: any) => Observable<T[]>
-  getTotal: (filter?: any) => Observable<number>
+  get: (pagination: Pagination, filter?: any) => Observable<Pageable<T>>
   isFilterable: boolean
 }
 
@@ -49,11 +48,10 @@ export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T
       const startItem = (pagination.currentPage - 1) * pagination.selectedSize
       const endItem = pagination.currentPage * pagination.selectedSize
       
-
-      return of(data.slice(startItem, endItem).filter(_filterCondition(filter)))
-    },
-    getTotal: (filter?: any) => {
-      return of(data.filter(_filterCondition(filter)).length)
+      return of({
+        data: data.slice(startItem, endItem).filter(_filterCondition(filter)),
+        total: data.filter(_filterCondition(filter)).length
+      })
     },
     isFilterable: !!filterCondition
   }

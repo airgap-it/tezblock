@@ -3,6 +3,7 @@ import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/di
 import { forkJoin, from, Observable, throwError } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { range } from 'lodash'
+import { Pageable } from '@tezblock/domain/table'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/domain/table'
@@ -41,21 +42,22 @@ export class RewardService {
 
   getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
     return this.getLastCycles(pagination).pipe(
-      switchMap(cycles =>
-        forkJoin(
-          cycles.map(cycle =>
-            from(this.calculateRewards(address, cycle))
-          )
-        )
-      )
+      switchMap(cycles => forkJoin(cycles.map(cycle => from(this.calculateRewards(address, cycle)))))
     )
   }
 
-  getRewardsPayouts(rewards: TezosRewards, filter: string): Observable<TezosPayoutInfo[]> {
+  getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
     const filterCondition = (address: string) => (filter ? address.toLowerCase().indexOf(filter.toLowerCase()) !== -1 : true)
+    const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
+    const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
     const addresses = rewards.delegatedContracts.filter(filterCondition)
 
-    return from(this.protocol.calculatePayouts(rewards, addresses))
+    return from(this.protocol.calculatePayouts(rewards, addresses.slice(offset, Math.min(offset + limit, addresses.length)))).pipe(
+      map(data => ({
+        data,
+        total: addresses.length
+      }))
+    )
   }
 
   getRewardAmont(accountAddress: string, bakerAddress: string): Observable<string> {
