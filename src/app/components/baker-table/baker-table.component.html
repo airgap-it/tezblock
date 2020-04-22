@@ -1,8 +1,41 @@
+<ng-template #rewardsExpandedRowHeaderTemplate let-context>
+  <div class="table-responsive mb-3">
+    <loading-skeleton *ngIf="(context | async) === undefined" [loadingWidth]="'50%'"></loading-skeleton>
+    <table class="table table-hover" *ngIf="context | async as bakerReward">
+      <thead>
+        <tr>
+          <th>
+            Baker Account
+          </th>
+          <th>
+            Payout
+          </th>
+          <th>
+            Share
+          </th>
+        </tr>
+      </thead>
+      <tr>
+        <td>
+          <address-item [address]="bakerReward.delegator"></address-item>
+        </td>
+        <td>
+          <amount-cell [data]="{ amount: bakerReward.payout }"></amount-cell>
+        </td>
+        <td>
+          {{ bakerReward.share | percentage }}
+        </td>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+
 <ng-template #expandedRowTemplate let-context>
   <app-client-side-table
-    [data]="context.data"
+    [dataSource]="context.dataSource"
     [columns]="context.columns"
-    [filterCondition]="context.filterCondition"
+    [headerTemplate]="context.headerTemplate"
+    [headerContext]="context.headerContext"
   ></app-client-side-table>
 </ng-template>
 
@@ -320,6 +353,7 @@
         [expandedRow]="rewardsExpandedRow"
         [pagination]="true"
         (onLoadMore)="loadMoreRewards()"
+        (rowExpanded)="onRowExpanded($event)"
       ></tezblock-table>
     </ng-container>
 
