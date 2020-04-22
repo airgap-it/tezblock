@@ -975,10 +975,6 @@ export class ApiService {
     )
   }
 
-  // getCurrentCycle(): Observable<number> {
-  //   return from(this.protocol.fetchCurrentCycle())
-  // }
-
   getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
     const _predicates = (<Predicate[]>[
       {
