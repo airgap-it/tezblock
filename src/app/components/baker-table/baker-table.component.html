@@ -328,7 +328,7 @@
         [columns]="tab.columns"
         [data]="votes$ | async"
         [loading]="votesLoading$ | async"
-        [pagination]="true"
+        [pagination]="votesShowLoadMore$ | async"
         (onLoadMore)="loadMoreVotes()"
       ></tezblock-table>
     </ng-container>
