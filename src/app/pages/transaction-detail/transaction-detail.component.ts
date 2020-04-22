@@ -21,7 +21,7 @@ import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
@@ -61,6 +61,8 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly store$: Store<fromRoot.State>,
     private readonly activatedRoute: ActivatedRoute,
     private titleService: Title,
+    private metaTagService: Meta,
+
     private aliasService: AliasService
   ) {
     super()
@@ -118,6 +120,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
     this.titleService.setTitle('Tezos Operation: ' + this.aliasService.getFormattedAddress(this.transactionHash) + ' - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Transaction ${this.transactionHash}. The transaction hash, block level, timestamp, value, fees and and tranfers are detailed on tezblock.">`
+    })
   }
 
   copyToClipboard(val: string) {

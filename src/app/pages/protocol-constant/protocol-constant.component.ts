@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core'
 import { Block } from '@tezblock/interfaces/Block'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 
 export interface ProtocolConstantResponse {
   proof_of_work_nonce_size: number
@@ -64,13 +64,18 @@ export class ProtocolConstantComponent implements OnInit {
     private readonly http: HttpClient,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly blockService: BlockService,
-    private titleService: Title
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     this.getData()
   }
 
   ngOnInit() {
     this.titleService.setTitle('Tezos Constants - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `tezblock constants page shows relevant information about periods, rewards and limits of the tezos blockchain.">`
+    })
   }
 
   public getData() {

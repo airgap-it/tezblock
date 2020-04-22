@@ -7,7 +7,7 @@ import * as actions from './actions'
 import { BlockStatus } from '@tezblock/services/health/health.service'
 import { map } from 'rxjs/operators'
 import * as moment from 'moment'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 
 const isOlderThan4Mins = (time: moment.Moment): boolean => {
   const fourMinutesOld = moment().add(-4, 'minutes')
@@ -26,7 +26,7 @@ export class HealthComponent implements OnInit {
   latestConseilBlock$: Observable<BlockStatus>
   isConseilUp$: Observable<boolean>
 
-  constructor(private readonly store$: Store<fromRoot.State>, private titleService: Title) {
+  constructor(private readonly store$: Store<fromRoot.State>, private titleService: Title, private metaTagService: Meta) {
     this.store$.dispatch(actions.loadLatestNodeBlock())
     this.store$.dispatch(actions.loadLatestConseilBlock())
   }
@@ -41,5 +41,9 @@ export class HealthComponent implements OnInit {
       map(latestConseilBlock => latestConseilBlock && !isOlderThan4Mins(moment(latestConseilBlock.timestamp, 'YYYY-MM-DD')))
     )
     this.titleService.setTitle('Health - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `tezblock health page shows information about status and time of last seen block of the tezos node and conseil.">`
+    })
   }
 }

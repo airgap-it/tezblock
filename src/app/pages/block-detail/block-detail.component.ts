@@ -22,7 +22,7 @@ import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-block-detail',
@@ -60,6 +60,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
     private titleService: Title,
+    private metaTagService: Meta,
     private readonly activatedRoute: ActivatedRoute
   ) {
     super()
@@ -119,6 +120,10 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
     this.titleService.setTitle('Tezos Block: ' + this.blockLevel + ' - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Block Height ${this.blockLevel}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`
+    })
   }
 
   tabSelected(kind: string) {

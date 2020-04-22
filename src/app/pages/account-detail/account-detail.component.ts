@@ -32,7 +32,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -216,6 +216,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
     private titleService: Title,
+    private metaTagService: Meta,
     private aliasService: AliasService
   ) {
     super()
@@ -347,6 +348,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
 
     this.titleService.setTitle('Tezos Address: ' + this.aliasService.getFormattedAddress(this.address) + ' - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Account Address  ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
+    })
   }
 
   getBakingInfos(address: string) {

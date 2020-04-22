@@ -18,7 +18,7 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Baker } from '@tezblock/services/api/api.service'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 
 const labelsParams = {
   display: true,
@@ -86,7 +86,8 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private titleService: Title
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
   }
@@ -139,6 +140,10 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     this.columns = columns
 
     this.titleService.setTitle('Tezos Bakers - tezblock')
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Baker list on tezblock shows the total number of bakers and lists the top 25 bakers with information about balance, number of votes, staking balance and number of delegators for each baker.">`
+    })
   }
 
   loadMore() {
