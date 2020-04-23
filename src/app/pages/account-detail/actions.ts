@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store'
+import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/interfaces/Account'
@@ -84,5 +85,9 @@ export const loadTransactionsErrorsSucceeded = createAction(
   props<{ operationErrorsById: OperationErrorsById[] }>()
 )
 export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
+
+export const loadBakerReward = createAction(`[${featureName}] Load Baker Reward`, props<{ bakerAddress: string }>())
+export const loadBakerRewardSucceeded = createAction(`[${featureName}] Load Baker Reward Succeeded`, props<{ bakerReward: TezosPayoutInfo }>())
+export const loadBakerRewardFailed = createAction(`[${featureName}] Load Baker Reward Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

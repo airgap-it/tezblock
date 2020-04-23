@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { from, of, forkJoin } from 'rxjs'
-import { map, catchError, filter, switchMap, tap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, filter, switchMap, take, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { get, isNil, negate } from 'lodash'
 
 import { TransactionService } from '@tezblock/services/transaction/transaction.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
@@ -14,7 +15,6 @@ import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/
 import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
-import { get } from 'lodash'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
 
 @Injectable()
@@ -168,9 +168,7 @@ export class AccountDetailEffects {
               return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
             }
 
-            return this.bakingService
-              .getBakingBadRatings(address)
-              .pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
+            return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
           }),
           map(response => actions.loadBakingBadRatingsSucceeded({ response })),
           catchError(error => of(actions.loadBakingBadRatingsFailed({ error })))
@@ -270,6 +268,32 @@ export class AccountDetailEffects {
         this.apiService.getErrorsForOperations(transactions).pipe(
           map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
           catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onBakerLoadBakerReward$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccountSucceeded),
+      filter(({ account }) => account.is_baker),
+      map(({ account }) => actions.loadBakerReward({ bakerAddress: account.account_id }))
+    )
+  )
+
+  loadBakerReward$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBakerReward),
+      switchMap(({ bakerAddress }) =>
+        this.store$.select(fromRoot.app.currentCycle).pipe(
+          filter(negate(isNil)),
+          take(1),
+          switchMap(currentCycle =>
+            this.rewardService.getRewardsForAddressInCycle(bakerAddress, ++currentCycle).pipe(
+              map(bakerReward => actions.loadBakerRewardSucceeded({ bakerReward })),
+              catchError(error => of(actions.loadBakerRewardFailed({ error })))
+            )
+          )
         )
       )
     )
