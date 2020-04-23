@@ -54,7 +54,7 @@
     "@nguniversal/express-engine": "^9.0.1",
     "@nguniversal/module-map-ngfactory-loader": "^8.2.6",
     "@ngx-pwa/local-storage": "^9.0.2",
-    "airgap-coin-lib": "^0.7.7",
+    "airgap-coin-lib": "0.7.7",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",
