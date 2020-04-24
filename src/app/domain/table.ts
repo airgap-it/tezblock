@@ -35,6 +35,19 @@ export interface Pageable<T> {
 
 export const sort = (field: string, direction: Direction): OrderBy => ({ field, direction })
 
+export const tryUpdateTotal = (tableState: TableState<any>, data: any[]): Pagination => {
+  const previousLength = (tableState.data || []).length
+  const newLength = (data || []).length
+
+  return {
+    ...tableState.pagination,
+    total:
+      newLength === previousLength || (newLength > 0 && newLength % tableState.pagination.selectedSize !== 0)
+        ? newLength
+        : tableState.pagination.total
+  }
+}
+
 export interface DataSource<T> {
   get: (pagination: Pagination, filter?: any) => Observable<Pageable<T>>
   isFilterable: boolean
