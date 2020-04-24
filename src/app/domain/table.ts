@@ -1,3 +1,5 @@
+import { Observable, of } from 'rxjs'
+
 import { OrderBy, Direction } from '@tezblock/services/base.service'
 
 export interface Pagination {
@@ -26,9 +28,31 @@ export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): Tabl
   orderBy
 })
 
-export interface Data<T> {
+export interface Pageable<T> {
   data: T[]
   total: number
 }
 
 export const sort = (field: string, direction: Direction): OrderBy => ({ field, direction })
+
+export interface DataSource<T> {
+  get: (pagination: Pagination, filter?: any) => Observable<Pageable<T>>
+  isFilterable: boolean
+}
+
+export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T, filter: any) => boolean): DataSource<T> {
+  const _filterCondition = (filter?: any) => filter && filterCondition ? (item: T) => filterCondition(item, filter) : () => true
+
+  return {
+    get: (pagination: Pagination, filter?: any) => {
+      const startItem = (pagination.currentPage - 1) * pagination.selectedSize
+      const endItem = pagination.currentPage * pagination.selectedSize
+      
+      return of({
+        data: data.slice(startItem, endItem).filter(_filterCondition(filter)),
+        total: data.filter(_filterCondition(filter)).length
+      })
+    },
+    isFilterable: !!filterCondition
+  }
+}
