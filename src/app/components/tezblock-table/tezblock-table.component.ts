@@ -98,12 +98,16 @@ export class TezblockTableComponent implements OnInit {
   noDataLabel: string
 
   @Output()
-  readonly downloadClicked: EventEmitter<void> = new EventEmitter()
+  downloadClicked: EventEmitter<void> = new EventEmitter()
 
-  @Output() readonly onLoadMore: EventEmitter<void> = new EventEmitter()
+  @Output() 
+  onLoadMore: EventEmitter<void> = new EventEmitter()
 
   @Output()
-  readonly onSort: EventEmitter<OrderBy> = new EventEmitter()
+  onSort: EventEmitter<OrderBy> = new EventEmitter()
+
+  @Output()
+  rowExpanded: EventEmitter<any> = new EventEmitter()
 
   private expandedRows: any[] = []
 
@@ -129,6 +133,7 @@ export class TezblockTableComponent implements OnInit {
 
       // expane
       this.expandedRows = this.expandedRows.concat(key)
+      this.rowExpanded.emit(row)
     }
   }
 

@@ -205,17 +205,7 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <amount-cell [data]="{ amount: delegatedAmount }" [options]="{ showFiatValue: false }"></amount-cell>
-                      <ng-container *ngIf="isMainnet">
-                        <span class="badge badge-pill badge-primary-light ml-1">
-                          {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                          }}{{
-                            delegatedAmount
-                              | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                              | number: '1.0-2'
-                          }}
-                        </span>
-                      </ng-container>
+                      <amount-cell [data]="{ amount: delegatedAmount }" [options]="{ showFiatValue: isMainnet }"></amount-cell>
                     </p>
                   </div>
                 </div>
@@ -230,12 +220,12 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                        <ng-container *ngIf="rewardAmount$ | async">
+                      <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
+                        <ng-container *ngIf="rewardAmountMinusFee$ | async">
                           {{ remainingTime$ | async }}
                         </ng-container>
-                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
                       </ng-container>
