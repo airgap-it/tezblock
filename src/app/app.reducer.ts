@@ -1,7 +1,6 @@
 import { createReducer, on } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
 import BigNumber from 'bignumber.js'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
@@ -41,7 +40,6 @@ export interface State {
 
   // XTZ -> USD
   fiatCurrencyInfo: CurrencyInfo
-  cryptoHistoricData: MarketDataSample[]
 }
 
 const initialState: State = {
@@ -61,8 +59,7 @@ const initialState: State = {
     symbol: '$',
     currency: 'USD',
     price: new BigNumber(0)
-  },
-  cryptoHistoricData: []
+  }
 }
 
 export const reducer = createReducer(
@@ -105,10 +102,6 @@ export const reducer = createReducer(
   on(actions.loadExchangeRateSucceeded, (state, { from, to, price }) => ({
     ...state,
     exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
-  })),
-  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
-    ...state,
-    cryptoHistoricData
   }))
 )
 
@@ -138,25 +131,3 @@ export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
     ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
     : undefined
-export const currencyGrowthPercentageSelector = (state: State): number => {
-  const startingPrice = state.cryptoHistoricData
-  const priceNow = state.fiatCurrencyInfo.price
-
-  if (!startingPrice || startingPrice.length === 0) {
-    return 0
-  }
-
-  if (!startingPrice[0].open) {
-    return 0
-  }
-
-  if (!priceNow) {
-    return 0
-  }
-
-  return priceNow
-    .minus(startingPrice[0].open)
-    .multipliedBy(100)
-    .dividedBy(startingPrice[0].open)
-    .toNumber()
-}

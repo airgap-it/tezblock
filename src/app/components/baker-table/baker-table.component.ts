@@ -63,6 +63,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   upcomingRightsLoading$: Observable<boolean>
   votes$: Observable<Transaction[]>
   votesLoading$: Observable<boolean>
+  votesShowLoadMore$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
@@ -210,6 +211,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       )
     this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
     this.votesLoading$ = this.store$.select(state => state.bakerTable.votes.loading)
+    this.votesShowLoadMore$ = this.store$
+      .select(state => state.bakerTable.votes)
+      .pipe(map(votes => (votes.data || []).length !== votes.pagination.total))
 
     this.setupExpandedRows()
     this.setupTables()

@@ -5,4 +5,9 @@
   .card.latest {
     min-height: 630px;
   }
+  .card-title__secondary {
+    button:not(:first-child) {
+      margin-left: 3px;
+    }
+  }
 }

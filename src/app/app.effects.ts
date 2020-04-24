@@ -208,18 +208,6 @@ export class AppEffects {
     )
   )
 
-  loadCryptoHistoricData$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadCryptoHistoricData),
-      switchMap(() =>
-        this.cryptoPricesService.getHistoricCryptoPrices(24, new Date(), 'USD', 'XTZ').pipe(
-          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
-          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
-        )
-      )
-    )
-  )
-
   constructor(
     private readonly actions$: Actions,
     private readonly baseService: BaseService,

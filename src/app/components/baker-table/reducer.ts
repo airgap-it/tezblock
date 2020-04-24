@@ -5,7 +5,7 @@ import * as actions from './actions'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { TableState, getInitialTableState, Pagination, tryUpdateTotal } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
@@ -243,6 +243,7 @@ export const reducer = createReducer(
     votes: {
       ...state.votes,
       data,
+      pagination: tryUpdateTotal(state.votes, data),
       loading: false
     }
   })),
