@@ -237,6 +237,20 @@ export class BakerTableEffects {
     )
   )
 
+  loadBakerReward$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBakerReward),
+      withLatestFrom(this.store$.select(state => state.bakerTable.bakerReward)),
+      filter(([{ baker, cycle }, bakerReward]) => bakerReward[cycle] === undefined),
+      switchMap(([{ baker, cycle }]) =>
+        this.rewardService.getRewardsForAddressInCycle(baker, cycle).pipe(
+          map(bakerReward => actions.loadBakerRewardSucceeded({ cycle, bakerReward })),
+          catchError(error => of(actions.loadBakerRewardFailed({ cycle, error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,

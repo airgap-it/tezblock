@@ -89,11 +89,7 @@ export const getState = (store: Store<State>): State => {
 export const selectGlobal = (state: State) => state
 export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
-
-export const blockDetails = {
-  id: createSelector(selectBlockDetails, state => state.id),
-  block: createSelector(selectBlockDetails, state => state.block)
-}
+export const selectBakerTable = (state: State) => state.bakerTable
 
 export const dashboard = {
   currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector)
@@ -106,4 +102,13 @@ export const app = {
   cycleEndingBlockLevel: createSelector(selectApp, fromApp.cycleEndingBlockLevelSelector),
   cycleProgress: createSelector(selectApp, fromApp.cycleProgressSelector),
   remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector)
+}
+
+export const blockDetails = {
+  id: createSelector(selectBlockDetails, state => state.id),
+  block: createSelector(selectBlockDetails, state => state.block)
+}
+
+export const bakerTable = {
+  bakerReward: (cycle: number) => createSelector(selectBakerTable, fromBakerTable.bakerRewardSelector(cycle))
 }

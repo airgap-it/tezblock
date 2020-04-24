@@ -1,4 +1,8 @@
-<div *ngIf="!!filterCondition" class="input-group input-group-main">
+<ng-container *ngIf="headerTemplate">
+  <ng-container *ngTemplateOutlet="headerTemplate; context: { $implicit: headerContext }"></ng-container>
+</ng-container>
+
+<div *ngIf="dataSource.isFilterable" class="input-group input-group-main">
   <input
     class="form-control form-control--focus-white"
     placeholder="Filter by Address"
@@ -13,9 +17,9 @@
   </div>
 </div>
 <div class="table-responsive">
-  <tezblock-table [columns]="columns" [data]="pagedData" [pagination]="false"></tezblock-table>
+  <tezblock-table [columns]="columns" [data]="data" [pagination]="false" [loading]="loading"></tezblock-table>
   <div class="w-100 p-0 d-flex justify-content-sm-end">
-    <pagination
+    <pagination *ngIf="pagination$ | async as pagination"
       [totalItems]="pagination.total"
       (pageChanged)="pageChanged($event)"
       [boundaryLinks]="true"
