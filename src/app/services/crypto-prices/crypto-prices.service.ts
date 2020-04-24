@@ -7,6 +7,12 @@ import { filter, map, tap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { isNil, negate } from 'lodash'
 
+export enum PricePeriod {
+  day = 0,
+  week = 1,
+  threeMonths = 2
+}
+
 import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import * as fromRoot from '@tezblock/reducers'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
@@ -41,14 +47,33 @@ export class CryptoPricesService {
   }
 
   getHistoricCryptoPrices(
-    numberOfHours: number,
     date: Date,
     baseSymbol = 'USD',
-    protocolIdentifier = 'XTZ'
+    protocolIdentifier = 'XTZ',
+    pricePeriod: PricePeriod
   ): Observable<MarketDataSample[]> {
+    if (pricePeriod === PricePeriod.day) {
+      return from(
+        <Promise<any>>cryptocompare.histoHour(protocolIdentifier, baseSymbol, {
+          limit: 24 - 1,
+          timestamp: date
+        })
+      )
+    }
+
+    if (pricePeriod === PricePeriod.week) {
+      return from(
+        <Promise<any>>cryptocompare.histoDay(protocolIdentifier, baseSymbol, {
+          limit: 7,
+          timestamp: date
+        })
+      )
+    }
+
+    // 3 months
     return from(
-      <Promise<any>>cryptocompare.histoHour(protocolIdentifier, baseSymbol, {
-        limit: numberOfHours - 1,
+      <Promise<any>>cryptocompare.histoDay(protocolIdentifier, baseSymbol, {
+        limit: 90,
         timestamp: date
       })
     )
