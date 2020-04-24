@@ -1,4 +1,5 @@
 import { createReducer, on } from '@ngrx/store'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
@@ -7,6 +8,7 @@ import { PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vot
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { State as appState } from '@tezblock/reducers/index'
 
 interface Busy {
   blocks: boolean
@@ -22,6 +24,7 @@ export interface State {
   proposal: ProposalListDto
   transactions: Transaction[]
   currentPeriodTimespan: PeriodTimespan
+  cryptoHistoricData: MarketDataSample[]
   busy: Busy
 }
 
@@ -31,6 +34,7 @@ const initialState: State = {
   proposal: undefined,
   currentPeriodTimespan: undefined,
   transactions: undefined,
+  cryptoHistoricData: [],
   busy: {
     blocks: false,
     contracts: false,
@@ -155,5 +159,32 @@ export const reducer = createReducer(
       blocks: false
     }
   })),
+  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
+    ...state,
+    cryptoHistoricData
+  })),
   on(actions.reset, () => initialState)
 )
+
+export const currencyGrowthPercentageSelector = (state: appState): number => {
+  const startingPrice = state.dashboard.cryptoHistoricData
+  const priceNow = state.app.fiatCurrencyInfo.price
+
+  if (!startingPrice || startingPrice.length === 0) {
+    return 0
+  }
+
+  if (!startingPrice[0].open) {
+    return 0
+  }
+
+  if (!priceNow) {
+    return 0
+  }
+
+  return priceNow
+    .minus(startingPrice[0].open)
+    .multipliedBy(100)
+    .dividedBy(startingPrice[0].open)
+    .toNumber()
+}

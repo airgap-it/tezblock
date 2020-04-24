@@ -101,7 +101,10 @@
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
-                Tezos Price Last 24h
+                Tezos Price Last
+                <button type="button" class="btn btn-sm" [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 0, 'btn-outline-primary': (pricePeriod$ | async) !== 0 }" (click)="changePricePeriod(0)">24 hrs</button>
+                <button type="button" class="btn btn-sm" [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 1, 'btn-outline-primary': (pricePeriod$ | async) !== 1 }" (click)="changePricePeriod(1)">7 days</button>
+                <button type="button" class="btn btn-sm" [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 2, 'btn-outline-primary': (pricePeriod$ | async) !== 2 }" (click)="changePricePeriod(2)">90 days</button>
               </h5>
               <ng-container *ngIf="fiatInfo$">
                 <ng-container *ngIf="cryptoInfo$">

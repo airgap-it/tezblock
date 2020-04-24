@@ -8,12 +8,12 @@ import * as actions from './actions'
 import { BaseService } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
-import * as appActions from '@tezblock/app.actions'
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { first, get } from '@tezblock/services/fp'
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -100,12 +100,25 @@ export class DashboarEffects {
     )
   )
 
+  loadCryptoHistoricData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCryptoHistoricData),
+      switchMap(({ periodIndex }) =>
+        this.cryptoPricesService.getHistoricCryptoPrices(new Date(), 'USD', 'XTZ', periodIndex).pipe(
+          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
+          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
     private readonly chainNetworkService: ChainNetworkService,
+    private readonly cryptoPricesService: CryptoPricesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }
