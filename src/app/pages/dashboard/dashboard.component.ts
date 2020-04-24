@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Observable } from 'rxjs'
-import { map, filter, withLatestFrom } from 'rxjs/operators'
+import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
 import { Actions, ofType } from '@ngrx/effects'
@@ -116,7 +116,19 @@ export class DashboardComponent extends BaseComponent {
 
       this.actions$
         .pipe(ofType(appActions.loadPeriodInfosSucceeded))
-        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan()))
+        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan())),
+
+        this.contracts$
+        .pipe(
+          filter(data => Array.isArray(data) && data.some(item => ['tzBTC', 'BTC'].includes(item.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 
