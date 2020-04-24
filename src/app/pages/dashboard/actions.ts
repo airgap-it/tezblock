@@ -1,4 +1,5 @@
 import { createAction, props } from '@ngrx/store'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TokenContract } from '@tezblock/domain/contract'
@@ -30,5 +31,12 @@ export const loadTransactionsFailed = createAction(`[${featureName}] Load Transa
 export const loadBlocks = createAction(`[${featureName}] Load Blocks`)
 export const loadBlocksSucceeded = createAction(`[${featureName}] Load Blocks Succeeded`, props<{ blocks: Block[] }>())
 export const loadBlocksFailed = createAction(`[${featureName}] Load Blocks Failed`, props<{ error: any }>())
+
+export const loadCryptoHistoricData = createAction(`[${featureName}] Load Crypto Historic Data`, props<{ periodIndex: number }>())
+export const loadCryptoHistoricDataSucceeded = createAction(
+  `[${featureName}] Load Crypto Historic Data Succeeded`,
+  props<{ cryptoHistoricData: MarketDataSample[] }>()
+)
+export const loadCryptoHistoricDataFailed = createAction(`[${featureName}] Load Crypto Historic Data Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

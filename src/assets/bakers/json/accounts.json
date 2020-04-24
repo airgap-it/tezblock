@@ -342,7 +342,7 @@
     "hasLogo": true
   },
   "tz1Vyuu4EJ5Nym4JcrfRLnp3hpaq1DSEp1Ke": {
-    "alias": "POS Bakerz",
+    "alias": "Stakin",
     "hasLogo": true
   },
   "tz1W1f1JrE7VsqgpUpj1iiDobqP5TixgZhDk": {
@@ -852,6 +852,10 @@
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "alias": "tzBTC",
+    "hasLogo": true
+  },
+  "tz1NXjtXZzwVJLocUtts5VmQ9nEPJVotweZm": {
+    "alias": "BAKRRR.COM",
     "hasLogo": true
   }
 }

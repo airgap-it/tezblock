@@ -3,7 +3,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
 
-import { Data } from '@tezblock/domain/table'
+import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get as fpGet } from '@tezblock/services/fp'
@@ -66,7 +66,7 @@ export const getTokenContractByAddress = (address: string, tezosNetwork: TezosNe
       : undefined
   })(tokenContracts[address])
 
-export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): Data<TokenContract> => {
+export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): Pageable<TokenContract> => {
   const data = Object.keys(tokenContracts)
     .map(key => getTokenContractByAddress(key, tezosNetwork))
     .filter(negate(isNil))

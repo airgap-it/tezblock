@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute, Router } from '@angular/router'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { combineLatest, from, Observable, EMPTY } from 'rxjs'
+import { TezosNetwork, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -21,7 +21,10 @@ import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-tab
 import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
+import { toClientsideDataScource, DataSource, Pagination } from '@tezblock/domain/table'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 
+// TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
     ...reward,
@@ -43,6 +46,7 @@ const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
 })
 export class BakerTableComponent extends BaseComponent implements OnInit {
   @ViewChild('expandedRowTemplate', { static: true }) expandedRowTemplate: TemplateRef<any>
+  @ViewChild('rewardsExpandedRowHeaderTemplate', { static: true }) rewardsExpandedRowHeaderTemplate: TemplateRef<any>
   private _tabs: Tab[] | undefined = []
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
@@ -51,12 +55,15 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<Reward[]>
+  rewards$: Observable<TezosRewards[]>
+  bakerReward$: Observable<{ [key: string]: TezosPayoutInfo }>
+  isBakerRewardBusy$: Observable<{ [key: string]: boolean }>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
   upcomingRights$: Observable<actions.UpcomingRights>
   upcomingRightsLoading$: Observable<boolean>
   votes$: Observable<Transaction[]>
   votesLoading$: Observable<boolean>
+  votesShowLoadMore$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
@@ -65,7 +72,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance$: Observable<number>
-  rewardsExpandedRow: ExpandedRow<Reward>
+  rewardsExpandedRow: ExpandedRow<TezosRewards>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
@@ -127,10 +134,11 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly apiService: ApiService,
+    private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -158,24 +166,27 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       .pipe(
         switchMap(kind => {
           if (kind === OperationTypes.BakingRights) {
-            return this.store$.select(state => state.bakerTable.bakingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.bakingRights.data)
           }
 
           if (kind === OperationTypes.EndorsingRights) {
-            return this.store$.select(state => state.bakerTable.endorsingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.endorsingRights.data)
           }
 
           return EMPTY
         })
       )
 
-    this.rewards$ = combineLatest(
-      this.store$.select(state => state.bakerTable.rewards.data).pipe(map(data => data || [])),
-      this.bakerFee$
-    ).pipe(
-      filter(([rewards, bakerFee]) => bakerFee !== undefined),
-      map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
-    )
+    this.rewards$ = this.store$.select(state => state.bakerTable.rewards.data)
+    // combineLatest(
+    //   this.store$.select(state => state.bakerTable.rewards.data),
+    //   this.bakerFee$
+    // ).pipe(
+    //   filter(([rewards, bakerFee]) => bakerFee !== undefined),
+    //   map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
+    // )
+    this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
+    this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
@@ -200,6 +211,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       )
     this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
     this.votesLoading$ = this.store$.select(state => state.bakerTable.votes.loading)
+    this.votesShowLoadMore$ = this.store$
+      .select(state => state.bakerTable.votes)
+      .pipe(map(votes => (votes.data || []).length !== votes.pagination.total))
 
     this.setupExpandedRows()
     this.setupTables()
@@ -314,6 +328,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     return tab.disabled()
   }
 
+  onRowExpanded(reward: TezosRewards) {
+    const { baker, cycle } = reward
+
+    this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
+  }
+
   private updateSelectedTab(selectedTab: Tab) {
     this.tabs.forEach(tab => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
@@ -333,24 +353,25 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private setupExpandedRows() {
     this.rewardsExpandedRow = {
       template: this.expandedRowTemplate,
-      getContext: (item: Reward) => ({
+      getContext: (item: TezosRewards) => ({
         columns: [
           {
             name: 'Delegator Account',
             field: 'delegator',
             template: Template.address,
-            data: (item: Payout) => ({ data: item.delegator, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: item.delegator })
           },
           {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: { amount: item.payout }, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: { amount: item.payout } })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
-        data: item.payouts,
-        filterCondition: (detail, query) => detail.delegator === query
+        dataSource: this.getRewardsInnerDataSource(item.cycle),
+        headerTemplate: this.rewardsExpandedRowHeaderTemplate,
+        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
       }),
       primaryKey: 'cycle'
     }
@@ -377,7 +398,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: BakingRights) => ({ data: { amount: item.deposit } })
           }
         ],
-        data: item.items
+        dataSource: toClientsideDataScource(item.items)
       }),
       primaryKey: 'cycle'
     }
@@ -403,7 +424,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
           }
         ],
-        data: item.items
+        dataSource: toClientsideDataScource(item.items)
       }),
       primaryKey: 'cycle'
     }
@@ -414,5 +435,16 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const updatedTab = first(updateTabCounts([votesTab], counts))
 
     votesTab.count = updatedTab.count
+  }
+
+  private getRewardsInnerDataSource(cycle: number): DataSource<TezosPayoutInfo> {
+    return {
+      get: (pagination: Pagination, filter?: any) => {
+        const rewards = fromRoot.getState(this.store$).bakerTable.rewards.data.find(_reward => _reward.cycle === cycle)
+
+        return this.rewardService.getRewardsPayouts(rewards, pagination, filter)
+      },
+      isFilterable: true
+    }
   }
 }

@@ -1,3 +1,4 @@
+// TODO: probalby this file is not needed
 import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 export interface Payout {
