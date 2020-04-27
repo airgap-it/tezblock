@@ -139,7 +139,19 @@ export class DashboardComponent extends BaseComponent {
 
       this.actions$
         .pipe(ofType(appActions.loadPeriodInfosSucceeded))
-        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan()))
+        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan())),
+
+        this.contracts$
+        .pipe(
+          filter(data => Array.isArray(data) && data.some(item => ['tzBTC', 'BTC'].includes(item.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 
