@@ -7,8 +7,8 @@
       <div class="col-8 p-0">
         <p class="m-0">
           <amount-cell
-            [data]="{ amount: contract.totalSupply }"
-            [options]="{ symbol: contract.symbol, conventer: getConventer(contract), showFiatValue: showFiatValue(contract) }"
+            [data]="contract.totalSupply"
+            [options]="{ symbol: contract.symbol, showFiatValue: showFiatValue(contract) }"
           ></amount-cell>
         </p>
       </div>

@@ -5,7 +5,6 @@ import { ToastrService } from 'ngx-toastr'
 import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
-import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
 import { first } from '@tezblock/services/fp'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
@@ -63,7 +62,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
   @Input()
   isMainnet = true
 
-  amountFromLatestTransactionFee: AmountData
+  amountFromLatestTransactionFee: { data: any; options: any }
 
   statusLabel: string
 
@@ -98,7 +97,10 @@ export class TransactionDetailWrapperComponent implements OnInit {
       return
     }
 
-    this.amountFromLatestTransactionFee = { amount: this.latestTransaction.fee, timestamp: this.latestTransaction.timestamp }
+    this.amountFromLatestTransactionFee = {
+      data: this.latestTransaction.fee,
+      options: { comparisonTimestamp: this.latestTransaction.timestamp, showFiatValue: true, maxDigits: 8 }
+    }
     this.statusLabel =
       ['failed', 'backtracked', 'skipped'].indexOf(this.latestTransaction.status) !== -1 ? this.latestTransaction.status : null
   }

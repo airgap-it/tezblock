@@ -1,5 +1,4 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Block } from '@tezblock/interfaces/Block'
 
 export const columns: Column[] = [
   {
@@ -11,7 +10,7 @@ export const columns: Column[] = [
     name: 'Balance',
     field: 'balance',
     template: Template.amount,
-    data: (item: any) => ({ data: { amount: item.balance } }),
+    data: (item: any) => ({ data: item.balance }),
     sortable: true
   },
   {
@@ -22,7 +21,7 @@ export const columns: Column[] = [
     name: 'Staking Balance',
     field: 'staking_balance',
     template: Template.amount,
-    data: (item: any) => ({ data: { amount: item.staking_balance } }),
+    data: (item: any) => ({ data: item.staking_balance }),
     sortable: true
   },
   {

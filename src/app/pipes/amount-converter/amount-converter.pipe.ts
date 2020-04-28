@@ -71,7 +71,7 @@ const makeFullNumberSmaller = (value: BigNumber, maxDigits: number): string => {
 export class AmountConverterPipe implements PipeTransform {
   public transform(
     value: BigNumber | string | number,
-    args: { protocolIdentifier: string; maxDigits?: number; fontColor?: boolean; fontSmall?: boolean }
+    args: { protocolIdentifier: string; maxDigits?: number }
   ): string {
     if (BigNumber.isBigNumber(value)) {
       value = value.toNumber()

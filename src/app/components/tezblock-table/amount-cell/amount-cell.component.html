@@ -12,6 +12,7 @@
   </ng-template>
 </span>
 {{ options?.symbol || 'ꜩ' }}
+
 <ng-container *ngIf="enableComparison; else noComparison">
   <ng-container *ngIf="showOldValue">
     <span
@@ -21,8 +22,8 @@
       (click)="tooltipClick()"
       [adaptivePosition]="false"
     >
-      {{ 1 | currencySymbol: { currInfo: historicCurrencyInfo } }}
-      {{ amount | currencyConverter: { currInfo: historicCurrencyInfo, protocolIdentifier: 'xtz' } | number: '1.0-2' }}
+      {{ 1 | currencySymbol: { currInfo: { symbol: '$' } } }}
+      {{ historicAmount }}
     </span>
   </ng-container>
   <ng-container *ngIf="!showOldValue">
@@ -33,14 +34,14 @@
       (click)="tooltipClick()"
       [adaptivePosition]="false"
     >
-      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-      {{ amount | currencyConverter: (currencyConverterPipeArgs$ | async) | number: '1.0-' + precision }}
+      {{ 1 | currencySymbol: { currInfo: { symbol: '$' } } }}
+      {{ currencyAmount$ | async }}
     </span>
   </ng-container>
 </ng-container>
 <ng-template #noComparison>
   <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
-    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}
-    {{ amount | currencyConverter: (currencyConverterPipeArgs$ | async) | number: '1.0-' + precision  }}
+    {{ 1 | currencySymbol: { currInfo: { symbol: '$' } } }}
+    {{ currencyAmount$ | async }}
   </span>
 </ng-template>
