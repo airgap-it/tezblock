@@ -42,7 +42,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },
@@ -109,7 +109,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },
@@ -169,7 +169,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: false
     },
@@ -221,7 +221,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },

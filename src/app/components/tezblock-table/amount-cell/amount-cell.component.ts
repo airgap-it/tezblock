@@ -13,6 +13,16 @@ import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-pri
 
 const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
 
+export interface AmountOptions {
+  showFiatValue?: boolean
+  symbol?: string
+  comparisonTimestamp?: number
+  maxDigits?: number
+  digitsInfo?: string
+  fontColor?: boolean
+  fontSmall?: boolean
+}
+
 @Component({
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
@@ -37,11 +47,11 @@ export class AmountCellComponent implements OnInit {
   private _data: number | string
 
   @Input()
-  set options(value: any) {
+  set options(value: AmountOptions) {
     if (value !== this._options) {
       this._options = value
 
-      this.enableComparison = get<any>(v => dayDifference(v.comparisonTimestamp) >= 1)(value)
+      this.enableComparison = get<AmountOptions>(v => dayDifference(v.comparisonTimestamp) >= 1)(value)
       if (this.data !== undefined) {
         this.setAmountPiped()
       }
@@ -54,7 +64,7 @@ export class AmountCellComponent implements OnInit {
     return this._options === undefined ? { showFiatValue: true } : this._options
   }
 
-  private _options = undefined
+  private _options: AmountOptions
 
   historicAmount: string
   currencyAmount$: Observable<string>
@@ -134,13 +144,23 @@ export class AmountCellComponent implements OnInit {
 
   private getPrecision(value: string): string {
     const numericValue = parseFloat(value.replace(',', ''))
+    const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(this.options)
 
-    if (numericValue < 1) {
-      return '1.2-8'
+    // this case overrides options.decimals
+    if (numericValue === 0) {
+      return '1.0-0'
+    }
+
+    if (digitsInfo) {
+      return digitsInfo
     }
 
     if (numericValue >= 1000) {
       return '1.0-0'
+    }
+
+    if (numericValue < 1) {
+      return '1.2-8'
     }
 
     return '1.2-2'

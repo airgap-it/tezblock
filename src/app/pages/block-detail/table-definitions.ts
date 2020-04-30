@@ -36,7 +36,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Fee',
       field: 'fee',
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       template: Template.amount,
       sortable: true
     },
@@ -91,7 +91,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
@@ -144,7 +144,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {

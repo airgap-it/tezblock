@@ -99,7 +99,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
 
     this.amountFromLatestTransactionFee = {
       data: this.latestTransaction.fee,
-      options: { comparisonTimestamp: this.latestTransaction.timestamp, showFiatValue: true, maxDigits: 8 }
+      options: { comparisonTimestamp: this.latestTransaction.timestamp, showFiatValue: true, maxDigits: 8, digitsInfo: '1.2-2' }
     }
     this.statusLabel =
       ['failed', 'backtracked', 'skipped'].indexOf(this.latestTransaction.status) !== -1 ? this.latestTransaction.status : null

@@ -28,12 +28,16 @@ export class BlockDetailWrapperComponent implements OnInit {
   @Output()
   blockChangeClicked: EventEmitter<number> = new EventEmitter()
 
-  get amountFromBlockVolume(): { data: any, options: any } {
-    return this.wrapperBlock ? { data: this.wrapperBlock.volume, options: { comparisonTimestamp: this.wrapperBlock.timestamp } } : undefined
+  get amountFromBlockVolume(): { data: any; options: any } {
+    return this.wrapperBlock
+      ? { data: this.wrapperBlock.volume, options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true } }
+      : undefined
   }
 
-  get amountFromBlockFee(): { data: any, options: any } {
-    return this.wrapperBlock ? { data: this.wrapperBlock.fee, options: { comparisonTimestamp: this.wrapperBlock.timestamp } } : undefined
+  get amountFromBlockFee(): { data: any; options: any } {
+    return this.wrapperBlock
+      ? { data: this.wrapperBlock.fee, options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true, digitsInfo: '1.2-2' } }
+      : undefined
   }
 
   constructor() {}

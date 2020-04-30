@@ -390,7 +390,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             template: Template.amount,
             data: (item: BakingRights) => ({ data: item.rewards })
           },
-          { name: 'Fees', field: 'fees', template: Template.amount, data: (item: BakingRights) => ({ data: item.fees }) },
+          {
+            name: 'Fees',
+            field: 'fees',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: item.fees, options: { digitsInfo: '1.2-2' } })
+          },
           {
             name: 'Deposits',
             field: 'deposit',
