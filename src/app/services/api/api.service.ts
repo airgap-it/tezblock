@@ -1045,7 +1045,7 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedBakingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.rewardService.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                this.rewardService.calculateRewards(address, aggregatedRight.cycle).pipe(
                   map((reward: TezosRewards) => {
                     const rewardByLevel = reward.bakingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
@@ -1140,7 +1140,7 @@ export class ApiService {
           switchMap((aggregatedRights: AggregatedEndorsingRights[]) => {
             return forkJoin(
               aggregatedRights.map(aggregatedRight =>
-                from(this.rewardService.calculateRewards(address, aggregatedRight.cycle)).pipe(
+                this.rewardService.calculateRewards(address, aggregatedRight.cycle).pipe(
                   map((reward: TezosRewards) => {
                     const rewardByLevel = reward.endorsingRewardsDetails.reduce(
                       (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),

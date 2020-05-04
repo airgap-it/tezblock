@@ -11,7 +11,7 @@ import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { CurrentCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Currency } from '@tezblock/domain/airgap'
@@ -39,11 +39,11 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<ByCycleState>(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
           this.cacheService
-            .set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
+            .set<CurrentCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
             .subscribe(() => {})
         })
       ),

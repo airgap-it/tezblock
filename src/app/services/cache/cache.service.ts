@@ -2,20 +2,22 @@ import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { Observable } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
+import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
-  exchangeRates = 'exchangeRates'
+  exchangeRates = 'exchangeRates',
+  byAddress = 'byAddress'
 }
 
 export interface BakerData extends BakerTableRatings {
   efficiencyLast10Cycles?: number
 }
 
-export interface ByCycleState {
+export interface CurrentCycleState {
   cycleNumber: number
   myTezosBaker?: TezosBakerResponse
   fromAddress?: {
@@ -32,9 +34,18 @@ export interface ExchangeRates {
   }
 }
 
+export interface ByAddressState {
+  [address: string]: {
+    [cycle: string]: {
+      rewards: TezosRewards
+    }
+  }
+}
+
 export interface Cache {
-  [CacheKeys.fromCurrentCycle]: ByCycleState
+  [CacheKeys.fromCurrentCycle]: CurrentCycleState
   [CacheKeys.exchangeRates]: ExchangeRates
+  [CacheKeys.byAddress]: ByAddressState
 }
 
 @Injectable({

@@ -12,7 +12,7 @@ import { TezosBakerResponse, Baker } from 'src/app/interfaces/TezosBakerResponse
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { get } from '@tezblock/services/fp'
 import { get as _get } from 'lodash'
-import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { CurrentCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
 interface TezosNodesApiResponse {
   name: string
@@ -88,7 +88,7 @@ export class BakingService {
 
             return this.http.get<TezosBakerResponse>(this.tezosBakerUrl).pipe(
               tap(myTezosBaker =>
-                this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+                this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
                   ...currentCycleCache,
                   myTezosBaker
                 }))
