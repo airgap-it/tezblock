@@ -1104,69 +1104,44 @@ export class ApiService {
   }
 
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
-    const group = groupBy('cycle')
-
     return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
-      switchMap(cycles => {
-        const minLevel = cycleToLevel(last(cycles))
-        const maxLevel = cycleToLevel(first(cycles) + 1)
-        const predicates = [
-          {
-            field: 'level',
-            operation: Operation.gt,
-            set: [minLevel]
-          },
-          {
-            field: 'level',
-            operation: Operation.lt,
-            set: [maxLevel]
-          }
-        ]
-
-        return this.getEndorsingRights(address, 30000, predicates).pipe(
-          map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)),
-          map((rights: EndorsingRights[]) =>
-            Object.entries(group(rights)).map(
-              ([cycle, items]) =>
-                <AggregatedEndorsingRights>{
-                  cycle: parseInt(cycle),
-                  endorsementsCount: (<any[]>items).length,
-                  endorsementRewards: undefined,
-                  deposits: undefined,
-                  items
-                }
+      switchMap(cycles =>
+        forkJoin(
+          cycles.map(cycle =>
+            from(this.rewardService.calculateRewards(address, cycle)).pipe(
+              map((reward: TezosRewards) => ({
+                cycle,
+                endorsementRewards: reward.endorsingRewards,
+                deposits: reward.endorsingDeposits,
+                endorsementsCount: reward.endorsingRewardsDetails.length
+              }))
             )
-          ),
-          switchMap((aggregatedRights: AggregatedEndorsingRights[]) => {
-            return forkJoin(
-              aggregatedRights.map(aggregatedRight =>
-                from(this.rewardService.calculateRewards(address, aggregatedRight.cycle)).pipe(
-                  map((reward: TezosRewards) => {
-                    const rewardByLevel = reward.endorsingRewardsDetails.reduce(
-                      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
-                      {}
-                    )
-
-                    return {
-                      ...aggregatedRight,
-                      endorsementRewards: reward.endorsingRewards,
-                      deposits: reward.endorsingDeposits,
-                      items: aggregatedRight.items.map(item => ({
-                        ...item,
-                        rewards: rewardByLevel[item.level] ? rewardByLevel[item.level].amount : '0',
-                        deposit: rewardByLevel[item.level] ? rewardByLevel[item.level].deposit : '0'
-                      }))
-                    }
-                  })
-                )
-              )
-            )
-          }),
+          )
+        ).pipe(
           map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
           map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
-      })
+      )
     )
+  }
+
+  getEndorsingRightItems(address: string, cycle: number): Observable<EndorsingRights[]> {
+    const minLevel = cycleToLevel(cycle)
+    const maxLevel = cycleToLevel(cycle + 1)
+    const predicates = [
+      {
+        field: 'level',
+        operation: Operation.gt,
+        set: [minLevel]
+      },
+      {
+        field: 'level',
+        operation: Operation.lt,
+        set: [maxLevel]
+      }
+    ]
+
+    return this.getEndorsingRights(address, 30000, predicates).pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel)))
   }
 
   getEndorsedSlotsCount(blockHash: string): Observable<number> {

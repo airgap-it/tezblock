@@ -253,6 +253,20 @@ export class BakerTableEffects {
     )
   )
 
+  loadEndorsingRightItems$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadEndorsingRightItems),
+      withLatestFrom(this.store$.select(state => state.bakerTable.endorsingRightItems)),
+      filter(([{ baker, cycle }, endorsingRightItems]) => endorsingRightItems[cycle] === undefined),
+      switchMap(([{ baker, cycle }]) =>
+        this.apiService.getEndorsingRightItems(baker, cycle).pipe(
+          map(endorsingRightItems => actions.loadEndorsingRightItemsSucceeded({ cycle, endorsingRightItems })),
+          catchError(error => of(actions.loadEndorsingRightItemsFailed({ cycle, error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
