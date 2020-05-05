@@ -1,7 +1,7 @@
 import { createAction, props } from '@ngrx/store'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Baker } from '@tezblock/services/api/api.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { Account } from '@tezblock/interfaces/Account'
@@ -62,7 +62,7 @@ export const loadTotalActiveBakersSucceeded = createAction(
 export const loadTotalActiveBakersFailed = createAction(`[${featureName}] Load Total Active Bakers Failed`, props<{ error: any }>())
 
 export const loadProposals = createAction(`[${featureName}] Load Proposals`)
-export const loadProposalsSucceeded = createAction(`[${featureName}] Load Proposals Succeeded`, props<{ proposals: ProposalListDto[] }>())
+export const loadProposalsSucceeded = createAction(`[${featureName}] Load Proposals Succeeded`, props<{ proposals: ProposalDto[] }>())
 export const loadProposalsFailed = createAction(`[${featureName}] Load Proposals Failed`, props<{ error: any }>())
 export const increasePageOfProposals = createAction(`[${featureName}] Increase Page Of Proposals`)
 export const sortProposalsByKind = createAction(`[${featureName}] Sort Proposals`, props<{ orderBy: OrderBy }>())

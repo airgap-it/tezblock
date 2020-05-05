@@ -4,8 +4,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
-import { map, switchMap, filter } from 'rxjs/operators'
+import { map, switchMap, tap } from 'rxjs/operators'
 import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
+import { get as _get } from 'lodash'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight } from '@tezblock/interfaces/BakingRights'
 import { EndorsingRights, AggregatedEndorsingRights, getEmptyAggregatedEndorsingRight } from '@tezblock/interfaces/EndorsingRights'
@@ -17,11 +18,13 @@ import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, groupBy, last, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation } from '../base.service'
-import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+import { CacheService, CacheKeys, ByAddressState, ByBlockState, ByProposalState } from '@tezblock/services/cache/cache.service'
+import { squareBrackets } from '@tezblock/domain/pattern'
 
 export interface OperationCount {
   [key: string]: string
@@ -84,6 +87,7 @@ export class ApiService {
   }
 
   constructor(
+    private readonly cacheService: CacheService,
     private readonly http: HttpClient,
     readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService
@@ -447,23 +451,49 @@ export class ApiService {
     )
   }
 
-  getAccountById(id: string): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: 'eq',
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit: 1
-      },
-      this.options
+  getAccountById(id: string): Observable<Account> {
+    return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
+      switchMap(byAddressCache => {
+        const account: any = _get(byAddressCache, `${id}.account`)
+
+        if (account) {
+          return of(account as Account)
+        }
+
+        return this.http
+          .post<Account[]>(
+            this.accountsApiUrl,
+            {
+              predicates: [
+                {
+                  field: 'account_id',
+                  operation: 'eq',
+                  set: [id],
+                  inverse: false
+                }
+              ],
+              limit: 1
+            },
+            this.options
+          )
+          .pipe(
+            map(first),
+            tap(
+              account => {}
+              // TODO: uncomment when conseil won't bug is_baker property ( returns randomly true or false )
+              // this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
+              //   ...byAddressCache,
+              //   [id]: {
+              //     ..._get(byAddressCache, id),
+              //     account
+              //   }
+              // }))
+            )
+          )
+      })
     )
   }
+
   getAccountsByIds(ids: string[]): Observable<Account[]> {
     return this.http.post<Account[]>(
       this.accountsApiUrl,
@@ -929,39 +959,79 @@ export class ApiService {
       .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field }))))
   }
 
-  getBlockById(id: string): Observable<Block[]> {
-    return this.http.post<Block[]>(
-      this.blocksApiUrl,
-      {
-        predicates: [
-          {
-            field: 'level',
-            operation: 'eq',
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit: 1
-      },
-      this.options
+  getBlockByLevel(level: string): Observable<Block> {
+    return this.cacheService.get<ByBlockState>(CacheKeys.byBlock).pipe(
+      switchMap(byBlockCache => {
+        const block: any = _get(byBlockCache, level)
+
+        if (block) {
+          return of(block as Block)
+        }
+
+        return this.http
+          .post<Block[]>(
+            this.blocksApiUrl,
+            {
+              predicates: [
+                {
+                  field: 'level',
+                  operation: 'eq',
+                  set: [level],
+                  inverse: false
+                }
+              ],
+              limit: 1
+            },
+            this.options
+          )
+          .pipe(
+            map(first),
+            tap(block =>
+              this.cacheService.update<ByBlockState>(CacheKeys.byBlock, byBlockCache => ({
+                ...byBlockCache,
+                [level]: block
+              }))
+            )
+          )
+      })
     )
   }
 
-  getBlockByHash(hash: string): Observable<Block[]> {
-    return this.http.post<Block[]>(
-      this.blocksApiUrl,
-      {
-        predicates: [
-          {
-            field: 'hash',
-            operation: 'eq',
-            set: [hash],
-            inverse: false
-          }
-        ],
-        limit: 1
-      },
-      this.options
+  getBlockByHash(hash: string): Observable<Block> {
+    return this.cacheService.get<ByBlockState>(CacheKeys.byBlock).pipe(
+      switchMap(byBlockCache => {
+        const block: any = Object.values(byBlockCache).find(block => block.hash === hash)
+
+        if (block) {
+          return of(block as Block)
+        }
+
+        return this.http
+          .post<Block[]>(
+            this.blocksApiUrl,
+            {
+              predicates: [
+                {
+                  field: 'hash',
+                  operation: 'eq',
+                  set: [hash],
+                  inverse: false
+                }
+              ],
+              limit: 1
+            },
+            this.options
+          )
+          .pipe(
+            map(first),
+            tap(block =>
+              this.cacheService.update<ByBlockState>(CacheKeys.byBlock, byBlockCache => ({
+                ...byBlockCache,
+                [block.level]: block
+              }))
+            )
+          )
+      })
     )
   }
 
@@ -1342,40 +1412,59 @@ export class ApiService {
       )
   }
 
-  getProposal(id: string): Observable<any> {
+  getProposal(hash: string): Observable<ProposalDto> {
+    return this.cacheService.get<ByProposalState>(CacheKeys.byProposal).pipe(
+      switchMap(byProposalState => {
+        const period: any = _get(byProposalState, hash)
+
+        if (period) {
+          return of({ proposal: hash, period })
+        }
+
+        return this.http
+          .post<ProposalDto[]>(
+            this.transactionsApiUrl,
+            {
+              fields: ['proposal', 'period'],
+              predicates: [
+                {
+                  field: 'kind',
+                  operation: 'eq',
+                  set: ['proposals'],
+                  inverse: false
+                },
+                { field: 'proposal', operation: 'like', set: [hash], inverse: false }
+              ],
+              orderBy: [
+                {
+                  field: 'block_level',
+                  direction: 'asc'
+                }
+              ],
+              limit: 1
+            },
+            this.options
+          )
+          .pipe(
+            map(first),
+            map(item => ({ ...item, proposal: item.proposal.replace(squareBrackets, '') })),
+            tap(proposal =>
+              this.cacheService.update<ByProposalState>(CacheKeys.byProposal, byProposalState => ({
+                ...byProposalState,
+                [hash]: proposal.period
+              }))
+            )
+          )
+      })
+    )
+  }
+
+  getProposals(limit: number, orderBy = { field: 'period', direction: 'desc' }): Observable<ProposalDto[]> {
     return this.http
-      .post<any>(
+      .post<ProposalDto[]>(
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'period'],
-          predicates: [
-            {
-              field: 'kind',
-              operation: 'eq',
-              set: ['proposals'],
-              inverse: false
-            },
-            { field: 'proposal', operation: 'like', set: [id], inverse: false }
-          ],
-          orderBy: [
-            {
-              field: 'block_level',
-              direction: 'asc'
-            }
-          ],
-          limit: 1
-        },
-        this.options
-      )
-      .pipe(map(first))
-  }
-
-  getProposals(limit: number, orderBy = { field: 'period', direction: 'desc' }): Observable<ProposalListDto[]> {
-    return this.http
-      .post<ProposalListDto[]>(
-        this.transactionsApiUrl,
-        {
-          fields: ['proposal', 'operation_group_hash', 'period'],
           predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
           orderBy: [orderBy],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],

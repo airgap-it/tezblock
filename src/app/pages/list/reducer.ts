@@ -3,7 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Baker } from '@tezblock/services/api/api.service'
-import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { Block } from '@tezblock/interfaces/Block'
 import { sort } from '@tezblock/domain/table'
@@ -15,7 +15,7 @@ export interface State {
   transactions: TableState<Transaction>
   doubleBakings: TableState<Transaction>
   doubleEndorsements: TableState<Transaction>
-  proposals: TableState<ProposalListDto>
+  proposals: TableState<ProposalDto>
   activeBakers: TableState<Baker>
   activations: TableState<Transaction>
   originations: TableState<Transaction>

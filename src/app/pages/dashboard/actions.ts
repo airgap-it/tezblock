@@ -3,7 +3,7 @@ import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TokenContract } from '@tezblock/domain/contract'
-import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { PeriodTimespan } from '@tezblock/domain/vote'
 import { Block } from '@tezblock/interfaces/Block'
 
@@ -14,7 +14,7 @@ export const loadContractsSucceeded = createAction(`[${featureName}] Load Contra
 export const loadContractsFailed = createAction(`[${featureName}] Load Contracts Failed`, props<{ error: any }>())
 
 export const loadLatestProposal = createAction(`[${featureName}] Load Latest Proposal`)
-export const loadLatestProposalSucceeded = createAction(`[${featureName}] Load Latest Proposal Succeeded`, props<{ proposal: ProposalListDto }>())
+export const loadLatestProposalSucceeded = createAction(`[${featureName}] Load Latest Proposal Succeeded`, props<{ proposal: ProposalDto }>())
 export const loadLatestProposalFailed = createAction(`[${featureName}] Load Latest Proposal Failed`, props<{ error: any }>())
 
 export const loadCurrentPeriodTimespan = createAction(`[${featureName}] Load CurrenyPeriodTimespan`)

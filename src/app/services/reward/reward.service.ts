@@ -17,7 +17,6 @@ import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cach
 export class RewardService {
   protocol: TezosProtocol
 
-  private calculatedRewardsMap = new Map<String, TezosRewards>()
   private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
   constructor(
@@ -88,7 +87,7 @@ export class RewardService {
   calculateRewards(address: string, cycle: number): Observable<TezosRewards> {
     return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
       switchMap(byAddressCache => {
-        const rewards: any = get(byAddressCache, `${address}.${cycle}.rewards`)
+        const rewards: any = get(byAddressCache, `${address}.byCycle.${cycle}.rewards`)
 
         if (rewards) {
           return of(rewards as TezosRewards)
@@ -98,7 +97,6 @@ export class RewardService {
         const promise = this.pendingPromises.has(key)
           ? this.pendingPromises.get(key)
           : this.protocol.calculateRewards(address, cycle).then(result => {
-              this.calculatedRewardsMap.set(key, result)
               this.pendingPromises.delete(key)
 
               const latestCycle = get(fromRoot.getState(this.store$).app.latestBlock, 'meta_cycle')
@@ -108,9 +106,12 @@ export class RewardService {
                   ...byAddressCache,
                   [address]: {
                     ...get(byAddressCache, address),
-                    [cycle]: {
-                      ...get(byAddressCache, `${address}.${cycle}`),
-                      rewards: result
+                    byCycle: {
+                      ...<any>get(byAddressCache, `${address}.byCycle`),
+                      [cycle]: {
+                        ...<any>get(byAddressCache, `${address}.byCycle.${cycle}`),
+                        rewards: result
+                      }
                     }
                   }
                 }))
@@ -118,6 +119,7 @@ export class RewardService {
 
               return result
             })
+
         this.pendingPromises.set(key, promise)
 
         return from(promise)

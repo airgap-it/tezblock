@@ -6,11 +6,15 @@ import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
   exchangeRates = 'exchangeRates',
-  byAddress = 'byAddress'
+  byAddress = 'byAddress',
+  byBlock = 'byBlock',
+  byProposal = 'byProposal'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -36,16 +40,31 @@ export interface ExchangeRates {
 
 export interface ByAddressState {
   [address: string]: {
-    [cycle: string]: {
-      rewards: TezosRewards
-    }
+    byCycle: {
+      [cycle: string]: {
+        rewards: TezosRewards
+      }
+    },
+    account?: Account
   }
+}
+
+export interface ByBlockState {
+  [level: string]: Block
+}
+
+export interface ByProposalState {
+  [proposal: string]: number/* period */
 }
 
 export interface Cache {
   [CacheKeys.fromCurrentCycle]: CurrentCycleState
   [CacheKeys.exchangeRates]: ExchangeRates
   [CacheKeys.byAddress]: ByAddressState
+  [CacheKeys.byBlock]: ByBlockState
+
+  // probably in future this entry will replace byPeriod which will contain this data
+  [CacheKeys.byProposal]: ByProposalState
 }
 
 @Injectable({

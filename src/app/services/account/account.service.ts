@@ -25,8 +25,8 @@ export class AccountService {
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           return this.apiService.getAccountById(address).pipe(
-            map((accounts: Account[]) => {
-              const delegated = accounts.length > 0 && accounts[0].delegate_value ? [accounts[0]] : []
+            map((account: Account) => {
+              const delegated = account && account.delegate_value ? [account] : []
 
               return {
                 delegated,
@@ -42,8 +42,8 @@ export class AccountService {
           const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
 
           return forkJoin(this.apiService.getAccountById(address), this.apiService.getAccountsByIds(originatedContracts)).pipe(
-            map(([accounts, relatedAccounts]) => {
-              const delegatedAccounts = accounts[0].delegate_value ? accounts : []
+            map(([account, relatedAccounts]) => {
+              const delegatedAccounts = account.delegate_value ? [account] : []
 
               return {
                 delegated:
@@ -59,8 +59,8 @@ export class AccountService {
         const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
 
         return forkJoin(this.apiService.getAccountById(address), this.apiService.getAccountsByIds(managerPubKeys)).pipe(
-          map(([accounts, relatedAccounts]) => {
-            const delegated = accounts[0].delegate_value ? accounts : []
+          map(([account, relatedAccounts]) => {
+            const delegated = account.delegate_value ? [account] : []
 
             return {
               delegated,
