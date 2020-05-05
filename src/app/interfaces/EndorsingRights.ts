@@ -14,13 +14,12 @@ export interface AggregatedEndorsingRights {
   endorsementsCount: number
   endorsementRewards: string
   deposits: string
-  items: EndorsingRights[]
+  items?: EndorsingRights[]
 }
 
 export const getEmptyAggregatedEndorsingRight = () => ({
   cycle: null,
   endorsementsCount: 0,
   endorsementRewards: null,
-  deposits: null,
-  items: []
+  deposits: null
 })

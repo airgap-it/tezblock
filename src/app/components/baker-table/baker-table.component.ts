@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
+import { ActivatedRoute } from '@angular/router'
 import { TezosNetwork, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
@@ -92,8 +92,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     if (!this.selectedTab) {
       this.updateSelectedTab(tabs[0])
     }
-
-    this.getTabCount(tabs)
   }
 
   get tabs() {
@@ -103,6 +101,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       return []
     }
   }
+
+  @Input() address: string
 
   @Input() data: any
 
@@ -136,7 +136,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly route: ActivatedRoute,
-    private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
@@ -272,42 +271,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  getTabCount(tabs: Tab[]) {
-    let ownId: string = this.router.url
-    const split = ownId.split('/')
-    ownId = split.slice(-1).pop()
-
-    const aggregateFunction = info => {
-      let tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
-      if (info.kind === 'proposals') {
-        tab = tabs.find(tabArgument => tabArgument.kind === 'ballot')
-      }
-      if (tab) {
-        const count = parseInt(info.count_operation_group_hash, 10)
-        tab.count = tab.count ? tab.count + count : count
-      }
-    }
-
-    const setFirstActiveTab = () => {
-      const firstActiveTab = this.tabs.find(tab => tab.count > 0)
-      if (firstActiveTab) {
-        this.selectTab(firstActiveTab)
-      }
-    }
-
-    if (this.page === 'transaction') {
-      const transactionPromise = this.apiService.getOperationCount('operation_group_hash', ownId).toPromise()
-
-      transactionPromise
-        .then(transactionCounts => {
-          transactionCounts.forEach(aggregateFunction)
-
-          setFirstActiveTab()
-        })
-        .catch(console.error)
-    }
-  }
-
   loadMoreRights() {
     this.store$.dispatch(actions.increaseRightsPageSize())
   }
@@ -424,7 +387,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
           }
         ],
-        dataSource: toClientsideDataScource(item.items)
+        dataSource: this.getEndorsingRightsInnerDataSource(item.cycle)
       }),
       primaryKey: 'cycle'
     }
@@ -445,6 +408,33 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         return this.rewardService.getRewardsPayouts(rewards, pagination, filter)
       },
       isFilterable: true
+    }
+  }
+
+  private getEndorsingRightsInnerDataSource(cycle: number): DataSource<EndorsingRights> {
+    return {
+      get: (pagination: Pagination, _filter?: any) => {
+        this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle }))
+
+        return this.store$
+          .select(state => state.bakerTable.endorsingRightItems)
+          .pipe(
+            filter(response => response[cycle] !== undefined),
+            map(response => {
+              const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
+              const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
+              const _response = response[cycle]
+
+              return _response
+                ? {
+                    data: _response.slice(offset, Math.min(offset + limit, _response.length)),
+                    total: _response.length
+                  }
+                : { data: undefined, total: 0 }
+            })
+          )
+      },
+      isFilterable: false
     }
   }
 }
