@@ -413,12 +413,13 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   private getEndorsingRightsInnerDataSource(cycle: number): DataSource<EndorsingRights> {
     return {
-      get: (pagination: Pagination, filter?: any) => {
+      get: (pagination: Pagination, _filter?: any) => {
         this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle }))
 
         return this.store$
           .select(state => state.bakerTable.endorsingRightItems)
           .pipe(
+            filter(response => response[cycle] !== undefined),
             map(response => {
               const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
               const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
