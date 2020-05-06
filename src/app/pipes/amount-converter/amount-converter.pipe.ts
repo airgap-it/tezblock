@@ -73,11 +73,9 @@ export class AmountConverterPipe implements PipeTransform {
     value: BigNumber | string | number,
     args: { protocolIdentifier: string; maxDigits?: number }
   ): string {
-    if (BigNumber.isBigNumber(value)) {
-      value = value.toNumber()
-    }
+    const _value = BigNumber.isBigNumber(value) ? value.toNumber() : value
 
-    if (!args.protocolIdentifier || (isNil(value)) || isNaN(Number(value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
+    if (!args.protocolIdentifier || (isNil(_value)) || isNaN(Number(_value)) || (args.maxDigits && isNaN(Number(args.maxDigits)))) {
       return ''
     }
 
@@ -90,8 +88,8 @@ export class AmountConverterPipe implements PipeTransform {
         groupSize: 3
       }
     })
-    const amount = new BN(value).shiftedBy(protocol.decimals * -1)
+    const amount = new BN(_value).shiftedBy(protocol.decimals * -1)
 
-    return formatBigNumber(amount, args.maxDigits)
+    return formatBigNumber(amount, amount.isLessThan(0.01) ? undefined : args.maxDigits)
   }
 }
