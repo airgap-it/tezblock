@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule, HttpClient } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -94,6 +94,12 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+
+export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+}
 
 @NgModule({
   imports: [
@@ -145,7 +151,15 @@ import { TokenContractOverviewEffects } from './pages/token-contract-overview/ef
       DashboardLatestContractsTransactionsEffects,
       TokenContractOverviewEffects
     ]),
-    StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true }),
+    TranslateModule.forRoot({
+      defaultLanguage: 'en',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
+      }
+    })
   ],
   declarations: [
     AppComponent,

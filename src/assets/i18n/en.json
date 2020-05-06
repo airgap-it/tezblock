@@ -1,0 +1,37 @@
+{
+  "header-item": {
+    "by": "by AirGap",
+    "cycle": "Cycle",
+    "overview_button": "Overview",
+    "blockchain_button": "Blockchain",
+    "operations_button": "Operations",
+    "transactions_button": "Transactions",
+    "activations_button": "Activations",
+    "originations_button": "Originations",
+    "accounts_button": "Accounts",
+    "network-validation_button": "Network Validation",
+    "bakers_button": "Bakers",
+    "blocks_button": "Blocks",
+    "endorsements_button": "Endorsements",
+    "delegations_button": "Delegations",
+    "double-baking-evidence_button": "Double Baking Evidence",
+    "double-endorsement-evidence_button": "Double Endorsement Evidence",
+    "governance_button": "Governance",
+    "votes_button": "Votes",
+    "proposals_button": "Proposals",
+    "smart-contracts_button": "Smart Contracts",
+    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "contracts_button": "Contracts",
+    "resources_button": "Resources",
+    "wallets_button": "Wallets",
+    "constants_button": "Constants",
+    "tezblock-health_button": "tezblock Health",
+    "dapps_button": "Dapps",
+    "development_button": "Development"
+  },
+  "search-item": {},
+  "tezblock-table": {
+    "load-more_button": "Load more",
+    "download-csv_button": "Download CSV Export"
+  }
+}
