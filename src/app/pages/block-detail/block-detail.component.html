@@ -1,5 +1,8 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
+    <h1 hidden="true">
+      block detail page with information about level, timestamp, block reward, baker, value, fees and number of transactions
+    </h1>
     <ng-container *ngIf="block$ | async; else noBlock">
       <div class="card h-100 pt-3">
         <block-detail-wrapper

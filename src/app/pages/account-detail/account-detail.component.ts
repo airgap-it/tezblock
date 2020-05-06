@@ -350,7 +350,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.titleService.setTitle('Tezos Address: ' + this.aliasService.getFormattedAddress(this.address) + ' - tezblock')
     this.metaTagService.updateTag({
       name: 'description',
-      content: `Tezos Account Address  ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
+      content: `Tezos Account Address ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
     })
   }
 
