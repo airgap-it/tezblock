@@ -11,7 +11,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
 import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
-import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import * as fromRoot from '@tezblock/reducers'
@@ -21,7 +21,7 @@ import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-tab
 import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
-import { toClientsideDataScource, DataSource, Pagination } from '@tezblock/domain/table'
+import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 
 // TODO: ask Pascal if this override payout logic is needed
@@ -361,7 +361,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: BakingRights) => ({ data: { amount: item.deposit } })
           }
         ],
-        dataSource: toClientsideDataScource(item.items)
+        dataSource: this.getBakingRightsInnerDataSource(item)
       }),
       primaryKey: 'cycle'
     }
@@ -387,7 +387,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
           }
         ],
-        dataSource: this.getEndorsingRightsInnerDataSource(item.cycle)
+        dataSource: this.getEndorsingRightsInnerDataSource(item)
       }),
       primaryKey: 'cycle'
     }
@@ -411,27 +411,36 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  private getEndorsingRightsInnerDataSource(cycle: number): DataSource<EndorsingRights> {
+  private getEndorsingRightsInnerDataSource(item: AggregatedEndorsingRights): DataSource<EndorsingRights> {
+    const { cycle, endorsingRewardsDetails } = item
+
     return {
       get: (pagination: Pagination, _filter?: any) => {
-        this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle }))
+        this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle, endorsingRewardsDetails }))
 
         return this.store$
           .select(state => state.bakerTable.endorsingRightItems)
           .pipe(
             filter(response => response[cycle] !== undefined),
-            map(response => {
-              const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
-              const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
-              const _response = response[cycle]
+            map(response => toPagable(response[cycle], pagination))
+          )
+      },
+      isFilterable: false
+    }
+  }
 
-              return _response
-                ? {
-                    data: _response.slice(offset, Math.min(offset + limit, _response.length)),
-                    total: _response.length
-                  }
-                : { data: undefined, total: 0 }
-            })
+  private getBakingRightsInnerDataSource(item: AggregatedBakingRights): DataSource<BakingRights> {
+    const { cycle, bakingRewardsDetails } = item
+
+    return {
+      get: (pagination: Pagination, _filter?: any) => {
+        this.store$.dispatch(actions.loadBakingRightItems({ baker: this.address, cycle, bakingRewardsDetails }))
+
+        return this.store$
+          .select(state => state.bakerTable.bakingRightItems)
+          .pipe(
+            filter(response => response[cycle] !== undefined),
+            map(response => toPagable(response[cycle], pagination))
           )
       },
       isFilterable: false
