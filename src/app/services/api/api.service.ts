@@ -1090,7 +1090,7 @@ export class ApiService {
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
                 cycle,
-                bakingsCount: undefined,
+                bakingsCount: reward.bakingRewardsDetails.length,
                 blockRewards: reward.bakingRewards,
                 deposits: reward.bakingDeposits,
                 fees: new BigNumber(reward.fees).toNumber(),
