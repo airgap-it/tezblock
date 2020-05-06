@@ -29,7 +29,16 @@
     "dapps_button": "Dapps",
     "development_button": "Development"
   },
-  "search-item": {},
+  "footer-item": {
+    "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
+    "behind": "Behind tezblock",
+    "about": "About",
+    "social-links": "Social Links",
+    "donations": "Donations"
+  },
+  "search-item": {
+    "label": "Search"
+  },
   "tezblock-table": {
     "load-more_button": "Load more",
     "download-csv_button": "Download CSV Export"
