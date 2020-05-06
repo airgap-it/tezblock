@@ -1,13 +1,13 @@
 <div class="card-body p-4">
   <h5 class="card-title mb-4 ">
-    Block Details
+    {{ 'block-detail.block-details' | translate }}
   </h5>
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
         <tooltip-item
-          [title]="'Block Height'"
-          [tooltip]="'The block height, which indicates the length of the blockchain, increases after the addition of the new block.'"
+          [title]="'block-detail.block-height' | translate"
+          [tooltip]="'block-detail.block-height-tooltip' | translate"
         ></tooltip-item>
       </p>
     </div>
@@ -15,7 +15,9 @@
     <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
       {{ wrapperBlock.level }}
       <ng-container *ngIf="confirmations">
-        <span *ngIf="confirmations >= 1" class="text-secondary ml-1">{{ confirmations }} Block Confirmation</span>
+        <span *ngIf="confirmations >= 1" class="text-secondary ml-1">
+          {{ confirmations }} {{ 'block-detail.block-confirmation' | translate }}
+        </span>
       </ng-container>
       <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel(-1)">
         <fa-icon [icon]="'chevronLeft' | iconPipe" class="text-secondary"></fa-icon>
@@ -39,7 +41,7 @@
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
-        <tooltip-item [title]="'Baker'" [tooltip]="'A Baker takes part in the validation of the network.'"></tooltip-item>
+        <tooltip-item [title]="'block-detail.baker' | translate" [tooltip]="'block-detail.baker-tooltip' | translate"></tooltip-item>
       </p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
@@ -49,7 +51,10 @@
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
-        <tooltip-item [title]="'Timestamp'" [tooltip]="'The date an time at which a block was created.'"></tooltip-item>
+        <tooltip-item
+          [title]="'block-detail.timestamp' | translate"
+          [tooltip]="'block-detail.timestamp-tooltip' | translate"
+        ></tooltip-item>
       </p>
     </div>
     <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
@@ -62,7 +67,7 @@
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
-        <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in transactions for this block.'"></tooltip-item>
+        <tooltip-item [title]="'block-detail.value' | translate" [tooltip]="'block-detail.value-tooltip' | translate"></tooltip-item>
       </p>
     </div>
     <ng-container *ngIf="amountFromBlockVolume; else loadingTemplate">
@@ -75,8 +80,8 @@
     <div class="col-md-3">
       <p class="text-secondary mb-0">
         <tooltip-item
-          [title]="'Transaction Fees'"
-          [tooltip]="'The total amount of fees spent for transactions in this block.'"
+          [title]="'block-detail.transaction-fees' | translate"
+          [tooltip]="'block-detail.transaction-fees-tooltip' | translate"
         ></tooltip-item>
       </p>
     </div>
@@ -99,8 +104,8 @@
     aria-controls="collapseBasic"
     [ngClass]="{ 'btn--rotated': !isCollapsed }"
   >
-    <span>{{ isCollapsed ? 'More' : 'Less' }}</span>
-    Details
+    <span>{{ isCollapsed ? ('block-detail.more' | translate) : ('block-detail.less' | translate) }}</span>
+    {{ 'block-detail.details' | translate }}
     <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
   </button>
   <div id="collapseBasic" [collapse]="isCollapsed" [isAnimated]="true">
@@ -108,8 +113,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Endorsed Slots'"
-            [tooltip]="'A block has to be enndorsed by other bakers, up to 32 bakers confirm that this block is valid.'"
+            [title]="'block-detail.endorsed-slots' | translate"
+            [tooltip]="'block-detail.endorsed-slots-tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>
@@ -123,12 +128,7 @@
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
-          <tooltip-item
-            [title]="'Cycle'"
-            [tooltip]="
-              'A Cycle is a set of consecutive blocks consisting out of 4095 blocks. Cycles are used as a unit of “time” in the block chain. For example, the different phases in the amendment voting procedures are defined based on cycles.'
-            "
-          ></tooltip-item>
+          <tooltip-item [title]="'block-detail.cycle' | translate" [tooltip]="'block-detail.cycle-tooltip' | translate"></tooltip-item>
         </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
@@ -138,16 +138,19 @@
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
-          <tooltip-item [title]="'Cycle Position'" [tooltip]="'The position in number of blocks out of 4095 blocks.'"></tooltip-item>
+          <tooltip-item
+            [title]="'block-detail.cycle-position' | translate"
+            [tooltip]="'block-detail.cycle-position-tooltip' | translate"
+          ></tooltip-item>
         </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
-        <p class="mb-0">{{ wrapperBlock.meta_cycle_position }} of 4095</p>
+        <p class="mb-0">{{ wrapperBlock.meta_cycle_position }} {{ 'block-detail.of' | translate }} 4095</p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Block Hash</p>
+        <p class="text-secondary mb-0">{{ 'block-detail.block-hash' | translate }}</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.hash }}</p>
@@ -155,7 +158,7 @@
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">Signature</p>
+        <p class="text-secondary mb-0">{{ 'block-detail.signature' | translate }}</p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.signature }}</p>
@@ -164,12 +167,7 @@
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
-          <tooltip-item
-            [title]="'Fitness'"
-            [tooltip]="
-              'Fitness is a metric used to compare contexts. For example, when several blocks claim to be heads of the chain, their context’s fitness are compared. The block with the highest fitness is selected as the head of the chain.'
-            "
-          ></tooltip-item>
+          <tooltip-item [title]="'block-detail.fitness' | translate" [tooltip]="'block-detail.fitness-tooltip' | translate"></tooltip-item>
         </p>
       </div>
       <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
@@ -180,8 +178,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Protocol'"
-            [tooltip]="'The active protcol of this block. The protocol can be changed through the protocol amendment proccess.'"
+            [title]="'block-detail.protocol' | translate"
+            [tooltip]="'block-detail.protocol-tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>
