@@ -234,9 +234,7 @@ export class ListEffects {
 
         return this.apiService.getBlocksOfIds(blockIds).pipe(
           map((blocks: Block[]) => {
-            let doubleBakings: Transaction[] = JSON.parse(JSON.stringify(temporaryData))
-
-            doubleBakings = doubleBakings.map(doubleBaking => {
+            const doubleBakings: Transaction[] = temporaryData.map(doubleBaking => {
               const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
 
               return { ...doubleBaking, baker: additionalData.baker }
@@ -316,9 +314,7 @@ export class ListEffects {
 
         return this.apiService.getBlocksOfIds(blockIds).pipe(
           map((blocks: Block[]) => {
-            let doubleEndorsements: Transaction[] = JSON.parse(JSON.stringify(temporaryData))
-
-            doubleEndorsements = doubleEndorsements.map(doubleEndorsement => {
+            const doubleEndorsements: Transaction[] = temporaryData.map(doubleEndorsement => {
               const additionalData = blocks.find(block => block.level === doubleEndorsement.block_level)
 
               return { ...doubleEndorsement, baker: additionalData.baker }
