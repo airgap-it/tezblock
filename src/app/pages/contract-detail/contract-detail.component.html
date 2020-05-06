@@ -85,11 +85,24 @@
                 </div>
                 <div class="col-md-7">
                   <p class="mb-0">
+                    <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
                     <amount-cell
                       [data]="{ amount: contract.totalSupply }"
-                      [options]="{ symbol: contract.symbol, conventer: conventer$ | async, showFiatValue: false }"
+                      [options]="{
+                        symbol: contract.symbol,
+                        conventer: conventer$ | async,
+                        showFiatValue: showFiatValue$ | async
+                      }"
                     ></amount-cell>
                   </p>
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-5">
+                  <p class="text-secondary mb-0">Decimals</p>
+                </div>
+                <div class="col-md-7">
+                  {{ contract.decimals }}
                 </div>
               </div>
               <div class="row mb-3">

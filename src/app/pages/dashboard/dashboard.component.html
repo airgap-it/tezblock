@@ -94,18 +94,42 @@
                 <h5 class="card-title__secondary mb-3 ">
                   Circulating Supply
                 </h5>
-                <h3>830,326,787 ꜩ</h3>
+                <h3>832,702,414 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 Market Cap
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('830326787').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('832702414').toFormat(0) }}</h3>
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
-                Tezos Price Last 24h
+                Tezos Price Last
+                <button
+                  type="button"
+                  class="btn btn-sm ml-2"
+                  [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 0, 'btn-outline-primary': (pricePeriod$ | async) !== 0 }"
+                  (click)="changePricePeriod(0)"
+                >
+                  24 hrs
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 1, 'btn-outline-primary': (pricePeriod$ | async) !== 1 }"
+                  (click)="changePricePeriod(1)"
+                >
+                  7 days
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 2, 'btn-outline-primary': (pricePeriod$ | async) !== 2 }"
+                  (click)="changePricePeriod(2)"
+                >
+                  90 days
+                </button>
               </h5>
               <ng-container *ngIf="fiatInfo$">
                 <ng-container *ngIf="cryptoInfo$">
@@ -140,16 +164,16 @@
         <div class="row">
           <div class="col-lg-6 pr-3 pr-md-5 pb-5 pb-md-0">
             <h5 class="card-title__secondary mb-3 ">
-              Latest FA 1.2 Assets
+              Latest Asset Contracts
             </h5>
             <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
-            <button type="button" routerLink="/token-contract/list" class="btn btn-primary-light btn-sm btn-block">
-              All FA 1.2 Assets
+            <button type="button" [routerLink]="['/token-contract/list']" class="btn btn-primary-light btn-sm btn-block">
+              All Assets
             </button>
           </div>
           <div class="col-lg-6 pl-3 pl-md-5">
             <h5 class="card-title__secondary mb-3 ">
-              Latest FA 1.2 Transfers
+              Latest Transfers
             </h5>
             <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
           </div>

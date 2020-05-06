@@ -17,6 +17,7 @@ import * as fromHealth from '../pages/health/reducer'
 import * as fromApp from '../app.reducer'
 import * as fromDashboard from '../pages/dashboard/reducer'
 import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer'
+import * as fromTokenContractOveview from '../pages/token-contract-overview/reducer'
 
 export interface State {
   app: fromApp.State
@@ -28,6 +29,7 @@ export interface State {
   dashboard: fromDashboard.State
   dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.State
   endorsementDetails: fromEndorsementDetails.State
+  tokenContractOveview: fromTokenContractOveview.State
   transactionDetails: fromTransactionDetails.State
   proposalDetails: fromProposalDetails.State
   contractDetails: fromContractDetails.State
@@ -51,6 +53,7 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     dashboard: fromDashboard.reducer,
     dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
+    tokenContractOveview: fromTokenContractOveview.reducer,
     transactionDetails: fromTransactionDetails.reducer,
     proposalDetails: fromProposalDetails.reducer,
     contractDetails: fromContractDetails.reducer,
@@ -83,12 +86,13 @@ export const getState = (store: Store<State>): State => {
   return state
 }
 
+export const selectGlobal = (state: State) => state
 export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
+export const selectBakerTable = (state: State) => state.bakerTable
 
-export const blockDetails = {
-  id: createSelector(selectBlockDetails, state => state.id),
-  block: createSelector(selectBlockDetails, state => state.block)
+export const dashboard = {
+  currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector)
 }
 
 export const app = {
@@ -97,6 +101,14 @@ export const app = {
   cycleStartingBlockLevel: createSelector(selectApp, fromApp.cycleStartingBlockLevelSelector),
   cycleEndingBlockLevel: createSelector(selectApp, fromApp.cycleEndingBlockLevelSelector),
   cycleProgress: createSelector(selectApp, fromApp.cycleProgressSelector),
-  remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector),
-  currencyGrowthPercentage: createSelector(selectApp, fromApp.currencyGrowthPercentageSelector)
+  remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector)
+}
+
+export const blockDetails = {
+  id: createSelector(selectBlockDetails, state => state.id),
+  block: createSelector(selectBlockDetails, state => state.block)
+}
+
+export const bakerTable = {
+  bakerReward: (cycle: number) => createSelector(selectBakerTable, fromBakerTable.bakerRewardSelector(cycle))
 }

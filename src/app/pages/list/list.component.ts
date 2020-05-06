@@ -19,9 +19,10 @@ import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
-import { toXTZ, tryGetProtocolByIdentifier } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
 import { Title, Meta } from '@angular/platform-browser'
+import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
@@ -423,29 +424,6 @@ export class ListComponent extends BaseComponent implements OnInit {
               content: `Tezos Proposal list on tezblock shows all the proposals with information about hash and period of each proposal.">`
             })
             break
-          case 'token-contract':
-            const showLoadMoreTokenContracts$ = this.store$
-              .select(state => state.list.tokenContracts)
-              .pipe(map(contracts => contracts.data.length < contracts.pagination.total))
-            const loadingTokenContracts$ = this.store$.select(state => state.list.tokenContracts.loading)
-            const tokenContractsData$ = this.store$.select(state => state.list.tokenContracts.data)
-            const tokenContractsOrderBy$ = this.store$.select(state => state.list.tokenContracts.orderBy)
-
-            this.store$.dispatch(actions.loadTokenContracts())
-
-            this.setupTable(
-              columns[OperationTypes.TokenContract]({ showFiatValue: this.isMainnet }),
-              tokenContractsData$,
-              loadingTokenContracts$,
-              tokenContractsOrderBy$,
-              showLoadMoreTokenContracts$,
-              'No Contracts'
-            )
-            this.metaTagService.updateTag({
-              name: 'description',
-              content: `Tezos FA 1.2 Assets list on tezblock shows all the assets with information about their address, total supply and a description for each asset.">`
-            })
-            break
           case 'contract':
             const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
             const contractsData$ = this.store$.select(state => state.list.contracts.data)
@@ -508,9 +486,6 @@ export class ListComponent extends BaseComponent implements OnInit {
         break
       case 'vote':
         this.store$.dispatch(actions.increasePageOfVotes())
-        break
-      case 'token-contract':
-        this.store$.dispatch(actions.increasePageOfTokenContracts())
         break
       case 'contract':
         this.store$.dispatch(actions.increasePageOfContracts())

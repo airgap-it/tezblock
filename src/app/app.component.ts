@@ -35,10 +35,6 @@ export class AppComponent implements OnInit {
       this.actions$.pipe(ofType(actions.loadCryptoPriceSucceeded)),
       this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
     ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
-      getRefresh([
-        this.actions$.pipe(ofType(actions.loadCryptoHistoricDataSucceeded)),
-        this.actions$.pipe(ofType(actions.loadCryptoHistoricDataFailed))
-      ]).subscribe(() => this.store$.dispatch(actions.loadCryptoHistoricData()))
 
     this.store$.dispatch(actions.loadPeriodInfos())
   }

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Observable } from 'rxjs'
-import { map, filter, withLatestFrom } from 'rxjs/operators'
+import { BehaviorSubject, Observable } from 'rxjs'
+import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
 import { Actions, ofType } from '@ngrx/effects'
@@ -11,6 +11,7 @@ import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
+import * as appActions from '@tezblock/app.actions'
 import { TokenContract } from '@tezblock/domain/contract'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { PeriodTimespan, PeriodKind } from '@tezblock/domain/vote'
@@ -19,6 +20,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Title } from '@angular/platform-browser'
+import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -50,6 +52,7 @@ export class DashboardComponent extends BaseComponent {
   currentPeriodTimespan$: Observable<PeriodTimespan>
   currentPeriodKind$: Observable<string>
   currentPeriodIndex$: Observable<number>
+  pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day)
 
   constructor(
     private readonly actions$: Actions,
@@ -74,13 +77,23 @@ export class DashboardComponent extends BaseComponent {
 
     this.fiatInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.cryptoInfo$ = this.store$.select(state => state.app.cryptoCurrencyInfo)
-    this.historicData$ = this.store$.select(state => state.app.cryptoHistoricData)
-    this.percentage$ = this.store$.select(fromRoot.app.currencyGrowthPercentage)
+    this.historicData$ = this.store$.select(state => state.dashboard.cryptoHistoricData)
+    this.percentage$ = this.store$.select(fromRoot.dashboard.currencyGrowthPercentage)
 
     this.isMainnet()
 
     this.priceChartDatasets$ = this.historicData$.pipe(map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }]))
-    this.priceChartLabels$ = this.historicData$.pipe(map(data => data.map(dataItem => new Date(dataItem.time * 1000).toLocaleTimeString())))
+    this.priceChartLabels$ = this.pricePeriod$.pipe(
+      switchMap(pricePeriod =>
+        this.historicData$.pipe(
+          map(data =>
+            data.map(dataItem =>
+              pricePeriod === 0 ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
+            )
+          )
+        )
+      )
+    )
     this.proposalHash$ = this.store$
       .select(state => state.dashboard.proposal)
       .pipe(
@@ -113,7 +126,34 @@ export class DashboardComponent extends BaseComponent {
       getRefresh([
         this.actions$.pipe(ofType(actions.loadBlocksSucceeded)),
         this.actions$.pipe(ofType(actions.loadBlocksFailed))
-      ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
+      ]).subscribe(() => this.store$.dispatch(actions.loadBlocks())),
+
+      this.pricePeriod$
+        .pipe(
+          switchMap(periodIndex =>
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadCryptoHistoricDataSucceeded)),
+              this.actions$.pipe(ofType(actions.loadCryptoHistoricDataFailed))
+            ]).pipe(map(() => periodIndex))
+          )
+        )
+        .subscribe(periodIndex => this.store$.dispatch(actions.loadCryptoHistoricData({ periodIndex }))),
+
+      this.actions$
+        .pipe(ofType(appActions.loadPeriodInfosSucceeded))
+        .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan())),
+
+      this.contracts$
+        .pipe(
+          filter(data => Array.isArray(data) && data.some(item => ['tzBTC', 'BTC'].includes(item.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
     this.titleService.setTitle('tezblock - Tezos block explorer')
   }
@@ -121,5 +161,9 @@ export class DashboardComponent extends BaseComponent {
   isMainnet() {
     const selectedNetwork = this.chainNetworkService.getNetwork()
     return selectedNetwork === TezosNetwork.MAINNET
+  }
+
+  changePricePeriod(periodIndex: number) {
+    this.pricePeriod$.next(periodIndex)
   }
 }

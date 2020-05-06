@@ -3,6 +3,7 @@ import { Router } from '@angular/router'
 
 import { TokenContract, getConventer } from '@tezblock/domain/contract'
 import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 @Component({
   selector: 'app-latest-contracts',
@@ -26,5 +27,9 @@ export class LatestContractsComponent implements OnInit {
 
   inspectDetail(contractHash: string) {
     this.router.navigate([`/contract/${contractHash}`])
+  }
+
+  showFiatValue(contract: TokenContract): boolean {
+    return isConvertableToUSD(contract.symbol)
   }
 }

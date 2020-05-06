@@ -1,62 +1,95 @@
-import { Component, Input, OnInit, TrackByFunction } from '@angular/core'
+import { Component, Input, OnInit, TemplateRef } from '@angular/core'
 import { FormControl } from '@angular/forms'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
+import { filter, switchMap } from 'rxjs/operators'
 
-import { Pagination } from '@tezblock/domain/table'
+import { DataSource, Pagination, Pageable } from '@tezblock/domain/table'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { BaseComponent } from '@tezblock/components/base.component'
+import { get } from '@tezblock/services/fp'
 
 @Component({
   selector: 'app-client-side-table',
   templateUrl: './client-side-table.component.html',
   styleUrls: ['./client-side-table.component.scss']
 })
-export class ClientSideTableComponent implements OnInit {
-  @Input() data: any[]
+export class ClientSideTableComponent extends BaseComponent implements OnInit {
+  @Input() dataSource: DataSource<any>
 
   @Input() columns: Column[]
 
-  @Input() filterCondition: (item: any, query: string) => boolean
+  @Input() headerTemplate: TemplateRef<any>
 
-  pagedData: any[]
-  pagination: Pagination
+  @Input() headerContext: (index: any) => Observable<any>
+
+  data: any[]
+
+  pagination$ = new BehaviorSubject<Pagination>({
+    selectedSize: 10,
+    currentPage: 1
+  })
   filterTerm: FormControl
+  loading = true
 
-  constructor() {}
+  private _data$: Observable<Pageable<any>>
+  private filter$ = new BehaviorSubject<string>(undefined)
+  private previousFilter: string = null
+  private previousPagination: Pagination
+
+  constructor() {
+    super()
+  }
 
   ngOnInit() {
-    this.filterTerm = new FormControl('')
-    this.pagedData = this.data.slice(0, 10)
-    this.pagination = {
-      selectedSize: undefined,
-      currentPage: 1,
-      pageSizes: undefined,
-      total: this.data.length
-    }
+    this.filterTerm = new FormControl(this.previousFilter)
+
+    // for some reason only one subscription works ... thats why I'm using data: any[], and not data$: Observable<any[]>, because async pipe doesn't work (2nd subscription)
+    this._data$ = combineLatest(
+      this.pagination$.pipe(
+        // this elegant approach doesn't work ( html binding seems not subscribing to data$ with this, but in code .subscribe(..) does.. )
+        // pairwise(),
+        // filter(([previous, current]) => get<Pagination>(p => p.currentPage)(previous) !== get<Pagination>(p => p.currentPage)(current)),
+        // map(([previous, current]) => current)
+        filter(pagination => {
+          const result = get<Pagination>(p => p.currentPage)(pagination) !== get<Pagination>(p => p.currentPage)(this.previousPagination)
+          this.previousPagination = pagination
+
+          return result
+        })
+      ),
+      this.filter$
+    ).pipe(switchMap(([pagination, filter]) => this.dataSource.get(pagination, filter)))
+
+    this.subscriptions.push(
+      this._data$.subscribe(response => {
+        this.pagination$.next({
+          ...this.pagination$.getValue(),
+          total: response.total
+        })
+        this.data = response.data
+        this.loading = false
+      })
+    )
   }
 
   pageChanged(event: PageChangedEvent) {
-    const startItem = (event.page - 1) * event.itemsPerPage
-    const endItem = event.page * event.itemsPerPage
-
-    // QUESTION: should I take under account filtering here ?
-    this.pagedData = this.data.slice(startItem, endItem)
-    this.pagination = {
-      selectedSize: undefined,
+    this.loading = true
+    this.pagination$.next({
+      selectedSize: 10,
       currentPage: event.page,
-      pageSizes: undefined,
-      total: this.data.length
-    }
+      total: this.pagination$.getValue().total
+    })
   }
 
   filter() {
-    const filteredData = this.filterTerm.value ? this.data.filter(item => this.filterCondition(item, this.filterTerm.value)) : this.data
+    const filter = this.filterTerm.value
 
-    this.pagedData = filteredData.slice(0, 10)
-    this.pagination = {
-      selectedSize: undefined,
-      currentPage: 1,
-      pageSizes: undefined,
-      total: filteredData.length
+    if (filter !== this.previousFilter) {
+      this.loading = true
     }
+
+    this.previousFilter = filter
+    this.filter$.next(filter)
   }
 }

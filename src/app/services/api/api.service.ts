@@ -975,11 +975,7 @@ export class ApiService {
     )
   }
 
-  getCurrentCycle(): Observable<number> {
-    return from(this.protocol.fetchCurrentCycle())
-  }
-
-  getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
+  private getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
     const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
@@ -1079,7 +1075,7 @@ export class ApiService {
     )
   }
 
-  getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
+  private getEndorsingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<EndorsingRights[]> {
     const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
@@ -1092,6 +1088,7 @@ export class ApiService {
       .post<EndorsingRights[]>(
         this.endorsingRightsApiUrl,
         {
+          fields: ['level', 'slot', 'estimated_time'],
           predicates: _predicates,
           orderBy: [
             {
@@ -1207,6 +1204,7 @@ export class ApiService {
       .post<any[]>(
         this.delegatesApiUrl,
         {
+          fields: ['frozen_balance'],
           predicates: [
             {
               field: 'pkh',
