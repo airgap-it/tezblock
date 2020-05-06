@@ -9,6 +9,7 @@ import { Pageable } from '@tezblock/domain/table'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
+import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
 @Injectable({
@@ -99,7 +100,7 @@ export class RewardService {
           : this.protocol.calculateRewards(address, cycle).then(result => {
               this.pendingPromises.delete(key)
 
-              const latestCycle = get(fromRoot.getState(this.store$).app.latestBlock, 'meta_cycle')
+              const latestCycle = fromApp.currentCycleSelector(fromRoot.getState(this.store$).app)
 
               if (cycle < latestCycle) {
                 this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
