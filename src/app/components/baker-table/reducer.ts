@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store'
 import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
-import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
+import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
@@ -29,6 +29,7 @@ export interface State {
   bakerReward: { [key: string]: TezosPayoutInfo }
   votes: TableState<Transaction>
   endorsingRightItems: { [key: string]: EndorsingRights[] }
+  bakingRightItems: { [key: string]: BakingRights[] }
 }
 
 const initialState: State = {
@@ -49,7 +50,8 @@ const initialState: State = {
   rewards: getInitialTableState(undefined, 3),
   bakerReward: {},
   votes: getInitialTableState(),
-  endorsingRightItems: {}
+  endorsingRightItems: {},
+  bakingRightItems: {}
 }
 
 export const reducer = createReducer(
@@ -315,6 +317,20 @@ export const reducer = createReducer(
     ...state,
     endorsingRightItems: {
       ...state.endorsingRightItems,
+      [cycle]: null
+    }
+  })),
+  on(actions.loadBakingRightItemsSucceeded, (state, { cycle, bakingRightItems }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
+      [cycle]: bakingRightItems
+    }
+  })),
+  on(actions.loadBakingRightItemsFailed, (state, { cycle }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
       [cycle]: null
     }
   })),
