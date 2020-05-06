@@ -36,6 +36,67 @@
     "social-links": "Social Links",
     "donations": "Donations"
   },
+  "dashboard": {
+    "explore": "Explore the Tezos Blockchain",
+    "current-cycle": "Current Cycle",
+    "cycle": "Cycle",
+    "governance": "Governance",
+    "period": "Period until",
+    "no-proposal": "No Proposal submitted yet",
+    "of": "of",
+    "circulating-supply": "Circulating Supply",
+    "market-cap": "Market Cap",
+    "tezos-price": "Tezos Price Last",
+    "24h_button": "24 hrs",
+    "7d_button": "7 days",
+    "90d_button": "90 days",
+    "at": "at",
+    "latest-asset": "Latest Asset Contracts",
+    "all-assets_button": "All Assets",
+    "latest-transfers": "Latest Transfers",
+    "latest-blocks": "Latest Blocks",
+    "all-blocks_button": "All Blocks",
+    "latest-transactions": "Latest Transactions",
+    "all-transactions_button": "All Transactions"
+  },
+  "list": {
+    "transactions": {
+      "transactions": "Transactions",
+      "last24h": "last 24 hours",
+      "transaction-volume": "Transaction Volume",
+      "last7d": "last 7 days"
+    },
+    "blocks": "Blocks",
+    "activations": "Activations",
+    "originations": "Originations",
+    "delegations": "Delegations",
+    "endorsements": "Endorsements",
+    "votes": "Votes",
+    "proposals": "Proposals",
+    "double-baking-evidence": "Double Baking Evidence",
+    "double-endorsement-evidence": "Double Endorsement Evidence",
+    "assets-smart-contracts": "Assets Smart Contracts",
+    "contracts": "Contracts"
+  },
+  "account-overview": {
+    "accounts": "Accounts",
+    "top25": "Top 25 Accounts by Balance"
+  },
+  "baker-overview": {
+    "bakers": "Bakers",
+    "total-number": "Total Number of Bakers",
+    "top25": "Top 25 Bakers by Staking Balance"
+  },
+  "block-detail": {
+    "invalid-block_title": "Invalid Block Level",
+    "invalid-block_text": "This block level is not valid.",
+    "block-details": "Block Details",
+    "block-height": "Block Height",
+    "block-height-tooltip": "The block height, which indicates the length of the blockchain, increases after the addition of the new block.",
+    "block-confirmations": "Block Confirmations",
+    "baker": "Baker",
+    "baker-tootltip": "A Baker takes part in the validation of the network."
+  },
   "search-item": {
     "label": "Search"
   },
