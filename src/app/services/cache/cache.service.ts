@@ -38,13 +38,19 @@ export interface ExchangeRates {
   }
 }
 
+export interface ByCycle<T> {
+  value: T
+  cycle: number
+}
+
 export interface ByAddressState {
   [address: string]: {
     byCycle: {
       [cycle: string]: {
         rewards: TezosRewards
       }
-    },
+    }
+    frozenBalance: ByCycle<number>
     account?: Account
   }
 }
@@ -54,7 +60,7 @@ export interface ByBlockState {
 }
 
 export interface ByProposalState {
-  [proposal: string]: number/* period */
+  [proposal: string]: number /* period */
 }
 
 export interface Cache {
