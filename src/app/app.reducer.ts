@@ -1,17 +1,27 @@
 import { createReducer, on } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
 import BigNumber from 'bignumber.js'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 
 export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
 
 export const meanBlockTimeFromPeriod = 60.846710205078125 // Pascal's suspicious calculation from period length
 export const numberOfBlocksToSecondsFromPeriod = (numberOfBlocks: number): number => meanBlockTimeFromPeriod * numberOfBlocks
+
+const updateExchangeRates = (from: string, to: string, price: number, exchangeRates: ExchangeRates): ExchangeRates => {
+  return {
+    ...exchangeRates,
+    [from]: {
+      ...exchangeRates[from],
+      [to]: price
+    }
+  }
+}
 
 export interface State {
   firstBlockOfCurrentCycle: Block
@@ -20,9 +30,16 @@ export interface State {
   currentVotingPeriod: number
   currentVotingeriodPosition: number
   blocksPerVotingPeriod: number
-  fiatCurrencyInfo: CurrencyInfo
+
+  exchangeRates: ExchangeRates
+
+  // TODO: refactor there 2 properties ( I suppose these are prices XTZ -> BTC & USD ), and now BTC -> USD is added
+  // move into exchangeRate
+  // XTZ -> BTC
   cryptoCurrencyInfo: CurrencyInfo
-  cryptoHistoricData: MarketDataSample[]
+
+  // XTZ -> USD
+  fiatCurrencyInfo: CurrencyInfo
 }
 
 const initialState: State = {
@@ -32,6 +49,7 @@ const initialState: State = {
   currentVotingPeriod: undefined,
   currentVotingeriodPosition: undefined,
   blocksPerVotingPeriod: undefined,
+  exchangeRates: {},
   cryptoCurrencyInfo: {
     symbol: 'BTC',
     currency: 'BTC',
@@ -41,8 +59,7 @@ const initialState: State = {
     symbol: '$',
     currency: 'USD',
     price: new BigNumber(0)
-  },
-  cryptoHistoricData: []
+  }
 }
 
 export const reducer = createReducer(
@@ -82,9 +99,9 @@ export const reducer = createReducer(
       price: cryptoPrice
     }
   })),
-  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
+  on(actions.loadExchangeRateSucceeded, (state, { from, to, price }) => ({
     ...state,
-    cryptoHistoricData
+    exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
   }))
 )
 
@@ -114,25 +131,3 @@ export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
     ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
     : undefined
-export const currencyGrowthPercentageSelector = (state: State): number => {
-  const startingPrice = state.cryptoHistoricData
-  const priceNow = state.fiatCurrencyInfo.price
-
-  if (!startingPrice || startingPrice.length === 0) {
-    return 0
-  }
-
-  if (!startingPrice[0].open) {
-    return 0
-  }
-
-  if (!priceNow) {
-    return 0
-  }
-
-  return priceNow
-    .minus(startingPrice[0].open)
-    .multipliedBy(100)
-    .dividedBy(startingPrice[0].open)
-    .toNumber()
-}

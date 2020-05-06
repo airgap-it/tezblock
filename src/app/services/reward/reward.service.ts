@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core'
-import { TezosProtocol, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { forkJoin, from, Observable, throwError } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
-import { range } from 'lodash'
+import { map, switchMap, catchError, take, filter } from 'rxjs/operators'
+import { isNil, negate, range } from 'lodash'
+import { Store } from '@ngrx/store'
+import { Pageable } from '@tezblock/domain/table'
 
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { HttpClient } from '@angular/common/http'
 import { Pagination } from '@tezblock/domain/table'
-import { Reward } from '@tezblock/domain/reward'
+import * as fromRoot from '@tezblock/reducers'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -25,7 +27,11 @@ export class RewardService {
   private calculatedRewardsMap = new Map<String, TezosRewards>()
   private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
-  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly http: HttpClient) {
+  constructor(
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly store$: Store<fromRoot.State>,
+    private readonly http: HttpClient
+  ) {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
 
@@ -40,7 +46,7 @@ export class RewardService {
   environmentUrls = this.chainNetworkService.getEnvironment()
 
   getLastCycles(pagination: Pagination): Observable<number[]> {
-    return from(this.protocol.fetchCurrentCycle()).pipe(
+    return this.getCurrentCycle().pipe(
       map(currentCycle =>
         range(0, pagination.currentPage * pagination.selectedSize)
           .map(index => currentCycle - (index + 1))
@@ -49,26 +55,28 @@ export class RewardService {
     )
   }
 
-  getRewards(address: string, pagination: Pagination): Observable<Reward[]> {
+  getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
     return this.getLastCycles(pagination).pipe(
-      switchMap(cycles =>
-        forkJoin(
-          cycles.map(cycle =>
-            from(this.calculateRewards(address, cycle)).pipe(
-              switchMap(rewards =>
-                from(this.protocol.calculatePayouts(rewards, 0, rewards.delegatedContracts.length)).pipe(
-                  map(payouts => ({ ...rewards, payouts }))
-                )
-              )
-            )
-          )
-        )
-      )
+      switchMap(cycles => forkJoin(cycles.map(cycle => from(this.calculateRewards(address, cycle)))))
+    )
+  }
+
+  getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
+    const filterCondition = (address: string) => (filter ? address.toLowerCase().indexOf(filter.toLowerCase()) !== -1 : true)
+    const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
+    const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
+    const addresses = rewards.delegatedContracts.filter(filterCondition)
+
+    return from(this.protocol.calculatePayouts(rewards, addresses.slice(offset, Math.min(offset + limit, addresses.length)))).pipe(
+      map(data => ({
+        data,
+        total: addresses.length
+      }))
     )
   }
 
   getRewardAmount(accountAddress: string, bakerAddress: string): Observable<string> {
-    return from(this.protocol.fetchCurrentCycle()).pipe(
+    return this.getCurrentCycle().pipe(
       switchMap(currentCycle =>
         from(this.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
           switchMap(tezosRewards =>
@@ -96,15 +104,24 @@ export class RewardService {
 
     if (this.pendingPromises.has(key)) {
       return this.pendingPromises.get(key)
-    } else {
-      const promise = this.protocol.calculateRewards(address, cycle).then(result => {
-        this.calculatedRewardsMap.set(key, result)
-        this.pendingPromises.delete(key)
-        return result
-      })
-      this.pendingPromises.set(key, promise)
-      return promise
     }
+
+    const promise = this.protocol.calculateRewards(address, cycle).then(result => {
+      this.calculatedRewardsMap.set(key, result)
+      this.pendingPromises.delete(key)
+      return result
+    })
+    this.pendingPromises.set(key, promise)
+
+    return promise
+  }
+
+  getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
+    return from(this.calculateRewards(address, cycle)).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
+  }
+
+  private getCurrentCycle(): Observable<number> {
+    return this.store$.select(fromRoot.app.currentCycle).pipe(filter(negate(isNil)), take(1))
   }
 
   getDoubleBakingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {

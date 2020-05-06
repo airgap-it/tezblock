@@ -577,39 +577,6 @@ export class ListEffects {
     )
   )
 
-  loadTokenContracts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.loadTokenContracts),
-      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
-      switchMap(([action, pagination]) => {
-        const contracts = getTokenContracts(this.chainNetworkService.getNetwork(), pagination.currentPage * pagination.selectedSize)
-
-        if (!contracts || contracts.total === 0) {
-          return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
-        }
-
-        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
-          map(totalSupplies =>
-            listActions.loadTokenContractsSucceeded({
-              tokenContracts: {
-                data: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply })),
-                total: contracts.total
-              }
-            })
-          ),
-          catchError(error => of(listActions.loadTokenContractsFailed({ error })))
-        )
-      })
-    )
-  )
-
-  increasePageOfTokenContracts$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(listActions.increasePageOfTokenContracts),
-      map(() => listActions.loadTokenContracts())
-    )
-  )
-
   loadContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadContracts),

@@ -11,9 +11,10 @@ import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { ByCycleState, CacheService, CacheKeys, Currency } from '@tezblock/services/cache/cache.service'
+import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { Currency } from '@tezblock/domain/airgap'
 
 @Injectable()
 export class AppEffects {
@@ -123,10 +124,10 @@ export class AppEffects {
         this.store$.select(state => state.app.fiatCurrencyInfo)
       ),
       switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
-        this.cacheService.get<Currency>(CacheKeys.currency).pipe(
+        this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
           map(currency => {
-            const fiatCurrency = get(currency, fiatCurrencyInfo.currency)
-            const cryptoCurrency = get(currency, cryptoCurrencyInfo.currency)
+            const fiatCurrency = get(get(currency, Currency.XTZ), fiatCurrencyInfo.currency)
+            const cryptoCurrency = get(get(currency, Currency.XTZ), cryptoCurrencyInfo.currency)
             const fiatPrice = new BigNumber(fiatCurrency)
             const cryptoPrice = new BigNumber(cryptoCurrency)
 
@@ -153,20 +154,22 @@ export class AppEffects {
         this.store$.select(state => state.app.fiatCurrencyInfo)
       ),
       switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
-        this.cacheService.get<Currency>(CacheKeys.currency).pipe(
-          switchMap(currency =>
+        this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
+          switchMap(exchangeRates =>
             this.cryptoPricesService.getCryptoPrices('xtz', [fiatCurrencyInfo.currency, cryptoCurrencyInfo.currency]).pipe(
               map(prices => {
-                const fiatCurrency = get(prices, fiatCurrencyInfo.currency) || get(currency, fiatCurrencyInfo.currency)
-                const cryptoCurrency = get(prices, cryptoCurrencyInfo.currency) || get(currency, cryptoCurrencyInfo.currency)
+                const fiatCurrency =
+                  get(prices, fiatCurrencyInfo.currency) || get(get(exchangeRates, Currency.XTZ), fiatCurrencyInfo.currency)
+                const cryptoCurrency =
+                  get(prices, cryptoCurrencyInfo.currency) || get(get(exchangeRates, Currency.XTZ), cryptoCurrencyInfo.currency)
                 const fiatPrice = new BigNumber(fiatCurrency)
                 const cryptoPrice = new BigNumber(cryptoCurrency)
 
                 return actions.loadCryptoPriceSucceeded({ fiatPrice, cryptoPrice })
               }),
               catchError(error => {
-                const fiatCurrency = get(currency, fiatCurrencyInfo.currency)
-                const cryptoCurrency = get(currency, cryptoCurrencyInfo.currency)
+                const fiatCurrency = get(get(exchangeRates, Currency.XTZ), fiatCurrencyInfo.currency)
+                const cryptoCurrency = get(get(exchangeRates, Currency.XTZ), cryptoCurrencyInfo.currency)
                 const fiatPrice = new BigNumber(fiatCurrency)
                 const cryptoPrice = new BigNumber(cryptoCurrency)
 
@@ -179,13 +182,27 @@ export class AppEffects {
     )
   )
 
-  loadCryptoHistoricData$ = createEffect(() =>
+  loadExchangeRate$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadCryptoHistoricData),
-      switchMap(() =>
-        this.cryptoPricesService.getHistoricCryptoPrices(24, new Date(), 'USD', 'XTZ').pipe(
-          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
-          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
+      ofType(actions.loadExchangeRate),
+      switchMap(action =>
+        this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
+          switchMap(exchangeRates =>
+            this.cryptoPricesService.getCryptoPrices(action.from, [action.to]).pipe(
+              map(prices => {
+                const price = get(prices, action.to) || get(get(exchangeRates, action.from), action.to)
+
+                return actions.loadExchangeRateSucceeded({ from: action.from, to: action.to, price })
+              }),
+              catchError(error => {
+                const price = get(get(exchangeRates, action.from), action.to)
+
+                return price
+                  ? of(actions.loadExchangeRateSucceeded({ from: action.from, to: action.to, price }))
+                  : of(actions.loadExchangeRateFailed({ error }))
+              })
+            )
+          )
         )
       )
     )

@@ -229,16 +229,33 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
     this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)
     this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
-    this.rewardAmountMinusFee$ = combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
-      map(([rewardAmont, tezosBakerFee]) => (rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null))
+    this.rewardAmountMinusFee$ = this.account$.pipe(
+      switchMap(account =>
+        account.is_baker
+          ? this.store$
+              .select(state => state.accountDetails.bakerReward)
+              .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
+          : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
+              map(([rewardAmont, tezosBakerFee]) =>
+                rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null
+              )
+            )
+      )
     )
-    this.isRewardAmountMinusFeeBusy$ = combineLatest(
-      this.store$.select(state => state.accountDetails.busy.rewardAmont),
-      this.store$.select(state => state.accountDetails.rewardAmont),
-      this.tezosBakerFee$
-    ).pipe(
-      map(
-        ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) => !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+    this.isRewardAmountMinusFeeBusy$ = this.account$.pipe(
+      switchMap(account =>
+        account.is_baker
+          ? this.store$.select(state => state.accountDetails.busy.bakerReward)
+          : combineLatest(
+              this.store$.select(state => state.accountDetails.busy.rewardAmont),
+              this.store$.select(state => state.accountDetails.rewardAmont),
+              this.tezosBakerFee$
+            ).pipe(
+              map(
+                ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) =>
+                  !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+              )
+            )
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
