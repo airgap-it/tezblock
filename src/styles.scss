@@ -72,6 +72,7 @@ $badge-font-weight: 400;
 $dropdown-link-hover-bg: #fff;
 $modal-content-border-radius: 0;
 $modal-content-border-color: rgba(46, 91, 255, 0.08);
+$modal-xl: 1100px;
 
 /* identicon image size */
 identicon {
@@ -162,6 +163,21 @@ app-latest-contracts {
   .row {
     min-height: 52px;
   }
+}
+
+ngx-json-viewer {
+  overflow: auto !important;
+  section {
+    background: map_get($theme-colors, 'light');
+    overflow: auto !important;
+  }
+}
+
+.modal,
+.modal-open,
+.modal-content,
+.modal-body {
+  overflow: auto !important;
 }
 
 @media (max-width: 576px) {
