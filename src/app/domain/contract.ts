@@ -7,7 +7,6 @@ import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get as fpGet } from '@tezblock/services/fp'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { Currency, isInBTC } from '@tezblock/domain/airgap'
@@ -123,19 +122,6 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
       .concat(tokenContractByAddress ? [tokenContractByAddress] : [])
   )
 }
-
-export const getConventer = (contract: { decimals?: number }): Conventer => {
-  if (isNil(contract) || isNil(contract.decimals)) {
-    return null
-  }
-
-  // https://stackoverflow.com/questions/3612744/remove-insignificant-trailing-zeros-from-a-number
-  const noInsignificantTrailingZeros = /([0-9]+(\.[0-9]+[1-9])?)(\.?0+$)/
-
-  return (amount: any) => (amount / Math.pow(10, contract.decimals)).toFixed(contract.decimals).replace(noInsignificantTrailingZeros, '$1')
-}
-
-
 
 export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
   if (isNil(contract) || !isInBTC(contract.symbol) || !get(exchangeRates, `${Currency.BTC}.${Currency.USD}`)) {

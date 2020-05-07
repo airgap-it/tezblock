@@ -25,8 +25,8 @@
           <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
             <p class="m-0">
               <amount-cell
-                [data]="{ amount: operation.amount }"
-                [options]="{ symbol: operation.symbol, conventer: getConventer(operation), showFiatValue: false }"
+                [data]="operation.amount"
+                [options]="{ symbol: operation.symbol, showFiatValue: false }"
               ></amount-cell>
             </p>
           </div>

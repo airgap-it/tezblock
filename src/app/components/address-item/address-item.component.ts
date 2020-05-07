@@ -13,6 +13,7 @@ export interface Options {
   showAlliasOrFullAddress?: boolean
   forceIdenticon?: boolean
   hideIdenticon?: boolean
+  comparisonTimestamp?: number
   kind?: string //TODO: not needed probably
 }
 
