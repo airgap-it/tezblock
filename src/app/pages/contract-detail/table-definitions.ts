@@ -1,19 +1,16 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 export const columns: {
   [key: string]: (options: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => Column[]
 } = {
   transfers: (options: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => [
     {
       name: 'From',
@@ -39,11 +36,10 @@ export const columns: {
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: false
@@ -52,7 +48,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2'} }),
       sortable: false
     },
     {
@@ -78,7 +74,6 @@ export const columns: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => [
     {
       name: 'From',
@@ -104,11 +99,10 @@ export const columns: {
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: true
@@ -117,7 +111,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {

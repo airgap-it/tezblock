@@ -29,14 +29,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Amount',
       field: 'amount',
-      data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
       template: Template.amount,
       sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       template: Template.amount,
       sortable: true
     },
@@ -84,14 +84,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Amount',
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.delegatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
@@ -121,7 +121,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Balance',
       field: 'originatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
@@ -144,14 +144,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
       name: 'Burn',
       field: 'burn',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.burn }, options: { showFiatValue: false } }),
+      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
       sortable: false
     },
     {

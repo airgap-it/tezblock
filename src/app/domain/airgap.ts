@@ -10,8 +10,6 @@ const convertSymbol = (symbol: string): string => {
   switch (symbol) {
     // case 'tzBTC':
     //   return 'xtz-btc'
-    case 'STKR':
-      return 'xtz'
     case 'BTC':
     case 'tzBTC':
       return 'btc'

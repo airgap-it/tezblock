@@ -365,7 +365,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: { amount: item.payout } })
+            data: (item: Payout) => ({ data: item.payout })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
@@ -388,14 +388,19 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: BakingRights) => ({ data: { amount: item.rewards } })
+            data: (item: BakingRights) => ({ data: item.rewards })
           },
-          { name: 'Fees', field: 'fees', template: Template.amount, data: (item: BakingRights) => ({ data: { amount: item.fees } }) },
+          {
+            name: 'Fees',
+            field: 'fees',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: item.fees, options: { digitsInfo: '1.2-2' } })
+          },
           {
             name: 'Deposits',
             field: 'deposit',
             template: Template.amount,
-            data: (item: BakingRights) => ({ data: { amount: item.deposit } })
+            data: (item: BakingRights) => ({ data: item.deposit })
           }
         ],
         dataSource: toClientsideDataScource(item.items)
@@ -415,13 +420,13 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: { amount: item.rewards }, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
           },
           {
             name: 'Deposits',
             field: 'deposit',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: item.deposit, options: { showFiatValue: true } })
           }
         ],
         dataSource: toClientsideDataScource(item.items)

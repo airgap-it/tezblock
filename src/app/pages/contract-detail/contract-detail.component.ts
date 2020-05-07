@@ -13,7 +13,6 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import * as appActions from '@tezblock/app.actions'
 import {
-  getConventer,
   TokenContract,
   Social,
   SocialType,
@@ -23,7 +22,6 @@ import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { columns } from './table-definitions'
 import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
@@ -88,7 +86,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     }
   ]
   manager$: Observable<string>
-  conventer$: Observable<Conventer>
   showFiatValue$: Observable<boolean>
 
   get isMainnet(): boolean {
@@ -162,7 +159,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
-    this.conventer$ = this.contract$.pipe(map(getConventer))
     this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
 
     this.subscriptions.push(
@@ -244,8 +240,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         columns: columns.transfers({
           pageId,
           showFiatValue,
-          symbol: contract.symbol,
-          conventer: getConventer(contract)
+          symbol: contract.symbol
         })
       },
       {
@@ -253,8 +248,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         columns: columns.other({
           pageId,
           showFiatValue,
-          symbol: contract.symbol,
-          conventer: getConventer(contract)
+          symbol: contract.symbol
         })
       }
     ]
