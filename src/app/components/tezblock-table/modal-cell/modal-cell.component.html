@@ -4,19 +4,16 @@
 <button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">Show</button>
 
 <ng-template #template>
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <ngx-json-viewer *ngIf="json; else noJson" [json]="json"></ngx-json-viewer>
-        <ng-template #noJson>
-          {{ data }}
-        </ng-template>
-      </div>
-    </div>
+  <div class="modal-header">
+    <h5 class="modal-title pull-left">Parameters</h5>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ngx-json-viewer *ngIf="json; else noJson" [json]="json"></ngx-json-viewer>
+    <ng-template #noJson>
+      {{ data }}
+    </ng-template>
   </div>
 </ng-template>
