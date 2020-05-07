@@ -32,6 +32,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { first } from '@tezblock/services/fp'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -299,22 +300,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .select(state => state.accountDetails.delegatedAccounts)
         .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
         .subscribe(delegatedAccounts => {
-          if (!delegatedAccounts) {
+          const delegatedAccount: Account = first(delegatedAccounts)
+
+          if (!delegatedAccounts/* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (delegatedAccounts.length > 0) {
-            this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate_value
-            this.delegatedAmount = delegatedAccounts[0].balance
-            this.setRewardAmont()
+          if (!delegatedAccount/* delegatedAccounts is [<empty> | null | undefined] */) {
+            this.delegatedAccountAddress = ''
 
             return
           }
 
-          this.delegatedAccountAddress = ''
+          this.delegatedAccountAddress = delegatedAccount.account_id
+          this.bakerAddress = delegatedAccount.delegate_value
+          this.delegatedAmount = delegatedAccount.balance
+          this.setRewardAmont()
         }),
 
       // refresh account
