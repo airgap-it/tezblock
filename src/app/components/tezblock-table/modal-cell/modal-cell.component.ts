@@ -43,6 +43,6 @@ export class ModalCellComponent implements OnInit {
   ngOnInit() {}
 
   openModal(template: TemplateRef<any>) {
-    this.modalRef = this.modalService.show(template)
+    this.modalRef = this.modalService.show(template, { class: 'modal-xl' })
   }
 }
