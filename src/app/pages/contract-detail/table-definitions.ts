@@ -121,6 +121,10 @@ export const columns: {
       sortable: true
     },
     {
+      name: 'Entry Point',
+      field: 'entrypoint'
+    },
+    {
       name: 'Block',
       field: 'block_level',
       template: Template.block,
