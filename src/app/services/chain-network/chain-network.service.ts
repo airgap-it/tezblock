@@ -37,9 +37,9 @@ export class ChainNetworkService implements OnInit {
   }
 
   public getEnvironmentVariable(): string {
-    if (this.chainName === TezosNetwork.CARTHAGENET) {
-      return TezosNetwork.MAINNET
-    }
+    // if (this.chainName === TezosNetwork.CARTHAGENET) {
+    //   return TezosNetwork.MAINNET
+    // }
     return this.chainName
   }
 
