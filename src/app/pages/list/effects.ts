@@ -227,38 +227,21 @@ export class ListEffects {
       ofType(listActions.loadBlockDataForDBE),
       withLatestFrom(this.store$.select(state => state.list.doubleBakings.temporaryData)),
       switchMap(([action, temporaryData]) => {
-        const blockIds = []
-        temporaryData.forEach(doubleBaking => {
-          blockIds.push(doubleBaking.block_level)
+
+        const result = temporaryData.map(doubleBaking => {
+          return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
+            map(additionalData => {
+              return {
+                ...doubleBaking,
+                reward: additionalData.bakerReward,
+                offender: additionalData.offender,
+                lostAmount: additionalData.lostAmount,
+                denouncedLevel: additionalData.denouncedBlockLevel
+              } as Transaction
+            }),
+          )
         })
-
-        return this.apiService.getBlocksOfIds(blockIds).pipe(
-          map((blocks: Block[]) => {
-            const doubleBakings: Transaction[] = temporaryData.map(doubleBaking => {
-              const additionalData = blocks.find(block => block.level === doubleBaking.block_level)
-
-              return { ...doubleBaking, baker: additionalData.baker }
-            })
-
-            return doubleBakings
-          }),
-
-          switchMap(doubleBakings => {
-            const doubleBakingObservable: Observable<Transaction>[] = doubleBakings.map(doubleBaking => {
-              return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
-                map(additionalData => {
-                  return {
-                    ...doubleBaking,
-                    reward: additionalData.bakerReward,
-                    offender: additionalData.offender,
-                    lostAmount: additionalData.lostAmount,
-                    denouncedLevel: additionalData.denouncedBlockLevel
-                  }
-                })
-              )
-            })
-            return combineLatest(doubleBakingObservable)
-          }),
+        return combineLatest(result).pipe(
           map(doubleBakings => {
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
           }),
