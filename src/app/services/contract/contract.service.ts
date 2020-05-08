@@ -145,7 +145,7 @@ export class ContractService extends BaseService {
   }
 
   loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
-    const faProtocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
 
     return this.post<ContractOperation[]>('operations', {
       predicates: otherPredicates(contract.id),

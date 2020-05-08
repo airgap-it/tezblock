@@ -2,6 +2,8 @@ import { IAirGapTransaction } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
+import { forkJoin, from, Observable, of } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
@@ -9,7 +11,10 @@ import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get as fpGet } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
-import { Currency, isInBTC } from '@tezblock/domain/airgap'
+import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -140,3 +145,31 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
     protocolIdentifier: 'BTC'
   }
 }
+
+// fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
+export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> => 
+  forkJoin(transactions.map(transaction => {
+      const contract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
+
+      if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters) {
+        const faProtocol = getFaProtocol(contract, chainNetworkService)
+
+        return from(faProtocol.normalizeTransactionParameters(transaction.parameters)).pipe(
+          map(normalizedParameters => {
+            if (normalizedParameters.entrypoint === 'transfer') {
+              const transferDetails = faProtocol.transferDetailsFromParameters(normalizedParameters)
+              return {
+                  ...transaction,
+                  source: transferDetails.from,
+                  destination: transferDetails.to,
+                  amount: parseFloat(transferDetails.amount)
+                }
+            }
+
+            return transaction
+          })
+        )
+      }
+
+      return of(transaction)
+    }))
