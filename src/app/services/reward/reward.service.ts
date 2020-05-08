@@ -10,12 +10,21 @@ import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { HttpClient } from '@angular/common/http'
 import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
+import BigNumber from 'bignumber.js'
 
 export interface DoubleEvidence {
   lostAmount: string
   denouncedBlockLevel: number
   offender: string
   bakerReward: string
+}
+
+interface BalanceUpdate {
+  kind: string
+  category: string 
+  delegate: string
+  cycle: number
+  change: string
 }
 
 @Injectable({
@@ -124,73 +133,57 @@ export class RewardService {
     return this.store$.select(fromRoot.app.currentCycle).pipe(filter(negate(isNil)), take(1))
   }
 
-  getDoubleBakingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {
+  getDoubleBakingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
-        const denouncedBlockLevel = response.operations[2][0].contents[0].bh1.level
-
-        const depositsArray = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'deposits'
-        )
-
-        let totalLostAmount = 0
-        response.operations[2][0].contents[0].metadata.balance_updates.forEach(balanceUpdate => {
-          if (balanceUpdate.category === 'rewards' && balanceUpdate.delegate === depositsArray.delegate) {
-            totalLostAmount += Number(balanceUpdate.change)
-          }
-        })
-
-        const deposits = Number(depositsArray.change)
-        const bakerReward = (deposits / -2).toString()
-
-        totalLostAmount += deposits
-
-        const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'deposits'
-        ).delegate
-
+        const operation = this.findEvidenceOperationInBlock(response, operationGroupHash, 'double_baking_evidence')
+        const evidence = this.getDoubleEvidenceInfo(operation.metadata.balance_updates)
+        const denouncedBlockLevel = operation.bh1.level
         return {
-          lostAmount: totalLostAmount.toString(),
+          lostAmount: evidence.lostAmount,
           denouncedBlockLevel: denouncedBlockLevel,
-          offender: offender,
-          bakerReward: bakerReward
+          offender: evidence.offender,
+          bakerReward: evidence.bakerReward
         }
       })
     )
   }
 
-  getDoubleEndorsingEvidenceData(blockLevel: number): Observable<DoubleEvidence> {
+  getDoubleEndorsingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
-        const denouncedBlockLevel = response.operations[2][0].contents[0].op2.operations.level
-
-        const depositsArray = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'deposits'
-        )
-
-        let totalLostAmount = 0
-        response.operations[2][0].contents[0].metadata.balance_updates.forEach(balanceUpdate => {
-          if (balanceUpdate.category === 'rewards' && balanceUpdate.delegate === depositsArray.delegate) {
-            totalLostAmount += Number(balanceUpdate.change)
-          }
-        })
-
-        const deposits = Number(depositsArray.change)
-        const bakerReward = (deposits / -2).toString()
-
-        totalLostAmount += deposits
-
-        const offender: string = response.operations[2][0].contents[0].metadata.balance_updates.find(
-          balanceArray => balanceArray.category === 'deposits'
-        ).delegate
-
+        const operation = this.findEvidenceOperationInBlock(response, operationGroupHash, 'double_endorsement_evidence')
+        const evidence = this.getDoubleEvidenceInfo(operation.metadata.balance_updates)
+        const denouncedBlockLevel = operation.op2.operations.level
         return {
-          lostAmount: totalLostAmount.toString(),
+          lostAmount: evidence.lostAmount,
           denouncedBlockLevel: denouncedBlockLevel,
-          offender: offender,
-          bakerReward: bakerReward
+          offender: evidence.offender,
+          bakerReward: evidence.bakerReward
         }
       })
     )
+  }
+
+  private findEvidenceOperationInBlock(block: any, operationGroupHash: string, kind: 'double_baking_evidence'|'double_endorsement_evidence'): any {
+    const indexForEvidenceOperations = 2
+    const operationGroups: any[] = block.operations[indexForEvidenceOperations]
+    const operationGroup = operationGroups.find((operationGroup) => operationGroup.hash === operationGroupHash)
+    return operationGroup.contents.find((operation: { kind: string }) => operation.kind === kind)
+  }
+
+  private getDoubleEvidenceInfo(balanceUpdates: BalanceUpdate[]): Omit<DoubleEvidence, 'denouncedBlockLevel'> {
+    const deposits = balanceUpdates.find((update) => update.category === 'deposits')
+    const lostAmount = balanceUpdates.filter((update) => update.delegate === deposits.delegate).reduce((current, next) => {
+      return current.plus(new BigNumber(next.change))
+    }, new BigNumber(0))
+    const bakerRewards = balanceUpdates.filter((update) => update.delegate !== deposits.delegate).reduce((current, next) => {
+      return current.plus(new BigNumber(next.change))
+    }, new BigNumber(0))
+    return {
+      lostAmount: lostAmount.toFixed(),
+      offender: deposits.delegate,
+      bakerReward: bakerRewards.toFixed()
+    }
   }
 }

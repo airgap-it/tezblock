@@ -245,7 +245,7 @@ export class ListEffects {
 
           switchMap(doubleBakings => {
             const doubleBakingObservable: Observable<Transaction>[] = doubleBakings.map(doubleBaking => {
-              return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level).pipe(
+              return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
                 map(additionalData => {
                   return {
                     ...doubleBaking,
@@ -325,7 +325,7 @@ export class ListEffects {
 
           switchMap(doubleEndorsements => {
             const doubleEndorsementObservable: Observable<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
-              return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level).pipe(
+              return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash).pipe(
                 map(additionalData => {
                   return {
                     ...doubleEndorsement,
