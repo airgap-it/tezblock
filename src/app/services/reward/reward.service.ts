@@ -180,11 +180,11 @@ export class RewardService {
     const lostAmount = balanceUpdates.filter((update) => update.delegate === deposits.delegate).reduce((current, next) => {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
-    const bakerRewards = balanceUpdates.filter((update) => update.delegate !== deposits.delegate)
-    const baker = bakerRewards.pop().delegate
+    const bakerRewards = balanceUpdates.filter((update) => update.category === 'rewards' && update.delegate !== deposits.delegate)
     const rewardsAmount = bakerRewards.reduce((current, next) => {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
+    const baker = bakerRewards.pop().delegate
     return {
       lostAmount: lostAmount.toFixed(),
       offender: deposits.delegate,
