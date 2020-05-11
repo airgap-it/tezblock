@@ -32,7 +32,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.amount,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, symbol: item.symbol }
       }),
       sortable: true
     },

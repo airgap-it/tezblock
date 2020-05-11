@@ -35,7 +35,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
       {
         name: 'Amount',
         field: 'amount',
-        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
+        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp, symbol: item.symbol } }),
         template: Template.amount,
         sortable: true
       },

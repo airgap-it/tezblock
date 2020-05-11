@@ -149,7 +149,7 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
 export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> => 
   forkJoin(transactions.map(transaction => {
-      const contract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
+      const contract: TokenContract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
       if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters) {
         const faProtocol = getFaProtocol(contract, chainNetworkService)
@@ -162,7 +162,8 @@ export const fillTransferOperations = (transactions: Transaction[], chainNetwork
                   ...transaction,
                   source: transferDetails.from,
                   destination: transferDetails.to,
-                  amount: parseFloat(transferDetails.amount)
+                  amount: parseFloat(transferDetails.amount),
+                  symbol: contract.symbol
                 }
             }
 
