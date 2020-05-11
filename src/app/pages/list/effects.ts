@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
 import * as moment from 'moment'
-import { forkJoin, Observable, of } from 'rxjs'
+import { forkJoin, Observable, of, combineLatest } from 'rxjs'
 import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
@@ -13,6 +13,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 import { toNotNilArray } from '@tezblock/services/fp'
 import * as listActions from './actions'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -212,9 +213,41 @@ export class ListEffects {
         return this.apiService
           .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
           .pipe(
-            map((doubleBakings: Transaction[]) => listActions.loadDoubleBakingsSucceeded({ doubleBakings })),
+            map((doubleBakings: Transaction[]) => {
+              return listActions.loadBlockDataForDBE({ doubleBakings })
+            }),
             catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
           )
+      })
+    )
+  )
+
+  getDoubleBakingsBlockData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadBlockDataForDBE),
+      withLatestFrom(this.store$.select(state => state.list.doubleBakings.temporaryData)),
+      switchMap(([action, temporaryData]) => {
+        return combineLatest(
+          temporaryData.map(doubleBaking => {
+            return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
+              map(additionalData => {
+                return {
+                  ...doubleBaking,
+                  reward: additionalData.bakerReward,
+                  offender: additionalData.offender,
+                  lostAmount: additionalData.lostAmount,
+                  denouncedLevel: additionalData.denouncedBlockLevel,
+                  baker: additionalData.baker
+                }
+              }),
+            )
+          })
+        ).pipe(
+          map(doubleBakings => {
+            return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
+          }),
+          catchError(error => of(listActions.loadDoubleBakingsFailed({ error })))
+        )
       })
     )
   )
@@ -242,11 +275,43 @@ export class ListEffects {
       ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_baking_evidence'], orderBy)
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['double_endorsement_evidence'], orderBy)
           .pipe(
-            map((doubleEndorsements: Transaction[]) => listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })),
+            map((doubleEndorsements: Transaction[]) => {
+              return listActions.loadBlockDataForDEE({ doubleEndorsements })
+            }),
             catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
           )
+      })
+    )
+  )
+
+  getDoubleEndorsementsBlockData$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(listActions.loadBlockDataForDEE),
+      withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.temporaryData)),
+      switchMap(([action, temporaryData]) => {
+        return combineLatest(
+          temporaryData.map(doubleEndorsement => {
+            return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash).pipe(
+              map(additionalData => {
+                return {
+                  ...doubleEndorsement,
+                  reward: additionalData.bakerReward,
+                  offender: additionalData.offender,
+                  lostAmount: additionalData.lostAmount,
+                  denouncedLevel: additionalData.denouncedBlockLevel,
+                  baker: additionalData.baker
+                }
+              })
+            )
+          })
+        ).pipe(
+          map(doubleEndorsements => {
+            return listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })
+          }),
+          catchError(error => of(listActions.loadDoubleEndorsementsFailed({ error })))
+        )
       })
     )
   )
@@ -571,7 +636,8 @@ export class ListEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
-    private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly rewardService: RewardService,
+    private readonly chainNetworkService: ChainNetworkService
   ) {}
 }

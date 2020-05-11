@@ -14,6 +14,7 @@ export interface TableState<T> {
   pagination: Pagination
   loading: boolean
   orderBy: OrderBy
+  temporaryData: T[]
 }
 
 export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): TableState<any> => ({
@@ -25,7 +26,8 @@ export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): Tabl
     total: undefined
   },
   loading: false,
-  orderBy
+  orderBy,
+  temporaryData: []
 })
 
 export interface Pageable<T> {
