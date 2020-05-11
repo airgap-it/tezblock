@@ -41,8 +41,10 @@ export interface TokenContract {
 export interface ContractOperation extends IAirGapTransaction {
   singleFrom: string
   singleTo: string
+  parameters: string
   symbol?: string
   decimals?: number
+  entrypoint?: string
 }
 
 const networkCondition = (tezosNetwork: TezosNetwork) => (tokenContract: TokenContract): boolean => {
@@ -80,7 +82,8 @@ export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): P
 export const airGapTransactionToContractOperation = (airGapTransaction: IAirGapTransaction): ContractOperation => ({
   ...airGapTransaction,
   singleFrom: first(airGapTransaction.from),
-  singleTo: first(airGapTransaction.to)
+  singleTo: first(airGapTransaction.to),
+  parameters: undefined
 })
 
 export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOption[] => {
