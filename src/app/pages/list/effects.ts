@@ -227,21 +227,22 @@ export class ListEffects {
       ofType(listActions.loadBlockDataForDBE),
       withLatestFrom(this.store$.select(state => state.list.doubleBakings.temporaryData)),
       switchMap(([action, temporaryData]) => {
-
-        const result = temporaryData.map(doubleBaking => {
-          return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
-            map(additionalData => {
-              return {
-                ...doubleBaking,
-                reward: additionalData.bakerReward,
-                offender: additionalData.offender,
-                lostAmount: additionalData.lostAmount,
-                denouncedLevel: additionalData.denouncedBlockLevel
-              } as Transaction
-            }),
-          )
-        })
-        return combineLatest(result).pipe(
+        return combineLatest(
+          temporaryData.map(doubleBaking => {
+            return this.rewardService.getDoubleBakingEvidenceData(doubleBaking.block_level, doubleBaking.operation_group_hash).pipe(
+              map(additionalData => {
+                return {
+                  ...doubleBaking,
+                  reward: additionalData.bakerReward,
+                  offender: additionalData.offender,
+                  lostAmount: additionalData.lostAmount,
+                  denouncedLevel: additionalData.denouncedBlockLevel,
+                  baker: additionalData.baker
+                }
+              }),
+            )
+          })
+        ).pipe(
           map(doubleBakings => {
             return listActions.loadDoubleBakingsSucceeded({ doubleBakings })
           }),
@@ -290,38 +291,22 @@ export class ListEffects {
       ofType(listActions.loadBlockDataForDEE),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.temporaryData)),
       switchMap(([action, temporaryData]) => {
-        const blockIds = []
-        temporaryData.forEach(doubleEndorsement => {
-          blockIds.push(doubleEndorsement.block_level)
-        })
-
-        return this.apiService.getBlocksOfIds(blockIds).pipe(
-          map((blocks: Block[]) => {
-            const doubleEndorsements: Transaction[] = temporaryData.map(doubleEndorsement => {
-              const additionalData = blocks.find(block => block.level === doubleEndorsement.block_level)
-
-              return { ...doubleEndorsement, baker: additionalData.baker }
-            })
-
-            return doubleEndorsements
-          }),
-
-          switchMap(doubleEndorsements => {
-            const doubleEndorsementObservable: Observable<Transaction>[] = doubleEndorsements.map(doubleEndorsement => {
-              return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash).pipe(
-                map(additionalData => {
-                  return {
-                    ...doubleEndorsement,
-                    reward: additionalData.bakerReward,
-                    offender: additionalData.offender,
-                    lostAmount: additionalData.lostAmount,
-                    denouncedLevel: additionalData.denouncedBlockLevel
-                  }
-                })
-              )
-            })
-            return combineLatest(doubleEndorsementObservable)
-          }),
+        return combineLatest(
+          temporaryData.map(doubleEndorsement => {
+            return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash).pipe(
+              map(additionalData => {
+                return {
+                  ...doubleEndorsement,
+                  reward: additionalData.bakerReward,
+                  offender: additionalData.offender,
+                  lostAmount: additionalData.lostAmount,
+                  denouncedLevel: additionalData.denouncedBlockLevel,
+                  baker: additionalData.baker
+                }
+              })
+            )
+          })
+        ).pipe(
           map(doubleEndorsements => {
             return listActions.loadDoubleEndorsementsSucceeded({ doubleEndorsements })
           }),
