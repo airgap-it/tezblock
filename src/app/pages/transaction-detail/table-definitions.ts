@@ -1,6 +1,7 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean }) => Column[] } = {
   [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean }) => [
@@ -32,7 +33,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.amount,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, symbol: item.symbol }
+        options: {
+          maxDigits: 8,
+          comparisonTimestamp: item.timestamp,
+          symbol: item.symbol,
+          showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+        }
       }),
       sortable: true
     },

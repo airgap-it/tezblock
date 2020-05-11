@@ -17,10 +17,8 @@ import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { getTokenContractByAddress, fillTransferOperations } from '@tezblock/domain/contract'
+import { fillTransferOperations } from '@tezblock/domain/contract'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getFaProtocol } from '@tezblock/domain/airgap'
 
 @Injectable()
 export class AccountDetailEffects {
