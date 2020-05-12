@@ -12,7 +12,7 @@ import { CopyService } from '@tezblock/services/copy/copy.service'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getTokenContractByAddress, getContractProtocol } from '@tezblock/domain/contract'
+import { getTokenContractByAddress } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { ContractService } from '@tezblock/services/contract/contract.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -240,7 +240,7 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTokenHolders),
       switchMap(({ contract }) =>
-        from(getContractProtocol(contract).fetchTokenHolders()).pipe(
+        this.contractService.loadTokenHolders(contract).pipe(
           map(data => actions.loadTokenHoldersSucceeded({ data })),
           catchError(error => of(actions.loadTokenHoldersFailed({ error })))
         )

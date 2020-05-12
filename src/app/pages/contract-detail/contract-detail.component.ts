@@ -52,7 +52,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias$: Observable<boolean>
   loading$: Observable<boolean>
-  transactions$: Observable<ContractOperation[]>
+  transactions$: Observable<any[]>
   orderBy$: Observable<OrderBy>
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
@@ -125,11 +125,20 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.transactions$ = combineLatest(
       this.store$.select(state => state.contractDetails.currentTabKind),
       this.store$.select(state => state.contractDetails.transferOperations.data),
-      this.store$.select(state => state.contractDetails.otherOperations.data)
+      this.store$.select(state => state.contractDetails.otherOperations.data),
+      this.store$.select(state => state.contractDetails.tokenHolders.data)
     ).pipe(
-      map(([currentTabKind, transferOperations, otherOperations]) =>
-        currentTabKind === actions.OperationTab.transfers ? transferOperations : otherOperations
-      )
+      map(([currentTabKind, transferOperations, otherOperations, tokenHolders]) => {
+        if (currentTabKind === actions.OperationTab.transfers) {
+          return transferOperations
+        }
+
+        if (currentTabKind === actions.OperationTab.other) {
+          return otherOperations
+        }
+
+        return tokenHolders
+      })
     )
     this.loading$ = combineLatest(
       this.store$.select(state => state.contractDetails.transferOperations.loading),

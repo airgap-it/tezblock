@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { forkJoin, Observable, pipe } from 'rxjs'
+import { forkJoin, from, Observable, pipe } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { get as _get } from 'lodash'
+import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
-import { ContractOperation, TokenContract } from '@tezblock/domain/contract'
+import { ContractOperation, TokenContract, TokenHolder } from '@tezblock/domain/contract'
 import { getFaProtocol } from '@tezblock/domain/airgap'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
@@ -61,6 +62,39 @@ const otherPredicates = (contractHash: string): Predicate[] => [
 export interface ContractOperationsCount {
   transferTotal: number
   otherTotal
+}
+
+export interface ContractProtocol {
+  fetchTokenHolders(): Promise<TokenHolder[]>
+}
+
+export const getContractProtocol = (contract: TokenContract, chainNetworkService: ChainNetworkService): ContractProtocol => {
+  const environmentUrls = chainNetworkService.getEnvironment()
+
+  // Why airgap implements api interfaces in such a inconsistent way - compare to new TezosFAProtocol where arguments it's an object
+  if (contract.name === 'Staker') {
+    return new TezosStaker(
+      contract.id,
+      environmentUrls.rpcUrl,
+      environmentUrls.conseilUrl,
+      environmentUrls.conseilApiKey,
+      chainNetworkService.getEnvironmentVariable(),
+      chainNetworkService.getNetwork()
+    )
+  }
+
+  if (contract.name === 'tzBTC') {
+    return new TezosBTC(
+      contract.id,
+      environmentUrls.rpcUrl,
+      environmentUrls.conseilUrl,
+      environmentUrls.conseilApiKey,
+      chainNetworkService.getEnvironmentVariable(),
+      chainNetworkService.getNetwork()
+    )
+  }
+
+  return undefined
 }
 
 @Injectable({
@@ -145,7 +179,7 @@ export class ContractService extends BaseService {
   }
 
   loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
-    const faProtocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
 
     return this.post<ContractOperation[]>('operations', {
       predicates: otherPredicates(contract.id),
@@ -163,5 +197,9 @@ export class ContractService extends BaseService {
         )
       )
     )
+  }
+
+  loadTokenHolders(contract: TokenContract): Observable<TokenHolder[]> {
+    return from(getContractProtocol(contract, this.chainNetworkService).fetchTokenHolders())
   }
 }
