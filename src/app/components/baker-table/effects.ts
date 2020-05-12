@@ -49,7 +49,7 @@ export class BakerTableEffects {
       ofType(actions.loadEndorsingRights),
       withLatestFrom(
         this.store$.select(state => state.bakerTable.accountAddress),
-        this.store$.select(state => state.bakerTable.bakingRights.pagination)
+        this.store$.select(state => state.bakerTable.endorsingRights.pagination)
       ),
       switchMap(([action, accountAddress, pagination]) =>
         this.apiService.getAggregatedEndorsingRights(accountAddress, pagination.selectedSize * pagination.currentPage).pipe(
@@ -248,6 +248,34 @@ export class BakerTableEffects {
         this.rewardService.getRewardsForAddressInCycle(baker, cycle).pipe(
           map(bakerReward => actions.loadBakerRewardSucceeded({ cycle, bakerReward })),
           catchError(error => of(actions.loadBakerRewardFailed({ cycle, error })))
+        )
+      )
+    )
+  )
+
+  loadEndorsingRightItems$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadEndorsingRightItems),
+      withLatestFrom(this.store$.select(state => state.bakerTable.endorsingRightItems)),
+      filter(([{ baker, cycle, endorsingRewardsDetails }, endorsingRightItems]) => endorsingRightItems[cycle] === undefined),
+      switchMap(([{ baker, cycle, endorsingRewardsDetails }]) =>
+        this.apiService.getEndorsingRightItems(baker, cycle, endorsingRewardsDetails).pipe(
+          map(endorsingRightItems => actions.loadEndorsingRightItemsSucceeded({ cycle, endorsingRightItems })),
+          catchError(error => of(actions.loadEndorsingRightItemsFailed({ cycle, error })))
+        )
+      )
+    )
+  )
+
+  loadBakingRightItems$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBakingRightItems),
+      withLatestFrom(this.store$.select(state => state.bakerTable.bakingRightItems)),
+      filter(([{ baker, cycle, bakingRewardsDetails }, bakingRightItems]) => bakingRightItems[cycle] === undefined),
+      switchMap(([{ baker, cycle, bakingRewardsDetails }]) =>
+        this.apiService.getBakingRightsItems(baker, cycle, bakingRewardsDetails).pipe(
+          map(bakingRightItems => actions.loadBakingRightItemsSucceeded({ cycle, bakingRightItems })),
+          catchError(error => of(actions.loadBakingRightItemsFailed({ cycle, error })))
         )
       )
     )

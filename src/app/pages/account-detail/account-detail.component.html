@@ -302,8 +302,8 @@
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <ng-container *ngIf="account.is_baker">
               <baker-table
+                [address]="bakerAddress"
                 [tabs]="bakerTabs"
-                [page]="'account'"
                 [data]="bakerTableInfos"
                 [ratings]="bakerTableRatings$ | async"
                 [bakerFee$]="tezosBakerFee$"

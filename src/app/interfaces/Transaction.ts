@@ -49,6 +49,11 @@ export interface Transaction {
   voting_period?: string
   burn?: string
   symbol?: string
+  baker?: string
   errors?: OperationError[]
   outgoing?: boolean
+  reward?: string
+  offender?: string
+  lostAmount?: string
+  denouncedLevel?: number
 }

@@ -2,10 +2,10 @@ import { createReducer, on } from '@ngrx/store'
 import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
-import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
-import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
+import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState, Pagination, tryUpdateTotal } from '@tezblock/domain/table'
+import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
@@ -28,6 +28,8 @@ export interface State {
   rewards: TableState<TezosRewards>
   bakerReward: { [key: string]: TezosPayoutInfo }
   votes: TableState<Transaction>
+  endorsingRightItems: { [key: string]: EndorsingRights[] }
+  bakingRightItems: { [key: string]: BakingRights[] }
 }
 
 const initialState: State = {
@@ -47,7 +49,9 @@ const initialState: State = {
   activeDelegations: undefined,
   rewards: getInitialTableState(undefined, 3),
   bakerReward: {},
-  votes: getInitialTableState()
+  votes: getInitialTableState(),
+  endorsingRightItems: {},
+  bakingRightItems: {}
 }
 
 export const reducer = createReducer(
@@ -300,6 +304,34 @@ export const reducer = createReducer(
         ...state.busy.bakerReward,
         [cycle]: false
       }
+    }
+  })),
+  on(actions.loadEndorsingRightItemsSucceeded, (state, { cycle, endorsingRightItems }) => ({
+    ...state,
+    endorsingRightItems: {
+      ...state.endorsingRightItems,
+      [cycle]: endorsingRightItems
+    }
+  })),
+  on(actions.loadBakerRewardFailed, (state, { cycle }) => ({
+    ...state,
+    endorsingRightItems: {
+      ...state.endorsingRightItems,
+      [cycle]: null
+    }
+  })),
+  on(actions.loadBakingRightItemsSucceeded, (state, { cycle, bakingRightItems }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
+      [cycle]: bakingRightItems
+    }
+  })),
+  on(actions.loadBakingRightItemsFailed, (state, { cycle }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
+      [cycle]: null
     }
   })),
   on(actions.reset, () => initialState)

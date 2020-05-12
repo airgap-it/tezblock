@@ -289,6 +289,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     [
       {
         name: 'Baker',
+        field: 'baker',
         template: Template.address
       },
       {
@@ -299,21 +300,25 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Reward',
+        field: 'reward',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options: { ...options, comparisonTimestamp: item.timestamp } })
+        data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: 'Offender',
+        field: 'offender',
         template: Template.address
       },
       {
         name: 'Denounced Level',
+        field: 'denouncedLevel',
         template: Template.block
       },
       {
         name: 'Lost Amount',
+        field: 'lostAmount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options: { ...options, comparisonTimestamp: item.timestamp } })
+        data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
     ].concat(<any>blockAndTxHashColumns),
 
@@ -322,6 +327,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
     [
       {
         name: 'Baker',
+        field: 'baker',
         template: Template.address
       },
       {
@@ -332,21 +338,25 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean }) =
       },
       {
         name: 'Reward',
+        field: 'reward',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options: { ...options, comparisonTimestamp: item.timestamp } })
+        data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: 'Offender',
+        field: 'offender',
         template: Template.address
       },
       {
         name: 'Denounced Level',
+        field: 'denouncedLevel',
         template: Template.block
       },
       {
         name: 'Lost Amount',
+        field: 'lostAmount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: null, options: { ...options, comparisonTimestamp: item.timestamp } })
+        data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
     ].concat(<any>blockAndTxHashColumns),
 
