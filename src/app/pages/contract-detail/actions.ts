@@ -1,14 +1,15 @@
 import { createAction, props } from '@ngrx/store'
 import { TezosTransactionResult } from 'airgap-coin-lib'
 
-import { TokenContract, ContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { OrderBy } from '@tezblock/services/base.service'
 
 const featureName = 'Contract Detail'
 
 export enum OperationTab {
   transfers = 'transfers',
-  other = 'other'
+  other = 'other',
+  tokenHolders = 'token holders'
 }
 
 export const loadContract = createAction(`[${featureName}] Load Contract`, props<{ address: string }>())
@@ -40,6 +41,13 @@ export const loadOtherOperationsSucceeded = createAction(
 export const loadOtherOperationsFailed = createAction(`[${featureName}] Load Other Operations Failed`, props<{ error: any }>())
 export const loadMoreOtherOperations = createAction(`[${featureName}] Load More Other Operations`)
 export const sortOtherOperations = createAction(`[${featureName}] Sort Other Operations`, props<{ orderBy: OrderBy }>())
+
+export const loadTokenHolders = createAction(`[${featureName}] Load Token Holders`, props<{ contract: TokenContract }>())
+export const loadTokenHoldersSucceeded = createAction(
+  `[${featureName}] Load Token Holders Succeeded`,
+  props<{ data: TokenHolder[] }>()
+)
+export const loadTokenHoldersFailed = createAction(`[${featureName}] Load Token Holders Failed`, props<{ error: any }>())
 
 export const loadOperationsCount = createAction(`[${featureName}] Load Operations Count`, props<{ contractHash: string }>())
 export const loadOperationsCountSucceeded = createAction(

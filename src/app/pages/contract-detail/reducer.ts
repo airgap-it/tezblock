@@ -2,7 +2,7 @@ import { createReducer, on } from '@ngrx/store'
 import { TezosTransactionCursor } from 'airgap-coin-lib'
 
 import * as actions from './actions'
-import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, ContractOperation, airGapTransactionToContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 
 const addSymbol = (symbol: string) => (contractOperation: ContractOperation) => ({ ...contractOperation, symbol })
@@ -14,6 +14,7 @@ export interface State {
   copyToClipboardState: string
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
+  tokenHolders: TableState<TokenHolder>
   currentTabKind: actions.OperationTab
   cursor: TezosTransactionCursor
 }
@@ -31,6 +32,7 @@ const initialState: State = {
     field: 'block_level',
     direction: 'desc'
   }),
+  tokenHolders: getInitialTableState(undefined, Number.MIN_SAFE_INTEGER),
   currentTabKind: actions.OperationTab.transfers,
   cursor: undefined
 }
@@ -172,6 +174,32 @@ export const reducer = createReducer(
   on(actions.loadManagerAddressFailed, (state, { error }) => ({
     ...state,
     manager: null
+  })),
+  on(actions.loadTokenHolders, state => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      loading: true
+    }
+  })),
+  on(actions.loadTokenHoldersSucceeded, (state, { data }) => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      data,
+      pagination: {
+        ...state.tokenHolders.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadTokenHoldersFailed, state => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      loading: false
+    }
   })),
   on(actions.reset, () => initialState)
 )

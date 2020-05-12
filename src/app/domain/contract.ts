@@ -1,4 +1,4 @@
-import { IAirGapTransaction } from 'airgap-coin-lib'
+import { IAirGapTransaction, TezosStaker, TezosBTC } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
@@ -139,4 +139,27 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
     },
     protocolIdentifier: 'BTC'
   }
+}
+
+export const hasTokenHolders = (contract: TokenContract): boolean => ['Staker', 'tzBTC'].includes(contract.name)
+
+export interface TokenHolder {
+  address: string
+  amount: string
+}
+
+export interface ContractProtocol {
+  fetchTokenHolders(): Promise<TokenHolder[]>
+}
+
+export const getContractProtocol = (contract: TokenContract): ContractProtocol => {
+  if (contract.name === 'Staker') {
+    return new TezosStaker(contract.id)
+  }
+
+  if (contract.name === 'tzBTC') {
+    return new TezosBTC(contract.id)
+  }
+
+  return undefined
 }
