@@ -101,6 +101,18 @@
                   </div>
                 </ng-container>
               </div>
+
+              <div *ngIf="false" class="row mb-3">
+                <div class=" col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Assets</p>
+                </div>
+                <div class=" col-md-10 pl-sm-0">
+                  <h5 class="mb-0">
+                    <amount-cell [data]="0" [options]="{ showFiatValue: false }"></amount-cell>
+                  </h5>
+                </div>
+              </div>
+
               <h5 class="card-title__secondary mb-3 pt-3">
                 <tooltip-item
                   [title]="'Related Accounts'"
