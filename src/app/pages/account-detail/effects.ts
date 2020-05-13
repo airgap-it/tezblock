@@ -16,6 +16,9 @@ import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
+import { getTokenContracts, hasTokenHolders } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { ContractService } from '@tezblock/services/contract/contract.service'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -299,12 +302,49 @@ export class AccountDetailEffects {
     )
   )
 
+  onLoadAccountLoadContractAssets$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccount),
+      map(() => actions.loadContractAssets())
+    )
+  )
+
+  loadContractAssets$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractAssets),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        forkJoin(
+          getTokenContracts(this.chainNetworkService.getNetwork())
+            .data.filter(hasTokenHolders)
+            .map(contract =>
+              this.contractService.loadTokenHolders(contract).pipe(
+                map(tokenHolders =>
+                  tokenHolders
+                    .filter(tokenHolder => tokenHolder.address === address)
+                    .map(tokenHolder => ({
+                      contract,
+                      amount: tokenHolder.amount
+                    }))
+                )
+              )
+            )
+        ).pipe(
+          map(assets => actions.loadContractAssetsSucceeded({ data: flatten(assets) })),
+          catchError(error => of(actions.loadContractAssetsFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly accountService: AccountService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly contractService: ContractService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
     private readonly transactionService: TransactionService

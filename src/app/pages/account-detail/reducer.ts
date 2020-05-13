@@ -111,6 +111,7 @@ export interface State {
   tezosBakerFee: number
   temporaryBalance: Balance[]
   bakerReward: TezosPayoutInfo
+  contractAssets: TableState<actions.ContractAsset>
 }
 
 const initialState: State = {
@@ -130,7 +131,8 @@ const initialState: State = {
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
   temporaryBalance: undefined,
-  bakerReward: undefined
+  bakerReward: undefined,
+  contractAssets: getInitialTableState(undefined, Number.MAX_SAFE_INTEGER)
 }
 
 export const reducer = createReducer(
@@ -285,6 +287,29 @@ export const reducer = createReducer(
     busy: {
       ...state.busy,
       bakerReward: false
+    }
+  })),
+  on(actions.loadContractAssets, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      loading: true
+    }
+  })),
+  on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      data,
+      loading: false
+    }
+  })),
+  on(actions.loadContractAssetsFailed, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      data: null,
+      loading: false
     }
   })),
   on(actions.reset, () => initialState)

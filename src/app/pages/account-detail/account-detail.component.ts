@@ -3,11 +3,11 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge } from 'rxjs'
-import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
+import { from, Observable, combineLatest } from 'rxjs'
+import { delay, map, filter, withLatestFrom, switchMap, reduce } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
-import { negate, isNil } from 'lodash'
+import { negate, isNil, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
@@ -114,6 +114,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
+  contractAssets$: Observable<actions.ContractAsset[]>
+  contractAssetsBalance$: Observable<number>
+  numberOfContractAssets$: Observable<number>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -278,6 +281,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
     this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
+    this.contractAssets$ = this.store$.select(state => state.accountDetails.contractAssets.data)
+    this.numberOfContractAssets$ = this.contractAssets$.pipe(
+      filter(negate(isNil)),
+      map((contractAssets: actions.ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
+    )
+    this.contractAssetsBalance$ = this.contractAssets$.pipe(
+      filter(negate(isNil)),
+      map((contractAssets: actions.ContractAsset[]) =>
+        contractAssets.reduce((accumulator, currentItem) => accumulator + parseFloat(currentItem.amount), 0)
+      )
+    )
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {

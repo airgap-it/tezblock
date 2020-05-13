@@ -102,7 +102,7 @@
                 </ng-container>
               </div>
 
-              <div *ngIf="false" class="row mb-3">
+              <div *ngIf="(numberOfContractAssets$ | async) > 0" class="row mb-3">
                 <div class=" col-md-2 pr-0">
                   <p class="text-secondary mb-0">Assets</p>
                 </div>
