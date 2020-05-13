@@ -144,8 +144,8 @@ export const columns: {
     {
       name: 'Account',
       field: 'address',
-      // template: Template.address,
-      // data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
+      template: Template.address,
+      data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Token Balance',
