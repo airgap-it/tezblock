@@ -95,6 +95,56 @@
     "wallet-item": {
       "features": "Features",
       "download_button": "Download"
+    },
+    "airgap": {
+      "title": "AirGap",
+      "description": "With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your XTZ with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
+      "features": "Offline device, Highest security, XTZ delegation, Coin agnostic, Secure storage, Social recovery, Hot wallet option"
+    },
+    "atomic": {
+      "title": "Atomic Wallet",
+      "description": "Atomic is a decentralized wallet that supports 300+ cryptocurrency assets. Strong encryption and custody-free solution guarantee their users the highest level of security. Atomic Wallet provides instant exchange and 'buy crypto with a credit card' feature.",
+      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, XTZ delegation"
+    },
+    "atomex": {
+      "title": "Atomex",
+      "description": "Multicurrency HD wallet with built-in hybrid atomic swap exchange.",
+      "features": "HD wallet, built-in hybrid atomic swap DEX"
+    },
+    "cortez": {
+      "title": "Cortez",
+      "description": "Mobile wallet developed by Nomadic Labs.",
+      "features": "Mobile"
+    },
+    "galleon": {
+      "title": "Galleon",
+      "description": "Galleon is a smart wallet for Tezos. Galleon is a deployment of Tezori, an open source wallet framework for Tezos, supporting both software and hardware wallets in eight languages on Mac, Windows and Linux.",
+      "features": "Ledger Support, Delegation"
+    },
+    "kukai": {
+      "title": "Kukai",
+      "description": "One of the first Tezos wallets with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in their wallet.",
+      "features": "Ledger Support, Delegation, Offline-signing"
+    },
+    "magnum": {
+      "title": "Magnum Wallet",
+      "description": "Magnum Wallet is a multicurrency non-custodial wallet service. Designed for those who wish to manage their crypto portfolio in a secure and convenient interface, it also lets the user earn rewards through staking or by claiming forks and bounty airdrops. As part of their “Multiply Your Funds” paradigm, the team is always on the lookout for new ways to benefit the users.",
+      "features": "Blockchain Agnostic, In-App Exchange, Hardware Wallets, Ultimate Security, Passive Income, Forks & Bounties"
+    },
+    "paytomat": {
+      "title": "paytomat",
+      "description": "paytomat is a non-custodial wallet that brings financial services that modern customers eager. From exchanging assets, to referral programs, to trading BEP-2 tokens or accessing dApps and games, paytomat supports over 14 cryptocurrencies and covers all of a user's wants and needs in one single app.",
+      "features": "reliable, decentralized, convenient"
+    },
+    "simplestacking": {
+      "title": "simplestacking.com",
+      "description": "Safe way to store & stake Tezos. Desktop & Web wallet with Trezor support.",
+      "features": "Trezor T, multiple wallets, wallet balance history"
+    },
+    "tezbox": {
+      "title": "TezBox",
+      "description": "TezBox was the earliest functional GUI wallet for Tezos. TezBox has grown to be one of the major community developed wallets and will continue to provide users and developers with an easy to use, powerful and secure wallet.",
+      "features": "Secure, Mobile, Developer Friendly, Open Source, Hardware Wallet Support"
     }
   },
   "protocol-constants": {
