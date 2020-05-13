@@ -87,6 +87,39 @@
     "total-number": "Total Number of Bakers",
     "top25": "Top 25 Bakers by Staking Balance"
   },
+  "resources-wallets": {
+    "wallets": "Wallets",
+    "introduction_1": "A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list updated and",
+    "introduction_2": "if a wallet is missing.",
+    "let-us-know_link": "let us know",
+    "wallet-item": {
+      "features": "Features",
+      "download_button": "Download"
+    }
+  },
+  "protocol-constants": {
+    "periods": "Periods",
+    "blocks-per-cycle": "Blocks per cycle",
+    "blocks-per-commitment": "Blocks per commitment",
+    "blocks-per-roll-snapshot": "Blocks per roll snapshot",
+    "time-between-blocks": "Time between blocks",
+    "rewards": "Rewards",
+    "block-security-deposit": "Block security deposit",
+    "endorsement-security-deposit": "Endorsement security deposit",
+    "limits": "Limits",
+    "maximum-revelations-per-block": "Maximum revelations per block",
+    "maximum-operation-data-length": "Maximum operation data length",
+    "hard-gas-limit-per-operation": "Hard gas limit per operation",
+    "hard-gas-limit-per-block": "Hard gas limit per block"
+  },
+  "health": {
+    "tezos-node-health": "Tezos Node Health",
+    "conseil-health": "Conseil Health",
+    "status": "Status",
+    "up": "Up",
+    "down": "Down",
+    "latest-block-seen": "Latest Block Seen"
+  },
   "block-detail": {
     "invalid-block_title": "Invalid Block Level",
     "invalid-block_text": "This block level is not valid.",
