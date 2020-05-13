@@ -200,6 +200,21 @@
     "invalid-address": "Invalid Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
+  "modal-component": {
+    "none": "None",
+    "show_button": "Show"
+  },
+  "telegram-modal-component": {
+    "title": "Telegram Tezos Notifier Bot",
+    "text_1": "With the Telegram",
+    "text_2": ", you can stay up-to-date about accounts and be notified for delegations, transactions and much more directly in Telegram.",
+    "telegram_link": "Tezos Notifier Bot",
+    "notified-about": "You'll be notified about the following address",
+    "choose-name": "Choose a corresponding name",
+    "placeholder": "Enter a name for this address",
+    "name-too-long": "The name can only have 18 characters",
+    "start-notifications_button": "Start Notifications"
+  },
   "search-item": {
     "label": "Search",
     "placeholder": "Search by Address / Alias / Transaction / Block"

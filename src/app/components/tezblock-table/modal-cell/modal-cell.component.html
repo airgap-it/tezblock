@@ -1,7 +1,9 @@
 <span *ngIf="!data" class="text-secondary">
-  None
+  {{ 'modal-component.none' | translate }}
 </span>
-<button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">Show</button>
+<button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">
+  {{ 'modal-component.show_button' | translate }}
+</button>
 
 <ng-template #template>
   <div class="modal-header">
