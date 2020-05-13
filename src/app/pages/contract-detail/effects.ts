@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
-import { catchError, delay, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
+import { of, from } from 'rxjs'
+import { catchError, delay, filter, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
@@ -197,6 +197,7 @@ export class ContractDetailEffects {
   onChangeOperationsTabLoadOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.changeOperationsTab),
+      filter(({ currentTabKind }) => currentTabKind !== actions.OperationTab.tokenHolders),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
       map(([{ currentTabKind }, contract]) =>
         currentTabKind === actions.OperationTab.transfers
@@ -224,6 +225,25 @@ export class ContractDetailEffects {
         // currentTabKind === actions.OperationTab.transfers
         //   ? actions.sortTransferOperations({ orderBy }) :
         actions.sortOtherOperations({ orderBy })
+      )
+    )
+  )
+
+  onLoadedContractLoadTokenHolders = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractSucceeded),
+      map(({ contract }) => actions.loadTokenHolders({ contract }))
+    )
+  )
+
+  loadTokenHolders$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTokenHolders),
+      switchMap(({ contract }) =>
+        this.contractService.loadTokenHolders(contract).pipe(
+          map(data => actions.loadTokenHoldersSucceeded({ data })),
+          catchError(error => of(actions.loadTokenHoldersFailed({ error })))
+        )
       )
     )
   )

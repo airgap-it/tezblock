@@ -1,7 +1,6 @@
 import { getProtocolByIdentifier, ICoinProtocol, TezosFAProtocol } from 'airgap-coin-lib'
 
 import { TokenContract } from '@tezblock/domain/contract'
-import { EnvironmentUrls } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export enum Currency {
@@ -36,9 +35,10 @@ export const isInBTC = (symbol: string): boolean => ['tzBTC', 'BTC'].includes(sy
 
 export const getFaProtocol = (
   contract: TokenContract,
-  chainNetworkService: ChainNetworkService,
-  environmentUrls: EnvironmentUrls
+  chainNetworkService: ChainNetworkService
 ): TezosFAProtocol => {
+  const environmentUrls = chainNetworkService.getEnvironment()
+
   return new TezosFAProtocol({
     symbol: contract.symbol,
     name: contract.name,

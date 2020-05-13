@@ -135,5 +135,29 @@ export const columns: {
       field: 'operation_group_hash',
       template: Template.hash
     }
+  ],
+  tokenHolders: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+  }) => [
+    {
+      name: 'Account',
+      field: 'address',
+      // template: Template.address,
+      // data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Token Balance',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: any) => ({
+        data: item.amount,
+        options: {
+          showFiatValue: options.showFiatValue,
+          symbol: options.symbol
+        }
+      })
+    }
   ]
 }
