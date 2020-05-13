@@ -110,7 +110,7 @@ export class TezblockTableComponent implements OnInit {
   @Output()
   downloadClicked: EventEmitter<void> = new EventEmitter()
 
-  @Output() 
+  @Output()
   onLoadMore: EventEmitter<void> = new EventEmitter()
 
   @Output()

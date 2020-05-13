@@ -11,6 +11,7 @@ export interface Options {
   forceIdenticon?: boolean
   hideIdenticon?: boolean
   kind?: string //TODO: not needed probably
+  comparisonTimestamp?: number
 }
 
 @Injectable({
