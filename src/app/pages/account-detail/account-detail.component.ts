@@ -86,6 +86,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
+  is_baker: boolean | undefined
 
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
@@ -576,6 +577,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
+    this.is_baker = false
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }

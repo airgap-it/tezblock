@@ -56,7 +56,7 @@
             <p class="text-secondary mb-0">Block security deposit</p>
           </div>
           <div class="col-md-9">
-            <amount-cell [data]="{ amount: blockSecurityDeposit }" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+            <amount-cell [data]="blockSecurityDeposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
           </div>
         </div>
         <div class="row mb-3">
@@ -64,7 +64,7 @@
             <p class="text-secondary mb-0">Endorsement security deposit</p>
           </div>
           <div class="col-md-9">
-            <amount-cell [data]="{ amount: endorsementSecurityDeposit }" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+            <amount-cell [data]="endorsementSecurityDeposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
           </div>
         </div>
       </div>

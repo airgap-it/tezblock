@@ -64,33 +64,32 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Name</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.name }}</p>
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Symbol</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.symbol }}</p>
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Total Supply</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">
                     <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
                     <amount-cell
-                      [data]="{ amount: contract.totalSupply }"
+                      [data]="contract.totalSupply"
                       [options]="{
                         symbol: contract.symbol,
-                        conventer: conventer$ | async,
                         showFiatValue: showFiatValue$ | async
                       }"
                     ></amount-cell>
@@ -98,18 +97,18 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Decimals</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   {{ contract.decimals }}
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Manager</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <address-item [address]="manager$ | async"></address-item>
                 </div>
               </div>
@@ -124,19 +123,19 @@
               </h5>
 
               <div class="row mb-3">
-                <div class=" col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Description</p>
                 </div>
-                <div class=" col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.description }}</p>
                 </div>
               </div>
 
               <div class="row mb-3">
-                <div class=" col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Website</p>
                 </div>
-                <div class=" col-md-7">
+                <div class="col-md-9">
                   <a [href]="website$ | async" target="_blank">
                     {{ website$ | async }}
                   </a>
@@ -144,10 +143,10 @@
               </div>
 
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">Social Profiles</p>
                 </div>
-                <div class=" col-md-7">
+                <div class=" col-md-9">
                   <a
                     *ngFor="let social of contract.socials"
                     class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"

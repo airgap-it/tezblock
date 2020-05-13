@@ -12,7 +12,7 @@ export const columns: Column[] = [
     name: 'Balance',
     field: 'balance',
     template: Template.amount,
-    data: (item: any) => ({ data: { amount: item.balance } }),
+    data: (item: any) => ({ data: item.balance }),
     sortable: true
   }
 ]

@@ -10,13 +10,20 @@ export interface BakingRights {
   fees?: string
 }
 
+export interface BakingRewardsDetail {
+  level: number;
+  amount: string;
+  deposit: string;
+  fees?: string;
+}
+
 export interface AggregatedBakingRights {
   cycle: number
   bakingsCount: number
   blockRewards: string
   deposits: string
   fees: number
-  items: BakingRights[]
+  bakingRewardsDetails: BakingRewardsDetail[]
 }
 
 export const getEmptyAggregatedBakingRight = () => ({
@@ -25,5 +32,5 @@ export const getEmptyAggregatedBakingRight = () => ({
   blockRewards: null,
   deposits: null,
   fees: 0,
-  items: []
+  bakingRewardsDetails: []
 })

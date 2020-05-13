@@ -179,9 +179,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
             const balance = <number>data.datasets[0].data[tooltipItem.index] * 1000
             const balanceLabel = this.amountConverterPipe.transform(balance, {
               protocolIdentifier: 'xtz',
-              maxDigits: 6,
-              fontSmall: true,
-              fontColor: true
+              maxDigits: 6
             })
 
             return `${accountName} ${balanceLabel} ꜩ`

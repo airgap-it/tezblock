@@ -35,14 +35,14 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
       {
         name: 'Amount',
         field: 'amount',
-        data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
+        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
         template: Template.amount,
         sortable: true
       },
       {
         name: 'Fee',
         field: 'fee',
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
         template: Template.amount,
         sortable: true
       }
@@ -83,7 +83,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         name: 'Amount',
         field: 'delegatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
+        data: (item: Transaction) => ({ data: item.delegatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
         sortable: false // delegatedBalance is joined property from accounts
       }
     ].concat(<any>blockAndTxHashColumns),
@@ -100,7 +100,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         name: 'Balance',
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
+        data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
         sortable: true
       },
       {
@@ -127,7 +127,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),

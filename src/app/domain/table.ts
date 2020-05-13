@@ -14,6 +14,7 @@ export interface TableState<T> {
   pagination: Pagination
   loading: boolean
   orderBy: OrderBy
+  temporaryData: T[]
 }
 
 export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): TableState<any> => ({
@@ -25,7 +26,8 @@ export const getInitialTableState = (orderBy?: OrderBy, selectedSize = 10): Tabl
     total: undefined
   },
   loading: false,
-  orderBy
+  orderBy,
+  temporaryData: []
 })
 
 export interface Pageable<T> {
@@ -68,4 +70,16 @@ export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T
     },
     isFilterable: !!filterCondition
   }
+}
+
+export function toPagable<T>(data: T[], pagination: Pagination): Pageable<T> {
+  const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
+  const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
+
+  return data
+    ? {
+        data: data.slice(offset, Math.min(offset + limit, data.length)),
+        total: data.length
+      }
+    : { data: undefined, total: 0 }
 }

@@ -169,7 +169,7 @@ export class ContractDetailEffects {
         this.store$.select(state => state.contractDetails.otherOperations.pagination),
         this.store$.select(state => state.contractDetails.otherOperations.orderBy)
       ),
-      switchMap(([{ contractHash }, pagination, orderBy]) =>
+      switchMap(([{ contract: contractHash }, pagination, orderBy]) =>
         this.contractService.loadOtherOperations(contractHash, orderBy, pagination.currentPage * pagination.selectedSize).pipe(
           map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
           catchError(error => of(actions.loadOtherOperationsFailed({ error })))
@@ -182,7 +182,7 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadMoreOtherOperations),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadOtherOperations({ contractHash: contract.id }))
+      map(([action, contract]) => actions.loadOtherOperations({ contract }))
     )
   )
 
@@ -190,7 +190,7 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.sortOtherOperations),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadOtherOperations({ contractHash: contract.id }))
+      map(([action, contract]) => actions.loadOtherOperations({ contract }))
     )
   )
 
@@ -201,7 +201,7 @@ export class ContractDetailEffects {
       map(([{ currentTabKind }, contract]) =>
         currentTabKind === actions.OperationTab.transfers
           ? actions.loadTransferOperations({ contract })
-          : actions.loadOtherOperations({ contractHash: contract.id })
+          : actions.loadOtherOperations({ contract })
       )
     )
   )
