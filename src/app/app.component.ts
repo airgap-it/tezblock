@@ -9,6 +9,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './app.actions'
 import { AnalyticsService } from './services/analytics/analytics.service'
+import defaultLanguage from './../assets/i18n/en.json'
 
 @Component({
   selector: 'app-root',
@@ -25,6 +26,7 @@ export class AppComponent implements OnInit {
     private readonly analyticsService: AnalyticsService,
     private readonly translate: TranslateService
   ) {
+    this.loadLanguages(this.supportedLanguages)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: e as NavigationEnd })))
@@ -40,10 +42,10 @@ export class AppComponent implements OnInit {
       this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
     ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
       this.store$.dispatch(actions.loadPeriodInfos())
-    this.loadLanguages(this.supportedLanguages)
   }
 
   loadLanguages(supportedLanguages: string[]) {
+    this.translate.setTranslation('en', defaultLanguage)
     this.translate.setDefaultLang('en')
 
     const language = this.translate.getBrowserLang()
@@ -55,6 +57,8 @@ export class AppComponent implements OnInit {
           this.translate.use(supportedLanguage)
         }
       })
+    } else {
+      this.translate.use('en')
     }
   }
 
@@ -63,5 +67,6 @@ export class AppComponent implements OnInit {
   }
   public ngOnInit() {
     this.analyticsService.init()
+    this.loadLanguages(this.supportedLanguages)
   }
 }

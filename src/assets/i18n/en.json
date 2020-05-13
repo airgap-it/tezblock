@@ -200,9 +200,27 @@
     "invalid-address": "Invalid Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
+  "contract-detail": {
+    "revealed": "Revealed",
+    "not-revealed": "Not Revealed",
+    "name": "Name",
+    "symbol": "Symbol",
+    "total-supply": "Total Supply",
+    "decimals": "Decimals",
+    "manager": "Manager",
+    "contract-overview": "Contract Overview",
+    "description": "Description",
+    "website": "Website",
+    "social-profiles": "Social Profiles",
+    "invalid-address": "Invalid Address",
+    "invalid-address_text": "This address is currently not visible on the blockchain."
+  },
   "modal-component": {
     "none": "None",
     "show_button": "Show"
+  },
+  "copy-modal": {
+    "has-been-copied": "has been copied to clipboard"
   },
   "telegram-modal-component": {
     "title": "Telegram Tezos Notifier Bot",
@@ -222,5 +240,35 @@
   "tezblock-table": {
     "load-more_button": "Load more",
     "download-csv_button": "Download CSV Export"
+  },
+  "baker-table": {
+    "baker-overview": "Baker Overview",
+    "baking-rights": "Baking Rights",
+    "endorsing-rights": "Endorsing Rights",
+    "rewards": "Rewards",
+    "votes": "Votes"
+  },
+  "tabbed-table": {
+    "account-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "endorsements": "Endorsements"
+    },
+    "transaction-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "reveals": "Reveals",
+      "activations": "Activations",
+      "votes": "Votes"
+    },
+    "block-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "endorsements": "Endorsements",
+      "activations": "Activations"
+    }
   }
 }

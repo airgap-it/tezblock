@@ -22,6 +22,7 @@ import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-block-detail',
@@ -53,7 +54,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
   }
@@ -130,7 +132,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   private setTabs(pageId: string) {
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.block-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
@@ -141,7 +143,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.block-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
@@ -152,7 +154,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.block-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
@@ -163,7 +165,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Endorsements',
+        title: this.translateService.instant('tabbed-table.block-detail.endorsements'),
         active: false,
         kind: 'endorsement',
         count: undefined,
@@ -174,7 +176,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Activations',
+        title: this.translateService.instant('tabbed-table.block-detail.activations'),
         active: false,
         kind: 'activate_account',
         count: undefined,
