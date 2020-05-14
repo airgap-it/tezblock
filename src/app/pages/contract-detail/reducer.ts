@@ -16,7 +16,6 @@ export interface State {
   otherOperations: TableState<ContractOperation>
   tokenHolders: TableState<TokenHolder>
   currentTabKind: actions.OperationTab
-  cursor: TezosTransactionCursor
 }
 
 const initialState: State = {
@@ -34,7 +33,6 @@ const initialState: State = {
   }),
   tokenHolders: getInitialTableState(undefined, Number.MIN_SAFE_INTEGER),
   currentTabKind: actions.OperationTab.transfers,
-  cursor: undefined
 }
 
 export const reducer = createReducer(
@@ -67,16 +65,15 @@ export const reducer = createReducer(
     }
   })),
   on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
-    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation).map(addSymbol(state.contract.symbol))
+    const data = transferOperations.map(addSymbol(state.contract.symbol))
 
     return {
       ...state,
       transferOperations: {
         ...state.transferOperations,
-        data: state.cursor ? state.transferOperations.data.concat(newData) : newData,
+        data,
         loading: false
-      },
-      cursor: transferOperations.cursor
+      }
     }
   }),
   on(actions.loadTransferOperationsFailed, state => ({

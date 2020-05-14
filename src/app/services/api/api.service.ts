@@ -1387,6 +1387,7 @@ export class ApiService {
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
+  // TODO: remove
   getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
     const protocol = getFaProtocol(contract, this.chainNetworkService)
 

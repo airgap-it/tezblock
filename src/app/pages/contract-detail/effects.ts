@@ -116,9 +116,13 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.cursor)),
-      switchMap(([{ contract }, cursor]) =>
-        this.apiService.getTransferOperationsForContract(contract, cursor).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.contractDetails.otherOperations.pagination),
+        this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+      ),
+      switchMap(([{ contract }, pagination, orderBy]) =>
+        this.contractService.loadTransferOperations(contract, orderBy, pagination.currentPage * pagination.selectedSize)
+        .pipe(
           map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )

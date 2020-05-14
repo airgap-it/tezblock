@@ -13,10 +13,16 @@ import { getFaProtocol } from '@tezblock/domain/airgap'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
+    field: 'parameters_entrypoints',
+    operation: Operation.eq,
+    set: ['transfer'],
     inverse: false
+  },
+  {
+    field: 'parameters',
+    operation: Operation.isnull,
+    set: [],
+    inverse: true
   },
   {
     field: 'kind',
@@ -34,9 +40,9 @@ const transferPredicates = (contractHash: string): Predicate[] => [
 
 const otherPredicates = (contractHash: string): Predicate[] => [
   {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
+    field: 'parameters_entrypoints',
+    operation: Operation.eq,
+    set: ['transfer'],
     inverse: true
   },
   {
@@ -187,12 +193,45 @@ export class ContractService extends BaseService {
       limit
     }).pipe(
       switchMap(contractOperations =>
-        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters))).pipe(
+        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters))).pipe(
           map(response =>
             contractOperations.map((contractOperation, index) => ({
               ...contractOperation,
-              entrypoint: _get(response[index], 'entrypoint')
+              entrypoint: _get(response[index], 'entrypoint') // parameters_entrypoints
             }))
+          )
+        )
+      )
+    )
+  }
+
+  // TODO: remove apiService.getTransferOperationsForContract
+  loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
+    // faProtocol.transferDetailsFromParameters()
+
+    return this.post<ContractOperation[]>('operations', {
+      predicates: transferPredicates(contract.id),
+      orderBy: [orderBy],
+      limit
+    }).pipe(
+      switchMap(contractOperations =>
+        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters))).pipe(
+          map(response => contractOperations.map((contractOperation, index) => {
+            // const details = faProtocol.transferDetailsFromParameters({
+            //   entrypoint: _get(response[index], 'entrypoint'),
+            //   value: contractOperation.parameters_micheline ?? contractOperation.parameters
+            // })
+            const details = faProtocol.transferDetailsFromParameters(response[index])
+
+            return {
+              ...contractOperation,
+              singleFrom: details.from,
+              singleTo: details.to,
+              amount: details.amount
+            }
+          })
+           
           )
         )
       )

@@ -42,6 +42,7 @@ export interface ContractOperation extends IAirGapTransaction {
   singleFrom: string
   singleTo: string
   parameters: string
+  parameters_micheline: string
   symbol?: string
   decimals?: number
   entrypoint?: string
@@ -83,7 +84,8 @@ export const airGapTransactionToContractOperation = (airGapTransaction: IAirGapT
   ...airGapTransaction,
   singleFrom: first(airGapTransaction.from),
   singleTo: first(airGapTransaction.to),
-  parameters: undefined
+  parameters: undefined,
+  parameters_micheline: undefined
 })
 
 export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOption[] => {
