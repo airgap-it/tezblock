@@ -1387,13 +1387,6 @@ export class ApiService {
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
   }
 
-  // TODO: remove
-  getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService)
-
-    return from(protocol.getTransactions(10, cursor))
-  }
-
   getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
     const today = new Date()
     const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */

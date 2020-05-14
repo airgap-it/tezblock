@@ -117,13 +117,13 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
       withLatestFrom(
-        this.store$.select(state => state.contractDetails.otherOperations.pagination),
-        this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+        this.store$.select(state => state.contractDetails.transferOperations.pagination),
+        this.store$.select(state => state.contractDetails.transferOperations.orderBy)
       ),
       switchMap(([{ contract }, pagination, orderBy]) =>
         this.contractService.loadTransferOperations(contract, orderBy, pagination.currentPage * pagination.selectedSize)
         .pipe(
-          map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
+          map(data => actions.loadTransferOperationsSucceeded({ data })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
@@ -175,7 +175,7 @@ export class ContractDetailEffects {
       ),
       switchMap(([{ contract: contractHash }, pagination, orderBy]) =>
         this.contractService.loadOtherOperations(contractHash, orderBy, pagination.currentPage * pagination.selectedSize).pipe(
-          map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
+          map(data => actions.loadOtherOperationsSucceeded({ data })),
           catchError(error => of(actions.loadOtherOperationsFailed({ error })))
         )
       )

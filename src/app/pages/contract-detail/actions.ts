@@ -26,7 +26,7 @@ export const resetCopyToClipboardState = createAction(`[${featureName}] Reset Co
 export const loadTransferOperations = createAction(`[${featureName}] Load Transfer Operations`, props<{ contract: TokenContract }>())
 export const loadTransferOperationsSucceeded = createAction(
   `[${featureName}] Load Transfer Operations Succeeded`,
-  props<{ transferOperations: ContractOperation[] }>()
+  props<{ data: ContractOperation[] }>()
 )
 export const loadTransferOperationsFailed = createAction(`[${featureName}] Load Transfer Operations Failed`, props<{ error: any }>())
 export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
@@ -35,7 +35,7 @@ export const loadMoreTransferOperations = createAction(`[${featureName}] Load Mo
 export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contract: TokenContract }>())
 export const loadOtherOperationsSucceeded = createAction(
   `[${featureName}] Load Other Operations Succeeded`,
-  props<{ otherOperations: ContractOperation[] }>()
+  props<{ data: ContractOperation[] }>()
 )
 export const loadOtherOperationsFailed = createAction(`[${featureName}] Load Other Operations Failed`, props<{ error: any }>())
 export const loadMoreOtherOperations = createAction(`[${featureName}] Load More Other Operations`)

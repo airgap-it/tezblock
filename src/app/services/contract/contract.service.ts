@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { forkJoin, from, Observable, pipe } from 'rxjs'
+import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
@@ -193,22 +193,28 @@ export class ContractService extends BaseService {
       limit
     }).pipe(
       switchMap(contractOperations =>
-        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters))).pipe(
-          map(response =>
-            contractOperations.map((contractOperation, index) => ({
-              ...contractOperation,
-              entrypoint: _get(response[index], 'entrypoint') // parameters_entrypoints
-            }))
-          )
-        )
+        contractOperations.length > 0
+          ? forkJoin(
+              contractOperations.map(contractOperation =>
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              )
+            ).pipe(
+              map(response =>
+                contractOperations.map((contractOperation, index) => ({
+                  ...contractOperation,
+                  entrypoint: _get(response[index], 'entrypoint'),
+                  symbol: contract.symbol,
+                  decimals: contract.decimals
+                }))
+              )
+            )
+          : of([])
       )
     )
   }
 
-  // TODO: remove apiService.getTransferOperationsForContract
   loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
     const faProtocol = getFaProtocol(contract, this.chainNetworkService)
-    // faProtocol.transferDetailsFromParameters()
 
     return this.post<ContractOperation[]>('operations', {
       predicates: transferPredicates(contract.id),
@@ -216,24 +222,31 @@ export class ContractService extends BaseService {
       limit
     }).pipe(
       switchMap(contractOperations =>
-        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters))).pipe(
-          map(response => contractOperations.map((contractOperation, index) => {
-            // const details = faProtocol.transferDetailsFromParameters({
-            //   entrypoint: _get(response[index], 'entrypoint'),
-            //   value: contractOperation.parameters_micheline ?? contractOperation.parameters
-            // })
-            const details = faProtocol.transferDetailsFromParameters(response[index])
+        contractOperations.length > 0
+          ? forkJoin(
+              contractOperations.map(contractOperation =>
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              )
+            ).pipe(
+              map(response =>
+                contractOperations.map((contractOperation, index) => {
+                  const details = faProtocol.transferDetailsFromParameters({
+                    entrypoint: contractOperation.parameters_entrypoints,
+                    value: response[index].value
+                  })
 
-            return {
-              ...contractOperation,
-              singleFrom: details.from,
-              singleTo: details.to,
-              amount: details.amount
-            }
-          })
-           
-          )
-        )
+                  return {
+                    ...contractOperation,
+                    from: details.from,
+                    to: details.to,
+                    amount: details.amount,
+                    symbol: contract.symbol,
+                    decimals: contract.decimals
+                  }
+                })
+              )
+            )
+          : of([])
       )
     )
   }

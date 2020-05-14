@@ -14,10 +14,10 @@ export const columns: {
   }) => [
     {
       name: 'From',
-      field: 'singleFrom',
+      field: 'from',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.from, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -26,10 +26,10 @@ export const columns: {
     },
     {
       name: 'To',
-      field: 'singleTo',
+      field: 'to',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.to, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
@@ -55,18 +55,18 @@ export const columns: {
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
-      data: (item: any) => ({ data: item.timestamp * 1000 }),
+      data: (item: any) => ({ data: item.timestamp }),
       sortable: true
     },
     {
       name: 'Block',
-      field: 'blockHeight',
+      field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
       name: 'Tx Hash',
-      field: 'hash',
+      field: 'operation_group_hash',
       template: Template.hash
     }
   ],
