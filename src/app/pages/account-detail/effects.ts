@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { from, of, forkJoin } from 'rxjs'
-import { map, catchError, filter, switchMap, take, tap, withLatestFrom } from 'rxjs/operators'
+import { distinctUntilChanged, map, catchError, filter, switchMap, take, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 
@@ -19,6 +19,7 @@ import { aggregateOperationCounts } from '@tezblock/domain/tab'
 import { getTokenContracts, hasTokenHolders } from '@tezblock/domain/contract'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { ContractService } from '@tezblock/services/contract/contract.service'
+import { BakingRatingResponse } from './model'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -168,7 +169,7 @@ export class AccountDetailEffects {
 
             // bug was reported so now I compare to undefined OR null, not only undefined
             if (bakingBadRating && tezosBakerFee) {
-              return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
+              return of(<BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
             }
 
             return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
@@ -217,7 +218,7 @@ export class AccountDetailEffects {
 
             // bug was reported so now I compare to undefined OR null, not only undefined
             if (tezosBakerRating && tezosBakerFee) {
-              return of(<actions.BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
+              return of(<BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
             }
 
             return from(this.bakingService.getTezosBakerInfos(address)).pipe(
@@ -305,6 +306,7 @@ export class AccountDetailEffects {
   onLoadAccountLoadContractAssets$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadAccount),
+      distinctUntilChanged((previous, current) => previous.address === current.address),
       map(() => actions.loadContractAssets())
     )
   )

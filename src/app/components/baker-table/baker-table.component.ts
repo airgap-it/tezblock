@@ -23,6 +23,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { ContractAsset } from '@tezblock/pages/account-detail/model'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -110,6 +111,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   @Input() bakerFee$: Observable<number>
 
+  @Input() contractAssets: ContractAsset[]
+
   rewardsColumns: Column[]
   rewardsFields: string[]
 
@@ -149,8 +152,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         const accountAddress = paramMap.get('id')
 
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
-        this.store$.dispatch(actions.loadBakingRights())
-        this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())

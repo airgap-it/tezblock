@@ -3,8 +3,8 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest } from 'rxjs'
-import { delay, map, filter, withLatestFrom, switchMap, reduce } from 'rxjs/operators'
+import { from, Observable, combineLatest, forkJoin } from 'rxjs'
+import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil, uniqBy } from 'lodash'
@@ -32,6 +32,11 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { ContractAsset } from './model'
+import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
+import { CurrencyConverterPipe, CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import * as appActions from '@tezblock/app.actions'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -114,7 +119,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
-  contractAssets$: Observable<actions.ContractAsset[]>
+  contractAssets$: Observable<ContractAsset[]>
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
 
@@ -210,6 +215,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
+    private readonly cryptoPricesService: CryptoPricesService,
+    private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
@@ -281,15 +288,28 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
     this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
-    this.contractAssets$ = this.store$.select(state => state.accountDetails.contractAssets.data)
+    this.contractAssets$ = this.store$
+      .select(state => state.accountDetails.contractAssets.data)
+      .pipe(filter(negate(isNil)), distinctUntilChanged())
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
-      filter(negate(isNil)),
-      map((contractAssets: actions.ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
+      map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
     )
-    this.contractAssetsBalance$ = this.contractAssets$.pipe(
-      filter(negate(isNil)),
-      map((contractAssets: actions.ContractAsset[]) =>
-        contractAssets.reduce((accumulator, currentItem) => accumulator + parseFloat(currentItem.amount), 0)
+    this.contractAssetsBalance$ = combineLatest(
+      this.contractAssets$, this.store$.select(state => state.app.exchangeRates)
+    ).pipe(
+      map(([contractAssets]) => contractAssets.filter(contractAsset => isConvertableToUSD(contractAsset.contract.symbol))),
+      switchMap(contractAssets =>
+        forkJoin(
+          contractAssets.map(contractAsset => this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol))
+        ).pipe(
+          map(currencyConverterArgs =>
+            currencyConverterArgs
+              .map((currencyConverterArg, index) =>
+                this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg)
+              )
+              .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
+          )
+        )
       )
     )
 
@@ -371,7 +391,19 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.store$
         .select(state => state.accountDetails.counts)
         .pipe(filter(counts => !!counts))
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+
+      this.contractAssets$
+        .pipe(
+          filter(contractAssets => contractAssets.some(contractAsset => isInBTC(contractAsset.contract.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 

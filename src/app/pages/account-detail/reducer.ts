@@ -13,6 +13,7 @@ import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadRes
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import { BakingRatingResponse, ContractAsset } from './model'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -64,7 +65,7 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
   get(feeByCycle => feeByCycle.value * 100)
 )
 
-export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
+export const fromBakingBadResponse = (response: BakingBadResponse, state: State): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.payoutAccuracy
       ? response.payoutAccuracy !== 'no_data'
@@ -78,7 +79,7 @@ export const fromMyTezosBakerResponse = (
   response: MyTezosBakerResponse,
   state: State,
   updateFee: boolean
-): actions.BakingRatingResponse => ({
+): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.rating
       ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
@@ -111,7 +112,7 @@ export interface State {
   tezosBakerFee: number
   temporaryBalance: Balance[]
   bakerReward: TezosPayoutInfo
-  contractAssets: TableState<actions.ContractAsset>
+  contractAssets: TableState<ContractAsset>
 }
 
 const initialState: State = {

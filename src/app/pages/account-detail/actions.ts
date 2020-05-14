@@ -8,17 +8,7 @@ import { Balance } from '@tezblock/services/api/api.service'
 import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { OperationErrorsById } from '@tezblock/domain/operations'
-import { TokenContract } from '@tezblock/domain/contract'
-
-export interface BakingRatingResponse {
-  bakingRating: string
-  tezosBakerFee: number
-}
-
-export interface ContractAsset {
-  contract: TokenContract
-  amount: string
-}
+import { BakingRatingResponse, ContractAsset } from './model'
 
 const featureName = 'Account Detail'
 

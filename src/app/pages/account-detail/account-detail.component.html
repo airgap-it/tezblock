@@ -108,7 +108,7 @@
                 </div>
                 <div class=" col-md-10 pl-sm-0">
                   <h5 class="mb-0">
-                    <amount-cell [data]="0" [options]="{ showFiatValue: false }"></amount-cell>
+                    <amount-cell [data]="contractAssetsBalance$ | async" [options]="{ showFiatValue: false }"></amount-cell>
                   </h5>
                 </div>
               </div>
