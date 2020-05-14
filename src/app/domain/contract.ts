@@ -10,6 +10,7 @@ import { get as fpGet } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { Currency, isInBTC } from '@tezblock/domain/airgap'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -38,11 +39,12 @@ export interface TokenContract {
   decimals?: number
 }
 
-export interface ContractOperation extends IAirGapTransaction {
-  singleFrom: string
-  singleTo: string
+export interface ContractOperation extends Transaction {
+  from: string
+  to: string
   parameters: string
-  symbol?: string
+  parameters_micheline: string
+  parameters_entrypoints: string
   decimals?: number
   entrypoint?: string
 }
@@ -78,13 +80,6 @@ export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): P
     total: data.length
   }
 }
-
-export const airGapTransactionToContractOperation = (airGapTransaction: IAirGapTransaction): ContractOperation => ({
-  ...airGapTransaction,
-  singleFrom: first(airGapTransaction.from),
-  singleTo: first(airGapTransaction.to),
-  parameters: undefined
-})
 
 export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOption[] => {
   if (!searchTerm) {

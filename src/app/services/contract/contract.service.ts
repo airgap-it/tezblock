@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { forkJoin, from, Observable, pipe } from 'rxjs'
+import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
@@ -13,10 +13,16 @@ import { getFaProtocol } from '@tezblock/domain/airgap'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
+    field: 'parameters_entrypoints',
+    operation: Operation.eq,
+    set: ['transfer'],
     inverse: false
+  },
+  {
+    field: 'parameters',
+    operation: Operation.isnull,
+    set: [],
+    inverse: true
   },
   {
     field: 'kind',
@@ -34,9 +40,9 @@ const transferPredicates = (contractHash: string): Predicate[] => [
 
 const otherPredicates = (contractHash: string): Predicate[] => [
   {
-    field: 'parameters',
-    operation: Operation.like,
-    set: ['"transfer"'],
+    field: 'parameters_entrypoints',
+    operation: Operation.eq,
+    set: ['transfer'],
     inverse: true
   },
   {
@@ -187,14 +193,60 @@ export class ContractService extends BaseService {
       limit
     }).pipe(
       switchMap(contractOperations =>
-        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters))).pipe(
-          map(response =>
-            contractOperations.map((contractOperation, index) => ({
-              ...contractOperation,
-              entrypoint: _get(response[index], 'entrypoint')
-            }))
-          )
-        )
+        contractOperations.length > 0
+          ? forkJoin(
+              contractOperations.map(contractOperation =>
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              )
+            ).pipe(
+              map(response =>
+                contractOperations.map((contractOperation, index) => ({
+                  ...contractOperation,
+                  entrypoint: _get(response[index], 'entrypoint'),
+                  symbol: contract.symbol,
+                  decimals: contract.decimals
+                }))
+              )
+            )
+          : of([])
+      )
+    )
+  }
+
+  loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
+
+    return this.post<ContractOperation[]>('operations', {
+      predicates: transferPredicates(contract.id),
+      orderBy: [orderBy],
+      limit
+    }).pipe(
+      switchMap(contractOperations =>
+        contractOperations.length > 0
+          ? forkJoin(
+              contractOperations.map(contractOperation =>
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              )
+            ).pipe(
+              map(response =>
+                contractOperations.map((contractOperation, index) => {
+                  const details = faProtocol.transferDetailsFromParameters({
+                    entrypoint: contractOperation.parameters_entrypoints,
+                    value: response[index].value
+                  })
+
+                  return {
+                    ...contractOperation,
+                    from: details.from,
+                    to: details.to,
+                    amount: details.amount,
+                    symbol: contract.symbol,
+                    decimals: contract.decimals
+                  }
+                })
+              )
+            )
+          : of([])
       )
     )
   }
