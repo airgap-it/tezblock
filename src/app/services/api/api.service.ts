@@ -1519,12 +1519,6 @@ export class ApiService {
       )
   }
 
-  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService)
-
-    return from(protocol.getTotalSupply())
-  }
-
   getErrorsForOperations(operations: Transaction[]): Observable<OperationErrorsById[]> {
     const distinctBlockLevels = operations.map(operation => operation.block_level).filter(distinctFilter)
     const contentWithError = (content: RPCContent): boolean =>

@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, forkJoin } from 'rxjs'
-import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
+import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil, uniqBy } from 'lodash'
@@ -31,12 +31,12 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
-import { CurrencyConverterPipe, CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import * as appActions from '@tezblock/app.actions'
+import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -114,7 +114,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  transactions$: Observable<Transaction[]>
+  transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
@@ -122,6 +122,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   contractAssets$: Observable<ContractAsset[]>
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
+  getPrecision = getPrecision
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -270,8 +271,25 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
-    this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
-    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
+    this.transactions$ = this.store$
+      .select(state => state.accountDetails.kind)
+      .pipe(
+        switchMap(kind =>
+          kind !== 'assets'
+            ? this.store$.select(state => state.accountDetails.transactions.data)
+            : this.store$.select(state => state.accountDetails.contractAssets.data)
+        ),
+        filter(negate(isNil))
+      )
+    this.areTransactionsLoading$ = this.store$
+      .select(state => state.accountDetails.kind)
+      .pipe(
+        switchMap(kind =>
+          kind !== 'assets'
+            ? this.store$.select(state => state.accountDetails.transactions.loading)
+            : this.store$.select(state => state.accountDetails.contractAssets.loading)
+        )
+      )
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
       map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
@@ -295,12 +313,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
     )
     this.contractAssetsBalance$ = combineLatest(
-      this.contractAssets$, this.store$.select(state => state.app.exchangeRates)
+      this.contractAssets$,
+      this.store$.select(state => state.app.exchangeRates)
     ).pipe(
       map(([contractAssets]) => contractAssets.filter(contractAsset => isConvertableToUSD(contractAsset.contract.symbol))),
       switchMap(contractAssets =>
         forkJoin(
-          contractAssets.map(contractAsset => this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol))
+          contractAssets.map(contractAsset =>
+            this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
+          )
         ).pipe(
           map(currencyConverterArgs =>
             currencyConverterArgs
@@ -448,7 +469,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   tabSelected(kind: string) {
-    this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
+    if (kind !== 'assets') {
+      this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
+      return
+    }
+    
+    this.store$.dispatch(actions.setKind({ kind }))
   }
 
   onLoadMore() {
@@ -498,6 +524,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
+  showAssets() {
+    this.store$.dispatch(actions.setKind({ kind: 'assets' }))
+    this.tabs = this.tabs.map(tab => ({
+      ...tab,
+      active: tab.kind === 'assets'
+    }))
+  }
+
   private setTabs(pageId: string) {
     this.tabs = [
       {
@@ -540,6 +574,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Assets',
+        active: false,
+        kind: 'assets',
+        count: undefined,
+        icon: this.iconPipe.transform('link'),
+        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }

@@ -26,7 +26,7 @@ export class ContractDetailEffects {
         const contract = getTokenContractByAddress(address, this.chainNetworkService.getNetwork())
 
         if (contract) {
-          return this.apiService.getTotalSupplyByContract(contract).pipe(
+          return this.contractService.getTotalSupplyByContract(contract).pipe(
             map(totalSupply => actions.loadContractSucceeded({ contract: { ...contract, totalSupply } })),
             catchError(error => of(actions.loadContractFailed({ error })))
           )

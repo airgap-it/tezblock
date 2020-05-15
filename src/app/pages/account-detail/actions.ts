@@ -93,4 +93,6 @@ export const loadContractAssetsSucceeded = createAction(
 )
 export const loadContractAssetsFailed = createAction(`[${featureName}] Load Contract Assets Failed`, props<{ error: any }>())
 
+export const setKind = createAction(`[${featureName}] Set Kind`, props<{ kind: string }>())
+
 export const reset = createAction(`[${featureName}] Reset`)

@@ -7,5 +7,5 @@ export interface BakingRatingResponse {
 
 export interface ContractAsset {
   contract: TokenContract
-  amount: string
+  amount: number
 }

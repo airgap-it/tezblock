@@ -306,7 +306,8 @@ export class AccountDetailEffects {
   onLoadAccountLoadContractAssets$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadAccount),
-      distinctUntilChanged((previous, current) => previous.address === current.address),
+      withLatestFrom(this.store$.select(state => state.accountDetails.contractAssets.data)),
+      filter(([action, contractAssets]) => contractAssets === undefined),
       map(() => actions.loadContractAssets())
     )
   )
@@ -321,18 +322,18 @@ export class AccountDetailEffects {
             .data.filter(hasTokenHolders)
             .map(contract =>
               this.contractService.loadTokenHolders(contract).pipe(
-                map(tokenHolders =>
-                  tokenHolders
-                    .filter(tokenHolder => tokenHolder.address === address)
-                    .map(tokenHolder => ({
-                      contract,
-                      amount: tokenHolder.amount
-                    }))
+                map(tokenHolders => ({
+                  contract,
+                  amount: tokenHolders
+                  .filter(tokenHolder => tokenHolder.address === address)
+                  .map(tokenHolder => parseFloat(tokenHolder.amount)).reduce((a, b) => a + b, 0)
+                })
                 )
               )
             )
         ).pipe(
-          map(assets => actions.loadContractAssetsSucceeded({ data: flatten(assets) })),
+          map(data => data.filter(item => item.amount > 0)),
+          map(data => actions.loadContractAssetsSucceeded({ data })),
           catchError(error => of(actions.loadContractAssetsFailed({ error })))
         )
       )

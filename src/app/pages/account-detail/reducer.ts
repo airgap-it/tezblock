@@ -39,12 +39,7 @@ const ensure30Days = (balance: Balance[]): Balance[] => {
   const attachBalance = (date: number): Balance =>
     balance.find(getBalanceFrom(date)) || getPreviousBalance(balance, date) || { balance: 0, asof: date }
 
-  return range(0, 30).map(
-    pipe(
-      toDay,
-      attachBalance
-    )
-  )
+  return range(0, 30).map(pipe(toDay, attachBalance))
 }
 
 const ratingNumberToLabel = [
@@ -75,11 +70,7 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
   tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
 })
 
-export const fromMyTezosBakerResponse = (
-  response: MyTezosBakerResponse,
-  state: State,
-  updateFee: boolean
-): BakingRatingResponse => ({
+export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.rating
       ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
@@ -261,7 +252,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
-    counts
+    counts: (counts || []).concat([{ key: 'assets', count: state.contractAssets.pagination.total }])
   })),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
@@ -299,9 +290,14 @@ export const reducer = createReducer(
   })),
   on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
     ...state,
+    counts: (state.counts || []).filter(count => count.key !== 'assets').concat([{ key: 'assets', count: data.length }]),
     contractAssets: {
       ...state.contractAssets,
       data,
+      pagination: {
+        ...state.contractAssets.pagination,
+        total: data.length
+      },
       loading: false
     }
   })),
@@ -312,6 +308,10 @@ export const reducer = createReducer(
       data: null,
       loading: false
     }
+  })),
+  on(actions.setKind, (state, { kind }) => ({
+    ...state,
+    kind
   })),
   on(actions.reset, () => initialState)
 )

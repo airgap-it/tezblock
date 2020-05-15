@@ -254,4 +254,10 @@ export class ContractService extends BaseService {
   loadTokenHolders(contract: TokenContract): Observable<TokenHolder[]> {
     return from(getContractProtocol(contract, this.chainNetworkService).fetchTokenHolders())
   }
+
+  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
+    const protocol = getFaProtocol(contract, this.chainNetworkService)
+
+    return from(protocol.getTotalSupply())
+  }
 }
