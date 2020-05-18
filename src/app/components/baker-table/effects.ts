@@ -49,7 +49,7 @@ export class BakerTableEffects {
       ofType(actions.loadEndorsingRights),
       withLatestFrom(
         this.store$.select(state => state.bakerTable.accountAddress),
-        this.store$.select(state => state.bakerTable.bakingRights.pagination)
+        this.store$.select(state => state.bakerTable.endorsingRights.pagination)
       ),
       switchMap(([action, accountAddress, pagination]) =>
         this.apiService.getAggregatedEndorsingRights(accountAddress, pagination.selectedSize * pagination.currentPage).pipe(

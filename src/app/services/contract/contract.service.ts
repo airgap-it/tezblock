@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { forkJoin, Observable, pipe } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
+import { get as _get } from 'lodash'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
-import { ContractOperation } from '@tezblock/domain/contract'
+import { ContractOperation, TokenContract } from '@tezblock/domain/contract'
+import { getFaProtocol } from '@tezblock/domain/airgap'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -142,11 +144,24 @@ export class ContractService extends BaseService {
     ).pipe(map(([transferTotal, otherTotal]) => ({ transferTotal, otherTotal })))
   }
 
-  loadOtherOperations(contractHash: string, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+  loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
+
     return this.post<ContractOperation[]>('operations', {
-      predicates: otherPredicates(contractHash),
+      predicates: otherPredicates(contract.id),
       orderBy: [orderBy],
       limit
-    })
+    }).pipe(
+      switchMap(contractOperations =>
+        forkJoin(contractOperations.map(contractOperation => faProtocol.normalizeTransactionParameters(contractOperation.parameters))).pipe(
+          map(response =>
+            contractOperations.map((contractOperation, index) => ({
+              ...contractOperation,
+              entrypoint: _get(response[index], 'entrypoint')
+            }))
+          )
+        )
+      )
+    )
   }
 }

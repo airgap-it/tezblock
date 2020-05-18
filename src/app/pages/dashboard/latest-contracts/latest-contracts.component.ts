@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Router } from '@angular/router'
 
-import { TokenContract, getConventer } from '@tezblock/domain/contract'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { TokenContract } from '@tezblock/domain/contract'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 @Component({
@@ -19,10 +18,6 @@ export class LatestContractsComponent implements OnInit {
   constructor(private readonly router: Router) {}
 
   ngOnInit() {
-  }
-
-  getConventer(contract: TokenContract): Conventer {
-    return getConventer(contract)
   }
 
   inspectDetail(contractHash: string) {

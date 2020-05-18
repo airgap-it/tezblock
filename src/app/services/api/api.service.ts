@@ -33,6 +33,7 @@ import { CacheService, CacheKeys, ByAddressState, ByBlockState, ByProposalState,
 import { squareBrackets } from '@tezblock/domain/pattern'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
+import { getFaProtocol } from '@tezblock/domain/airgap'
 
 export interface OperationCount {
   [key: string]: string
@@ -1006,6 +1007,25 @@ export class ApiService {
     )
   }
 
+  getBlocksOfIds(blockIds: number[]): Observable<Block[]> {
+    const limit = blockIds.length
+    return this.http.post<Block[]>(
+      this.blocksApiUrl,
+      {
+        predicates: [
+          {
+            field: 'level',
+            operation: 'in',
+            set: blockIds,
+            inverse: false
+          }
+        ],
+        limit: limit
+      },
+      this.options
+    )
+  }
+
   getBlockByHash(hash: string): Observable<Block> {
     return this.cacheService.get<ByBlockState>(CacheKeys.byBlock).pipe(
       switchMap(byBlockCache => {
@@ -1481,7 +1501,7 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = this.getFaProtocol(contract)
+    const protocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
 
     return from(protocol.getTransactions(10, cursor))
   }
@@ -1619,7 +1639,7 @@ export class ApiService {
   }
 
   getTotalSupplyByContract(contract: TokenContract): Observable<string> {
-    const protocol = this.getFaProtocol(contract)
+    const protocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
 
     return from(protocol.getTotalSupply())
   }
@@ -1669,25 +1689,5 @@ export class ApiService {
         return x //TODO remove this map
       })
     )
-  }
-
-  private getFaProtocol(contract: TokenContract): TezosFAProtocol {
-    return new TezosFAProtocol({
-      symbol: contract.symbol,
-      name: contract.name,
-      marketSymbol: contract.symbol,
-      identifier: '', // not important in this context can be empty string
-      contractAddress: contract.id,
-      jsonRPCAPI: this.environmentUrls.rpcUrl,
-      baseApiUrl: this.environmentUrls.conseilUrl,
-      baseApiKey: this.environmentUrls.conseilApiKey,
-      baseApiNetwork: this.chainNetworkService.getEnvironmentVariable(),
-      network: this.chainNetworkService.getNetwork(),
-      feeDefaults: {
-        low: '0',
-        medium: '0',
-        high: '0'
-      }
-    })
   }
 }

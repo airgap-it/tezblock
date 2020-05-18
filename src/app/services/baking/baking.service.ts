@@ -10,7 +10,6 @@ import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse, Baker } from 'src/app/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { get } from '@tezblock/services/fp'
 import { get as _get } from 'lodash'
 import { CurrentCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
@@ -118,19 +117,6 @@ export class BakingService {
           (/* error */) => resolve({ status: 'error' })
         )
     })
-  }
-
-  async checkDelegated(address: string): Promise<DelegationInfo> {
-    const network = this.chainNetworkService.getNetwork()
-    const protocol = new TezosKtProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      this.environmentUrls.conseilApiKey
-    )
-
-    return protocol.isAddressDelegated(address)
   }
 
   async getBakerInfos(tzAddress: string) {
