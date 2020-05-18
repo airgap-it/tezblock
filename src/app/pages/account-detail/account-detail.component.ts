@@ -3,7 +3,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, forkJoin } from 'rxjs'
+import { from, Observable, combineLatest, forkJoin, of } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
@@ -37,6 +37,7 @@ import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/curren
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { get } from '@tezblock/services/fp'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -316,21 +317,25 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.contractAssets$,
       this.store$.select(state => state.app.exchangeRates)
     ).pipe(
-      map(([contractAssets]) => contractAssets.filter(contractAsset => isConvertableToUSD(contractAsset.contract.symbol))),
+      map(([contractAssets]) => contractAssets),
       switchMap(contractAssets =>
-        forkJoin(
-          contractAssets.map(contractAsset =>
-            this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
-          )
-        ).pipe(
-          map(currencyConverterArgs =>
-            currencyConverterArgs
-              .map((currencyConverterArg, index) =>
-                this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg)
+        get<ContractAsset[]>(_contractAssets => _contractAssets.length > 0)(contractAssets)
+          ? forkJoin(
+              contractAssets.map(contractAsset =>
+                isConvertableToUSD(contractAsset.contract.symbol)
+                  ? this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
+                  : of(null)
               )
-              .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
-          )
-        )
+            ).pipe(
+              map(currencyConverterArgs =>
+                currencyConverterArgs
+                  .map((currencyConverterArg, index) =>
+                    currencyConverterArg ? this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg) : 0
+                  )
+                  .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
+              )
+            )
+          : of(0)
       )
     )
 
@@ -473,7 +478,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
       return
     }
-    
+
     this.store$.dispatch(actions.setKind({ kind }))
   }
 

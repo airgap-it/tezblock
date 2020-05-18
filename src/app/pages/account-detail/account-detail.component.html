@@ -102,18 +102,28 @@
                 </ng-container>
               </div>
 
-              <div *ngIf="(numberOfContractAssets$ | async) > 0" class="row mb-3">
+              <div class="row mb-3">
                 <div class=" col-md-2 pr-0">
                   <p class="text-secondary mb-0">Assets</p>
                 </div>
                 <div class=" col-md-10 pl-sm-0">
-                  <span class="h5">
-                    ${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) }}
+                  <span class="h5">${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) }}</span>
+                  <span
+                    class="badge badge-pill d-none d-sm-inline-block"
+                    [ngClass]="{
+                      'badge-primary': (numberOfContractAssets$ | async) > 0,
+                      'badge-primary-light': (numberOfContractAssets$ | async) === 0
+                    }"
+                  >
+                    {{ numberOfContractAssets$ | async }}
                   </span>
-                  <span class="badge badge-pill d-none d-sm-inline-block badge-primary">{{ numberOfContractAssets$ | async }}</span>
-                  <a class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block" (click)="showAssets()">
+                  <button
+                    (click)="showAssets()"
+                    [disabled]="(numberOfContractAssets$ | async) === 0"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-none d-sm-inline-block"
+                  >
                     <fa-icon [icon]="'qrcode' | iconPipe" class="text-secondary"></fa-icon>
-                  </a>
+                  </button>
                 </div>
               </div>
 
