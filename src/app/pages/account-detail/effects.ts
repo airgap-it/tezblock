@@ -62,12 +62,12 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
+      filter(({ kind }) => kind !== 'assets'),
       withLatestFrom(
         this.store$.select(state => state.accountDetails.transactions.pagination),
         this.store$.select(state => state.accountDetails.address),
         this.store$.select(state => state.accountDetails.transactions.orderBy)
       ),
-
       switchMap(([{ kind }, pagination, address, orderBy]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
           map(data => actions.loadTransactionsByKindSucceeded({ data })),

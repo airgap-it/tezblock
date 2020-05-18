@@ -31,7 +31,8 @@ import {
   faGraduationCap,
   faCircle,
   faChevronLeft,
-  faChevronRight
+  faChevronRight,
+  faExpand
 } from '@fortawesome/free-solid-svg-icons'
 
 export const addFontAwesome = () => {
@@ -72,6 +73,7 @@ export const addFontAwesome = () => {
     faGraduationCap,
     faCircle,
     faChevronLeft,
-    faChevronRight
+    faChevronRight,
+    faExpand
   )
 }
