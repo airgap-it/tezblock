@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { DelegationInfo, TezosKtProtocol } from 'airgap-coin-lib'
 import * as moment from 'moment'
 import { Observable, of } from 'rxjs'
 import { map, switchMap, tap } from 'rxjs/operators'
@@ -103,19 +102,6 @@ export class BakingService extends BaseService {
           (/* error */) => resolve({ status: 'error' })
         )
     })
-  }
-
-  async checkDelegated(address: string): Promise<DelegationInfo> {
-    const network = this.chainNetworkService.getNetwork()
-    const protocol = new TezosKtProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      this.environmentUrls.conseilApiKey
-    )
-
-    return protocol.isAddressDelegated(address)
   }
 
   getBakerInfos(tzAddress: string): Observable<any> {
