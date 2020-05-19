@@ -12,6 +12,7 @@ import { OperationErrorsById } from '@tezblock/domain/operations'
 export interface BakingRatingResponse {
   bakingRating: string
   tezosBakerFee: number
+  stakingCapacity?: number
 }
 
 const featureName = 'Account Detail'

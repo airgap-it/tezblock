@@ -71,7 +71,8 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
         ? response.payoutAccuracy
         : null
       : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  stakingCapacity: response.stakingCapacity
 })
 
 export const fromMyTezosBakerResponse = (
@@ -94,6 +95,7 @@ export interface Busy {
 export interface BakerTableRatings {
   bakingBadRating: string
   tezosBakerRating: string
+  stakingCapacity?: number
 }
 
 export interface State {
@@ -236,7 +238,8 @@ export const reducer = createReducer(
     ...state,
     bakerTableRatings: {
       ...state.bakerTableRatings,
-      bakingBadRating: response.bakingRating
+      bakingBadRating: response.bakingRating,
+      stakingCapacity: response.stakingCapacity
     },
     tezosBakerFee: response.tezosBakerFee,
     busy: {

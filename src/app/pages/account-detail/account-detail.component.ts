@@ -3,7 +3,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge } from 'rxjs'
+import { from, Observable, combineLatest } from 'rxjs'
 import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
@@ -32,6 +32,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { get } from '@tezblock/services/fp'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -361,25 +362,45 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   getBakingInfos(address: string) {
-    this.bakingService.getBakerInfos(address).then(result => {
-      const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
-
-      this.bakerTableInfos = result
-        ? {
-            stakingBalance: result.stakingBalance,
-            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-            stakingCapacity: result.stakingCapacity,
-            stakingProgress: Math.min(100, result.stakingProgress),
-            stakingBond: result.selfBond,
-            payoutAddress
-          }
-        : {
-            payoutAddress
-          }
-    })
+    const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
     this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
+
+    this.subscriptions.push(
+      this.store$
+        .select(state => state.accountDetails.bakerTableRatings)
+        .pipe(
+          map(bakerTableRatings => get<BakerTableRatings>(bakerTableRatings => bakerTableRatings.stakingCapacity)(bakerTableRatings)),
+          filter(negate(isNil)),
+          switchMap(stakingCapacity =>
+            this.bakingService.getBakerInfos(address).pipe(
+              map(bakerInfos => {
+                if (!bakerInfos) {
+                  return null
+                }
+
+                const stakingBalance: number = bakerInfos.staking_balance
+                const stakingProgress: number = Math.min(100, (1 - (stakingCapacity - stakingBalance) / stakingCapacity) * 100)
+                const stakingBond: number = bakerInfos.staking_balance - bakerInfos.delegated_balance
+
+                return {
+                  stakingBalance: bakerInfos.staking_balance,
+                  numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
+                  stakingCapacity,
+                  stakingProgress,
+                  stakingBond
+                }
+              })
+            )
+          )
+        )
+        .subscribe(bakerInfos => {
+          this.bakerTableInfos = bakerInfos ?? {
+            payoutAddress
+          }
+        })
+    )
   }
 
   private setRewardAmont() {
