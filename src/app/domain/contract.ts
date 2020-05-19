@@ -147,24 +147,25 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
 }
 
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
-export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> => 
-  forkJoin(transactions.map(transaction => {
+export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> =>
+  forkJoin(
+    transactions.map(transaction => {
       const contract: TokenContract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
-      if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters) {
+      if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
         const faProtocol = getFaProtocol(contract, chainNetworkService)
 
-        return from(faProtocol.normalizeTransactionParameters(transaction.parameters)).pipe(
+        return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
           map(normalizedParameters => {
             if (normalizedParameters.entrypoint === 'transfer') {
               const transferDetails = faProtocol.transferDetailsFromParameters(normalizedParameters)
               return {
-                  ...transaction,
-                  source: transferDetails.from,
-                  destination: transferDetails.to,
-                  amount: parseFloat(transferDetails.amount),
-                  symbol: contract.symbol
-                }
+                ...transaction,
+                source: transferDetails.from,
+                destination: transferDetails.to,
+                amount: parseFloat(transferDetails.amount),
+                symbol: contract.symbol
+              }
             }
 
             return transaction
@@ -173,4 +174,5 @@ export const fillTransferOperations = (transactions: Transaction[], chainNetwork
       }
 
       return of(transaction)
-    }))
+    })
+  )

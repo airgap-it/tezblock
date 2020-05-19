@@ -30,6 +30,7 @@ export interface Transaction {
   kind: string
   gas_limit?: any
   parameters?: any
+  parameters_micheline?: any
   destination?: any
   fee: number
   level: number
