@@ -1,8 +1,8 @@
 import { createAction, props } from '@ngrx/store'
+import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
-import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
-import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
-import { Reward } from '@tezblock/domain/reward'
+import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRewardsDetail, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 export interface LevelInTime {
@@ -68,7 +68,7 @@ export const loadActiveDelegationsSucceeded = createAction(
 export const loadActiveDelegationsFailed = createAction(`[${featureName}] Load Active Delegations Failed`, props<{ error: any }>())
 
 export const loadRewards = createAction(`[${featureName}] Load Rewards`)
-export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: Reward[] }>())
+export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: TezosRewards[] }>())
 export const loadRewardsFailed = createAction(`[${featureName}] Load Rewards Failed`, props<{ error: any }>())
 export const increaseRewardsPageSize = createAction(`[${featureName}] Change Rewards Page Size`)
 
@@ -78,6 +78,18 @@ export const loadVotes = createAction(`[${featureName}] Load Votes`)
 export const loadVotesSucceeded = createAction(`[${featureName}] Load Votes Succeeded`, props<{ data: Transaction[] }>())
 export const loadVotesFailed = createAction(`[${featureName}] Load Votes Failed`, props<{ error: any }>())
 export const increaseVotesPageSize = createAction(`[${featureName}] Change Votes Page Size`)
+
+export const loadBakerReward = createAction(`[${featureName}] Load Baker Rewards`, props<{ baker: string, cycle: number }>())
+export const loadBakerRewardSucceeded = createAction(`[${featureName}] Load Baker Rewards Succeeded`, props<{ cycle: number, bakerReward: TezosPayoutInfo }>())
+export const loadBakerRewardFailed = createAction(`[${featureName}] Load Baker Rewards Failed`, props<{ cycle: number, error: any }>())
+
+export const loadEndorsingRightItems = createAction(`[${featureName}] Load Endorsing Right Items`, props<{ baker: string, cycle: number, endorsingRewardsDetails: EndorsingRewardsDetail[] }>())
+export const loadEndorsingRightItemsSucceeded = createAction(`[${featureName}] Load Endorsing Right Items Succeeded`, props<{ cycle: number, endorsingRightItems: EndorsingRights[] }>())
+export const loadEndorsingRightItemsFailed = createAction(`[${featureName}] Load Endorsing Right Items Failed`, props<{ cycle: number, error: any }>())
+
+export const loadBakingRightItems = createAction(`[${featureName}] Load Baking Right Items`, props<{ baker: string, cycle: number, bakingRewardsDetails: BakingRewardsDetail[] }>())
+export const loadBakingRightItemsSucceeded = createAction(`[${featureName}] Load Baking Right Items Succeeded`, props<{ cycle: number, bakingRightItems: BakingRights[] }>())
+export const loadBakingRightItemsFailed = createAction(`[${featureName}] Load Baking Right Items Failed`, props<{ cycle: number, error: any }>())
 
 export const kindChanged = createAction(`[${featureName}] Kind Changed`, props<{ kind: string }>())
 

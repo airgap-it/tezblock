@@ -2,6 +2,7 @@ import { createReducer, on } from '@ngrx/store'
 import { pipe } from 'rxjs'
 import { range } from 'lodash'
 import * as moment from 'moment'
+import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
@@ -87,6 +88,7 @@ export const fromMyTezosBakerResponse = (
 
 export interface Busy {
   rewardAmont: boolean
+  bakerReward: boolean
 }
 
 export interface BakerTableRatings {
@@ -108,6 +110,7 @@ export interface State {
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
   temporaryBalance: Balance[]
+  bakerReward: TezosPayoutInfo
 }
 
 const initialState: State = {
@@ -120,12 +123,14 @@ const initialState: State = {
   kind: undefined,
   rewardAmont: undefined,
   busy: {
-    rewardAmont: false
+    rewardAmont: false,
+    bakerReward: false
   },
   balanceFromLast30Days: undefined,
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
-  temporaryBalance: undefined
+  temporaryBalance: undefined,
+  bakerReward: undefined
 }
 
 export const reducer = createReducer(
@@ -258,6 +263,29 @@ export const reducer = createReducer(
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
     transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
+  })),
+  on(actions.loadBakerReward, state => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      bakerReward: true
+    }
+  })),
+  on(actions.loadBakerRewardSucceeded, (state, { bakerReward }) => ({
+    ...state,
+    bakerReward,
+    busy: {
+      ...state.busy,
+      bakerReward: false
+    }
+  })),
+  on(actions.loadBakerRewardFailed, state => ({
+    ...state,
+    bakerReward: null,
+    busy: {
+      ...state.busy,
+      bakerReward: false
+    }
   })),
   on(actions.reset, () => initialState)
 )

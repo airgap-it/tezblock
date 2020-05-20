@@ -2,8 +2,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core
 import { Store } from '@ngrx/store'
 import { Observable } from 'rxjs'
 
-import { getConventer, TokenContract, ContractOperation } from '@tezblock/domain/contract'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { TokenContract, ContractOperation } from '@tezblock/domain/contract'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 
@@ -34,9 +33,5 @@ export class LatestContractsTransactionsComponent implements OnInit {
 
   ngOnInit() {
     this.transferOperations$ = this.store$.select(state => state.dashboardLatestContractsTransactions.transferOperations)
-  }
-
-  getConventer(contract: ContractOperation): Conventer {
-    return getConventer(contract)
   }
 }

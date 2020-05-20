@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { combineLatest, from, Observable, EMPTY } from 'rxjs'
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
+import { ActivatedRoute } from '@angular/router'
+import { TezosNetwork, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -11,7 +11,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
 import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
-import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import * as fromRoot from '@tezblock/reducers'
@@ -21,7 +21,10 @@ import { Column, Template, ExpandedRow } from '@tezblock/components/tezblock-tab
 import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
+import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
+import { RewardService } from '@tezblock/services/reward/reward.service'
 
+// TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
   rewards.map(reward => ({
     ...reward,
@@ -43,6 +46,7 @@ const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
 })
 export class BakerTableComponent extends BaseComponent implements OnInit {
   @ViewChild('expandedRowTemplate', { static: true }) expandedRowTemplate: TemplateRef<any>
+  @ViewChild('rewardsExpandedRowHeaderTemplate', { static: true }) rewardsExpandedRowHeaderTemplate: TemplateRef<any>
   private _tabs: Tab[] | undefined = []
   selectedTab: Tab | undefined = undefined
   transactions$: Observable<Transaction[]>
@@ -51,12 +55,15 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<Reward[]>
+  rewards$: Observable<TezosRewards[]>
+  bakerReward$: Observable<{ [key: string]: TezosPayoutInfo }>
+  isBakerRewardBusy$: Observable<{ [key: string]: boolean }>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
   upcomingRights$: Observable<actions.UpcomingRights>
   upcomingRightsLoading$: Observable<boolean>
   votes$: Observable<Transaction[]>
   votesLoading$: Observable<boolean>
+  votesShowLoadMore$: Observable<boolean>
 
   efficiencyLast10Cycles$: Observable<number>
   efficiencyLast10CyclesLoading$: Observable<boolean>
@@ -65,7 +72,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   isRightsTabAvailable$: Observable<boolean>
 
   frozenBalance$: Observable<number>
-  rewardsExpandedRow: ExpandedRow<Reward>
+  rewardsExpandedRow: ExpandedRow<TezosRewards>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
@@ -85,8 +92,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     if (!this.selectedTab) {
       this.updateSelectedTab(tabs[0])
     }
-
-    this.getTabCount(tabs)
   }
 
   get tabs() {
@@ -96,6 +101,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       return []
     }
   }
+
+  @Input() address: string
 
   @Input() data: any
 
@@ -127,10 +134,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly route: ActivatedRoute,
-    private readonly router: Router,
-    private readonly chainNetworkService: ChainNetworkService,
     private readonly apiService: ApiService,
+    private readonly route: ActivatedRoute,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -158,24 +165,27 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       .pipe(
         switchMap(kind => {
           if (kind === OperationTypes.BakingRights) {
-            return this.store$.select(state => state.bakerTable.bakingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.bakingRights.data)
           }
 
           if (kind === OperationTypes.EndorsingRights) {
-            return this.store$.select(state => state.bakerTable.endorsingRights).pipe(map(table => table.data))
+            return this.store$.select(state => state.bakerTable.endorsingRights.data)
           }
 
           return EMPTY
         })
       )
 
-    this.rewards$ = combineLatest(
-      this.store$.select(state => state.bakerTable.rewards.data).pipe(map(data => data || [])),
-      this.bakerFee$
-    ).pipe(
-      filter(([rewards, bakerFee]) => bakerFee !== undefined),
-      map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
-    )
+    this.rewards$ = this.store$.select(state => state.bakerTable.rewards.data)
+    // combineLatest(
+    //   this.store$.select(state => state.bakerTable.rewards.data),
+    //   this.bakerFee$
+    // ).pipe(
+    //   filter(([rewards, bakerFee]) => bakerFee !== undefined),
+    //   map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
+    // )
+    this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
+    this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
     this.rightsLoading$ = combineLatest(
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
@@ -200,6 +210,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       )
     this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
     this.votesLoading$ = this.store$.select(state => state.bakerTable.votes.loading)
+    this.votesShowLoadMore$ = this.store$
+      .select(state => state.bakerTable.votes)
+      .pipe(map(votes => (votes.data || []).length !== votes.pagination.total))
 
     this.setupExpandedRows()
     this.setupTables()
@@ -258,42 +271,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
   }
 
-  getTabCount(tabs: Tab[]) {
-    let ownId: string = this.router.url
-    const split = ownId.split('/')
-    ownId = split.slice(-1).pop()
-
-    const aggregateFunction = info => {
-      let tab = tabs.find(tabArgument => tabArgument.kind === info.kind)
-      if (info.kind === 'proposals') {
-        tab = tabs.find(tabArgument => tabArgument.kind === 'ballot')
-      }
-      if (tab) {
-        const count = parseInt(info.count_operation_group_hash, 10)
-        tab.count = tab.count ? tab.count + count : count
-      }
-    }
-
-    const setFirstActiveTab = () => {
-      const firstActiveTab = this.tabs.find(tab => tab.count > 0)
-      if (firstActiveTab) {
-        this.selectTab(firstActiveTab)
-      }
-    }
-
-    if (this.page === 'transaction') {
-      const transactionPromise = this.apiService.getOperationCount('operation_group_hash', ownId).toPromise()
-
-      transactionPromise
-        .then(transactionCounts => {
-          transactionCounts.forEach(aggregateFunction)
-
-          setFirstActiveTab()
-        })
-        .catch(console.error)
-    }
-  }
-
   loadMoreRights() {
     this.store$.dispatch(actions.increaseRightsPageSize())
   }
@@ -312,6 +289,12 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     }
 
     return tab.disabled()
+  }
+
+  onRowExpanded(reward: TezosRewards) {
+    const { baker, cycle } = reward
+
+    this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
   }
 
   private updateSelectedTab(selectedTab: Tab) {
@@ -333,24 +316,25 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private setupExpandedRows() {
     this.rewardsExpandedRow = {
       template: this.expandedRowTemplate,
-      getContext: (item: Reward) => ({
+      getContext: (item: TezosRewards) => ({
         columns: [
           {
             name: 'Delegator Account',
             field: 'delegator',
             template: Template.address,
-            data: (item: Payout) => ({ data: item.delegator, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: item.delegator })
           },
           {
             name: 'Payout',
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: { amount: item.payout }, options: { showFiatValue: true } })
+            data: (item: Payout) => ({ data: item.payout })
           },
           { name: 'Share', field: 'share', template: Template.percentage }
         ],
-        data: item.payouts,
-        filterCondition: (detail, query) => detail.delegator === query
+        dataSource: this.getRewardsInnerDataSource(item.cycle),
+        headerTemplate: this.rewardsExpandedRowHeaderTemplate,
+        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
       }),
       primaryKey: 'cycle'
     }
@@ -367,17 +351,22 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: BakingRights) => ({ data: { amount: item.rewards } })
+            data: (item: BakingRights) => ({ data: item.rewards })
           },
-          { name: 'Fees', field: 'fees', template: Template.amount, data: (item: BakingRights) => ({ data: { amount: item.fees } }) },
+          {
+            name: 'Fees',
+            field: 'fees',
+            template: Template.amount,
+            data: (item: BakingRights) => ({ data: item.fees, options: { digitsInfo: '1.2-2' } })
+          },
           {
             name: 'Deposits',
             field: 'deposit',
             template: Template.amount,
-            data: (item: BakingRights) => ({ data: { amount: item.deposit } })
+            data: (item: BakingRights) => ({ data: item.deposit })
           }
         ],
-        data: item.items
+        dataSource: this.getBakingRightsInnerDataSource(item)
       }),
       primaryKey: 'cycle'
     }
@@ -394,16 +383,16 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: 'Rewards',
             field: 'rewards',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: { amount: item.rewards }, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
           },
           {
             name: 'Deposits',
             field: 'deposit',
             template: Template.amount,
-            data: (item: EndorsingRights) => ({ data: { amount: item.deposit }, options: { showFiatValue: true } })
+            data: (item: EndorsingRights) => ({ data: item.deposit, options: { showFiatValue: true } })
           }
         ],
-        data: item.items
+        dataSource: this.getEndorsingRightsInnerDataSource(item)
       }),
       primaryKey: 'cycle'
     }
@@ -414,5 +403,52 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const updatedTab = first(updateTabCounts([votesTab], counts))
 
     votesTab.count = updatedTab.count
+  }
+
+  private getRewardsInnerDataSource(cycle: number): DataSource<TezosPayoutInfo> {
+    return {
+      get: (pagination: Pagination, filter?: any) => {
+        const rewards = fromRoot.getState(this.store$).bakerTable.rewards.data.find(_reward => _reward.cycle === cycle)
+
+        return this.rewardService.getRewardsPayouts(rewards, pagination, filter)
+      },
+      isFilterable: true
+    }
+  }
+
+  private getEndorsingRightsInnerDataSource(item: AggregatedEndorsingRights): DataSource<EndorsingRights> {
+    const { cycle, endorsingRewardsDetails } = item
+
+    return {
+      get: (pagination: Pagination, _filter?: any) => {
+        this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle, endorsingRewardsDetails }))
+
+        return this.store$
+          .select(state => state.bakerTable.endorsingRightItems)
+          .pipe(
+            filter(response => response[cycle] !== undefined),
+            map(response => toPagable(response[cycle], pagination))
+          )
+      },
+      isFilterable: false
+    }
+  }
+
+  private getBakingRightsInnerDataSource(item: AggregatedBakingRights): DataSource<BakingRights> {
+    const { cycle, bakingRewardsDetails } = item
+
+    return {
+      get: (pagination: Pagination, _filter?: any) => {
+        this.store$.dispatch(actions.loadBakingRightItems({ baker: this.address, cycle, bakingRewardsDetails }))
+
+        return this.store$
+          .select(state => state.bakerTable.bakingRightItems)
+          .pipe(
+            filter(response => response[cycle] !== undefined),
+            map(response => toPagable(response[cycle], pagination))
+          )
+      },
+      isFilterable: false
+    }
   }
 }

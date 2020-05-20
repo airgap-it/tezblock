@@ -1,8 +1,41 @@
+<ng-template #rewardsExpandedRowHeaderTemplate let-context>
+  <div class="table-responsive mb-3">
+    <loading-skeleton *ngIf="(context | async) === undefined" [loadingWidth]="'50%'"></loading-skeleton>
+    <table class="table table-hover" *ngIf="context | async as bakerReward">
+      <thead>
+        <tr>
+          <th>
+            Baker Account
+          </th>
+          <th>
+            Payout
+          </th>
+          <th>
+            Share
+          </th>
+        </tr>
+      </thead>
+      <tr>
+        <td>
+          <address-item [address]="bakerReward.delegator"></address-item>
+        </td>
+        <td>
+          <amount-cell [data]="bakerReward.payout"></amount-cell>
+        </td>
+        <td>
+          {{ bakerReward.share | percentage }}
+        </td>
+      </tr>
+    </table>
+  </div>
+</ng-template>
+
 <ng-template #expandedRowTemplate let-context>
   <app-client-side-table
-    [data]="context.data"
+    [dataSource]="context.dataSource"
     [columns]="context.columns"
-    [filterCondition]="context.filterCondition"
+    [headerTemplate]="context.headerTemplate"
+    [headerContext]="context.headerContext"
   ></app-client-side-table>
 </ng-template>
 
@@ -32,7 +65,7 @@
                   Full Balance
                 </h5>
                 <h3>
-                  <amount-cell [data]="{ amount: data?.stakingBond }" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+                  <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                 </h3>
               </div>
 
@@ -61,7 +94,7 @@
                       <div class="col p-0">
                         <p class="m-0">
                           <amount-cell
-                            [data]="{ amount: data?.stakingBalance }"
+                            [data]="data?.stakingBalance"
                             [options]="{ showFiatValue: false, maxDigits: 10 }"
                           ></amount-cell>
                         </p>
@@ -70,7 +103,7 @@
                         <div class="float-right">
                           <p class="m-0 ">
                             <amount-cell
-                              [data]="{ amount: data?.stakingCapacity }"
+                              [data]="data?.stakingCapacity"
                               [options]="{ showFiatValue: false, maxDigits: 10 }"
                             ></amount-cell>
                           </p>
@@ -126,7 +159,7 @@
                 <h5>
                   <amount-cell
                     *ngIf="frozenBalance$ | async as frozenBalance; else noFrozenBalance"
-                    [data]="{ amount: frozenBalance }"
+                    [data]="frozenBalance"
                     [options]="{ showFiatValue: false, maxDigits: 10 }"
                   ></amount-cell>
                   <ng-template #noFrozenBalance>
@@ -320,6 +353,7 @@
         [expandedRow]="rewardsExpandedRow"
         [pagination]="true"
         (onLoadMore)="loadMoreRewards()"
+        (rowExpanded)="onRowExpanded($event)"
       ></tezblock-table>
     </ng-container>
 
@@ -328,7 +362,7 @@
         [columns]="tab.columns"
         [data]="votes$ | async"
         [loading]="votesLoading$ | async"
-        [pagination]="true"
+        [pagination]="votesShowLoadMore$ | async"
         (onLoadMore)="loadMoreVotes()"
       ></tezblock-table>
     </ng-container>

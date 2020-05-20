@@ -5,17 +5,19 @@ import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { MetaVotingPeriod, PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
-import { squareBrackets } from '@tezblock/domain/pattern'
-import { get } from '@tezblock/services/fp'
 import {
+  MetaVotingPeriod,
+  PeriodTimespan,
+  fillMissingPeriodTimespans,
   DivisionOfVotes,
   _yayRollsSelector,
   _nayRollsSelector,
   _passRollsSelector,
   _yayRollsPercentageSelector,
   _nayRollsPercentageSelector
-} from '@tezblock/services/proposal/proposal.service'
+} from '@tezblock/domain/vote'
+import { squareBrackets } from '@tezblock/domain/pattern'
+import { get } from '@tezblock/services/fp'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
   if (!state.metaVotingPeriods) {

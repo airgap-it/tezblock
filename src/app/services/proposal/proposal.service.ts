@@ -1,38 +1,18 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { of, pipe, Observable, forkJoin } from 'rxjs'
-import { map, catchError, combineLatest, filter, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
 
 import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { first, get } from '@tezblock/services/fp'
-import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery } from '@tezblock/domain/vote'
+import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery, DivisionOfVotes } from '@tezblock/domain/vote'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { Pagination } from '@tezblock/domain/table'
 import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
-
-export interface DivisionOfVotes {
-  voting_period: number
-  max_yay_rolls: number
-  max_yay_count: number
-  max_nay_rolls: number
-  max_nay_count: number
-  max_pass_rolls: number
-  max_pass_count: number
-  proposal_hash: string
-  voting_period_kind: string
-  max_level: number
-}
-
-export const _yayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_yay_rolls).reduce((a, b) => a + b, 0) : undefined)
-export const _nayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_nay_rolls).reduce((a, b) => a + b, 0) : undefined)
-export const _passRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_pass_rolls).reduce((a, b) => a + b, 0) : undefined)
-const allRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => _yayRollsSelector(divisionOfVotes) + _nayRollsSelector(divisionOfVotes)
-export const _yayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_yayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0
-export const _nayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_nayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0
 
 @Injectable({
   providedIn: 'root'

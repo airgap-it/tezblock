@@ -32,7 +32,7 @@ export const loadTransferOperationsFailed = createAction(`[${featureName}] Load 
 export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
 // export const sortTransferOperations = createAction(`[${featureName}] Sort Transfer Operations`, props<{ orderBy: OrderBy }>())
 
-export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contractHash: string }>())
+export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contract: TokenContract }>())
 export const loadOtherOperationsSucceeded = createAction(
   `[${featureName}] Load Other Operations Succeeded`,
   props<{ otherOperations: ContractOperation[] }>()

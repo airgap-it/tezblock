@@ -1,20 +1,23 @@
 import { createReducer, on } from '@ngrx/store'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
-import { PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
-import { first } from '@tezblock/services/fp'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Block } from '@tezblock/interfaces/Block'
 import {
+  PeriodTimespan,
+  fillMissingPeriodTimespans,
   DivisionOfVotes,
   _yayRollsSelector,
   _nayRollsSelector,
   _passRollsSelector,
   _yayRollsPercentageSelector,
   _nayRollsPercentageSelector
-} from '@tezblock/services/proposal/proposal.service'
+} from '@tezblock/domain/vote'
+import { first } from '@tezblock/services/fp'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Block } from '@tezblock/interfaces/Block'
+import { State as appState } from '@tezblock/reducers/index'
 
 interface Busy {
   blocks: boolean
@@ -30,6 +33,7 @@ export interface State {
   proposal: ProposalListDto
   transactions: Transaction[]
   currentPeriodTimespan: PeriodTimespan
+  cryptoHistoricData: MarketDataSample[]
   divisionOfVotes: DivisionOfVotes[]
   busy: Busy
 }
@@ -40,6 +44,7 @@ const initialState: State = {
   proposal: undefined,
   currentPeriodTimespan: undefined,
   transactions: undefined,
+  cryptoHistoricData: [],
   divisionOfVotes: undefined,
   busy: {
     blocks: false,
@@ -165,6 +170,10 @@ export const reducer = createReducer(
       blocks: false
     }
   })),
+  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
+    ...state,
+    cryptoHistoricData
+  })),
   on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
     ...state,
     divisionOfVotes
@@ -181,3 +190,25 @@ export const nayRollsSelector = (state: State): number => _nayRollsSelector(stat
 export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
 export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
 export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)
+export const currencyGrowthPercentageSelector = (state: appState): number => {
+  const startingPrice = state.dashboard.cryptoHistoricData
+  const priceNow = state.app.fiatCurrencyInfo.price
+
+  if (!startingPrice || startingPrice.length === 0) {
+    return 0
+  }
+
+  if (!startingPrice[0].open) {
+    return 0
+  }
+
+  if (!priceNow) {
+    return 0
+  }
+
+  return priceNow
+    .minus(startingPrice[0].open)
+    .multipliedBy(100)
+    .dividedBy(startingPrice[0].open)
+    .toNumber()
+}

@@ -2,8 +2,7 @@ import { createAction, props } from '@ngrx/store'
 
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { MetaVotingPeriod, PeriodTimespan } from '@tezblock/domain/vote'
-import { DivisionOfVotes } from '@tezblock/services/proposal/proposal.service'
+import { MetaVotingPeriod, PeriodTimespan, DivisionOfVotes } from '@tezblock/domain/vote'
 
 const featureName = 'Proposal Details'
 
