@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { from, of, forkJoin } from 'rxjs'
+import { from, of, forkJoin, Observable } from 'rxjs'
 import { map, catchError, filter, switchMap, take, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
@@ -16,6 +16,9 @@ import { first, flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { fillTransferOperations } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -66,6 +69,7 @@ export class AccountDetailEffects {
 
       switchMap(([{ kind }, pagination, address, orderBy]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
+          switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -305,6 +309,7 @@ export class AccountDetailEffects {
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
     private readonly transactionService: TransactionService

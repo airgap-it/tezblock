@@ -145,9 +145,10 @@ export class AmountCellComponent implements OnInit {
   private getPrecision(value: string): string {
     const numericValue = parseFloat(value.replace(',', ''))
     const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(this.options)
+    const hasDecimals = (numericValue - Math.floor(numericValue)) !== 0
 
     // this case overrides options.decimals
-    if (numericValue === 0) {
+    if (numericValue === 0 || !hasDecimals) {
       return '1.0-0'
     }
 

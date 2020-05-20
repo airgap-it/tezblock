@@ -852,7 +852,8 @@
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "alias": "tzBTC",
-    "hasLogo": true
+    "hasLogo": true,
+    "accountType": "contract"
   },
   "tz1NXjtXZzwVJLocUtts5VmQ9nEPJVotweZm": {
     "alias": "BAKRRR.COM",
