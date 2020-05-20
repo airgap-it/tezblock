@@ -138,7 +138,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: this.tableDefinitionService.columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.blockColumns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -149,7 +149,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: this.tableDefinitionService.columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.blockColumns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -160,7 +160,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: this.tableDefinitionService.columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.blockColumns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -171,7 +171,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: this.tableDefinitionService.columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.blockColumns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -182,7 +182,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: this.tableDefinitionService.columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.blockColumns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }

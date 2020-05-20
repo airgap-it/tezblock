@@ -287,15 +287,73 @@
     "label": "Search",
     "placeholder": "Search by Address / Alias / Transaction / Block"
   },
-  "tezblock-table": {
-    "load-more_button": "Load more",
-    "download-csv_button": "Download CSV Export"
-  },
+
   "baker-table": {
-    "baker-overview": "Baker Overview",
-    "baking-rights": "Baking Rights",
-    "endorsing-rights": "Endorsing Rights",
-    "rewards": "Rewards",
+    "baker-overview": {
+      "baker-overview": "Baker Overview",
+      "full-balance": "Full Balance",
+      "staking-balance": "Staking Balance",
+      "staking-capacity": "Staking Capacity",
+      "payout-account": "Payout Account",
+      "no-related-payout": "No related payout account.",
+      "frozen-balance": "Frozen Balance",
+      "active-delegations": "Active Delegations",
+      "number-of-rolls": "Number of Rolls",
+      "next-baking-right": "Next Baking Right",
+      "not-available": "not available",
+      "payout-accuracy": "Payout Accuracy",
+      "baking-efficiency": "Baking Efficiency",
+      "efficiency": "Efficiency",
+      "last10cycles": "Last 10 Cycles",
+      "next-endorsing-right": "Next Endorsing Right"
+    },
+    "baking-rights": {
+      "baking-rights": "Baking Rights",
+      "cycle": "Cycle",
+      "number-of-bakings": "# of Bakings",
+      "block-rewards": "Block Rewards",
+      "deposits": "Deposists",
+      "fees": "Fees",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Age",
+        "level": "Level",
+        "priority": "Priority",
+        "rewards": "Rewards",
+        "fees": "Fees",
+        "deposits": "Deposists"
+      }
+    },
+    "endorsing-rights": {
+      "endorsing-rights": "Endorsing Rights",
+      "cycle": "Cycle",
+      "number-of-endorsements": "# of Endorsements",
+      "endorsement-rewards": "Endorsement Rewards",
+      "deposits": "Deposists",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Age",
+        "level": "Level",
+        "slot": "Slot",
+        "rewards": "Rewards",
+        "deposits": "Deposists"
+      }
+    },
+    "rewards": {
+      "rewards": "Rewards",
+      "cycle": "Cycle",
+      "delegations": "Delegations",
+      "staking-balance": "Staking Balance",
+      "block-rewards": "Block Rewards",
+      "endorsement-rewards": "Endorsement Rewards",
+      "fees": "Fees",
+      "expanded-rows": {
+        "delegator-account": "Delegator Account",
+        "payout": "Payout",
+        "share": "Share",
+        "baker-account": "Baker Account"
+      }
+    },
     "votes": "Votes"
   },
   "tabbed-table": {
@@ -319,6 +377,60 @@
       "originations": "Originations",
       "endorsements": "Endorsements",
       "activations": "Activations"
+    }
+  },
+  "tezblock-table": {
+    "load-more_button": "Load more",
+    "download-csv_button": "Download CSV Export",
+    "transaction": {
+      "from": "From",
+      "to": "To",
+      "amount": "Amount",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age"
+    },
+    "delegation": {
+      "delegator": "Delegator",
+      "baker": "Baker",
+      "amount": "Amount",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age"
+    },
+    "origination": {
+      "new-account": "New Account",
+      "balance": "Balance",
+      "originator": "Originator",
+      "baker": "Baker",
+      "fee": "Fee",
+      "burn": "Burn",
+      "gas-limit": "Gas Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age"
+    },
+    "endorsement": {
+      "endorser": "Endorser",
+      "age": "Age",
+      "slots": "Slots",
+      "tx-hash": "Tx Hash",
+      "endorsed-level": "Endorsed Level",
+      "block": "Block"
+    },
+    "activation": {
+      "account": "Account",
+      "secret": "Secret",
+      "tx-hash": "Tx Hash"
+    },
+    "ballot": {
+      "ballot": "Ballot",
+      "age": "Age",
+      "kind": "Kind",
+      "voting-period": "Voting Period",
+      "number-of-votes": "# of Votes",
+      "proposal-hash": "Proposal Hash"
     }
   }
 }

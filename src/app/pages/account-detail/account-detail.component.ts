@@ -33,6 +33,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TranslateService } from '@ngx-translate/core'
+import { TableDefinitionService } from '@tezblock/services/table-definition/table-definition.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -214,7 +215,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private tableDefinitionService: TableDefinitionService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -462,7 +464,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.accountColumns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -473,7 +475,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.accountColumns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -484,7 +486,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.accountColumns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -495,7 +497,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.accountColumns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }
@@ -504,7 +506,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.bakerTabs = [
       {
-        title: this.translateService.instant('baker-table.baker-overview'),
+        title: this.translateService.instant('baker-table.baker-overview.baker-overview'),
         active: true,
         kind: 'baker_overview',
         count: undefined,
@@ -514,7 +516,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: this.translateService.instant('baker-table.baking-rights'),
+        title: this.translateService.instant('baker-table.baking-rights.baking-rights'),
         active: false,
         kind: 'baking_rights',
         count: undefined,
@@ -524,7 +526,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: this.translateService.instant('baker-table.endorsing-rights'),
+        title: this.translateService.instant('baker-table.endorsing-rights.endorsing-rights'),
         active: false,
         kind: 'endorsing_rights',
         count: undefined,
@@ -534,7 +536,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: this.translateService.instant('baker-table.rewards'),
+        title: this.translateService.instant('baker-table.rewards.rewards'),
         active: false,
         kind: 'rewards',
         count: undefined,
@@ -549,7 +551,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'ballot',
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        columns: this.tableDefinitionService.accountColumns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return this.count === 0
         }
