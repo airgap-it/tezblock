@@ -36,14 +36,25 @@ export const columns: { [key: string]: (options: any) => Column[] } = {
       {
         name: 'Amount',
         field: 'amount',
-        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
+        data: (item: Transaction) => ({
+          data: item.amount,
+          options: {
+            ...options,
+            comparisonTimestamp: item.timestamp,
+            symbol: item.symbol,
+            showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+          }
+        }),
         template: Template.amount,
         sortable: true
       },
       {
         name: 'Fee',
         field: 'fee',
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        }),
         template: Template.amount,
         sortable: true
       }
@@ -128,7 +139,10 @@ export const columns: { [key: string]: (options: any) => Column[] } = {
         name: 'Fee',
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns),

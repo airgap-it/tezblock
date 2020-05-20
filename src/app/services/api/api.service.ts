@@ -4,8 +4,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
-import { map, switchMap, filter } from 'rxjs/operators'
-import { TezosProtocol, TezosFAProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
+import { map, switchMap } from 'rxjs/operators'
+import { TezosProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight, BakingRewardsDetail } from '@tezblock/interfaces/BakingRights'
 import {
@@ -1385,6 +1385,12 @@ export class ApiService {
         this.options
       )
       .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
+  }
+
+  getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
+    const protocol = getFaProtocol(contract, this.chainNetworkService)
+
+    return from(protocol.getTransactions(10, cursor))
   }
 
   getBalanceForLast30Days(accountId: string): Observable<Balance[]> {

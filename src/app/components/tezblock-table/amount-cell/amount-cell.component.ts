@@ -26,9 +26,10 @@ export interface AmountOptions {
 export const getPrecision = (value: string | number, options?: AmountOptions): string => {
   const numericValue: number = typeof value === 'string' ? parseFloat(value.replace(',', '')) : value
   const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(options)
+  const hasDecimals = (numericValue - Math.floor(numericValue)) !== 0
 
   // this case overrides options.decimals
-  if (numericValue === 0) {
+  if (numericValue === 0 || !hasDecimals) {
     return '1.0-0'
   }
 
@@ -121,7 +122,7 @@ export class AmountCellComponent implements OnInit {
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly decimalPipe: DecimalPipe
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.currencyAmount$ = this.options$.pipe(
