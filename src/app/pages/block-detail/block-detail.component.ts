@@ -22,7 +22,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
-import { TableDefinitionService } from '@tezblock/services/table-definition/table-definition.service'
+import { columns } from './table-definitions'
 
 @Component({
   selector: 'app-block-detail',
@@ -55,8 +55,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService,
-    private tableDefinitionService: TableDefinitionService
+    private translateService: TranslateService
   ) {
     super()
   }
@@ -138,7 +137,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: this.tableDefinitionService.blockColumns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
@@ -149,7 +148,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: this.tableDefinitionService.blockColumns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
@@ -160,7 +159,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: this.tableDefinitionService.blockColumns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
@@ -171,7 +170,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: this.tableDefinitionService.blockColumns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
@@ -182,7 +181,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: this.tableDefinitionService.blockColumns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }

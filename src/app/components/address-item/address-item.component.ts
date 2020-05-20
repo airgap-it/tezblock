@@ -4,6 +4,7 @@ import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contr
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TranslateService } from '@ngx-translate/core'
 
 export interface Options {
   pageId?: string | number
@@ -14,6 +15,7 @@ export interface Options {
   forceIdenticon?: boolean
   hideIdenticon?: boolean
   kind?: string //TODO: not needed probably
+  translate?: any
 }
 
 @Component({
@@ -75,7 +77,11 @@ export class AddressItemComponent implements OnInit {
     return this.options && this.options.pageId ? this.options.pageId !== this.address : true
   }
 
-  constructor(private readonly aliasPipe: AliasPipe, private readonly chainNetworkService: ChainNetworkService, private readonly shortenStringPipe: ShortenStringPipe) {}
+  constructor(
+    private readonly aliasPipe: AliasPipe,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly shortenStringPipe: ShortenStringPipe
+  ) {}
 
   ngOnInit() {}
 
@@ -87,7 +93,7 @@ export class AddressItemComponent implements OnInit {
     }
 
     if (this.options.showAlliasOrFullAddress) {
-      return this.formattedAddress = this.aliasPipe.transform(this.address) || this.address
+      return (this.formattedAddress = this.aliasPipe.transform(this.address) || this.address)
     }
 
     if (this.options.showFullAddress) {

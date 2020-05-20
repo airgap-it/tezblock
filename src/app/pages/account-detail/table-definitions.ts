@@ -7,7 +7,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
   [OperationTypes.Transaction]: (options: Options) =>
     [
       {
-        name: 'From',
+        name: options.translate.instant('tezblock-table.transaction.from'),
         field: 'source',
         width: '1',
         template: Template.address,
@@ -20,38 +20,38 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         data: (item: Transaction) => ({ data: item.outgoing })
       },
       {
-        name: 'To',
+        name: options.translate.instant('tezblock-table.transaction.to'),
         field: 'destination',
         width: '1',
         data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } }),
         template: Template.address
       },
       {
-        name: 'Age',
+        name: options.translate.instant('tezblock-table.transaction.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: 'Amount',
+        name: options.translate.instant('tezblock-table.transaction.amount'),
         field: 'amount',
         data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
         template: Template.amount,
         sortable: true
       },
       {
-        name: 'Fee',
+        name: options.translate.instant('tezblock-table.transaction.fee'),
         field: 'fee',
         data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         template: Template.amount,
         sortable: true
       }
-    ].concat(<any>blockAndTxHashColumns),
+    ].concat(<any>blockAndTxHashColumns(options.translate)),
 
   [OperationTypes.Delegation]: (options: Options) =>
     [
       {
-        name: 'Delegator',
+        name: options.translate.instant('tezblock-table.delegation.delegator'),
         field: 'source',
         width: '1',
         template: Template.address,
@@ -64,7 +64,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         data: (item: Transaction) => ({ data: item.outgoing })
       },
       {
-        name: 'Baker',
+        name: options.translate.instant('tezblock-table.delegation.baker'),
         field: 'delegate',
         width: '1',
         template: Template.address,
@@ -74,89 +74,89 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         })
       },
       {
-        name: 'Age',
+        name: options.translate.instant('tezblock-table.delegation.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: 'Amount',
+        name: options.translate.instant('tezblock-table.delegation.amount'),
         field: 'delegatedBalance',
         template: Template.amount,
         data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
         sortable: false // delegatedBalance is joined property from accounts
       }
-    ].concat(<any>blockAndTxHashColumns),
+    ].concat(<any>blockAndTxHashColumns(options.translate)),
 
   [OperationTypes.Origination]: (options: Options) =>
     [
       {
-        name: 'New Account',
+        name: options.translate.instant('tezblock-table.origination.new-account'),
         field: 'originated_contracts',
         template: Template.address,
         data: (item: Transaction) => ({ data: item.originated_contracts, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
-        name: 'Balance',
+        name: options.translate.instant('tezblock-table.origination.balance'),
         field: 'originatedBalance',
         template: Template.amount,
         data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
         sortable: true
       },
       {
-        name: 'Age',
+        name: options.translate.instant('tezblock-table.origination.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: 'Originator',
+        name: options.translate.instant('tezblock-table.origination.originator'),
         field: 'source',
         width: '1',
         template: Template.address,
         data: (item: Transaction) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
-        name: 'Baker',
+        name: options.translate.instant('tezblock-table.origination.baker'),
         field: 'delegate',
         width: '1',
         template: Template.address,
         data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } })
       },
       {
-        name: 'Fee',
+        name: options.translate.instant('tezblock-table.origination.fee'),
         field: 'fee',
         template: Template.amount,
         data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
         sortable: true
       }
-    ].concat(<any>blockAndTxHashColumns),
+    ].concat(<any>blockAndTxHashColumns(options.translate)),
 
   [OperationTypes.Endorsement]: (options: Options) => [
     {
-      name: 'Age',
+      name: options.translate.instant('tezblock-table.endorsement.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
     },
     {
-      name: 'Slots',
+      name: options.translate.instant('tezblock-table.endorsement.slots'),
       field: 'slots',
       sortable: false
     },
     {
-      name: 'Endorsed Level',
+      name: options.translate.instant('tezblock-table.endorsement.endorsed-level'),
       field: 'level',
       template: Template.block
     },
     {
-      name: 'Block',
+      name: options.translate.instant('tezblock-table.endorsement.block'),
       field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
-      name: 'Tx Hash',
+      name: options.translate.instant('tezblock-table.endorsement.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } })
@@ -166,35 +166,35 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
   [OperationTypes.Ballot]: (options: Options) =>
     [
       {
-        name: 'Ballot',
+        name: options.translate.instant('tezblock-table.ballot.ballot'),
         field: 'ballot'
       },
       {
-        name: 'Age',
+        name: options.translate.instant('tezblock-table.ballot.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: 'Kind',
+        name: options.translate.instant('tezblock-table.ballot.kind'),
         field: 'kind',
         sortable: false
       },
       {
-        name: 'Voting Period',
+        name: options.translate.instant('tezblock-table.ballot.voting-period'),
         field: 'voting_period',
         sortable: false
       },
       {
-        name: '# of Votes',
+        name: options.translate.instant('tezblock-table.ballot.number-of-votes'),
         field: 'votes',
         sortable: false
       },
       {
-        name: 'Proposal Hash',
+        name: options.translate.instant('tezblock-table.ballot.proposal-hash'),
         field: 'proposal',
         template: Template.hash,
         data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
       }
-    ].concat(<any>blockAndTxHashColumns)
+    ].concat(<any>blockAndTxHashColumns(options.translate))
 }

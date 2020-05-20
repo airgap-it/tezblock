@@ -24,7 +24,6 @@ import { first } from '@tezblock/services/fp'
 import { toClientsideDataScource, DataSource, Pagination } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { TranslateService } from '@ngx-translate/core'
-import { TableDefinitionService } from '@tezblock/services/table-definition/table-definition.service'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -142,8 +141,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService,
-    private tableDefinitionService: TableDefinitionService
+    private translateService: TranslateService
   ) {
     super()
 
@@ -344,15 +342,16 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   private setupTables() {
-    this.bakingRightsColumns = this.tableDefinitionService.bakerColumns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet })
+    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet, translate: this.translateService })
     this.bakingRightsFields = this.bakingRightsColumns.map(column => column.field)
 
-    this.endorsingRightsColumns = this.tableDefinitionService.bakerColumns[OperationTypes.EndorsingRights]({
-      showFiatValue: this.isMainnet
+    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights]({
+      showFiatValue: this.isMainnet,
+      translate: this.translateService
     })
     this.endorsingRightsFields = this.endorsingRightsColumns.map(column => column.field)
 
-    this.rewardsColumns = this.tableDefinitionService.bakerColumns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet })
+    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet, translate: this.translateService })
     this.rewardsFields = this.rewardsColumns.map(column => column.field)
   }
 

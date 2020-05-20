@@ -5,7 +5,7 @@ import { filter, map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range, negate, isNil } from 'lodash'
-import * as moment from 'moment'
+import moment from 'moment'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
@@ -22,6 +22,7 @@ import { defaultOptions } from '@tezblock/components/chart-item/chart-item.compo
 import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
 import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+import { TranslateService } from '@ngx-translate/core'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
@@ -47,12 +48,7 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
     })
   const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
 
-  return pipe(
-    toDiffsInDays,
-    groupBy('diffInDays'),
-    sum,
-    amountToXTZ
-  )(data)
+  return pipe(toDiffsInDays, groupBy('diffInDays'), sum, amountToXTZ)(data)
 }
 
 export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
@@ -106,7 +102,8 @@ export class ListComponent extends BaseComponent implements OnInit {
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -128,7 +125,12 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.actions$.pipe(ofType(actions.loadBlocksSucceeded))
               ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
             )
-            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$, blockOrderBy$)
+            this.setupTable(
+              columns[OperationTypes.Block]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              blockData$,
+              blockLoading$,
+              blockOrderBy$
+            )
 
             break
           case 'transaction':
@@ -163,10 +165,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               //this.store$.select(state => state.list.transactionsChartDatasets)
               this.store$
                 .select(state => state.list.transactionsChartData)
-                .pipe(
-                  filter(Array.isArray),
-                  map(toTransactionsChartDataSource('Transactions', 'Volume'))
-                )
+                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume')))
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(
@@ -183,7 +182,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactions()))
             )
             this.setupTable(
-              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               transactionData$,
               transactionLoading$,
               transactionOrderBy$
@@ -203,11 +202,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.activationsCountLast24h$ = this.store$.select(state => state.list.activationsCountLast24h)
             this.activationsChartDatasets$ = this.store$
               .select(state => state.list.activationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Activations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Activations')), map(toArray))
             const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
             const activationsData$ = this.store$.select(state => state.list.activations.data)
             const activationsOrderBy$ = this.store$.select(state => state.list.activations.orderBy)
@@ -218,7 +213,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadActivations()))
             )
             this.setupTable(
-              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               activationsData$,
               activationsLoading$,
               activationsOrderBy$
@@ -238,11 +233,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.originationsCountLast24h$ = this.store$.select(state => state.list.originationsCountLast24h)
             this.originationsChartDatasets$ = this.store$
               .select(state => state.list.originationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Originations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Originations')), map(toArray))
             const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
             const originationsData$ = this.store$.select(state => state.list.originations.data)
             const originationsOrderBy$ = this.store$.select(state => state.list.originations.orderBy)
@@ -254,7 +245,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadOriginations()))
             )
             this.setupTable(
-              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               originationsData$,
               originationsLoading$,
               originationsOrderBy$
@@ -272,7 +263,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDelegations()))
             )
             this.setupTable(
-              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               delegationsData$,
               delegationsLoading$,
               delegationsOrderBy$
@@ -290,7 +281,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               endorsementsData$,
               endorsementsLoading$,
               endorsementsOrderBy$
@@ -307,7 +298,12 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.actions$.pipe(ofType(actions.loadVotesSucceeded))
               ]).subscribe(() => this.store$.dispatch(actions.loadVotes()))
             )
-            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$, votesOrderBy$)
+            this.setupTable(
+              columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              votesData$,
+              votesLoading$,
+              votesOrderBy$
+            )
             break
           case 'double-baking':
             const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
@@ -321,7 +317,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleBakings()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               dbData$,
               dbLoading$,
               dbOrderBy$
@@ -339,7 +335,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({
+                showFiatValue: this.isMainnet,
+                translate: this.translateService
+              }),
               deData$,
               deLoading$,
               deOrderBy$
@@ -357,7 +356,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({
+                showFiatValue: this.isMainnet,
+                translate: this.translateService
+              }),
               bakersData$,
               bakersLoading$,
               bakersOrderBy$
@@ -384,7 +386,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadProposals()))
             )
             this.setupTable(
-              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               proposalData$,
               proposalLoading$,
               proposalOrderBy$,
@@ -399,7 +401,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.store$.dispatch(actions.loadContracts())
 
             this.setupTable(
-              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet, translate: this.translateService }),
               contractsData$,
               loadingContracts$,
               contractsOrderBy$,
