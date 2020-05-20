@@ -158,8 +158,11 @@ export const fillTransferOperations = (transactions: Transaction[], chainNetwork
 
         return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
           map(normalizedParameters => {
-            if (normalizedParameters.entrypoint === 'transfer') {
-              const transferDetails = faProtocol.transferDetailsFromParameters(normalizedParameters)
+            if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
+              const transferDetails = faProtocol.transferDetailsFromParameters({
+                entrypoint: 'transfer',
+                value: normalizedParameters.value
+              })
               return {
                 ...transaction,
                 source: transferDetails.from,

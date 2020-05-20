@@ -31,6 +31,7 @@ export interface Transaction {
   gas_limit?: any
   parameters?: any
   parameters_micheline?: any
+  parameters_entrypoints?: any
   destination?: any
   fee: number
   level: number
