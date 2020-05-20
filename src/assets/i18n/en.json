@@ -265,6 +265,26 @@
     "invalid-address": "Invalid Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
+  "proposal-detail": {
+    "proposal": "Proposal",
+    "proposal-hash": "Proposal Hash",
+    "proposal-name": "Proposal Name",
+    "period": "Period",
+    "proposal-discussion": "Proposal Discussion",
+    "discussion-on-tezos": "Discussion on Tezos Agora",
+    "more-info": "More Information",
+    "details-of-proposal": "Details of Proposal on Tezos Agora",
+    "more-proposal": "More Proposal",
+    "less-proposal": "Less Proposal",
+    "details": "Details",
+    "period-has-ended": "period has ended, period was between",
+    "and": "and",
+    "the-current": "The current",
+    "period-ends": "period ends on",
+    "period-will-start": "period will start on",
+    "invalid-proposal-hash": "Invalid Proposal Hash",
+    "invalid-proposal-text": "This operation hash is invalid."
+  },
   "modal-component": {
     "none": "None",
     "show_button": "Show"
@@ -377,6 +397,12 @@
       "originations": "Originations",
       "endorsements": "Endorsements",
       "activations": "Activations"
+    },
+    "proposal-detail": {
+      "proposal": "Proposal",
+      "exploration": "Exploration",
+      "testing": "Testing",
+      "promotion": "Promotion"
     }
   },
   "tezblock-table": {
@@ -535,6 +561,12 @@
       "account": "Account",
       "balance": "Balance",
       "baker": "Baker"
+    },
+    "proposal": {
+      "baker": "Baker",
+      "ballot": "Ballot",
+      "age": "Age",
+      "number-of-votes": "# of Votes"
     }
   }
 }
