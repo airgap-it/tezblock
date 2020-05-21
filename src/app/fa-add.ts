@@ -32,7 +32,10 @@ import {
   faCircle,
   faChevronLeft,
   faChevronRight,
-  faExpand
+  faExpand,
+  faThumbsUp,
+  faThumbsDown,
+  faHandRock
 } from '@fortawesome/free-solid-svg-icons'
 
 export const addFontAwesome = () => {
@@ -74,6 +77,9 @@ export const addFontAwesome = () => {
     faCircle,
     faChevronLeft,
     faChevronRight,
-    faExpand
+    faExpand,
+    faThumbsUp,
+    faThumbsDown,
+    faHandRock
   )
 }

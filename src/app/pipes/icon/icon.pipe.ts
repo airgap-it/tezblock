@@ -43,6 +43,9 @@ export type IconRef =
   | 'chevronLeft'
   | 'chevronRight'
   | 'expand'
+  | 'thumbsUp'
+  | 'thumbsDown'
+  | 'handRock'
 
 @Pipe({
   name: 'iconPipe'
@@ -109,7 +112,10 @@ export class IconPipe implements PipeTransform {
       chevronLeft: { prefix, iconName: 'chevron-left' },
       chevronRight: { prefix, iconName: 'chevron-right' },
       expand: { prefix, iconName: 'expand' },
-      coins: { prefix, iconName: 'coins' }
+      coins: { prefix, iconName: 'coins' },
+      thumbsUp: { prefix, iconName: 'thumbs-up' },
+      thumbsDown: { prefix, iconName: 'thumbs-down' },
+      handRock: { prefix, iconName: 'hand-rock' }
     }
   }
 

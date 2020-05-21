@@ -71,3 +71,23 @@ export const getPeriodTimespanQuery = (period: number, direction: Direction): Bo
   ],
   limit: 1
 })
+
+export interface DivisionOfVotes {
+  voting_period: number
+  max_yay_rolls: number
+  max_yay_count: number
+  max_nay_rolls: number
+  max_nay_count: number
+  max_pass_rolls: number
+  max_pass_count: number
+  proposal_hash: string
+  voting_period_kind: string
+  max_level: number
+}
+
+export const _yayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_yay_rolls).reduce((a, b) => a + b, 0) : undefined)
+export const _nayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_nay_rolls).reduce((a, b) => a + b, 0) : undefined)
+export const _passRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_pass_rolls).reduce((a, b) => a + b, 0) : undefined)
+const allRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => _yayRollsSelector(divisionOfVotes) + _nayRollsSelector(divisionOfVotes)
+export const _yayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_yayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0
+export const _nayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_nayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0

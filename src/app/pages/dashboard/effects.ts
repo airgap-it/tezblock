@@ -15,6 +15,7 @@ import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ContractService } from '@tezblock/services/contract/contract.service'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
 export class DashboarEffects {
@@ -113,6 +114,19 @@ export class DashboarEffects {
     )
   )
 
+	loadDivisionOfVotes$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadDivisionOfVotes),
+      withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),
+      switchMap(([action, votingPeriod]) =>
+        this.proposalService.getDivisionOfVotes({ votingPeriod }).pipe(
+          map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
+          catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
@@ -121,6 +135,7 @@ export class DashboarEffects {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly contractService: ContractService,
     private readonly cryptoPricesService: CryptoPricesService,
+    private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

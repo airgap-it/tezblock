@@ -83,6 +83,22 @@
                 </div>
               </div>
             </div>
+            <div class="pt-3" *ngIf="showRolls$ | async">
+              <p class="pr-3 m-0 d-inline-block">
+                <fa-icon [icon]="'thumbsUp' | iconPipe" class="text-primary mr-2"></fa-icon>
+                <strong>{{ yayRollsPercentage$ | async }}%</strong>
+                <span class="text-secondary ml-1">{{ yayRolls$ | async }}</span>
+              </p>
+              <p class="pr-3 m-0 d-inline-block">
+                <fa-icon [icon]="'thumbsDown' | iconPipe" class="text-primary mr-2"></fa-icon>
+                <strong>{{ nayRollsPercentage$ | async }}%</strong>
+                <span class="text-secondary ml-1">{{ nayRolls$ | async }}</span>
+              </p>
+              <p class="m-0 d-inline-block">
+                <fa-icon [icon]="'handRock' | iconPipe" class="text-primary mr-1"></fa-icon>
+                <span class="text-secondary ml-1">{{ passRolls$ | async }}</span>
+              </p>
+            </div>
           </div>
           <ng-container *ngIf="isMainnet()">
             <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
