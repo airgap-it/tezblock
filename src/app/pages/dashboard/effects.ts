@@ -14,6 +14,7 @@ import { getPeriodTimespanQuery } from '@tezblock/domain/vote'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { ContractService } from '@tezblock/services/contract/contract.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
@@ -28,7 +29,7 @@ export class DashboarEffects {
           return of(actions.loadContractsSucceeded({ contracts: [] }))
         }
 
-        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
+        return forkJoin(contracts.data.map(contract => this.contractService.getTotalSupplyByContract(contract))).pipe(
           map(totalSupplies =>
             actions.loadContractsSucceeded({
               contracts: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply }))
@@ -132,6 +133,7 @@ export class DashboarEffects {
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
     private readonly chainNetworkService: ChainNetworkService,
+    private readonly contractService: ContractService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>

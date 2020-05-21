@@ -32,6 +32,7 @@ import {
   faCircle,
   faChevronLeft,
   faChevronRight,
+  faExpand,
   faThumbsUp,
   faThumbsDown,
   faHandRock
@@ -76,6 +77,7 @@ export const addFontAwesome = () => {
     faCircle,
     faChevronLeft,
     faChevronRight,
+    faExpand,
     faThumbsUp,
     faThumbsDown,
     faHandRock

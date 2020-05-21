@@ -11,6 +11,8 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { fillTransferOperations } from '@tezblock/domain/contract'
 
 @Injectable()
 export class TransactionDetailEffects {
@@ -35,6 +37,7 @@ export class TransactionDetailEffects {
       ),
       switchMap(([{ transactionHash }, pagination, orderBy]) =>
         this.apiService.getTransactionsById(transactionHash, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
+          switchMap(data => fillTransferOperations(data, this.chainNetworkService)),
           map(data => actions.loadTransactionsByHashSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByHashFailed({ error })))
         )
@@ -190,6 +193,7 @@ export class TransactionDetailEffects {
     private readonly apiService: ApiService,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

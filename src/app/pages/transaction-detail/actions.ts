@@ -45,4 +45,6 @@ export const loadTransactionsErrorsSucceeded = createAction(
 )
 export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
+export const changeKind = createAction(`[${featureName}] Change kind`, props<{ kind: string }>())
+
 export const reset = createAction(`[${featureName}] Reset`)

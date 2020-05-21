@@ -2,12 +2,12 @@
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "symbol": "STKR",
     "name": "Staker",
-    "website": "http://www.stakerdao.com/",
+    "website": "https://stakerdao.com",
     "description": "The Staker token is the governance token for the StakerDAO ecosystem.  STKR holders participate in StakerDAO decision making and elect the Staker Council.",
     "socials": [
       {
         "type": "website",
-        "url": "http://www.stakerdao.com/"
+        "url": "https://stakerdao.com"
       },
       {
         "type": "twitter",
@@ -24,12 +24,12 @@
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "symbol": "tzBTC",
     "name": "tzBTC",
-    "website": "http://www.tzbtc.io/",
+    "website": "https://tzbtc.io",
     "description": "tzBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
     "socials": [
       {
         "type": "website",
-        "url": "http://www.tzbtc.io/"
+        "url": "https://tzbtc.io"
       }
     ],
     "tezosNetwork": ["mainnet"],

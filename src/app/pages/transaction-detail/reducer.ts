@@ -16,6 +16,7 @@ export interface State {
   transactionHash: string
   transactions: TableState<Transaction>
   counts: Count[]
+  kind: string
   latestBlock: Block
   totalAmount: number
   totalFee: number
@@ -31,6 +32,7 @@ const initialState: State = {
   transactionHash: undefined,
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
+  kind: 'transaction',
   latestBlock: undefined,
   totalAmount: undefined,
   totalFee: undefined
@@ -106,6 +108,10 @@ export const reducer = createReducer(
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
     transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
+  })),
+  on(actions.changeKind, (state, { kind }) => ({
+    ...state,
+    kind
   })),
   on(actions.reset, () => initialState)
 )
