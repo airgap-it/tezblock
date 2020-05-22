@@ -27,7 +27,7 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { getFaProtocol } from '@tezblock/domain/airgap'
+import { getFaProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 export interface OperationCount {
   [key: string]: string
@@ -1200,6 +1200,7 @@ export class ApiService {
       .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
+  // not used anywhere
   getFrozenBalance(tzAddress: string): Observable<number> {
     return this.http
       .post<any[]>(
@@ -1432,7 +1433,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => balances.sort((a, b) => a.asof - b.asof)),
@@ -1500,7 +1501,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => {

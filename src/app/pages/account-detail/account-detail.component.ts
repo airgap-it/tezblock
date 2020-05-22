@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest } from 'rxjs'
-import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
+import { delay, map, filter, withLatestFrom, switchMap, distinctUntilChanged, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
@@ -374,6 +374,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .pipe(
           map(bakerTableRatings => get<BakerTableRatings>(bakerTableRatings => bakerTableRatings.stakingCapacity)(bakerTableRatings)),
           filter(negate(isNil)),
+          take(1),
           switchMap(stakingCapacity =>
             this.bakingService.getBakerInfos(address).pipe(
               map(bakerInfos => {
@@ -390,7 +391,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
                   numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
                   stakingCapacity,
                   stakingProgress,
-                  stakingBond
+                  stakingBond,
+                  frozenBalance: bakerInfos.frozen_balance
                 }
               })
             )

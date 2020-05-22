@@ -161,11 +161,12 @@ export class AccountDetailEffects {
         this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
           switchMap(currentCycleCache => {
             const bakingBadRating = get(currentCycleCache, `fromAddress[${address}].bakerData.bakingBadRating`)
+            const stakingCapacity = get(currentCycleCache, `fromAddress[${address}].bakerData.stakingCapacity`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${address}].tezosBakerFee`)
 
             // bug was reported so now I compare to undefined OR null, not only undefined
-            if (bakingBadRating && tezosBakerFee) {
-              return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
+            if (bakingBadRating && tezosBakerFee && stakingCapacity) {
+              return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee, stakingCapacity })
             }
 
             return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
@@ -191,7 +192,8 @@ export class AccountDetailEffects {
                 ...get(currentCycleCache, `fromAddress[${state.address}]`),
                 bakerData: {
                   ...get(currentCycleCache, `fromAddress[${state.address}].bakerData`),
-                  bakingBadRating: state.bakerTableRatings.bakingBadRating
+                  bakingBadRating: state.bakerTableRatings.bakingBadRating,
+                  stakingCapacity: state.bakerTableRatings.stakingCapacity // not confirmed if should be cached..
                 },
                 tezosBakerFee: state.tezosBakerFee
               }
