@@ -101,8 +101,8 @@ export class AmountCellComponent implements OnInit {
 
   ngOnInit() {
     this.currencyAmount$ = this.options$.pipe(
-      switchMap(
-        options => this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
+      switchMap(options =>
+        this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
           filter(currencyConverterArgs => currencyConverterArgs && this.data !== undefined),
           map(this.getFormattedCurremcy.bind(this))
         )
@@ -129,13 +129,17 @@ export class AmountCellComponent implements OnInit {
 
   private setAmountPiped() {
     const protocolIdentifier = get<any>(o => o.symbol)(this.options) || 'xtz'
-    const converted = this.amountConverterPipe.transform(this.data || 0, {
-      protocolIdentifier,
-      maxDigits: this.maxDigits
-    })
+    const converted: string =
+      this.amountConverterPipe.transform(this.data || 0, {
+        protocolIdentifier,
+        maxDigits: this.maxDigits
+      }) || '0'
     const decimals = pipe<string, number, string>(
       stringNumber => parseFloat(stringNumber.replace(',', '')),
-      numericValue => this.decimalPipe.transform(numericValue, this.getPrecision(converted)).split('.')[1]
+      pipe(
+        numericValue => this.decimalPipe.transform(numericValue, this.getPrecision(converted)),
+        decimalPiped => (decimalPiped ? decimalPiped.split('.')[1] : decimalPiped)
+      )
     )(converted)
 
     this.amountPipedLeadingChars = converted.split('.')[0]
