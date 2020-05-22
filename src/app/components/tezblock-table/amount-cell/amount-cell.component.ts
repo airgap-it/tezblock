@@ -23,6 +23,31 @@ export interface AmountOptions {
   fontSmall?: boolean
 }
 
+export const getPrecision = (value: string | number, options?: AmountOptions): string => {
+  const numericValue: number = typeof value === 'string' ? parseFloat(value.replace(',', '')) : value
+  const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(options)
+  const hasDecimals = (numericValue - Math.floor(numericValue)) !== 0
+
+  // this case overrides options.decimals
+  if (numericValue === 0 || !hasDecimals) {
+    return '1.0-0'
+  }
+
+  if (digitsInfo) {
+    return digitsInfo
+  }
+
+  if (numericValue >= 1000) {
+    return '1.0-0'
+  }
+
+  if (numericValue < 1) {
+    return '1.2-8'
+  }
+
+  return '1.2-2'
+}
+
 @Component({
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
@@ -97,7 +122,7 @@ export class AmountCellComponent implements OnInit {
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly decimalPipe: DecimalPipe
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.currencyAmount$ = this.options$.pipe(
@@ -135,35 +160,11 @@ export class AmountCellComponent implements OnInit {
     })
     const decimals = pipe<string, number, string>(
       stringNumber => parseFloat(stringNumber.replace(',', '')),
-      numericValue => this.decimalPipe.transform(numericValue, this.getPrecision(converted)).split('.')[1]
+      numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted, this.options)).split('.')[1]
     )(converted)
 
     this.amountPipedLeadingChars = converted.split('.')[0]
     this.amountPipedTrailingChars = decimals
-  }
-
-  private getPrecision(value: string): string {
-    const numericValue = parseFloat(value.replace(',', ''))
-    const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(this.options)
-
-    // this case overrides options.decimals
-    if (numericValue === 0) {
-      return '1.0-0'
-    }
-
-    if (digitsInfo) {
-      return digitsInfo
-    }
-
-    if (numericValue >= 1000) {
-      return '1.0-0'
-    }
-
-    if (numericValue < 1) {
-      return '1.2-8'
-    }
-
-    return '1.2-2'
   }
 
   private getFormattedCurremcy(args: CurrencyConverterPipeArgs): string {
@@ -173,6 +174,6 @@ export class AmountCellComponent implements OnInit {
 
     const converted = this.currencyConverterPipe.transform(this.data || 0, args)
 
-    return this.decimalPipe.transform(converted, this.getPrecision(converted.toString()))
+    return this.decimalPipe.transform(converted, getPrecision(converted, this.options))
   }
 }

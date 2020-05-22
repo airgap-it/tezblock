@@ -10,6 +10,9 @@ import * as actions from './actions'
 import { ApiService } from '@tezblock/services/api/api.service'
 import * as fromRoot from '@tezblock/reducers'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
+import { fillTransferOperations } from '@tezblock/domain/contract'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 @Injectable()
 export class BlockDetailEffects {
@@ -48,6 +51,7 @@ export class BlockDetailEffects {
         this.apiService
           .getTransactionsByField(blockHash, 'block_hash', kind, pagination.currentPage * pagination.selectedSize, orderBy)
           .pipe(
+            switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
             map(data => actions.loadTransactionsByKindSucceeded({ data })),
             catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
           )
@@ -132,6 +136,7 @@ export class BlockDetailEffects {
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly blockService: BlockService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router,
     private readonly store$: Store<fromRoot.State>
   ) {}

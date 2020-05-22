@@ -28,7 +28,7 @@ export interface Predicate {
 
 export interface Aggregation {
   field: string
-  function: 'count' | 'sum'
+  function: 'count' | 'sum' | 'max'
 }
 
 export type Direction = 'asc' | 'desc'
