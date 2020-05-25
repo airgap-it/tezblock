@@ -3,6 +3,7 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { get } from '@tezblock/services/fp'
 
 export interface State {
   manager: string
@@ -189,3 +190,10 @@ export const reducer = createReducer(
   })),
   on(actions.reset, () => initialState)
 )
+
+export const transferOperationsSelector = (state: State): ContractOperation[] => {
+  const pagination = state.transferOperations.pagination
+  const to = pagination.currentPage * pagination.selectedSize
+
+  return get<ContractOperation[]>(data => data.slice(0, to))(state.transferOperations.data)
+}

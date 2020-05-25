@@ -159,16 +159,16 @@
                   <p class="text-secondary mb-0">Transactions Last 24 Hours</p>
                 </div>
                 <div class=" col-md-9">
-                  <!-- TODO -->
+                  {{ transactions24hCount$ | async }}
                 </div>
               </div>
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Transaction Volume Last 24 Hourss</p>
+                  <p class="text-secondary mb-0">Transaction Volume Last 24 Hours</p>
                 </div>
                 <div class=" col-md-9">
-                  <!-- TODO -->
+                  {{ transactions24hVolume$ | async }}
                 </div>
               </div>
             </div>
