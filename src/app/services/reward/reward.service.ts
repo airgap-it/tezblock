@@ -22,7 +22,7 @@ export interface DoubleEvidence {
 
 interface BalanceUpdate {
   kind: string
-  category: string 
+  category: string
   delegate: string
   cycle: number
   change: string
@@ -63,6 +63,10 @@ export class RewardService {
           .filter(cycle => cycle >= 7)
       )
     )
+  }
+
+  getCycles4Rewards(): Observable<number[]> {
+    return this.getCurrentCycle().pipe(map(currentCycle => range(0, 6).map(index => currentCycle - 2 + index)))
   }
 
   getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
@@ -130,7 +134,7 @@ export class RewardService {
     return from(this.calculateRewards(address, cycle)).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
   }
 
-  private getCurrentCycle(): Observable<number> {
+  getCurrentCycle(): Observable<number> {
     return this.store$.select(fromRoot.app.currentCycle).pipe(filter(negate(isNil)), take(1))
   }
 
@@ -168,19 +172,25 @@ export class RewardService {
     )
   }
 
-  private findEvidenceOperationInBlock(block: any, operationGroupHash: string, kind: 'double_baking_evidence'|'double_endorsement_evidence'): any {
+  private findEvidenceOperationInBlock(
+    block: any,
+    operationGroupHash: string,
+    kind: 'double_baking_evidence' | 'double_endorsement_evidence'
+  ): any {
     const indexForEvidenceOperations = 2
     const operationGroups: any[] = block.operations[indexForEvidenceOperations]
-    const operationGroup = operationGroups.find((operationGroup) => operationGroup.hash === operationGroupHash)
+    const operationGroup = operationGroups.find(operationGroup => operationGroup.hash === operationGroupHash)
     return operationGroup.contents.find((operation: { kind: string }) => operation.kind === kind)
   }
 
   private getDoubleEvidenceInfo(balanceUpdates: BalanceUpdate[]): Omit<DoubleEvidence, 'denouncedBlockLevel'> {
-    const deposits = balanceUpdates.find((update) => update.category === 'deposits')
-    const lostAmount = balanceUpdates.filter((update) => update.delegate === deposits.delegate).reduce((current, next) => {
-      return current.plus(new BigNumber(next.change))
-    }, new BigNumber(0))
-    const bakerRewards = balanceUpdates.filter((update) => update.category === 'rewards' && update.delegate !== deposits.delegate)
+    const deposits = balanceUpdates.find(update => update.category === 'deposits')
+    const lostAmount = balanceUpdates
+      .filter(update => update.delegate === deposits.delegate)
+      .reduce((current, next) => {
+        return current.plus(new BigNumber(next.change))
+      }, new BigNumber(0))
+    const bakerRewards = balanceUpdates.filter(update => update.category === 'rewards' && update.delegate !== deposits.delegate)
     const rewardsAmount = bakerRewards.reduce((current, next) => {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
