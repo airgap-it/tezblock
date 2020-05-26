@@ -156,7 +156,11 @@
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Transactions Last 24 Hours</p>
+                  <p class="text-secondary mb-0">
+                    Transactions
+                    <br />
+                    <small>Last 24 Hours</small>
+                  </p>
                 </div>
                 <div class=" col-md-9">
                   {{ transactions24hCount$ | async }}
@@ -165,7 +169,11 @@
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Transaction Volume Last 24 Hours</p>
+                  <p class="text-secondary mb-0">
+                    Volume
+                    <br />
+                    <small>Last 24 Hours</small>
+                  </p>
                 </div>
                 <div class=" col-md-9">
                   {{ transactions24hVolume$ | async }}
