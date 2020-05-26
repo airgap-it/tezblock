@@ -168,7 +168,7 @@
                   <p class="text-secondary mb-0">Transaction Volume Last 24 Hours</p>
                 </div>
                 <div class=" col-md-9">
-                  {{ transactions24hVolume$ | async }}
+                  <amount-cell [data]="transactions24hVolume$ | async" [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"></amount-cell>
                 </div>
               </div>
             </div>

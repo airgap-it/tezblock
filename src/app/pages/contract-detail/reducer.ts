@@ -4,6 +4,7 @@ import * as actions from './actions'
 import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { get } from '@tezblock/services/fp'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 
 export interface State {
   manager: string
@@ -187,6 +188,10 @@ export const reducer = createReducer(
       ...state.tokenHolders,
       loading: false
     }
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transferOperations: <TableState<ContractOperation>>getTransactionsWithErrors(operationErrorsById, state.transferOperations)
   })),
   on(actions.reset, () => initialState)
 )

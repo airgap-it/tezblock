@@ -2,6 +2,8 @@ import { createAction, props } from '@ngrx/store'
 
 import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { OperationErrorsById } from '@tezblock/domain/operations'
 
 const featureName = 'Contract Detail'
 
@@ -54,6 +56,13 @@ export const loadOperationsCountSucceeded = createAction(
   props<{ transferTotal: number, otherTotal: number }>()
 )
 export const loadOperationsCountFailed = createAction(`[${featureName}] Load Operations Count Failed`, props<{ error: any }>())
+
+export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[] }>())
+export const loadTransactionsErrorsSucceeded = createAction(
+  `[${featureName}] Load Transactions Errors Succeeded`,
+  props<{ operationErrorsById: OperationErrorsById[] }>()
+)
+export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const changeOperationsTab = createAction(`[${featureName}] Change Operations Tab`, props<{ currentTabKind: OperationTab }>())
 
