@@ -13,6 +13,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-token-contract-overview',
@@ -26,7 +27,11 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
   orderBy$: Observable<OrderBy>
   columns: Column[]
 
-  constructor(private readonly actions$: Actions, private readonly store$: Store<fromRoot.State>) {
+  constructor(
+    private readonly actions$: Actions,
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
+  ) {
     super()
 
     this.store$.dispatch(actions.reset())
@@ -36,10 +41,10 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
     this.data$ = this.store$.select(state => state.tokenContractOveview.tokenContracts.data)
     this.loading$ = this.store$.select(state => state.tokenContractOveview.tokenContracts.loading)
     this.showLoadMore$ = this.store$
-    .select(state => state.tokenContractOveview.tokenContracts)
-    .pipe(map(contracts => (contracts.data || []).length < contracts.pagination.total))
+      .select(state => state.tokenContractOveview.tokenContracts)
+      .pipe(map(contracts => (contracts.data || []).length < contracts.pagination.total))
     this.orderBy$ = this.store$.select(state => state.tokenContractOveview.tokenContracts.orderBy)
-    this.columns = columns()
+    this.columns = columns(this.translateService)
 
     this.store$.dispatch(actions.loadTokenContracts())
 

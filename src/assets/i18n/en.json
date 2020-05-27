@@ -576,6 +576,12 @@
       "age": "Age",
       "block": "Block",
       "tx-hash": "Tx Hash"
+    },
+    "token-contract": {
+      "asset": "Asset",
+      "contract-address": "Contract Address",
+      "total-supply": "Total Supply",
+      "description": "Description"
     }
   }
 }
