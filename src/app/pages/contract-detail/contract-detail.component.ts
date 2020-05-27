@@ -12,13 +12,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import * as appActions from '@tezblock/app.actions'
-import {
-  getConventer,
-  TokenContract,
-  Social,
-  SocialType,
-  ContractOperation
-} from '@tezblock/domain/contract'
+import { getConventer, TokenContract, Social, SocialType, ContractOperation } from '@tezblock/domain/contract'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
@@ -29,6 +23,7 @@ import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-contract-detail',
@@ -102,7 +97,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private translateService: TranslateService
   ) {
     super()
 
@@ -180,9 +176,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
       )
         .pipe(filter(([address, contract]) => !!address && !!contract))
-        .subscribe(([address, contract, counts]) =>
-          this.updateTabs(address, contract, counts)
-        ),
+        .subscribe(([address, contract, counts]) => this.updateTabs(address, contract, counts)),
 
       this.contract$
         .pipe(
@@ -245,7 +239,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           pageId,
           showFiatValue,
           symbol: contract.symbol,
-          conventer: getConventer(contract)
+          conventer: getConventer(contract),
+          translate: this.translateService
         })
       },
       {
@@ -254,7 +249,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           pageId,
           showFiatValue,
           symbol: contract.symbol,
-          conventer: getConventer(contract)
+          conventer: getConventer(contract),
+          translate: this.translateService
         })
       }
     ]

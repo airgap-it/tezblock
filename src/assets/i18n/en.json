@@ -567,6 +567,15 @@
       "ballot": "Ballot",
       "age": "Age",
       "number-of-votes": "# of Votes"
+    },
+    "transfers": {
+      "from": "From",
+      "to": "To",
+      "amount": "Amount",
+      "fee": "Fee",
+      "age": "Age",
+      "block": "Block",
+      "tx-hash": "Tx Hash"
     }
   }
 }
