@@ -92,6 +92,7 @@ export const selectApp = (state: State) => state.app
 export const selectBakerTable = (state: State) => state.bakerTable
 export const selectProposalDetails = (state: State) => state.proposalDetails
 export const selectDashboard = (state: State) => state.dashboard
+export const selectContractDetails = (state: State) => state.contractDetails
 
 export const dashboard = {
   currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector),
@@ -126,4 +127,8 @@ export const blockDetails = {
 
 export const bakerTable = {
   bakerReward: (cycle: number) => createSelector(selectBakerTable, fromBakerTable.bakerRewardSelector(cycle))
+}
+
+export const contractDetails = {
+  transferOperations: createSelector(selectContractDetails, fromContractDetails.transferOperationsSelector)
 }

@@ -3,6 +3,8 @@ import { createReducer, on } from '@ngrx/store'
 import * as actions from './actions'
 import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
+import { get } from '@tezblock/services/fp'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 
 export interface State {
   manager: string
@@ -187,5 +189,16 @@ export const reducer = createReducer(
       loading: false
     }
   })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transferOperations: <TableState<ContractOperation>>getTransactionsWithErrors(operationErrorsById, state.transferOperations)
+  })),
   on(actions.reset, () => initialState)
 )
+
+export const transferOperationsSelector = (state: State): ContractOperation[] => {
+  const pagination = state.transferOperations.pagination
+  const to = pagination.currentPage * pagination.selectedSize
+
+  return get<ContractOperation[]>(data => data.slice(0, to))(state.transferOperations.data)
+}

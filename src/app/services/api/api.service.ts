@@ -1565,10 +1565,7 @@ export class ApiService {
             errors: match.length > 0 ? flatten(match.map(item => flatten(item.contents.map(contentToErrors)))) : null
           }
         })
-      ),
-      map(x => {
-        return x //TODO remove this map
-      })
+      )
     )
   }
 }

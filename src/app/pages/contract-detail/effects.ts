@@ -16,6 +16,7 @@ import { getTokenContractByAddress } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { ContractService } from '@tezblock/services/contract/contract.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { maxLimit } from '@tezblock/services/base.service'
 
 @Injectable()
 export class ContractDetailEffects {
@@ -117,11 +118,10 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
       withLatestFrom(
-        this.store$.select(state => state.contractDetails.transferOperations.pagination),
         this.store$.select(state => state.contractDetails.transferOperations.orderBy)
       ),
-      switchMap(([{ contract }, pagination, orderBy]) =>
-        this.contractService.loadTransferOperations(contract, orderBy, pagination.currentPage * pagination.selectedSize)
+      switchMap(([{ contract }, orderBy]) =>
+        this.contractService.loadTransferOperations(contract, orderBy, maxLimit)
         .pipe(
           map(data => actions.loadTransferOperationsSucceeded({ data })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
@@ -130,11 +130,23 @@ export class ContractDetailEffects {
     )
   )
 
-  loadMoreTransferOperations$ = createEffect(() =>
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadMoreTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadTransferOperations({ contract }))
+      ofType(actions.loadTransferOperationsSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
     )
   )
 
