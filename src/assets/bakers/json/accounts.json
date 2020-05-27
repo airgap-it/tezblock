@@ -118,7 +118,12 @@
     "hasLogo": true
   },
   "tz1MXFrtZoaXckE41bjUCSjAjAap3AFDSr3N": {
+    "alias": "Everstake Legacy",
+    "hasLogo": true
+  },
+  "tz1aRoaRhSpRYvFdyvgWLL6TGyRoGF51wDjM": {
     "alias": "Everstake",
+    "logoReference": "tz1MXFrtZoaXckE41bjUCSjAjAap3AFDSr3N",
     "hasLogo": true
   },
   "tz1MkaTVYdM9QvXxKvYEwG9BPN2XxriTs7Jh": {
