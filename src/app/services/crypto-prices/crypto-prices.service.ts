@@ -2,21 +2,22 @@ import { Injectable } from '@angular/core'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
-import { Observable, from } from 'rxjs'
+import { Observable, from, of } from 'rxjs'
 import { filter, map, tap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { isNil, negate } from 'lodash'
+
+import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
+import * as fromRoot from '@tezblock/reducers'
+import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export enum PricePeriod {
   day = 0,
   week = 1,
   threeMonths = 2
 }
-
-import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
-import * as fromRoot from '@tezblock/reducers'
-import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
-import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract'
 
 export interface CurrencyInfo {
   symbol: string
@@ -80,6 +81,10 @@ export class CryptoPricesService {
   }
 
   getCurrencyConverterArgs(symbol: string): Observable<CurrencyConverterPipeArgs> {
+    if (symbol && !isConvertableToUSD(symbol)) {
+      return of(null)
+    }
+
     if (!symbol) {
       return this.store$
         .select(state => state.app.fiatCurrencyInfo)
@@ -91,6 +96,9 @@ export class CryptoPricesService {
 
     return this.store$
       .select(state => state.app.exchangeRates)
-      .pipe(map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates)))
+      .pipe(
+        filter(negate(isNil)),
+        map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates))
+      )
   }
 }

@@ -1417,7 +1417,7 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
+    const protocol = getFaProtocol(contract, this.chainNetworkService)
 
     return from(protocol.getTransactions(10, cursor))
   }
@@ -1552,12 +1552,6 @@ export class ApiService {
           return copiedBalances
         })
       )
-  }
-
-  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService, this.environmentUrls)
-
-    return from(protocol.getTotalSupply())
   }
 
   getErrorsForOperations(operations: Transaction[]): Observable<OperationErrorsById[]> {

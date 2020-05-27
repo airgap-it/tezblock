@@ -149,8 +149,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         const accountAddress = paramMap.get('id')
 
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
-        this.store$.dispatch(actions.loadBakingRights())
-        this.store$.dispatch(actions.loadEndorsingRights())
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())

@@ -1,6 +1,7 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean }) => Column[] } = {
   [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean }) => [
@@ -29,14 +30,25 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: 'Amount',
       field: 'amount',
-      data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
+      data: (item: Transaction) => ({
+        data: item.amount,
+        options: {
+          ...options,
+          comparisonTimestamp: item.timestamp,
+          symbol: item.symbol,
+          showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+        }
+      }),
       template: Template.amount,
       sortable: true
     },
     {
       name: 'Fee',
       field: 'fee',
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+      }),
       template: Template.amount,
       sortable: true
     },
@@ -91,7 +103,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+      }),
       sortable: true
     },
     {
@@ -144,7 +159,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+      }),
       sortable: true
     },
     {
