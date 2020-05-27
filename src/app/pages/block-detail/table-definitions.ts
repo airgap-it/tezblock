@@ -30,14 +30,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: options.translate.instant('tezblock-table.transaction.amount'),
       field: 'amount',
-      data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
       template: Template.amount,
       sortable: true
     },
     {
       name: options.translate.instant('tezblock-table.transaction.fee'),
       field: 'fee',
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       template: Template.amount,
       sortable: true
     },
@@ -85,14 +85,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.delegation.amount'),
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.delegatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
       name: options.translate.instant('tezblock-table.delegation.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
@@ -122,7 +122,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.origination.balance'),
       field: 'originatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
@@ -145,14 +145,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.origination.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: true } }),
+      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
       name: options.translate.instant('tezblock-table.origination.burn'),
       field: 'burn',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.burn }, options: { showFiatValue: false } }),
+      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
       sortable: false
     },
     {

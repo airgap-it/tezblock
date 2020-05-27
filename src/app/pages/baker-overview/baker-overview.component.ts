@@ -171,9 +171,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
             const stakingBalance = <number>data.datasets[0].data[tooltipItem.index]
             const stakingBalanceLabel = this.amountConverterPipe.transform(stakingBalance, {
               protocolIdentifier: 'xtz',
-              maxDigits: 6,
-              fontSmall: true,
-              fontColor: true
+              maxDigits: 6
             })
 
             return `${bakerName} ${stakingBalanceLabel} ꜩ`

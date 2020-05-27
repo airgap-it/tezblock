@@ -43,11 +43,11 @@ export class AccountDetailEffects {
     )
   )
 
-  getRewardAmont$ = createEffect(() =>
+  getRewardAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadRewardAmont),
       switchMap(action =>
-        this.rewardService.getRewardAmont(action.accountAddress, action.bakerAddress).pipe(
+        this.rewardService.getRewardAmount(action.accountAddress, action.bakerAddress).pipe(
           map(rewardAmont => actions.loadRewardAmontSucceeded({ rewardAmont })),
           catchError(error => of(actions.loadRewardAmontFailed({ error })))
         )

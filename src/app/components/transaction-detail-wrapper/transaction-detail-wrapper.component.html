@@ -80,7 +80,7 @@
       </div>
       <ng-container *ngIf="totalAmount !== undefined; else loadingTemplate">
         <div class="col col-md-9">
-          <amount-cell [data]="{ amount: totalAmount }" [options]="{ showFiatValue: isMainnet, maxDigits: 8 }"></amount-cell>
+          <amount-cell [data]="totalAmount" [options]="{ showFiatValue: isMainnet, comparisonTimestamp: latestTransaction?.timestamp, maxDigits: 8 }"></amount-cell>
         </div>
       </ng-container>
       <ng-template #hideValue>
@@ -100,7 +100,7 @@
       </div>
       <ng-container *ngIf="amountFromLatestTransactionFee; else loadingTemplate">
         <div class=" col-md-9">
-          <amount-cell [data]="amountFromLatestTransactionFee" [options]="{ showFiatValue: true, maxDigits: 8 }"></amount-cell>
+          <amount-cell [data]="amountFromLatestTransactionFee.data" [options]="amountFromLatestTransactionFee.options"></amount-cell>
         </div>
       </ng-container>
     </div>

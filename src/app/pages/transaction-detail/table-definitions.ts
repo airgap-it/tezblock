@@ -32,8 +32,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'amount',
       template: Template.amount,
       data: (item: Transaction) => ({
-        data: { amount: item.amount, timestamp: item.timestamp },
-        options: { showFiatValue: true, maxDigits: 8 }
+        data: item.amount,
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
       }),
       sortable: true
     },
@@ -42,8 +42,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
-        data: { amount: item.fee, timestamp: item.timestamp },
-        options: { showFiatValue: true, maxDigits: 8 }
+        data: item.fee,
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },
@@ -101,7 +101,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.delegation.value'),
       field: 'delegatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.delegatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.delegatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
@@ -109,8 +109,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
-        data: { amount: item.fee, timestamp: item.timestamp },
-        options: { showFiatValue: true, maxDigits: 8 }
+        data: item.fee,
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },
@@ -145,7 +145,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.origination.balance'),
       field: 'originatedBalance',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options }),
+      data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
@@ -169,8 +169,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
-        data: { amount: item.fee, timestamp: item.timestamp },
-        options: { showFiatValue: true, maxDigits: 8 }
+        data: item.fee,
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: false
     },
@@ -178,7 +178,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.origination.burn'),
       field: 'burn',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: { amount: item.burn }, options: { showFiatValue: false } }),
+      data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
       sortable: false
     },
     {
@@ -221,8 +221,8 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
-        data: { amount: item.fee, timestamp: item.timestamp },
-        options: { showFiatValue: true, maxDigits: 8 }
+        data: item.fee,
+        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
       }),
       sortable: true
     },

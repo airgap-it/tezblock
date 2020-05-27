@@ -65,7 +65,7 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.name' | translate }}</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.name }}</p>
                 </div>
               </div>
@@ -73,7 +73,7 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.symbol' | translate }}</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.symbol }}</p>
                 </div>
               </div>
@@ -81,14 +81,13 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.total-supply' | translate }}</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">
                     <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
                     <amount-cell
-                      [data]="{ amount: contract.totalSupply }"
+                      [data]="contract.totalSupply"
                       [options]="{
                         symbol: contract.symbol,
-                        conventer: conventer$ | async,
                         showFiatValue: showFiatValue$ | async
                       }"
                     ></amount-cell>
@@ -99,7 +98,7 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.decimals' | translate }}</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   {{ contract.decimals }}
                 </div>
               </div>
@@ -107,7 +106,7 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.manager' | translate }}</p>
                 </div>
-                <div class="col-md-7">
+                <div class="col-md-9">
                   <address-item [address]="manager$ | async"></address-item>
                 </div>
               </div>
@@ -125,7 +124,7 @@
                 <div class=" col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.description' | translate }}</p>
                 </div>
-                <div class=" col-md-7">
+                <div class="col-md-9">
                   <p class="mb-0">{{ contract.description }}</p>
                 </div>
               </div>
@@ -134,7 +133,7 @@
                 <div class=" col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.website' | translate }}</p>
                 </div>
-                <div class=" col-md-7">
+                <div class="col-md-9">
                   <a [href]="website$ | async" target="_blank">
                     {{ website$ | async }}
                   </a>
@@ -145,7 +144,7 @@
                 <div class="col-md-5">
                   <p class="text-secondary mb-0">{{ 'contract-detail.social-profiles' | translate }}</p>
                 </div>
-                <div class=" col-md-7">
+                <div class=" col-md-9">
                   <a
                     *ngFor="let social of contract.socials"
                     class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"

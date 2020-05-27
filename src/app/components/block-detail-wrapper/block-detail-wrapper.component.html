@@ -72,7 +72,7 @@
     </div>
     <ng-container *ngIf="amountFromBlockVolume; else loadingTemplate">
       <div class=" col-md-9">
-        <amount-cell [data]="amountFromBlockVolume"></amount-cell>
+        <amount-cell [data]="amountFromBlockVolume.data" [options]="amountFromBlockVolume.options"></amount-cell>
       </div>
     </ng-container>
   </div>
@@ -87,7 +87,7 @@
     </div>
     <ng-container *ngIf="amountFromBlockFee; else loadingTemplate">
       <div class=" col-md-9">
-        <amount-cell [data]="amountFromBlockFee"></amount-cell>
+        <amount-cell [data]="amountFromBlockFee.data" [options]="amountFromBlockFee.options"></amount-cell>
       </div>
     </ng-container>
     <ng-template #hideValue>

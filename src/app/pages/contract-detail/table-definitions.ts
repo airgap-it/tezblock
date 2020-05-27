@@ -1,13 +1,12 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { TranslateService } from '@ngx-translate/core'
 
 export const columns: {
-  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer; translate?: any }) => Column[]
+  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: any }) => Column[]
 } = {
-  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer; translate?: TranslateService }) => [
+  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: TranslateService }) => [
     {
-      name: options.translate.instant('tezblock-table.transfers.from'),
+      name: 'From',
       field: 'singleFrom',
       width: '1',
       template: Template.address,
@@ -30,11 +29,10 @@ export const columns: {
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: false
@@ -43,7 +41,7 @@ export const columns: {
       name: options.translate.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
       sortable: false
     },
     {
@@ -65,7 +63,7 @@ export const columns: {
       template: Template.hash
     }
   ],
-  other: (options: { pageId: string; showFiatValue: boolean; symbol: string; conventer: Conventer; translate?: TranslateService }) => [
+  other: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: TranslateService }) => [
     {
       name: options.translate.instant('tezblock-table.transfers.from'),
       field: 'source',
@@ -90,11 +88,10 @@ export const columns: {
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: true
@@ -103,7 +100,7 @@ export const columns: {
       name: options.translate.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
@@ -111,6 +108,10 @@ export const columns: {
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
+    },
+    {
+      name: options.translate.instant('tezblock-table.transfers.entrypoint'),
+      field: 'entrypoint'
     },
     {
       name: options.translate.instant('tezblock-table.transfers.block'),

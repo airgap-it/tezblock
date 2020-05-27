@@ -22,19 +22,19 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean; trans
       name: options.translate.instant('baker-table.baking-rights.block-rewards'),
       field: 'blockRewards',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: { amount: item.blockRewards }, options })
+      data: (item: AggregatedBakingRights) => ({ data: item.blockRewards, options })
     },
     {
       name: options.translate.instant('baker-table.baking-rights.deposits'),
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: { amount: item.deposits }, options })
+      data: (item: AggregatedBakingRights) => ({ data: item.deposits, options })
     },
     {
       name: options.translate.instant('baker-table.baking-rights.fees'),
       field: 'fees',
       template: Template.amount,
-      data: (item: AggregatedBakingRights) => ({ data: { amount: item.fees }, options })
+      data: (item: AggregatedBakingRights) => ({ data: item.fees, options })
     }
   ],
 
@@ -53,13 +53,13 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean; trans
       name: options.translate.instant('baker-table.endorsing-rights.endorsement-rewards'),
       field: 'endorsementRewards',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: { amount: item.endorsementRewards }, options })
+      data: (item: AggregatedEndorsingRights) => ({ data: item.endorsementRewards, options })
     },
     {
       name: options.translate.instant('baker-table.endorsing-rights.deposits'),
       field: 'deposits',
       template: Template.amount,
-      data: (item: AggregatedEndorsingRights) => ({ data: { amount: item.deposits }, options })
+      data: (item: AggregatedEndorsingRights) => ({ data: item.deposits, options })
     }
   ],
 
@@ -78,25 +78,25 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean; trans
     {
       name: options.translate.instant('baker-table.rewards.staking-balance'),
       field: 'stakingBalance',
-      data: (item: TezosRewards) => ({ data: { amount: item.stakingBalance }, options }),
+      data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
       template: Template.amount
     },
     {
       name: options.translate.instant('baker-table.rewards.block-rewards'),
       field: 'bakingRewards',
-      data: (item: TezosRewards) => ({ data: { amount: item.bakingRewards }, options }),
+      data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
       template: Template.amount
     },
     {
       name: options.translate.instant('baker-table.rewards.endorsement-rewards'),
       field: 'endorsingRewards',
-      data: (item: TezosRewards) => ({ data: { amount: item.endorsingRewards }, options }),
+      data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
       template: Template.amount
     },
     {
       name: options.translate.instant('baker-table.rewards.fees'),
       field: 'fees',
-      data: (item: TezosRewards) => ({ data: { amount: item.fees }, options: { showFiatValue: false } }),
+      data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
       template: Template.amount
     }
   ]

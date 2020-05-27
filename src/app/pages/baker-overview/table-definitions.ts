@@ -1,5 +1,4 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Block } from '@tezblock/interfaces/Block'
 import { TranslateService } from '@ngx-translate/core'
 
 export const columns = (translate: TranslateService): Column[] => [
@@ -12,7 +11,7 @@ export const columns = (translate: TranslateService): Column[] => [
     name: translate.instant('tezblock-table.baker-overview.balance'),
     field: 'balance',
     template: Template.amount,
-    data: (item: any) => ({ data: { amount: item.balance } }),
+    data: (item: any) => ({ data: item.balance }),
     sortable: true
   },
   {
@@ -23,7 +22,7 @@ export const columns = (translate: TranslateService): Column[] => [
     name: translate.instant('tezblock-table.baker-overview.staking-balance'),
     field: 'staking_balance',
     template: Template.amount,
-    data: (item: any) => ({ data: { amount: item.staking_balance } }),
+    data: (item: any) => ({ data: item.staking_balance }),
     sortable: true
   },
   {

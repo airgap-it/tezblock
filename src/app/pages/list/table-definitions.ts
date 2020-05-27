@@ -4,7 +4,6 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import { Account } from '@tezblock/interfaces/Account'
-import { getConventer, TokenContract } from '@tezblock/domain/contract'
 import { TranslateService } from '@ngx-translate/core'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean; translate?: any }) => Column[] } = {
@@ -26,13 +25,16 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
       name: options.translate.instant('tezblock-table.block-list.transaction-volume'),
       field: 'volume',
       template: Template.amount,
-      data: (item: Block) => ({ data: { amount: item.volume, timestamp: item.timestamp } })
+      data: (item: Block) => ({ data: item.volume, options: { comparisonTimestamp: item.timestamp } })
     },
     {
       name: options.translate.instant('tezblock-table.block-list.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: Block) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } })
+      data: (item: Block) => ({
+        data: item.fee,
+        options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+      })
     },
     {
       name: options.translate.instant('tezblock-table.block-list.transactions'),
@@ -82,14 +84,17 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         name: options.translate.instant('tezblock-table.transaction-list.amount'),
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.amount, timestamp: item.timestamp }, options }),
+        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
         sortable: true
       },
       {
         name: options.translate.instant('tezblock-table.transaction-list.fees'),
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        }),
         sortable: true
       },
       {
@@ -142,7 +147,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         name: options.translate.instant('tezblock-table.origination-list.balance'),
         field: 'originatedBalance',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.originatedBalance, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: options.translate.instant('tezblock-table.origination-list.originator'),
@@ -164,7 +169,10 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         name: options.translate.instant('tezblock-table.origination-list.fee'),
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
@@ -205,13 +213,16 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         name: options.translate.instant('tezblock-table.delegation-list.value'),
         field: 'amount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.fee, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: options.translate.instant('tezblock-table.delegation-list.fee'),
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: item.fee, timestamp: item.timestamp }, options: { showFiatValue: false } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        }),
         sortable: true
       },
       {
@@ -299,6 +310,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
     [
       {
         name: options.translate.instant('tezblock-table.double-baking-list.baker'),
+        field: 'baker',
+
         template: Template.address
       },
       {
@@ -309,21 +322,29 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
       },
       {
         name: options.translate.instant('tezblock-table.double-baking-list.reward'),
+        field: 'reward',
+
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: options.translate.instant('tezblock-table.double-baking-list.offender'),
+        field: 'offender',
+
         template: Template.address
       },
       {
         name: options.translate.instant('tezblock-table.double-baking-list.denounced-level'),
+        field: 'denouncedLevel',
+
         template: Template.block
       },
       {
         name: options.translate.instant('tezblock-table.double-baking-list.lost-amount'),
+        field: 'lostAmount',
+
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
 
@@ -334,6 +355,8 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
     [
       {
         name: options.translate.instant('tezblock-table.double-endorsement-list.baker'),
+        field: 'baker',
+
         template: Template.address
       },
       {
@@ -344,21 +367,26 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
       },
       {
         name: options.translate.instant('tezblock-table.double-endorsement-list.reward'),
+        field: 'reward',
+
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
         name: options.translate.instant('tezblock-table.double-endorsement-list.offender'),
+        field: 'offender',
         template: Template.address
       },
       {
         name: options.translate.instant('tezblock-table.double-endorsement-list.denounced-level'),
+        field: 'denouncedLevel',
         template: Template.block
       },
       {
         name: options.translate.instant('tezblock-table.double-endorsement-list.lost-amount'),
+        field: 'lostAmount',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: { amount: null, timestamp: item.timestamp }, options })
+        data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
 
@@ -394,7 +422,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
       name: options.translate.instant('tezblock-table.contract-list.balance'),
       field: 'balance',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.balance } }),
+      data: (item: any) => ({ data: item.balance }),
       sortable: true
     },
     {

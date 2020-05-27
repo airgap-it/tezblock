@@ -344,7 +344,8 @@
         "priority": "Priority",
         "rewards": "Rewards",
         "fees": "Fees",
-        "deposits": "Deposists"
+        "deposits": "Deposists",
+        "payout": "Payout"
       }
     },
     "endorsing-rights": {
@@ -578,7 +579,8 @@
       "fee": "Fee",
       "age": "Age",
       "block": "Block",
-      "tx-hash": "Tx Hash"
+      "tx-hash": "Tx Hash",
+      "entrypoint": "Entry Point"
     },
     "token-contract": {
       "asset": "Asset",

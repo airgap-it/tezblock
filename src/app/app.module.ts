@@ -21,6 +21,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
+import { NgxJsonViewerModule } from 'ngx-json-viewer'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -127,6 +128,7 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ModalModule.forRoot(),
     FontAwesomeModule,
     ChartsModule,
+    NgxJsonViewerModule,
     StoreModule.forRoot(ROOT_REDUCERS, {
       metaReducers,
       runtimeChecks: {

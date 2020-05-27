@@ -70,7 +70,7 @@
                   *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
-                    <amount-cell [data]="{ amount: account.balance }" [options]="{ showFiatValue: false }"></amount-cell>
+                    <amount-cell [data]="account.balance" [options]="{ showFiatValue: false }"></amount-cell>
                   </h5>
                 </div>
                 <ng-template #hideValue>
@@ -207,7 +207,7 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <amount-cell [data]="{ amount: delegatedAmount }" [options]="{ showFiatValue: isMainnet }"></amount-cell>
+                      <amount-cell [data]="delegatedAmount" [options]="{ showFiatValue: isMainnet }"></amount-cell>
                     </p>
                   </div>
                 </div>
@@ -249,7 +249,7 @@
                       <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
                         <amount-cell
                           *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
-                          [data]="{ amount: rewardAmountMinusFee }"
+                          [data]="rewardAmountMinusFee"
                         ></amount-cell>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           {{ 'account-detail.not-available' | translate }}
@@ -300,8 +300,8 @@
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <ng-container *ngIf="account.is_baker">
               <baker-table
+                [address]="bakerAddress"
                 [tabs]="bakerTabs"
-                [page]="'account'"
                 [data]="bakerTableInfos"
                 [ratings]="bakerTableRatings$ | async"
                 [bakerFee$]="tezosBakerFee$"
