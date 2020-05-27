@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } 
 import { DecimalPipe } from '@angular/common'
 import { Observable, BehaviorSubject, pipe } from 'rxjs'
 import { switchMap, filter, map } from 'rxjs/operators'
-import * as moment from 'moment'
+import moment from 'moment'
 import BigNumber from 'bignumber.js'
 
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
@@ -101,8 +101,8 @@ export class AmountCellComponent implements OnInit {
 
   ngOnInit() {
     this.currencyAmount$ = this.options$.pipe(
-      switchMap(
-        options => this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
+      switchMap(options =>
+        this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
           filter(currencyConverterArgs => currencyConverterArgs && this.data !== undefined),
           map(this.getFormattedCurremcy.bind(this))
         )

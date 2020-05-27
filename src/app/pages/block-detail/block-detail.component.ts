@@ -16,12 +16,13 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { refreshRate } from '@tezblock/domain/synchronization'
-import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
+import { columns } from './table-definitions'
 
 @Component({
   selector: 'app-block-detail',
@@ -53,7 +54,8 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
   }
@@ -130,56 +132,56 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   private setTabs(pageId: string) {
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.block-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.block-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.block-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Endorsements',
+        title: this.translateService.instant('tabbed-table.block-detail.endorsements'),
         active: false,
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Activations',
+        title: this.translateService.instant('tabbed-table.block-detail.activations'),
         active: false,
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }

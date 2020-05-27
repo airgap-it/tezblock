@@ -32,6 +32,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { TranslateService } from '@ngx-translate/core'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -213,7 +214,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -242,6 +244,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             )
       )
     )
+
     this.isRewardAmountMinusFeeBusy$ = this.account$.pipe(
       switchMap(account =>
         account.is_baker
@@ -445,7 +448,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     setTimeout(() => {
       this.current = 'copyGrey'
     }, 1500)
-    this.toastrService.success('has been copied to clipboard', address)
+    this.toastrService.success(this.translateService.instant('copy-modal.has-been-copied'), address)
   }
 
   sortBy(orderBy: OrderBy) {
@@ -455,45 +458,45 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   private setTabs(pageId: string) {
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.account-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.account-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.account-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Endorsements',
+        title: this.translateService.instant('tabbed-table.account-detail.endorsements'),
         active: false,
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
@@ -502,7 +505,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.bakerTabs = [
       {
-        title: 'Baker Overview',
+        title: this.translateService.instant('baker-table.baker-overview.baker-overview'),
         active: true,
         kind: 'baker_overview',
         count: undefined,
@@ -512,7 +515,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Baking Rights',
+        title: this.translateService.instant('baker-table.baking-rights.baking-rights'),
         active: false,
         kind: 'baking_rights',
         count: undefined,
@@ -522,7 +525,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Endorsing Rights',
+        title: this.translateService.instant('baker-table.endorsing-rights.endorsing-rights'),
         active: false,
         kind: 'endorsing_rights',
         count: undefined,
@@ -532,7 +535,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Rewards',
+        title: this.translateService.instant('baker-table.rewards.rewards'),
         active: false,
         kind: 'rewards',
         count: undefined,
@@ -542,12 +545,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Votes',
+        title: this.translateService.instant('baker-table.votes'),
         active: false,
         kind: 'ballot',
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return this.count === 0
         }

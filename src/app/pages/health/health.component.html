@@ -7,27 +7,30 @@
             <div class="row">
               <div class="col-10">
                 <h5 class="card-title mb-4">
-                  Tezos Node Health
+                  {{ 'health.tezos-node-health' | translate }}
                 </h5>
               </div>
               <div class="col-2 d-flex justify-content-end">
-                <div class="health--indicator  rounded" [ngClass]="{'bg-success': isNodeUp$ | async, 'bg-danger': !(isNodeUp$ | async)}"></div>
+                <div
+                  class="health--indicator  rounded"
+                  [ngClass]="{ 'bg-success': isNodeUp$ | async, 'bg-danger': !(isNodeUp$ | async) }"
+                ></div>
               </div>
             </div>
             <div class="row mb-3">
               <div class=" col-md-5">
-                <p class="text-secondary mb-0">Status</p>
+                <p class="text-secondary mb-0">{{ 'health.status' | translate }}</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
                 <p class="m-0" [ngSwitch]="isNodeUp$ | async">
-                  <ng-container *ngSwitchCase="true">Up</ng-container>
-                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                  <ng-container *ngSwitchCase="true">{{ 'health.up' | translate }}</ng-container>
+                  <ng-container *ngSwitchCase="false">{{ 'health.down' | translate }}</ng-container>
                 </p>
               </div>
             </div>
             <div class="row mb-3">
               <div class=" col-md-5">
-                <p class="text-secondary mb-0">Latest Block Seen</p>
+                <p class="text-secondary mb-0">{{ 'health.latest-block-seen' | translate }}</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
                 <p class="m-0">
@@ -44,27 +47,30 @@
             <div class="row">
               <div class="col-10">
                 <h5 class="card-title mb-4">
-                  Conseil Health
+                  {{ 'health.conseil-health' | translate }}
                 </h5>
               </div>
               <div class="col-2 d-flex justify-content-end">
-                <div class="health--indicator bg-success rounded" [ngClass]="{'bg-success': isConseilUp$ | async, 'bg-danger': !(isConseilUp$ | async)}"></div>
+                <div
+                  class="health--indicator bg-success rounded"
+                  [ngClass]="{ 'bg-success': isConseilUp$ | async, 'bg-danger': !(isConseilUp$ | async) }"
+                ></div>
               </div>
             </div>
             <div class="row mb-3">
               <div class=" col-md-5">
-                <p class="text-secondary mb-0">Status</p>
+                <p class="text-secondary mb-0">{{ 'health.status' | translate }}</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
                 <p class="m-0" [ngSwitch]="isConseilUp$ | async">
-                  <ng-container *ngSwitchCase="true">Up</ng-container>
-                  <ng-container *ngSwitchCase="false">Down</ng-container>
+                  <ng-container *ngSwitchCase="true">{{ 'health.up' | translate }}</ng-container>
+                  <ng-container *ngSwitchCase="false">{{ 'health.down' | translate }}</ng-container>
                 </p>
               </div>
             </div>
             <div class="row mb-3">
               <div class=" col-md-5">
-                <p class="text-secondary mb-0">Latest Block Seen</p>
+                <p class="text-secondary mb-0">{{ 'health.latest-block-seen' | translate }}</p>
               </div>
               <div class="col-md-7 d-flex justify-content-sm-end">
                 <p class="m-0">

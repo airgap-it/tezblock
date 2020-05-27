@@ -1,7 +1,18 @@
-import { Component, EventEmitter, Input, OnInit, Output, TemplateRef, TrackByFunction, ViewChild, ChangeDetectionStrategy } from '@angular/core'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  TemplateRef,
+  TrackByFunction,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core'
 
 import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
 import { Options } from '@tezblock/components/address-item/address-item.component'
+import { TranslateService } from '@ngx-translate/core'
 
 export enum Template {
   address,
@@ -19,7 +30,7 @@ export interface Column {
   name?: string
   field?: string
   width?: string
-  data?: (item: any) => { data?: any, options?: Options }
+  data?: (item: any) => { data?: any; options?: Options }
   template?: TemplateRef<any> | Template
   sortable?: boolean | undefined
 }
@@ -30,15 +41,15 @@ export interface ExpandedRow<Entity> {
   primaryKey: string
 }
 
-export const blockAndTxHashColumns: Column[] = [
+export const blockAndTxHashColumns = (translate: TranslateService): Column[] => [
   {
-    name: 'Block',
+    name: translate.instant('tezblock-table.block-and-txhash.block'),
     field: 'block_level',
     template: Template.block,
     sortable: true
   },
   {
-    name: 'Tx Hash',
+    name: translate.instant('tezblock-table.block-and-txhash.tx-hash'),
     field: 'operation_group_hash',
     template: Template.hash,
     data: (item: any) => ({ data: item.operation_group_hash })
@@ -100,7 +111,7 @@ export class TezblockTableComponent implements OnInit {
   @Output()
   downloadClicked: EventEmitter<void> = new EventEmitter()
 
-  @Output() 
+  @Output()
   onLoadMore: EventEmitter<void> = new EventEmitter()
 
   @Output()

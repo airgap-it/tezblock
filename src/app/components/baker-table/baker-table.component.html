@@ -5,13 +5,13 @@
       <thead>
         <tr>
           <th>
-            Baker Account
+            {{ 'baker-table.rewards.expanded-rows.baker-account' | translate }}
           </th>
           <th>
-            Payout
+            {{ 'baker-table.rewards.expanded-rows.payout' | translate }}
           </th>
           <th>
-            Share
+            {{ 'baker-table.rewards.expanded-rows.share' | translate }}
           </th>
         </tr>
       </thead>
@@ -62,7 +62,7 @@
             <div class="col-md-6 col-lg-4">
               <div class="mb-3">
                 <h5 class="card-title__secondary mb-3">
-                  Full Balance
+                  {{ 'baker-table.baker-overview.full-balance' | translate }}
                 </h5>
                 <h3>
                   <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
@@ -74,11 +74,11 @@
                   <div class="container p-0">
                     <div class="row mb-2">
                       <div class="col">
-                        <p class="text-secondary m-0">Staking Balance</p>
+                        <p class="text-secondary m-0">{{ 'baker-table.baker-overview.staking-balance' | translate }}</p>
                       </div>
                       <div class="col">
                         <p class="text-right text-secondary m-0">
-                          Staking Capactiy
+                          {{ 'baker-table.baker-overview.staking-capacity' | translate }}
                         </p>
                       </div>
                     </div>
@@ -118,10 +118,12 @@
                 <div class="col-md-12">
                   <div class="mb-4">
                     <h5 class="card-title__secondary mb-3">
-                      Payout Account
+                      {{ 'baker-table.baker-overview.payout-account' | translate }}
                     </h5>
                     <address-item *ngIf="data?.payoutAddress; else noPayoutAddress" [address]="data?.payoutAddress"></address-item>
-                    <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
+                    <ng-template #noPayoutAddress>
+                      <p class="text-secondary m-0">{{ 'baker-table.baker-overview.no-related-payout' | translate }}</p>
+                    </ng-template>
                   </div>
                 </div>
               </div>
@@ -130,11 +132,11 @@
                 <div class="container p-0">
                   <div class="row mb-2">
                     <div class="col">
-                      <p class="text-secondary m-0">Staking Balance</p>
+                      <p class="text-secondary m-0">{{ 'baker-table.baker-overview.staking-balance' | translate }}</p>
                     </div>
                     <div class="col">
                       <p class="text-right text-secondary m-0">
-                        Staking Capactiy
+                        {{ 'baker-table.baker-overview.staking-capacity' | translate }}
                       </p>
                     </div>
                   </div>
@@ -154,7 +156,7 @@
             <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
               <div class="mb-4">
                 <h5 class="card-title__secondary mb-3 ">
-                  Frozen Balance
+                  {{ 'baker-table.baker-overview.frozen-balance' | translate }}
                 </h5>
                 <h5>
                   <amount-cell
@@ -170,7 +172,7 @@
 
               <div class="mb-4">
                 <h5 class="card-title__secondary mb-3 ">
-                  Active Delegations
+                  {{ 'baker-table.baker-overview.active-delegations' | translate }}
                 </h5>
                 <h5>
                   <ng-container *ngIf="accountLoading$ | async; else loaded">
@@ -186,7 +188,7 @@
 
               <div class="mb-4">
                 <h5 class="card-title__secondary mb-3">
-                  Number of Rolls
+                  {{ 'baker-table.baker-overview.number-of-rolls' | translate }}
                 </h5>
                 <h5>
                   <ng-container *ngIf="!data?.numberOfRolls; else rolls">
@@ -200,7 +202,7 @@
 
               <div>
                 <h5 class="card-title__secondary mb-3">
-                  Next Baking Right
+                  {{ 'baker-table.baker-overview.next-baking-right' | translate }}
                 </h5>
                 <ng-container *ngIf="upcomingRightsLoading$ | async; else nextBakingRight">
                   <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
@@ -212,14 +214,14 @@
                       <app-timestamp-cell [data]="baking?.estimated_time"></app-timestamp-cell>
                     </h5>
                   </div>
-                  <ng-template #noBaking>not available</ng-template>
+                  <ng-template #noBaking>{{ 'baker-table.baker-overview.not-available' | translate }}</ng-template>
                 </ng-template>
               </div>
             </div>
             <div class=" col-md-6 col-lg-4">
               <div class="mb-3">
                 <h5 class="card-title__secondary mb-2">
-                  Payout Accuracy
+                  {{ 'baker-table.baker-overview.payout-accuracy' | translate }}
                 </h5>
                 <div class="d-block">
                   <div
@@ -241,7 +243,7 @@
                         <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="ratings?.bakingBadRating === null">
-                        not available
+                        {{ 'baker-table.baker-overview.not-available' | translate }}
                       </ng-container>
                     </a>
                   </div>
@@ -249,7 +251,7 @@
               </div>
               <div class="mb-3">
                 <h5 class="card-title__secondary mb-2">
-                  Baking Efficiency
+                  {{ 'baker-table.baker-overview.baking-efficiency' | translate }}
                 </h5>
                 <div class="d-block">
                   <div
@@ -271,7 +273,7 @@
                         <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="ratings?.tezosBakerRating === null">
-                        not available
+                        {{ 'baker-table.baker-overview.not-available' | translate }}
                       </ng-container>
                     </a>
                   </div>
@@ -279,8 +281,8 @@
               </div>
               <div class="mb-4">
                 <h5 class="card-title__secondary mb-2">
-                  Efficiency
-                  <small>Last 10 Cycles</small>
+                  {{ 'baker-table.baker-overview.efficiency' | translate }}
+                  <small>{{ 'baker-table.baker-overview.last10cycles' | translate }}</small>
                 </h5>
                 <div class="d-block">
                   <div
@@ -302,7 +304,7 @@
                         <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="(efficiencyLast10Cycles$ | async) === null">
-                        not available
+                        {{ 'baker-table.baker-overview.not-available' | translate }}
                       </ng-container>
                     </a>
                   </div>
@@ -311,7 +313,7 @@
 
               <div>
                 <h5 class="card-title__secondary mb-3">
-                  Next Endorsing Right
+                  {{ 'baker-table.baker-overview.next-endorsing-right' | translate }}
                 </h5>
                 <ng-container *ngIf="upcomingRightsLoading$ | async; else nextEndorsingRight">
                   <loading-skeleton [loadingWidth]="'50%'"></loading-skeleton>
@@ -323,7 +325,7 @@
                       <app-timestamp-cell [data]="endorsing?.estimated_time"></app-timestamp-cell>
                     </h5>
                   </div>
-                  <ng-template #noEndorsing>not available</ng-template>
+                  <ng-template #noEndorsing>{{ 'baker-table.baker-overview.not-available' | translate }}</ng-template>
                 </ng-template>
               </div>
             </div>
@@ -342,7 +344,9 @@
         [pagination]="true"
         (onLoadMore)="loadMoreRights()"
       ></tezblock-table>
-      <ng-template #noRights><div class="p-0 pt-3 p-md-3">not available</div></ng-template>
+      <ng-template #noRights>
+        <div class="p-0 pt-3 p-md-3">{{ 'baker-table.baker-overview.not-available' | translate }}</div>
+      </ng-template>
     </ng-container>
 
     <ng-container *ngIf="tab.kind === 'rewards'">

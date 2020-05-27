@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core'
-import { Router, NavigationEnd } from '@angular/router'
-import { filter } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
+import { NavigationEnd, Router } from '@angular/router'
 import { Actions, ofType } from '@ngrx/effects'
+import { Store } from '@ngrx/store'
+import { filter } from 'rxjs/operators'
 
-import * as actions from './app.actions'
-import * as fromRoot from '@tezblock/reducers'
+import { TranslateService } from '@ngx-translate/core'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './app.actions'
 import { AnalyticsService } from './services/analytics/analytics.service'
+import defaultLanguage from './../assets/i18n/en.json'
 
 @Component({
   selector: 'app-root',
@@ -15,15 +17,19 @@ import { AnalyticsService } from './services/analytics/analytics.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  supportedLanguages = ['en', 'de', 'zh-cn']
+
   constructor(
     private readonly actions$: Actions,
     readonly router: Router,
     private readonly store$: Store<fromRoot.State>,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly translate: TranslateService
   ) {
+    this.loadLanguages(this.supportedLanguages)
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
+      .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: e as NavigationEnd })))
 
     getRefresh([
       this.actions$.pipe(ofType(actions.loadLatestBlockSucceeded)),
@@ -35,14 +41,32 @@ export class AppComponent implements OnInit {
       this.actions$.pipe(ofType(actions.loadCryptoPriceSucceeded)),
       this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
     ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
-
-    this.store$.dispatch(actions.loadPeriodInfos())
+      this.store$.dispatch(actions.loadPeriodInfos())
   }
 
-  navigate(entity: string) {
+  loadLanguages(supportedLanguages: string[]) {
+    this.translate.setTranslation('en', defaultLanguage)
+    this.translate.setDefaultLang('en')
+
+    const language = this.translate.getBrowserLang()
+
+    if (language) {
+      const lowerCaseLanguage = language.toLowerCase()
+      supportedLanguages.forEach(supportedLanguage => {
+        if (supportedLanguage.startsWith(lowerCaseLanguage)) {
+          this.translate.use(supportedLanguage)
+        }
+      })
+    } else {
+      this.translate.use('en')
+    }
+  }
+
+  public navigate(entity: string) {
     this.router.navigate([`${entity}/list`])
   }
-  ngOnInit() {
+  public ngOnInit() {
     this.analyticsService.init()
+    this.loadLanguages(this.supportedLanguages)
   }
 }

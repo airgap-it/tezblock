@@ -1,17 +1,10 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { TranslateService } from '@ngx-translate/core'
 
 export const columns: {
-  [key: string]: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => Column[]
+  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: any }) => Column[]
 } = {
-  transfers: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => [
+  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: TranslateService }) => [
     {
       name: 'From',
       field: 'singleFrom',
@@ -25,14 +18,14 @@ export const columns: {
       template: Template.symbol
     },
     {
-      name: 'To',
+      name: options.translate.instant('tezblock-table.transfers.to'),
       field: 'singleTo',
       width: '1',
       template: Template.address,
       data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
-      name: 'Amount',
+      name: options.translate.instant('tezblock-table.transfers.amount'),
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
@@ -45,38 +38,34 @@ export const columns: {
       sortable: false
     },
     {
-      name: 'Fee',
+      name: options.translate.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2'} }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
       sortable: false
     },
     {
-      name: 'Age',
+      name: options.translate.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
       data: (item: any) => ({ data: item.timestamp * 1000 }),
       sortable: true
     },
     {
-      name: 'Block',
+      name: options.translate.instant('tezblock-table.transfers.block'),
       field: 'blockHeight',
       template: Template.block,
       sortable: true
     },
     {
-      name: 'Tx Hash',
+      name: options.translate.instant('tezblock-table.transfers.tx-hash'),
       field: 'hash',
       template: Template.hash
     }
   ],
-  other: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => [
+  other: (options: { pageId: string; showFiatValue: boolean; symbol: string; translate?: TranslateService }) => [
     {
-      name: 'From',
+      name: options.translate.instant('tezblock-table.transfers.from'),
       field: 'source',
       width: '1',
       template: Template.address,
@@ -88,14 +77,14 @@ export const columns: {
       template: Template.symbol
     },
     {
-      name: 'To',
+      name: options.translate.instant('tezblock-table.transfers.to'),
       field: 'destination',
       width: '1',
       template: Template.address,
       data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
-      name: 'Amount',
+      name: options.translate.instant('tezblock-table.transfers.amount'),
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
@@ -108,30 +97,30 @@ export const columns: {
       sortable: true
     },
     {
-      name: 'Fee',
+      name: options.translate.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
       sortable: true
     },
     {
-      name: 'Age',
+      name: options.translate.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
     },
     {
-      name: 'Entry Point',
+      name: options.translate.instant('tezblock-table.transfers.entrypoint'),
       field: 'entrypoint'
     },
     {
-      name: 'Block',
+      name: options.translate.instant('tezblock-table.transfers.block'),
       field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
-      name: 'Tx Hash',
+      name: options.translate.instant('tezblock-table.transfers.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash
     }

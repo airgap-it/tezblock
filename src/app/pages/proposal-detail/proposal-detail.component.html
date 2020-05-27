@@ -4,11 +4,11 @@
       <div class="card h-100 pt-3 ">
         <div class="card-body p-4">
           <h5 class="card-title mb-4 ">
-            Proposal
+            {{ 'proposal-detail.proposal' | translate }}
           </h5>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Proposal Hash</p>
+              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-hash' | translate }}</p>
             </div>
             <div class="col-md-9">
               <p class="mb-0">
@@ -26,7 +26,7 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Proposal Name</p>
+              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-name' | translate }}</p>
             </div>
             <div class="col-md-9">
               {{ proposal.proposal | alias: 'proposal' }}
@@ -34,7 +34,7 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Period</p>
+              <p class="text-secondary mb-0">{{ 'proposal-detail.period' | translate }}</p>
             </div>
             <div class="col-md-9">
               {{ proposal.period }}
@@ -42,14 +42,14 @@
           </div>
           <div *ngIf="proposal.discussionLink" class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">Proposal Discussion</p>
+              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-discussion' | translate }}</p>
             </div>
             <div class="col-md-9">
               <div class="d-block">
                 <div>
                   <img src="/assets/img/tezos-agora.svg" width="16px" />
                   <a role="button" class="btn btn-link py-0 text-capitalize" [href]="proposal.discussionLink" target="_blank">
-                    Discussion on Tezos Agora
+                    {{ 'proposal-detail.discussion-on-tezos' | translate }}
                   </a>
                 </div>
               </div>
@@ -57,7 +57,7 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">More Information</p>
+              <p class="text-secondary mb-0">{{ 'proposal-detail.more-info' | translate }}</p>
             </div>
             <div class="col-md-9">
               <div class="d-block">
@@ -69,7 +69,7 @@
                     [href]="'https://www.tezosagora.org/period/' + proposal.period"
                     target="_blank"
                   >
-                    Details of Proposal on Tezos Agora
+                    {{ 'proposal-detail.details-of-proposal' | translate }}
                   </a>
                 </div>
               </div>
@@ -86,8 +86,10 @@
                 aria-controls="collapseBasic"
                 [ngClass]="{ 'btn--rotated': !isCollapsed }"
               >
-                <span>{{ isCollapsed ? 'More Proposal' : 'Less Proposal' }}</span>
-                Details
+                <span>
+                  {{ isCollapsed ? ('proposal-detail.more-proposal' | translate) : ('proposal-detail.less-proposal' | translate) }}
+                </span>
+                {{ 'proposal-detail.details' | translate }}
                 <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
               </button>
               <div
@@ -122,19 +124,25 @@
               <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
                 <div class="pl-0 pl-md-3 py-3">
                   <strong>
-                    {{ periodKind$ | async }} period has ended, period was between {{ periodTimespan.start | amDateFormat: 'LL' }} and
+                    {{ periodKind$ | async }} {{ 'proposal-detail.period-has-ended' | translate }}
+                    {{ periodTimespan.start | amDateFormat: 'LL' }} {{ 'proposal-detail.and' | translate }}
                     {{ periodTimespan.end | amDateFormat: 'LL' }}
                   </strong>
                 </div>
               </ng-container>
               <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
                 <div class="pl-0 pl-md-3 py-3">
-                  <strong>The current {{ periodKind$ | async }} period ends on {{ periodTimespan.end | amDateFormat: 'LL' }}</strong>
+                  <strong>
+                    {{ 'proposal-detail.the-current' | translate }} {{ periodKind$ | async }}
+                    {{ 'proposal-detail.period-ends' | translate }}
+                    {{ periodTimespan.end | amDateFormat: 'LL' }}
+                  </strong>
                 </div>
               </ng-container>
               <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
                 <div class="pl-0 pl-md-3 py-3">
-                  {{ periodKind$ | async }} period will start on {{ periodTimespan.start | amDateFormat: 'LL' }}
+                  {{ periodKind$ | async }} {{ 'proposal-detail.period-will-start' | translate }}
+                  {{ periodTimespan.start | amDateFormat: 'LL' }}
                 </div>
               </ng-container>
             </ng-container>
@@ -150,10 +158,10 @@
     <div class="container p-0">
       <div class="card p-3">
         <h5 class="card-title mb-4 ">
-          Invalid Proposal hash
+          {{ 'proposal-detail.invalid-proposal-hash' | translate }}
         </h5>
         <p>
-          This operation hash is invalid.
+          {{ 'proposal-detail.invalid-proposal-text' | translate }}
         </p>
       </div>
     </div>

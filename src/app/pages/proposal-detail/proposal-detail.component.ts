@@ -23,6 +23,7 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import * as moment from 'moment'
 import { get } from '@tezblock/services/fp'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -51,7 +52,8 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private translateService: TranslateService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -79,14 +81,14 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       combineLatest(
         this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
         this.store$.select(state => state.proposalDetails.proposal)
-      ).pipe(
-        filter(([paramMap, proposal]) => !!proposal)
-      ).subscribe(() => {
-        const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
-        const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
+      )
+        .pipe(filter(([paramMap, proposal]) => !!proposal))
+        .subscribe(() => {
+          const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
+          const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
 
-        this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
-      }),
+          this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
+        }),
 
       getRefresh([this.actions$.pipe(ofType(actions.loadVotesSucceeded)), this.actions$.pipe(ofType(actions.loadVotesFailed))])
         .pipe(
@@ -159,21 +161,21 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   private setTabs(selectedTitle: string = 'Proposal') {
     this.tabs = [
       {
-        title: 'Proposal',
+        title: this.translateService.instant('tabbed-table.proposal-detail.proposal'),
         active: selectedTitle === 'Proposal',
         kind: PeriodKind.Proposal,
         count: undefined,
         icon: this.iconPipe.transform('fileUpload'),
-        columns: columns.filter(column => column.field !== 'ballot'),
+        columns: columns(this.translateService).filter(column => column.field !== 'ballot'),
         disabled: () => false
       },
       {
-        title: 'Exploration',
+        title: this.translateService.instant('tabbed-table.proposal-detail.exploration'),
         active: selectedTitle === 'Exploration',
         kind: PeriodKind.Exploration,
         count: undefined,
         icon: this.iconPipe.transform('binoculars'),
-        columns,
+        columns: columns(this.translateService),
         disabled: () => {
           const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
 
@@ -188,12 +190,12 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Testing',
+        title: this.translateService.instant('tabbed-table.proposal-detail.exploration'),
         active: selectedTitle === 'Testing',
         kind: PeriodKind.Testing,
         count: undefined,
         icon: this.iconPipe.transform('hammer'),
-        columns,
+        columns: columns(this.translateService),
         emptySign: '-',
         disabled: () => {
           const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
@@ -208,12 +210,12 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Promotion',
+        title: this.translateService.instant('tabbed-table.proposal-detail.promotion'),
         active: selectedTitle === 'Promotion',
         kind: PeriodKind.Promotion,
         count: undefined,
         icon: this.iconPipe.transform('graduationCap'),
-        columns,
+        columns: columns(this.translateService),
         disabled: () => {
           const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
 

@@ -1,0 +1,599 @@
+{
+  "header-item": {
+    "by": "by AirGap",
+    "cycle": "Cycle",
+    "overview_button": "Overview",
+    "blockchain_button": "Blockchain",
+    "operations_button": "Operations",
+    "transactions_button": "Transactions",
+    "activations_button": "Activations",
+    "originations_button": "Originations",
+    "accounts_button": "Accounts",
+    "network-validation_button": "Network Validation",
+    "bakers_button": "Bakers",
+    "blocks_button": "Blocks",
+    "endorsements_button": "Endorsements",
+    "delegations_button": "Delegations",
+    "double-baking-evidence_button": "Double Baking Evidence",
+    "double-endorsement-evidence_button": "Double Endorsement Evidence",
+    "governance_button": "Governance",
+    "votes_button": "Votes",
+    "proposals_button": "Proposals",
+    "smart-contracts_button": "Smart Contracts",
+    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "contracts_button": "Contracts",
+    "resources_button": "Resources",
+    "wallets_button": "Wallets",
+    "constants_button": "Constants",
+    "tezblock-health_button": "tezblock Health",
+    "dapps_button": "Dapps",
+    "development_button": "Development"
+  },
+  "footer-item": {
+    "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
+    "behind": "Behind tezblock",
+    "about": "About",
+    "social-links": "Social Links",
+    "donations": "Donations"
+  },
+  "dashboard": {
+    "explore": "Explore the Tezos Blockchain",
+    "current-cycle": "Current Cycle",
+    "cycle": "Cycle",
+    "governance": "Governance",
+    "period": "Period until",
+    "no-proposal": "No Proposal submitted yet",
+    "of": "of",
+    "circulating-supply": "Circulating Supply",
+    "market-cap": "Market Cap",
+    "tezos-price": "Tezos Price Last",
+    "24h_button": "24 hrs",
+    "7d_button": "7 days",
+    "90d_button": "90 days",
+    "at": "at",
+    "latest-asset": "Latest Asset Contracts",
+    "all-assets_button": "All Assets",
+    "latest-transfers": "Latest Transfers",
+    "latest-blocks": "Latest Blocks",
+    "all-blocks_button": "All Blocks",
+    "latest-transactions": "Latest Transactions",
+    "all-transactions_button": "All Transactions"
+  },
+  "list": {
+    "transactions": {
+      "transactions": "Transactions",
+      "last24h": "last 24 hours",
+      "transaction-volume": "Transaction Volume",
+      "last7d": "last 7 days"
+    },
+    "blocks": "Blocks",
+    "activations": "Activations",
+    "originations": "Originations",
+    "delegations": "Delegations",
+    "endorsements": "Endorsements",
+    "votes": "Votes",
+    "proposals": "Proposals",
+    "double-baking-evidence": "Double Baking Evidence",
+    "double-endorsement-evidence": "Double Endorsement Evidence",
+    "assets-smart-contracts": "Assets Smart Contracts",
+    "contracts": "Contracts"
+  },
+  "account-overview": {
+    "accounts": "Accounts",
+    "top25": "Top 25 Accounts by Balance"
+  },
+  "baker-overview": {
+    "bakers": "Bakers",
+    "total-number": "Total Number of Bakers",
+    "top25": "Top 25 Bakers by Staking Balance"
+  },
+  "resources-wallets": {
+    "wallets": "Wallets",
+    "introduction_1": "A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list updated and",
+    "introduction_2": "if a wallet is missing.",
+    "let-us-know_link": "let us know",
+    "wallet-item": {
+      "features": "Features",
+      "download_button": "Download"
+    },
+    "airgap": {
+      "title": "AirGap",
+      "description": "With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your XTZ with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
+      "features": "Offline device, Highest security, XTZ delegation, Coin agnostic, Secure storage, Social recovery, Hot wallet option"
+    },
+    "atomic": {
+      "title": "Atomic Wallet",
+      "description": "Atomic is a decentralized wallet that supports 300+ cryptocurrency assets. Strong encryption and custody-free solution guarantee their users the highest level of security. Atomic Wallet provides instant exchange and 'buy crypto with a credit card' feature.",
+      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, XTZ delegation"
+    },
+    "atomex": {
+      "title": "Atomex",
+      "description": "Multicurrency HD wallet with built-in hybrid atomic swap exchange.",
+      "features": "HD wallet, built-in hybrid atomic swap DEX"
+    },
+    "cortez": {
+      "title": "Cortez",
+      "description": "Mobile wallet developed by Nomadic Labs.",
+      "features": "Mobile"
+    },
+    "galleon": {
+      "title": "Galleon",
+      "description": "Galleon is a smart wallet for Tezos. Galleon is a deployment of Tezori, an open source wallet framework for Tezos, supporting both software and hardware wallets in eight languages on Mac, Windows and Linux.",
+      "features": "Ledger Support, Delegation"
+    },
+    "kukai": {
+      "title": "Kukai",
+      "description": "One of the first Tezos wallets with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in their wallet.",
+      "features": "Ledger Support, Delegation, Offline-signing"
+    },
+    "magnum": {
+      "title": "Magnum Wallet",
+      "description": "Magnum Wallet is a multicurrency non-custodial wallet service. Designed for those who wish to manage their crypto portfolio in a secure and convenient interface, it also lets the user earn rewards through staking or by claiming forks and bounty airdrops. As part of their “Multiply Your Funds” paradigm, the team is always on the lookout for new ways to benefit the users.",
+      "features": "Blockchain Agnostic, In-App Exchange, Hardware Wallets, Ultimate Security, Passive Income, Forks & Bounties"
+    },
+    "paytomat": {
+      "title": "paytomat",
+      "description": "paytomat is a non-custodial wallet that brings financial services that modern customers eager. From exchanging assets, to referral programs, to trading BEP-2 tokens or accessing dApps and games, paytomat supports over 14 cryptocurrencies and covers all of a user's wants and needs in one single app.",
+      "features": "reliable, decentralized, convenient"
+    },
+    "simplestacking": {
+      "title": "simplestacking.com",
+      "description": "Safe way to store & stake Tezos. Desktop & Web wallet with Trezor support.",
+      "features": "Trezor T, multiple wallets, wallet balance history"
+    },
+    "tezbox": {
+      "title": "TezBox",
+      "description": "TezBox was the earliest functional GUI wallet for Tezos. TezBox has grown to be one of the major community developed wallets and will continue to provide users and developers with an easy to use, powerful and secure wallet.",
+      "features": "Secure, Mobile, Developer Friendly, Open Source, Hardware Wallet Support"
+    }
+  },
+  "protocol-constants": {
+    "periods": "Periods",
+    "blocks-per-cycle": "Blocks per cycle",
+    "blocks-per-commitment": "Blocks per commitment",
+    "blocks-per-roll-snapshot": "Blocks per roll snapshot",
+    "time-between-blocks": "Time between blocks",
+    "rewards": "Rewards",
+    "block-security-deposit": "Block security deposit",
+    "endorsement-security-deposit": "Endorsement security deposit",
+    "limits": "Limits",
+    "maximum-revelations-per-block": "Maximum revelations per block",
+    "maximum-operation-data-length": "Maximum operation data length",
+    "hard-gas-limit-per-operation": "Hard gas limit per operation",
+    "hard-gas-limit-per-block": "Hard gas limit per block"
+  },
+  "health": {
+    "tezos-node-health": "Tezos Node Health",
+    "conseil-health": "Conseil Health",
+    "status": "Status",
+    "up": "Up",
+    "down": "Down",
+    "latest-block-seen": "Latest Block Seen"
+  },
+  "block-detail": {
+    "invalid-block_title": "Invalid Block Level",
+    "invalid-block_text": "This block level is not valid.",
+    "block-details": "Block Details",
+    "block-height": "Block Height",
+    "block-height_tooltip": "The block height, which indicates the length of the blockchain, increases after the addition of the new block.",
+    "block-confirmations": "Block Confirmations",
+    "baker": "Baker",
+    "baker_tooltip": "A Baker takes part in the validation of the network.",
+    "timestamp": "Timestamp",
+    "timestamp_tooltip": "The date and time at which a block was created.",
+    "value": "Value",
+    "value_tooltip": "The total amount of Tezzies included in transactions for this block.",
+    "transaction-fees": "Transaction Fees",
+    "transaction-fees_tooltip": "The total amount of fees spent for transactions in this block.",
+    "details": "Details",
+    "endorsed-slots": "Endorsed Slots",
+    "endorsed-slots_tooltip": "A block has to be enndorsed by other bakers, up to 32 bakers confirm that this block is valid.",
+    "cycle": "Cycle",
+    "cycle_tooltip": "A Cycle is a set of consecutive blocks consisting out of 4095 blocks. Cycles are used as a unit of “time” in the block chain. For example, the different phases in the amendment voting procedures are defined based on cycles.",
+    "cycle-position": "Cycle Position",
+    "cycle-position_tooltip": "The position in number of blocks out of 4095 blocks.",
+    "of": "of",
+    "block-hash": "Block Hash",
+    "signature": "Signature",
+    "fitness": "Fitness",
+    "fitness_tooltip": "Fitness is a metric used to compare contexts. For example, when several blocks claim to be heads of the chain, their context’s fitness are compared. The block with the highest fitness is selected as the head of the chain.",
+    "protocol": "protocol",
+    "protocol_tooltip": "The active protcol of this block. The protocol can be changed through the protocol amendment proccess.",
+    "more": "More",
+    "less": "Less",
+    "details": "Details"
+  },
+  "transaction-detail": {
+    "invalid-operation-hash_title": "Invalid Operation Hash",
+    "invalid-operation-hash_text": "This hash is currently invalid, it might not yet have been included in the blockchain.",
+    "invalid-operation-hash_update": "This page continuously updates to get the latest state.",
+    "transaction-details": "Transaction Details",
+    "transaction-hash": "Transaction Hash",
+    "transaction-hash_tooltip": "An identifier that is generated on transaction creation, used to uniquely identify a particular transaction.",
+    "block": "Block",
+    "block_tooltip": "The block height at which this transaction was included into the blockchain.",
+    "block-confirmation": "Block Confirmation",
+    "timestamp": "Timestamp",
+    "timestamp_tooltip": "The date and time at which this transaction was included in a block.",
+    "value": "Value",
+    "value_tooltip": "The total amount of Tezzies included in this transaction.",
+    "transaction-fees": "Transaction Fees",
+    "transaction-fees_tooltip": "The total amount of fees spent for transactions in this block."
+  },
+  "account-detail": {
+    "revealed": "Revealed",
+    "not-revealed": "Not Revealed",
+    "balance": "Balance",
+    "value": "Value",
+    "related-accounts": "Related Accounts",
+    "related-accounts_tooltip": "Accounts that are either managed by this account or are the manager of this account.",
+    "no-related-accounts": "This account has no related accounts.",
+    "show-all-accounts": "Show All Accounts",
+    "minimize": "Minimize",
+    "delegation": "Delegation",
+    "not-delegated": "This account has not been delegated.",
+    "not-delegated_text": "Delegate to a baker and contribute to the network validation and receive a reward back.",
+    "delegated-account": "Delegated Account",
+    "delegated-account_tooltip": "The first delegated account that is managed by this account. This can be the same account or an account that starts with KT1.",
+    "amount": "Amount",
+    "amount_tooltip": "The account balance of the delegated account shown above.",
+    "next-reward-expected": "Next Reward Expected",
+    "next-reward-expected_tooltip": "The time until the next reward is exptected to be paid out by the baker.",
+    "not-available": "not available",
+    "reward-amount": "Reward Amount",
+    "reward-amount_tooltip": "The amount being paid out as reward by the baker for the delegation. This is the expected amount to be paid out, the baker split is alreay subtracted.",
+    "baker": "Baker",
+    "baker_tooltip": "A Baker takes part in the validation of the network with his balance and the balances of delegations.",
+    "baker-split": "Baker Split",
+    "baker-split_tooltip": "The baker split is a percentage taken by the baker as a reward for running his infrastrucutre. This split is decided by the baker, happens offchain and could also be 0%.",
+    "last30d": "last 30 days",
+    "invalid-address": "Invalid Address",
+    "invalid-address_text": "This address is currently not visible on the blockchain."
+  },
+  "contract-detail": {
+    "revealed": "Revealed",
+    "not-revealed": "Not Revealed",
+    "name": "Name",
+    "symbol": "Symbol",
+    "total-supply": "Total Supply",
+    "decimals": "Decimals",
+    "manager": "Manager",
+    "contract-overview": "Contract Overview",
+    "description": "Description",
+    "website": "Website",
+    "social-profiles": "Social Profiles",
+    "invalid-address": "Invalid Address",
+    "invalid-address_text": "This address is currently not visible on the blockchain."
+  },
+  "proposal-detail": {
+    "proposal": "Proposal",
+    "proposal-hash": "Proposal Hash",
+    "proposal-name": "Proposal Name",
+    "period": "Period",
+    "proposal-discussion": "Proposal Discussion",
+    "discussion-on-tezos": "Discussion on Tezos Agora",
+    "more-info": "More Information",
+    "details-of-proposal": "Details of Proposal on Tezos Agora",
+    "more-proposal": "More Proposal",
+    "less-proposal": "Less Proposal",
+    "details": "Details",
+    "period-has-ended": "period has ended, period was between",
+    "and": "and",
+    "the-current": "The current",
+    "period-ends": "period ends on",
+    "period-will-start": "period will start on",
+    "invalid-proposal-hash": "Invalid Proposal Hash",
+    "invalid-proposal-text": "This operation hash is invalid."
+  },
+  "token-contract-overview": {
+    "asset-smart-contracts": "Asset Smart Contracts"
+  },
+  "modal-component": {
+    "none": "None",
+    "show_button": "Show"
+  },
+  "copy-modal": {
+    "has-been-copied": "has been copied to clipboard"
+  },
+  "telegram-modal-component": {
+    "title": "Telegram Tezos Notifier Bot",
+    "text_1": "With the Telegram",
+    "text_2": ", you can stay up-to-date about accounts and be notified for delegations, transactions and much more directly in Telegram.",
+    "telegram_link": "Tezos Notifier Bot",
+    "notified-about": "You'll be notified about the following address",
+    "choose-name": "Choose a corresponding name",
+    "placeholder": "Enter a name for this address",
+    "name-too-long": "The name can only have 18 characters",
+    "start-notifications_button": "Start Notifications"
+  },
+  "search-item": {
+    "label": "Search",
+    "placeholder": "Search by Address / Alias / Transaction / Block"
+  },
+
+  "baker-table": {
+    "baker-overview": {
+      "baker-overview": "Baker Overview",
+      "full-balance": "Full Balance",
+      "staking-balance": "Staking Balance",
+      "staking-capacity": "Staking Capacity",
+      "payout-account": "Payout Account",
+      "no-related-payout": "No related payout account.",
+      "frozen-balance": "Frozen Balance",
+      "active-delegations": "Active Delegations",
+      "number-of-rolls": "Number of Rolls",
+      "next-baking-right": "Next Baking Right",
+      "not-available": "not available",
+      "payout-accuracy": "Payout Accuracy",
+      "baking-efficiency": "Baking Efficiency",
+      "efficiency": "Efficiency",
+      "last10cycles": "Last 10 Cycles",
+      "next-endorsing-right": "Next Endorsing Right"
+    },
+    "baking-rights": {
+      "baking-rights": "Baking Rights",
+      "cycle": "Cycle",
+      "number-of-bakings": "# of Bakings",
+      "block-rewards": "Block Rewards",
+      "deposits": "Deposists",
+      "fees": "Fees",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Age",
+        "level": "Level",
+        "priority": "Priority",
+        "rewards": "Rewards",
+        "fees": "Fees",
+        "deposits": "Deposists",
+        "payout": "Payout"
+      }
+    },
+    "endorsing-rights": {
+      "endorsing-rights": "Endorsing Rights",
+      "cycle": "Cycle",
+      "number-of-endorsements": "# of Endorsements",
+      "endorsement-rewards": "Endorsement Rewards",
+      "deposits": "Deposists",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Age",
+        "level": "Level",
+        "slot": "Slot",
+        "rewards": "Rewards",
+        "deposits": "Deposists"
+      }
+    },
+    "rewards": {
+      "rewards": "Rewards",
+      "cycle": "Cycle",
+      "delegations": "Delegations",
+      "staking-balance": "Staking Balance",
+      "block-rewards": "Block Rewards",
+      "endorsement-rewards": "Endorsement Rewards",
+      "fees": "Fees",
+      "expanded-rows": {
+        "delegator-account": "Delegator Account",
+        "payout": "Payout",
+        "share": "Share",
+        "baker-account": "Baker Account"
+      }
+    },
+    "votes": "Votes"
+  },
+  "tabbed-table": {
+    "account-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "endorsements": "Endorsements"
+    },
+    "transaction-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "reveals": "Reveals",
+      "activations": "Activations",
+      "votes": "Votes"
+    },
+    "block-detail": {
+      "transactions": "Transactions",
+      "delegations": "Delegations",
+      "originations": "Originations",
+      "endorsements": "Endorsements",
+      "activations": "Activations"
+    },
+    "proposal-detail": {
+      "proposal": "Proposal",
+      "exploration": "Exploration",
+      "testing": "Testing",
+      "promotion": "Promotion"
+    }
+  },
+  "tezblock-table": {
+    "load-more_button": "Load more",
+    "download-csv_button": "Download CSV Export",
+    "transaction": {
+      "from": "From",
+      "to": "To",
+      "amount": "Amount",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age",
+      "parameters": "Parameters",
+      "block": "Block"
+    },
+    "delegation": {
+      "delegator": "Delegator",
+      "baker": "Baker",
+      "amount": "Amount",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age",
+      "value": "Value",
+      "storage-limit": "Storage Limit",
+      "block": "Block"
+    },
+    "origination": {
+      "new-account": "New Account",
+      "balance": "Balance",
+      "originator": "Originator",
+      "baker": "Baker",
+      "fee": "Fee",
+      "burn": "Burn",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Age",
+      "block": "Block"
+    },
+    "reveal": {
+      "account": "Account",
+      "public-key": "Public Key",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "block": "Block"
+    },
+    "endorsement": {
+      "endorser": "Endorser",
+      "age": "Age",
+      "slots": "Slots",
+      "tx-hash": "Tx Hash",
+      "endorsed-level": "Endorsed Level",
+      "block": "Block"
+    },
+    "activation": {
+      "account": "Account",
+      "secret": "Secret",
+      "tx-hash": "Tx Hash",
+      "age": "Age"
+    },
+    "ballot": {
+      "ballot": "Ballot",
+      "age": "Age",
+      "kind": "Kind",
+      "voting-period": "Voting Period",
+      "number-of-votes": "# of Votes",
+      "proposal-hash": "Proposal Hash",
+      "proposal": "Proposal",
+      "baker": "Baker",
+      "block": "Block"
+    },
+    "block-and-txhash": {
+      "block": "Block",
+      "tx-hash": "Tx Hash"
+    },
+    "block-list": {
+      "baker": "Baker",
+      "age": "Age",
+      "transaction-volume": "Transaction Volume",
+      "fee": "Fee",
+      "transactions": "Transactions",
+      "fitness": "Fitness",
+      "block": "Block"
+    },
+    "transaction-list": {
+      "from": "From",
+      "to": "To",
+      "age": "Age",
+      "amount": "Amount",
+      "fees": "Fees",
+      "parameters": "Parameters"
+    },
+    "activation-list": {
+      "account": "Account",
+      "age": "Age",
+      "secret": "Secret"
+    },
+    "origination-list": {
+      "new-account": "New Account",
+      "age": "Age",
+      "balance": "Balance",
+      "originator": "Originator",
+      "baker": "Baker",
+      "fee": "Fee"
+    },
+    "delegation-list": {
+      "delegator": "Delegator",
+      "baker": "Baker",
+      "age": "Age",
+      "value": "Value",
+      "fee": "Fee",
+      "gas-limit": "Gas Limit"
+    },
+    "endorsement-list": {
+      "endorser": "Endorser",
+      "age": "Age",
+      "slots": "Slots",
+      "block": "Block",
+      "tx-hash": "Tx Hash"
+    },
+    "votes-list": {
+      "baker": "Baker",
+      "ballot": "Ballot",
+      "age": "Age",
+      "kind": "Kind",
+      "voting-period": "Voting Period",
+      "number-of-votes": "# of Votes",
+      "proposal": "Proposal"
+    },
+    "double-baking-list": {
+      "baker": "Baker",
+      "age": "Age",
+      "reward": "Reward",
+      "offender": "Offender",
+      "denounced-level": "Denounced Level",
+      "lost-amount": "Lost Amount"
+    },
+    "double-endorsement-list": {
+      "baker": "Baker",
+      "age": "Age",
+      "reward": "Reward",
+      "offender": "Offender",
+      "denounced-level": "Denounced Level",
+      "lost-amount": "Lost Amount"
+    },
+    "proposal-list": {
+      "proposal": "Proposal",
+      "proposal-hash": "Proposal Hash",
+      "period": "Period"
+    },
+    "contract-list": {
+      "account": "Account",
+      "balance": "Balance",
+      "baker": "Baker"
+    },
+    "proposal": {
+      "baker": "Baker",
+      "ballot": "Ballot",
+      "age": "Age",
+      "number-of-votes": "# of Votes"
+    },
+    "transfers": {
+      "from": "From",
+      "to": "To",
+      "amount": "Amount",
+      "fee": "Fee",
+      "age": "Age",
+      "block": "Block",
+      "tx-hash": "Tx Hash",
+      "entrypoint": "Entry Point"
+    },
+    "token-contract": {
+      "asset": "Asset",
+      "contract-address": "Contract Address",
+      "total-supply": "Total Supply",
+      "description": "Description"
+    },
+    "baker-overview": {
+      "baker": "Baker",
+      "balance": "Balance",
+      "number-of-votes": "# of Votes",
+      "staking-balance": "Staking Balance",
+      "number-of-delegators": "# of Delegators"
+    }
+  }
+}

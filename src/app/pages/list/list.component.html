@@ -4,14 +4,15 @@
       <div class="card-body p-4">
         <h5 [ngSwitch]="routeName$ | async" class="card-title mb-3">
           <ng-container *ngSwitchCase="'transaction'">
-            Transactions
+            {{ 'list.transactions.transactions' | translate }}
+
             <div class="row py-3">
               <div class="col col-md-3 py-3">
                 <div class="row mb-3">
                   <div class="col">
                     <h5 class="card-title__secondary mb-3 ">
-                      Transactions
-                      <small>last 24 hours</small>
+                      {{ 'list.transactions.transactions' | translate }}
+                      <small>{{ 'list.transactions.last24h' | translate }}</small>
                     </h5>
                     <h3>
                       {{ transactionsCountLast24h$ | async }}
@@ -25,9 +26,9 @@
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title__secondary mb-3 ">
-                      Transaction Volume
+                      {{ 'list.transactions.transaction-volume' | translate }}
                       <br />
-                      <small>last 24 hours</small>
+                      <small>{{ 'list.transactions.last24h' | translate }}</small>
                     </h5>
                     <h3>
                       <amount-cell
@@ -42,8 +43,8 @@
               </div>
               <div class="col col-md-9 py-3 chart--container">
                 <h5 class="card-title__secondary mb-3 ">
-                  Transactions
-                  <small>last 7 days</small>
+                  {{ 'list.transactions.transactions' | translate }}
+                  <small>{{ 'list.transactions.last7d' | translate }}</small>
                 </h5>
                 <chart-item
                   *ngIf="transactionsChartDatasets$ | async"
@@ -58,10 +59,10 @@
             </div>
           </ng-container>
           <ng-container *ngSwitchCase="'block'">
-            Blocks
+            {{ 'list.blocks' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'activation'">
-            Activations
+            {{ 'list.activations' | translate }}
             <app-occurrence-statistics
               kind="Activations"
               [count]="activationsCountLast24h$ | async"
@@ -70,7 +71,7 @@
             ></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngSwitchCase="'origination'">
-            Originations
+            {{ 'list.originations' | translate }}
             <app-occurrence-statistics
               kind="Originations"
               [count]="originationsCountLast24h$ | async"
@@ -79,28 +80,28 @@
             ></app-occurrence-statistics>
           </ng-container>
           <ng-container *ngSwitchCase="'delegation'">
-            Delegations
+            {{ 'list.delegations' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'endorsement'">
-            Endorsements
+            {{ 'list.endorsements' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'vote'">
-            Votes
+            {{ 'list.votes' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'proposal'">
-            Proposals
+            {{ 'list.proposals' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'double-baking'">
-            Double Baking Evidence
+            {{ 'list.double-baking-evidence' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'double-endorsement'">
-            Double Endorsement Evidence
+            {{ 'list.double-endorsement-evidence' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'token-contract'">
-            Assets Smart Contracts
+            {{ 'list.asset-smart-contracts' | translate }}
           </ng-container>
           <ng-container *ngSwitchCase="'contract'">
-            Contracts
+            {{ 'list.contracts' | translate }}
           </ng-container>
         </h5>
         <div class="row">
