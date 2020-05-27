@@ -285,6 +285,9 @@
     "invalid-proposal-hash": "Invalid Proposal Hash",
     "invalid-proposal-text": "This operation hash is invalid."
   },
+  "token-contract-overview": {
+    "asset-smart-contracts": "Asset Smart Contracts"
+  },
   "modal-component": {
     "none": "None",
     "show_button": "Show"
@@ -582,6 +585,13 @@
       "contract-address": "Contract Address",
       "total-supply": "Total Supply",
       "description": "Description"
+    },
+    "baker-overview": {
+      "baker": "Baker",
+      "balance": "Balance",
+      "number-of-votes": "# of Votes",
+      "staking-balance": "Staking Balance",
+      "number-of-delegators": "# of Delegators"
     }
   }
 }

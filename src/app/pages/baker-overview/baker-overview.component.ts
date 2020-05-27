@@ -18,6 +18,7 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Baker } from '@tezblock/services/api/api.service'
 import { OrderBy } from '@tezblock/services/base.service'
+import { TranslateService } from '@ngx-translate/core'
 
 const labelsParams = {
   display: true,
@@ -84,7 +85,8 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
   }
@@ -134,7 +136,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
       })
     )
 
-    this.columns = columns
+    this.columns = columns(this.translateService)
   }
 
   loadMore() {
