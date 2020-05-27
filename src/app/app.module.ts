@@ -19,9 +19,9 @@ import { SortableModule } from 'ngx-bootstrap/sortable'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
+import { NgxJsonViewerModule } from 'ngx-json-viewer'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
-import { NgxJsonViewerModule } from 'ngx-json-viewer'
 
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
@@ -76,6 +76,7 @@ import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-c
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
 import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
 import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { GlossaryComponent } from './pages/glossary/glossary.component'
 import { HealthEffects } from './pages/health/effects'
 import { HealthComponent } from './pages/health/health.component'
 import { ListEffects } from './pages/list/effects'
@@ -84,6 +85,8 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -93,8 +96,6 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
-import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 
 @NgModule({
   imports: [
@@ -198,7 +199,8 @@ import { TokenContractOverviewEffects } from './pages/token-contract-overview/ef
     LatestContractsComponent,
     LatestContractsTransactionsComponent,
     TransactionErrorsComponent,
-    TokenContractOverviewComponent
+    TokenContractOverviewComponent,
+    GlossaryComponent
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
