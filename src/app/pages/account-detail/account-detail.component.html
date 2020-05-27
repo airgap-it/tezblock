@@ -114,7 +114,7 @@
                     class="badge badge-pill ml-2"
                     [ngClass]="{
                       'badge-primary': (numberOfContractAssets$ | async) > 0,
-                      'badge-primary-light': (numberOfContractAssets$ | async) === 0
+                      'badge-primary-light badge-disabled': (numberOfContractAssets$ | async) === 0
                     }"
                   >
                     {{ numberOfContractAssets$ | async }}

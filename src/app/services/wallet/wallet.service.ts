@@ -370,57 +370,6 @@ const wallets: Wallet[] = [
     ],
     features: ['Trezor T', 'multiple wallets', 'wallet balance history'],
     downloadLink: 'https://simplestaking.com'
-  },
-  {
-    title: 'TezBox',
-    description: `TezBox was the earliest functional GUI wallet for Tezos. TezBox has grown to be one of the major community developed wallets and will continue to provide users and developers with an easy to use, powerful and secure wallet.`,
-    logo: 'TezBox.jpg',
-    socials: [
-      {
-        type: SocialType.website,
-        url: 'https://tezbox.com/'
-      },
-      {
-        type: SocialType.twitter,
-        url: 'https://twitter.com/TezBox_Wallet'
-      },
-      {
-        type: SocialType.telegram,
-        url: 'https://t.me/TezTechLabs'
-      },
-      {
-        type: SocialType.medium,
-        url: 'https://medium.com/@officialtezbox'
-      },
-      {
-        type: SocialType.github,
-        url: 'https://github.com/tezbox'
-      }
-    ],
-    platforms: [
-      {
-        name: PlatformName.macOS,
-        icon: 'apple',
-        url: 'https://github.com/tezbox/desktop-wallet/releases/download/6.0.1/TezBox-Wallet_MacOS_6.0.1.dmg'
-      },
-      {
-        name: PlatformName.Windows,
-        icon: 'laptop',
-        url: 'https://github.com/tezbox/desktop-wallet/releases/download/6.0.1/TezBox_Winx64_6.0.1.exe'
-      },
-      {
-        name: PlatformName.Android,
-        icon: 'laptop',
-        url: 'https://tezbox.com/'
-      },
-      {
-        name: PlatformName.BrowserExtension,
-        icon: 'laptop',
-        url: 'https://tezbox.com/'
-      }
-    ],
-    features: ['Secure', 'Mobile', 'Developer Friendly', 'Open Source', 'Hardware Wallet Support'],
-    downloadLink: 'https://galleon-wallet.tech'
   }
 ]
 
