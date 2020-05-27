@@ -96,8 +96,7 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
-import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
