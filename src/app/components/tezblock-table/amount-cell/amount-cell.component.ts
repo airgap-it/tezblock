@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { Observable, BehaviorSubject } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import * as moment from 'moment'
+import moment from 'moment'
 import { Store } from '@ngrx/store'
 import BigNumber from 'bignumber.js'
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
-import * as moment from 'moment'
+import moment from 'moment'
 import { forkJoin, Observable, of } from 'rxjs'
 import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
