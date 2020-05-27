@@ -48,7 +48,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2'} }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8'} }),
       sortable: false
     },
     {
@@ -111,7 +111,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: true
     },
     {
