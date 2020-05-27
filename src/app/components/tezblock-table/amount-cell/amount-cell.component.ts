@@ -162,7 +162,7 @@ export class AmountCellComponent implements OnInit {
     const decimals = pipe<string, number, string>(
       stringNumber => parseFloat(stringNumber.replace(',', '')),
       pipe(
-        numericValue => this.decimalPipe.transform(numericValue, this.getPrecision(converted)),
+        numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted)),
         decimalPiped => (decimalPiped ? decimalPiped.split('.')[1] : decimalPiped)
       )
     )(converted)
