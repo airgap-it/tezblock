@@ -133,7 +133,8 @@
               <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
                 <div class="pl-0 pl-md-3 py-3">
                   <strong>
-                    The current {{ periodKind$ | async }} {{ 'proposal-detail.period-ends' | translate }}
+                    {{ 'proposal-detail.the-current' | translate }} {{ periodKind$ | async }}
+                    {{ 'proposal-detail.period-ends' | translate }}
                     {{ periodTimespan.end | amDateFormat: 'LL' }}
                   </strong>
                 </div>
