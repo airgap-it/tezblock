@@ -858,5 +858,10 @@
   "tz1NXjtXZzwVJLocUtts5VmQ9nEPJVotweZm": {
     "alias": "BAKRRR.COM",
     "hasLogo": true
+  },
+  "KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9": {
+    "alias": "USDtz",
+    "hasLogo": true,
+    "accountType": "contract"
   }
 }
