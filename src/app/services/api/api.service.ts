@@ -88,7 +88,10 @@ const getRightStatus = (currentCycle: number, cycle: number): string => {
   return 'Frozen'
 }
 
-const firstRightsCycle = (currentCycle: number): number => currentCycle - 2
+const getRightCycles = (currentCycle: number, limit: number): number[] =>
+  _.range(0, limit)
+    .map(index => currentCycle + 3 - index)
+    .sort((a, b) => b - a)
 
 @Injectable({
   providedIn: 'root'
@@ -1058,11 +1061,11 @@ export class ApiService {
 
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
     return this.rewardService.getCurrentCycle().pipe(
-      switchMap(currentCycle =>
-        forkJoin(
-          _.range(0, 6)
-            .map(index => firstRightsCycle(currentCycle) + index)
-            .map(cycle =>
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
+          cycles.map(cycle =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
                 cycle,
@@ -1077,9 +1080,9 @@ export class ApiService {
           )
         ).pipe(
           map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
-          map(ensureCycle(firstRightsCycle(currentCycle), getEmptyAggregatedBakingRight))
+          map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
         )
-      )
+      })
     )
   }
 
@@ -1145,27 +1148,27 @@ export class ApiService {
 
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
     return this.rewardService.getCurrentCycle().pipe(
-      switchMap(currentCycle =>
-        forkJoin(
-          _.range(0, 6)
-            .map(index => firstRightsCycle(currentCycle) + index)
-            .map(cycle =>
-              from(this.rewardService.calculateRewards(address, cycle)).pipe(
-                map((reward: TezosRewards) => ({
-                  cycle,
-                  endorsementRewards: reward.endorsingRewards,
-                  deposits: reward.endorsingDeposits,
-                  endorsementsCount: reward.endorsingRewardsDetails.length,
-                  endorsingRewardsDetails: reward.endorsingRewardsDetails,
-                  rightStatus: getRightStatus(currentCycle, cycle)
-                }))
-              )
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
+          cycles.map(cycle =>
+            from(this.rewardService.calculateRewards(address, cycle)).pipe(
+              map((reward: TezosRewards) => ({
+                cycle,
+                endorsementRewards: reward.endorsingRewards,
+                deposits: reward.endorsingDeposits,
+                endorsementsCount: reward.endorsingRewardsDetails.length,
+                endorsingRewardsDetails: reward.endorsingRewardsDetails,
+                rightStatus: getRightStatus(currentCycle, cycle)
+              }))
             )
+          )
         ).pipe(
           map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
-          map(ensureCycle(firstRightsCycle(currentCycle), getEmptyAggregatedEndorsingRight))
+          map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
-      )
+      })
     )
   }
 
