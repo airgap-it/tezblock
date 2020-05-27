@@ -131,7 +131,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$, blockOrderBy$)
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Block list on tezblock shows the latest blocks with information about bakers, timestamp, transaction volume, fees, number of transactions and fitness of each block.">`
+              content: `Tezos Blocks on tezblock with information about bakers, timestamp, transaction volume, fees, number of transactions and fitness of each block.">`
             })
 
             break
@@ -191,7 +191,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Transaction list on tezblock shows the total number of transactions and volume of the last 24 hours, the latest transactions with information about source, destination, timestamp, amount, fees, parameters and level of each transaction.">`
+              content: `Tezos Transactions on tezblock with total number of transactions and volume of the last 24 hours, the latest transactions with information about source, destination, timestamp, amount, fees, parameters and level of each transaction.">`
             })
             break
           case 'activation':
@@ -226,7 +226,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Activation list on tezblock shows the total number of activations in the last 24 hours and the last 7 days, the latest activations with information about account, timestamp, secret and level of each activation.">`
+              content: `Tezos Activations on tezblock with the total number of activations in the last 24 hours and the last 7 days, the latest activations with information about account, timestamp, secret and level of each activation.">`
             })
             break
           case 'origination':
@@ -262,7 +262,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Origination list on tezblock shows the total number of originations in the last 24 hours and the last 7 days, the latest originations with information about the new account, timestamp, originator, baker, fee and level of each origination.">`
+              content: `Tezos Originations on tezblock with the total number of originations in the last 24 hours and the last 7 days, the latest originations with information about the new account, timestamp, originator, baker, fee and level of each origination.">`
             })
             break
           case 'delegation':
@@ -284,7 +284,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Delegation list on tezblock shows the latest delegations with information about delegator, baker, timestamp, value, fee, gas limit and level of each delegation.">`
+              content: `Tezos Delegations on tezblock with the latest delegations with information about delegator, baker, timestamp, value, fee, gas limit and level of each delegation.">`
             })
             break
           case 'endorsement':
@@ -306,7 +306,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Endorsement list on tezblock shows the latest endorsements with information about endorser, timestamp, slots and level of each endorsement.">`
+              content: `Tezos Endorsements on tezblock with the latest endorsements with information about endorser, timestamp, slots and level of each endorsement.">`
             })
             break
           case 'vote':
@@ -323,7 +323,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$, votesOrderBy$)
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Vote list on tezblock shows the latest votes with information about baker, ballot, timestamp, kind, voting period, number of votes, proposal and level of each vote.">`
+              content: `Tezos Votes on tezblock with the latest votes with information about baker, ballot, timestamp, kind, voting period, number of votes, proposal and level of each vote.">`
             })
             break
           case 'double-baking':
@@ -345,7 +345,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Double Baking Evidence list on tezblock shows the latest double baking evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double baking evidence.">`
+              content: `Tezos Double Baking Evidences on tezblock with the latest double baking evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double baking evidence.">`
             })
             break
           case 'double-endorsement':
@@ -367,7 +367,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Double Endorsement Evidence list on tezblock shows the latest double endorsement evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double endorsement evidence.">`
+              content: `Tezos Double Endorsement Evidences on tezblock with the latest double endorsement evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double endorsement evidence.">`
             })
             break
           case 'bakers':
@@ -389,7 +389,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Baker list on tezblock shows the total number of bakers and lists the top 25 bakers with information about balance, number of votes, staking balance and number of delegators for each baker.">`
+              content: `Top 25 Tezos bakers on tezblock with information about balance, number of votes, staking balance and number of delegators.">`
             })
             break
           case 'proposal':
@@ -421,7 +421,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Proposal list on tezblock shows all the proposals with information about hash and period of each proposal.">`
+              content: `Tezos Proposals on tezblock with all the proposals with information about hash and period of each proposal.">`
             })
             break
           case 'contract':
@@ -441,7 +441,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             )
             this.metaTagService.updateTag({
               name: 'description',
-              content: `Tezos Contract list on tezblock shows all the contracts with information about account, balance and baker of each contract.">`
+              content: `Tezos Contracts on tezblock with all the contracts with information about account, balance and baker of each contract.">`
             })
             break
 

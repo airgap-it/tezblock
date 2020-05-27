@@ -130,7 +130,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
     this.titleService.setTitle('Tezos Accounts - tezblock')
     this.metaTagService.updateTag({
       name: 'description',
-      content: `Tezos Account list on tezblock visually shows the top 25 accounts and lists all accounts with information about their balance.">`
+      content: `Top 25 Tezos accounts on tezblock visualized and with information about accounts and their balance.">`
     })
   }
   public loadMore() {
