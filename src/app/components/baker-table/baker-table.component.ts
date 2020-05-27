@@ -23,7 +23,6 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -292,10 +291,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
-  }
-
-  xtzToMutez(amount: number): number {
-    return amount * xtzToMutezConvertionRatio
   }
 
   private updateSelectedTab(selectedTab: Tab) {

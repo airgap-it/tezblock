@@ -4,12 +4,13 @@ import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest } from 'rxjs'
-import { delay, map, filter, withLatestFrom, switchMap, distinctUntilChanged, take } from 'rxjs/operators'
+import { delay, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChartOptions } from 'chart.js'
 
 import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
@@ -30,9 +31,9 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { ChartOptions } from 'chart.js'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { get } from '@tezblock/services/fp'
+import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -383,13 +384,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
                 }
 
                 const stakingBalance: number = bakerInfos.staking_balance
-                const stakingProgress: number = Math.min(100, (1 - (stakingCapacity - stakingBalance) / stakingCapacity) * 100)
+                const mutezStakingCapacity = stakingCapacity * xtzToMutezConvertionRatio
+                const stakingProgress: number = Math.min(100, (1 - (mutezStakingCapacity - stakingBalance) / mutezStakingCapacity) * 100)
                 const stakingBond: number = bakerInfos.staking_balance - bakerInfos.delegated_balance
 
                 return {
                   stakingBalance: bakerInfos.staking_balance,
                   numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
-                  stakingCapacity,
+                  stakingCapacity: mutezStakingCapacity,
                   stakingProgress,
                   stakingBond,
                   frozenBalance: bakerInfos.frozen_balance
