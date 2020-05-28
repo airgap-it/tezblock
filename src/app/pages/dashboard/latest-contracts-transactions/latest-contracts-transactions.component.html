@@ -5,9 +5,9 @@
         <div class="row">
           <div class="col-6 col-sm-3 pl-0 order-2 order-sm-0">
             <div class="d-block pt-2 pt-sm-0">
-              <app-hash-cell [data]="operation.hash"></app-hash-cell>
+              <app-hash-cell [data]="operation.operation_group_hash"></app-hash-cell>
               <p class="m-0 small text-secondary">
-                <app-timestamp-cell [data]="operation.timestamp * 1000"></app-timestamp-cell>
+                <app-timestamp-cell [data]="operation.timestamp"></app-timestamp-cell>
               </p>
             </div>
           </div>
@@ -17,16 +17,16 @@
           <div class="col-10 col-sm-5 pl-0 order-1 order-sm-3">
             <div class="d-block ">
               <div class="mb-1">
-                <address-item [address]="operation.singleFrom"></address-item>
+                <address-item [address]="operation.from"></address-item>
               </div>
-              <address-item [address]="operation.singleTo"></address-item>
+              <address-item [address]="operation.to"></address-item>
             </div>
           </div>
           <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
             <p class="m-0">
               <amount-cell
-                [data]="{ amount: operation.amount }"
-                [options]="{ symbol: operation.symbol, conventer: getConventer(operation), showFiatValue: false }"
+                [data]="operation.amount"
+                [options]="{ symbol: operation.symbol, showFiatValue: false }"
               ></amount-cell>
             </p>
           </div>

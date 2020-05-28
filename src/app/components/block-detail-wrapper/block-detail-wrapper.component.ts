@@ -1,8 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { Observable } from 'rxjs'
-import { map } from 'rxjs/operators'
 
-import { AmountData } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { Block } from 'src/app/interfaces/Block'
 
 @Component({
@@ -31,12 +28,19 @@ export class BlockDetailWrapperComponent implements OnInit {
   @Output()
   blockChangeClicked: EventEmitter<number> = new EventEmitter()
 
-  get amountFromBlockVolume(): AmountData {
-    return this.wrapperBlock ? { amount: this.wrapperBlock.volume, timestamp: this.wrapperBlock.timestamp } : undefined
+  get amountFromBlockVolume(): { data: any; options: any } {
+    return this.wrapperBlock
+      ? { data: this.wrapperBlock.volume, options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true } }
+      : undefined
   }
 
-  get amountFromBlockFee(): AmountData {
-    return this.wrapperBlock ? { amount: this.wrapperBlock.fee, timestamp: this.wrapperBlock.timestamp } : undefined
+  get amountFromBlockFee(): { data: any; options: any } {
+    return this.wrapperBlock
+      ? {
+          data: this.wrapperBlock.fee,
+          options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true, digitsInfo: '1.2-8' }
+        }
+      : undefined
   }
 
   constructor() {}

@@ -30,6 +30,8 @@ export interface Transaction {
   kind: string
   gas_limit?: any
   parameters?: any
+  parameters_micheline?: any
+  parameters_entrypoints?: any
   destination?: any
   fee: number
   level: number
@@ -49,6 +51,11 @@ export interface Transaction {
   voting_period?: string
   burn?: string
   symbol?: string
+  baker?: string
   errors?: OperationError[]
   outgoing?: boolean
+  reward?: string
+  offender?: string
+  lostAmount?: string
+  denouncedLevel?: number
 }

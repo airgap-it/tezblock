@@ -1,58 +1,83 @@
 import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
-import { Observable, BehaviorSubject } from 'rxjs'
-import { switchMap } from 'rxjs/operators'
+import { DecimalPipe } from '@angular/common'
+import { Observable, BehaviorSubject, pipe } from 'rxjs'
+import { switchMap, filter, map } from 'rxjs/operators'
 import * as moment from 'moment'
-import { Store } from '@ngrx/store'
 import BigNumber from 'bignumber.js'
 
-import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
-import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
-import * as fromRoot from '@tezblock/reducers'
+import { CurrencyConverterPipe, CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { get } from '@tezblock/services/fp'
-import { isInBTC } from '@tezblock/domain/airgap'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
-export interface AmountData {
-  amount: number | string
-  timestamp?: number
+const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
+
+export interface AmountOptions {
+  showFiatValue?: boolean
+  symbol?: string
+  comparisonTimestamp?: number
+  maxDigits?: number
+  digitsInfo?: string
+  fontColor?: boolean
+  fontSmall?: boolean
 }
 
-export type Conventer = (amount: any) => string
+export const getPrecision = (value: string | number, options?: AmountOptions): string => {
+  const numericValue: number = typeof value === 'string' ? parseFloat(value.replace(',', '')) : value
+  const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(options)
+  const hasDecimals = numericValue - Math.floor(numericValue) !== 0
 
-const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
+  // this case overrides options.decimals
+  if (numericValue === 0 || !hasDecimals) {
+    return '1.0-0'
+  }
+
+  if (digitsInfo) {
+    return digitsInfo
+  }
+
+  if (numericValue >= 1000) {
+    return '1.0-0'
+  }
+
+  if (numericValue < 1) {
+    return '1.2-8'
+  }
+
+  return '1.2-2'
+}
 
 @Component({
   selector: 'amount-cell',
   templateUrl: './amount-cell.component.html',
-  styleUrls: ['./amount-cell.component.scss']
+  styleUrls: ['./amount-cell.component.scss'],
+  providers: [DecimalPipe]
 })
 export class AmountCellComponent implements OnInit {
   @Input()
-  set data(value: AmountData) {
+  set data(value: number | string) {
     if (value !== this._data) {
       this._data = value
 
       if (value) {
-        this.enableComparison = dayDifference(this.data.timestamp) >= 1
-        this.amount = this.data.amount || 0
         this.setAmountPiped()
       }
     }
   }
-  get data(): AmountData {
+  get data(): number | string {
     return this._data
   }
 
-  private _data: AmountData
+  private _data: number | string
 
   @Input()
-  set options(value: any) {
+  set options(value: AmountOptions) {
     if (value !== this._options) {
       this._options = value
 
-      if (this.amount) {
+      this.enableComparison = get<AmountOptions>(v => dayDifference(v.comparisonTimestamp) >= 1)(value)
+      if (this.data !== undefined) {
         this.setAmountPiped()
       }
 
@@ -64,20 +89,12 @@ export class AmountCellComponent implements OnInit {
     return this._options === undefined ? { showFiatValue: true } : this._options
   }
 
-  get conventer(): Conventer {
-    return this.options.conventer || this.defaultConventer.bind(this)
-  }
-  currencyConverterPipeArgs$: Observable<CurrencyConverterPipeArgs>
+  private _options: AmountOptions
 
-  private _options = undefined
-
-  fiatCurrencyInfo$: Observable<CurrencyInfo>
-
-  historicCurrencyInfo: CurrencyInfo
+  historicAmount: string
+  currencyAmount$: Observable<string>
 
   enableComparison = false
-
-  amount: number | BigNumber | string
 
   amountPipedLeadingChars: string
   amountPipedTrailingChars: string
@@ -94,11 +111,6 @@ export class AmountCellComponent implements OnInit {
     return this.options.maxDigits === undefined ? 6 : this.options.maxDigits
   }
 
-  // temporary solution: ask how to utilizy existing maxDigits but doesn't used by fiatValue
-  get precision(): number {
-    return isInBTC(get<any>(options => options.symbol)(this.options)) ? 8 : 2
-  }
-
   showOldValue = false
 
   private options$ = new BehaviorSubject<any>(null)
@@ -106,29 +118,33 @@ export class AmountCellComponent implements OnInit {
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly chartDataService: ChartDataService,
-    private cdRef: ChangeDetectorRef,
+    private readonly cdRef: ChangeDetectorRef,
     private readonly cryptoPricesService: CryptoPricesService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly currencyConverterPipe: CurrencyConverterPipe,
+    private readonly decimalPipe: DecimalPipe
   ) {}
 
   ngOnInit() {
-    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
-
-    // TODO: this is bad: for a split of a second always is visible fiatCurrencyInfo$ conversion
-    this.currencyConverterPipeArgs$ = this.options$.pipe(
-      switchMap(options => this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)))
+    this.currencyAmount$ = this.options$.pipe(
+      switchMap(options =>
+        this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
+          filter(currencyConverterArgs => currencyConverterArgs && this.data !== undefined),
+          map(this.getFormattedCurremcy.bind(this))
+        )
+      )
     )
   }
 
   tooltipClick() {
-    if (dayDifference(this.data.timestamp) >= 1) {
-      const date = new Date(this.data.timestamp)
+    if (this.enableComparison) {
+      const date = new Date(this.options.comparisonTimestamp)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {
-        this.historicCurrencyInfo = {
+        const currInfo = {
           symbol: '$',
           currency: 'USD',
           price: new BigNumber(response[1].close)
         }
+        this.historicAmount = this.getFormattedCurremcy({ currInfo, protocolIdentifier: 'xtz' })
         this.cdRef.markForCheck()
 
         this.showOldValue = !this.showOldValue
@@ -137,18 +153,31 @@ export class AmountCellComponent implements OnInit {
   }
 
   private setAmountPiped() {
-    const amountPiped = this.conventer(this.amount).split('.')
+    const protocolIdentifier = get<any>(o => o.symbol)(this.options) || 'xtz'
+    const converted: string =
+      this.amountConverterPipe.transform(this.data || 0, {
+        protocolIdentifier,
+        maxDigits: this.maxDigits
+      }) || '0'
+    const decimals = pipe<string, number, string>(
+      stringNumber => parseFloat(stringNumber.replace(',', '')),
+      pipe(
+        numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted)),
+        decimalPiped => (decimalPiped ? decimalPiped.split('.')[1] : decimalPiped)
+      )
+    )(converted)
 
-    this.amountPipedLeadingChars = amountPiped[0]
-    this.amountPipedTrailingChars = amountPiped[1]
+    this.amountPipedLeadingChars = converted.split('.')[0]
+    this.amountPipedTrailingChars = decimals
   }
 
-  private defaultConventer(amount: any): string {
-    return this.amountConverterPipe.transform(amount, {
-      protocolIdentifier: 'xtz',
-      maxDigits: this.maxDigits,
-      fontSmall: this.fontSmall,
-      fontColor: this.fontColor
-    })
+  private getFormattedCurremcy(args: CurrencyConverterPipeArgs): string {
+    if (this.data === undefined) {
+      return undefined
+    }
+
+    const converted = this.currencyConverterPipe.transform(this.data || 0, args)
+
+    return this.decimalPipe.transform(converted, getPrecision(converted, this.options))
   }
 }

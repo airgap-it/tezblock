@@ -1,14 +1,16 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosTransactionResult } from 'airgap-coin-lib'
 
-import { TokenContract, ContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { OperationErrorsById } from '@tezblock/domain/operations'
 
 const featureName = 'Contract Detail'
 
 export enum OperationTab {
   transfers = 'transfers',
-  other = 'other'
+  other = 'other',
+  tokenHolders = 'token holders'
 }
 
 export const loadContract = createAction(`[${featureName}] Load Contract`, props<{ address: string }>())
@@ -26,20 +28,27 @@ export const resetCopyToClipboardState = createAction(`[${featureName}] Reset Co
 export const loadTransferOperations = createAction(`[${featureName}] Load Transfer Operations`, props<{ contract: TokenContract }>())
 export const loadTransferOperationsSucceeded = createAction(
   `[${featureName}] Load Transfer Operations Succeeded`,
-  props<{ transferOperations: TezosTransactionResult }>()
+  props<{ data: ContractOperation[] }>()
 )
 export const loadTransferOperationsFailed = createAction(`[${featureName}] Load Transfer Operations Failed`, props<{ error: any }>())
 export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
 // export const sortTransferOperations = createAction(`[${featureName}] Sort Transfer Operations`, props<{ orderBy: OrderBy }>())
 
-export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contractHash: string }>())
+export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contract: TokenContract }>())
 export const loadOtherOperationsSucceeded = createAction(
   `[${featureName}] Load Other Operations Succeeded`,
-  props<{ otherOperations: ContractOperation[] }>()
+  props<{ data: ContractOperation[] }>()
 )
 export const loadOtherOperationsFailed = createAction(`[${featureName}] Load Other Operations Failed`, props<{ error: any }>())
 export const loadMoreOtherOperations = createAction(`[${featureName}] Load More Other Operations`)
 export const sortOtherOperations = createAction(`[${featureName}] Sort Other Operations`, props<{ orderBy: OrderBy }>())
+
+export const loadTokenHolders = createAction(`[${featureName}] Load Token Holders`, props<{ contract: TokenContract }>())
+export const loadTokenHoldersSucceeded = createAction(
+  `[${featureName}] Load Token Holders Succeeded`,
+  props<{ data: TokenHolder[] }>()
+)
+export const loadTokenHoldersFailed = createAction(`[${featureName}] Load Token Holders Failed`, props<{ error: any }>())
 
 export const loadOperationsCount = createAction(`[${featureName}] Load Operations Count`, props<{ contractHash: string }>())
 export const loadOperationsCountSucceeded = createAction(
@@ -47,6 +56,13 @@ export const loadOperationsCountSucceeded = createAction(
   props<{ transferTotal: number, otherTotal: number }>()
 )
 export const loadOperationsCountFailed = createAction(`[${featureName}] Load Operations Count Failed`, props<{ error: any }>())
+
+export const loadTransactionsErrors = createAction(`[${featureName}] Load Transactions Errors`, props<{ transactions: Transaction[] }>())
+export const loadTransactionsErrorsSucceeded = createAction(
+  `[${featureName}] Load Transactions Errors Succeeded`,
+  props<{ operationErrorsById: OperationErrorsById[] }>()
+)
+export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const changeOperationsTab = createAction(`[${featureName}] Change Operations Tab`, props<{ currentTabKind: OperationTab }>())
 

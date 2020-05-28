@@ -1,6 +1,5 @@
-import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { getConventer, TokenContract } from '@tezblock/domain/contract'
+import { TokenContract } from '@tezblock/domain/contract'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export const columns = (): Column[] => [
@@ -24,8 +23,8 @@ export const columns = (): Column[] => [
       field: 'totalSupply',
       template: Template.amount,
       data: (item: TokenContract) => ({
-        data: { amount: item.totalSupply },
-        options: { symbol: item.symbol, conventer: getConventer(item), showFiatValue: isConvertableToUSD(item.symbol) }
+        data: item.totalSupply,
+        options: { symbol: item.symbol, showFiatValue: isConvertableToUSD(item.symbol) }
       })
     },
     {

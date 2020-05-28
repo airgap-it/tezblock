@@ -68,7 +68,7 @@
                   *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
-                    <amount-cell [data]="{ amount: account.balance }" [options]="{ showFiatValue: false }"></amount-cell>
+                    <amount-cell [data]="account.balance" [options]="{ showFiatValue: false }"></amount-cell>
                   </h5>
                 </div>
                 <ng-template #hideValue>
@@ -101,6 +101,34 @@
                   </div>
                 </ng-container>
               </div>
+
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Assets</p>
+                </div>
+                <div class="col-md-10 pl-sm-0 d-flex align-items-center">
+                  <h5 class="d-inline-block m-0">
+                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) }}</span>
+                  </h5>
+                  <span
+                    class="badge badge-pill ml-2"
+                    [ngClass]="{
+                      'badge-primary': (numberOfContractAssets$ | async) > 0,
+                      'badge-primary-light badge-disabled': (numberOfContractAssets$ | async) === 0
+                    }"
+                  >
+                    {{ numberOfContractAssets$ | async }}
+                  </span>
+                  <button
+                    (click)="showAssets()"
+                    [disabled]="(numberOfContractAssets$ | async) === 0"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1"
+                  >
+                    <fa-icon [icon]="'expand' | iconPipe" class="text-secondary"></fa-icon>
+                  </button>
+                </div>
+              </div>
+
               <h5 class="card-title__secondary mb-3 pt-3">
                 <tooltip-item
                   [title]="'Related Accounts'"
@@ -205,17 +233,7 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <amount-cell [data]="{ amount: delegatedAmount }" [options]="{ showFiatValue: false }"></amount-cell>
-                      <ng-container *ngIf="isMainnet">
-                        <span class="badge badge-pill badge-primary-light ml-1">
-                          {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                          }}{{
-                            delegatedAmount
-                              | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                              | number: '1.0-2'
-                          }}
-                        </span>
-                      </ng-container>
+                      <amount-cell [data]="delegatedAmount" [options]="{ showFiatValue: isMainnet }"></amount-cell>
                     </p>
                   </div>
                 </div>
@@ -230,12 +248,12 @@
                   </div>
                   <div class="col-md-7">
                     <p class="mb-0">
-                      <loading-skeleton *ngIf="(isBusy$ | async).rewardAmont" [loadingWidth]="'150px'"></loading-skeleton>
-                      <ng-container *ngIf="!(isBusy$ | async).rewardAmont">
-                        <ng-container *ngIf="rewardAmount$ | async">
+                      <loading-skeleton *ngIf="isRewardAmountMinusFeeBusy$ | async" [loadingWidth]="'150px'"></loading-skeleton>
+                      <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
+                        <ng-container *ngIf="rewardAmountMinusFee$ | async">
                           {{ remainingTime$ | async }}
                         </ng-container>
-                        <ng-container *ngIf="(rewardAmount$ | async) === null">
+                        <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
                         </ng-container>
                       </ng-container>
@@ -259,7 +277,7 @@
                       <ng-container *ngIf="!(isRewardAmountMinusFeeBusy$ | async)">
                         <amount-cell
                           *ngIf="rewardAmountMinusFee$ | async as rewardAmountMinusFee"
-                          [data]="{ amount: rewardAmountMinusFee }"
+                          [data]="rewardAmountMinusFee"
                         ></amount-cell>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
                           not available
@@ -312,8 +330,8 @@
           <div class="card-body px-3 px-sm-3 pt-4 pb-3">
             <ng-container *ngIf="account.is_baker">
               <baker-table
+                [address]="bakerAddress"
                 [tabs]="bakerTabs"
-                [page]="'account'"
                 [data]="bakerTableInfos"
                 [ratings]="bakerTableRatings$ | async"
                 [bakerFee$]="tezosBakerFee$"

@@ -1,18 +1,18 @@
 import { createReducer, on } from '@ngrx/store'
-import { range } from 'lodash'
+import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
-import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
-import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
+import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState, Pagination } from '@tezblock/domain/table'
-import { Reward } from '@tezblock/domain/reward'
+import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
   upcomingRights: boolean
   activeDelegations: boolean
+  bakerReward: { [key: string]: boolean }
 }
 
 export interface State {
@@ -25,8 +25,11 @@ export interface State {
   busy: Busy
   upcomingRights: actions.UpcomingRights
   activeDelegations: number
-  rewards: TableState<Reward>
+  rewards: TableState<TezosRewards>
+  bakerReward: { [key: string]: TezosPayoutInfo }
   votes: TableState<Transaction>
+  endorsingRightItems: { [key: string]: EndorsingRights[] }
+  bakingRightItems: { [key: string]: BakingRights[] }
 }
 
 const initialState: State = {
@@ -39,41 +42,16 @@ const initialState: State = {
   busy: {
     efficiencyLast10Cycles: false,
     upcomingRights: false,
-    activeDelegations: false
+    activeDelegations: false,
+    bakerReward: {}
   },
   upcomingRights: undefined,
   activeDelegations: undefined,
   rewards: getInitialTableState(undefined, 3),
-  votes: getInitialTableState()
-}
-
-const bakingRightsFactory = (cycle: number): AggregatedBakingRights => ({
-  cycle: cycle,
-  bakingsCount: 0,
-  blockRewards: null,
-  deposits: null,
-  fees: null,
-  items: []
-})
-
-const endorsingRightsFactory = (cycle: number): AggregatedEndorsingRights => ({
-  cycle: cycle,
-  endorsementsCount: 0,
-  endorsementRewards: null,
-  deposits: null,
-  items: []
-})
-
-const fillMissingCycles = (currentCycle: number, rights: { cycle: number }[], paging: Pagination, rightFactory: (cycle: number) => any) => {
-  const count = paging.currentPage * paging.selectedSize
-
-  return range(currentCycle - count, currentCycle)
-    .map(cycle => {
-      const match = rights.find(right => right.cycle === cycle)
-
-      return match || rightFactory(cycle)
-    })
-    .sort((a, b) => b.cycle - a.cycle)
+  bakerReward: {},
+  votes: getInitialTableState(),
+  endorsingRightItems: {},
+  bakingRightItems: {}
 }
 
 export const reducer = createReducer(
@@ -269,6 +247,7 @@ export const reducer = createReducer(
     votes: {
       ...state.votes,
       data,
+      pagination: tryUpdateTotal(state.votes, data),
       loading: false
     }
   })),
@@ -289,5 +268,73 @@ export const reducer = createReducer(
       }
     }
   })),
+  on(actions.loadBakerReward, (state, { baker, cycle }) => ({
+    ...state,
+    busy: {
+      ...state.busy,
+      bakerReward: {
+        ...state.busy.bakerReward,
+        [cycle]: true
+      }
+    }
+  })),
+  on(actions.loadBakerRewardSucceeded, (state, { cycle, bakerReward }) => ({
+    ...state,
+    bakerReward: {
+      ...state.bakerReward,
+      [cycle]: bakerReward
+    },
+    busy: {
+      ...state.busy,
+      bakerReward: {
+        ...state.busy.bakerReward,
+        [cycle]: false
+      }
+    }
+  })),
+  on(actions.loadBakerRewardFailed, (state, { cycle }) => ({
+    ...state,
+    bakerReward: {
+      ...state.bakerReward,
+      [cycle]: null
+    },
+    busy: {
+      ...state.busy,
+      bakerReward: {
+        ...state.busy.bakerReward,
+        [cycle]: false
+      }
+    }
+  })),
+  on(actions.loadEndorsingRightItemsSucceeded, (state, { cycle, endorsingRightItems }) => ({
+    ...state,
+    endorsingRightItems: {
+      ...state.endorsingRightItems,
+      [cycle]: endorsingRightItems
+    }
+  })),
+  on(actions.loadBakerRewardFailed, (state, { cycle }) => ({
+    ...state,
+    endorsingRightItems: {
+      ...state.endorsingRightItems,
+      [cycle]: null
+    }
+  })),
+  on(actions.loadBakingRightItemsSucceeded, (state, { cycle, bakingRightItems }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
+      [cycle]: bakingRightItems
+    }
+  })),
+  on(actions.loadBakingRightItemsFailed, (state, { cycle }) => ({
+    ...state,
+    bakingRightItems: {
+      ...state.bakingRightItems,
+      [cycle]: null
+    }
+  })),
   on(actions.reset, () => initialState)
 )
+
+export const bakerRewardSelector = (cycle: number) => (state: State): TezosPayoutInfo => state.bakerReward[cycle]

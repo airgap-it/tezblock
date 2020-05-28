@@ -1,12 +1,12 @@
 import { createReducer, on } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
 import BigNumber from 'bignumber.js'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
@@ -31,8 +31,11 @@ export interface State {
   currentVotingPeriod: number
   currentVotingeriodPosition: number
   blocksPerVotingPeriod: number
-
   exchangeRates: ExchangeRates
+  protocolVariables: ProtocolConstantResponse
+  busy: {
+    protocolVariables: boolean
+  }
 
   // TODO: refactor there 2 properties ( I suppose these are prices XTZ -> BTC & USD ), and now BTC -> USD is added
   // move into exchangeRate
@@ -41,7 +44,7 @@ export interface State {
 
   // XTZ -> USD
   fiatCurrencyInfo: CurrencyInfo
-  cryptoHistoricData: MarketDataSample[]
+
 }
 
 const initialState: State = {
@@ -52,6 +55,10 @@ const initialState: State = {
   currentVotingeriodPosition: undefined,
   blocksPerVotingPeriod: undefined,
   exchangeRates: {},
+  protocolVariables: undefined,
+  busy: {
+    protocolVariables: false
+  },
   cryptoCurrencyInfo: {
     symbol: 'BTC',
     currency: 'BTC',
@@ -61,8 +68,7 @@ const initialState: State = {
     symbol: '$',
     currency: 'USD',
     price: new BigNumber(0)
-  },
-  cryptoHistoricData: []
+  }
 }
 
 export const reducer = createReducer(
@@ -106,9 +112,27 @@ export const reducer = createReducer(
     ...state,
     exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
   })),
-  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
+  on(actions.loadProtocolVariables, state => ({
     ...state,
-    cryptoHistoricData
+    busy: {
+        ...state.busy,
+        protocolVariables: true
+    }
+  })),
+  on(actions.loadProtocolVariablesSucceeded, (state, { protocolVariables }) => ({
+    ...state,
+    protocolVariables,
+    busy: {
+        ...state.busy,
+        protocolVariables: false
+    }
+  })),
+  on(actions.loadProtocolVariablesFailed, state => ({
+    ...state,
+    busy: {
+        ...state.busy,
+        protocolVariables: false
+    }
   }))
 )
 
@@ -138,25 +162,3 @@ export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
     ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
     : undefined
-export const currencyGrowthPercentageSelector = (state: State): number => {
-  const startingPrice = state.cryptoHistoricData
-  const priceNow = state.fiatCurrencyInfo.price
-
-  if (!startingPrice || startingPrice.length === 0) {
-    return 0
-  }
-
-  if (!startingPrice[0].open) {
-    return 0
-  }
-
-  if (!priceNow) {
-    return 0
-  }
-
-  return priceNow
-    .minus(startingPrice[0].open)
-    .multipliedBy(100)
-    .dividedBy(startingPrice[0].open)
-    .toNumber()
-}

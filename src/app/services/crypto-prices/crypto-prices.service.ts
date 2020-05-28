@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
-import { Observable, from } from 'rxjs'
+import { Observable, from, of } from 'rxjs'
 import { filter, map, tap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { isNil, negate } from 'lodash'
@@ -11,6 +11,13 @@ import { CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache
 import * as fromRoot from '@tezblock/reducers'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
+
+export enum PricePeriod {
+  day = 0,
+  week = 1,
+  threeMonths = 2
+}
 
 export interface CurrencyInfo {
   symbol: string
@@ -41,20 +48,43 @@ export class CryptoPricesService {
   }
 
   getHistoricCryptoPrices(
-    numberOfHours: number,
     date: Date,
     baseSymbol = 'USD',
-    protocolIdentifier = 'XTZ'
+    protocolIdentifier = 'XTZ',
+    pricePeriod: PricePeriod
   ): Observable<MarketDataSample[]> {
+    if (pricePeriod === PricePeriod.day) {
+      return from(
+        <Promise<any>>cryptocompare.histoHour(protocolIdentifier, baseSymbol, {
+          limit: 24 - 1,
+          timestamp: date
+        })
+      )
+    }
+
+    if (pricePeriod === PricePeriod.week) {
+      return from(
+        <Promise<any>>cryptocompare.histoDay(protocolIdentifier, baseSymbol, {
+          limit: 7,
+          timestamp: date
+        })
+      )
+    }
+
+    // 3 months
     return from(
-      <Promise<any>>cryptocompare.histoHour(protocolIdentifier, baseSymbol, {
-        limit: numberOfHours - 1,
+      <Promise<any>>cryptocompare.histoDay(protocolIdentifier, baseSymbol, {
+        limit: 90,
         timestamp: date
       })
     )
   }
 
   getCurrencyConverterArgs(symbol: string): Observable<CurrencyConverterPipeArgs> {
+    if (symbol && !isConvertableToUSD(symbol)) {
+      return of(null)
+    }
+
     if (!symbol) {
       return this.store$
         .select(state => state.app.fiatCurrencyInfo)
@@ -66,6 +96,9 @@ export class CryptoPricesService {
 
     return this.store$
       .select(state => state.app.exchangeRates)
-      .pipe(map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates)))
+      .pipe(
+        filter(negate(isNil)),
+        map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates))
+      )
   }
 }

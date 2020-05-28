@@ -1,26 +1,23 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { Conventer } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 
 export const columns: {
   [key: string]: (options: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => Column[]
 } = {
   transfers: (options: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => [
     {
       name: 'From',
-      field: 'singleFrom',
+      field: 'from',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.from, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -29,21 +26,20 @@ export const columns: {
     },
     {
       name: 'To',
-      field: 'singleTo',
+      field: 'to',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.to, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: false
@@ -52,25 +48,25 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8'} }),
       sortable: false
     },
     {
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
-      data: (item: any) => ({ data: item.timestamp * 1000 }),
+      data: (item: any) => ({ data: item.timestamp }),
       sortable: true
     },
     {
       name: 'Block',
-      field: 'blockHeight',
+      field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
       name: 'Tx Hash',
-      field: 'hash',
+      field: 'operation_group_hash',
       template: Template.hash
     }
   ],
@@ -78,7 +74,6 @@ export const columns: {
     pageId: string
     showFiatValue: boolean
     symbol: string
-    conventer: Conventer
   }) => [
     {
       name: 'From',
@@ -104,11 +99,10 @@ export const columns: {
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
-        data: { amount: item.amount },
+        data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol,
-          conventer: options.conventer
+          symbol: options.symbol
         }
       }),
       sortable: true
@@ -117,7 +111,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: { amount: item.fee }, options: { showFiatValue: false } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: true
     },
     {
@@ -125,6 +119,10 @@ export const columns: {
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
+    },
+    {
+      name: 'Entry Point',
+      field: 'entrypoint'
     },
     {
       name: 'Block',
@@ -136,6 +134,30 @@ export const columns: {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash
+    }
+  ],
+  tokenHolders: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+  }) => [
+    {
+      name: 'Account',
+      field: 'address',
+      template: Template.address,
+      data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Token Balance',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: any) => ({
+        data: item.amount,
+        options: {
+          showFiatValue: options.showFiatValue,
+          symbol: options.symbol
+        }
+      })
     }
   ]
 }

@@ -1,4 +1,7 @@
-import { getProtocolByIdentifier, ICoinProtocol } from 'airgap-coin-lib'
+import { getProtocolByIdentifier, ICoinProtocol, TezosFAProtocol } from 'airgap-coin-lib'
+
+import { TokenContract } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export enum Currency {
   BTC = 'BTC',
@@ -10,8 +13,6 @@ const convertSymbol = (symbol: string): string => {
   switch (symbol) {
     // case 'tzBTC':
     //   return 'xtz-btc'
-    case 'STKR':
-      return 'xtz'
     case 'BTC':
     case 'tzBTC':
       return 'btc'
@@ -31,3 +32,28 @@ export const tryGetProtocolByIdentifier = (identifier: string): ICoinProtocol =>
 export const isConvertableToUSD = (symbol: string): boolean => ['xtz', 'tzBTC', 'BTC'].includes(symbol)
 
 export const isInBTC = (symbol: string): boolean => ['tzBTC', 'BTC'].includes(symbol)
+
+export const getFaProtocol = (
+  contract: TokenContract,
+  chainNetworkService: ChainNetworkService
+): TezosFAProtocol => {
+  const environmentUrls = chainNetworkService.getEnvironment()
+
+  return new TezosFAProtocol({
+    symbol: contract.symbol,
+    name: contract.name,
+    marketSymbol: contract.symbol,
+    identifier: '', // not important in this context can be empty string
+    contractAddress: contract.id,
+    jsonRPCAPI: environmentUrls.rpcUrl,
+    baseApiUrl: environmentUrls.conseilUrl,
+    baseApiKey: environmentUrls.conseilApiKey,
+    baseApiNetwork: chainNetworkService.getEnvironmentVariable(),
+    network: chainNetworkService.getNetwork(),
+    feeDefaults: {
+      low: '0',
+      medium: '0',
+      high: '0'
+    }
+  })
+}

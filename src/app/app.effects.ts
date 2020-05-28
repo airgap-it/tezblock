@@ -15,6 +15,7 @@ import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Currency } from '@tezblock/domain/airgap'
+import { ProtocolVariablesService } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 @Injectable()
 export class AppEffects {
@@ -99,9 +100,7 @@ export class AppEffects {
               limit: 1
             })
             .pipe(map(first)),
-          this.baseService
-            .get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true)
-            .pipe(map(response => response.blocks_per_voting_period))
+          this.protocolVariablesService.getBlocksPerVotingPeriod()
         ).pipe(
           map(([{ meta_voting_period, meta_voting_period_position }, blocksPerVotingPeriod]) =>
             actions.loadPeriodInfosSucceeded({
@@ -208,13 +207,13 @@ export class AppEffects {
     )
   )
 
-  loadCryptoHistoricData$ = createEffect(() =>
+  loadProtocolVariables$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadCryptoHistoricData),
+      ofType(actions.loadProtocolVariables),
       switchMap(() =>
-        this.cryptoPricesService.getHistoricCryptoPrices(24, new Date(), 'USD', 'XTZ').pipe(
-          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
-          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
+        this.protocolVariablesService.getProtocolVariables().pipe(
+          map(protocolVariables => actions.loadProtocolVariablesSucceeded({ protocolVariables })),
+          catchError(error => of(actions.loadProtocolVariablesFailed({ error })))
         )
       )
     )
@@ -226,6 +225,7 @@ export class AppEffects {
     private readonly blockService: BlockService,
     private readonly cacheService: CacheService,
     private readonly cryptoPricesService: CryptoPricesService,
+    private readonly protocolVariablesService: ProtocolVariablesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }
