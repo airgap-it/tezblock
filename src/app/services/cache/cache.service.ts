@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
@@ -43,20 +45,35 @@ export interface Cache {
 export class CacheService {
   private updateQueue: { [key: string]: ((value: any) => any)[] } = {}
   private isBusy: { [key: string]: boolean } = {}
+  private get isMainnet(): boolean {
+    return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
 
   delete(key: CacheKeys): Observable<undefined> {
     return this.storage.delete(key)
   }
 
   set<T>(key: CacheKeys, value: T): Observable<undefined> {
+    if (!this.isMainnet) {
+      return of()
+    }
+
     return this.storage.set(key, value)
   }
 
   get<T>(key: CacheKeys): Observable<T> {
+    if (!this.isMainnet) {
+      return of()
+    }
+
     return <Observable<T>>this.storage.get(key)
   }
 
   update<T>(key: CacheKeys, change: (value: T) => T) {
+    if (!this.isMainnet) {
+      return
+    }
+
     if (!this.isBusy[key]) {
       this.executeUpdate(key, change).subscribe(() => {
         this.isBusy[key] = false
@@ -73,12 +90,16 @@ export class CacheService {
   }
 
   executeUpdate<T>(key: CacheKeys, change: (value: T) => T): Observable<undefined> {
+    if (!this.isMainnet) {
+      return of()
+    }
+
     this.isBusy[key] = true
 
     return this.get<T>(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
   }
 
-  constructor(private readonly storage: StorageMap) {
+  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly storage: StorageMap) {
     // from(navigator.storage.estimate()).subscribe(x => console.log(`>>>> IndexedDB storage: ${JSON.stringify(x)}`))
   }
 }
