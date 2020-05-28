@@ -1,9 +1,9 @@
 import { createAction, props } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
 import BigNumber from 'bignumber.js'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import { Block } from '@tezblock/interfaces/Block'
+import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 const featureName = 'App'
 
@@ -44,3 +44,7 @@ export const loadExchangeRateSucceeded = createAction(
   props<{ from: string, to: string, price: number }>()
 )
 export const loadExchangeRateFailed = createAction(`[${featureName}] Load Exchange Rate Failed`, props<{ error: any }>())
+
+export const loadProtocolVariables = createAction(`[${featureName}] Load Protocol Variables`)
+export const loadProtocolVariablesSucceeded = createAction(`[${featureName}] Load Protocol Variables Succeeded`, props<{ protocolVariables: ProtocolConstantResponse }>())
+export const loadProtocolVariablesFailed = createAction(`[${featureName}] Load Protocol Variables Failed`, props<{ error: any }>())

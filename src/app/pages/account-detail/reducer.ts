@@ -13,6 +13,7 @@ import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadRes
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import { BakingRatingResponse, ContractAsset } from './model'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -38,12 +39,7 @@ const ensure30Days = (balance: Balance[]): Balance[] => {
   const attachBalance = (date: number): Balance =>
     balance.find(getBalanceFrom(date)) || getPreviousBalance(balance, date) || { balance: 0, asof: date }
 
-  return range(0, 30).map(
-    pipe(
-      toDay,
-      attachBalance
-    )
-  )
+  return range(0, 30).map(pipe(toDay, attachBalance))
 }
 
 const ratingNumberToLabel = [
@@ -64,7 +60,7 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
   get(feeByCycle => feeByCycle.value * 100)
 )
 
-export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
+export const fromBakingBadResponse = (response: BakingBadResponse, state: State): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.payoutAccuracy
       ? response.payoutAccuracy !== 'no_data'
@@ -75,11 +71,7 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
   stakingCapacity: response.stakingCapacity
 })
 
-export const fromMyTezosBakerResponse = (
-  response: MyTezosBakerResponse,
-  state: State,
-  updateFee: boolean
-): actions.BakingRatingResponse => ({
+export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.rating
       ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
@@ -113,6 +105,7 @@ export interface State {
   tezosBakerFee: number
   temporaryBalance: Balance[]
   bakerReward: TezosPayoutInfo
+  contractAssets: TableState<ContractAsset>
 }
 
 const initialState: State = {
@@ -132,7 +125,8 @@ const initialState: State = {
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
   temporaryBalance: undefined,
-  bakerReward: undefined
+  bakerReward: undefined,
+  contractAssets: getInitialTableState(undefined, Number.MAX_SAFE_INTEGER)
 }
 
 export const reducer = createReducer(
@@ -261,7 +255,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
-    counts
+    counts: (counts || []).concat([{ key: 'assets', count: state.contractAssets.pagination.total }])
   })),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
@@ -289,6 +283,38 @@ export const reducer = createReducer(
       ...state.busy,
       bakerReward: false
     }
+  })),
+  on(actions.loadContractAssets, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      loading: true
+    }
+  })),
+  on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
+    ...state,
+    counts: (state.counts || []).filter(count => count.key !== 'assets').concat([{ key: 'assets', count: data.length }]),
+    contractAssets: {
+      ...state.contractAssets,
+      data,
+      pagination: {
+        ...state.contractAssets.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadContractAssetsFailed, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      data: null,
+      loading: false
+    }
+  })),
+  on(actions.setKind, (state, { kind }) => ({
+    ...state,
+    kind
   })),
   on(actions.reset, () => initialState)
 )

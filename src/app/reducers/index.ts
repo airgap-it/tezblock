@@ -31,7 +31,7 @@ export interface State {
   endorsementDetails: fromEndorsementDetails.State
   tokenContractOveview: fromTokenContractOveview.State
   transactionDetails: fromTransactionDetails.State
-  proposalDetails: fromProposalDetails.State
+  proposalDetails: fromProposalDetails.State,
   contractDetails: fromContractDetails.State
   list: fromList.State
   health: fromHealth.State
@@ -90,9 +90,25 @@ export const selectGlobal = (state: State) => state
 export const selectBlockDetails = (state: State) => state.blockDetails
 export const selectApp = (state: State) => state.app
 export const selectBakerTable = (state: State) => state.bakerTable
+export const selectProposalDetails = (state: State) => state.proposalDetails
+export const selectDashboard = (state: State) => state.dashboard
+export const selectContractDetails = (state: State) => state.contractDetails
 
 export const dashboard = {
-  currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector)
+  currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector),
+  yayRolls: createSelector(selectDashboard, fromDashboard.yayRollsSelector),
+  nayRolls: createSelector(selectDashboard, fromDashboard.nayRollsSelector),
+  passRolls: createSelector(selectDashboard, fromDashboard.passRollsSelector),
+  yayRollsPercentage: createSelector(selectDashboard, fromDashboard.yayRollsPercentageSelector),
+  nayRollsPercentage: createSelector(selectDashboard, fromDashboard.nayRollsPercentageSelector)
+}
+
+export const proposalDetails = {
+  yayRolls: createSelector(selectProposalDetails, fromProposalDetails.yayRollsSelector),
+  nayRolls: createSelector(selectProposalDetails, fromProposalDetails.nayRollsSelector),
+  passRolls: createSelector(selectProposalDetails, fromProposalDetails.passRollsSelector),
+  yayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.yayRollsPercentageSelector),
+  nayRollsPercentage: createSelector(selectProposalDetails, fromProposalDetails.nayRollsPercentageSelector)
 }
 
 export const app = {
@@ -111,4 +127,8 @@ export const blockDetails = {
 
 export const bakerTable = {
   bakerReward: (cycle: number) => createSelector(selectBakerTable, fromBakerTable.bakerRewardSelector(cycle))
+}
+
+export const contractDetails = {
+  transferOperations: createSelector(selectContractDetails, fromContractDetails.transferOperationsSelector)
 }
