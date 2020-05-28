@@ -30,7 +30,7 @@ export class DashboardLatestContractsTransactionsEffects {
           map(response => flatten(response)),
           map(transferOperations =>
             actions.loadTransferOperationsSucceeded({
-              transferOperations: transferOperations.slice(0, 6)
+              transferOperations: transferOperations.slice(0, 3)
             })
           ),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
