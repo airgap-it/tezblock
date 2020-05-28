@@ -7,7 +7,6 @@ interface Context<T> {
 }
 
 @Directive({
-    // don't use 'ng' prefix since it's reserved for Angular
     selector: '[appVar]',
 })
 export class VarDirective<T = unknown> {
