@@ -2,6 +2,8 @@ import { IAirGapTransaction } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
+import { forkJoin, from, Observable, of } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
@@ -9,7 +11,10 @@ import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get as fpGet } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
-import { Currency, isInBTC } from '@tezblock/domain/airgap'
+import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -38,11 +43,12 @@ export interface TokenContract {
   decimals?: number
 }
 
-export interface ContractOperation extends IAirGapTransaction {
-  singleFrom: string
-  singleTo: string
+export interface ContractOperation extends Transaction {
+  from: string
+  to: string
   parameters: string
-  symbol?: string
+  parameters_micheline: string
+  parameters_entrypoints: string
   decimals?: number
   entrypoint?: string
 }
@@ -78,13 +84,6 @@ export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): P
     total: data.length
   }
 }
-
-export const airGapTransactionToContractOperation = (airGapTransaction: IAirGapTransaction): ContractOperation => ({
-  ...airGapTransaction,
-  singleFrom: first(airGapTransaction.from),
-  singleTo: first(airGapTransaction.to),
-  parameters: undefined
-})
 
 export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOption[] => {
   if (!searchTerm) {
@@ -140,3 +139,44 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
     protocolIdentifier: 'BTC'
   }
 }
+
+export const hasTokenHolders = (contract: TokenContract): boolean => ['Staker', 'tzBTC'].includes(contract.name)
+
+export interface TokenHolder {
+  address: string
+  amount: string
+}
+
+// fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
+export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> =>
+  forkJoin(
+    transactions.map(transaction => {
+      const contract: TokenContract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
+
+      if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
+        const faProtocol = getFaProtocol(contract, chainNetworkService)
+
+        return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
+          map(normalizedParameters => {
+            if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
+              const transferDetails = faProtocol.transferDetailsFromParameters({
+                entrypoint: 'transfer',
+                value: normalizedParameters.value
+              })
+              return {
+                ...transaction,
+                source: transferDetails.from,
+                destination: transferDetails.to,
+                amount: parseFloat(transferDetails.amount),
+                symbol: contract.symbol
+              }
+            }
+
+            return transaction
+          })
+        )
+      }
+
+      return of(transaction)
+    })
+  )

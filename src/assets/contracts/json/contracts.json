@@ -2,12 +2,12 @@
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "symbol": "STKR",
     "name": "Staker",
-    "website": "http://www.stakerdao.com/",
+    "website": "https://stakerdao.com",
     "description": "The Staker token is the governance token for the StakerDAO ecosystem.  STKR holders participate in StakerDAO decision making and elect the Staker Council.",
     "socials": [
       {
         "type": "website",
-        "url": "http://www.stakerdao.com/"
+        "url": "https://stakerdao.com"
       },
       {
         "type": "twitter",
@@ -24,15 +24,41 @@
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "symbol": "tzBTC",
     "name": "tzBTC",
-    "website": "http://www.tzbtc.io/",
+    "website": "https://tzbtc.io",
     "description": "tzBTC delivers the power of Bitcoin with the flexibility of a token on the Tezos blockchain.",
     "socials": [
       {
         "type": "website",
-        "url": "http://www.tzbtc.io/"
+        "url": "https://tzbtc.io"
       }
     ],
     "tezosNetwork": ["mainnet"],
     "decimals": 8
+  },
+  "KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9": {
+    "symbol": "USDtz",
+    "name": "USD Tez",
+    "website": "https://USDtz.com",
+    "description": "USD Tez is a Tezos stablecoin pegged to the US Dollar and backed by FIAT collateral, targeting a maximum growth cap of 4:1 overcollateralization with both FIAT and XTZ.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://USDtz.com"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/USDtz"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/USDtz"
+      },
+      {
+        "type": "telegram",
+        "url": "https://t.me/USDtezos"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 6
   }
 }
