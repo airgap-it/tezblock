@@ -154,13 +154,17 @@ export class AmountCellComponent implements OnInit {
 
   private setAmountPiped() {
     const protocolIdentifier = get<any>(o => o.symbol)(this.options) || 'xtz'
-    const converted = this.amountConverterPipe.transform(this.data || 0, {
-      protocolIdentifier,
-      maxDigits: this.maxDigits
-    })
+    const converted: string =
+      this.amountConverterPipe.transform(this.data || 0, {
+        protocolIdentifier,
+        maxDigits: this.maxDigits
+      }) || '0'
     const decimals = pipe<string, number, string>(
       stringNumber => parseFloat(stringNumber.replace(',', '')),
-      numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted, this.options)).split('.')[1]
+      pipe(
+        numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted)),
+        decimalPiped => (decimalPiped ? decimalPiped.split('.')[1] : decimalPiped)
+      )
     )(converted)
 
     this.amountPipedLeadingChars = converted.split('.')[0]
