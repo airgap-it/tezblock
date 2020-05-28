@@ -202,7 +202,7 @@ export class ContractService extends BaseService {
               map(response =>
                 contractOperations.map((contractOperation, index) => ({
                   ...contractOperation,
-                  entrypoint: _get(response[index], 'entrypoint'),
+                  entrypoint: contractOperation.parameters_entrypoints === 'default' ? _get(response[index], 'entrypoint') : contractOperation.parameters_entrypoints,
                   symbol: contract.symbol,
                   decimals: contract.decimals
                 }))
