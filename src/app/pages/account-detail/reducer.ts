@@ -14,6 +14,7 @@ import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
+import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -68,7 +69,7 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
         : null
       : null,
   tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
-  stakingCapacity: response.stakingCapacity
+  stakingCapacity: get<number>(stakingCapacity => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
 })
 
 export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
@@ -315,6 +316,13 @@ export const reducer = createReducer(
   on(actions.setKind, (state, { kind }) => ({
     ...state,
     kind
+  })),
+  on(actions.loadStakingCapacityFromTezosProtocolSucceeded, (state, { stakingCapacity }) => ({
+    ...state,
+    bakerTableRatings: {
+      ...state.bakerTableRatings,
+      stakingCapacity
+    }
   })),
   on(actions.reset, () => initialState)
 )

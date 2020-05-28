@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as moment from 'moment'
-import { Observable, of } from 'rxjs'
+import { Observable, of, from } from 'rxjs'
 import { map, switchMap, tap } from 'rxjs/operators'
+import { TezosProtocol } from 'airgap-coin-lib'
 
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
@@ -31,7 +32,6 @@ const hoursPerCycle = 68
   providedIn: 'root'
 })
 export class BakingService extends BaseService {
-
   private readonly bakingBadUrl = 'https://api.baking-bad.org/v2/bakers'
   private readonly tezosBakerUrl = 'https://api.mytezosbaker.com/v1/bakers/'
   private readonly efficiencyLast10CyclesUrl = 'https://api.tezos-nodes.com/v1/baker/'
@@ -114,9 +114,20 @@ export class BakingService extends BaseService {
           inverse: false
         }
       ]
-    }).pipe(
-      map(first)
+    }).pipe(map(first))
+  }
+
+  getStakingCapacityFromTezosProtocol(tzAddress: string): Observable<number> {
+    const network = this.chainNetworkService.getNetwork()
+    const tezosProtocol = new TezosProtocol(
+      this.environmentUrls.rpcUrl,
+      this.environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      this.environmentUrls.conseilApiKey
     )
+
+    return from(tezosProtocol.bakerInfo(tzAddress)).pipe(map(response => response.bakerCapacity.multipliedBy(0.7).toNumber()))
   }
 
   addPayoutDelayToMoment(time: Moment): Moment {

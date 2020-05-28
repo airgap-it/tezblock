@@ -31,8 +31,6 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { ChartOptions } from 'chart.js'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
 import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
@@ -40,7 +38,6 @@ import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-pri
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { get } from '@tezblock/services/fp'
-import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -457,14 +454,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
                 }
 
                 const stakingBalance: number = bakerInfos.staking_balance
-                const mutezStakingCapacity = stakingCapacity * xtzToMutezConvertionRatio
-                const stakingProgress: number = Math.min(100, (1 - (mutezStakingCapacity - stakingBalance) / mutezStakingCapacity) * 100)
+                const stakingProgress: number = Math.min(100, (1 - (stakingCapacity - stakingBalance) / stakingCapacity) * 100)
                 const stakingBond: number = bakerInfos.staking_balance - bakerInfos.delegated_balance
 
                 return {
                   stakingBalance: bakerInfos.staking_balance,
                   numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
-                  stakingCapacity: mutezStakingCapacity,
+                  stakingCapacity,
                   stakingProgress,
                   stakingBond,
                   frozenBalance: bakerInfos.frozen_balance

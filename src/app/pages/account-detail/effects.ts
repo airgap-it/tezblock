@@ -71,7 +71,7 @@ export class AccountDetailEffects {
       ),
       switchMap(([{ kind }, pagination, address, orderBy]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
-          switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
+          switchMap(data => (kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data))),
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -329,16 +329,37 @@ export class AccountDetailEffects {
                 map(tokenHolders => ({
                   contract,
                   amount: tokenHolders
-                  .filter(tokenHolder => tokenHolder.address === address)
-                  .map(tokenHolder => parseFloat(tokenHolder.amount)).reduce((a, b) => a + b, 0)
-                })
-                )
+                    .filter(tokenHolder => tokenHolder.address === address)
+                    .map(tokenHolder => parseFloat(tokenHolder.amount))
+                    .reduce((a, b) => a + b, 0)
+                }))
               )
             )
         ).pipe(
           map(data => data.filter(item => item.amount > 0)),
           map(data => actions.loadContractAssetsSucceeded({ data })),
           catchError(error => of(actions.loadContractAssetsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onBakingBadRatingsEmptyLoadStakingCapacityFromTezosProtocol$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBakingBadRatingsSucceeded),
+      filter(({ response }) => !response.stakingCapacity),
+      map(() => actions.loadStakingCapacityFromTezosProtocol())
+    )
+  )
+
+  loadStakingCapacityFromTezosProtocol$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadStakingCapacityFromTezosProtocol),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        this.bakingService.getStakingCapacityFromTezosProtocol(address).pipe(
+          map(stakingCapacity => actions.loadStakingCapacityFromTezosProtocolSucceeded({ stakingCapacity })),
+          catchError(error => of(actions.loadStakingCapacityFromTezosProtocolFailed({ error })))
         )
       )
     )
