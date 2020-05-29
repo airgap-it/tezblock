@@ -198,7 +198,7 @@ export class ContractService extends BaseService {
               contractOperations.map(contractOperation =>
                 from(
                   faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
-                ).pipe(catchError(() => of({ entrypoint: 'defaulf', value: null })))
+                ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
               )
             ).pipe(
               map(response =>
