@@ -1,4 +1,3 @@
-import { IAirGapTransaction } from 'airgap-coin-lib'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
@@ -11,7 +10,7 @@ import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { get as fpGet } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
-import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
+import { Currency, isInBTC, getFaProtocol, tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -125,6 +124,13 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
   )
 }
 
+export const getTokenContractBySymbol = (symbol: string, tezosNetwork: TezosNetwork): TokenContract => {
+  if (!symbol) {
+    return undefined
+  }
+  return getTokenContracts(tezosNetwork).data.find(tokenContract => tokenContract.symbol === symbol)
+}
+
 export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
   if (isNil(contract) || !isInBTC(contract.symbol) || !get(exchangeRates, `${Currency.BTC}.${Currency.USD}`)) {
     return null
@@ -136,7 +142,7 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
       currency: 'USD',
       price: new BigNumber(exchangeRates[Currency.BTC][Currency.USD])
     },
-    protocolIdentifier: 'BTC'
+    protocolIdentifier: 'btc'
   }
 }
 
@@ -180,3 +186,11 @@ export const fillTransferOperations = (transactions: Transaction[], chainNetwork
       return of(transaction)
     })
   )
+
+  export const getDecimalsForSymbol = (symbol: string, network: TezosNetwork): number => {
+    const protocol = tryGetProtocolByIdentifier(symbol)
+    if (protocol) {
+      return protocol.decimals
+    }
+    return getTokenContractBySymbol(symbol, network).decimals ?? 0
+  }
