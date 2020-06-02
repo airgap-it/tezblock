@@ -309,7 +309,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
     this.contractAssets$ = this.store$
       .select(state => state.accountDetails.contractAssets.data)
-      .pipe(filter(negate(isNil)), distinctUntilChanged())
+      .pipe(
+        distinctUntilChanged(),
+        map(contractAssets => contractAssets || [])
+      )
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
     )

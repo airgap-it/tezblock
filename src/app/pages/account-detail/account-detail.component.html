@@ -90,13 +90,13 @@
                       else hideValue
                     "
                   >
-                    <h5 class="mb-0">
-                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                      }}{{
-                        account.balance
-                          | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                          | number: '1.0-6'
-                      }}
+                    <h5
+                      *appVar="
+                        account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                      "
+                      class="mb-0"
+                    >
+                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
                     </h5>
                   </div>
                 </ng-container>
