@@ -7,7 +7,7 @@ import { IdenticonComponent } from '../identicon/identicon'
 import { AddressItemComponent } from './../address-item/address-item.component'
 import { BlockItemComponent } from './block-item.component'
 
-describe('ListItemComponent', () => {
+xdescribe('ListItemComponent', () => {
   let component: BlockItemComponent
   let fixture: ComponentFixture<BlockItemComponent>
 

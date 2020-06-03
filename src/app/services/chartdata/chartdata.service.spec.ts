@@ -2,7 +2,7 @@ import { ChartDataService } from './chartdata.service'
 import { TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-describe('ChartDataService', () => {
+xdescribe('ChartDataService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

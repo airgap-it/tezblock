@@ -691,49 +691,6 @@ export class ApiService {
     )
   }
 
-  getAccountStatus(address: string): Promise<string> {
-    return new Promise(resolve => {
-      this.http
-        .post<Transaction[]>(
-          this.transactionsApiUrl,
-          {
-            predicates: [
-              {
-                field: 'operation_group_hash',
-                operation: 'isnull',
-                inverse: true
-              },
-              {
-                field: 'kind',
-                operation: 'eq',
-                set: ['reveal']
-              },
-              {
-                field: 'source',
-                operation: 'eq',
-                set: [address]
-              }
-            ],
-            orderBy: [sort('block_level', 'desc')],
-            limit: 1
-          },
-          this.options
-        )
-        .subscribe(
-          (transactions: Transaction[]) => {
-            if (transactions.length > 0) {
-              resolve('Revealed')
-            } else {
-              resolve('Not Revealed')
-            }
-          },
-          err => {
-            resolve('Not Available')
-          }
-        )
-    })
-  }
-
   getLatestBlocks(
     limit: number,
     orderBy = {

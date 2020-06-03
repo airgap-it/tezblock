@@ -12,7 +12,7 @@ import { IdenticonComponent } from 'src/app/components/identicon/identicon'
 import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
-describe('EndorsementDetailComponent', () => {
+xdescribe('EndorsementDetailComponent', () => {
   let component: EndorsementDetailComponent
   let fixture: ComponentFixture<EndorsementDetailComponent>
 

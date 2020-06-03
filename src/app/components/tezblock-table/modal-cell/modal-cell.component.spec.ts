@@ -5,7 +5,7 @@ import { ModalModule, BsModalService } from 'ngx-bootstrap/modal'
 import { ModalCellComponent } from './modal-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('ModalCellComponent', () => {
+xdescribe('ModalCellComponent', () => {
   let component: ModalCellComponent
   let fixture: ComponentFixture<ModalCellComponent>
 
