@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { ActivatedRoute } from '@angular/router'
+import { ActivatedRoute, Router } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
 import { from, Observable, combineLatest, forkJoin, of } from 'rxjs'
@@ -225,6 +225,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
+    private readonly router: Router,
     private readonly store$: Store<fromRoot.State>
   ) {
     super()
@@ -534,10 +535,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   showAssets() {
     this.store$.dispatch(actions.setKind({ kind: 'assets' }))
-    this.tabs = this.tabs.map(tab => ({
-      ...tab,
-      active: tab.kind === 'assets'
-    }))
+    this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { tab: 'Assets' } })
   }
 
   private setTabs(pageId: string) {
