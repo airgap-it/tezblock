@@ -436,7 +436,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
   }
 
-  getBakingInfos(address: string) {
+  private getBakingInfos(address: string) {
     this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 

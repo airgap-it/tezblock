@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
 import { TestScheduler } from 'rxjs/testing'
 import { Actions } from '@ngrx/effects'
-import { EMPTY, Subject } from 'rxjs'
+import { EMPTY, of, Subject } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
@@ -57,27 +57,25 @@ describe('AccountDetailComponent', () => {
     })
 
     TestBed.configureTestingModule({
-        providers: [
-          provideMockStore({ initialState }),
-          { provide: Actions, useValue: EMPTY },
-          { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
-          { provide: ActivatedRoute, useValue: activatedRouteMock },
-          { provide: AccountService, useValue: accountServiceMock },
-          { provide: BakingService, useValue: bakingServiceMock },
-          { provide: CryptoPricesService, useValue: cryptoPricesServiceMock },
-          { provide: CurrencyConverterPipe, useValue: currencyConverterPipeMock },
-          { provide: BsModalService, useValue: bsModalServiceMock },
-          { provide: CopyService, useValue: copyServiceMock },
-          { provide: AliasPipe, useValue: aliasPipeMock },
-          { provide: ToastrService, useValue: toastrServiceMock },
-          { provide: IconPipe, useValue: iconPipeMock },
-          { provide: BreakpointObserver, useValue: breakpointObserverMock }
-        ],
-        imports: [],
-        declarations: [
-          AccountDetailComponent,
-        ]
-      })
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: Actions, useValue: EMPTY },
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: AccountService, useValue: accountServiceMock },
+        { provide: BakingService, useValue: bakingServiceMock },
+        { provide: CryptoPricesService, useValue: cryptoPricesServiceMock },
+        { provide: CurrencyConverterPipe, useValue: currencyConverterPipeMock },
+        { provide: BsModalService, useValue: bsModalServiceMock },
+        { provide: CopyService, useValue: copyServiceMock },
+        { provide: AliasPipe, useValue: aliasPipeMock },
+        { provide: ToastrService, useValue: toastrServiceMock },
+        { provide: IconPipe, useValue: iconPipeMock },
+        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+      ],
+      imports: [],
+      declarations: [AccountDetailComponent]
+    })
 
     fixture = TestBed.createComponent(AccountDetailComponent)
     component = fixture.componentInstance
@@ -120,7 +118,7 @@ describe('AccountDetailComponent', () => {
 
         it('and bakerReward.payout is number as string, then should calculate from bakerReward.payout', () => {
           const payoutValue = '44'
-  
+
           storeMock.setState({
             ..._initialState,
             accountDetails: {
@@ -130,12 +128,12 @@ describe('AccountDetailComponent', () => {
               }
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: parseFloat(payoutValue) }
-  
+
             expectObservable(component.rewardAmountMinusFee$).toBe(expected, expectedValues)
           })
         })
@@ -147,7 +145,7 @@ describe('AccountDetailComponent', () => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: undefined }
-  
+
             expectObservable(component.rewardAmountMinusFee$).toBe(expected, expectedValues)
           })
         })
@@ -165,7 +163,7 @@ describe('AccountDetailComponent', () => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: null }
-  
+
             expectObservable(component.rewardAmountMinusFee$).toBe(expected, expectedValues)
           })
         })
@@ -187,7 +185,6 @@ describe('AccountDetailComponent', () => {
         })
 
         it('and both: rewardAmount and tezosBakerFee are not truthy, then should return null', () => {
-
           // case when only rewardAmount is falsy
           storeMock.setState({
             ..._initialState,
@@ -196,12 +193,12 @@ describe('AccountDetailComponent', () => {
               tezosBakerFee: 8
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: null }
-  
+
             expectObservable(component.rewardAmountMinusFee$).toBe(expected, expectedValues)
           })
         })
@@ -219,21 +216,19 @@ describe('AccountDetailComponent', () => {
               tezosBakerFee
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: getRewardAmountMinusFee(parseFloat(rewardAmount), tezosBakerFee) }
-  
+
             expectObservable(component.rewardAmountMinusFee$).toBe(expected, expectedValues)
           })
         })
-
       })
     })
 
     describe('isRewardAmountMinusFeeBusy$', () => {
-
       it('should not trigger when account is not set', () => {
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
@@ -244,7 +239,6 @@ describe('AccountDetailComponent', () => {
       })
 
       it('when account is baker, then returns busy.bakerReward', () => {
-    
         storeMock.setState({
           ...initialState,
           accountDetails: {
@@ -290,12 +284,12 @@ describe('AccountDetailComponent', () => {
               rewardAmount: 7
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: true }
-  
+
             expectObservable(component.isRewardAmountMinusFeeBusy$).toBe(expected, expectedValues)
           })
         })
@@ -311,12 +305,12 @@ describe('AccountDetailComponent', () => {
               }
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: true }
-  
+
             expectObservable(component.isRewardAmountMinusFeeBusy$).toBe(expected, expectedValues)
           })
         })
@@ -329,21 +323,19 @@ describe('AccountDetailComponent', () => {
               rewardAmount: null
             }
           })
-  
+
           testScheduler.run(helpers => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: false }
-  
+
             expectObservable(component.isRewardAmountMinusFeeBusy$).toBe(expected, expectedValues)
           })
         })
-
       })
     })
 
     describe('tezosBakerFeeLabel$', () => {
-
       it('when tezosBakerFee is truthy, then returns tezosBakerFee + %', () => {
         storeMock.setState({
           ...initialState,
@@ -428,9 +420,60 @@ describe('AccountDetailComponent', () => {
       })
     })
 
-    // describe('contractAssetsBalance$', () => {
+    describe('contractAssetsBalance$', () => {
+      it('when contractAssets are empty then returns 0', () => {
+        storeMock.setState({
+          ...initialState,
+          accountDetails: {
+            ...initialState.accountDetails,
+            contractAssets: { data: [] }
+          }
+        })
 
-    // })
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = 'a'
+          const expectedValues = { a: 0 }
 
+          expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
+        })
+      })
+
+      describe('when contractAssets are NOT empty', () => {
+        const asset1 = { contract: { amount: 1, symbol: 'tzBTC' } }
+        const asset2 = { contract: { amount: 2, symbol: 'STKR' } }
+        const asset3 = { contract: { amount: 3, symbol: 'xtz' } }
+
+        beforeEach(() => {
+          storeMock.setState({
+            ...initialState,
+            accountDetails: {
+              ...initialState.accountDetails,
+              contractAssets: { data: [asset1, asset2, asset3] }
+            }
+          })
+        })
+
+        it('then cryptoPricesService.getCurrencyConverterArgs is called with convertable contracts symbol', () => {
+          component.contractAssetsBalance$.subscribe(() => {})
+
+          expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[0].args[0]).toEqual(asset1.contract.symbol)
+          expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[1].args[0]).toEqual(asset3.contract.symbol)
+        })
+
+        it('returns sum of currencyConverterPipe.transform only for concertable to $ assets', () => {
+          cryptoPricesServiceMock.getCurrencyConverterArgs.and.returnValue(of('mocked currencyConverterArgs'))
+          currencyConverterPipeMock.transform.and.returnValue(4)
+
+          testScheduler.run(helpers => {
+            const { expectObservable } = helpers
+            const expected = 'a'
+            const expectedValues = { a: 8 }
+  
+            expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
+          })
+        })
+      })
+    })
   })
 })
