@@ -51,6 +51,7 @@
                       [address]="account.account_id"
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
+                    <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">Exchange</span>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
                       Not Revealed
