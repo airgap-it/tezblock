@@ -21,7 +21,7 @@ import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { distinctFilter, first, get, groupBy, last, flatten } from '@tezblock/services/fp'
+import { distinctFilter, first, get, isNotEmptyArray, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
@@ -237,6 +237,10 @@ export class ApiService {
   }
 
   addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {
+    if (!isNotEmptyArray(transactions)) {
+      return of([])
+    }
+
     kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
 
     if (kindList.includes('ballot') || kindList.includes('proposals')) {
