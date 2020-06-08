@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { SymbolCellComponent } from './symbol-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('SymbolCellComponent', () => {
+xdescribe('SymbolCellComponent', () => {
   let component: SymbolCellComponent
   let fixture: ComponentFixture<SymbolCellComponent>
 

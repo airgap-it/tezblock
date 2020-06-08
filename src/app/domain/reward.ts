@@ -10,3 +10,6 @@ export interface Payout {
 export interface Reward extends TezosRewards {
   payouts: Payout[]
 }
+
+export const getRewardAmountMinusFee = (rewardAmont: number, tezosBakerFee: number): number =>
+  rewardAmont - rewardAmont * (tezosBakerFee / 100)
