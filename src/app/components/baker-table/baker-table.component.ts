@@ -5,6 +5,7 @@ import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
+import { DAppClient, TezosDelegationOperation, TezosOperationType } from '@airgap/beacon-sdk'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -293,6 +294,19 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
+  }
+
+  delegate() {
+    const client = new DAppClient({ name: 'My Sample DApp' })
+    const operation: Partial<TezosDelegationOperation> = {
+      kind: TezosOperationType.DELEGATION,
+      // source: string;
+      // fee: string;
+      // counter: string;
+      // gas_limit: string;
+      // storage_limit: string;
+      // delegate?: string;
+    }
   }
 
   private updateSelectedTab(selectedTab: Tab) {
