@@ -66,6 +66,13 @@
                 </h5>
                 <h3>
                   <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+                  <ng-container
+                    *appVar="
+                      data?.stakingBond | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                    "
+                  >
+                  {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
+                </ng-container>
                 </h3>
               </div>
 
