@@ -27,7 +27,8 @@
     "constants_button": "Constants",
     "tezblock-health_button": "tezblock Health",
     "dapps_button": "Dapps",
-    "development_button": "Development"
+    "development_button": "Development",
+    "glossary_button": "Glossary"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
