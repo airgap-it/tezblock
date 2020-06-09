@@ -96,7 +96,7 @@ export interface State {
   transactions: TableState<Transaction>
   counts: Count[]
   kind: string
-  rewardAmount: string
+  rewardAmont: string
   busy: Busy
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
@@ -114,7 +114,7 @@ export const initialState: State = {
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   kind: undefined,
-  rewardAmount: undefined,
+  rewardAmont: undefined,
   busy: {
     rewardAmont: false,
     bakerReward: false
@@ -159,7 +159,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
     ...state,
-    rewardAmount: rewardAmont,
+    rewardAmont: rewardAmont,
     busy: {
       ...state.busy,
       rewardAmont: false
@@ -167,7 +167,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
-    rewardAmount: null,
+    rewardAmont: null,
     busy: {
       ...state.busy,
       rewardAmont: false
