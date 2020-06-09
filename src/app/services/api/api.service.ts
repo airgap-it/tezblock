@@ -29,11 +29,11 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+import { getFaProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 import { CacheService, CacheKeys, ByAddressState, ByBlockState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
-import { getFaProtocol } from '@tezblock/domain/airgap'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 export interface OperationCount {
@@ -1494,7 +1494,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => balances.sort((a, b) => a.asof - b.asof)),
@@ -1562,7 +1562,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => {

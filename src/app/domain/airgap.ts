@@ -53,3 +53,6 @@ export const getFaProtocol = (
     }
   })
 }
+
+// (1,000,000 mutez = 1 tez/XTZ)
+export const xtzToMutezConvertionRatio = 1000000

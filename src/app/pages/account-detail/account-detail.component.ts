@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store'
 import { negate, isNil, isNumber, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { ChartOptions } from 'chart.js'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
@@ -30,7 +31,6 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { ChartOptions } from 'chart.js'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
 import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
@@ -446,25 +446,47 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   private getBakingInfos(address: string) {
-    this.bakingService.getBakerInfos(address).then(result => {
-      const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
-
-      this.bakerTableInfos = result
-        ? {
-            stakingBalance: result.stakingBalance,
-            numberOfRolls: Math.floor(result.stakingBalance / (8000 * 1000000)),
-            stakingCapacity: result.stakingCapacity,
-            stakingProgress: Math.min(100, result.stakingProgress),
-            stakingBond: result.selfBond,
-            payoutAddress
-          }
-        : {
-            payoutAddress
-          }
-    })
+    const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
     this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
+
+    this.subscriptions.push(
+      this.store$
+        .select(state => state.accountDetails.bakerTableRatings)
+        .pipe(
+          map(bakerTableRatings => get<BakerTableRatings>(bakerTableRatings => bakerTableRatings.stakingCapacity)(bakerTableRatings)),
+          filter(negate(isNil)),
+          take(1),
+          switchMap(stakingCapacity =>
+            this.bakingService.getBakerInfos(address).pipe(
+              map(bakerInfos => {
+                if (!bakerInfos) {
+                  return null
+                }
+
+                const stakingBalance: number = bakerInfos.staking_balance
+                const stakingProgress: number = Math.min(100, (1 - (stakingCapacity - stakingBalance) / stakingCapacity) * 100)
+                const stakingBond: number = bakerInfos.staking_balance - bakerInfos.delegated_balance
+
+                return {
+                  stakingBalance: bakerInfos.staking_balance,
+                  numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
+                  stakingCapacity,
+                  stakingProgress,
+                  stakingBond,
+                  frozenBalance: bakerInfos.frozen_balance
+                }
+              })
+            )
+          )
+        )
+        .subscribe(bakerInfos => {
+          this.bakerTableInfos = bakerInfos ?? {
+            payoutAddress
+          }
+        })
+    )
   }
 
   private setRewardAmont() {
