@@ -11,7 +11,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
 import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
-import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
+import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { OperationTypes } from '@tezblock/domain/operations'
 import * as fromRoot from '@tezblock/reducers'
@@ -72,7 +72,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   activeDelegations$: Observable<number>
   isRightsTabAvailable$: Observable<boolean>
 
-  frozenBalance$: Observable<number>
   rewardsExpandedRow: ExpandedRow<TezosRewards>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
@@ -154,7 +153,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadCurrentCycleThenRights())
         this.store$.dispatch(actions.loadEfficiencyLast10Cycles())
         this.store$.dispatch(actions.loadUpcomingRights())
-        this.frozenBalance$ = this.apiService.getFrozenBalance(accountAddress)
       })
     )
   }
