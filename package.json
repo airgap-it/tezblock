@@ -89,6 +89,7 @@
     "@angular/compiler-cli": "^9.1.2",
     "@angular/platform-server": "^9.1.2",
     "@ngrx/schematics": "^9.1.0",
+    "@types/chrome": "0.0.114",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "^2.0.4",
     "@types/lodash": "^4.14.149",
