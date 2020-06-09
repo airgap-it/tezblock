@@ -594,6 +594,10 @@
       "number-of-votes": "# of Votes",
       "staking-balance": "Staking Balance",
       "number-of-delegators": "# of Delegators"
+    },
+    "contract": {
+      "asset": "Asset",
+      "balance": "Balance"
     }
   }
 }

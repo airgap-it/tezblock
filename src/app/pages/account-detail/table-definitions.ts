@@ -215,12 +215,12 @@ export const columns: { [key: string]: (options: any) => Column[] } = {
 
   [OperationTypes.Contract]: (options: any) => [
     {
-      name: 'Asset',
+      name: options.translate.instant('tezblock-table.contract.asset'),
       template: Template.address,
       data: (item: ContractAsset) => ({ data: item.contract.id, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
-      name: 'Balance',
+      name: options.translate.instant('tezblock-table.contract.balance'),
       field: 'amount',
       template: Template.amount,
       data: (item: ContractAsset) => ({
