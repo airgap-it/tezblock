@@ -43,7 +43,7 @@ export class HeaderItemComponent {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private readonly translate: TranslateService,
+    public translate: TranslateService,
     private readonly loadLanguageService: LoadLanguagesService
   ) {
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
@@ -57,6 +57,7 @@ export class HeaderItemComponent {
         isMobile ? (this.triggers = '') : (this.triggers = 'hover')
       })
   }
+  currentLanguage = this.translate.currentLang
 
   public navigate(entity: string) {
     this.router.navigate([`${entity}/list`])
@@ -70,7 +71,7 @@ export class HeaderItemComponent {
   public changeNetwork(name: TezosNetwork) {
     this.chainNetworkService.changeEnvironment(name)
   }
-  public changeLanguage(language: string) {
+  changeLanguage(language: string) {
     this.loadLanguageService.loadLanguages(language)
   }
 }

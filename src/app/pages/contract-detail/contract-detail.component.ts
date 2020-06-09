@@ -6,7 +6,7 @@ import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'

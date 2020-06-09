@@ -9,7 +9,7 @@ import German from './../../../assets/i18n/de.json'
 export class LoadLanguagesService {
   supportedLanguages = ['en', 'de', 'zh-cn']
 
-  languages: { [key: string]: JSON } = {
+  languages = {
     en: English,
     de: German
   }
