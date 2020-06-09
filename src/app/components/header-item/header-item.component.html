@@ -265,40 +265,6 @@
                   </ul>
                 </span>
               </li>
-              <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown #dp4="bs-dropdown">
-                  <a
-                    class="btn btn-sm btn-outline-dark dropdown-toggle"
-                    href
-                    role="button"
-                    dropdownToggle
-                    (click)="(false)"
-                    id="button-basic"
-                    routerLinkActive="btn-link"
-                    (mouseover)="dp1.hide(); dp2.hide()"
-                  >
-                    {{ this.translate.currentLang }}
-                  </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
-                    <li role="menuitem">
-                      <a
-                        class="dropdown-item"
-                        [ngClass]="'en' === this.translate.currentLang ? 'active' : ''"
-                        (click)="changeLanguage('en'); dp4.hide()"
-                      >
-                        EN
-                      </a>
-                      <a
-                        class="dropdown-item"
-                        [ngClass]="'de' === this.translate.currentLang ? 'active' : ''"
-                        (click)="changeLanguage('de'); dp4.hide()"
-                      >
-                        DE
-                      </a>
-                    </li>
-                  </ul>
-                </span>
-              </li>
             </ul>
           </div>
         </div>
