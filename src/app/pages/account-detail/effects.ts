@@ -167,11 +167,12 @@ export class AccountDetailEffects {
         this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
           switchMap(currentCycleCache => {
             const bakingBadRating = get(currentCycleCache, `fromAddress[${address}].bakerData.bakingBadRating`)
+            const stakingCapacity = get(currentCycleCache, `fromAddress[${address}].bakerData.stakingCapacity`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${address}].tezosBakerFee`)
 
             // bug was reported so now I compare to undefined OR null, not only undefined
-            if (bakingBadRating && tezosBakerFee) {
-              return of(<BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
+            if (bakingBadRating && tezosBakerFee && stakingCapacity) {
+              return of(<BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee, stakingCapacity })
             }
 
             return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
@@ -197,7 +198,8 @@ export class AccountDetailEffects {
                 ...get(currentCycleCache, `fromAddress[${state.address}]`),
                 bakerData: {
                   ...get(currentCycleCache, `fromAddress[${state.address}].bakerData`),
-                  bakingBadRating: state.bakerTableRatings.bakingBadRating
+                  bakingBadRating: state.bakerTableRatings.bakingBadRating,
+                  stakingCapacity: state.bakerTableRatings.stakingCapacity // not confirmed if should be cached..
                 },
                 tezosBakerFee: state.tezosBakerFee
               }
@@ -337,6 +339,27 @@ export class AccountDetailEffects {
           map(data => data.filter(item => item.amount > 0)),
           map(data => actions.loadContractAssetsSucceeded({ data })),
           catchError(error => of(actions.loadContractAssetsFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onBakingBadRatingsEmptyLoadStakingCapacityFromTezosProtocol$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadBakingBadRatingsSucceeded),
+      filter(({ response }) => !response.stakingCapacity),
+      map(() => actions.loadStakingCapacityFromTezosProtocol())
+    )
+  )
+
+  loadStakingCapacityFromTezosProtocol$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadStakingCapacityFromTezosProtocol),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        this.bakingService.getStakingCapacityFromTezosProtocol(address).pipe(
+          map(stakingCapacity => actions.loadStakingCapacityFromTezosProtocolSucceeded({ stakingCapacity })),
+          catchError(error => of(actions.loadStakingCapacityFromTezosProtocolFailed({ error })))
         )
       )
     )

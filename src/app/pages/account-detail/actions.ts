@@ -96,6 +96,16 @@ export const loadContractAssetsSucceeded = createAction(
 )
 export const loadContractAssetsFailed = createAction(`[${featureName}] Load Contract Assets Failed`, props<{ error: any }>())
 
+export const loadStakingCapacityFromTezosProtocol = createAction(`[${featureName}] Load Staking Capacity From TezosProtocol`)
+export const loadStakingCapacityFromTezosProtocolSucceeded = createAction(
+  `[${featureName}] Load Staking Capacity From TezosProtocol Succeeded`,
+  props<{ stakingCapacity: number }>()
+)
+export const loadStakingCapacityFromTezosProtocolFailed = createAction(
+  `[${featureName}] Load Staking Capacity From TezosProtocol Failed`,
+  props<{ error: any }>()
+)
+
 export const setKind = createAction(`[${featureName}] Set Kind`, props<{ kind: string }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

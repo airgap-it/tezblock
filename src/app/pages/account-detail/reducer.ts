@@ -14,6 +14,7 @@ import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
+import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -67,7 +68,8 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
         ? response.payoutAccuracy
         : null
       : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  stakingCapacity: get<number>(stakingCapacity => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
 })
 
 export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
@@ -86,6 +88,7 @@ export interface Busy {
 export interface BakerTableRatings {
   bakingBadRating: string
   tezosBakerRating: string
+  stakingCapacity?: number
 }
 
 export interface State {
@@ -230,7 +233,8 @@ export const reducer = createReducer(
     ...state,
     bakerTableRatings: {
       ...state.bakerTableRatings,
-      bakingBadRating: response.bakingRating
+      bakingBadRating: response.bakingRating,
+      stakingCapacity: response.stakingCapacity
     },
     tezosBakerFee: response.tezosBakerFee,
     busy: {
@@ -312,6 +316,13 @@ export const reducer = createReducer(
   on(actions.setKind, (state, { kind }) => ({
     ...state,
     kind
+  })),
+  on(actions.loadStakingCapacityFromTezosProtocolSucceeded, (state, { stakingCapacity }) => ({
+    ...state,
+    bakerTableRatings: {
+      ...state.bakerTableRatings,
+      stakingCapacity
+    }
   })),
   on(actions.reset, () => initialState)
 )
