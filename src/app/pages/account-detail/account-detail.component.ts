@@ -357,10 +357,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           this.hasAlias = !!this.aliasPipe.transform(address)
           this.hasLogo = jsonAccount.hasLogo
           this.isExchange = jsonAccount.isExchange
-          this.bakerTableInfos = {
-            ...this.bakerTableInfos,
-            acceptsDelegations: jsonAccount.acceptsDelegations
-          }
+        }
+
+        this.bakerTableInfos = {
+          ...this.bakerTableInfos,
+          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
         }
 
         this.revealed$ = from(this.accountService.getAccountStatus(address))
