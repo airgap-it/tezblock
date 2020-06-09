@@ -23,7 +23,7 @@ export class ProtocolConstantComponent implements OnInit {
   ngOnInit() {
     this.protocolVariables$ = this.store$.select(state => state.app.protocolVariables)
 
-    this.titleService.setTitle('Tezos Constants - tezblock')
+    this.titleService.setTitle(`Tezos Constants - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `tezblock constants page shows relevant information about periods, rewards and limits of the tezos blockchain.">`

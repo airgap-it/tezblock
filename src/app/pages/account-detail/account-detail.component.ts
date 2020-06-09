@@ -247,7 +247,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       .pipe(map(breakpointState => breakpointState.matches))
     this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
     this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)
-    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
+    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmount)
     this.rewardAmountMinusFee$ = this.account$.pipe(
       filter(negate(isNil)),
       switchMap(account =>
@@ -256,8 +256,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               .select(state => state.accountDetails.bakerReward)
               .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
           : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
-              map(([rewardAmont, tezosBakerFee]) =>
-                rewardAmont && tezosBakerFee ? getRewardAmountMinusFee(rewardAmont, tezosBakerFee) : null
+              map(([rewardAmount, tezosBakerFee]) =>
+                rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
               )
             )
       )
@@ -268,13 +268,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         account.is_baker
           ? this.store$.select(state => state.accountDetails.busy.bakerReward)
           : combineLatest(
-              this.store$.select(state => state.accountDetails.busy.rewardAmont),
-              this.store$.select(state => state.accountDetails.rewardAmont),
+              this.store$.select(state => state.accountDetails.busy.rewardAmount),
+              this.store$.select(state => state.accountDetails.rewardAmount),
               this.tezosBakerFee$
             ).pipe(
               map(
-                ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) =>
-                  !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+                ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
+                  !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
               )
             )
       )
@@ -444,7 +444,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
 
-    this.titleService.setTitle('Tezos Address: ' + this.aliasService.getFormattedAddress(this.address) + ' - tezblock')
+    this.titleService.setTitle(`Tezos Address: ${this.aliasService.getFormattedAddress(this.address)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Account Address ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
@@ -488,7 +488,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     }
 
     this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
-    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
+    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmount: null }))
   }
 
   tabSelected(kind: string) {

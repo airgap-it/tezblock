@@ -70,7 +70,7 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
       }),
       timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
     )
-    this.titleService.setTitle('Tezos Endorsement: ' + this.aliasService.getFormattedAddress(this.endorsementHash) + ' - tezblock')
+    this.titleService.setTitle(`Tezos Endorsement: ${this.aliasService.getFormattedAddress(this.endorsementHash)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Endorsement Hash ${this.endorsementHash}. The hash, endorser, block, cycle, deposit, reward and endorsed slots are detailed on tezblock.">`

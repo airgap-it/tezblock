@@ -11,7 +11,7 @@ import {
 } from '@angular/core'
 
 import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
-import { Options } from '@tezblock/services/alias/alias.service'
+import { Options } from '../address-item/options'
 
 export enum Template {
   address,

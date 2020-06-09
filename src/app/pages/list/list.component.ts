@@ -113,7 +113,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   ngOnInit() {
     this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
     this.route.paramMap.subscribe(paramMap => {
-      this.titleService.setTitle('Tezos ' + paramMap.get('route').replace(/^\w/, c => c.toUpperCase()) + 's' + ' - tezblock')
+      this.titleService.setTitle(`Tezos ${paramMap.get('route').replace(/^\w/, c => c.toUpperCase())}s - tezblock`)
     })
     this.routeName$.subscribe(routeName => {
       try {

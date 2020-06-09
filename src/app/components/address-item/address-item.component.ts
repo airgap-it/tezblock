@@ -4,7 +4,8 @@ import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contr
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { AliasService, Options } from '@tezblock/services/alias/alias.service'
+import { AliasService } from '@tezblock/services/alias/alias.service'
+import { Options } from './options'
 
 @Component({
   selector: 'address-item',
@@ -74,11 +75,7 @@ export class AddressItemComponent implements OnInit {
 
   ngOnInit() {}
 
-  getFormattedAddress() {
-    if (this.options) {
-      return this.aliasService.getFormattedAddress(this.address, this.options)
-    } else {
-      return this.aliasService.getFormattedAddress(this.address)
-    }
+  private getFormattedAddress() {
+    return this.aliasService.getFormattedAddress(this.address, this.options)
   }
 }

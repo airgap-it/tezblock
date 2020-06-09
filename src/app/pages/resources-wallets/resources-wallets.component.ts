@@ -18,7 +18,7 @@ export class ResourcesWalletsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.titleService.setTitle('Tezos Wallets - tezblock')
+    this.titleService.setTitle(`Tezos Wallets - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Wallet list on tezblock is a list of wallets that support the Tezos protocol for transactions, delegations or other operations. We provide a short description with links to all relevant pages as well as download links.">`

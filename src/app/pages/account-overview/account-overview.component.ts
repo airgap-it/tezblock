@@ -127,7 +127,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
     this.top25ChartOptions$ = this.isMobile$.pipe(map(this.getOptions.bind(this)))
     this.top25ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 800, height: 500 })))
 
-    this.titleService.setTitle('Tezos Accounts - tezblock')
+    this.titleService.setTitle(`Tezos Accounts - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Top 25 Tezos accounts on tezblock visualized and with information about accounts and their balance.">`
@@ -188,7 +188,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
       }
     }
   }
-  
+
   private getFormattedAddress(address: string) {
     const getAliasOrShorten = () => this.aliasPipe.transform(address) || this.shortenStringPipe.transform(address)
 

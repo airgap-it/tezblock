@@ -231,7 +231,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
-    this.titleService.setTitle('Tezos Contract: ' + this.aliasService.getFormattedAddress(this.contractAddress) + ' - tezblock')
+    this.titleService.setTitle(`Tezos Contract: ${this.aliasService.getFormattedAddress(this.contractAddress)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Contract Address ${this.contractAddress}. The name, symbol, total supply, manager, description, website, transfers and other calls of transactions of the contract are detailed on tezblock.">`

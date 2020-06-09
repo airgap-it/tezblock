@@ -40,7 +40,7 @@ export class HealthComponent implements OnInit {
     this.isConseilUp$ = this.latestConseilBlock$.pipe(
       map(latestConseilBlock => latestConseilBlock && !isOlderThan4Mins(moment(latestConseilBlock.timestamp, 'YYYY-MM-DD')))
     )
-    this.titleService.setTitle('Health - tezblock')
+    this.titleService.setTitle(`Health - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `tezblock health page shows information about status and time of last seen block of the tezos node and conseil.">`

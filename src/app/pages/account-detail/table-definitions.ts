@@ -1,7 +1,6 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Options } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 

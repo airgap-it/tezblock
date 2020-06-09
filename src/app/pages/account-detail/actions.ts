@@ -13,7 +13,7 @@ import { BakingRatingResponse, ContractAsset } from './model'
 const featureName = 'Account Detail'
 
 export const loadRewardAmont = createAction(`[${featureName}] Load Reward Amont`, props<{ accountAddress: string; bakerAddress: string }>())
-export const loadRewardAmontSucceeded = createAction(`[${featureName}] Load Reward Amont Succeeded`, props<{ rewardAmont: string }>())
+export const loadRewardAmontSucceeded = createAction(`[${featureName}] Load Reward Amont Succeeded`, props<{ rewardAmount: string }>())
 export const loadRewardAmontFailed = createAction(`[${featureName}] Load Reward Amont Failed`, props<{ error: any }>())
 
 export const loadTransactionsByKind = createAction(
@@ -83,7 +83,10 @@ export const loadTransactionsErrorsSucceeded = createAction(
 export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const loadBakerReward = createAction(`[${featureName}] Load Baker Reward`, props<{ bakerAddress: string }>())
-export const loadBakerRewardSucceeded = createAction(`[${featureName}] Load Baker Reward Succeeded`, props<{ bakerReward: TezosPayoutInfo }>())
+export const loadBakerRewardSucceeded = createAction(
+  `[${featureName}] Load Baker Reward Succeeded`,
+  props<{ bakerReward: TezosPayoutInfo }>()
+)
 export const loadBakerRewardFailed = createAction(`[${featureName}] Load Baker Reward Failed`, props<{ error: any }>())
 
 export const loadContractAssets = createAction(`[${featureName}] Load Contract Assets`)

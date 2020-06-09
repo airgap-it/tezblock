@@ -79,7 +79,7 @@ export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: 
 })
 
 export interface Busy {
-  rewardAmont: boolean
+  rewardAmount: boolean
   bakerReward: boolean
 }
 
@@ -96,7 +96,7 @@ export interface State {
   transactions: TableState<Transaction>
   counts: Count[]
   kind: string
-  rewardAmont: string
+  rewardAmount: string
   busy: Busy
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
@@ -114,9 +114,9 @@ export const initialState: State = {
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   kind: undefined,
-  rewardAmont: undefined,
+  rewardAmount: undefined,
   busy: {
-    rewardAmont: false,
+    rewardAmount: false,
     bakerReward: false
   },
   balanceFromLast30Days: undefined,
@@ -154,23 +154,23 @@ export const reducer = createReducer(
     ...state,
     busy: {
       ...state.busy,
-      rewardAmont: true
+      rewardAmount: true
     }
   })),
-  on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
+  on(actions.loadRewardAmontSucceeded, (state, { rewardAmount }) => ({
     ...state,
-    rewardAmont: rewardAmont,
+    rewardAmount: rewardAmount,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      rewardAmount: false
     }
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
-    rewardAmont: null,
+    rewardAmount: null,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      rewardAmount: false
     }
   })),
   on(actions.loadTransactionsByKind, (state, { kind }) => ({

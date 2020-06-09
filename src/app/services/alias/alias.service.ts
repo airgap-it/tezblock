@@ -1,18 +1,7 @@
 import { Injectable } from '@angular/core'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
-
-export interface Options {
-  pageId?: string | number
-  isText?: boolean
-  showFiatValue?: boolean
-  showFullAddress?: boolean
-  showAlliasOrFullAddress?: boolean
-  forceIdenticon?: boolean
-  hideIdenticon?: boolean
-  kind?: string //TODO: not needed probably
-  comparisonTimestamp?: number
-}
+import { Options } from '@tezblock/components/address-item/options'
 
 @Injectable({
   providedIn: 'root'

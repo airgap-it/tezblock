@@ -139,7 +139,7 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
 
     this.columns = columns
 
-    this.titleService.setTitle('Tezos Bakers - tezblock')
+    this.titleService.setTitle(`Tezos Bakers - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Top 25 Tezos bakers on tezblock with information about balance, number of votes, staking balance and number of delegators.">`

@@ -179,7 +179,7 @@ export class DashboardComponent extends BaseComponent {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' }))),
 
-	this.actions$
+      this.actions$
         .pipe(
           ofType(appActions.loadPeriodInfosSucceeded),
           switchMap(() =>
@@ -191,7 +191,7 @@ export class DashboardComponent extends BaseComponent {
         )
         .subscribe(() => this.store$.dispatch(actions.loadDivisionOfVotes()))
     )
-    this.titleService.setTitle('tezblock - Tezos block explorer')
+    this.titleService.setTitle(`tezblock - Tezos block explorer`)
   }
 
   isMainnet() {

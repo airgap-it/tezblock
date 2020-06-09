@@ -53,7 +53,7 @@ export class AccountDetailEffects {
       ofType(actions.loadRewardAmont),
       switchMap(action =>
         this.rewardService.getRewardAmount(action.accountAddress, action.bakerAddress).pipe(
-          map(rewardAmont => actions.loadRewardAmontSucceeded({ rewardAmont })),
+          map(rewardAmount => actions.loadRewardAmontSucceeded({ rewardAmount })),
           catchError(error => of(actions.loadRewardAmontFailed({ error })))
         )
       )
@@ -71,7 +71,7 @@ export class AccountDetailEffects {
       ),
       switchMap(([{ kind }, pagination, address, orderBy]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
-          switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
+          switchMap(data => (kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data))),
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -327,10 +327,10 @@ export class AccountDetailEffects {
                 map(tokenHolders => ({
                   contract,
                   amount: tokenHolders
-                  .filter(tokenHolder => tokenHolder.address === address)
-                  .map(tokenHolder => parseFloat(tokenHolder.amount)).reduce((a, b) => a + b, 0)
-                })
-                )
+                    .filter(tokenHolder => tokenHolder.address === address)
+                    .map(tokenHolder => parseFloat(tokenHolder.amount))
+                    .reduce((a, b) => a + b, 0)
+                }))
               )
             )
         ).pipe(
