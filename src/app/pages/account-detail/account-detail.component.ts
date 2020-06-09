@@ -38,6 +38,7 @@ import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-pri
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { get } from '@tezblock/services/fp'
+import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -132,6 +133,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
+  @ViewChild(TabbedTableComponent)
+  private tabbedTableComponent: TabbedTableComponent
 
   balanceChartOptions: ChartOptions = {
     responsive: true,
@@ -536,11 +539,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   showAssets() {
-    this.store$.dispatch(actions.setKind({ kind: 'assets' }))
-    this.tabs = this.tabs.map(tab => ({
-      ...tab,
-      active: tab.kind === 'assets'
-    }))
+    const kind = 'assets'
+    const tab = this.tabs.find(_tab => _tab.kind === kind)
+
+    this.store$.dispatch(actions.setKind({ kind }))
+    this.tabbedTableComponent.onSelectTab(tab)
   }
 
   private setTabs(pageId: string) {
