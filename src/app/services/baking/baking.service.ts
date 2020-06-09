@@ -58,7 +58,7 @@ export class BakingService {
     readonly chainNetworkService: ChainNetworkService
   ) {}
 
-  environmentUrls = this.chainNetworkService.getEnvironment()
+  private environmentUrls = this.chainNetworkService.getEnvironment()
 
   getBakingBadRatings(address: string): Observable<BakingBadResponse> {
     return this.http

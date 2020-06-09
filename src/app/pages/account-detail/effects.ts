@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { from, of, forkJoin } from 'rxjs'
+import { from, of, forkJoin, Observable } from 'rxjs'
 import { map, catchError, filter, switchMap, take, tap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
@@ -16,6 +16,11 @@ import { flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
+import { getTokenContracts, hasTokenHolders, fillTransferOperations } from '@tezblock/domain/contract'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { ContractService } from '@tezblock/services/contract/contract.service'
+import { BakingRatingResponse } from './model'
+import { OperationTypes } from '@tezblock/domain/operations'
 
 @Injectable()
 export class AccountDetailEffects {
@@ -58,14 +63,15 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
+      filter(({ kind }) => kind !== 'assets'),
       withLatestFrom(
         this.store$.select(state => state.accountDetails.transactions.pagination),
         this.store$.select(state => state.accountDetails.address),
         this.store$.select(state => state.accountDetails.transactions.orderBy)
       ),
-
       switchMap(([{ kind }, pagination, address, orderBy]) =>
         this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
+          switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -165,7 +171,7 @@ export class AccountDetailEffects {
 
             // bug was reported so now I compare to undefined OR null, not only undefined
             if (bakingBadRating && tezosBakerFee) {
-              return of(<actions.BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
+              return of(<BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee: tezosBakerFee })
             }
 
             return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
@@ -214,7 +220,7 @@ export class AccountDetailEffects {
 
             // bug was reported so now I compare to undefined OR null, not only undefined
             if (tezosBakerRating && tezosBakerFee) {
-              return of(<actions.BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
+              return of(<BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
             }
 
             return from(this.bakingService.getTezosBakerInfos(address)).pipe(
@@ -299,12 +305,51 @@ export class AccountDetailEffects {
     )
   )
 
+  onLoadAccountLoadContractAssets$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccount),
+      withLatestFrom(this.store$.select(state => state.accountDetails.contractAssets.data)),
+      filter(([action, contractAssets]) => contractAssets === undefined),
+      map(() => actions.loadContractAssets())
+    )
+  )
+
+  loadContractAssets$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractAssets),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
+        forkJoin(
+          getTokenContracts(this.chainNetworkService.getNetwork())
+            .data.filter(hasTokenHolders)
+            .map(contract =>
+              this.contractService.loadTokenHolders(contract).pipe(
+                map(tokenHolders => ({
+                  contract,
+                  amount: tokenHolders
+                  .filter(tokenHolder => tokenHolder.address === address)
+                  .map(tokenHolder => parseFloat(tokenHolder.amount)).reduce((a, b) => a + b, 0)
+                })
+                )
+              )
+            )
+        ).pipe(
+          map(data => data.filter(item => item.amount > 0)),
+          map(data => actions.loadContractAssetsSucceeded({ data })),
+          catchError(error => of(actions.loadContractAssetsFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly accountService: AccountService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,
     private readonly cacheService: CacheService,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly contractService: ContractService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
     private readonly transactionService: TransactionService

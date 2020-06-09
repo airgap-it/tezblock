@@ -3,24 +3,24 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, merge } from 'rxjs'
-import { delay, map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
+import { from, Observable, combineLatest, forkJoin, of } from 'rxjs'
+import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
-import { negate, isNil } from 'lodash'
+import { negate, isNil, isNumber, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
-import { TelegramModalComponent } from './../../components/telegram-modal/telegram-modal.component'
-import { QrModalComponent } from '../../components/qr-modal/qr-modal.component'
+import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
+import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { Account } from '../../interfaces/Account'
-import { AliasPipe } from '../../pipes/alias/alias.pipe'
-import { AccountService } from '../../services/account/account.service'
-import { BakingService } from '../../services/baking/baking.service'
-import { CopyService } from '../../services/copy/copy.service'
-import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Account } from '@tezblock/interfaces/Account'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { AccountService } from '@tezblock/services/account/account.service'
+import { BakingService } from '@tezblock/services/baking/baking.service'
+import { CopyService } from '@tezblock/services/copy/copy.service'
+import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
@@ -31,8 +31,16 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ChartOptions } from 'chart.js'
+import { ContractAsset } from './model'
+import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
+import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import * as appActions from '@tezblock/app.actions'
+import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { first, get } from '@tezblock/services/fp'
+import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
+import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { first } from '@tezblock/services/fp'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -110,11 +118,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   isMobile$: Observable<boolean>
   isBusy$: Observable<Busy>
-  transactions$: Observable<Transaction[]>
+  transactions$: Observable<any[]>
   areTransactionsLoading$: Observable<boolean>
   balanceChartDatasets$: Observable<{ data: number[]; label: string }[]>
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
+  contractAssets$: Observable<ContractAsset[]>
+  contractAssetsBalance$: Observable<number>
+  numberOfContractAssets$: Observable<number>
+  getPrecision = getPrecision
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -122,6 +134,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   private rewardAmountSetFor: { account: string; baker: string } = { account: undefined, baker: undefined }
   private scrolledToTransactions = false
+  @ViewChild(TabbedTableComponent)
+  private tabbedTableComponent: TabbedTableComponent
 
   balanceChartOptions: ChartOptions = {
     responsive: true,
@@ -208,6 +222,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
+    private readonly cryptoPricesService: CryptoPricesService,
+    private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
@@ -229,8 +245,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       .pipe(map(breakpointState => breakpointState.matches))
     this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
     this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)
-    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmont)
+    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmount)
     this.rewardAmountMinusFee$ = this.account$.pipe(
+      filter(negate(isNil)),
       switchMap(account =>
         account.is_baker
           ? this.store$
@@ -238,18 +255,19 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
           : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
               map(([rewardAmont, tezosBakerFee]) =>
-                rewardAmont && tezosBakerFee ? rewardAmont - rewardAmont * (tezosBakerFee / 100) : null
+                rewardAmont && tezosBakerFee ? getRewardAmountMinusFee(rewardAmont, tezosBakerFee) : null
               )
             )
       )
     )
     this.isRewardAmountMinusFeeBusy$ = this.account$.pipe(
+      filter(negate(isNil)),
       switchMap(account =>
         account.is_baker
           ? this.store$.select(state => state.accountDetails.busy.bakerReward)
           : combineLatest(
               this.store$.select(state => state.accountDetails.busy.rewardAmont),
-              this.store$.select(state => state.accountDetails.rewardAmont),
+              this.store$.select(state => state.accountDetails.rewardAmount),
               this.tezosBakerFee$
             ).pipe(
               map(
@@ -261,10 +279,27 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
     this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
-    this.transactions$ = this.store$.select(state => state.accountDetails.transactions.data).pipe(filter(negate(isNil)))
-    this.areTransactionsLoading$ = this.store$.select(state => state.accountDetails.transactions.loading)
+    this.transactions$ = this.store$
+      .select(state => state.accountDetails.kind)
+      .pipe(
+        switchMap(kind =>
+          kind !== 'assets'
+            ? this.store$.select(state => state.accountDetails.transactions.data)
+            : this.store$.select(state => state.accountDetails.contractAssets.data)
+        ),
+        filter(negate(isNil))
+      )
+    this.areTransactionsLoading$ = this.store$
+      .select(state => state.accountDetails.kind)
+      .pipe(
+        switchMap(kind =>
+          kind !== 'assets'
+            ? this.store$.select(state => state.accountDetails.transactions.loading)
+            : this.store$.select(state => state.accountDetails.contractAssets.loading)
+        )
+      )
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
-      map(tezosBakerFee => (tezosBakerFee ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
+      map(tezosBakerFee => (isNumber(tezosBakerFee) ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
     this.balanceChartDatasets$ = this.store$
       .select(state => state.accountDetails.balanceFromLast30Days)
@@ -279,6 +314,40 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
       )
     this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
+    this.contractAssets$ = this.store$
+      .select(state => state.accountDetails.contractAssets.data)
+      .pipe(
+        distinctUntilChanged(),
+        map(contractAssets => contractAssets || [])
+      )
+    this.numberOfContractAssets$ = this.contractAssets$.pipe(
+      map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
+    )
+    this.contractAssetsBalance$ = combineLatest(
+      this.contractAssets$,
+      this.store$.select(state => state.app.exchangeRates)
+    ).pipe(
+      map(([contractAssets]) => contractAssets),
+      switchMap(contractAssets =>
+        get<ContractAsset[]>(_contractAssets => _contractAssets.length > 0)(contractAssets)
+          ? forkJoin(
+              contractAssets.map(contractAsset =>
+                isConvertableToUSD(contractAsset.contract.symbol)
+                  ? this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
+                  : of(null)
+              )
+            ).pipe(
+              map(currencyConverterArgs =>
+                currencyConverterArgs
+                  .map((currencyConverterArg, index) =>
+                    currencyConverterArg ? this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg) : 0
+                  )
+                  .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
+              )
+            )
+          : of(0)
+      )
+    )
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -294,7 +363,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           this.hasLogo = accounts[address].hasLogo
         }
 
-        this.revealed$ = from(this.accountService.getAccountStatus(address))
+        this.revealed$ = this.accountService.getAccountStatus(address)
       }),
 
       this.store$
@@ -360,11 +429,23 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       this.store$
         .select(state => state.accountDetails.counts)
         .pipe(filter(counts => !!counts))
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+
+      this.contractAssets$
+        .pipe(
+          filter(contractAssets => contractAssets.some(contractAsset => isInBTC(contractAsset.contract.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
   }
 
-  getBakingInfos(address: string) {
+  private getBakingInfos(address: string) {
     this.bakingService.getBakerInfos(address).then(result => {
       const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
 
@@ -405,7 +486,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   tabSelected(kind: string) {
-    this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
+    if (kind !== 'assets') {
+      this.store$.dispatch(actions.loadTransactionsByKind({ kind }))
+      return
+    }
+
+    this.store$.dispatch(actions.setKind({ kind }))
   }
 
   onLoadMore() {
@@ -455,6 +541,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.sortTransactionsByKind({ orderBy }))
   }
 
+  showAssets() {
+    const kind = 'assets'
+    const tab = this.tabs.find(_tab => _tab.kind === kind)
+
+    this.store$.dispatch(actions.setKind({ kind }))
+    this.tabbedTableComponent.onSelectTab(tab)
+  }
+
   private setTabs(pageId: string) {
     this.tabs = [
       {
@@ -497,6 +591,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        disabled: function() {
+          return !this.count
+        }
+      },
+      {
+        title: 'Assets',
+        active: false,
+        kind: 'assets',
+        count: undefined,
+        icon: this.iconPipe.transform('coins'),
+        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }),
         disabled: function() {
           return !this.count
         }

@@ -5,6 +5,7 @@ import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/op
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'
@@ -15,12 +16,15 @@ import { CurrentCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezb
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Currency } from '@tezblock/domain/airgap'
+import { ProtocolVariablesService } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 @Injectable()
 export class AppEffects {
   loadLatestBlock$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadLatestBlock),
+      withLatestFrom(this.store$.select(state => state.app.latestBlock)),
+      filter(([action, latestBlock]) => !latestBlock || moment().diff(moment(latestBlock.timestamp), 'seconds') > 60),
       switchMap(() =>
         this.blockService.getLatest().pipe(
           map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
@@ -99,9 +103,7 @@ export class AppEffects {
               limit: 1
             })
             .pipe(map(first)),
-          this.baseService
-            .get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true)
-            .pipe(map(response => response.blocks_per_voting_period))
+          this.protocolVariablesService.getBlocksPerVotingPeriod()
         ).pipe(
           map(([{ meta_voting_period, meta_voting_period_position }, blocksPerVotingPeriod]) =>
             actions.loadPeriodInfosSucceeded({
@@ -208,12 +210,25 @@ export class AppEffects {
     )
   )
 
+  loadProtocolVariables$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadProtocolVariables),
+      switchMap(() =>
+        this.protocolVariablesService.getProtocolVariables().pipe(
+          map(protocolVariables => actions.loadProtocolVariablesSucceeded({ protocolVariables })),
+          catchError(error => of(actions.loadProtocolVariablesFailed({ error })))
+        )
+      )
+    )
+  )
+
   constructor(
     private readonly actions$: Actions,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
     private readonly cacheService: CacheService,
     private readonly cryptoPricesService: CryptoPricesService,
+    private readonly protocolVariablesService: ProtocolVariablesService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

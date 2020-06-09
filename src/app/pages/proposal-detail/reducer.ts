@@ -5,7 +5,18 @@ import * as actions from './actions'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { MetaVotingPeriod, PeriodTimespan, fillMissingPeriodTimespans } from '@tezblock/domain/vote'
+import {
+  MetaVotingPeriod,
+  PeriodTimespan,
+  fillMissingPeriodTimespans,
+  DivisionOfVotes,
+  _yayRollsSelector,
+  _nayRollsSelector,
+  _passRollsSelector,
+  _yayRollsPercentageSelector,
+  _nayRollsPercentageSelector
+} from '@tezblock/domain/vote'
+import { squareBrackets } from '@tezblock/domain/pattern'
 import { get } from '@tezblock/services/fp'
 
 const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
@@ -31,6 +42,7 @@ export interface State {
   metaVotingPeriods: MetaVotingPeriod[]
   periodsTimespans: PeriodTimespan[]
   votes: TableState<Transaction>
+  divisionOfVotes: DivisionOfVotes[]
 }
 
 const initialState: State = {
@@ -40,7 +52,8 @@ const initialState: State = {
   periodKind: undefined,
   metaVotingPeriods: undefined,
   periodsTimespans: undefined,
-  votes: getInitialTableState()
+  votes: getInitialTableState(),
+  divisionOfVotes: undefined
 }
 
 export const reducer = createReducer(
@@ -123,5 +136,19 @@ export const reducer = createReducer(
       ...state.proposal,
       description
     }
+  })),
+  on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
+    ...state,
+    divisionOfVotes
+  })),
+  on(actions.loadDivisionOfVotesFailed, state => ({
+    ...state,
+    divisionOfVotes: null
   }))
 )
+
+export const yayRollsSelector = (state: State): number => _yayRollsSelector(state.divisionOfVotes)
+export const nayRollsSelector = (state: State): number => _nayRollsSelector(state.divisionOfVotes)
+export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
+export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
+export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)

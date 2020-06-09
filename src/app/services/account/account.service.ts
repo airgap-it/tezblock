@@ -1,10 +1,14 @@
 import { Injectable } from '@angular/core'
-import { forkJoin, Observable } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { forkJoin, Observable, of } from 'rxjs'
+import { map, switchMap, catchError } from 'rxjs/operators'
+import { HttpClient } from '@angular/common/http'
 
 import { Account } from '../../interfaces/Account'
 import { ApiService } from '../api/api.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
+import { BaseService, Operation } from '@tezblock/services/base.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { sort } from '@tezblock/domain/table'
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
@@ -14,12 +18,12 @@ export interface GetDelegatedAccountsResponseDto {
 @Injectable({
   providedIn: 'root'
 })
-export class AccountService {
-  constructor(private readonly apiService: ApiService) {}
+export class AccountService extends BaseService {
+  constructor(private readonly apiService: ApiService, readonly chainNetworkService: ChainNetworkService, readonly httpClient: HttpClient) {
+    super(chainNetworkService, httpClient)
+  }
 
-  getDelegatedAccounts(
-    address: string
-  ): Observable<GetDelegatedAccountsResponseDto> {
+  getDelegatedAccounts(address: string): Observable<GetDelegatedAccountsResponseDto> {
     return this.apiService.getDelegatedAccounts(address, 10).pipe(
       switchMap((transactions: Transaction[]) => {
         if (transactions.length === 0) {
@@ -72,7 +76,30 @@ export class AccountService {
     )
   }
 
-  getAccountStatus(address: string): Promise<string> {
-    return this.apiService.getAccountStatus(address)
+  getAccountStatus(address: string): Observable<string> {
+    return this.post<Transaction[]>('operations', {
+      predicates: [
+        {
+          field: 'operation_group_hash',
+          operation: Operation.isnull,
+          inverse: true
+        },
+        {
+          field: 'kind',
+          operation: Operation.eq,
+          set: ['reveal']
+        },
+        {
+          field: 'source',
+          operation: Operation.eq,
+          set: [address]
+        }
+      ],
+      orderBy: [sort('block_level', 'desc')],
+      limit: 1
+    }).pipe(
+      map(transactions => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
+      catchError(() => of('Not Available'))
+    )
   }
 }

@@ -28,7 +28,7 @@ export interface Predicate {
 
 export interface Aggregation {
   field: string
-  function: 'count' | 'sum'
+  function: 'count' | 'sum' | 'max'
 }
 
 export type Direction = 'asc' | 'desc'
@@ -106,8 +106,8 @@ export class BaseService {
   protected readonly options: Options
 
   constructor(protected readonly chainNetworkService: ChainNetworkService, protected readonly httpClient: HttpClient) {
-    this.environmentUrls = this.chainNetworkService.getEnvironment()
-    this.environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+    this.environmentUrls = chainNetworkService.getEnvironment()
+    this.environmentVariable = chainNetworkService.getEnvironmentVariable()
     this.options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
@@ -117,26 +117,25 @@ export class BaseService {
   }
 
   post<T>(url: string, body: Body, isFullUrl = false): Observable<T> {
-    const _url = isFullUrl
-      ? url
-          .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
-          .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
-          .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
-          .replace(ENVIRONMENT_VAR, this.environmentVariable)
-      : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
+    const _url = this.getUrl(url, isFullUrl)
 
     return this.httpClient.post<T>(_url, body, this.options)
   }
 
-  get<T>(url: string, isFullUrl = false): Observable<T> {
-    const _url = isFullUrl
-      ? url
-          .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
-          .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
-          .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
-          .replace(ENVIRONMENT_VAR, this.environmentVariable)
-      : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
+  get<T>(url: string, isFullUrl = false, useOptions = false): Observable<T> {
+    const _url: string = this.getUrl(url, isFullUrl)
+    const options: Options = useOptions ? this.options : undefined
 
-    return this.httpClient.get<T>(_url)
+    return this.httpClient.get<T>(_url, options)
+  }
+
+  protected getUrl(url: string, isFullUrl = false): string {
+    return isFullUrl
+    ? url
+        .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
+        .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
+        .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
+        .replace(ENVIRONMENT_VAR, this.environmentVariable)
+    : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
   }
 }

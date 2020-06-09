@@ -4,7 +4,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { RewardService } from './reward.service';
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 
-describe('RewardService', () => {
+xdescribe('RewardService', () => {
   let unitHelper: UnitHelper
 
   beforeEach(() => {

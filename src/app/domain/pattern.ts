@@ -1,3 +1,3 @@
 export const squareBrackets: RegExp = /[[\]]/g
-
-const noBraces: RegExp = /[\[\]']/g
+export const leadingZeros: RegExp = /^0*/
+export const trailingZeros: RegExp = /[0]+$/

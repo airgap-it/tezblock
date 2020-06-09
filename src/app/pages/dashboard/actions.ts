@@ -4,7 +4,7 @@ import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TokenContract } from '@tezblock/domain/contract'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { PeriodTimespan } from '@tezblock/domain/vote'
+import { PeriodTimespan, DivisionOfVotes } from '@tezblock/domain/vote'
 import { Block } from '@tezblock/interfaces/Block'
 
 const featureName = 'Dashboard'
@@ -38,5 +38,12 @@ export const loadCryptoHistoricDataSucceeded = createAction(
   props<{ cryptoHistoricData: MarketDataSample[] }>()
 )
 export const loadCryptoHistoricDataFailed = createAction(`[${featureName}] Load Crypto Historic Data Failed`, props<{ error: any }>())
+
+export const loadDivisionOfVotes = createAction(`[${featureName}] Load Division Of Votes`)
+export const loadDivisionOfVotesSucceeded = createAction(
+  `[${featureName}] Load Division Of Votes Succeeded`,
+  props<{ divisionOfVotes: DivisionOfVotes[] }>()
+)
+export const loadDivisionOfVotesFailed = createAction(`[${featureName}] Load Division Of Votes Failed`, props<{ error: any }>())
 
 export const reset = createAction(`[${featureName}] Reset`)
