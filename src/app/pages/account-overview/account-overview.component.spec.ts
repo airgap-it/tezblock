@@ -124,13 +124,14 @@ describe('AccountOverviewComponent', () => {
       it('when Breakpoints.Small, Breakpoints.Handset are emited returns small size', () => {
         breakpointObserverMock.observe.and.returnValue(of(getObserveValue(true)))
         component.ngOnInit()
+        //component.isMobile$.subscribe(x => console.log(`>>>>>>>> ${x}`))
 
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
           const expected = 'a'
           const expectedValues = { a: { width: 200, height: 200 } }
   
-          expectObservable(component.top25ChartLabels$).toBe(expected, expectedValues)
+          expectObservable(component.top25ChartSize$).toBe(expected, expectedValues)
         })
       })
     })
