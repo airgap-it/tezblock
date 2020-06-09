@@ -1,3 +1,33 @@
 {
-  "load-button": "mehr moree"
+  "header-item": {
+    "by": "von AirGap",
+    "cycle": "Cycle",
+    "overview_button": "Überblick",
+    "blockchain_button": "Blockchain",
+    "operations_button": "Operationen",
+    "transactions_button": "Transaktionen",
+    "activations_button": "Aktivierungen",
+    "originations_button": "Originationen",
+    "accounts_button": "Accounts",
+    "network-validation_button": "Netzwerkvalidierung",
+    "bakers_button": "Bakers",
+    "blocks_button": "Blöcke",
+    "endorsements_button": "Endorsements",
+    "delegations_button": "Delegations",
+    "double-baking-evidence_button": "Double Baking Evidence",
+    "double-endorsement-evidence_button": "Double Endorsement Evidence",
+    "governance_button": "Governance",
+    "votes_button": "Votes",
+    "proposals_button": "Proposals",
+    "smart-contracts_button": "Smart Contracts",
+    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "contracts_button": "Contracts",
+    "resources_button": "Ressourcen",
+    "wallets_button": "Wallets",
+    "constants_button": "Constants",
+    "tezblock-health_button": "tezblock Health",
+    "dapps_button": "Dapps",
+    "development_button": "Entwicklung",
+    "glossary_button": "Glossar"
+  }
 }

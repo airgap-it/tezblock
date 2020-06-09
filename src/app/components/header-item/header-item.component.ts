@@ -1,13 +1,15 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Component, Input } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, Subscription } from 'rxjs'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
-import { map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { TranslateService } from '@ngx-translate/core'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Observable, Subscription } from 'rxjs'
+import { map } from 'rxjs/operators'
 
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import * as fromRoot from '@tezblock/reducers'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { LoadLanguagesService } from '@tezblock/services/translation/load-languages.service'
 
 @Component({
   selector: 'header-item',
@@ -40,7 +42,9 @@ export class HeaderItemComponent {
     private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private readonly translate: TranslateService,
+    private readonly loadLanguageService: LoadLanguagesService
   ) {
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
     this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress)
@@ -65,5 +69,8 @@ export class HeaderItemComponent {
 
   public changeNetwork(name: TezosNetwork) {
     this.chainNetworkService.changeEnvironment(name)
+  }
+  public changeLanguage(language: string) {
+    this.loadLanguageService.loadLanguages(language)
   }
 }
