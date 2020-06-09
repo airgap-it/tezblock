@@ -153,7 +153,8 @@
   },
   "tz1NpWrAyDL9k2Lmnyxcgr9xuJakbBxdq7FB": {
     "alias": "Gate.io",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true
   },
   "tz1NqKH9D5HdfvoEQssMS5Up13CVypVxLA1k": {
     "alias": "Cypher-Baker",
@@ -667,7 +668,8 @@
   },
   "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk": {
     "alias": "Coinbase Custody",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true
   },
   "tz1isXamBXpTUgbByQ6gXgZQg4GWNW7r6rKE": {
     "alias": "Tez Whale",
@@ -774,7 +776,8 @@
   },
   "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2": {
     "alias": "Binance",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true
   },
   "tz1eogbwM5NdoojKEvvSnjYGcJapZgADRK3m": {
     "alias": "Binance Delegator",
@@ -835,7 +838,8 @@
   },
   "tz1gfArv665EUkSg2ojMBzcbfwuPxAvqPvjo": {
     "alias": "Kraken",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true
   },
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "alias": "Staker",
