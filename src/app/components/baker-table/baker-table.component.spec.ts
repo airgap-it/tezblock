@@ -20,7 +20,7 @@ import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell
 import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
 import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
-describe('BakerTableComponent', () => {
+xdescribe('BakerTableComponent', () => {
   let component: BakerTableComponent
   let fixture: ComponentFixture<BakerTableComponent>
   let unitHelper: UnitHelper

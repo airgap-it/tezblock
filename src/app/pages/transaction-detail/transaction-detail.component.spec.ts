@@ -27,7 +27,7 @@ import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell
 import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
 import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
 
-describe('TransactionDetailComponent', () => {
+xdescribe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
   let fixture: ComponentFixture<TransactionDetailComponent>
 

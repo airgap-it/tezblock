@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ContractService } from './contract.service';
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-describe('ContractService', () => {
+xdescribe('ContractService', () => {
   beforeEach(() => {
     const unitHelper = new UnitHelper()
 

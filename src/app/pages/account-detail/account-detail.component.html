@@ -108,7 +108,7 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
                   <h5 class="d-inline-block m-0">
-                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) }}</span>
+                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
                   </h5>
                   <span
                     class="badge badge-pill ml-2"

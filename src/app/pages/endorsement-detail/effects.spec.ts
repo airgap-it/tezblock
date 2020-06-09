@@ -6,7 +6,7 @@ import { Store } from '@ngrx/store'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { EndorsementDetailEffects } from './effects'
 
-describe('AppEffects', () => {
+xdescribe('AppEffects', () => {
   let actions$: Observable<any>
   let effects: EndorsementDetailEffects
 
