@@ -85,8 +85,6 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
-import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
-import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -96,7 +94,9 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+import { VarDirective } from '@tezblock/directives/var.directive'
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
@@ -215,7 +215,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     LatestContractsTransactionsComponent,
     TransactionErrorsComponent,
     TokenContractOverviewComponent,
-    GlossaryComponent
+    GlossaryComponent,
+    VarDirective
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],

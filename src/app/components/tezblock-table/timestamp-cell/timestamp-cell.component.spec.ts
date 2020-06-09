@@ -5,7 +5,7 @@ import { TimestampCellComponent } from './timestamp-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { MomentModule } from 'ngx-moment'
 
-describe('TimestampCellComponent', () => {
+xdescribe('TimestampCellComponent', () => {
   let component: TimestampCellComponent
   let fixture: ComponentFixture<TimestampCellComponent>
 

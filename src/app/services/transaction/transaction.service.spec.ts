@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { TransactionService } from './transaction.service';
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('TransactionService', () => {
+xdescribe('TransactionService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

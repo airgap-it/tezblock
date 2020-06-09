@@ -6,7 +6,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { AmountCellComponent } from './amount-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('AmountCellComponent', () => {
+xdescribe('AmountCellComponent', () => {
   let component: AmountCellComponent
   let fixture: ComponentFixture<AmountCellComponent>
 

@@ -5,7 +5,7 @@ import { FooterComponent } from './footer.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
-describe('FooterComponent', () => {
+xdescribe('FooterComponent', () => {
   let component: FooterComponent
   let fixture: ComponentFixture<FooterComponent>
 

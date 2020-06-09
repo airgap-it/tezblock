@@ -45,7 +45,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   isInvalidHash$: Observable<boolean>
   orderBy$: Observable<OrderBy>
 
-  private kind$ = new BehaviorSubject('transaction')
+  private kind$: Observable<string>
 
   constructor(
     private readonly actions$: Actions,
@@ -61,6 +61,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   }
 
   ngOnInit() {
+    this.kind$ = this.store$.select(state => state.transactionDetails.kind)
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.transactionsLoading$ = this.store$.select(state => state.transactionDetails.transactions.loading)
     this.transactions$ = this.store$.select(state => state.transactionDetails.transactions.data).pipe(filter(negate(isNil)))
@@ -117,7 +118,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   }
 
   tabSelected(kind: string) {
-    this.kind$.next(kind)
+    this.store$.dispatch(actions.changeKind({ kind }))
   }
 
   onLoadMore() {

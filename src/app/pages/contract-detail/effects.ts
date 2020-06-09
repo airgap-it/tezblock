@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of } from 'rxjs'
-import { catchError, delay, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
+import { of, from } from 'rxjs'
+import { catchError, delay, filter, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
@@ -16,6 +16,7 @@ import { getTokenContractByAddress } from '@tezblock/domain/contract'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { ContractService } from '@tezblock/services/contract/contract.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { maxLimit } from '@tezblock/services/base.service'
 
 @Injectable()
 export class ContractDetailEffects {
@@ -26,7 +27,7 @@ export class ContractDetailEffects {
         const contract = getTokenContractByAddress(address, this.chainNetworkService.getNetwork())
 
         if (contract) {
-          return this.apiService.getTotalSupplyByContract(contract).pipe(
+          return this.contractService.getTotalSupplyByContract(contract).pipe(
             map(totalSupply => actions.loadContractSucceeded({ contract: { ...contract, totalSupply } })),
             catchError(error => of(actions.loadContractFailed({ error })))
           )
@@ -116,21 +117,36 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.cursor)),
-      switchMap(([{ contract }, cursor]) =>
-        this.apiService.getTransferOperationsForContract(contract, cursor).pipe(
-          map(transferOperations => actions.loadTransferOperationsSucceeded({ transferOperations })),
+      withLatestFrom(
+        this.store$.select(state => state.contractDetails.transferOperations.orderBy)
+      ),
+      switchMap(([{ contract }, orderBy]) =>
+        this.contractService.loadTransferOperations(contract, orderBy, maxLimit)
+        .pipe(
+          map(data => actions.loadTransferOperationsSucceeded({ data })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
     )
   )
 
-  loadMoreTransferOperations$ = createEffect(() =>
+  onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadMoreTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-      map(([action, contract]) => actions.loadTransferOperations({ contract }))
+      ofType(actions.loadTransferOperationsSucceeded),
+      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
+    )
+  )
+
+  loadTransactionsErrors$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsErrors),
+      switchMap(({ transactions }) =>
+        this.apiService.getErrorsForOperations(transactions).pipe(
+          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+        )
+      )
     )
   )
 
@@ -171,7 +187,7 @@ export class ContractDetailEffects {
       ),
       switchMap(([{ contract: contractHash }, pagination, orderBy]) =>
         this.contractService.loadOtherOperations(contractHash, orderBy, pagination.currentPage * pagination.selectedSize).pipe(
-          map(otherOperations => actions.loadOtherOperationsSucceeded({ otherOperations })),
+          map(data => actions.loadOtherOperationsSucceeded({ data })),
           catchError(error => of(actions.loadOtherOperationsFailed({ error })))
         )
       )
@@ -197,6 +213,7 @@ export class ContractDetailEffects {
   onChangeOperationsTabLoadOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.changeOperationsTab),
+      filter(({ currentTabKind }) => currentTabKind !== actions.OperationTab.tokenHolders),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
       map(([{ currentTabKind }, contract]) =>
         currentTabKind === actions.OperationTab.transfers
@@ -224,6 +241,25 @@ export class ContractDetailEffects {
         // currentTabKind === actions.OperationTab.transfers
         //   ? actions.sortTransferOperations({ orderBy }) :
         actions.sortOtherOperations({ orderBy })
+      )
+    )
+  )
+
+  onLoadedContractLoadTokenHolders = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractSucceeded),
+      map(({ contract }) => actions.loadTokenHolders({ contract }))
+    )
+  )
+
+  loadTokenHolders$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTokenHolders),
+      switchMap(({ contract }) =>
+        this.contractService.loadTokenHolders(contract).pipe(
+          map(data => actions.loadTokenHoldersSucceeded({ data })),
+          catchError(error => of(actions.loadTokenHoldersFailed({ error })))
+        )
       )
     )
   )

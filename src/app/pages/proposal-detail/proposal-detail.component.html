@@ -120,6 +120,31 @@
             (tabClicked)="tabSelected($event)"
             (loadMore)="onLoadMore()"
           >
+            <ng-container *ngIf="showRolls$ | async">
+              <div class="row pl-0 pl-md-3 pt-3">
+                <div class="col-12 col-md-3">
+                  <p>
+                    <fa-icon [icon]="'thumbsUp' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    <strong>{{ yayRollsPercentage$ | async }}%</strong>
+                    ({{ yayRolls$ | async }}) In Favor
+                  </p>
+                </div>
+                <div class="col-12 col-md-3">
+                  <p>
+                    <fa-icon [icon]="'thumbsDown' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    <strong>{{ nayRollsPercentage$ | async }}%</strong>
+                    ({{ nayRolls$ | async }}) Against
+                  </p>
+                </div>
+                <div class="col-12 col-md-3">
+                  <p>
+                    <fa-icon [icon]="'handRock' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    {{ passRolls$ | async }}
+                    Pass
+                  </p>
+                </div>
+              </div>
+            </ng-container>
             <ng-container *ngIf="periodTimespan$ | async as periodTimespan">
               <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
                 <div class="pl-0 pl-md-3 py-3">

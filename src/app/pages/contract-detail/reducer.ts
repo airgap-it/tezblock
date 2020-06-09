@@ -1,11 +1,10 @@
 import { createReducer, on } from '@ngrx/store'
-import { TezosTransactionCursor } from 'airgap-coin-lib'
 
 import * as actions from './actions'
-import { TokenContract, ContractOperation, airGapTransactionToContractOperation } from '@tezblock/domain/contract'
+import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/contract'
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
-
-const addSymbol = (symbol: string) => (contractOperation: ContractOperation) => ({ ...contractOperation, symbol })
+import { get } from '@tezblock/services/fp'
+import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 
 export interface State {
   manager: string
@@ -14,8 +13,8 @@ export interface State {
   copyToClipboardState: string
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
+  tokenHolders: TableState<TokenHolder>
   currentTabKind: actions.OperationTab
-  cursor: TezosTransactionCursor
 }
 
 const initialState: State = {
@@ -31,8 +30,8 @@ const initialState: State = {
     field: 'block_level',
     direction: 'desc'
   }),
-  currentTabKind: actions.OperationTab.transfers,
-  cursor: undefined
+  tokenHolders: getInitialTableState(undefined, Number.MIN_SAFE_INTEGER),
+  currentTabKind: actions.OperationTab.transfers
 }
 
 export const reducer = createReducer(
@@ -64,19 +63,14 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-  on(actions.loadTransferOperationsSucceeded, (state, { transferOperations }) => {
-    const newData = transferOperations.transactions.map(airGapTransactionToContractOperation).map(addSymbol(state.contract.symbol))
-
-    return {
-      ...state,
-      transferOperations: {
-        ...state.transferOperations,
-        data: state.cursor ? state.transferOperations.data.concat(newData) : newData,
-        loading: false
-      },
-      cursor: transferOperations.cursor
+  on(actions.loadTransferOperationsSucceeded, (state, { data }) => ({
+    ...state,
+    transferOperations: {
+      ...state.transferOperations,
+      data,
+      loading: false
     }
-  }),
+  })),
   on(actions.loadTransferOperationsFailed, state => ({
     ...state,
     transferOperations: {
@@ -108,18 +102,14 @@ export const reducer = createReducer(
       loading: true
     }
   })),
-  on(actions.loadOtherOperationsSucceeded, (state, { otherOperations }) => {
-    const data = otherOperations.map(addSymbol(state.contract.symbol))
-
-    return {
-      ...state,
-      otherOperations: {
-        ...state.otherOperations,
-        data,
-        loading: false
-      }
+  on(actions.loadOtherOperationsSucceeded, (state, { data }) => ({
+    ...state,
+    otherOperations: {
+      ...state.otherOperations,
+      data,
+      loading: false
     }
-  }),
+  })),
   on(actions.loadOtherOperationsFailed, state => ({
     ...state,
     otherOperations: {
@@ -173,5 +163,42 @@ export const reducer = createReducer(
     ...state,
     manager: null
   })),
+  on(actions.loadTokenHolders, state => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      loading: true
+    }
+  })),
+  on(actions.loadTokenHoldersSucceeded, (state, { data }) => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      data,
+      pagination: {
+        ...state.tokenHolders.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadTokenHoldersFailed, state => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      loading: false
+    }
+  })),
+  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
+    ...state,
+    transferOperations: <TableState<ContractOperation>>getTransactionsWithErrors(operationErrorsById, state.transferOperations)
+  })),
   on(actions.reset, () => initialState)
 )
+
+export const transferOperationsSelector = (state: State): ContractOperation[] => {
+  const pagination = state.transferOperations.pagination
+  const to = pagination.currentPage * pagination.selectedSize
+
+  return get<ContractOperation[]>(data => data.slice(0, to))(state.transferOperations.data)
+}

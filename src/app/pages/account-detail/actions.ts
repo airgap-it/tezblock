@@ -8,11 +8,7 @@ import { Balance } from '@tezblock/services/api/api.service'
 import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { OperationErrorsById } from '@tezblock/domain/operations'
-
-export interface BakingRatingResponse {
-  bakingRating: string
-  tezosBakerFee: number
-}
+import { BakingRatingResponse, ContractAsset } from './model'
 
 const featureName = 'Account Detail'
 
@@ -87,7 +83,29 @@ export const loadTransactionsErrorsSucceeded = createAction(
 export const loadTransactionsErrorsFailed = createAction(`[${featureName}] Load Transactions Errors Failed`, props<{ error: any }>())
 
 export const loadBakerReward = createAction(`[${featureName}] Load Baker Reward`, props<{ bakerAddress: string }>())
-export const loadBakerRewardSucceeded = createAction(`[${featureName}] Load Baker Reward Succeeded`, props<{ bakerReward: TezosPayoutInfo }>())
+export const loadBakerRewardSucceeded = createAction(
+  `[${featureName}] Load Baker Reward Succeeded`,
+  props<{ bakerReward: TezosPayoutInfo }>()
+)
 export const loadBakerRewardFailed = createAction(`[${featureName}] Load Baker Reward Failed`, props<{ error: any }>())
+
+export const loadContractAssets = createAction(`[${featureName}] Load Contract Assets`)
+export const loadContractAssetsSucceeded = createAction(
+  `[${featureName}] Load Contract Assets Succeeded`,
+  props<{ data: ContractAsset[] }>()
+)
+export const loadContractAssetsFailed = createAction(`[${featureName}] Load Contract Assets Failed`, props<{ error: any }>())
+
+export const loadStakingCapacityFromTezosProtocol = createAction(`[${featureName}] Load Staking Capacity From TezosProtocol`)
+export const loadStakingCapacityFromTezosProtocolSucceeded = createAction(
+  `[${featureName}] Load Staking Capacity From TezosProtocol Succeeded`,
+  props<{ stakingCapacity: number }>()
+)
+export const loadStakingCapacityFromTezosProtocolFailed = createAction(
+  `[${featureName}] Load Staking Capacity From TezosProtocol Failed`,
+  props<{ error: any }>()
+)
+
+export const setKind = createAction(`[${featureName}] Set Kind`, props<{ kind: string }>())
 
 export const reset = createAction(`[${featureName}] Reset`)

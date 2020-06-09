@@ -31,6 +31,13 @@ export class AppComponent implements OnInit {
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: e as NavigationEnd })))
     this.store$.dispatch(actions.loadPeriodInfos())
+
+    getRefresh([
+      this.actions$.pipe(ofType(actions.loadCryptoPriceSucceeded)),
+      this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
+    ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
+      this.store$.dispatch(actions.loadPeriodInfos())
+    this.store$.dispatch(actions.loadProtocolVariables())
   }
 
   loadLanguages(supportedLanguages: string[]) {

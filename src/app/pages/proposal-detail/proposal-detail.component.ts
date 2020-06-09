@@ -40,6 +40,12 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   noDataLabel$: Observable<string>
   periodKind$: Observable<string>
   isCollapsed = true
+  yayRolls$: Observable<number>
+  nayRolls$: Observable<number>
+  passRolls$: Observable<number>
+  yayRollsPercentage$: Observable<number>
+  nayRollsPercentage$: Observable<number>
+  showRolls$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -144,6 +150,20 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         filter(negate(isNil)),
         map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
       )
+    this.yayRolls$ = this.store$.select(fromRoot.proposalDetails.yayRolls)
+    this.nayRolls$ = this.store$.select(fromRoot.proposalDetails.nayRolls)
+    this.passRolls$ = this.store$.select(fromRoot.proposalDetails.passRolls)
+    this.yayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.yayRollsPercentage)
+    this.nayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.nayRollsPercentage)
+    this.showRolls$ = combineLatest(
+      this.store$.select(state => state.proposalDetails.periodKind),
+      this.yayRolls$
+    ).pipe(
+      map(
+        ([periodKind, yayRolls]) =>
+          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(periodKind) !== -1 && yayRolls !== undefined
+      )
+    )
   }
 
   copyToClipboard() {

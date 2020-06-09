@@ -13,6 +13,8 @@ import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadRes
 import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import { BakingRatingResponse, ContractAsset } from './model'
+import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -59,21 +61,18 @@ const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
   get(feeByCycle => feeByCycle.value * 100)
 )
 
-export const fromBakingBadResponse = (response: BakingBadResponse, state: State): actions.BakingRatingResponse => ({
+export const fromBakingBadResponse = (response: BakingBadResponse, state: State): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.payoutAccuracy
       ? response.payoutAccuracy !== 'no_data'
         ? response.payoutAccuracy
         : null
       : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  stakingCapacity: get<number>(stakingCapacity => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
 })
 
-export const fromMyTezosBakerResponse = (
-  response: MyTezosBakerResponse,
-  state: State,
-  updateFee: boolean
-): actions.BakingRatingResponse => ({
+export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
   bakingRating:
     response.status === 'success' && response.rating
       ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
@@ -89,6 +88,7 @@ export interface Busy {
 export interface BakerTableRatings {
   bakingBadRating: string
   tezosBakerRating: string
+  stakingCapacity?: number
 }
 
 export interface State {
@@ -99,16 +99,17 @@ export interface State {
   transactions: TableState<Transaction>
   counts: Count[]
   kind: string
-  rewardAmont: string
+  rewardAmount: string
   busy: Busy
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
   tezosBakerFee: number
   temporaryBalance: Balance[]
   bakerReward: TezosPayoutInfo
+  contractAssets: TableState<ContractAsset>
 }
 
-const initialState: State = {
+export const initialState: State = {
   address: undefined,
   account: undefined,
   delegatedAccounts: undefined,
@@ -116,7 +117,7 @@ const initialState: State = {
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   kind: undefined,
-  rewardAmont: undefined,
+  rewardAmount: undefined,
   busy: {
     rewardAmont: false,
     bakerReward: false
@@ -125,7 +126,8 @@ const initialState: State = {
   bakerTableRatings: undefined,
   tezosBakerFee: undefined,
   temporaryBalance: undefined,
-  bakerReward: undefined
+  bakerReward: undefined,
+  contractAssets: getInitialTableState(undefined, Number.MAX_SAFE_INTEGER)
 }
 
 export const reducer = createReducer(
@@ -160,7 +162,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
     ...state,
-    rewardAmont,
+    rewardAmount: rewardAmont,
     busy: {
       ...state.busy,
       rewardAmont: false
@@ -168,7 +170,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
-    rewardAmont: null,
+    rewardAmount: null,
     busy: {
       ...state.busy,
       rewardAmont: false
@@ -231,7 +233,8 @@ export const reducer = createReducer(
     ...state,
     bakerTableRatings: {
       ...state.bakerTableRatings,
-      bakingBadRating: response.bakingRating
+      bakingBadRating: response.bakingRating,
+      stakingCapacity: response.stakingCapacity
     },
     tezosBakerFee: response.tezosBakerFee,
     busy: {
@@ -253,7 +256,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
-    counts
+    counts: (counts || []).concat([{ key: 'assets', count: state.contractAssets.pagination.total }])
   })),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
@@ -280,6 +283,45 @@ export const reducer = createReducer(
     busy: {
       ...state.busy,
       bakerReward: false
+    }
+  })),
+  on(actions.loadContractAssets, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      loading: true
+    }
+  })),
+  on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
+    ...state,
+    counts: (state.counts || []).filter(count => count.key !== 'assets').concat([{ key: 'assets', count: data.length }]),
+    contractAssets: {
+      ...state.contractAssets,
+      data,
+      pagination: {
+        ...state.contractAssets.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadContractAssetsFailed, state => ({
+    ...state,
+    contractAssets: {
+      ...state.contractAssets,
+      data: null,
+      loading: false
+    }
+  })),
+  on(actions.setKind, (state, { kind }) => ({
+    ...state,
+    kind
+  })),
+  on(actions.loadStakingCapacityFromTezosProtocolSucceeded, (state, { stakingCapacity }) => ({
+    ...state,
+    bakerTableRatings: {
+      ...state.bakerTableRatings,
+      stakingCapacity
     }
   })),
   on(actions.reset, () => initialState)

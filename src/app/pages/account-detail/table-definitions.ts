@@ -1,10 +1,11 @@
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Options } from '@tezblock/components/address-item/address-item.component'
+import { ContractAsset } from './model'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
-export const columns: { [key: string]: (options: Options) => Column[] } = {
-  [OperationTypes.Transaction]: (options: Options) =>
+export const columns: { [key: string]: (options: any) => Column[] } = {
+  [OperationTypes.Transaction]: (options: any) =>
     [
       {
         name: options.translate.instant('tezblock-table.transaction.from'),
@@ -35,20 +36,31 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
       {
         name: options.translate.instant('tezblock-table.transaction.amount'),
         field: 'amount',
-        data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
+        data: (item: Transaction) => ({
+          data: item.amount,
+          options: {
+            ...options,
+            comparisonTimestamp: item.timestamp,
+            symbol: item.symbol,
+            showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+          }
+        }),
         template: Template.amount,
         sortable: true
       },
       {
         name: options.translate.instant('tezblock-table.transaction.fee'),
         field: 'fee',
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
+        }),
         template: Template.amount,
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
 
-  [OperationTypes.Delegation]: (options: Options) =>
+  [OperationTypes.Delegation]: (options: any) =>
     [
       {
         name: options.translate.instant('tezblock-table.delegation.delegator'),
@@ -88,7 +100,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
 
-  [OperationTypes.Origination]: (options: Options) =>
+  [OperationTypes.Origination]: (options: any) =>
     [
       {
         name: options.translate.instant('tezblock-table.origination.new-account'),
@@ -127,12 +139,15 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         name: options.translate.instant('tezblock-table.origination.fee'),
         field: 'fee',
         template: Template.amount,
-        data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+        data: (item: Transaction) => ({
+          data: item.fee,
+          options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
+        }),
         sortable: true
       }
     ].concat(<any>blockAndTxHashColumns(options.translate)),
 
-  [OperationTypes.Endorsement]: (options: Options) => [
+  [OperationTypes.Endorsement]: (options: any) => [
     {
       name: options.translate.instant('tezblock-table.endorsement.age'),
       field: 'timestamp',
@@ -163,7 +178,7 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
     }
   ],
 
-  [OperationTypes.Ballot]: (options: Options) =>
+  [OperationTypes.Ballot]: (options: any) =>
     [
       {
         name: options.translate.instant('tezblock-table.ballot.ballot'),
@@ -196,5 +211,22 @@ export const columns: { [key: string]: (options: Options) => Column[] } = {
         template: Template.hash,
         data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate))
+    ].concat(<any>blockAndTxHashColumns(options.translate)),
+
+  [OperationTypes.Contract]: (options: any) => [
+    {
+      name: 'Asset',
+      template: Template.address,
+      data: (item: ContractAsset) => ({ data: item.contract.id, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Balance',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: ContractAsset) => ({
+        data: item.amount,
+        options: { showFiatValue: isConvertableToUSD(item.contract.symbol), symbol: item.contract.symbol }
+      })
+    }
+  ]
 }

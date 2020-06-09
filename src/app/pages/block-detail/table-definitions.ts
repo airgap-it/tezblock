@@ -2,6 +2,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TranslateService } from '@ngx-translate/core'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; translate?: any }) => Column[] } = {
   [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
@@ -30,14 +31,25 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     {
       name: options.translate.instant('tezblock-table.transaction.amount'),
       field: 'amount',
-      data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
+      data: (item: Transaction) => ({
+        data: item.amount,
+        options: {
+          ...options,
+          comparisonTimestamp: item.timestamp,
+          symbol: item.symbol,
+          showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+        }
+      }),
       template: Template.amount,
       sortable: true
     },
     {
       name: options.translate.instant('tezblock-table.transaction.fee'),
       field: 'fee',
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
+      }),
       template: Template.amount,
       sortable: true
     },
@@ -92,7 +104,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.delegation.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
+      }),
       sortable: true
     },
     {
@@ -145,7 +160,10 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.origination.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: Transaction) => ({ data: item.fee, options: { showFiatValue: true, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' } }),
+      data: (item: Transaction) => ({
+        data: item.fee,
+        options: { showFiatValue: false, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
+      }),
       sortable: true
     },
     {

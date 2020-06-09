@@ -86,6 +86,22 @@
                 </div>
               </div>
             </div>
+            <div class="pt-3" *ngIf="showRolls$ | async">
+              <p class="pr-3 m-0 d-inline-block">
+                <fa-icon [icon]="'thumbsUp' | iconPipe" class="text-primary mr-2"></fa-icon>
+                <strong>{{ yayRollsPercentage$ | async }}%</strong>
+                <span class="text-secondary ml-1">{{ yayRolls$ | async }}</span>
+              </p>
+              <p class="pr-3 m-0 d-inline-block">
+                <fa-icon [icon]="'thumbsDown' | iconPipe" class="text-primary mr-2"></fa-icon>
+                <strong>{{ nayRollsPercentage$ | async }}%</strong>
+                <span class="text-secondary ml-1">{{ nayRolls$ | async }}</span>
+              </p>
+              <p class="m-0 d-inline-block">
+                <fa-icon [icon]="'handRock' | iconPipe" class="text-primary mr-1"></fa-icon>
+                <span class="text-secondary ml-1">{{ passRolls$ | async }}</span>
+              </p>
+            </div>
           </div>
           <ng-container *ngIf="isMainnet()">
             <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
@@ -93,14 +109,14 @@
                 <h5 class="card-title__secondary mb-3 ">
                   {{ 'dashboard.circulating-supply' | translate }}
                 </h5>
-                <h3>832,702,414 ꜩ</h3>
+                <h3>837,306,031 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 {{ 'dashboard.market-cap' | translate }}
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('832702414').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('837306031').toFormat(0) }}</h3>
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
