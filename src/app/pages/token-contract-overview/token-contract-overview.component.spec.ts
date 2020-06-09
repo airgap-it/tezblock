@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { TokenContractOverviewComponent } from './token-contract-overview.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('TokenContractOverviewComponent', () => {
+xdescribe('TokenContractOverviewComponent', () => {
   let component: TokenContractOverviewComponent
   let fixture: ComponentFixture<TokenContractOverviewComponent>
 

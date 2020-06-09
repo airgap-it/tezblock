@@ -1,5 +1,4 @@
 import { getProtocolByIdentifier, ICoinProtocol, TezosFAProtocol } from 'airgap-coin-lib'
-
 import { TokenContract } from '@tezblock/domain/contract'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
@@ -11,10 +10,7 @@ export enum Currency {
 
 const convertSymbol = (symbol: string): string => {
   switch (symbol) {
-    // case 'tzBTC':
-    //   return 'xtz-btc'
     case 'BTC':
-    case 'tzBTC':
       return 'btc'
     default:
       return symbol
