@@ -6,7 +6,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 
 import { TooltipItemComponent } from './tooltip-item.component'
 
-describe('TooltipItemComponent', () => {
+xdescribe('TooltipItemComponent', () => {
   let component: TooltipItemComponent
   let fixture: ComponentFixture<TooltipItemComponent>
 

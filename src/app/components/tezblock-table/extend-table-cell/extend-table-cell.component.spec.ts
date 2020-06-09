@@ -5,7 +5,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 
 import { ExtendTableCellComponent } from './extend-table-cell.component'
 
-describe('ExtendTableCellComponent', () => {
+xdescribe('ExtendTableCellComponent', () => {
   let component: ExtendTableCellComponent
   let fixture: ComponentFixture<ExtendTableCellComponent>
 

@@ -157,6 +157,32 @@
                   </a>
                 </div>
               </div>
+
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <p class="text-secondary mb-0">
+                    Transactions
+                    <br />
+                    <small>Last 24 Hours</small>
+                  </p>
+                </div>
+                <div class=" col-md-9">
+                  {{ transactions24hCount$ | async }}
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-3">
+                  <p class="text-secondary mb-0">
+                    Volume
+                    <br />
+                    <small>Last 24 Hours</small>
+                  </p>
+                </div>
+                <div class=" col-md-9">
+                  <amount-cell [data]="transactions24hVolume$ | async" [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"></amount-cell>
+                </div>
+              </div>
             </div>
           </div>
         </div>

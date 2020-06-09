@@ -5,7 +5,7 @@ import { HealthComponent } from './health.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { TimestampCellComponent } from '@tezblock/components/tezblock-table/timestamp-cell/timestamp-cell.component'
 
-describe('HealthComponent', () => {
+xdescribe('HealthComponent', () => {
   let component: HealthComponent
   let fixture: ComponentFixture<HealthComponent>
 

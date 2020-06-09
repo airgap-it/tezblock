@@ -6,7 +6,7 @@ import { ResourcesWalletItemComponent } from './resources-wallet-item.component'
 import { UnitHelper } from 'test-config/unit-test-helper';
 import { Wallet } from "../../interfaces/Wallet";
 
-describe('WalletComponent', () => {
+xdescribe('WalletComponent', () => {
   let component: ResourcesWalletItemComponent;
   let fixture: ComponentFixture<ResourcesWalletItemComponent>;
   let mockedWallet: Wallet;

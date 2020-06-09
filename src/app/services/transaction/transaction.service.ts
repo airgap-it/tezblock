@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { of } from 'rxjs'
+import { of, Observable } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
 
 import { ApiService } from '../api/api.service'
@@ -21,8 +21,13 @@ const kindToFieldsMap = {
 export class TransactionService {
   constructor(private readonly apiService: ApiService) {}
 
-  getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy) {
+  getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy): Observable<Transaction[]> {
     const fields = kindToFieldsMap[kind]
+
+    if (!fields) {
+      return of(null)
+    }
+
     const idNotNullPredicate = {
       field: 'operation_group_hash',
       operation: Operation.isnull,

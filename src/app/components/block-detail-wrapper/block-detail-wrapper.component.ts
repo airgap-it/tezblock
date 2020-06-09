@@ -36,7 +36,10 @@ export class BlockDetailWrapperComponent implements OnInit {
 
   get amountFromBlockFee(): { data: any; options: any } {
     return this.wrapperBlock
-      ? { data: this.wrapperBlock.fee, options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true, digitsInfo: '1.2-2' } }
+      ? {
+          data: this.wrapperBlock.fee,
+          options: { comparisonTimestamp: this.wrapperBlock.timestamp, showFiatValue: true, digitsInfo: '1.2-8' }
+        }
       : undefined
   }
 

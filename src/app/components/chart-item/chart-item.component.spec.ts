@@ -4,7 +4,7 @@ import { ChartItemComponent } from './chart-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-describe('AreaChartItemComponent', () => {
+xdescribe('AreaChartItemComponent', () => {
   let component: ChartItemComponent
   let fixture: ComponentFixture<ChartItemComponent>
 

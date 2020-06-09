@@ -14,10 +14,10 @@ export const columns: {
   }) => [
     {
       name: 'From',
-      field: 'singleFrom',
+      field: 'from',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleFrom, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.from, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -26,10 +26,10 @@ export const columns: {
     },
     {
       name: 'To',
-      field: 'singleTo',
+      field: 'to',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.singleTo, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.to, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
@@ -48,25 +48,25 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2'} }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8'} }),
       sortable: false
     },
     {
       name: 'Age',
       field: 'timestamp',
       template: Template.timestamp,
-      data: (item: any) => ({ data: item.timestamp * 1000 }),
+      data: (item: any) => ({ data: item.timestamp }),
       sortable: true
     },
     {
       name: 'Block',
-      field: 'blockHeight',
+      field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
       name: 'Tx Hash',
-      field: 'hash',
+      field: 'operation_group_hash',
       template: Template.hash
     }
   ],
@@ -111,7 +111,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-2' } }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: true
     },
     {
@@ -134,6 +134,30 @@ export const columns: {
       name: 'Tx Hash',
       field: 'operation_group_hash',
       template: Template.hash
+    }
+  ],
+  tokenHolders: (options: {
+    pageId: string
+    showFiatValue: boolean
+    symbol: string
+  }) => [
+    {
+      name: 'Account',
+      field: 'address',
+      template: Template.address,
+      data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Token Balance',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: any) => ({
+        data: item.amount,
+        options: {
+          showFiatValue: options.showFiatValue,
+          symbol: options.symbol
+        }
+      })
     }
   ]
 }

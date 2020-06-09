@@ -1,6 +1,6 @@
 import { Component } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { BehaviorSubject, Observable } from 'rxjs'
+import { combineLatest, BehaviorSubject, Observable } from 'rxjs'
 import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
@@ -53,6 +53,13 @@ export class DashboardComponent extends BaseComponent {
   currentPeriodKind$: Observable<string>
   currentPeriodIndex$: Observable<number>
   pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day)
+
+  yayRolls$: Observable<number>
+  nayRolls$: Observable<number>
+  passRolls$: Observable<number>
+  yayRollsPercentage$: Observable<number>
+  nayRollsPercentage$: Observable<number>
+  showRolls$: Observable<boolean>
 
   constructor(
     private readonly actions$: Actions,
@@ -117,6 +124,23 @@ export class DashboardComponent extends BaseComponent {
         map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
       )
 
+    this.yayRolls$ = this.store$.select(fromRoot.dashboard.yayRolls)
+    this.nayRolls$ = this.store$.select(fromRoot.dashboard.nayRolls)
+    this.passRolls$ = this.store$.select(fromRoot.dashboard.passRolls)
+    this.yayRollsPercentage$ = this.store$.select(fromRoot.dashboard.yayRollsPercentage)
+    this.nayRollsPercentage$ = this.store$.select(fromRoot.dashboard.nayRollsPercentage)
+    this.showRolls$ = combineLatest(
+      this.store$.select(state => state.app.latestBlock),
+      this.yayRolls$
+    ).pipe(
+      map(
+        ([latestBlock, yayRolls]) =>
+          latestBlock &&
+          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(latestBlock.period_kind) !== -1 &&
+          yayRolls !== undefined
+      )
+    )
+
     this.subscriptions.push(
       getRefresh([
         this.actions$.pipe(ofType(actions.loadTransactionsSucceeded)),
@@ -153,7 +177,19 @@ export class DashboardComponent extends BaseComponent {
             ])
           )
         )
-        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' }))),
+
+	this.actions$
+        .pipe(
+          ofType(appActions.loadPeriodInfosSucceeded),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(actions.loadDivisionOfVotesSucceeded)),
+              this.actions$.pipe(ofType(actions.loadDivisionOfVotesFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(actions.loadDivisionOfVotes()))
     )
     this.titleService.setTitle('tezblock - Tezos block explorer')
   }

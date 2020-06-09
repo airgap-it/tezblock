@@ -22,7 +22,7 @@ export interface DoubleEvidence {
 
 interface BalanceUpdate {
   kind: string
-  category: string 
+  category: string
   delegate: string
   cycle: number
   change: string
@@ -105,25 +105,31 @@ export class RewardService {
     )
   }
 
-  async calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
+  calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
     const key = `${address}${cycle}`
 
     if (this.calculatedRewardsMap.has(key)) {
-      return this.calculatedRewardsMap.get(key)
+      return Promise.resolve(this.calculatedRewardsMap.get(key))
     }
 
     if (this.pendingPromises.has(key)) {
       return this.pendingPromises.get(key)
     }
 
-    const promise = this.protocol.calculateRewards(address, cycle).then(result => {
-      this.calculatedRewardsMap.set(key, result)
-      this.pendingPromises.delete(key)
-      return result
-    })
-    this.pendingPromises.set(key, promise)
+    return this.getCurrentCycle()
+      .pipe(
+        switchMap((currentCycle: number) => {
+          const promise = this.protocol.calculateRewards(address, cycle, currentCycle).then(result => {
+            this.calculatedRewardsMap.set(key, result)
+            this.pendingPromises.delete(key)
+            return result
+          })
+          this.pendingPromises.set(key, promise)
 
-    return promise
+          return promise
+        })
+      )
+      .toPromise()
   }
 
   getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
@@ -168,23 +174,31 @@ export class RewardService {
     )
   }
 
-  private findEvidenceOperationInBlock(block: any, operationGroupHash: string, kind: 'double_baking_evidence'|'double_endorsement_evidence'): any {
+  private findEvidenceOperationInBlock(
+    block: any,
+    operationGroupHash: string,
+    kind: 'double_baking_evidence' | 'double_endorsement_evidence'
+  ): any {
     const indexForEvidenceOperations = 2
     const operationGroups: any[] = block.operations[indexForEvidenceOperations]
-    const operationGroup = operationGroups.find((operationGroup) => operationGroup.hash === operationGroupHash)
+    const operationGroup = operationGroups.find(operationGroup => operationGroup.hash === operationGroupHash)
+
     return operationGroup.contents.find((operation: { kind: string }) => operation.kind === kind)
   }
 
   private getDoubleEvidenceInfo(balanceUpdates: BalanceUpdate[]): Omit<DoubleEvidence, 'denouncedBlockLevel'> {
-    const deposits = balanceUpdates.find((update) => update.category === 'deposits')
-    const lostAmount = balanceUpdates.filter((update) => update.delegate === deposits.delegate).reduce((current, next) => {
-      return current.plus(new BigNumber(next.change))
-    }, new BigNumber(0))
-    const bakerRewards = balanceUpdates.filter((update) => update.category === 'rewards' && update.delegate !== deposits.delegate)
+    const deposits = balanceUpdates.find(update => update.category === 'deposits')
+    const lostAmount = balanceUpdates
+      .filter(update => update.delegate === deposits.delegate)
+      .reduce((current, next) => {
+        return current.plus(new BigNumber(next.change))
+      }, new BigNumber(0))
+    const bakerRewards = balanceUpdates.filter(update => update.category === 'rewards' && update.delegate !== deposits.delegate)
     const rewardsAmount = bakerRewards.reduce((current, next) => {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
     const baker = bakerRewards.pop().delegate
+    
     return {
       lostAmount: lostAmount.toFixed(),
       offender: deposits.delegate,

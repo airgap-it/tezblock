@@ -188,6 +188,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
       }
     }
   }
+  
   private getFormattedAddress(address: string) {
     const getAliasOrShorten = () => this.aliasPipe.transform(address) || this.shortenStringPipe.transform(address)
 

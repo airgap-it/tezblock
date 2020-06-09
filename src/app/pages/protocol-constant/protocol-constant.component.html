@@ -13,7 +13,7 @@
             <p class="text-secondary mb-0">Blocks per cycle</p>
           </div>
           <div class="col-md-9">
-            {{ blocksPerCyle }}
+            {{ (protocolVariables$ | async)?.blocks_per_cycle }}
           </div>
         </div>
         <div class="row mb-3">
@@ -21,7 +21,7 @@
             <p class="text-secondary mb-0">Blocks per commitment</p>
           </div>
           <div class="col-md-9">
-            {{ blocksPerCommitment }}
+            {{ (protocolVariables$ | async)?.blocks_per_commitment }}
           </div>
         </div>
         <div class="row mb-3">
@@ -29,7 +29,7 @@
             <p class="text-secondary mb-0">Blocks per roll snapshot</p>
           </div>
           <div class="col-md-9">
-            {{ blocksPerRollSnapshot }}
+            {{ (protocolVariables$ | async)?.blocks_per_roll_snapshot }}
           </div>
         </div>
         <div class="row mb-3">
@@ -37,7 +37,7 @@
             <p class="text-secondary mb-0">Time between blocks</p>
           </div>
           <div class="col-md-9">
-            {{ timeBetweenBlocks }}
+            {{ (protocolVariables$ | async)?.time_between_blocks }}
           </div>
         </div>
       </div>
@@ -56,7 +56,7 @@
             <p class="text-secondary mb-0">Block security deposit</p>
           </div>
           <div class="col-md-9">
-            <amount-cell [data]="blockSecurityDeposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+            <amount-cell [data]="(protocolVariables$ | async)?.block_security_deposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
           </div>
         </div>
         <div class="row mb-3">
@@ -64,7 +64,7 @@
             <p class="text-secondary mb-0">Endorsement security deposit</p>
           </div>
           <div class="col-md-9">
-            <amount-cell [data]="endorsementSecurityDeposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+            <amount-cell [data]="(protocolVariables$ | async)?.endorsement_security_deposit" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
           </div>
         </div>
       </div>
@@ -83,7 +83,7 @@
             <p class="text-secondary mb-0">Maximum revelations per block</p>
           </div>
           <div class="col-md-9">
-            {{ maximumRevelationsPerBlock }}
+            {{ (protocolVariables$ | async)?.max_revelations_per_block }}
           </div>
         </div>
         <div class="row mb-3">
@@ -91,7 +91,7 @@
             <p class="text-secondary mb-0">Maximum operation data length</p>
           </div>
           <div class="col-md-9">
-            {{ maximumRevelationsPerBlock }}
+            {{ (protocolVariables$ | async)?.max_revelations_per_block }}
           </div>
         </div>
         <div class="row mb-3">
@@ -99,7 +99,7 @@
             <p class="text-secondary mb-0">Hard gas limit per operation</p>
           </div>
           <div class="col-md-9">
-            {{ hardGasLimitPerOperation }}
+            {{ (protocolVariables$ | async)?.hard_gas_limit_per_operation }}
           </div>
         </div>
         <div class="row mb-3">
@@ -107,7 +107,7 @@
             <p class="text-secondary mb-0">Hard gas limit per block</p>
           </div>
           <div class="col-md-9">
-            {{ hardGasLimitPerBlock }}
+            {{ (protocolVariables$ | async)?.hard_gas_limit_per_block }}
           </div>
         </div>
       </div>

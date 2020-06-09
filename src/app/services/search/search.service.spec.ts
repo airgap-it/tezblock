@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing'
 import { SearchService } from './search.service'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('SearchService', () => {
+xdescribe('SearchService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()
