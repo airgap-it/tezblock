@@ -9,6 +9,7 @@ import { IconPipe } from './icon/icon.pipe'
 import { SafeHtmlPipe } from './safe-html/safe-html.pipe'
 import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
 import { WithoutBracesPipe } from './without-braces.pipe'
+import { FilterPipe } from './filter/filter.pipe'
 import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.pipe'
 
 @NgModule({
@@ -22,6 +23,7 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     IconPipe,
     PercentagePipe,
     WithoutBracesPipe,
+    FilterPipe,
     DecimalsFormatterPipe
   ],
   providers: [
@@ -34,6 +36,7 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     IconPipe,
     PercentagePipe,
     WithoutBracesPipe,
+    FilterPipe,
     DecimalsFormatterPipe
   ],
   imports: [],
@@ -47,6 +50,7 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     IconPipe,
     PercentagePipe,
     WithoutBracesPipe,
+    FilterPipe,
     DecimalsFormatterPipe
   ]
 })
