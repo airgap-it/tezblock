@@ -3,7 +3,7 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { ApiService } from './api.service'
 
-describe('ApiService', () => {
+xdescribe('ApiService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

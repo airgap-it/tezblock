@@ -52,7 +52,6 @@
     "@ngrx/effects": "^9.1.0",
     "@ngrx/store": "^9.1.0",
     "@nguniversal/express-engine": "^9.0.1",
-    "@nguniversal/module-map-ngfactory-loader": "^8.2.6",
     "@ngx-pwa/local-storage": "^9.0.2",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^4.0.0",

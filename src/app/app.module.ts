@@ -97,6 +97,7 @@ import { TokenContractOverviewComponent } from './pages/token-contract-overview/
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import { VarDirective } from '@tezblock/directives/var.directive'
 
 export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -212,7 +213,8 @@ export function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     LatestContractsComponent,
     LatestContractsTransactionsComponent,
     TransactionErrorsComponent,
-    TokenContractOverviewComponent
+    TokenContractOverviewComponent,
+    VarDirective
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],

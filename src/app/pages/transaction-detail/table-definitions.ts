@@ -2,6 +2,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TranslateService } from '@ngx-translate/core'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
 export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; translate?: any }) => Column[] } = {
   [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
@@ -33,7 +34,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.amount,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp }
+        options: {
+          maxDigits: 8,
+          comparisonTimestamp: item.timestamp,
+          symbol: item.symbol,
+          showFiatValue: !item.symbol || isConvertableToUSD(item.symbol)
+        }
       }),
       sortable: true
     },
@@ -43,7 +49,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },
@@ -61,6 +67,9 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: options.translate.instant('tezblock-table.transaction.parameters'),
       field: 'parameters',
       template: Template.modal,
+      data: (item: Transaction) => ({
+        data: item.parameters_micheline ?? item.parameters
+      }),
       sortable: false
     },
     {
@@ -110,7 +119,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },
@@ -170,7 +179,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: false
     },
@@ -222,7 +231,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },

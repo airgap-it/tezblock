@@ -16,7 +16,7 @@ import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/ex
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { ChartsModule } from 'ng2-charts'
 
-describe('AccountOverviewComponent', () => {
+xdescribe('AccountOverviewComponent', () => {
   let component: AccountOverviewComponent
   let fixture: ComponentFixture<AccountOverviewComponent>
 

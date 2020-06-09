@@ -6,9 +6,9 @@ import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { getTokenContracts } from '@tezblock/domain/contract'
 import * as fromRoot from '@tezblock/reducers'
-import { ApiService } from '@tezblock/services/api/api.service'
 import * as listActions from './actions'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { ContractService } from '@tezblock/services/contract/contract.service'
 
 @Injectable()
 export class TokenContractOverviewEffects {
@@ -24,7 +24,7 @@ export class TokenContractOverviewEffects {
           return of(listActions.loadTokenContractsSucceeded({ tokenContracts: { data: [], total: 0 } }))
         }
 
-        return forkJoin(contracts.data.map(contract => this.apiService.getTotalSupplyByContract(contract))).pipe(
+        return forkJoin(contracts.data.map(contract => this.contractService.getTotalSupplyByContract(contract))).pipe(
           map(totalSupplies =>
             listActions.loadTokenContractsSucceeded({
               tokenContracts: {
@@ -48,8 +48,8 @@ export class TokenContractOverviewEffects {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
+    private readonly contractService: ContractService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

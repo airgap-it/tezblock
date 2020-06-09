@@ -92,17 +92,45 @@
                       else hideValue
                     "
                   >
-                    <h5 class="mb-0">
-                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                      }}{{
-                        account.balance
-                          | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                          | number: '1.0-6'
-                      }}
+                    <h5
+                      *appVar="
+                        account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                      "
+                      class="mb-0"
+                    >
+                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
                     </h5>
                   </div>
                 </ng-container>
               </div>
+
+              <div class="row mb-3">
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">Assets</p>
+                </div>
+                <div class="col-md-10 pl-sm-0 d-flex align-items-center">
+                  <h5 class="d-inline-block m-0">
+                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
+                  </h5>
+                  <span
+                    class="badge badge-pill ml-2"
+                    [ngClass]="{
+                      'badge-primary': (numberOfContractAssets$ | async) > 0,
+                      'badge-primary-light badge-disabled': (numberOfContractAssets$ | async) === 0
+                    }"
+                  >
+                    {{ numberOfContractAssets$ | async }}
+                  </span>
+                  <button
+                    (click)="showAssets()"
+                    [disabled]="(numberOfContractAssets$ | async) === 0"
+                    class="btn btn-sm btn-icon btn-light rounded-circle ml-1"
+                  >
+                    <fa-icon [icon]="'expand' | iconPipe" class="text-secondary"></fa-icon>
+                  </button>
+                </div>
+              </div>
+
               <h5 class="card-title__secondary mb-3 pt-3">
                 <tooltip-item
                   [title]="'account-detail.related-accounts' | translate"

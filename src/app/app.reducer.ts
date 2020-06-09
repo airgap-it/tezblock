@@ -6,6 +6,7 @@ import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
 export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
 export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
@@ -30,8 +31,11 @@ export interface State {
   currentVotingPeriod: number
   currentVotingeriodPosition: number
   blocksPerVotingPeriod: number
-
   exchangeRates: ExchangeRates
+  protocolVariables: ProtocolConstantResponse
+  busy: {
+    protocolVariables: boolean
+  }
 
   // TODO: refactor there 2 properties ( I suppose these are prices XTZ -> BTC & USD ), and now BTC -> USD is added
   // move into exchangeRate
@@ -40,9 +44,10 @@ export interface State {
 
   // XTZ -> USD
   fiatCurrencyInfo: CurrencyInfo
+
 }
 
-const initialState: State = {
+export const initialState: State = {
   firstBlockOfCurrentCycle: undefined,
   latestBlock: undefined,
   navigationHistory: [],
@@ -50,6 +55,10 @@ const initialState: State = {
   currentVotingeriodPosition: undefined,
   blocksPerVotingPeriod: undefined,
   exchangeRates: {},
+  protocolVariables: undefined,
+  busy: {
+    protocolVariables: false
+  },
   cryptoCurrencyInfo: {
     symbol: 'BTC',
     currency: 'BTC',
@@ -102,6 +111,28 @@ export const reducer = createReducer(
   on(actions.loadExchangeRateSucceeded, (state, { from, to, price }) => ({
     ...state,
     exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
+  })),
+  on(actions.loadProtocolVariables, state => ({
+    ...state,
+    busy: {
+        ...state.busy,
+        protocolVariables: true
+    }
+  })),
+  on(actions.loadProtocolVariablesSucceeded, (state, { protocolVariables }) => ({
+    ...state,
+    protocolVariables,
+    busy: {
+        ...state.busy,
+        protocolVariables: false
+    }
+  })),
+  on(actions.loadProtocolVariablesFailed, state => ({
+    ...state,
+    busy: {
+        ...state.busy,
+        protocolVariables: false
+    }
   }))
 )
 

@@ -4,7 +4,7 @@ import { UnitHelper } from 'test-config/unit-test-helper'
 import { IdenticonComponent } from './../identicon/identicon'
 import { AddressItemComponent } from './address-item.component'
 
-describe('AddressItemComponent', () => {
+xdescribe('AddressItemComponent', () => {
   let component: AddressItemComponent
   let fixture: ComponentFixture<AddressItemComponent>
   let unitHelper: UnitHelper
