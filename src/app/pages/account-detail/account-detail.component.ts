@@ -624,7 +624,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'assets',
         count: undefined,
         icon: this.iconPipe.transform('coins'),
-        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet, translate: this.translateService }),
         disabled: function() {
           return !this.count
         }
