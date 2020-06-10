@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TransactionErrorsComponent } from './transaction-errors.component';
 
-describe('TransactionErrorsComponent', () => {
+xdescribe('TransactionErrorsComponent', () => {
   let component: TransactionErrorsComponent;
   let fixture: ComponentFixture<TransactionErrorsComponent>;
 

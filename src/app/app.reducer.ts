@@ -47,7 +47,7 @@ export interface State {
 
 }
 
-const initialState: State = {
+export const initialState: State = {
   firstBlockOfCurrentCycle: undefined,
   latestBlock: undefined,
   navigationHistory: [],

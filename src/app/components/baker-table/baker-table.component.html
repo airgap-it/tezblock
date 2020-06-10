@@ -169,7 +169,7 @@
                 </h5>
                 <h5>
                   <amount-cell
-                    *ngIf="frozenBalance$ | async as frozenBalance; else noFrozenBalance"
+                    *ngIf="data?.frozenBalance as frozenBalance; else noFrozenBalance"
                     [data]="frozenBalance"
                     [options]="{ showFiatValue: false, maxDigits: 10 }"
                   ></amount-cell>

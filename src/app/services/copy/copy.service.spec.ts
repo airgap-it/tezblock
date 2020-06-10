@@ -3,7 +3,7 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { CopyService } from './copy.service'
 
-describe('CopyService', () => {
+xdescribe('CopyService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

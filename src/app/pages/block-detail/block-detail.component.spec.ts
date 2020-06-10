@@ -1,71 +1,107 @@
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { CollapseModule } from 'ngx-bootstrap/collapse'
-import { TabsetConfig, TabsModule } from 'ngx-bootstrap/tabs'
-import { PaginationModule } from 'ngx-bootstrap/pagination'
-import { MomentModule } from 'ngx-moment'
 import { Actions } from '@ngrx/effects'
-import { EMPTY } from 'rxjs'
+import { of, Subject } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
 
-import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
-import { AddressItemComponent } from './../../components/address-item/address-item.component'
-import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
-import { AmountConverterPipe } from './../../pipes/amount-converter/amount-converter.pipe'
+import { ApiService } from '@tezblock/services/api/api.service'
+import { getApiServiceMock } from '@tezblock/services/api/api.service.mock'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { BlockDetailComponent } from './block-detail.component'
-import { BlockDetailWrapperComponent } from 'src/app/components/block-detail-wrapper/block-detail-wrapper.component'
-import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
-import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
-import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
-import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
-import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
-import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
-import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
-import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { initialState as bdInitialState } from './reducer'
+import { initialState as appInitialState } from '@tezblock/app.reducer'
+import * as actions from './actions'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
 
 describe('BlockDetailComponent', () => {
-  let component: BlockDetailComponent
   let fixture: ComponentFixture<BlockDetailComponent>
+  let component: BlockDetailComponent
+  let storeMock: MockStore<any>
+  let testScheduler: TestScheduler
+  const actionsMock = <Actions>of({ type: 'Action One' })
+  const apiServiceMock = getApiServiceMock()
+  const activatedRouteMock = getActivatedRouteMock()
+  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  const iconPipeMock = getPipeMock()
+  const initialState = { blockDetails: bdInitialState, app: appInitialState }
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [AmountConverterPipe, TabsetConfig, { provide: Actions, useValue: EMPTY }],
-        imports: [FontAwesomeModule, MomentModule, CollapseModule, TabsModule, BrowserAnimationsModule, PaginationModule],
-        declarations: [
-          BlockDetailComponent,
-          IdenticonComponent,
-          AddressItemComponent,
-          AmountCellComponent,
-          BlockCellComponent,
-          TabbedTableComponent,
-          TezblockTableComponent,
-          BlockDetailWrapperComponent,
-          LoadingSkeletonComponent,
-          TooltipItemComponent,
-          SymbolCellComponent,
-          HashCellComponent,
-          ModalCellComponent,
-          ExtendTableCellComponent
-        ]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
+    testScheduler = new TestScheduler((actual, expected) => {
+      // asserting the two objects are equal
+      expect(actual).toEqual(expected)
+    })
+
+    TestBed.configureTestingModule({
+      imports: [],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: Actions, useValue: actionsMock },
+        { provide: ApiService, useValue: apiServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: IconPipe, useValue: iconPipeMock },
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock }
+      ],
+      declarations: [BlockDetailComponent]
+    })
+
     fixture = TestBed.createComponent(BlockDetailComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
+    storeMock = TestBed.inject(MockStore)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
   })
 
-  afterEach(() => {
-    TestBed.resetTestingModule()
+  describe('ngOnInit', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    describe('numberOfConfirmations$', () => {
+      it('on initial state doesnt emit value', () => {
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = '---'
+
+          expectObservable(component.numberOfConfirmations$).toBe(expected)
+        })
+      })
+
+      it('on blocks set returns theirs level difference', () => {
+        storeMock.setState({
+          ...initialState,
+          app: {
+            ...initialState.app,
+            latestBlock: { level: 2 }
+          },
+          blockDetails: {
+            ...initialState.blockDetails,
+            block: { level: 1 }
+          }
+        })
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = 'a'
+          const expectedValues = { a: 1 }
+
+          expectObservable(component.numberOfConfirmations$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    it('on route change should create Load Block action', () => {
+      const mockedBlockId = 'mockedBlockId'
+
+      spyOn(storeMock, 'dispatch').and.callThrough()
+      activatedRouteMock.paramMap.next(getParamMapValue(mockedBlockId))
+
+      expect(storeMock.dispatch).toHaveBeenCalledWith(actions.loadBlock({ id: mockedBlockId }))
+    })
   })
 })

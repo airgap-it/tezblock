@@ -12,7 +12,7 @@ import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
-describe('TransactionDetailWrapperComponent', () => {
+xdescribe('TransactionDetailWrapperComponent', () => {
   let component: TransactionDetailWrapperComponent
   let fixture: ComponentFixture<TransactionDetailWrapperComponent>
 
