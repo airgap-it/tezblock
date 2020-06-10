@@ -81,7 +81,7 @@ export class CryptoPricesService {
   }
 
   getCurrencyConverterArgs(symbol: string): Observable<CurrencyConverterPipeArgs> {
-    if (!isConvertableToUSD(symbol)) {
+    if (symbol && !isConvertableToUSD(symbol)) {
       return of(null)
     }
 

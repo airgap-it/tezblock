@@ -34,5 +34,31 @@
     ],
     "tezosNetwork": ["mainnet"],
     "decimals": 8
+  },
+  "KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9": {
+    "symbol": "USDtz",
+    "name": "USD Tez",
+    "website": "https://USDtz.com",
+    "description": "USD Tez is a Tezos stablecoin pegged to the US Dollar and backed by FIAT collateral, targeting a maximum growth cap of 4:1 overcollateralization with both FIAT and XTZ.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://USDtz.com"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/USDtz"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/USDtz"
+      },
+      {
+        "type": "telegram",
+        "url": "https://t.me/USDtezos"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 6
   }
 }

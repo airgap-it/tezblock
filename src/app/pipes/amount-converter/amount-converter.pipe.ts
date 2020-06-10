@@ -2,8 +2,8 @@ import { Pipe, PipeTransform } from '@angular/core'
 import { ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { isNil } from 'lodash'
-
-import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getDecimalsForSymbol } from '@tezblock/domain/contract'
 
 export const toXTZ = (value: number, protocol: ICoinProtocol): number => {
   const BN = BigNumber.clone({
@@ -69,6 +69,9 @@ const makeFullNumberSmaller = (value: BigNumber, maxDigits: number): string => {
   name: 'amountConverter'
 })
 export class AmountConverterPipe implements PipeTransform {
+
+  constructor(private chainService: ChainNetworkService) {}
+
   public transform(
     value: BigNumber | string | number,
     args: { protocolIdentifier: string; maxDigits?: number }
@@ -79,7 +82,7 @@ export class AmountConverterPipe implements PipeTransform {
       return ''
     }
 
-    const protocol: { decimals: number } = tryGetProtocolByIdentifier(args.protocolIdentifier) || { decimals: 0 }
+    const decimals: number = getDecimalsForSymbol(args.protocolIdentifier, this.chainService.getNetwork())
 
     const BN = BigNumber.clone({
       FORMAT: {
@@ -88,7 +91,7 @@ export class AmountConverterPipe implements PipeTransform {
         groupSize: 3
       }
     })
-    const amount = new BN(_value).shiftedBy(protocol.decimals * -1)
+    const amount = new BN(_value).shiftedBy(decimals * -1)
 
     return formatBigNumber(amount, amount.isLessThan(0.01) ? undefined : args.maxDigits)
   }

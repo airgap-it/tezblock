@@ -2,7 +2,7 @@ import { BlockCellComponent } from './block-cell.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('BlockCellComponent', () => {
+xdescribe('BlockCellComponent', () => {
   let component: BlockCellComponent
   let fixture: ComponentFixture<BlockCellComponent>
 

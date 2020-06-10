@@ -118,7 +118,12 @@
     "hasLogo": true
   },
   "tz1MXFrtZoaXckE41bjUCSjAjAap3AFDSr3N": {
+    "alias": "Everstake Legacy",
+    "hasLogo": true
+  },
+  "tz1aRoaRhSpRYvFdyvgWLL6TGyRoGF51wDjM": {
     "alias": "Everstake",
+    "logoReference": "tz1MXFrtZoaXckE41bjUCSjAjAap3AFDSr3N",
     "hasLogo": true
   },
   "tz1MkaTVYdM9QvXxKvYEwG9BPN2XxriTs7Jh": {
@@ -858,5 +863,10 @@
   "tz1NXjtXZzwVJLocUtts5VmQ9nEPJVotweZm": {
     "alias": "BAKRRR.COM",
     "hasLogo": true
+  },
+  "KT1LN4LPSqTMS7Sd2CJw4bbDGRkMv2t68Fy9": {
+    "alias": "USDtz",
+    "hasLogo": true,
+    "accountType": "contract"
   }
 }

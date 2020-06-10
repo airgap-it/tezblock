@@ -48,7 +48,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },
@@ -66,6 +66,9 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Parameters',
       field: 'parameters',
       template: Template.modal,
+      data: (item: Transaction) => ({
+        data: item.parameters_micheline ?? item.parameters
+      }),
       sortable: false
     },
     {
@@ -115,7 +118,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },
@@ -175,7 +178,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: false
     },
@@ -227,7 +230,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       template: Template.amount,
       data: (item: Transaction) => ({
         data: item.fee,
-        options: { showFiatValue: true, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-2' }
+        options: { showFiatValue: false, maxDigits: 8, comparisonTimestamp: item.timestamp, digitsInfo: '1.2-8' }
       }),
       sortable: true
     },

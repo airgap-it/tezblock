@@ -8,7 +8,8 @@ import { CurrencySymbolPipe } from './currency-symbol/currency-symbol.pipe'
 import { IconPipe } from './icon/icon.pipe'
 import { SafeHtmlPipe } from './safe-html/safe-html.pipe'
 import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
-import { WithoutBracesPipe } from './without-braces.pipe'
+import { WithoutBracesPipe } from './without-braces.pipe';
+import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.pipe'
 
 @NgModule({
   declarations: [
@@ -20,7 +21,8 @@ import { WithoutBracesPipe } from './without-braces.pipe'
     SafeHtmlPipe,
     IconPipe,
     PercentagePipe,
-    WithoutBracesPipe
+    WithoutBracesPipe,
+    DecimalsFormatterPipe
   ],
   providers: [
     ShortenStringPipe,
@@ -31,7 +33,8 @@ import { WithoutBracesPipe } from './without-braces.pipe'
     SafeHtmlPipe,
     IconPipe,
     PercentagePipe,
-    WithoutBracesPipe
+    WithoutBracesPipe,
+    DecimalsFormatterPipe
   ],
   imports: [],
   exports: [
@@ -43,7 +46,8 @@ import { WithoutBracesPipe } from './without-braces.pipe'
     SafeHtmlPipe,
     IconPipe,
     PercentagePipe,
-    WithoutBracesPipe
+    WithoutBracesPipe,
+    DecimalsFormatterPipe
   ]
 })
 export class PipesModule {}

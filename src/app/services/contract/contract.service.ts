@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { forkJoin, from, Observable, pipe, of } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
 
@@ -196,13 +196,15 @@ export class ContractService extends BaseService {
         contractOperations.length > 0
           ? forkJoin(
               contractOperations.map(contractOperation =>
-                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+                from(
+                  faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+                ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
               )
             ).pipe(
               map(response =>
                 contractOperations.map((contractOperation, index) => ({
                   ...contractOperation,
-                  entrypoint: _get(response[index], 'entrypoint'),
+                  entrypoint: contractOperation.parameters_entrypoints === 'default' ? _get(response[index], 'entrypoint') : contractOperation.parameters_entrypoints,
                   symbol: contract.symbol,
                   decimals: contract.decimals
                 }))

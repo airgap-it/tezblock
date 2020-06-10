@@ -6,6 +6,7 @@ import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
+import * as moment from 'moment'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -22,6 +23,12 @@ import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { getRefresh } from '@tezblock/domain/synchronization'
+
+const last24 = (transaction: ContractOperation): boolean => {
+  const hoursAgo = moment().diff(moment(transaction.timestamp), 'hours', true)
+
+  return hoursAgo <= 24
+}
 
 @Component({
   selector: 'app-contract-detail',
@@ -56,6 +63,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   orderBy$: Observable<OrderBy>
   showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
+  manager$: Observable<string>
+  showFiatValue$: Observable<boolean>
+  transactions24hCount$: Observable<number>
+  transactions24hVolume$: Observable<number>
+
   tabs: Tab[] = [
     {
       title: 'Transfers',
@@ -80,8 +92,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       }
     }
   ]
-  manager$: Observable<string>
-  showFiatValue$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -105,7 +115,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
 
-        this.revealed$ = from(this.accountService.getAccountStatus(address))
+        this.revealed$ = this.accountService.getAccountStatus(address)
       })
     )
   }
@@ -124,7 +134,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       .pipe(map(address => address && !!this.aliasPipe.transform(address)))
     this.transactions$ = combineLatest(
       this.store$.select(state => state.contractDetails.currentTabKind),
-      this.store$.select(state => state.contractDetails.transferOperations.data),
+      this.store$.select(fromRoot.contractDetails.transferOperations),
       this.store$.select(state => state.contractDetails.otherOperations.data),
       this.store$.select(state => state.contractDetails.tokenHolders.data)
     ).pipe(
@@ -164,6 +174,20 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
     this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
+    this.transactions24hCount$ = this.store$
+      .select(state => state.contractDetails.transferOperations.data)
+      .pipe(
+        filter(negate(isNil)),
+        map((transitions: ContractOperation[]) => transitions.filter(last24)),
+        map(transitions => transitions.length)
+      )
+    this.transactions24hVolume$ = this.store$
+      .select(state => state.contractDetails.transferOperations.data)
+      .pipe(
+        filter(negate(isNil)),
+        map((transitions: ContractOperation[]) => transitions.filter(last24).map(transition => parseFloat(transition.amount.toString()))),
+        map(amounts => amounts.reduce((accumulator, currentItem) => accumulator + currentItem, 0))
+      )
 
     this.subscriptions.push(
       combineLatest(

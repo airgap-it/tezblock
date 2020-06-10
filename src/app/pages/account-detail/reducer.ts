@@ -14,6 +14,7 @@ import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
+import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
 
@@ -67,7 +68,8 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
         ? response.payoutAccuracy
         : null
       : null,
-  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null
+  tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
+  stakingCapacity: get<number>(stakingCapacity => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
 })
 
 export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
@@ -86,6 +88,7 @@ export interface Busy {
 export interface BakerTableRatings {
   bakingBadRating: string
   tezosBakerRating: string
+  stakingCapacity?: number
 }
 
 export interface State {
@@ -96,7 +99,7 @@ export interface State {
   transactions: TableState<Transaction>
   counts: Count[]
   kind: string
-  rewardAmont: string
+  rewardAmount: string
   busy: Busy
   balanceFromLast30Days: Balance[]
   bakerTableRatings: BakerTableRatings
@@ -106,7 +109,7 @@ export interface State {
   contractAssets: TableState<ContractAsset>
 }
 
-const initialState: State = {
+export const initialState: State = {
   address: undefined,
   account: undefined,
   delegatedAccounts: undefined,
@@ -114,7 +117,7 @@ const initialState: State = {
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
   kind: undefined,
-  rewardAmont: undefined,
+  rewardAmount: undefined,
   busy: {
     rewardAmont: false,
     bakerReward: false
@@ -159,7 +162,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
     ...state,
-    rewardAmont,
+    rewardAmount: rewardAmont,
     busy: {
       ...state.busy,
       rewardAmont: false
@@ -167,7 +170,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadRewardAmontFailed, state => ({
     ...state,
-    rewardAmont: null,
+    rewardAmount: null,
     busy: {
       ...state.busy,
       rewardAmont: false
@@ -230,7 +233,8 @@ export const reducer = createReducer(
     ...state,
     bakerTableRatings: {
       ...state.bakerTableRatings,
-      bakingBadRating: response.bakingRating
+      bakingBadRating: response.bakingRating,
+      stakingCapacity: response.stakingCapacity
     },
     tezosBakerFee: response.tezosBakerFee,
     busy: {
@@ -312,6 +316,13 @@ export const reducer = createReducer(
   on(actions.setKind, (state, { kind }) => ({
     ...state,
     kind
+  })),
+  on(actions.loadStakingCapacityFromTezosProtocolSucceeded, (state, { stakingCapacity }) => ({
+    ...state,
+    bakerTableRatings: {
+      ...state.bakerTableRatings,
+      stakingCapacity
+    }
   })),
   on(actions.reset, () => initialState)
 )

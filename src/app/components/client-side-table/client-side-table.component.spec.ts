@@ -15,7 +15,7 @@ import { LoadingSkeletonComponent } from '@tezblock/components/loading-skeleton/
 import { AddressItemComponent } from '@tezblock/components/address-item/address-item.component'
 import { IdenticonComponent } from '@tezblock/components/identicon/identicon'
 
-describe('ClientSideTableComponent', () => {
+xdescribe('ClientSideTableComponent', () => {
   let component: ClientSideTableComponent
   let fixture: ComponentFixture<ClientSideTableComponent>
 
