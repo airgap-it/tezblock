@@ -44,14 +44,14 @@
     <ng-template tabHeading>
       <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
         <span class="d-none d-sm-inline-block">
-          {{ tab.title }}
+          {{ tab.title | translate }}
         </span>
         <fa-icon [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
       </button>
     </ng-template>
     <h6 class="pt-3 mr-1 d-sm-none">
       <span>
-        {{ tab.title }}
+        {{ tab.title | translate }}
       </span>
     </h6>
 
