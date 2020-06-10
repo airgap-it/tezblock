@@ -8,7 +8,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './app.actions'
 import { AnalyticsService } from './services/analytics/analytics.service'
-import { LoadLanguagesService } from './services/translation/load-languages.service'
+import { LanguagesService } from './services/translation/languages.service'
 
 @Component({
   selector: 'app-root',
@@ -23,9 +23,9 @@ export class AppComponent implements OnInit {
     readonly router: Router,
     private readonly store$: Store<fromRoot.State>,
     private readonly analyticsService: AnalyticsService,
-    private readonly languageService: LoadLanguagesService
+    private readonly languagesService: LanguagesService
   ) {
-    this.languageService.loadLanguages()
+    this.languagesService.loadLanguages()
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
@@ -49,6 +49,6 @@ export class AppComponent implements OnInit {
   }
   public ngOnInit() {
     this.analyticsService.init()
-    this.languageService.loadLanguages()
+    this.languagesService.loadLanguages()
   }
 }

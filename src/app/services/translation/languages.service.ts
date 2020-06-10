@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
-import English from './../../../assets/i18n/en.json'
-import German from './../../../assets/i18n/de.json'
+import English from '../../../assets/i18n/en.json'
+import German from '../../../assets/i18n/de.json'
 
 @Injectable({
   providedIn: 'root'
 })
-export class LoadLanguagesService {
+export class LanguagesService {
   supportedLanguages = ['en', 'de', 'zh-cn']
 
   languages = {
@@ -28,12 +28,9 @@ export class LoadLanguagesService {
     this.translate.setDefaultLang('en')
 
     if (language) {
-      const lowerCaseLanguage = language.toLowerCase()
-      this.supportedLanguages.forEach(supportedLanguage => {
-        if (supportedLanguage.startsWith(lowerCaseLanguage)) {
-          this.translate.use(supportedLanguage)
-        }
-      })
+      this.supportedLanguages.filter(supportedLanguage =>
+        supportedLanguage.startsWith(language.toLowerCase()) ? this.translate.use(supportedLanguage) : null
+      )
     }
   }
 }

@@ -1,12 +1,12 @@
 // import { TestBed } from '@angular/core/testing';
 
-// import { LoadLanguagesService } from './load-languages.service';
+// import { LanguagesService } from './load-languages.service';
 
-// describe('LoadLanguagesService', () => {
+// describe('LanguagesService', () => {
 //   beforeEach(() => TestBed.configureTestingModule({}));
 
 //   it('should be created', () => {
-//     const service: LoadLanguagesService = TestBed.get(LoadLanguagesService);
+//     const service: LanguagesService = TestBed.get(LanguagesService);
 //     expect(service).toBeTruthy();
 //   });
 // });
