@@ -57,7 +57,6 @@ export class HeaderItemComponent {
         isMobile ? (this.triggers = '') : (this.triggers = 'hover')
       })
   }
-  currentLanguage = this.translate.currentLang
 
   public navigate(entity: string) {
     this.router.navigate([`${entity}/list`])

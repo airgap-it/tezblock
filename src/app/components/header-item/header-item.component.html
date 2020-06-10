@@ -272,20 +272,20 @@
                     routerLinkActive="btn-link"
                     (mouseover)="dp1.hide(); dp2.hide()"
                   >
-                    {{ currentLanguage }}
+                    {{ translate.currentLang }}
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
                     <li role="menuitem">
                       <a
                         class="dropdown-item"
-                        [ngClass]="'en' === currentLanguage ? 'active' : ''"
+                        [ngClass]="'en' === translate.currentLang ? 'active' : ''"
                         (click)="changeLanguage('en'); dp4.hide()"
                       >
                         EN
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="'de' === currentLanguage ? 'active' : ''"
+                        [ngClass]="'de' === translate.currentLang ? 'active' : ''"
                         (click)="changeLanguage('de'); dp4.hide()"
                       >
                         DE
