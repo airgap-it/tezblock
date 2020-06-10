@@ -107,6 +107,7 @@ describe('AccountOverviewComponent', () => {
           }
         })
   
+        aliasPipeMock.transform.and.returnValue(undefined)
         shortenStringPipeMock.transform.and.returnValue('BBB')
   
         testScheduler.run(helpers => {
