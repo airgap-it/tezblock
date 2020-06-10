@@ -1,13 +1,13 @@
-// import { TestBed } from '@angular/core/testing';
-// import { ToastrModule, ToastrService } from 'ngx-toastr'
+import { TestBed } from '@angular/core/testing';
+import { ToastrModule, ToastrService } from 'ngx-toastr'
 
-// import { DownloadService } from './download.service';
+import { DownloadService } from './download.service';
 
-// xdescribe('DownloadService', () => {
-//   beforeEach(() => TestBed.configureTestingModule({}));
+xdescribe('DownloadService', () => {
+  beforeEach(() => TestBed.configureTestingModule({}));
 
-//   it('should be created', () => {
-//     const service: DownloadService = TestBed.inject(DownloadService);
-//     expect(service).toBeTruthy();
-//   });
-// });
+  it('should be created', () => {
+    const service: DownloadService = TestBed.inject(DownloadService);
+    expect(service).toBeTruthy();
+  });
+});

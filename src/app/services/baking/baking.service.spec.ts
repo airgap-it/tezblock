@@ -3,7 +3,7 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { BakingService } from './baking.service'
 
-describe('BakerRatingService', () => {
+xdescribe('BakerRatingService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { HashCellComponent } from './hash-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('HashCellComponent', () => {
+xdescribe('HashCellComponent', () => {
   let component: HashCellComponent
   let fixture: ComponentFixture<HashCellComponent>
 

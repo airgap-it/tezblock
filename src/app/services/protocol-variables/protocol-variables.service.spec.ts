@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { ProtocolVariablesService } from './protocol-variables.service';
 
-describe('ProtocolVariablesService', () => {
+xdescribe('ProtocolVariablesService', () => {
   beforeEach(() => {
     const unitHelper = new UnitHelper()
 
