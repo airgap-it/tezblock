@@ -16,7 +16,7 @@
       {{ wrapperBlock.level }}
       <ng-container *ngIf="confirmations">
         <span *ngIf="confirmations >= 1" class="text-secondary ml-1">
-          {{ confirmations }} {{ 'block-detail.block-confirmation' | translate }}
+          {{ confirmations }} {{ 'block-detail.block-confirmations' | translate }}
         </span>
       </ng-container>
       <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel(-1)">
