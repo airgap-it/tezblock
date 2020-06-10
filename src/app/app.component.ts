@@ -17,7 +17,7 @@ import defaultLanguage from './../assets/i18n/en.json'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  supportedLanguages = ['en', 'de', 'zh-cn']
+  supportedLanguages = ['en']
 
   constructor(
     private readonly actions$: Actions,
