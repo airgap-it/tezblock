@@ -62,7 +62,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.name' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -70,7 +70,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.symbol' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -78,7 +78,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.total-supply' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -95,7 +95,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.decimals' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -103,7 +103,7 @@
                 </div>
               </div>
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.manager' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -121,7 +121,7 @@
               </h5>
 
               <div class="row mb-3">
-                <div class=" col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.description' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -130,7 +130,7 @@
               </div>
 
               <div class="row mb-3">
-                <div class=" col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.website' | translate }}</p>
                 </div>
                 <div class="col-md-9">
@@ -141,7 +141,7 @@
               </div>
 
               <div class="row mb-3">
-                <div class="col-md-5">
+                <div class="col-md-3">
                   <p class="text-secondary mb-0">{{ 'contract-detail.social-profiles' | translate }}</p>
                 </div>
                 <div class=" col-md-9">
@@ -159,9 +159,9 @@
               <div class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
-                    Transactions
+                    {{ 'contract-detail.transactions' | translate }}
                     <br />
-                    <small>Last 24 Hours</small>
+                    <small>{{ 'contract-detail.last24h' | translate }}</small>
                   </p>
                 </div>
                 <div class=" col-md-9">
@@ -172,13 +172,16 @@
               <div class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
-                    Volume
+                    {{ 'contract-detail.volume' | translate }}
                     <br />
-                    <small>Last 24 Hours</small>
+                    <small>{{ 'contract-detail.last24h' | translate }}</small>
                   </p>
                 </div>
                 <div class=" col-md-9">
-                  <amount-cell [data]="transactions24hVolume$ | async" [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"></amount-cell>
+                  <amount-cell
+                    [data]="transactions24hVolume$ | async"
+                    [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"
+                  ></amount-cell>
                 </div>
               </div>
             </div>

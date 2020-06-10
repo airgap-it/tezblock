@@ -280,18 +280,17 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     const options = {
       pageId,
       showFiatValue,
-      symbol: contract.symbol,
-      translate: this.translateService
+      symbol: contract.symbol
     }
     const customTabs = hasTokenHolders ? [this.getTokenHoldersTab(options)] : []
     const tabs = [
       {
         ...this.tabs[0],
-        columns: columns.transfers(options)
+        columns: columns.transfers(options, this.translateService)
       },
       {
         ...this.tabs[1],
-        columns: columns.other(options)
+        columns: columns.other(options, this.translateService)
       }
     ].concat(customTabs)
 
