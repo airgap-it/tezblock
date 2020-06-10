@@ -199,7 +199,7 @@ export class AccountDetailEffects {
                 bakerData: {
                   ...get(currentCycleCache, `fromAddress[${state.address}].bakerData`),
                   bakingBadRating: state.bakerTableRatings.bakingBadRating,
-                  stakingCapacity: state.bakerTableRatings.stakingCapacity // not confirmed if should be cached..
+                  stakingCapacity: state.bakerTableRatings.stakingCapacity
                 },
                 tezosBakerFee: state.tezosBakerFee
               }
