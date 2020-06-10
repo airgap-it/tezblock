@@ -17,12 +17,14 @@ export class LanguagesService {
   constructor(private readonly translate: TranslateService) {}
 
   loadLanguages(translateTo?: string) {
-    let language = 'en'
-    translateTo
-      ? this.supportedLanguages.includes(translateTo.toLowerCase())
-        ? (language = translateTo.toLowerCase())
-        : (language = this.translate.getBrowserLang())
-      : (language = this.translate.getBrowserLang())
+    const getLanguage = (translateTo?: string): string => {
+      if (translateTo) {
+        return this.supportedLanguages.includes(translateTo.toLowerCase()) ? translateTo.toLowerCase() : this.translate.getBrowserLang()
+      }
+
+      return this.translate.getBrowserLang()
+    }
+    const language = getLanguage(translateTo)
 
     this.translate.setTranslation(language, this.languages[language])
     this.translate.setDefaultLang('en')
