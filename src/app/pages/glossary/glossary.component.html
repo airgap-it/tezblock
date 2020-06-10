@@ -15,12 +15,12 @@
             <li *ngFor="let definition of definitions | filter: searchText">
               <div>
                 <p>
-                  {{ definition[0] }}
+                  {{ definition.name }}
                 </p>
               </div>
               <div>
                 <p>
-                  {{ definition[1] }}
+                  {{ definition.field }}
                 </p>
               </div>
             </li>
