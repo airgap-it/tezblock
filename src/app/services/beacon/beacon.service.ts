@@ -18,7 +18,7 @@ export class BeaconService {
   constructor(private readonly chainNetworkService: ChainNetworkService) {}
 
   async delegate(address: string): Promise<OperationResponseOutput> {
-    const client = new DAppClient({ name: 'tezblock' })
+    const client = this.getDAppClient()
     const isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
     const requestPermissions = async () => {
       const input: RequestPermissionInput = isMainnet
@@ -50,5 +50,10 @@ export class BeaconService {
       .requestOperation({
         operationDetails: [operation]
       })
+  }
+
+  // for testing (mainly)
+  getDAppClient(): DAppClient {
+    return new DAppClient({ name: 'tezblock' })
   }
 }
