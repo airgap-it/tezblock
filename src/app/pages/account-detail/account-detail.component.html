@@ -108,7 +108,9 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
                   <h5 class="d-inline-block m-0">
-                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
+                    <span>
+                      ${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}
+                    </span>
                   </h5>
                   <span
                     class="badge badge-pill ml-2"
@@ -203,8 +205,26 @@
                 <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
                 <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
 
-                <!-- TODO -->
-
+                <ng-template #delegationControlTemplate let-model="item" let-index="index">
+                  <address-item [address]="model"></address-item>
+                </ng-template>
+                <input
+                  [formControl]="delegationControl"
+                  [typeaheadAsync]="true"
+                  [typeahead]="delegationControlDataSource$"
+                  [typeaheadItemTemplate]="delegationControlTemplate"
+                  [adaptivePosition]="true"
+                  [typeaheadMinLength]="0"
+                  [typeaheadScrollable]="true"
+                  [typeaheadOptionsInScrollableView]="10"
+                  placeholder="Search by Address / Alias"
+                  class="form-control form-control--focus-white"
+                  (keydown.enter)="onDelegationControlKeyEnter()"
+                  (typeaheadOnSelect)="onDelegationControlSelect($event)"
+                  (mousedown)="onDelegationControlMouseDown()"
+                  [typeaheadIsFirstItemActive]="false"
+                  [isAnimated]="true"
+                />
               </ng-container>
               <ng-container *ngIf="delegatedAccountAddress">
                 <div class="row mb-3">

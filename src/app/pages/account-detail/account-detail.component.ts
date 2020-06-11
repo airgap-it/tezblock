@@ -11,6 +11,7 @@ import { negate, isNil, isNumber, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
+import { FormControl } from '@angular/forms'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
@@ -126,6 +127,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
+  delegationControl: FormControl
+  delegationControlDataSource$: Observable<string[]>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -236,6 +239,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.setupDelegationControl()
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.account$ = this.store$.select(state => state.accountDetails.account)
@@ -566,6 +570,25 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.store$.dispatch(actions.setKind({ kind }))
     this.tabbedTableComponent.onSelectTab(tab)
+  }
+
+  onDelegationControlKeyEnter() {
+    //TODO
+  }
+
+  onDelegationControlSelect() {
+    //TODO
+  }
+
+  onDelegationControlMouseDown() {
+    //TODO
+  }
+
+  private setupDelegationControl() {
+    this.delegationControl = new FormControl(null)
+    this.delegationControlDataSource$ = of(Object.keys(accounts))
+
+    this.delegationControl.valueChanges.subscribe(value => console.log(`>>>>>>>> ${value}`))
   }
 
   private setTabs(pageId: string) {
