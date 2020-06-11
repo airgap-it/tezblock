@@ -64,9 +64,18 @@
                 <h5 class="card-title__secondary mb-3">
                   Full Balance
                 </h5>
-                <h3>
+                <h3 class="d-inline-block">
                   <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                 </h3>
+                <ng-container
+                  *appVar="
+                    data?.stakingBond | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                  "
+                >
+                  <h5 class="text-secondary ml-2 d-inline-block">
+                    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
+                  </h5>
+                </ng-container>
               </div>
 
               <ng-container *ngIf="data?.stakingBalance; else loadingGraph">
@@ -165,7 +174,7 @@
                 </h5>
                 <h5>
                   <amount-cell
-                    *ngIf="frozenBalance$ | async as frozenBalance; else noFrozenBalance"
+                    *ngIf="data?.frozenBalance as frozenBalance; else noFrozenBalance"
                     [data]="frozenBalance"
                     [options]="{ showFiatValue: false, maxDigits: 10 }"
                   ></amount-cell>

@@ -3,7 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing'
 import { PlainValueCellComponent } from './plain-value-cell.component'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('PlainValueCellComponent', () => {
+xdescribe('PlainValueCellComponent', () => {
   let component: PlainValueCellComponent
   let fixture: ComponentFixture<PlainValueCellComponent>
 

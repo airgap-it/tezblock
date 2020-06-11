@@ -10,7 +10,7 @@ import { IdenticonComponent } from './../identicon/identicon'
 import { TransactionItemComponent } from './transaction-item.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
-describe('TransactionItemComponent', () => {
+xdescribe('TransactionItemComponent', () => {
   let component: TransactionItemComponent
   let fixture: ComponentFixture<TransactionItemComponent>
 

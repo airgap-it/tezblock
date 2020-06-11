@@ -6,7 +6,7 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.component'
 import { ChartItemComponent } from '../chart-item/chart-item.component'
 
-describe('OccurrenceStatisticsComponent', () => {
+xdescribe('OccurrenceStatisticsComponent', () => {
   let component: OccurrenceStatisticsComponent
   let fixture: ComponentFixture<OccurrenceStatisticsComponent>
 
