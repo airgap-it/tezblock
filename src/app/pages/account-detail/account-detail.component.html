@@ -1,7 +1,7 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
     <h1 hidden="true">
-      account detail page with information about transactions, balances, rewards, baker information, value, baking and endorsing rights
+      Account page with information about transactions, balances, rewards, baker information, value, baking and endorsing rights.
     </h1>
     <ng-container *ngIf="account$ | async as account; else noAccount">
       <div class="row">
@@ -111,7 +111,9 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
                   <h5 class="d-inline-block m-0">
-                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
+                    <span>
+                      ${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}
+                    </span>
                   </h5>
                   <span
                     class="badge badge-pill ml-2"

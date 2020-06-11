@@ -120,7 +120,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
-    this.titleService.setTitle(`Tezos Operation: ${this.aliasService.getFormattedAddress(this.transactionHash)} - tezblock`)
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.transactionHash)} Operation - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Transaction ${this.transactionHash}. The transaction hash, block level, timestamp, value, fees and and tranfers are detailed on tezblock.">`

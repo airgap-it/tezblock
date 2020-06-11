@@ -119,7 +119,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
-    this.titleService.setTitle(`Tezos Block: ${this.blockLevel} - tezblock`)
+    this.titleService.setTitle(`${this.blockLevel} Block - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Block Height ${this.blockLevel}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`
