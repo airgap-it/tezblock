@@ -56,7 +56,6 @@ describe('AccountOverviewComponent', () => {
   })
 
   describe('ngOnInit', () => {
-
     describe('top25ChartLabels$', () => {
       beforeEach(() => {
         component.ngOnInit()
@@ -66,76 +65,80 @@ describe('AccountOverviewComponent', () => {
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
           const expected = '---'
-  
+
           expectObservable(component.top25ChartLabels$).toBe(expected)
         })
       })
-  
+
       it('uses aliasPipe as main pipe', () => {
         storeMock.setState({
           ...initialState,
           accountsList: {
             ...initialState.accountsList,
-            top25Accounts: [
-              { account_id: '111' },
-              { account_id: '222' }
-            ]
+            top25Accounts: [{ account_id: '111' }, { account_id: '222' }]
           }
         })
-  
+
         aliasPipeMock.transform.and.returnValue('AAA')
         shortenStringPipeMock.transform.and.returnValue('BBB')
-  
+
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
           const expected = 'a'
           const expectedValues = { a: ['AAA -', 'AAA -'] }
-  
+
           expectObservable(component.top25ChartLabels$).toBe(expected, expectedValues)
         })
       })
-  
+
       it('uses shortenStringPipe as secondary pipe', () => {
         storeMock.setState({
           ...initialState,
           accountsList: {
             ...initialState.accountsList,
-            top25Accounts: [
-              { account_id: '111' },
-              { account_id: '222' }
-            ]
+            top25Accounts: [{ account_id: '111' }, { account_id: '222' }]
           }
         })
-  
+
         aliasPipeMock.transform.and.returnValue(undefined)
         shortenStringPipeMock.transform.and.returnValue('BBB')
-  
+
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
           const expected = 'a'
           const expectedValues = { a: ['BBB -', 'BBB -'] }
-  
+
           expectObservable(component.top25ChartLabels$).toBe(expected, expectedValues)
         })
       })
     })
 
-    // TODO: make it work
-    xdescribe('top25ChartSize$', () => {
+    describe('top25ChartSize$', () => {
       it('when Breakpoints.Small, Breakpoints.Handset are emited returns small size', () => {
         breakpointObserverMock.observe.and.returnValue(of(getObserveValue(true)))
         component.ngOnInit()
-        //component.isMobile$.subscribe(x => console.log(`>>>>>>>> ${x}`))
 
         testScheduler.run(helpers => {
           const { expectObservable } = helpers
-          const expected = 'a'
+          const expected = '(a|)'
           const expectedValues = { a: { width: 200, height: 200 } }
-  
+
+          expectObservable(component.top25ChartSize$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when NOT Breakpoints.Small, Breakpoints.Handset are emited returns big size', () => {
+        breakpointObserverMock.observe.and.returnValue(of(getObserveValue(false)))
+        component.ngOnInit()
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = '(a|)'
+          const expectedValues = { a: { width: 800, height: 500 } }
+
           expectObservable(component.top25ChartSize$).toBe(expected, expectedValues)
         })
       })
     })
-    
   })
 })
