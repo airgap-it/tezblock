@@ -5,15 +5,7 @@ import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
-import {
-  BeaconErrorMessage,
-  DAppClient,
-  NetworkType,
-  OperationResponseOutput,
-  RequestPermissionInput,
-  TezosDelegationOperation,
-  TezosOperationType
-} from '@airgap/beacon-sdk'
+import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -32,6 +24,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -144,6 +137,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
+    private readonly beaconService: BeaconService,
     private readonly route: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
@@ -304,38 +298,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
   }
 
-  async delegate() {
-    const client = new DAppClient({ name: 'My Sample DApp' })
-    const requestPermissions = async () => {
-      const input: RequestPermissionInput = this.isMainnet
-        ? undefined
-        : {
-            network: {
-              type: NetworkType.CARTHAGENET
-            }
-          }
-
-      await client.requestPermissions(input)
-    }
-
-    // Check if we have permissions stored locally already
-    const activeAccount = await client.getActiveAccount()
-    if (!activeAccount) {
-      // If no active account is set, we have to ask for permissions.
-      await requestPermissions()
-
-      // After this call, the SDK saves the permissions locally
-    }
-
-    const operation: Partial<TezosDelegationOperation> = {
-      kind: TezosOperationType.DELEGATION,
-      delegate: this.address
-    }
-
-    client
-      .requestOperation({
-        operationDetails: [operation]
-      })
+  delegate() {
+    this.beaconService
+      .delegate(this.address)
       .then((response: OperationResponseOutput) => {
         // make any action ?
       })
