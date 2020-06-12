@@ -493,16 +493,14 @@ export class ApiService {
           )
           .pipe(
             map(first),
-            tap(
-              account => {}
-              // TODO: uncomment when conseil won't bug is_baker property ( returns randomly true or false )
-              // this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
-              //   ...byAddressCache,
-              //   [id]: {
-              //     ..._get(byAddressCache, id),
-              //     account
-              //   }
-              // }))
+            tap(account =>
+              this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
+                ...byAddressCache,
+                [id]: {
+                  ..._get(byAddressCache, id),
+                  account
+                }
+              }))
             )
           )
       })
