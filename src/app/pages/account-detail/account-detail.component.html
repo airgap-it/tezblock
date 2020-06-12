@@ -210,8 +210,7 @@
                 </ng-template>
                 <input
                   [formControl]="delegationControl"
-                  [typeaheadAsync]="true"
-                  [typeahead]="delegationControlDataSource$"
+                  [typeahead]="delegationControlDataSource$ | async"
                   [typeaheadItemTemplate]="delegationControlTemplate"
                   [adaptivePosition]="true"
                   [typeaheadMinLength]="0"

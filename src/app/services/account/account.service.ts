@@ -10,6 +10,19 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { sort } from '@tezblock/domain/table'
 
+const accounts = require('../../../assets/bakers/json/accounts.json')
+
+export const getAddressesFilteredBy = (phrase: string) => Object.keys(accounts).filter(
+  address => {
+    if (!phrase) {
+      return true
+    }
+
+    return address.toLowerCase().includes(phrase.toLowerCase())
+  }
+)
+export const getAddressByAlias = (alias: string) => Object.keys(accounts).find(address => accounts[address].alias === alias)
+
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
   related: Account[]

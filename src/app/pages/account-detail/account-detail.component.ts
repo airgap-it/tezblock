@@ -12,6 +12,7 @@ import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
 import { FormControl } from '@angular/forms'
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
@@ -576,7 +577,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     //TODO
   }
 
-  onDelegationControlSelect() {
+  onDelegationControlSelect(e: TypeaheadMatch) {
     //TODO
   }
 
