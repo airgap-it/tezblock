@@ -30,7 +30,7 @@ const initialState: State = {
     field: 'block_level',
     direction: 'desc'
   }),
-  tokenHolders: getInitialTableState(undefined, Number.MIN_SAFE_INTEGER),
+  tokenHolders: getInitialTableState(),
   currentTabKind: actions.OperationTab.transfers
 }
 
@@ -187,6 +187,16 @@ export const reducer = createReducer(
     tokenHolders: {
       ...state.tokenHolders,
       loading: false
+    }
+  })),
+  on(actions.loadMoreTokenHolders, state => ({
+    ...state,
+    tokenHolders: {
+      ...state.tokenHolders,
+      pagination: {
+        ...state.tokenHolders.pagination,
+        currentPage: state.tokenHolders.pagination.currentPage + 1
+      }
     }
   })),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
