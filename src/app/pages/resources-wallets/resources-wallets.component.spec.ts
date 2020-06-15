@@ -6,7 +6,7 @@ import { ResourcesWalletItemComponent } from "../../components/resources-wallet-
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { UnitHelper } from 'test-config/unit-test-helper'
 
-describe('ResourcesWalletsComponent', () => {
+xdescribe('ResourcesWalletsComponent', () => {
   let component: ResourcesWalletsComponent
   let fixture: ComponentFixture<ResourcesWalletsComponent>
 

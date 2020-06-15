@@ -3,7 +3,7 @@ import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
 import { CryptoPricesService } from './crypto-prices.service'
 
-describe('CryptoPricesService', () => {
+xdescribe('CryptoPricesService', () => {
   let unitHelper: UnitHelper
   beforeEach(() => {
     unitHelper = new UnitHelper()

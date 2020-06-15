@@ -198,35 +198,6 @@ export class DeeplinkMock {
   )
 }
 
-export const ApiServiceMock = jasmine.createSpyObj('ApiService', {
-  getCurrentCycleRange: of([]),
-  getLatestTransactions: of([]),
-  getTransactionsById: of([]),
-  getEndorsementsById: of([]),
-  getTransactionsByBlock: of([]),
-  getTransactionsByField: of([]),
-  getLatestAccounts: of([]),
-  getAccountById: of([]),
-  getAccountsByIds: of([]),
-  getAccountsStartingWith: of([]),
-  getTransactionHashesStartingWith: of([]),
-  getBlockHashesStartingWith: of([]),
-  getDelegatedAccounts: of([]),
-  getManagerAccount: of([]),
-  getLatestBlocks: of([]),
-  getAdditionalBlockField: of([]).toPromise(),
-  getBlockById: of([]),
-  getBlockByHash: of([]),
-  getBakingRights: of([]),
-  getEndorsingRights: of([]),
-
-  getAccountStatus: of(null).toPromise(),
-  getOperationCount: of([]),
-  getEndorsedSlotsCount: of(null),
-  getFrozenBalance: of(null).toPromise(),
-  getDelegatedAccountsList: of(null)
-})
-
 export const BlockServiceMock = jasmine.createSpyObj('BlockService', {
   list$: EMPTY
 })

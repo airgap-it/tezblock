@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store'
 import { storeMock } from 'test-config/mocks'
 import { PipesModule } from '../src/app/pipes/pipes.module'
 import { ApiService } from '@tezblock/services/api/api.service'
+import { getApiServiceMock } from '@tezblock/services/api/api.service.mock'
 import {
   AlertControllerMock,
   AppVersionMock,
@@ -21,7 +22,6 @@ import {
   SplashScreenMock,
   StatusBarMock,
   ToastControllerMock,
-  ApiServiceMock
 } from './mocks'
 import { TimestampCellComponent } from '@tezblock/components/tezblock-table/timestamp-cell/timestamp-cell.component'
 

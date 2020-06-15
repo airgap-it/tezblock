@@ -14,7 +14,7 @@ import { LoadingSkeletonComponent } from '../loading-skeleton/loading-skeleton.c
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
 
-describe('BlockDetailWrapperComponent', () => {
+xdescribe('BlockDetailWrapperComponent', () => {
   let component: BlockDetailWrapperComponent
   let fixture: ComponentFixture<BlockDetailWrapperComponent>
 

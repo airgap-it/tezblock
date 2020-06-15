@@ -7,7 +7,7 @@ import { map } from 'rxjs/operators'
 import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { get as fpGet } from '@tezblock/services/fp'
+import { get as fpGet, isNotEmptyArray } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { Currency, isInBTC, getFaProtocol, tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
@@ -154,27 +154,39 @@ export interface TokenHolder {
 }
 
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
-export const fillTransferOperations = (transactions: Transaction[], chainNetworkService: ChainNetworkService): Observable<Transaction[]> =>
-  forkJoin(
+export const fillTransferOperations = (
+  transactions: Transaction[],
+  chainNetworkService: ChainNetworkService
+): Observable<Transaction[]> => {
+  if(!isNotEmptyArray(transactions)) {
+    return of([])
+  }
+
+  return forkJoin(
     transactions.map(transaction => {
       const contract: TokenContract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
       if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
         const faProtocol = getFaProtocol(contract, chainNetworkService)
-
         return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
           map(normalizedParameters => {
             if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
-              const transferDetails = faProtocol.transferDetailsFromParameters({
-                entrypoint: 'transfer',
-                value: normalizedParameters.value
-              })
-              return {
-                ...transaction,
-                source: transferDetails.from,
-                destination: transferDetails.to,
-                amount: parseFloat(transferDetails.amount),
-                symbol: contract.symbol
+              try {
+                const transferDetails = faProtocol.transferDetailsFromParameters({
+                  entrypoint: 'transfer',
+                  value: normalizedParameters.value
+                })
+                return {
+                  ...transaction,
+                  source: transferDetails.from,
+                  destination: transferDetails.to,
+                  amount: parseFloat(transferDetails.amount),
+                  symbol: contract.symbol
+                }
+              } catch (error) { 
+                // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                // in this case we return the normal operation so that at least it can be listed
+                return transaction
               }
             }
 
@@ -182,15 +194,15 @@ export const fillTransferOperations = (transactions: Transaction[], chainNetwork
           })
         )
       }
-
       return of(transaction)
     })
   )
+}
 
-  export const getDecimalsForSymbol = (symbol: string, network: TezosNetwork): number => {
-    const protocol = tryGetProtocolByIdentifier(symbol)
-    if (protocol) {
-      return protocol.decimals
-    }
-    return getTokenContractBySymbol(symbol, network).decimals ?? 0
+export const getDecimalsForSymbol = (symbol: string, network: TezosNetwork): number => {
+  const protocol = tryGetProtocolByIdentifier(symbol)
+  if (protocol) {
+    return protocol.decimals
   }
+  return getTokenContractBySymbol(symbol, network).decimals ?? 0
+}
