@@ -2,7 +2,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
 import { forkJoin, from, Observable, of } from 'rxjs'
-import { map, filter } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
 import { first } from '@tezblock/services/fp'
