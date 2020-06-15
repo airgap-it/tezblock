@@ -184,7 +184,7 @@ export const fillTransferOperations = (
                   symbol: contract.symbol
                 }
               } catch (error) { 
-                // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with ash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
                 // in this case we return the normal operation so that at least it can be listed
                 return transaction
               }
