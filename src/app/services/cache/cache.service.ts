@@ -51,7 +51,6 @@ export interface ByAddressState {
       }
     }
     frozenBalance: ByCycle<number>
-    account?: Account
   }
 }
 

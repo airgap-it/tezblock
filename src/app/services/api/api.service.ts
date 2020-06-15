@@ -467,44 +467,23 @@ export class ApiService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
-      switchMap(byAddressCache => {
-        const account: any = _get(byAddressCache, `${id}.account`)
-
-        if (account) {
-          return of(account as Account)
-        }
-
-        return this.http
-          .post<Account[]>(
-            this.accountsApiUrl,
+    return this.http
+      .post<Account[]>(
+        this.accountsApiUrl,
+        {
+          predicates: [
             {
-              predicates: [
-                {
-                  field: 'account_id',
-                  operation: 'eq',
-                  set: [id],
-                  inverse: false
-                }
-              ],
-              limit: 1
-            },
-            this.options
-          )
-          .pipe(
-            map(first),
-            tap(account =>
-              this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
-                ...byAddressCache,
-                [id]: {
-                  ..._get(byAddressCache, id),
-                  account
-                }
-              }))
-            )
-          )
-      })
-    )
+              field: 'account_id',
+              operation: 'eq',
+              set: [id],
+              inverse: false
+            }
+          ],
+          limit: 1
+        },
+        this.options
+      )
+      .pipe(map(first))
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
