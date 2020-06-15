@@ -2,6 +2,7 @@
   class="bg-white"
   [isMinimized]="router.url === '/'"
   [activeLinkBlockchain]="router.url.endsWith('/list')"
+  [activeLinkAssets]="router.url.startsWith('/token-contract/list/')"
   [activeLinkResources]="router.url.startsWith('/resources/')"
 ></header-item>
 <div class="container">
