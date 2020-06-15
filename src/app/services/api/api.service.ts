@@ -108,6 +108,11 @@ export class ApiService {
     this.setProperties()
   }
 
+  // method created to ease testing
+  private getUrl(domain: string): string {
+    return `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${domain}`
+  }
+
   private setProperties() {
     this.options = {
       headers: new HttpHeaders({
@@ -115,13 +120,13 @@ export class ApiService {
         apikey: this.environmentUrls.conseilApiKey
       })
     }
-    this.bakingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/baking_rights`
-    this.endorsingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/endorsing_rights`
-    this.blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
-    this.transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
-    this.accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
-    this.delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
-    this.accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
+    this.bakingRightsApiUrl = this.getUrl('baking_rights')
+    this.endorsingRightsApiUrl = this.getUrl('endorsing_rights')
+    this.blocksApiUrl = this.getUrl('blocks')
+    this.transactionsApiUrl = this.getUrl('operations')
+    this.accountsApiUrl = this.getUrl('accounts')
+    this.delegatesApiUrl = this.getUrl('delegates')
+    this.accountHistoryApiUrl = this.getUrl('accounts_history')
   }
 
   getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
@@ -490,6 +495,7 @@ export class ApiService {
       this.options
     )
   }
+
   getAccountsByIds(ids: string[]): Observable<Account[]> {
     return this.http.post<Account[]>(
       this.accountsApiUrl,
