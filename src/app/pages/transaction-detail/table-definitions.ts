@@ -66,6 +66,9 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       name: 'Parameters',
       field: 'parameters',
       template: Template.modal,
+      data: (item: Transaction) => ({
+        data: item.parameters_micheline ?? item.parameters
+      }),
       sortable: false
     },
     {

@@ -21,7 +21,7 @@ import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { distinctFilter, first, get, flatten } from '@tezblock/services/fp'
+import { distinctFilter, first, get, isNotEmptyArray, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation, Options, EnvironmentUrls } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
@@ -29,7 +29,7 @@ import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { getFaProtocol } from '@tezblock/domain/airgap'
+import { getFaProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 import { ProtocolVariablesService, ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 import * as fromRoot from '@tezblock/reducers'
 
@@ -256,6 +256,10 @@ export class ApiService {
   }
 
   addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {
+    if (!isNotEmptyArray(transactions)) {
+      return of([])
+    }
+
     kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
 
     if (kindList.includes('ballot') || kindList.includes('proposals')) {
@@ -1206,6 +1210,7 @@ export class ApiService {
       .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
   }
 
+  // not used anywhere
   getFrozenBalance(tzAddress: string): Observable<number> {
     return this.http
       .post<any[]>(
@@ -1438,7 +1443,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => balances.sort((a, b) => a.asof - b.asof)),
@@ -1506,7 +1511,7 @@ export class ApiService {
         map(balances =>
           balances.map(balance => ({
             ...balance,
-            balance: balance.balance / 1000000 // (1,000,000 mutez = 1 tez/XTZ)
+            balance: balance.balance / xtzToMutezConvertionRatio
           }))
         ),
         map(balances => {

@@ -90,13 +90,13 @@
                       else hideValue
                     "
                   >
-                    <h5 class="mb-0">
-                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async }
-                      }}{{
-                        account.balance
-                          | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }
-                          | number: '1.0-6'
-                      }}
+                    <h5
+                      *appVar="
+                        account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                      "
+                      class="mb-0"
+                    >
+                      {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
                     </h5>
                   </div>
                 </ng-container>
@@ -108,7 +108,7 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
                   <h5 class="d-inline-block m-0">
-                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) }}</span>
+                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
                   </h5>
                   <span
                     class="badge badge-pill ml-2"

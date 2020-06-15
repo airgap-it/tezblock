@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { forkJoin, from, Observable, pipe, of } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
 
@@ -196,7 +196,9 @@ export class ContractService extends BaseService {
         contractOperations.length > 0
           ? forkJoin(
               contractOperations.map(contractOperation =>
-                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+                from(
+                  faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+                ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
               )
             ).pipe(
               map(response =>
@@ -230,20 +232,25 @@ export class ContractService extends BaseService {
             ).pipe(
               map(response =>
                 contractOperations.map((contractOperation, index) => {
-                  const details = faProtocol.transferDetailsFromParameters({
-                    entrypoint: contractOperation.parameters_entrypoints,
-                    value: response[index].value
-                  })
-
-                  return {
-                    ...contractOperation,
-                    from: details.from,
-                    to: details.to,
-                    amount: details.amount,
-                    symbol: contract.symbol,
-                    decimals: contract.decimals
+                  try {
+                    const details = faProtocol.transferDetailsFromParameters({
+                      entrypoint: contractOperation.parameters_entrypoints,
+                      value: response[index].value
+                    })
+                    return {
+                      ...contractOperation,
+                      from: details.from,
+                      to: details.to,
+                      amount: details.amount,
+                      symbol: contract.symbol,
+                      decimals: contract.decimals
+                    }
+                  } catch {
+                    // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                    // in this case we return undefined because we cannot list it as a transfer operation since we cannot get out the details
+                    return undefined
                   }
-                })
+                }).filter(tx => tx !== undefined)
               )
             )
           : of([])
