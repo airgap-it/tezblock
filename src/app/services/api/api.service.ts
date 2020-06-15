@@ -485,7 +485,7 @@ export class ApiService {
       )
       .pipe(map(first))
   }
-
+  
   getAccountsByIds(ids: string[]): Observable<Account[]> {
     return this.http.post<Account[]>(
       this.accountsApiUrl,

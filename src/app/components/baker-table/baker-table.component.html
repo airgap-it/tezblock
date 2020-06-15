@@ -64,9 +64,18 @@
                 <h5 class="card-title__secondary mb-3">
                   Full Balance
                 </h5>
-                <h3>
+                <h3 class="d-inline-block">
                   <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                 </h3>
+                <ng-container
+                  *appVar="
+                    data?.stakingBond | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                  "
+                >
+                  <h5 class="text-secondary ml-2 d-inline-block">
+                    {{ 1 | currencySymbol: { currInfo: fiatCurrencyInfo$ | async } }}{{ value | number: getPrecision(value) }}
+                  </h5>
+                </ng-container>
               </div>
 
               <ng-container *ngIf="data?.stakingBalance; else loadingGraph">
@@ -107,6 +116,23 @@
                   </div>
                 </div>
               </ng-container>
+
+              <div class="row">
+                <div class="col-md-12 mb-4">
+                  <span class="badge badge-pill badge-light mr-2">
+                    <fa-icon
+                      [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
+                      [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
+                    ></fa-icon>
+                  </span>
+                  <ng-container *ngIf="data?.acceptsDelegations">
+                    Accepts Delegations
+                  </ng-container>
+                  <ng-container *ngIf="!data?.acceptsDelegations">
+                    Does Not Accept Delegations
+                  </ng-container>
+                </div>
+              </div>
 
               <div class="row">
                 <div class="col-md-12">
