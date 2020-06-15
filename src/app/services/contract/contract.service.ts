@@ -246,7 +246,7 @@ export class ContractService extends BaseService {
                       decimals: contract.decimals
                     }
                   } catch {
-                    // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with ash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                    // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
                     // in this case we return undefined because we cannot list it as a transfer operation since we cannot get out the details
                     return undefined
                   }
