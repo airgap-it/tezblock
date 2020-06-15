@@ -46,6 +46,8 @@ export type IconRef =
   | 'thumbsUp'
   | 'thumbsDown'
   | 'handRock'
+  | 'check'
+  | 'times'
 
 @Pipe({
   name: 'iconPipe'
@@ -115,7 +117,9 @@ export class IconPipe implements PipeTransform {
       coins: { prefix, iconName: 'coins' },
       thumbsUp: { prefix, iconName: 'thumbs-up' },
       thumbsDown: { prefix, iconName: 'thumbs-down' },
-      handRock: { prefix, iconName: 'hand-rock' }
+      handRock: { prefix, iconName: 'hand-rock' },
+      check: { prefix, iconName: 'check' },
+      times: { prefix, iconName: 'times' }
     }
   }
 
