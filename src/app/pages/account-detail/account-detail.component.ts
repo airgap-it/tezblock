@@ -3,7 +3,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, forkJoin, of } from 'rxjs'
+import { BehaviorSubject, Observable, combineLatest, forkJoin, of } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
@@ -13,13 +13,14 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { ChartOptions } from 'chart.js'
 import { FormControl } from '@angular/forms'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
+import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService } from '@tezblock/services/account/account.service'
+import { AccountService, getBakers } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -42,6 +43,7 @@ import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/am
 import { get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -129,7 +131,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
   delegationControl: FormControl
-  delegationControlDataSource$: Observable<string[]>
+  delegationControlDataSource$: BehaviorSubject<string[]>
+  selectedDelegation: string
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -225,6 +228,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
+    private readonly beaconService: BeaconService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly modalService: BsModalService,
@@ -240,7 +244,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
-    this.setupDelegationControl()
+    this.setupDelegation()
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.account$ = this.store$.select(state => state.accountDetails.account)
@@ -573,23 +577,39 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.tabbedTableComponent.onSelectTab(tab)
   }
 
-  onDelegationControlKeyEnter() {
-    //TODO
-  }
-
   onDelegationControlSelect(e: TypeaheadMatch) {
-    //TODO
+    this.selectedDelegation = e.value
+    this.delegationControl.setValue(null)
   }
 
-  onDelegationControlMouseDown() {
-    //TODO
+  delegate() {
+    this.beaconService
+      .delegate(this.address)
+      .then((response: OperationResponseOutput) => {
+        this.store$.dispatch(actions.loadDelegation())
+      })
+      .catch((operationError: BeaconErrorMessage) => {
+        // make any action ?
+      })
   }
 
-  private setupDelegationControl() {
+  private setupDelegation() {
+    const bakers = getBakers()
+
     this.delegationControl = new FormControl(null)
-    this.delegationControlDataSource$ = of(Object.keys(accounts))
+    this.delegationControlDataSource$ = new BehaviorSubject(bakers.map(baker => baker.address))
+    this.selectedDelegation = get<JsonAccountData>(baker => baker.address)(bakers.find(baker => baker.alias === 'AirGap'))
 
-    this.delegationControl.valueChanges.subscribe(value => console.log(`>>>>>>>> ${value}`))
+    this.subscriptions.push(
+      this.delegationControl.valueChanges.subscribe(value => {
+        if (!value) {
+          this.delegationControlDataSource$.next(bakers.map(baker => baker.address))
+        }
+
+        const filteredBakers = bakers.filter(baker => baker.address.toLowerCase().includes(value.toLowerCase())).map(baker => baker.address)
+        this.delegationControlDataSource$.next(filteredBakers)
+      })
+    )
   }
 
   private setTabs(pageId: string) {

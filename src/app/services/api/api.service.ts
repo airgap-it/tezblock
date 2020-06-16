@@ -498,6 +498,7 @@ export class ApiService {
   }
 
   getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+    // TODO: decouple accounts.service from api.service, then use getBakers
     const bakers: SearchOption[] = Object.keys(accounts)
       .map(key => accounts[key])
       .filter(

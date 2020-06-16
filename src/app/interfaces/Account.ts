@@ -1,13 +1,21 @@
+// in accounts.json file
+export interface JsonAccountData {
+  address: string
+  alias: string
+  hasLogo: boolean
+  hasPayoutAddress?: string
+  logoReference?: string
+  accountType?: string
+}
+
 export interface Account {
   block_level: number
   balance: number
   delegate_value: string
   account_id: string
   manager: string
-  storage?: any // TODO: any, both don't seem to be used
   counter: number
   block_id: string
-  script?: any
   proposal: string
-  is_baker?: boolean
+  is_baker: boolean
 }

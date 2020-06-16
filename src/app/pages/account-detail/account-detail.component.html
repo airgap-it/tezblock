@@ -205,8 +205,15 @@
                 <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
                 <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
 
+                <div class="float-left">
+                  <span>Delegate to</span>
+                  <address-item [address]="selectedDelegation" [clickableButton]="false"></address-item>
+                </div>
+                <button class="btn btn-sm btn-primary-light w-100 mb-2" type="button" (click)="delegate()">
+                  Delegate Now
+                </button>
                 <ng-template #delegationControlTemplate let-model="item" let-index="index">
-                  <address-item [address]="model"></address-item>
+                  <address-item [address]="model" [clickableButton]="false"></address-item>
                 </ng-template>
                 <input
                   [formControl]="delegationControl"
@@ -218,9 +225,7 @@
                   [typeaheadOptionsInScrollableView]="10"
                   placeholder="Search by Address / Alias"
                   class="form-control form-control--focus-white"
-                  (keydown.enter)="onDelegationControlKeyEnter()"
                   (typeaheadOnSelect)="onDelegationControlSelect($event)"
-                  (mousedown)="onDelegationControlMouseDown()"
                   [typeaheadIsFirstItemActive]="false"
                   [isAnimated]="true"
                 />
