@@ -5,13 +5,14 @@ import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/op
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { CurrentCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Currency } from '@tezblock/domain/airgap'
@@ -23,6 +24,8 @@ export class AppEffects {
   loadLatestBlock$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadLatestBlock),
+      withLatestFrom(this.store$.select(state => state.app.latestBlock)),
+      filter(([action, latestBlock]) => !latestBlock || moment().diff(moment(latestBlock.timestamp), 'seconds') > 60),
       switchMap(() =>
         this.blockService.getLatest().pipe(
           map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
@@ -41,11 +44,11 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<ByCycleState>(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
           this.cacheService
-            .set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
+            .set<CurrentCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
             .subscribe(() => {})
         })
       ),
