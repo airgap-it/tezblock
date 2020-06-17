@@ -11,8 +11,8 @@ import * as actions from './actions'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { AccountService } from '@tezblock/services/account/account.service'
-import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
-import { first, flatten } from '@tezblock/services/fp'
+import { CurrentCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { flatten } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromReducer from './reducer'
 import { aggregateOperationCounts } from '@tezblock/domain/tab'
@@ -29,7 +29,7 @@ export class AccountDetailEffects {
       ofType(actions.loadAccount),
       switchMap(({ address }) =>
         this.apiService.getAccountById(address).pipe(
-          map(accounts => actions.loadAccountSucceeded({ account: first(accounts) })),
+          map(account => actions.loadAccountSucceeded({ account })),
           catchError(error => of(actions.loadAccountFailed({ error })))
         )
       )
@@ -198,7 +198,7 @@ export class AccountDetailEffects {
         ofType(actions.loadBakingBadRatingsSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([action, state]) =>
-          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
@@ -250,7 +250,7 @@ export class AccountDetailEffects {
         ofType(actions.loadTezosBakerRatingSucceeded),
         withLatestFrom(this.store$.select(state => state.accountDetails)),
         tap(([{ response, address }, state]) =>
-          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),

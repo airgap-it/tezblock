@@ -28,8 +28,8 @@ export class BlockService {
   constructor(private readonly apiService: ApiService) {}
 
   getById(level: string, fields?: string[]): Observable<Block> {
-    return this.apiService.getBlockById(level).pipe(
-      switchMap(blocks => this.getAdditionalBlockData(blocks, fields)),
+    return this.apiService.getBlockByLevel(level).pipe(
+      switchMap(block => this.getAdditionalBlockData([block], fields)),
       map(first)
     )
   }

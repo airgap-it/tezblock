@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core'
 import { pipe } from 'rxjs'
 
 import { leadingZeros, trailingZeros } from '@tezblock/domain/pattern'
+import { get } from '@tezblock/services/fp'
 
 @Pipe({
   name: 'decimalsFormatter'
@@ -15,8 +16,9 @@ export class DecimalsFormatterPipe implements PipeTransform {
     const stringValue: string = value.toString()
     const valueParts: string[] = stringValue.split('.')
     const decimals: string = valueParts[1]
+    const isZero = (value: string): boolean => get<string>(_value => parseInt(_value) === 0)(value)
 
-    if (!decimals) {
+    if (!decimals || isZero(decimals)) {
       return value
     }
 

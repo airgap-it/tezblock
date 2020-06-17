@@ -1,59 +1,163 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { ChartsModule } from 'ng2-charts'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
+import { Actions } from '@ngrx/effects'
+import { EMPTY, of } from 'rxjs'
+import { BreakpointObserver } from '@angular/cdk/layout'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { BakerOverviewComponent } from './baker-overview.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
-import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
-import { ChartItemComponent } from '@tezblock/components/chart-item/chart-item.component'
-import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { AccountItemComponent } from '@tezblock/components/account-item/account-item.component'
-import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
-import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
-import { AddressItemComponent } from '@tezblock/components/address-item/address-item.component'
-import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
-import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
-import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
-import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { initialState as boInitialState } from './reducer'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { getBreakpointObserverMock, getObserveValue } from 'test-config/mocks/breakpoint-observer.mock'
 
-// TODO: problem: Failed: Template parse errors: Can't bind to 'address' since it isn't a known property of 'address-item'.
-xdescribe('BakerOverviewComponent', () => {
+describe('BakerOverviewComponent', () => {
   let component: BakerOverviewComponent
   let fixture: ComponentFixture<BakerOverviewComponent>
+  let testScheduler: TestScheduler
+  let storeMock: MockStore<any>
+  const initialState = { bakers: boInitialState }
+  const aliasPipeMock = getPipeMock()
+  const amountConverterPipeMock = getPipeMock()
+  const breakpointObserverMock = getBreakpointObserverMock()
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
+    testScheduler = new TestScheduler((actual, expected) => {
+      // asserting the two objects are equal
+      expect(actual).toEqual(expected)
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        declarations: [
-          BakerOverviewComponent,
-          LoadingSkeletonComponent,
-          ChartItemComponent,
-          TezblockTableComponent,
-          IdenticonComponent,
-          AccountItemComponent,
-          AddressItemComponent,
-          AmountCellComponent,
-          BlockCellComponent,
-          SymbolCellComponent,
-          HashCellComponent,
-          ModalCellComponent,
-          ExtendTableCellComponent
-        ],
-        imports: [FontAwesomeModule, ChartsModule]
-      })
-    ).compileComponents()
+    TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      declarations: [BakerOverviewComponent],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: Actions, useValue: EMPTY },
+        { provide: AliasPipe, useValue: aliasPipeMock },
+        { provide: AmountConverterPipe, useValue: amountConverterPipeMock },
+        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+      ]
+    })
   }))
 
   beforeEach(() => {
     fixture = TestBed.createComponent(BakerOverviewComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
+    storeMock = TestBed.inject(MockStore)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  describe('ngOnInit', () => {
+    describe('top24ChartLabels$', () => {
+      beforeEach(() => {
+        component.ngOnInit()
+      })
+
+      it('when top24Bakers is NOT array then does not emit', () => {
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = '---'
+
+          expectObservable(component.top24ChartLabels$).toBe(expected)
+        })
+      })
+
+      it('when top24Bakers pkh is "Others" then  returns "Others -"', () => {
+        storeMock.setState({
+          ...initialState,
+          bakers: {
+            top24Bakers: [
+              { pkh: 'Others' },
+              { pkh: 'Others' }
+            ]
+          }
+        })
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = 'a'
+          const expectedValues = { a: ['Others -', 'Others -'] }
+
+          expectObservable(component.top24ChartLabels$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when aliasPipe.transform of top24Bakers.pkh has value then uses it', () => {
+        storeMock.setState({
+          ...initialState,
+          bakers: {
+            top24Bakers: [
+              { pkh: 'A' },
+              { pkh: 'B' }
+            ]
+          }
+        })
+
+        aliasPipeMock.transform.and.returnValue('FOO')
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = 'a'
+          const expectedValues = { a: ['FOO -', 'FOO -'] }
+
+          expectObservable(component.top24ChartLabels$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when aliasPipe.transform of top24Bakers.pkh has NO value then uses top24Bakers.pkh', () => {
+        storeMock.setState({
+          ...initialState,
+          bakers: {
+            top24Bakers: [
+              { pkh: 'A' },
+              { pkh: 'B' }
+            ]
+          }
+        })
+
+        aliasPipeMock.transform.and.returnValue(undefined)
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = 'a'
+          const expectedValues = { a: ['A -', 'B -'] }
+
+          expectObservable(component.top24ChartLabels$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('top24ChartSize$', () => {
+      it('when Breakpoints.Small, Breakpoints.Handset are emited returns small size', () => {
+        breakpointObserverMock.observe.and.returnValue(of(getObserveValue(true)))
+        component.ngOnInit()
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = '(a|)'
+          const expectedValues = { a: { width: 200, height: 200 } }
+
+          expectObservable(component.top24ChartSize$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when NOT Breakpoints.Small, Breakpoints.Handset are emited returns big size', () => {
+        breakpointObserverMock.observe.and.returnValue(of(getObserveValue(false)))
+        component.ngOnInit()
+
+        testScheduler.run(helpers => {
+          const { expectObservable } = helpers
+          const expected = '(a|)'
+          const expectedValues = { a: { width: 800, height: 480 } }
+
+          expectObservable(component.top24ChartSize$).toBe(expected, expectedValues)
+        })
+      })
+    })
   })
 })

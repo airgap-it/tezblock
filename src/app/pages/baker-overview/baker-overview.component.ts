@@ -51,7 +51,6 @@ const palette = [
   '#3f51b5',
   '#5c6bc0',
   '#0d47a1',
-  // plus some 6 random ones ...
   '#e91e63',
   '#d81b60',
   '#c2185b',

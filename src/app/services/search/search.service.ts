@@ -74,7 +74,7 @@ export class SearchService {
       subscriptions.push(
         this.apiService
           .getAccountById(_searchTerm)
-          .pipe(map(first), filter(negate(isNil)))
+          .pipe(filter(negate(isNil)))
           .subscribe(account => processResult(account, () => this.router.navigateByUrl('/account/' + _searchTerm))),
         this.apiService
           .getTransactionsById(_searchTerm, 1)
@@ -90,8 +90,8 @@ export class SearchService {
               this.router.navigateByUrl('/transaction/' + _searchTerm)
             })
           ),
-        merge(this.apiService.getBlockByHash(_searchTerm), this.apiService.getBlockById(_searchTerm))
-          .pipe(map(first), filter(negate(isNil)))
+        merge(this.apiService.getBlockByHash(_searchTerm), this.apiService.getBlockByLevel(_searchTerm))
+          .pipe(filter(negate(isNil)))
           .subscribe(block => processResult(block, () => this.router.navigateByUrl('/block/' + block.level)))
       )
     }
