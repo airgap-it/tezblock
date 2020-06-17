@@ -31,7 +31,6 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TranslateService } from '@ngx-translate/core'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
@@ -39,9 +38,10 @@ import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/curren
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { get } from '@tezblock/services/fp'
+import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -128,6 +128,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
+  isExchange: boolean
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -355,15 +356,22 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
+        const jsonAccount = accounts[address]
 
         this.reset()
         this.setTabs(address)
         this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
 
-        if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
-          this.hasAlias = true
-          this.hasLogo = accounts[address].hasLogo
+        if (jsonAccount) {
+          this.hasAlias = !!this.aliasPipe.transform(address)
+          this.hasLogo = jsonAccount.hasLogo
+          this.isExchange = jsonAccount.isExchange
+        }
+
+        this.bakerTableInfos = {
+          ...this.bakerTableInfos,
+          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -373,22 +381,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .select(state => state.accountDetails.delegatedAccounts)
         .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
         .subscribe(delegatedAccounts => {
-          if (!delegatedAccounts) {
+          const delegatedAccount: Account = first(delegatedAccounts)
+
+          if (!delegatedAccounts /* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (delegatedAccounts.length > 0) {
-            this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate_value
-            this.delegatedAmount = delegatedAccounts[0].balance
-            this.setRewardAmont()
+          if (!delegatedAccount /* delegatedAccounts is [<empty> | null | undefined] */) {
+            this.delegatedAccountAddress = ''
 
             return
           }
 
-          this.delegatedAccountAddress = ''
+          this.delegatedAccountAddress = delegatedAccount.account_id
+          this.bakerAddress = delegatedAccount.delegate_value
+          this.delegatedAmount = delegatedAccount.balance
+          this.setRewardAmont()
         }),
 
       // refresh account

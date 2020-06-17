@@ -223,6 +223,7 @@
   "account-detail": {
     "revealed": "Revealed",
     "not-revealed": "Not Revealed",
+    "exchange": "Exchange",
     "balance": "Balance",
     "value": "Value",
     "related-accounts": "Related Accounts",
