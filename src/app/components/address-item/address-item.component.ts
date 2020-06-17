@@ -16,7 +16,6 @@ export interface Options {
   hideIdenticon?: boolean
   comparisonTimestamp?: number
   kind?: string //TODO: not needed probably
-  translate?: any
 }
 
 @Component({

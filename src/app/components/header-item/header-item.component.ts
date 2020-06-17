@@ -9,6 +9,7 @@ import { map } from 'rxjs/operators'
 
 import * as fromRoot from '@tezblock/reducers'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { LanguagesService } from '@tezblock/services/translation/languages.service'
 
 @Component({
   selector: 'header-item',
@@ -42,7 +43,8 @@ export class HeaderItemComponent {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private readonly translate: TranslateService
+    public translate: TranslateService,
+    private readonly languagesService: LanguagesService
   ) {
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
     this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress)
@@ -67,5 +69,8 @@ export class HeaderItemComponent {
 
   public changeNetwork(name: TezosNetwork) {
     this.chainNetworkService.changeEnvironment(name)
+  }
+  changeLanguage(language: string) {
+    this.languagesService.loadLanguages(language)
   }
 }

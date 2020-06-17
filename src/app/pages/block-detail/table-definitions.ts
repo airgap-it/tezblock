@@ -4,10 +4,12 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TranslateService } from '@ngx-translate/core'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 
-export const columns: { [key: string]: (options: { pageId: string; showFiatValue: boolean; translate?: any }) => Column[] } = {
-  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
+export const columns: {
+  [key: string]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => Column[]
+} = {
+  [OperationTypes.Transaction]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.transaction.from'),
+      name: translateService.instant('tezblock-table.transaction.from'),
       field: 'source',
       width: '1',
       template: Template.address,
@@ -21,7 +23,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.transaction.to'),
+      name: translateService.instant('tezblock-table.transaction.to'),
       field: 'destination',
       width: '1',
       data: (item: Transaction) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } }),
@@ -29,7 +31,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.transaction.amount'),
+      name: translateService.instant('tezblock-table.transaction.amount'),
       field: 'amount',
       data: (item: Transaction) => ({
         data: item.amount,
@@ -44,7 +46,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.transaction.fee'),
+      name: translateService.instant('tezblock-table.transaction.fee'),
       field: 'fee',
       data: (item: Transaction) => ({
         data: item.fee,
@@ -54,12 +56,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.transaction.gas-limit'),
+      name: translateService.instant('tezblock-table.transaction.gas-limit'),
       field: 'gas_limit',
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.transaction.tx-hash'),
+      name: translateService.instant('tezblock-table.transaction.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: any) => ({ data: item.operation_group_hash }),
@@ -67,9 +69,9 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     }
   ],
 
-  [OperationTypes.Delegation]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
+  [OperationTypes.Delegation]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.delegation.delegator'),
+      name: translateService.instant('tezblock-table.delegation.delegator'),
       field: 'source',
       width: '1',
       template: Template.address,
@@ -83,7 +85,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.delegation.baker'),
+      name: translateService.instant('tezblock-table.delegation.baker'),
       field: 'delegate',
       width: '1',
       template: Template.address,
@@ -94,14 +96,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.delegation.amount'),
+      name: translateService.instant('tezblock-table.delegation.amount'),
       field: 'delegatedBalance',
       template: Template.amount,
       data: (item: Transaction) => ({ data: item.delegatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.delegation.fee'),
+      name: translateService.instant('tezblock-table.delegation.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
@@ -111,12 +113,12 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.delegation.gas-limit'),
+      name: translateService.instant('tezblock-table.delegation.gas-limit'),
       field: 'gas_limit',
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.delegation.tx-hash'),
+      name: translateService.instant('tezblock-table.delegation.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: any) => ({ data: item.operation_group_hash }),
@@ -124,9 +126,9 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     }
   ],
 
-  [OperationTypes.Origination]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
+  [OperationTypes.Origination]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.origination.new-account'),
+      name: translateService.instant('tezblock-table.origination.new-account'),
       field: 'originated_contracts',
       width: '1',
       template: Template.address,
@@ -134,14 +136,14 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.origination.balance'),
+      name: translateService.instant('tezblock-table.origination.balance'),
       field: 'originatedBalance',
       template: Template.amount,
       data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } }),
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.origination.originator'),
+      name: translateService.instant('tezblock-table.origination.originator'),
       field: 'source',
       width: '1',
       template: Template.address,
@@ -149,7 +151,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.origination.baker'),
+      name: translateService.instant('tezblock-table.origination.baker'),
       field: 'delegate',
       width: '1',
       template: Template.address,
@@ -157,7 +159,7 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.origination.fee'),
+      name: translateService.instant('tezblock-table.origination.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: Transaction) => ({
@@ -167,19 +169,19 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.origination.burn'),
+      name: translateService.instant('tezblock-table.origination.burn'),
       field: 'burn',
       template: Template.amount,
       data: (item: Transaction) => ({ data: item.burn, options: { showFiatValue: false } }),
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.origination.gas-limit'),
+      name: translateService.instant('tezblock-table.origination.gas-limit'),
       field: 'gas_limit',
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.origination.tx-hash'),
+      name: translateService.instant('tezblock-table.origination.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: any) => ({ data: item.operation_group_hash }),
@@ -187,27 +189,27 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     }
   ],
 
-  [OperationTypes.Endorsement]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
+  [OperationTypes.Endorsement]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.endorsement.endorser'),
+      name: translateService.instant('tezblock-table.endorsement.endorser'),
       field: 'delegate',
       template: Template.address,
       data: (item: Transaction) => ({ data: item.delegate, options: { showFullAddress: false, pageId: options.pageId } }),
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement.age'),
+      name: translateService.instant('tezblock-table.endorsement.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement.slots'),
+      name: translateService.instant('tezblock-table.endorsement.slots'),
       field: 'slots',
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement.tx-hash'),
+      name: translateService.instant('tezblock-table.endorsement.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } }),
@@ -215,21 +217,21 @@ export const columns: { [key: string]: (options: { pageId: string; showFiatValue
     }
   ],
 
-  [OperationTypes.Activation]: (options: { pageId: string; showFiatValue: boolean; translate?: TranslateService }) => [
+  [OperationTypes.Activation]: (options: { pageId: string; showFiatValue: boolean }, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.activation.account'),
+      name: translateService.instant('tezblock-table.activation.account'),
       field: 'pkh',
       template: Template.address,
       data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true, pageId: options.pageId } }),
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.activation.secret'),
+      name: translateService.instant('tezblock-table.activation.secret'),
       field: 'secret',
       sortable: false
     },
     {
-      name: options.translate.instant('tezblock-table.activation.tx-hash'),
+      name: translateService.instant('tezblock-table.activation.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.operation_group_hash }),

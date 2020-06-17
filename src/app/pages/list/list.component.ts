@@ -126,7 +126,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
             )
             this.setupTable(
-              columns[OperationTypes.Block]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }, this.translateService),
               blockData$,
               blockLoading$,
               blockOrderBy$
@@ -182,7 +182,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactions()))
             )
             this.setupTable(
-              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }, this.translateService),
               transactionData$,
               transactionLoading$,
               transactionOrderBy$
@@ -213,7 +213,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadActivations()))
             )
             this.setupTable(
-              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }, this.translateService),
               activationsData$,
               activationsLoading$,
               activationsOrderBy$
@@ -245,7 +245,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadOriginations()))
             )
             this.setupTable(
-              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }, this.translateService),
               originationsData$,
               originationsLoading$,
               originationsOrderBy$
@@ -263,7 +263,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDelegations()))
             )
             this.setupTable(
-              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }, this.translateService),
               delegationsData$,
               delegationsLoading$,
               delegationsOrderBy$
@@ -281,7 +281,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }, this.translateService),
               endorsementsData$,
               endorsementsLoading$,
               endorsementsOrderBy$
@@ -299,7 +299,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadVotes()))
             )
             this.setupTable(
-              columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }, this.translateService),
               votesData$,
               votesLoading$,
               votesOrderBy$
@@ -317,7 +317,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleBakings()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }, this.translateService),
               dbData$,
               dbLoading$,
               dbOrderBy$
@@ -335,10 +335,12 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({
-                showFiatValue: this.isMainnet,
-                translate: this.translateService
-              }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview](
+                {
+                  showFiatValue: this.isMainnet
+                },
+                this.translateService
+              ),
               deData$,
               deLoading$,
               deOrderBy$
@@ -356,10 +358,12 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({
-                showFiatValue: this.isMainnet,
-                translate: this.translateService
-              }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview](
+                {
+                  showFiatValue: this.isMainnet
+                },
+                this.translateService
+              ),
               bakersData$,
               bakersLoading$,
               bakersOrderBy$
@@ -386,7 +390,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadProposals()))
             )
             this.setupTable(
-              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }, this.translateService),
               proposalData$,
               proposalLoading$,
               proposalOrderBy$,
@@ -401,7 +405,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.store$.dispatch(actions.loadContracts())
 
             this.setupTable(
-              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet, translate: this.translateService }),
+              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }, this.translateService),
               contractsData$,
               loadingContracts$,
               contractsOrderBy$,

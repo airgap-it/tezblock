@@ -6,29 +6,29 @@ import { squareBrackets } from '@tezblock/domain/pattern'
 import { Account } from '@tezblock/interfaces/Account'
 import { TranslateService } from '@ngx-translate/core'
 
-export const columns: { [key: string]: (options?: { showFiatValue?: boolean; translate?: any }) => Column[] } = {
+export const columns: { [key: string]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => Column[] } = {
   /* BLOCK */
-  [OperationTypes.Block]: (options: { translate?: TranslateService }) => [
+  [OperationTypes.Block]: (options: {}, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.block-list.baker'),
+      name: translateService.instant('tezblock-table.block-list.baker'),
       field: 'baker',
       width: '1',
       template: Template.address
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.age'),
+      name: translateService.instant('tezblock-table.block-list.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.transaction-volume'),
+      name: translateService.instant('tezblock-table.block-list.transaction-volume'),
       field: 'volume',
       template: Template.amount,
       data: (item: Block) => ({ data: item.volume, options: { comparisonTimestamp: item.timestamp } })
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.fee'),
+      name: translateService.instant('tezblock-table.block-list.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: Block) => ({
@@ -37,15 +37,15 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
       })
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.transactions'),
+      name: translateService.instant('tezblock-table.block-list.transactions'),
       field: 'txcount'
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.fitness'),
+      name: translateService.instant('tezblock-table.block-list.fitness'),
       field: 'fitness'
     },
     {
-      name: options.translate.instant('tezblock-table.block-list.block'),
+      name: translateService.instant('tezblock-table.block-list.block'),
       field: 'level',
       template: Template.block,
       sortable: true
@@ -53,12 +53,10 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
   ],
 
   /* TANSACTION */
-  [OperationTypes.Transaction]: (
-    options: { showFiatValue?: boolean; translate?: any } = { showFiatValue: true, translate: TranslateService }
-  ) =>
+  [OperationTypes.Transaction]: (options: { showFiatValue?: boolean } = { showFiatValue: true }, translateService: TranslateService) =>
     [
       {
-        name: options.translate.instant('tezblock-table.transaction-list.from'),
+        name: translateService.instant('tezblock-table.transaction-list.from'),
         field: 'source',
         width: '1',
         template: Template.address
@@ -69,26 +67,26 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         template: Template.symbol
       },
       {
-        name: options.translate.instant('tezblock-table.transaction-list.to'),
+        name: translateService.instant('tezblock-table.transaction-list.to'),
         field: 'destination',
         width: '1',
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.transaction-list.age'),
+        name: translateService.instant('tezblock-table.transaction-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.transaction-list.amount'),
+        name: translateService.instant('tezblock-table.transaction-list.amount'),
         field: 'amount',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.amount, options: { ...options, comparisonTimestamp: item.timestamp } }),
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.transaction-list.fees'),
+        name: translateService.instant('tezblock-table.transaction-list.fees'),
         field: 'fee',
         template: Template.amount,
         data: (item: Transaction) => ({
@@ -98,65 +96,63 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.transaction-list.parameters'),
+        name: translateService.instant('tezblock-table.transaction-list.parameters'),
         field: 'parameters',
         template: Template.modal
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* ACTIVATION */
-  [OperationTypes.Activation]: (options: { translate?: TranslateService }) =>
+  [OperationTypes.Activation]: (options: {}, translateService?: TranslateService) =>
     [
       {
-        name: options.translate.instant('tezblock-table.activation-list.account'),
+        name: translateService.instant('tezblock-table.activation-list.account'),
         field: 'pkh',
         width: '1',
         template: Template.address,
         data: (item: Transaction) => ({ data: item.pkh, options: { showFullAddress: true } })
       },
       {
-        name: options.translate.instant('tezblock-table.activation-list.age'),
+        name: translateService.instant('tezblock-table.activation-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.activation-list.secret'),
+        name: translateService.instant('tezblock-table.activation-list.secret'),
         field: 'secret'
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* ORIGINATION */
-  [OperationTypes.Origination]: (
-    options: { showFiatValue?: boolean; translate?: any } = { showFiatValue: true, translate: TranslateService }
-  ) =>
+  [OperationTypes.Origination]: (options: { showFiatValue?: boolean } = { showFiatValue: true }, translateService: TranslateService) =>
     [
       {
-        name: options.translate.instant('tezblock-table.origination-list.new-account'),
+        name: translateService.instant('tezblock-table.origination-list.new-account'),
         field: 'originated_contracts',
         width: '1',
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.origination-list.age'),
+        name: translateService.instant('tezblock-table.origination-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.origination-list.balance'),
+        name: translateService.instant('tezblock-table.origination-list.balance'),
         field: 'originatedBalance',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.originatedBalance, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
-        name: options.translate.instant('tezblock-table.origination-list.originator'),
+        name: translateService.instant('tezblock-table.origination-list.originator'),
         field: 'source',
         width: '1',
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.origination-list.baker'),
+        name: translateService.instant('tezblock-table.origination-list.baker'),
         field: 'delegate',
         width: '1',
         template: Template.address,
@@ -166,7 +162,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         })
       },
       {
-        name: options.translate.instant('tezblock-table.origination-list.fee'),
+        name: translateService.instant('tezblock-table.origination-list.fee'),
         field: 'fee',
         template: Template.amount,
         data: (item: Transaction) => ({
@@ -175,15 +171,13 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         }),
         sortable: true
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* DELEGATION */
-  [OperationTypes.Delegation]: (
-    options: { showFiatValue?: boolean; translate?: any } = { showFiatValue: true, translate: TranslateService }
-  ) =>
+  [OperationTypes.Delegation]: (options: { showFiatValue?: boolean } = { showFiatValue: true }, translateService: TranslateService) =>
     [
       {
-        name: options.translate.instant('tezblock-table.delegation-list.delegator'),
+        name: translateService.instant('tezblock-table.delegation-list.delegator'),
         field: 'source',
         width: '1',
         template: Template.address
@@ -194,7 +188,7 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         template: Template.symbol
       },
       {
-        name: options.translate.instant('tezblock-table.delegation-list.baker'),
+        name: translateService.instant('tezblock-table.delegation-list.baker'),
         field: 'delegate',
         width: '1',
         template: Template.address,
@@ -204,19 +198,19 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         })
       },
       {
-        name: options.translate.instant('tezblock-table.delegation-list.age'),
+        name: translateService.instant('tezblock-table.delegation-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.delegation-list.value'),
+        name: translateService.instant('tezblock-table.delegation-list.value'),
         field: 'amount',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.fee, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
-        name: options.translate.instant('tezblock-table.delegation-list.fee'),
+        name: translateService.instant('tezblock-table.delegation-list.fee'),
         field: 'fee',
         template: Template.amount,
         data: (item: Transaction) => ({
@@ -226,36 +220,36 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.delegation-list.gas-limit'),
+        name: translateService.instant('tezblock-table.delegation-list.gas-limit'),
         field: 'gas_limit'
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* ENDORSEMENT */
-  [OperationTypes.Endorsement]: (options: { translate?: TranslateService }) => [
+  [OperationTypes.Endorsement]: (options: {}, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.endorsement-list.endorser'),
+      name: translateService.instant('tezblock-table.endorsement-list.endorser'),
       field: 'delegate',
       template: Template.address
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement-list.age'),
+      name: translateService.instant('tezblock-table.endorsement-list.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement-list.slots'),
+      name: translateService.instant('tezblock-table.endorsement-list.slots'),
       field: 'slots'
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement-list.block'),
+      name: translateService.instant('tezblock-table.endorsement-list.block'),
       field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.endorsement-list.tx-hash'),
+      name: translateService.instant('tezblock-table.endorsement-list.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.operation_group_hash, options: { kind: 'endorsement' } })
@@ -263,170 +257,172 @@ export const columns: { [key: string]: (options?: { showFiatValue?: boolean; tra
   ],
 
   /* BALLOT */
-  [OperationTypes.Ballot]: (options: { translate?: TranslateService }) =>
+  [OperationTypes.Ballot]: (options: {}, translateService?: TranslateService) =>
     [
       {
-        name: options.translate.instant('tezblock-table.votes-list.baker'),
+        name: translateService.instant('tezblock-table.votes-list.baker'),
         field: 'source',
         width: '1',
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.ballot'),
+        name: translateService.instant('tezblock-table.votes-list.ballot'),
         field: 'ballot',
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.age'),
+        name: translateService.instant('tezblock-table.votes-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.kind'),
+        name: translateService.instant('tezblock-table.votes-list.kind'),
         field: 'kind',
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.voting-period'),
+        name: translateService.instant('tezblock-table.votes-list.voting-period'),
         field: 'voting_period'
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.number-of-votes'),
+        name: translateService.instant('tezblock-table.votes-list.number-of-votes'),
         field: 'votes'
       },
       {
-        name: options.translate.instant('tezblock-table.votes-list.proposal'),
+        name: translateService.instant('tezblock-table.votes-list.proposal'),
         field: 'proposal',
         template: Template.hash,
         data: (item: Transaction) => ({ data: item.proposal, options: { kind: 'proposal' } })
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* DOUBE BAKING */
   [OperationTypes.DoubleBakingEvidenceOverview]: (
-    options: { showFiatValue?: boolean; translate?: any } = { showFiatValue: true, translate: TranslateService }
+    options: { showFiatValue?: boolean } = { showFiatValue: true },
+    translateService: TranslateService
   ) =>
     [
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.baker'),
+        name: translateService.instant('tezblock-table.double-baking-list.baker'),
         field: 'baker',
 
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.age'),
+        name: translateService.instant('tezblock-table.double-baking-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.reward'),
+        name: translateService.instant('tezblock-table.double-baking-list.reward'),
         field: 'reward',
 
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.offender'),
+        name: translateService.instant('tezblock-table.double-baking-list.offender'),
         field: 'offender',
 
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.denounced-level'),
+        name: translateService.instant('tezblock-table.double-baking-list.denounced-level'),
         field: 'denouncedLevel',
 
         template: Template.block
       },
       {
-        name: options.translate.instant('tezblock-table.double-baking-list.lost-amount'),
+        name: translateService.instant('tezblock-table.double-baking-list.lost-amount'),
         field: 'lostAmount',
 
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* DOUBLE ENDORSEMENT */
   [OperationTypes.DoubleEndorsementEvidenceOverview]: (
-    options: { showFiatValue?: boolean; translate?: any } = { showFiatValue: true, translate: TranslateService }
+    options: { showFiatValue?: boolean } = { showFiatValue: true },
+    translateService: TranslateService
   ) =>
     [
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.baker'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.baker'),
         field: 'baker',
 
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.age'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.age'),
         field: 'timestamp',
         template: Template.timestamp,
         sortable: true
       },
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.reward'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.reward'),
         field: 'reward',
 
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.reward, options: { ...options, comparisonTimestamp: item.timestamp } })
       },
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.offender'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.offender'),
         field: 'offender',
         template: Template.address
       },
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.denounced-level'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.denounced-level'),
         field: 'denouncedLevel',
         template: Template.block
       },
       {
-        name: options.translate.instant('tezblock-table.double-endorsement-list.lost-amount'),
+        name: translateService.instant('tezblock-table.double-endorsement-list.lost-amount'),
         field: 'lostAmount',
         template: Template.amount,
         data: (item: Transaction) => ({ data: item.lostAmount, options: { ...options, comparisonTimestamp: item.timestamp } })
       }
-    ].concat(<any>blockAndTxHashColumns(options.translate)),
+    ].concat(<any>blockAndTxHashColumns(translateService)),
 
   /* PROPOSAL */
-  [OperationTypes.ProposalOverview]: (options: { translate?: TranslateService }) => [
+  [OperationTypes.ProposalOverview]: (options: {}, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.proposal-list.proposal'),
+      name: translateService.instant('tezblock-table.proposal-list.proposal'),
       field: 'proposal',
       template: Template.hash,
       data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, ''), options: { kind: 'proposal' } })
     },
     {
-      name: options.translate.instant('tezblock-table.proposal-list.proposal-hash'),
+      name: translateService.instant('tezblock-table.proposal-list.proposal-hash'),
       field: 'proposal',
       data: (item: Transaction) => ({ data: item.proposal.replace(squareBrackets, '') })
     },
     {
-      name: options.translate.instant('tezblock-table.proposal-list.period'),
+      name: translateService.instant('tezblock-table.proposal-list.period'),
       field: 'period'
     }
   ],
 
   /* CONTRACT */
-  [OperationTypes.Contract]: (options: { translate?: TranslateService }) => [
+  [OperationTypes.Contract]: (options: {}, translateService?: TranslateService) => [
     {
-      name: options.translate.instant('tezblock-table.contract-list.account'),
+      name: translateService.instant('tezblock-table.contract-list.account'),
       field: 'account_id',
       width: '40%',
       template: Template.address,
       data: (item: Account) => ({ data: item.account_id, options: { showAlliasOrFullAddress: true } })
     },
     {
-      name: options.translate.instant('tezblock-table.contract-list.balance'),
+      name: translateService.instant('tezblock-table.contract-list.balance'),
       field: 'balance',
       template: Template.amount,
       data: (item: any) => ({ data: item.balance }),
       sortable: true
     },
     {
-      name: options.translate.instant('tezblock-table.contract-list.baker'),
+      name: translateService.instant('tezblock-table.contract-list.baker'),
       field: 'delegate_value',
       template: Template.address
     }

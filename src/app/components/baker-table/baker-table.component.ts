@@ -301,16 +301,18 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   private setupTables() {
-    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet, translate: this.translateService })
+    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet }, this.translateService)
     this.bakingRightsFields = this.bakingRightsColumns.map(column => column.field)
 
-    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights]({
-      showFiatValue: this.isMainnet,
-      translate: this.translateService
-    })
+    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights](
+      {
+        showFiatValue: this.isMainnet
+      },
+      this.translateService
+    )
     this.endorsingRightsFields = this.endorsingRightsColumns.map(column => column.field)
 
-    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet, translate: this.translateService })
+    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet }, this.translateService)
     this.rewardsFields = this.rewardsColumns.map(column => column.field)
   }
 

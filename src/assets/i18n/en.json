@@ -262,6 +262,9 @@
     "description": "Description",
     "website": "Website",
     "social-profiles": "Social Profiles",
+    "transactions": "Transactions",
+    "last24h": "last 24 hours",
+    "volume": "Volume",
     "invalid-address": "Invalid Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
@@ -648,6 +651,10 @@
       "number-of-votes": "# of Votes",
       "staking-balance": "Staking Balance",
       "number-of-delegators": "# of Delegators"
+    },
+    "contract": {
+      "asset": "Asset",
+      "balance": "Balance"
     }
   }
 }

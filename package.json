@@ -68,7 +68,7 @@
     "chartjs-plugin-piechart-outlabels": "^0.1.4",
     "cryptocompare": "^1.0.0",
     "lodash": "^4.17.15",
-    "moment": "^2.24.0",
+    "moment": "^2.26.0",
     "myetherwallet-blockies": "^0.1.1",
     "ng2-charts": "^2.3.0",
     "ngx-bootstrap": "^5.6.0",

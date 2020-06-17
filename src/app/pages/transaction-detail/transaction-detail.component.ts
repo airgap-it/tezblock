@@ -139,7 +139,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -150,7 +150,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -161,7 +161,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -172,7 +172,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: 'reveal',
         count: undefined,
         icon: this.iconPipe.transform('eye'),
-        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -183,7 +183,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -194,7 +194,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         kind: ['ballot', 'proposals'],
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue, translate: this.translateService }),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }

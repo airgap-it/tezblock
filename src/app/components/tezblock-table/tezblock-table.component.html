@@ -70,7 +70,7 @@
                     }"
                     id="sortingColumn"
                   >
-                    {{ column.name }}
+                    {{ column.name | translate }}
                   </button>
                   <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
                     <ng-container *ngIf="!getDirection(column.field); else arrow">
@@ -87,7 +87,7 @@
               </ng-container>
               <ng-template #notSortable>
                 <th [width]="column.width">
-                  {{ column.name }}
+                  {{ column.name | translate }}
                 </th>
               </ng-template>
             </ng-container>
