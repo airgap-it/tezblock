@@ -15,6 +15,10 @@ import { AnalyticsService } from './services/analytics/analytics.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  get isActiveLinkBlockchain(): boolean {
+    return this.router.url.endsWith('/list') && this.router.url.indexOf('token-contract') === -1
+  }
+
   constructor(
     private readonly actions$: Actions,
     readonly router: Router,

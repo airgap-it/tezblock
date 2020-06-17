@@ -1,7 +1,7 @@
 <header-item
   class="bg-white"
   [isMinimized]="router.url === '/'"
-  [activeLinkBlockchain]="router.url.endsWith('/list')"
+  [activeLinkBlockchain]="isActiveLinkBlockchain"
   [activeLinkAssets]="router.url.startsWith('/token-contract/list/')"
   [activeLinkResources]="router.url.startsWith('/resources/')"
 ></header-item>
