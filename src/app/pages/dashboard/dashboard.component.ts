@@ -19,7 +19,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
-import { Title } from '@angular/platform-browser'
+import { Title, Meta } from '@angular/platform-browser'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -65,7 +65,8 @@ export class DashboardComponent extends BaseComponent {
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private titleService: Title
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
     this.store$.dispatch(actions.loadContracts())
@@ -192,6 +193,11 @@ export class DashboardComponent extends BaseComponent {
         .subscribe(() => this.store$.dispatch(actions.loadDivisionOfVotes()))
     )
     this.titleService.setTitle(`tezblock - Tezos block explorer`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content:
+        'tezblock is a block explorer built by AirGap for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.'
+    })
   }
 
   isMainnet() {
