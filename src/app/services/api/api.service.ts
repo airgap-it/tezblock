@@ -23,7 +23,7 @@ import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, isNotEmptyArray, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate, Operation } from '../base.service'
+import { Predicate, Operation, Options, EnvironmentUrls } from '../base.service'
 import { ProposalListDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
@@ -74,24 +74,18 @@ function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => 
   providedIn: 'root'
 })
 export class ApiService {
-  environmentUrls = this.chainNetworkService.getEnvironment()
-  environmentVariable = this.chainNetworkService.getEnvironmentVariable()
+  environmentUrls: EnvironmentUrls
+  environmentVariable: string
   protocol: TezosProtocol
 
-  private readonly bakingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/baking_rights`
-  private readonly endorsingRightsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/endorsing_rights`
-  private readonly blocksApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/blocks`
-  private readonly transactionsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/operations`
-  private readonly accountsApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts`
-  private readonly delegatesApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/delegates`
-  private readonly accountHistoryApiUrl = `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/accounts_history`
-
-  private readonly options = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      apikey: this.environmentUrls.conseilApiKey
-    })
-  }
+  private bakingRightsApiUrl: string
+  private endorsingRightsApiUrl: string
+  private blocksApiUrl: string
+  private transactionsApiUrl: string
+  private accountsApiUrl: string
+  private delegatesApiUrl: string
+  private accountHistoryApiUrl: string
+  private options: Options
 
   constructor(
     private readonly http: HttpClient,
@@ -100,14 +94,39 @@ export class ApiService {
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {
-    const network = this.chainNetworkService.getNetwork()
+    const network = chainNetworkService.getNetwork()
+
+    this.environmentUrls = chainNetworkService.getEnvironment()
+    this.environmentVariable = chainNetworkService.getEnvironmentVariable()
     this.protocol = new TezosProtocol(
       this.environmentUrls.rpcUrl,
       this.environmentUrls.conseilUrl,
       network,
-      this.chainNetworkService.getEnvironmentVariable(),
+      this.environmentVariable,
       this.environmentUrls.conseilApiKey
     )
+    this.setProperties()
+  }
+
+  // method created to ease testing
+  private getUrl(domain: string): string {
+    return `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${domain}`
+  }
+
+  private setProperties() {
+    this.options = {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        apikey: this.environmentUrls.conseilApiKey
+      })
+    }
+    this.bakingRightsApiUrl = this.getUrl('baking_rights')
+    this.endorsingRightsApiUrl = this.getUrl('endorsing_rights')
+    this.blocksApiUrl = this.getUrl('blocks')
+    this.transactionsApiUrl = this.getUrl('operations')
+    this.accountsApiUrl = this.getUrl('accounts')
+    this.delegatesApiUrl = this.getUrl('delegates')
+    this.accountHistoryApiUrl = this.getUrl('accounts_history')
   }
 
   getCurrentCycleRange(currentCycle: number): Observable<Block[]> {

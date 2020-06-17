@@ -15,7 +15,7 @@ export interface Sorting {
   value: string
 }
 
-const initialState: State = {
+export const initialState: State = {
   accounts: getInitialTableState({ field: 'balance', direction: 'desc' }),
   top25Accounts: undefined,
   top25AccountsLoading: undefined
