@@ -594,7 +594,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   private setupDelegation() {
-    const bakers = getBakers()
+    const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
+    const bakers = getBakers().sort(sortBakersAlphabeticaly)
 
     this.delegationControl = new FormControl(null)
     this.delegationControlDataSource$ = new BehaviorSubject(bakers.map(baker => baker.address))
