@@ -30,6 +30,7 @@ import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -71,7 +72,8 @@ describe('AccountDetailComponent', () => {
         { provide: AliasPipe, useValue: aliasPipeMock },
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
-        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+        { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        ShortenStringPipe
       ],
       imports: [],
       declarations: [AccountDetailComponent]
@@ -469,7 +471,7 @@ describe('AccountDetailComponent', () => {
             const { expectObservable } = helpers
             const expected = 'a'
             const expectedValues = { a: 8 }
-  
+
             expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
           })
         })

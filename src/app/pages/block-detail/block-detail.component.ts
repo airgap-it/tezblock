@@ -44,10 +44,6 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   orderBy$: Observable<OrderBy>
 
-  get blockLevel(): string {
-    return this.activatedRoute.snapshot.params.id
-  }
-
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
@@ -119,11 +115,15 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
-    this.titleService.setTitle(`${this.blockLevel} Block - tezblock`)
-    this.metaTagService.updateTag({
-      name: 'description',
-      content: `Tezos Block Height ${this.blockLevel}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`
-    })
+    this.store$
+      .select(state => state.blockDetails.id)
+      .subscribe(id => {
+        this.titleService.setTitle(`${id} Block - tezblock`)
+        this.metaTagService.updateTag({
+          name: 'description',
+          content: `Tezos Block Height ${id}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`
+        })
+      })
   }
 
   tabSelected(kind: string) {

@@ -114,7 +114,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private titleService: Title,
     private metaTagService: Meta,
-
     private aliasService: AliasService
   ) {
     super()
