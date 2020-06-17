@@ -34,9 +34,7 @@ export class AppComponent implements OnInit {
     getRefresh([
       this.actions$.pipe(ofType(actions.loadCryptoPriceSucceeded)),
       this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
-    ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
-      this.store$.dispatch(actions.loadPeriodInfos())
-    this.store$.dispatch(actions.loadProtocolVariables())
+    ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice()))
   }
 
   navigate(entity: string) {
