@@ -197,7 +197,7 @@
     "signature": "Signature",
     "fitness": "Fitness",
     "fitness_tooltip": "Fitness is a metric used to compare contexts. For example, when several blocks claim to be heads of the chain, their context’s fitness are compared. The block with the highest fitness is selected as the head of the chain.",
-    "protocol": "protocol",
+    "protocol": "Protocol",
     "protocol_tooltip": "The active protcol of this block. The protocol can be changed through the protocol amendment proccess.",
     "more": "More",
     "less": "Less",
