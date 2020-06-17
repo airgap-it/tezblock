@@ -13,7 +13,8 @@ import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.m
 import { OperationTypes } from '@tezblock/domain/operations'
 import { of } from 'rxjs'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Operation } from '@tezblock/services/base.service'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
+import { getProposalServiceMock } from '@tezblock/services/proposal/proposal.service.mock'
 
 describe('ApiService', () => {
   let service: ApiService
@@ -23,6 +24,7 @@ describe('ApiService', () => {
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const protocolVariablesServiceMock = getProtocolVariablesServiceMock()
   const rewardServiceMock = getRewardServiceMock()
+  const proposalServiceMock = getProposalServiceMock()
   const mockedTransactions: Transaction[] = [
     {
       timestamp: 1,
@@ -69,7 +71,8 @@ describe('ApiService', () => {
         provideMockStore({ initialState }),
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         { provide: ProtocolVariablesService, useValue: protocolVariablesServiceMock },
-        { provide: RewardService, useValue: rewardServiceMock }
+        { provide: RewardService, useValue: rewardServiceMock },
+        { provide: ProposalService, useValue: proposalServiceMock }
       ]
     })
 
@@ -130,12 +133,12 @@ describe('ApiService', () => {
       const kindList = [OperationTypes.Transaction, OperationTypes.Origination]
 
       spyOn(service, 'getAccountsByIds').and.returnValue(of(mockedOriginators))
-      spyOn(service, 'addVoteData').and.callFake((transactions, kindList) => of(transactions))
+      proposalServiceMock.addVoteData.and.callFake((transactions, kindList) => of(transactions))
 
       service.getLatestTransactions(10, kindList).subscribe(transactions => {
         expect(transactions).toEqual(<any>expectedTransactions)
         expect(service.getAccountsByIds).toHaveBeenCalledWith([fakeOriginatedContractName])
-        expect(service.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions, kindList)
+        expect(proposalServiceMock.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions, kindList)
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
@@ -155,12 +158,12 @@ describe('ApiService', () => {
       const mockedDelegation = [{ account_id: fakeSourceName, balance: 7 }]
 
       spyOn(service, 'getAccountsByIds').and.returnValue(of(mockedDelegation))
-      spyOn(service, 'addVoteData').and.callFake(transactions => of(transactions))
+      proposalServiceMock.addVoteData.and.callFake(transactions => of(transactions))
 
       service.getTransactionsById('fake_id', 10).subscribe(transactions => {
         expect(transactions).toEqual(<any>expectedTransactions)
         expect(service.getAccountsByIds).toHaveBeenCalledWith([fakeSourceName])
-        expect(service.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions)
+        expect(proposalServiceMock.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions)
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
@@ -181,12 +184,12 @@ describe('ApiService', () => {
       const mockedOriginations = [{ account_id: fakeOriginatedContractsName, balance: 8 }]
 
       spyOn(service, 'getAccountsByIds').and.returnValue(of(mockedOriginations))
-      spyOn(service, 'addVoteData').and.callFake(transactions => of(transactions))
+      proposalServiceMock.addVoteData.and.callFake(transactions => of(transactions))
 
       service.getTransactionsById('fake_id', 10).subscribe(transactions => {
         expect(transactions).toEqual(<any>expectedTransactions)
         expect(service.getAccountsByIds).toHaveBeenCalledWith([fakeOriginatedContractsName])
-        expect(service.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions)
+        expect(proposalServiceMock.addVoteData).toHaveBeenCalledWith(<any>expectedTransactions)
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
@@ -198,89 +201,17 @@ describe('ApiService', () => {
       const mockedTransactions = [{ kind: OperationTypes.Transaction }]
 
       spyOn(service, 'getAccountsByIds')
-      spyOn(service, 'addVoteData').and.callFake(transactions => of(transactions))
+      proposalServiceMock.addVoteData.and.callFake(transactions => of(transactions))
 
       service.getTransactionsById('fake_id', 10).subscribe(transactions => {
         expect(transactions).toEqual(<any>mockedTransactions)
         expect(service.getAccountsByIds).not.toHaveBeenCalled()
-        expect(service.addVoteData).toHaveBeenCalledWith(<any>mockedTransactions)
+        expect(proposalServiceMock.addVoteData).toHaveBeenCalledWith(<any>mockedTransactions)
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
       expect(req.request.method).toBe('POST')
       req.flush(mockedTransactions)
-    })
-  })
-
-  describe('addVoteData', () => {
-    it('when kindList does not include "ballot" or "proposals" then no logic is used', () => {
-      spyOn(service, 'getVotingPeriod')
-      spyOn(service, 'getVotesForTransaction')
-      const _mockedTransactions = mockedTransactions.map(transaction => ({ ...transaction, kind: OperationTypes.Transaction }))
-
-      service.addVoteData(_mockedTransactions, [OperationTypes.Transaction]).subscribe(transactions => {
-        expect(transactions).toEqual(_mockedTransactions)
-        expect(service.getVotingPeriod).not.toHaveBeenCalled()
-        expect(service.getVotesForTransaction).not.toHaveBeenCalled()
-      })
-    })
-
-    describe('when kindList includes "ballot" or "proposals"', () => {
-      let _mockedTransactions
-
-      beforeEach(() => {
-        _mockedTransactions = mockedTransactions.map(transaction => ({ ...transaction, block_level: 2 }))
-        spyOn(service, 'getVotingPeriod').and.returnValue(
-          of([
-            {
-              level: 2,
-              period_kind: 'mocked_period_kind'
-            }
-          ])
-        )
-      })
-
-      it('then getVotingPeriod is called only for transactions with distinct block_level', () => {
-        spyOn(service, 'getVotesForTransaction').and.callFake(transaction => of(transaction.fee))
-
-        service.addVoteData(_mockedTransactions, [OperationTypes.Ballot]).subscribe(transactions => {
-          expect(transactions.length).toBe(2)
-          
-          expect(service.getVotingPeriod).toHaveBeenCalledWith([
-            {
-              field: 'level',
-              operation: Operation.eq,
-              set: ['2'],
-              inverse: false,
-              group: `A0`
-            }
-          ])  
-        })
-      })
-
-      it('then sets voting_period and votes properties', () => {
-        const getVotesForTransactionSpy = spyOn(service, 'getVotesForTransaction').and.callFake(transaction => of(transaction.fee))
-
-        service.addVoteData(_mockedTransactions, [OperationTypes.Ballot]).subscribe(transactions => {
-          expect(transactions.length).toBe(2)
-          expect(transactions[0]).toEqual(
-            jasmine.objectContaining({
-              voting_period: 'mocked_period_kind',
-              votes: 0
-            })
-          )
-          expect(transactions[1]).toEqual(
-            jasmine.objectContaining({
-              voting_period: 'mocked_period_kind',
-              votes: 1
-            })
-          )
-
-          expect(getVotesForTransactionSpy.calls.all().length).toEqual(_mockedTransactions.length)
-          expect(getVotesForTransactionSpy.calls.all()[0].args[0]).toEqual(_mockedTransactions[0])
-          expect(getVotesForTransactionSpy.calls.all()[1].args[0]).toEqual(_mockedTransactions[1])
-        })
-      })
     })
   })
 })
