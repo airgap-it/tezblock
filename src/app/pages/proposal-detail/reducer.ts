@@ -31,9 +31,6 @@ const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: S
   })
 }
 
-const processProposal = (proposal: ProposalDto): ProposalDto =>
-  proposal ? { ...proposal, proposal: proposal.proposal.replace(squareBrackets, '') } : proposal
-
 export const isEmptyPeriodKind = (periodKind: string, metaVotingPeriods: MetaVotingPeriod[] = []): boolean =>
   get<MetaVotingPeriod>(period => period.count)(metaVotingPeriods.find(period => period.periodKind === periodKind)) === 0
 
@@ -69,7 +66,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadProposalSucceeded, (state, { proposal }) => ({
     ...state,
-    proposal: processProposal(proposal) || null,
+    proposal: proposal || null,
     loadingProposal: false
   })),
   on(actions.loadProposalFailed, state => ({
