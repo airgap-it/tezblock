@@ -480,6 +480,7 @@ export class ApiService {
       this.options
     )
   }
+  
   getAccountsByIds(ids: string[]): Observable<Account[]> {
     return this.http.post<Account[]>(
       this.accountsApiUrl,

@@ -168,20 +168,25 @@ export const fillTransferOperations = (
 
       if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
         const faProtocol = getFaProtocol(contract, chainNetworkService)
-
         return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
           map(normalizedParameters => {
             if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
-              const transferDetails = faProtocol.transferDetailsFromParameters({
-                entrypoint: 'transfer',
-                value: normalizedParameters.value
-              })
-              return {
-                ...transaction,
-                source: transferDetails.from,
-                destination: transferDetails.to,
-                amount: parseFloat(transferDetails.amount),
-                symbol: contract.symbol
+              try {
+                const transferDetails = faProtocol.transferDetailsFromParameters({
+                  entrypoint: 'transfer',
+                  value: normalizedParameters.value
+                })
+                return {
+                  ...transaction,
+                  source: transferDetails.from,
+                  destination: transferDetails.to,
+                  amount: parseFloat(transferDetails.amount),
+                  symbol: contract.symbol
+                }
+              } catch (error) { 
+                // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                // in this case we return the normal operation so that at least it can be listed
+                return transaction
               }
             }
 
@@ -189,7 +194,6 @@ export const fillTransferOperations = (
           })
         )
       }
-
       return of(transaction)
     })
   )

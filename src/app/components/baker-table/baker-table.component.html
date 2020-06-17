@@ -118,6 +118,23 @@
               </ng-container>
 
               <div class="row">
+                <div class="col-md-12 mb-4">
+                  <span class="badge badge-pill badge-light mr-2">
+                    <fa-icon
+                      [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
+                      [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
+                    ></fa-icon>
+                  </span>
+                  <ng-container *ngIf="data?.acceptsDelegations">
+                    Accepts Delegations
+                  </ng-container>
+                  <ng-container *ngIf="!data?.acceptsDelegations">
+                    Does Not Accept Delegations
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="row">
                 <div class="col-md-12">
                   <div class="mb-4">
                     <h5 class="card-title__secondary mb-3">
