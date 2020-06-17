@@ -37,7 +37,9 @@ import {
   faExpand,
   faThumbsUp,
   faThumbsDown,
-  faHandRock
+  faHandRock,
+  faCheck,
+  faTimes
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -84,6 +86,8 @@ export const addFontAwesome = () => {
     faExpand,
     faThumbsUp,
     faThumbsDown,
-    faHandRock
+    faHandRock,
+    faCheck,
+    faTimes
   )
 }

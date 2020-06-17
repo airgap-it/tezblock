@@ -126,6 +126,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
+  isExchange: boolean
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -351,15 +352,22 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
+        const jsonAccount = accounts[address]
 
         this.reset()
         this.setTabs(address)
         this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
 
-        if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
-          this.hasAlias = true
-          this.hasLogo = accounts[address].hasLogo
+        if (jsonAccount) {
+          this.hasAlias = !!this.aliasPipe.transform(address)
+          this.hasLogo = jsonAccount.hasLogo
+          this.isExchange = jsonAccount.isExchange
+        }
+
+        this.bakerTableInfos = {
+          ...this.bakerTableInfos,
+          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
