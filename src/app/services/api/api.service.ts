@@ -19,9 +19,8 @@ import {
 import { Account } from '@tezblock/interfaces/Account'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { VotingInfo, VotingPeriod } from '@tezblock/domain/vote'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { distinctFilter, first, get, isNotEmptyArray, flatten } from '@tezblock/services/fp'
+import { distinctFilter, first, get, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { Predicate, Operation, Options, EnvironmentUrls } from '../base.service'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
@@ -30,7 +29,7 @@ import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 import { getFaProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
-import { CacheService, CacheKeys, ByAddressState, ByBlockState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
+import { CacheService, CacheKeys, ByAddressState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
@@ -95,7 +94,6 @@ export class ApiService {
     private readonly cacheService: CacheService,
     private readonly http: HttpClient,
     readonly chainNetworkService: ChainNetworkService,
-    private readonly protocolVariablesService: ProtocolVariablesService,
     private readonly proposalService: ProposalService,
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
