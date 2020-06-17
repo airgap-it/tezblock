@@ -5,7 +5,7 @@ import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/op
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 import BigNumber from 'bignumber.js'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'
@@ -43,7 +43,10 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest(
+        this.store$.select(fromRoot.app.currentCycle),
+        this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)
+      ).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
           this.cacheService
