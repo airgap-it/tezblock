@@ -6,6 +6,7 @@ export interface JsonAccountData {
   hasPayoutAddress?: string
   logoReference?: string
   accountType?: string
+  acceptsDelegations?: boolean
 }
 
 export interface Account {

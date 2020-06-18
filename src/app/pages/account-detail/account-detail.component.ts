@@ -20,7 +20,7 @@ import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.compone
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService, getBakers } from '@tezblock/services/account/account.service'
+import { AccountService, getBakers, doesAcceptsDelegations } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -376,7 +376,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.bakerTableInfos = {
           ...this.bakerTableInfos,
-          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+          acceptsDelegations: get<JsonAccountData>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -388,13 +388,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(delegatedAccounts => {
           const delegatedAccount: Account = first(delegatedAccounts)
 
-          if (!delegatedAccounts/* null */) {
+          if (!delegatedAccounts /* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (!delegatedAccount/* delegatedAccounts is [<empty> | null | undefined] */) {
+          if (!delegatedAccount /* delegatedAccounts is [<empty> | null | undefined] */) {
             this.delegatedAccountAddress = ''
 
             return
@@ -498,8 +498,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           )
         )
         .subscribe(bakerInfos => {
-          this.bakerTableInfos = bakerInfos ?? {
-            payoutAddress
+          this.bakerTableInfos = {
+            ...this.bakerTableInfos,
+            ...(bakerInfos ?? {
+              payoutAddress
+            })
           }
         })
     )
@@ -605,7 +608,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   private setupDelegation() {
     const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
-    const bakers = getBakers().sort(sortBakersAlphabeticaly)
+    const bakers = getBakers()
+      .filter(doesAcceptsDelegations)
+      .sort(sortBakersAlphabeticaly)
 
     this.delegationControl = new FormControl(null)
     this.delegationControlDataSource$ = new BehaviorSubject(bakers.map(baker => baker.address))
