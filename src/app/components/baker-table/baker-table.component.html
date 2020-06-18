@@ -152,7 +152,12 @@
                     <h5 class="card-title__secondary mb-3">
                       Delegation
                     </h5>
-                    <button class="btn btn-sm btn-primary-light w-100" type="button" (click)="delegate()">
+                    <button
+                      (click)="delegate()"
+                      [disabled]="!data?.acceptsDelegations"
+                      class="btn btn-sm btn-primary-light w-100"
+                      type="button"
+                    >
                       Delegate Now
                     </button>
                   </div>

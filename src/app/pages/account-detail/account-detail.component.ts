@@ -43,7 +43,6 @@ import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/am
 import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')

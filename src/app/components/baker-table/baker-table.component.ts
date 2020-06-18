@@ -10,7 +10,6 @@ import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
-import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
@@ -139,7 +138,6 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly apiService: ApiService,
     private readonly beaconService: BeaconService,
     private readonly route: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
