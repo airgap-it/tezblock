@@ -79,7 +79,7 @@
               </div>
 
               <ng-container *ngIf="data?.stakingBalance; else loadingGraph">
-                <div class="mb-4">
+                <div class="mb-3">
                   <div class="container p-0">
                     <div class="row mb-2">
                       <div class="col">
@@ -118,7 +118,7 @@
               </ng-container>
 
               <div class="row">
-                <div class="col-md-12 mb-4">
+                <div class="col-md-12 mb-3">
                   <span class="badge badge-pill badge-light mr-2">
                     <fa-icon
                       [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
@@ -135,14 +135,15 @@
               </div>
 
               <div class="row">
-                <div class="col-md-12">
-                  <div class="mb-4">
-                    <h5 class="card-title__secondary mb-3">
-                      Payout Account
-                    </h5>
-                    <address-item *ngIf="data?.payoutAddress; else noPayoutAddress" [address]="data?.payoutAddress"></address-item>
-                    <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
-                  </div>
+                <div class="col-md-12 mb-4">
+                  <button
+                    (click)="delegate()"
+                    [disabled]="!data?.acceptsDelegations"
+                    class="btn btn-sm btn-primary-light w-100"
+                    type="button"
+                  >
+                    Delegate Now
+                  </button>
                 </div>
               </div>
 
@@ -150,16 +151,10 @@
                 <div class="col-md-12">
                   <div class="mb-4">
                     <h5 class="card-title__secondary mb-3">
-                      Delegation
+                      Payout Account
                     </h5>
-                    <button
-                      (click)="delegate()"
-                      [disabled]="!data?.acceptsDelegations"
-                      class="btn btn-sm btn-primary-light w-100"
-                      type="button"
-                    >
-                      Delegate Now
-                    </button>
+                    <address-item *ngIf="data?.payoutAddress; else noPayoutAddress" [address]="data?.payoutAddress"></address-item>
+                    <ng-template #noPayoutAddress><p class="text-secondary m-0">No related payout account.</p></ng-template>
                   </div>
                 </div>
               </div>
