@@ -1,15 +1,10 @@
 import { HttpClient } from '@angular/common/http'
 import { Injectable } from '@angular/core'
-import { forkJoin, Observable, of, timer } from 'rxjs'
-import { delayWhen, filter, map, retryWhen, switchMap, tap } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
-import { isNil, negate } from 'lodash'
+import { Observable, of, timer } from 'rxjs'
+import { delayWhen, map, retryWhen, tap } from 'rxjs/operators'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, ENVIRONMENT_URL } from '@tezblock/services/base.service'
-import * as fromRoot from '@tezblock/reducers'
-import { Block } from '@tezblock/interfaces/Block'
-import { get } from '@tezblock/services/fp'
 
 export interface ProtocolConstantResponse {
   proof_of_work_nonce_size: number
@@ -43,8 +38,6 @@ export interface ProtocolConstantResponse {
   min_proposal_quorum: number
   initial_endorsers: number
   delay_per_missing_endorsement: string
-
-  timeBetweenPriority?: number
 }
 
 @Injectable({
@@ -53,8 +46,7 @@ export interface ProtocolConstantResponse {
 export class ProtocolVariablesService extends BaseService {
   constructor(
     readonly chainNetworkService: ChainNetworkService,
-    readonly httpClient: HttpClient,
-    private readonly store$: Store<fromRoot.State>
+    readonly httpClient: HttpClient
   ) {
     super(chainNetworkService, httpClient)
   }
@@ -68,34 +60,14 @@ export class ProtocolVariablesService extends BaseService {
       return this._getProtocolVariables
     }
 
-    const toTimeBetweenPriority = (response: string): number =>
-      get<string>(_response => (new Date(_response).getTime() - new Date().getTime()) / 1000)(response)
-
-    return (this._getProtocolVariables = this.store$
-      .select(state => state.app.latestBlock)
+    return (this._getProtocolVariables = this.get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true)
       .pipe(
-        filter(negate(isNil)),
-        switchMap((latestBlock: Block) =>
-          forkJoin(
-            this.get<ProtocolConstantResponse>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/${latestBlock.hash}/context/constants`, true),
-            // this.get<string>(
-            //   `${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/${latestBlock.hash}/minimal_valid_time?[priority=0]&[endorsing_power=32]`,
-            //   true
-            // )
-
-            // this data (timeBetweenPriority) is not used currently in app, so real value getter commented above
-            of('Wed May 20 2020')
-          )
-        ),
-        map(([protocolConstantResponse, timePriority]) => {
-          if (!protocolConstantResponse || !timePriority) {
+        map(protocolConstantResponse => {
+          if (!protocolConstantResponse) {
             throw new Error('Empty response')
           }
 
-          return {
-            ...protocolConstantResponse,
-            timeBetweenPriority: toTimeBetweenPriority(timePriority)
-          }
+          return protocolConstantResponse
         }),
         tap(protocolVariables => this._protocolVariables = protocolVariables),
         // TODO: study more: https://blog.danlew.net/2016/01/25/rxjavas-repeatwhen-and-retrywhen-explained/
@@ -106,12 +78,6 @@ export class ProtocolVariablesService extends BaseService {
           )
         )
       ))
-  }
-
-  getBlocksPerVotingPeriod(): Observable<number> {
-    return this.get<any>(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/constants`, true).pipe(
-      map(response => response.blocks_per_voting_period)
-    )
   }
 
   private _getProtocolVariables: Observable<ProtocolConstantResponse>

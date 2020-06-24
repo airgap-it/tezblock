@@ -96,11 +96,6 @@
                             {{ 'header-item.originations_button' | translate }}
                           </a>
                         </li>
-                        <li>
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
-                            {{ 'header-item.accounts_button' | translate }}
-                          </a>
-                        </li>
                       </ul>
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -157,12 +152,11 @@
                       </ul>
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
-                          {{ 'header-item.smart-contracts_button' | translate }}
+                          {{ 'header-item.accounts_button' | translate }}
                         </li>
-
-                        <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/token-contract/list']">
-                            {{ 'header-item.asset-smart-contracts_button' | translate }}
+                        <li>
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
+                            {{ 'header-item.top-accounts_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
@@ -175,6 +169,19 @@
                   </ul>
                 </span>
               </div>
+              <li class="nav-item">
+                <button
+                  type="button"
+                  class="btn"
+                  routerLinkActive="btn-link"
+                  [ngClass]="{ 'btn-link': activeLinkAssets }"
+                  [routerLink]="['/token-contract/list']"
+                >
+                  {{ 'header-item.assets_button' | translate }}
+
+                  <!--TODO: translate-->
+                </button>
+              </li>
               <li class="nav-item dropdown">
                 <span class="d-block" dropdown [triggers]="triggers" #dp2="bs-dropdown">
                   <a
