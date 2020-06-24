@@ -15,6 +15,10 @@ import { AnalyticsService } from './services/analytics/analytics.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  get isActiveLinkBlockchain(): boolean {
+    return this.router.url.endsWith('/list') && this.router.url.indexOf('token-contract') === -1
+  }
+
   constructor(
     private readonly actions$: Actions,
     readonly router: Router,
@@ -34,9 +38,7 @@ export class AppComponent implements OnInit {
     getRefresh([
       this.actions$.pipe(ofType(actions.loadCryptoPriceSucceeded)),
       this.actions$.pipe(ofType(actions.loadCryptoPriceFailed))
-    ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice())),
-      this.store$.dispatch(actions.loadPeriodInfos())
-    this.store$.dispatch(actions.loadProtocolVariables())
+    ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice()))
   }
 
   navigate(entity: string) {

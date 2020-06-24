@@ -5,6 +5,7 @@ import { map, switchMap } from 'rxjs/operators'
 import { ApiService } from '../api/api.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { andGroup, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 const kindToFieldsMap = {
   transaction: ['source', 'destination'],
@@ -19,7 +20,7 @@ const kindToFieldsMap = {
   providedIn: 'root'
 })
 export class TransactionService {
-  constructor(private readonly apiService: ApiService) {}
+  constructor(private readonly apiService: ApiService, private readonly proposalService: ProposalService) {}
 
   getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy): Observable<Transaction[]> {
     const fields = kindToFieldsMap[kind]
@@ -104,7 +105,7 @@ export class TransactionService {
 
         return of(transactions)
       }),
-      switchMap(transactions => this.apiService.addVoteData(transactions)),
+      switchMap(transactions => this.proposalService.addVoteData(transactions)),
       map(transactions => {
         transactions = transactions.map(transaction => {
           // to determine if outgoing or not in order to later assign correct symbol in symbol-cell

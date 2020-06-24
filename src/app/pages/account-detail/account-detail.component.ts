@@ -500,9 +500,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(bakerInfos => {
           this.bakerTableInfos = {
             ...this.bakerTableInfos,
-            ...(bakerInfos ?? {
-              payoutAddress
-            })
+            ...bakerInfos,
+            payoutAddress
           }
         })
     )
