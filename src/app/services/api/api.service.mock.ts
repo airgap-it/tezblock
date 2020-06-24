@@ -15,7 +15,6 @@ export const getApiServiceMock = () => jasmine.createSpyObj('ApiService', {
   getTransactionHashesStartingWith: EMPTY,
   getBlockHashesStartingWith: EMPTY,
   getDelegatedAccounts: EMPTY,
-  getManagerAccount: EMPTY,
   getLatestBlocks: EMPTY,
   getLatestBlocksWithData: EMPTY,
   getAdditionalBlockField: Promise.resolve(),

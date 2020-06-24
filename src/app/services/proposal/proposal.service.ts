@@ -1,16 +1,24 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { of, pipe, Observable, forkJoin } from 'rxjs'
+import { from, of, pipe, Observable, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
+import { TezosProtocol } from 'airgap-coin-lib'
 
 import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { first, get } from '@tezblock/services/fp'
-import { PeriodKind, MetaVotingPeriod, PeriodTimespan, getPeriodTimespanQuery, DivisionOfVotes } from '@tezblock/domain/vote'
+import { distinctFilter, first, get, isNotEmptyArray } from '@tezblock/services/fp'
+import {
+  PeriodKind,
+  MetaVotingPeriod,
+  PeriodTimespan,
+  getPeriodTimespanQuery,
+  DivisionOfVotes,
+  VotingInfo,
+  VotingPeriod
+} from '@tezblock/domain/vote'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { ApiService } from '@tezblock/services/api/api.service'
 import { Pagination } from '@tezblock/domain/table'
 import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
 
@@ -18,8 +26,76 @@ import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
   providedIn: 'root'
 })
 export class ProposalService extends BaseService {
-  constructor(private readonly apiService: ApiService, readonly chainNetworkService: ChainNetworkService, readonly httpClient: HttpClient) {
+  private protocol: TezosProtocol
+
+  constructor(readonly chainNetworkService: ChainNetworkService, readonly httpClient: HttpClient) {
     super(chainNetworkService, httpClient)
+
+    const network = this.chainNetworkService.getNetwork()
+    this.protocol = new TezosProtocol(
+      this.environmentUrls.rpcUrl,
+      this.environmentUrls.conseilUrl,
+      network,
+      this.chainNetworkService.getEnvironmentVariable(),
+      this.environmentUrls.conseilApiKey
+    )
+  }
+
+  addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {
+    if (!isNotEmptyArray(transactions)) {
+      return of([])
+    }
+
+    kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
+
+    if (kindList.includes('ballot') || kindList.includes('proposals')) {
+      const votingPeriodPredicates: Predicate[] = transactions
+        .map(transaction => transaction.block_level)
+        .filter(distinctFilter)
+        .map((block_level, index) => ({
+          field: 'level',
+          operation: Operation.eq,
+          set: [block_level.toString()],
+          inverse: false,
+          group: `A${index}`
+        }))
+
+      return forkJoin(
+        this.getVotingPeriod(votingPeriodPredicates),
+        forkJoin(transactions.map(transaction => this.getVotesForTransaction(transaction)))
+      ).pipe(
+        map(([votingPeriods, votes]) =>
+          transactions.map((transaction, index) => {
+            const votingPeriod = votingPeriods.find(vP => vP.level === transaction.block_level)
+
+            return {
+              ...transaction,
+              voting_period: votingPeriod.period_kind,
+              votes: votes[index]
+            }
+          })
+        )
+      )
+    }
+
+    return of(transactions)
+  }
+
+  getVotingPeriod(predicates: Predicate[]): Observable<VotingPeriod[]> {
+    return this.post<VotingPeriod[]>('blocks', {
+      fields: ['level', 'period_kind'],
+      predicates
+    })
+  }
+
+  getVotesForTransaction(transaction: Transaction): Observable<number> {
+    return from(this.protocol.getTezosVotingInfo(transaction.block_hash)).pipe(
+      map(data => {
+        const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
+
+        return votingInfo ? votingInfo.rolls : null
+      })
+    )
   }
 
   getMetaVotingPeriods(proposalHash: string, proposal: ProposalDto): Observable<MetaVotingPeriod[]> {
@@ -76,7 +152,7 @@ export class ProposalService extends BaseService {
         }
       ],
       limit: pagination.currentPage * pagination.selectedSize
-    }).pipe(switchMap((votes: Transaction[]) => this.apiService.addVoteData(votes)))
+    }).pipe(switchMap((votes: Transaction[]) => this.addVoteData(votes)))
   }
 
   getProposalVotes(proposalHash, pagination): Observable<Transaction[]> {
@@ -218,6 +294,19 @@ export class ProposalService extends BaseService {
       ],
       limit: 1000
     })
+  }
+
+  getPeriodInfos(): Observable<{ meta_voting_period: number; meta_voting_period_position: number }> {
+    return this.post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
+      fields: ['meta_voting_period', 'meta_voting_period_position'],
+      orderBy: [
+        {
+          field: 'level',
+          direction: 'desc'
+        }
+      ],
+      limit: 1
+    }).pipe(map(first))
   }
 
   private getMetaVotingPeriod(proposalHash: string, periodKind: string): Observable<number> {

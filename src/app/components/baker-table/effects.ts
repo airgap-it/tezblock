@@ -13,7 +13,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { BaseService, Body, Operation } from '@tezblock/services/base.service'
 import { first } from '@tezblock/services/fp'
-import { ByCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { CurrentCycleState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { get } from 'lodash'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { TransactionService } from '@tezblock/services/transaction/transaction.service'
@@ -108,7 +108,7 @@ export class BakerTableEffects {
         ofType(actions.loadEfficiencyLast10CyclesSucceeded),
         withLatestFrom(this.store$.select(state => state.bakerTable.accountAddress)),
         tap(([{ efficiencyLast10Cycles }, accountAddress]) =>
-          this.cacheService.update<ByCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
