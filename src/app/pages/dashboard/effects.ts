@@ -82,7 +82,7 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadTransactions),
       switchMap(() => {
-        return this.apiService.getLatestTransactions(6, ['transaction']).pipe(
+        return this.apiService.getLatestTransactions(5, ['transaction']).pipe(
           map(transactions => actions.loadTransactionsSucceeded({ transactions })),
           catchError(error => of(actions.loadTransactionsFailed({ error })))
         )
@@ -94,7 +94,7 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadBlocks),
       switchMap(() =>
-        this.blockService.getLatestBlocks(6, ['volume', 'txcount']).pipe(
+        this.blockService.getLatestBlocks(5, ['volume', 'txcount']).pipe(
           map(blocks => actions.loadBlocksSucceeded({ blocks })),
           catchError(error => of(actions.loadBlocksFailed({ error })))
         )
@@ -114,7 +114,7 @@ export class DashboarEffects {
     )
   )
 
-	loadDivisionOfVotes$ = createEffect(() =>
+  loadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadDivisionOfVotes),
       withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),

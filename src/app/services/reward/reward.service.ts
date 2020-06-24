@@ -1,16 +1,18 @@
 import { Injectable } from '@angular/core'
-import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { forkJoin, from, Observable, throwError } from 'rxjs'
-import { map, switchMap, catchError, take, filter } from 'rxjs/operators'
-import { isNil, negate, range } from 'lodash'
-import { Store } from '@ngrx/store'
-import { Pageable } from '@tezblock/domain/table'
-
-import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { HttpClient } from '@angular/common/http'
+import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { forkJoin, from, Observable, of, throwError } from 'rxjs'
+import { map, switchMap, catchError, take, filter } from 'rxjs/operators'
+import { get, isNil, negate, range } from 'lodash'
+import { Store } from '@ngrx/store'
+import BigNumber from 'bignumber.js'
+
+import { Pageable } from '@tezblock/domain/table'
+import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
-import BigNumber from 'bignumber.js'
+import * as fromApp from '@tezblock/app.reducer'
+import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -34,10 +36,10 @@ interface BalanceUpdate {
 export class RewardService {
   protocol: TezosProtocol
 
-  private calculatedRewardsMap = new Map<String, TezosRewards>()
   private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
   constructor(
+    private readonly cacheService: CacheService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
     private readonly http: HttpClient
@@ -66,9 +68,7 @@ export class RewardService {
   }
 
   getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
-    return this.getLastCycles(pagination).pipe(
-      switchMap(cycles => forkJoin(cycles.map(cycle => from(this.calculateRewards(address, cycle)))))
-    )
+    return this.getLastCycles(pagination).pipe(switchMap(cycles => forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle)))))
   }
 
   getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
@@ -88,7 +88,7 @@ export class RewardService {
   getRewardAmount(accountAddress: string, bakerAddress: string): Observable<string> {
     return this.getCurrentCycle().pipe(
       switchMap(currentCycle =>
-        from(this.calculateRewards(bakerAddress, currentCycle - 6)).pipe(
+        this.calculateRewards(bakerAddress, currentCycle - 6).pipe(
           switchMap(tezosRewards =>
             from(this.protocol.calculatePayouts(tezosRewards, 0, tezosRewards.delegatedContracts.length)).pipe(
               map(payouts => {
@@ -105,35 +105,51 @@ export class RewardService {
     )
   }
 
-  calculateRewards(address: string, cycle: number): Promise<TezosRewards> {
-    const key = `${address}${cycle}`
+  calculateRewards(address: string, cycle: number): Observable<TezosRewards> {
+    return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
+      switchMap(byAddressCache => {
+        const rewards: any = get(byAddressCache, `${address}.byCycle.${cycle}.rewards`)
 
-    if (this.calculatedRewardsMap.has(key)) {
-      return Promise.resolve(this.calculatedRewardsMap.get(key))
-    }
+        if (rewards) {
+          return of(rewards as TezosRewards)
+        }
 
-    if (this.pendingPromises.has(key)) {
-      return this.pendingPromises.get(key)
-    }
+        const key = `${address}${cycle}`
+        const promise = this.pendingPromises.has(key)
+          ? this.pendingPromises.get(key)
+          : this.protocol.calculateRewards(address, cycle).then(result => {
+              this.pendingPromises.delete(key)
 
-    return this.getCurrentCycle()
-      .pipe(
-        switchMap((currentCycle: number) => {
-          const promise = this.protocol.calculateRewards(address, cycle, currentCycle).then(result => {
-            this.calculatedRewardsMap.set(key, result)
-            this.pendingPromises.delete(key)
-            return result
-          })
-          this.pendingPromises.set(key, promise)
+              const latestCycle = fromApp.currentCycleSelector(fromRoot.getState(this.store$).app)
 
-          return promise
-        })
-      )
-      .toPromise()
+              if (cycle < latestCycle) {
+                this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
+                  ...byAddressCache,
+                  [address]: {
+                    ...get(byAddressCache, address),
+                    byCycle: {
+                      ...<any>get(byAddressCache, `${address}.byCycle`),
+                      [cycle]: {
+                        ...<any>get(byAddressCache, `${address}.byCycle.${cycle}`),
+                        rewards: result
+                      }
+                    }
+                  }
+                }))
+              }
+
+              return result
+            })
+
+        this.pendingPromises.set(key, promise)
+
+        return from(promise)
+      })
+    )
   }
 
   getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
-    return from(this.calculateRewards(address, cycle)).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
+    return this.calculateRewards(address, cycle).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
   }
 
   private getCurrentCycle(): Observable<number> {

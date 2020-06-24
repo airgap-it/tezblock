@@ -2,22 +2,26 @@ import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { Account } from '@tezblock/interfaces/Account'
+import { Block } from '@tezblock/interfaces/Block'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
-  exchangeRates = 'exchangeRates'
+  exchangeRates = 'exchangeRates',
+  byAddress = 'byAddress',
+  byProposal = 'byProposal'
 }
 
 export interface BakerData extends BakerTableRatings {
   efficiencyLast10Cycles?: number
 }
 
-export interface ByCycleState {
+export interface CurrentCycleState {
   cycleNumber: number
   myTezosBaker?: TezosBakerResponse
   fromAddress?: {
@@ -34,9 +38,37 @@ export interface ExchangeRates {
   }
 }
 
+export interface ByCycle<T> {
+  value: T
+  cycle: number
+}
+
+export interface ByAddressState {
+  [address: string]: {
+    byCycle: {
+      [cycle: string]: {
+        rewards: TezosRewards
+      }
+    }
+    frozenBalance: ByCycle<number>
+  }
+}
+
+export interface ByBlockState {
+  [level: string]: Block
+}
+
+export interface ByProposalState {
+  [proposal: string]: number /* period */
+}
+
 export interface Cache {
-  [CacheKeys.fromCurrentCycle]: ByCycleState
+  [CacheKeys.fromCurrentCycle]: CurrentCycleState
   [CacheKeys.exchangeRates]: ExchangeRates
+  [CacheKeys.byAddress]: ByAddressState
+
+  // probably in future this entry will replace byPeriod which will contain this data
+  [CacheKeys.byProposal]: ByProposalState
 }
 
 @Injectable({

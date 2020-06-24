@@ -117,12 +117,9 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(
-        this.store$.select(state => state.contractDetails.transferOperations.orderBy)
-      ),
+      withLatestFrom(this.store$.select(state => state.contractDetails.transferOperations.orderBy)),
       switchMap(([{ contract }, orderBy]) =>
-        this.contractService.loadTransferOperations(contract, orderBy, maxLimit)
-        .pipe(
+        this.contractService.loadTransferOperations(contract, orderBy, maxLimit).pipe(
           map(data => actions.loadTransferOperationsSucceeded({ data })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
@@ -227,9 +224,16 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadMore),
       withLatestFrom(this.store$.select(state => state.contractDetails.currentTabKind)),
-      map(([action, currentTabKind]) =>
-        currentTabKind === actions.OperationTab.transfers ? actions.loadMoreTransferOperations() : actions.loadMoreOtherOperations()
-      )
+      map(([action, currentTabKind]) => {
+        switch (currentTabKind) {
+          case actions.OperationTab.transfers:
+            return actions.loadMoreTransferOperations()
+          case actions.OperationTab.other:
+            return actions.loadMoreOtherOperations()
+          default:
+            return actions.loadMoreTokenHolders()
+        }
+      })
     )
   )
 

@@ -1,27 +1,31 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, combineLatest, forkJoin } from 'rxjs'
+import { of, combineLatest, forkJoin, from } from 'rxjs'
 import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { first } from '@tezblock/services/fp'
 import * as fromRoot from '@tezblock/reducers'
-import { ByCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
+import { CurrentCycleState, CacheService, CacheKeys, ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { BlockService } from '@tezblock/services/blocks/blocks.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Currency } from '@tezblock/domain/airgap'
 import { ProtocolVariablesService } from '@tezblock/services/protocol-variables/protocol-variables.service'
+import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 
 @Injectable()
 export class AppEffects {
   loadLatestBlock$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadLatestBlock),
+      withLatestFrom(this.store$.select(state => state.app.latestBlock)),
+      filter(([action, latestBlock]) => !latestBlock || moment().diff(moment(latestBlock.timestamp), 'seconds') > 60),
       switchMap(() =>
         this.blockService.getLatest().pipe(
           map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
@@ -40,15 +44,22 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<ByCycleState>(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
           this.cacheService
-            .set<ByCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
+            .set<CurrentCycleState>(CacheKeys.fromCurrentCycle, { cycleNumber: currentCycle })
             .subscribe(() => {})
         })
       ),
     { dispatch: false }
+  )
+
+  onCurrentCycleChaneLoadProtocolVariables$ = createEffect(() =>
+    this.store$.select(fromRoot.app.currentCycle).pipe(
+      filter(negate(isNil)),
+      map(() => actions.loadProtocolVariables())
+    )
   )
 
   loadFirstBlockOfCycle$ = createEffect(() =>
@@ -83,30 +94,24 @@ export class AppEffects {
     )
   )
 
+  onLoadProtocolVariablesSucceededLoadPeriodInfos$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadProtocolVariablesSucceeded),
+      map(() => actions.loadPeriodInfos())
+    )
+  )
+
   loadPeriodInfos$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadPeriodInfos),
       switchMap(() =>
-        forkJoin(
-          this.baseService
-            .post<{ meta_voting_period: number; meta_voting_period_position: number }[]>('blocks', {
-              fields: ['meta_voting_period', 'meta_voting_period_position'],
-              orderBy: [
-                {
-                  field: 'level',
-                  direction: 'desc'
-                }
-              ],
-              limit: 1
-            })
-            .pipe(map(first)),
-          this.protocolVariablesService.getBlocksPerVotingPeriod()
-        ).pipe(
-          map(([{ meta_voting_period, meta_voting_period_position }, blocksPerVotingPeriod]) =>
+        this.proposalService.getPeriodInfos().pipe(
+          withLatestFrom(this.store$.select(state => state.app.protocolVariables)),
+          map(([{ meta_voting_period, meta_voting_period_position }, protocolVariables]) =>
             actions.loadPeriodInfosSucceeded({
               currentVotingPeriod: meta_voting_period,
               currentVotingeriodPosition: meta_voting_period_position,
-              blocksPerVotingPeriod
+              blocksPerVotingPeriod: protocolVariables.blocks_per_voting_period
             })
           ),
           catchError(error => of(actions.loadPeriodInfosFailed({ error })))
@@ -226,6 +231,7 @@ export class AppEffects {
     private readonly cacheService: CacheService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly protocolVariablesService: ProtocolVariablesService,
+    private readonly proposalService: ProposalService,
     private readonly store$: Store<fromRoot.State>
   ) {}
 }

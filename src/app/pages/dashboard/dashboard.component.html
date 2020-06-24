@@ -106,14 +106,14 @@
                 <h5 class="card-title__secondary mb-3 ">
                   Circulating Supply
                 </h5>
-                <h3>837,306,031 ꜩ</h3>
+                <h3>839,352,372 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 Market Cap
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('837306031').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('839352372').toFormat(0) }}</h3>
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
@@ -170,29 +170,7 @@
       </div>
     </div>
   </div>
-  <div class="container p-0 my-5">
-    <div class="card py-4 h-100">
-      <div class="card-body p-4 ">
-        <div class="row">
-          <div class="col-lg-6 pr-3 pr-md-5 pb-5 pb-md-0">
-            <h5 class="card-title__secondary mb-3 ">
-              Latest Asset Contracts
-            </h5>
-            <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
-            <button type="button" [routerLink]="['/token-contract/list']" class="btn btn-primary-light btn-sm btn-block">
-              All Assets
-            </button>
-          </div>
-          <div class="col-lg-6 pl-3 pl-md-5">
-            <h5 class="card-title__secondary mb-3 ">
-              Latest Transfers
-            </h5>
-            <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+
   <div class="container p-0 my-5">
     <div class="row mb-4">
       <div class="col-lg-6 mb-4 mb-lg-0">
@@ -218,6 +196,29 @@
             <button type="button" routerLink="/transaction/list" class="btn btn-primary-light btn-sm btn-block">
               All Transactions
             </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container p-0 my-5">
+    <div class="card py-4 h-100">
+      <div class="card-body p-4 ">
+        <div class="row">
+          <div class="col-lg-6 pr-3 pr-md-5 pb-5 pb-md-0">
+            <h5 class="card-title__secondary mb-3 ">
+              Latest Asset Contracts
+            </h5>
+            <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
+            <button type="button" [routerLink]="['/token-contract/list']" class="btn btn-primary-light btn-sm btn-block">
+              All Assets
+            </button>
+          </div>
+          <div class="col-lg-6 pl-3 pl-md-5">
+            <h5 class="card-title__secondary mb-3 ">
+              Latest Transfers
+            </h5>
+            <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
           </div>
         </div>
       </div>
