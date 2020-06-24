@@ -152,6 +152,10 @@ describe('ApiService', () => {
   })
 
   describe('getTransactionsById', () => {
+    beforeEach(() => {
+      accountServiceMock.getAccountsByIds.calls.reset()
+    })
+
     it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
       const fakeSourceName = 'fakeSourceName'
       const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
