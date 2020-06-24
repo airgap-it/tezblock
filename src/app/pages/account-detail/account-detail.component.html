@@ -51,6 +51,10 @@
                       [address]="account.account_id"
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
+                    <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">
+                      Exchange
+                      <!--TODO: translate-->
+                    </span>
                     <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">
                       {{ 'account-detail.revealed' | translate }}
                     </span>
@@ -110,7 +114,9 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
                   <h5 class="d-inline-block m-0">
-                    <span>${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}</span>
+                    <span>
+                      ${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}
+                    </span>
                   </h5>
                   <span
                     class="badge badge-pill ml-2"

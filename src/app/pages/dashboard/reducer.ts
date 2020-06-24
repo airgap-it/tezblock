@@ -3,7 +3,7 @@ import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet
 
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
-import { ProposalListDto } from '@tezblock/interfaces/proposal'
+import { ProposalDto } from '@tezblock/interfaces/proposal'
 import {
   PeriodTimespan,
   fillMissingPeriodTimespans,
@@ -30,7 +30,7 @@ interface Busy {
 export interface State {
   blocks: Block[]
   contracts: TokenContract[]
-  proposal: ProposalListDto
+  proposal: ProposalDto
   transactions: Transaction[]
   currentPeriodTimespan: PeriodTimespan
   cryptoHistoricData: MarketDataSample[]

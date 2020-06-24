@@ -13,7 +13,7 @@ import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import * as appActions from '@tezblock/app.actions'
-import { TokenContract, Social, SocialType, ContractOperation, hasTokenHolders } from '@tezblock/domain/contract'
+import { TokenContract, Social, SocialType, ContractOperation, hasTokenHolders, TokenHolder } from '@tezblock/domain/contract'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { AccountService } from '../../services/account/account.service'
 import { isNil, negate } from 'lodash'
@@ -24,6 +24,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
+import { get } from '@tezblock/services/fp'
 
 const last24 = (transaction: ContractOperation): boolean => {
   const hoursAgo = moment().diff(moment(transaction.timestamp), 'hours', true)
@@ -138,7 +139,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       this.store$.select(state => state.contractDetails.currentTabKind),
       this.store$.select(fromRoot.contractDetails.transferOperations),
       this.store$.select(state => state.contractDetails.otherOperations.data),
-      this.store$.select(state => state.contractDetails.tokenHolders.data)
+      this.store$.select(state => state.contractDetails.tokenHolders)
     ).pipe(
       map(([currentTabKind, transferOperations, otherOperations, tokenHolders]) => {
         if (currentTabKind === actions.OperationTab.transfers) {
@@ -149,7 +150,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           return otherOperations
         }
 
-        return tokenHolders
+        // client-side paging
+        return get<TokenHolder[]>(data => data.slice(0, tokenHolders.pagination.currentPage * tokenHolders.pagination.selectedSize))(
+          tokenHolders.data
+        )
       })
     )
     this.loading$ = combineLatest(

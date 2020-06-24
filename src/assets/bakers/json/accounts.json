@@ -153,7 +153,9 @@
   },
   "tz1NpWrAyDL9k2Lmnyxcgr9xuJakbBxdq7FB": {
     "alias": "Gate.io",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "tz1NqKH9D5HdfvoEQssMS5Up13CVypVxLA1k": {
     "alias": "Cypher-Baker",
@@ -229,7 +231,9 @@
   },
   "tz1SYq214SCBy9naR6cvycQsYcUGpBqQAE8d": {
     "alias": "Coinone",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "tz1Scdr2HsZiQjc7bHMeBbmDRXYVvdhjJbBh": {
     "alias": "Figment",
@@ -498,8 +502,10 @@
     "hasLogo": true
   },
   "tz1awXW7wuXy21c66vBudMXQVAPgRnqqwgTH": {
-    "alias": "Infinity Stones",
-    "hasLogo": false
+    "alias": "KuCoin",
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "tz1b2mCFQm8isfJRGUctgyxHhHcmTNTRPdps": {
     "alias": "Tezos Barcelona",
@@ -667,7 +673,9 @@
   },
   "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk": {
     "alias": "Coinbase Custody",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "tz1isXamBXpTUgbByQ6gXgZQg4GWNW7r6rKE": {
     "alias": "Tez Whale",
@@ -774,7 +782,9 @@
   },
   "tz1S8MNvuFEUsWgjHvi3AxibRBf388NhT1q2": {
     "alias": "Binance",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "tz1eogbwM5NdoojKEvvSnjYGcJapZgADRK3m": {
     "alias": "Binance Delegator",
@@ -835,7 +845,9 @@
   },
   "tz1gfArv665EUkSg2ojMBzcbfwuPxAvqPvjo": {
     "alias": "Kraken",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
     "alias": "Staker",
@@ -853,7 +865,9 @@
   },
   "tz1egoxWxfhwm94YrK5nB5BdyBjnEVm2kSzx": {
     "alias": "HitBTC",
-    "hasLogo": true
+    "hasLogo": true,
+    "isExchange": true,
+    "acceptsDelegations": false
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "alias": "tzBTC",
@@ -868,5 +882,23 @@
     "alias": "USDtz",
     "hasLogo": true,
     "accountType": "contract"
+  },
+  "tz1UuQ4HWDu3ALNRgAq94dX9MhqhQhnuY3gC": {
+    "alias": "OKEx",
+    "hasLogo": true,
+    "isExchage": true,
+    "acceptsDelegations": false
+  },
+  "tz1VQnqCCqX4K5sP3FNkVSNKTdCAMJDd3E1n": {
+    "alias": "PosDog",
+    "hasLogo": true
+  },
+  "tz1fb7c66UwePkkfDXz4ajFaBP9hVNLdS7JJ": {
+    "alias": "Tezos.nu",
+    "hasLogo": true
+  },
+  "tz3QCNyySViKHmeSr45kzDxzchys7NiXCWoa": {
+    "alias": "Proofofbake.com",
+    "hasLogo": true
   }
 }

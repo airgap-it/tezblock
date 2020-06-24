@@ -26,6 +26,9 @@ export class HeaderItemComponent {
   @Input()
   public activeLinkResources: boolean = false
 
+  @Input()
+  public activeLinkAssets: boolean = false
+
   public subscription: Subscription
 
   public currentCycle$: Observable<number>
