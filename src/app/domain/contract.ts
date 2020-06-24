@@ -158,7 +158,7 @@ export const fillTransferOperations = (
   transactions: Transaction[],
   chainNetworkService: ChainNetworkService
 ): Observable<Transaction[]> => {
-  if(!isNotEmptyArray(transactions)) {
+  if (!isNotEmptyArray(transactions)) {
     return of([])
   }
 

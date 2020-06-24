@@ -213,18 +213,20 @@ export const columns: { [key: string]: (options: any) => Column[] } = {
       }
     ].concat(<any>blockAndTxHashColumns),
 
-    [OperationTypes.Contract]: (options: any) =>
-    [
-      {
-        name: 'Asset',
-        template: Template.address,
-        data: (item: ContractAsset) => ({ data: item.contract.id, options: { showFullAddress: false, pageId: options.pageId } })
-      },
-      {
-        name: 'Balance',
-        field: 'amount',
-        template: Template.amount,
-        data: (item: ContractAsset) => ({ data: item.amount, options: { showFiatValue: isConvertableToUSD(item.contract.symbol), symbol: item.contract.symbol } })
-      }
-    ]
+  [OperationTypes.Contract]: (options: any) => [
+    {
+      name: 'Asset',
+      template: Template.address,
+      data: (item: ContractAsset) => ({ data: item.contract.id, options: { showFullAddress: false, pageId: options.pageId } })
+    },
+    {
+      name: 'Balance',
+      field: 'amount',
+      template: Template.amount,
+      data: (item: ContractAsset) => ({
+        data: item.amount,
+        options: { showFiatValue: isConvertableToUSD(item.contract.symbol), symbol: item.contract.symbol }
+      })
+    }
+  ]
 }

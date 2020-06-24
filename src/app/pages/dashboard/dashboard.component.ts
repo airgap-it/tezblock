@@ -19,6 +19,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
+import { Title, Meta } from '@angular/platform-browser'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
@@ -63,7 +64,9 @@ export class DashboardComponent extends BaseComponent {
   constructor(
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
     this.store$.dispatch(actions.loadContracts())
@@ -165,7 +168,7 @@ export class DashboardComponent extends BaseComponent {
         .pipe(ofType(appActions.loadPeriodInfosSucceeded))
         .subscribe(() => this.store$.dispatch(actions.loadCurrentPeriodTimespan())),
 
-        this.contracts$
+      this.contracts$
         .pipe(
           filter(data => Array.isArray(data) && data.some(item => ['tzBTC', 'BTC'].includes(item.symbol))),
           switchMap(() =>
@@ -177,7 +180,7 @@ export class DashboardComponent extends BaseComponent {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' }))),
 
-	this.actions$
+      this.actions$
         .pipe(
           ofType(appActions.loadPeriodInfosSucceeded),
           switchMap(() =>
@@ -189,6 +192,12 @@ export class DashboardComponent extends BaseComponent {
         )
         .subscribe(() => this.store$.dispatch(actions.loadDivisionOfVotes()))
     )
+    this.titleService.setTitle(`tezblock - Tezos block explorer`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content:
+        'tezblock is a block explorer built by AirGap for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.'
+    })
   }
 
   isMainnet() {
