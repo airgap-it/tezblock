@@ -218,7 +218,8 @@
                 </ng-template>
                 <input
                   [formControl]="delegationControl"
-                  [typeahead]="delegationControlDataSource$ | async"
+                  [typeahead]="delegationControlDataSource$"
+                  [typeaheadAsync]="true"
                   [typeaheadItemTemplate]="delegationControlTemplate"
                   [adaptivePosition]="true"
                   [typeaheadMinLength]="0"

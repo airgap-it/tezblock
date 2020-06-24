@@ -622,7 +622,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           this.delegationControlDataSource$.next(bakers.map(baker => baker.address))
         }
 
-        const filteredBakers = bakers.filter(baker => baker.address.toLowerCase().includes(value.toLowerCase())).map(baker => baker.address)
+        const filteredBakers = bakers
+          .filter(baker => baker.alias.toLowerCase().indexOf(value.toLowerCase()) !== -1)
+          .map(baker => baker.address)
         this.delegationControlDataSource$.next(filteredBakers)
       })
     )
