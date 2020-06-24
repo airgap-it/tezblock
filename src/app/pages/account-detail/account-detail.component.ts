@@ -380,13 +380,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(delegatedAccounts => {
           const delegatedAccount: Account = first(delegatedAccounts)
 
-          if (!delegatedAccounts/* null */) {
+          if (!delegatedAccounts /* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (!delegatedAccount/* delegatedAccounts is [<empty> | null | undefined] */) {
+          if (!delegatedAccount /* delegatedAccounts is [<empty> | null | undefined] */) {
             this.delegatedAccountAddress = ''
 
             return
@@ -490,7 +490,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           )
         )
         .subscribe(bakerInfos => {
-          this.bakerTableInfos = bakerInfos ?? {
+          this.bakerTableInfos = {
+            ...this.bakerTableInfos,
+            ...bakerInfos,
             payoutAddress
           }
         })
