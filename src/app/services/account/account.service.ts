@@ -23,12 +23,29 @@ export class AccountService extends BaseService {
     super(chainNetworkService, httpClient)
   }
 
+  getAccountById(id: string): Observable<Account[]> {
+    return this.post<Account[]>(
+      'accounts',
+      {
+        predicates: [
+          {
+            field: 'account_id',
+            operation: Operation.eq,
+            set: [id],
+            inverse: false
+          }
+        ],
+        limit: 1
+      }
+    )
+  }
+
   getDelegatedAccounts(address: string): Observable<GetDelegatedAccountsResponseDto> {
-    return this.apiService.getDelegatedAccounts(address, 10).pipe(
+    return this._getDelegatedAccounts(address, 10).pipe(
       switchMap((transactions: Transaction[]) => {
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
-          return this.apiService.getAccountById(address).pipe(
+          return this.getAccountById(address).pipe(
             map((accounts: Account[]) => {
               const delegated = accounts.length > 0 && accounts[0].delegate_value ? [accounts[0]] : []
 
@@ -45,7 +62,7 @@ export class AccountService extends BaseService {
 
           const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
 
-          return forkJoin(this.apiService.getAccountById(address), this.apiService.getAccountsByIds(originatedContracts)).pipe(
+          return forkJoin(this.getAccountById(address), this.apiService.getAccountsByIds(originatedContracts)).pipe(
             map(([accounts, relatedAccounts]) => {
               const delegatedAccounts = accounts[0].delegate_value ? accounts : []
 
@@ -62,7 +79,7 @@ export class AccountService extends BaseService {
 
         const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
 
-        return forkJoin(this.apiService.getAccountById(address), this.apiService.getAccountsByIds(managerPubKeys)).pipe(
+        return forkJoin(this.getAccountById(address), this.apiService.getAccountsByIds(managerPubKeys)).pipe(
           map(([accounts, relatedAccounts]) => {
             const delegated = accounts[0].delegate_value ? accounts : []
 
@@ -101,5 +118,69 @@ export class AccountService extends BaseService {
       map(transactions => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
       catchError(() => of('Not Available'))
     )
+  }
+
+  private _getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
+    if (address.startsWith('tz')) {
+      return this.post<Transaction[]>('operations', {
+        predicates: [
+          {
+            field: 'manager_pubkey',
+            operation: Operation.eq,
+            set: [address],
+            inverse: false
+          },
+          {
+            field: 'originated_contracts',
+            operation: Operation.isnull,
+            set: [''],
+            inverse: true
+          },
+          {
+            field: 'status',
+            operation: Operation.eq,
+            set: ['applied'],
+            inverse: false
+          }
+        ],
+        orderBy: [
+          {
+            field: 'balance',
+            direction: 'desc'
+          }
+        ],
+        limit
+      })
+    }
+
+    return this.post<Transaction[]>('operations', {
+      predicates: [
+        {
+          field: 'originated_contracts',
+          operation: Operation.eq,
+          set: [address],
+          inverse: false
+        },
+        {
+          field: 'manager_pubkey',
+          operation: Operation.isnull,
+          set: [''],
+          inverse: true
+        },
+        {
+          field: 'status',
+          operation: Operation.eq,
+          set: ['applied'],
+          inverse: false
+        }
+      ],
+      orderBy: [
+        {
+          field: 'balance',
+          direction: 'desc'
+        }
+      ],
+      limit
+    })
   }
 }

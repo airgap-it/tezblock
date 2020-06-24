@@ -28,7 +28,7 @@ export class AccountDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadAccount),
       switchMap(({ address }) =>
-        this.apiService.getAccountById(address).pipe(
+        this.accountService.getAccountById(address).pipe(
           map(accounts => actions.loadAccountSucceeded({ account: first(accounts) })),
           catchError(error => of(actions.loadAccountFailed({ error })))
         )

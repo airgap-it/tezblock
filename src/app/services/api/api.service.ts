@@ -471,34 +471,6 @@ export class ApiService {
         })
       )
   }
-
-  getLatestAccounts(limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        limit
-      },
-      this.options
-    )
-  }
-
-  getAccountById(id: string): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: 'eq',
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit: 1
-      },
-      this.options
-    )
-  }
   
   getAccountsByIds(ids: string[]): Observable<Account[]> {
     return this.http.post<Account[]>(
@@ -617,78 +589,6 @@ export class ApiService {
           })
         )
       )
-  }
-
-  getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
-    if (address.startsWith('tz')) {
-      return this.http.post<Transaction[]>(
-        this.transactionsApiUrl,
-        {
-          predicates: [
-            {
-              field: 'manager_pubkey',
-              operation: 'eq',
-              set: [address],
-              inverse: false
-            },
-            {
-              field: 'originated_contracts',
-              operation: 'isnull',
-              set: [''],
-              inverse: true
-            },
-            {
-              field: 'status',
-              operation: 'eq',
-              set: ['applied'],
-              inverse: false
-            }
-          ],
-          orderBy: [
-            {
-              field: 'balance',
-              direction: 'desc'
-            }
-          ],
-          limit
-        },
-        this.options
-      )
-    } else {
-      return this.http.post<Transaction[]>(
-        this.transactionsApiUrl,
-        {
-          predicates: [
-            {
-              field: 'originated_contracts',
-              operation: 'eq',
-              set: [address],
-              inverse: false
-            },
-            {
-              field: 'manager_pubkey',
-              operation: 'isnull',
-              set: [''],
-              inverse: true
-            },
-            {
-              field: 'status',
-              operation: 'eq',
-              set: ['applied'],
-              inverse: false
-            }
-          ],
-          orderBy: [
-            {
-              field: 'balance',
-              direction: 'desc'
-            }
-          ],
-          limit
-        },
-        this.options
-      )
-    }
   }
 
   getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
