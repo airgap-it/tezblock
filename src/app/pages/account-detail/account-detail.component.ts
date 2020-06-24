@@ -42,7 +42,6 @@ import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/am
 import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 
 const accounts = require('../../../assets/bakers/json/accounts.json')
 
@@ -384,13 +383,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(delegatedAccounts => {
           const delegatedAccount: Account = first(delegatedAccounts)
 
-          if (!delegatedAccounts/* null */) {
+          if (!delegatedAccounts /* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (!delegatedAccount/* delegatedAccounts is [<empty> | null | undefined] */) {
+          if (!delegatedAccount /* delegatedAccounts is [<empty> | null | undefined] */) {
             this.delegatedAccountAddress = ''
 
             return
