@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { of } from 'rxjs'
 
 import { ApiService } from './api.service'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
@@ -11,12 +12,12 @@ import { getProtocolVariablesServiceMock } from '@tezblock/services/protocol-var
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.mock'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { of } from 'rxjs'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { getProposalServiceMock } from '@tezblock/services/proposal/proposal.service.mock'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
+import { Predicate } from '@tezblock/services/base.service'
 
 describe('ApiService', () => {
   let service: ApiService
@@ -220,5 +221,145 @@ describe('ApiService', () => {
       expect(req.request.method).toBe('POST')
       req.flush(mockedTransactions)
     })
+  })
+
+  // tests very similar to getTransactionsById
+  describe('getTransactionsByField', () => {
+    beforeEach(() => {
+      accountServiceMock.getAccountsByIds.calls.reset()
+    })
+
+    it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
+      const fakeSourceName = 'fakeSourceName'
+      const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
+      const expectedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Delegation, source: fakeSourceName, delegatedBalance: 7 }
+      ]
+      const mockedDelegation = [{ account_id: fakeSourceName, balance: 7 }]
+
+      accountServiceMock.getAccountsByIds.and.returnValue(of(mockedDelegation))
+
+      service.getTransactionsByField('fake_value', 'fake_field', 'fake_kind', 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>expectedTransactions)
+        expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeSourceName])
+        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+
+    it('calls getAccountsByIds with transaction of kind Origination to set originatedBalance', () => {
+      const fakeOriginatedContractsName = 'fakeOriginatedContractsName'
+      const mockedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Origination, originated_contracts: fakeOriginatedContractsName }
+      ]
+      const expectedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Origination, originated_contracts: fakeOriginatedContractsName, originatedBalance: 8 }
+      ]
+      const mockedOriginations = [{ account_id: fakeOriginatedContractsName, balance: 8 }]
+
+      accountServiceMock.getAccountsByIds.and.returnValue(of(mockedOriginations))
+
+      service.getTransactionsByField('fake_value', 'fake_field', 'fake_kind', 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>expectedTransactions)
+        expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeOriginatedContractsName])
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+
+    it('does not call getAccountsByIds when no transactions of kind Delegation or Origination', () => {
+      const mockedTransactions = [{ kind: OperationTypes.Transaction }]
+
+      service.getTransactionsByField('fake_value', 'fake_field', 'fake_kind', 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>mockedTransactions)
+        expect(accountServiceMock.getAccountsByIds).not.toHaveBeenCalled()
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+  })
+
+  // tests very similar to getTransactionsById
+  describe('getTransactionsByPredicates', () => {
+    const predicate: Predicate = {
+      field: 'fake_field'
+    }
+
+    beforeEach(() => {
+      accountServiceMock.getAccountsByIds.calls.reset()
+    })
+
+    it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
+      const fakeSourceName = 'fakeSourceName'
+      const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
+      const expectedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Delegation, source: fakeSourceName, delegatedBalance: 7 }
+      ]
+      const mockedDelegation = [{ account_id: fakeSourceName, balance: 7 }]
+
+      accountServiceMock.getAccountsByIds.and.returnValue(of(mockedDelegation))
+
+      service.getTransactionsByPredicates([predicate], 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>expectedTransactions)
+        expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeSourceName])
+        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+
+    it('calls getAccountsByIds with transaction of kind Origination to set originatedBalance', () => {
+      const fakeOriginatedContractsName = 'fakeOriginatedContractsName'
+      const mockedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Origination, originated_contracts: fakeOriginatedContractsName }
+      ]
+      const expectedTransactions = [
+        { kind: OperationTypes.Transaction },
+        { kind: OperationTypes.Origination, originated_contracts: fakeOriginatedContractsName, originatedBalance: 8 }
+      ]
+      const mockedOriginations = [{ account_id: fakeOriginatedContractsName, balance: 8 }]
+
+      accountServiceMock.getAccountsByIds.and.returnValue(of(mockedOriginations))
+
+      service.getTransactionsByPredicates([predicate], 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>expectedTransactions)
+        expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeOriginatedContractsName])
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+
+    it('does not call getAccountsByIds when no transactions of kind Delegation or Origination', () => {
+      const mockedTransactions = [{ kind: OperationTypes.Transaction }]
+
+      service.getTransactionsByPredicates([predicate], 10).subscribe(transactions => {
+        expect(transactions).toEqual(<any>mockedTransactions)
+        expect(accountServiceMock.getAccountsByIds).not.toHaveBeenCalled()
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush(mockedTransactions)
+    })
+  })
+
+  xdescribe('getLatestBlocksWithData', () => {
+
   })
 })

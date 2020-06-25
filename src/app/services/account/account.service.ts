@@ -8,7 +8,10 @@ import { Transaction } from 'src/app/interfaces/Transaction'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { sort } from '@tezblock/domain/table'
-import { first } from '@tezblock/services/fp'
+import { first, get } from '@tezblock/services/fp'
+import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+
+const accounts = require('../../../assets/bakers/json/accounts.json')
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
@@ -136,6 +139,52 @@ export class AccountService extends BaseService {
       map(transactions => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
       catchError(() => of('Not Available'))
     )
+  }
+
+  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+    const bakers: SearchOption[] = Object.keys(accounts)
+      .map(key => accounts[key])
+      .filter(
+        account =>
+          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
+          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
+      )
+      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
+
+    if (bakers.length === 0) {
+      return this.post<Account[]>(
+          'accounts',
+          {
+            fields: ['account_id'],
+            predicates: [
+              {
+                field: 'account_id',
+                operation: Operation.startsWith,
+                set: [id],
+                inverse: false
+              }
+            ],
+            limit: 5
+          }
+        )
+        .pipe(
+          map(_accounts =>
+            _accounts
+              .filter(account => {
+                const isContract = Object.keys(accounts)
+                  .map(key => ({ ...accounts[key], id: key }))
+                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
+
+                return !isContract
+              })
+              .map(account => {
+                return { name: account.account_id, type: SearchOptionType.account }
+              })
+          )
+        )
+    }
+
+    return of(bakers)
   }
 
   private _getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {

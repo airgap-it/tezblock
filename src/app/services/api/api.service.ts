@@ -66,7 +66,6 @@ export interface Balance {
   asof: number
 }
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
 const cycleToLevel = (cycle: number, blocksPerCycle: number): number => cycle * blocksPerCycle
 export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, cycle: Math.floor(right.level / blocksPerCycle) })
 
@@ -221,42 +220,8 @@ export class ApiService {
       )
       .pipe(
         map(transactions => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.accountService.getAccountsByIds(sources).pipe(
-              map(delegators =>
-                transactions.map(transaction => {
-                  const match = delegators.find(delegator => delegator.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.accountService.getAccountsByIds(originatedAccounts).pipe(
-              map(originators =>
-                transactions.map(transaction => {
-                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.proposalService.addVoteData(transactions))
       )
   }
@@ -347,43 +312,47 @@ export class ApiService {
       )
       .pipe(
         map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.accountService.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.accountService.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        })
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
+  }
+
+  private fillDelegatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
+    const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+
+    if (sources.length > 0) {
+      return this.accountService.getAccountsByIds(sources).pipe(
+        map((accounts: Account[]) =>
+          transactions.map(transaction => {
+            const match = accounts.find(account => account.account_id === transaction.source)
+
+            return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+          })
+        )
+      )
+    }
+
+    return of(transactions)
+  }
+
+  private fillOriginatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
+    const originatedAccounts = transactions
+      .filter(transaction => transaction.kind === 'origination')
+      .map(transaction => transaction.originated_contracts)
+
+    if (originatedAccounts.length > 0) {
+      return this.accountService.getAccountsByIds(originatedAccounts).pipe(
+        map((accounts: Account[]) =>
+          transactions.map(transaction => {
+            const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+
+            return match ? { ...transaction, originatedBalance: match.balance } : transaction
+          })
+        )
+      )
+    }
+
+    return of(transactions)
   }
 
   getTransactionsByPredicates(predicates: Predicate[], limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
@@ -399,91 +368,9 @@ export class ApiService {
       )
       .pipe(
         map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.accountService.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.accountService.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        })
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
-  }
-
-  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
-    const bakers: SearchOption[] = Object.keys(accounts)
-      .map(key => accounts[key])
-      .filter(
-        account =>
-          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
-          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
-      )
-      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
-
-    if (bakers.length === 0) {
-      return this.http
-        .post<Account[]>(
-          this.accountsApiUrl,
-          {
-            fields: ['account_id'],
-            predicates: [
-              {
-                field: 'account_id',
-                operation: 'startsWith',
-                set: [id],
-                inverse: false
-              }
-            ],
-            limit: 5
-          },
-          this.options
-        )
-        .pipe(
-          map(_accounts =>
-            _accounts
-              .filter(account => {
-                const isContract = Object.keys(accounts)
-                  .map(key => ({ ...accounts[key], id: key }))
-                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
-
-                return !isContract
-              })
-              .map(account => {
-                return { name: account.account_id, type: SearchOptionType.account }
-              })
-          )
-        )
-    }
-
-    return of(bakers)
   }
 
   getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
