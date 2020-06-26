@@ -419,7 +419,8 @@
   },
   "tz1WtkJEkKjHX3bMDYwJoDVC4gPksNPUa3v7": {
     "alias": "BakeMyStake Old",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1X1fpAZtwQk94QXUgZwfgsvkQgyc2KHp9d": {
     "alias": "ownBLOCK",
@@ -646,7 +647,8 @@
   },
   "tz1e2meErj7eEfXwqr7bDK6N1YatmLaugfMp": {
     "alias": "STB",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1eEnQhbwf6trb8Q8mPb2RaPkNk2rN7BKi8": {
     "alias": "Cryptium Labs",
