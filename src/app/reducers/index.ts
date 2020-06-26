@@ -31,7 +31,7 @@ export interface State {
   endorsementDetails: fromEndorsementDetails.State
   tokenContractOveview: fromTokenContractOveview.State
   transactionDetails: fromTransactionDetails.State
-  proposalDetails: fromProposalDetails.State,
+  proposalDetails: fromProposalDetails.State
   contractDetails: fromContractDetails.State
   list: fromList.State
   health: fromHealth.State

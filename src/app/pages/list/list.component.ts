@@ -21,6 +21,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
 import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Title, Meta } from '@angular/platform-browser'
 import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
 
 const noOfDays = 7
@@ -47,12 +48,7 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
     })
   const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
 
-  return pipe(
-    toDiffsInDays,
-    groupBy('diffInDays'),
-    sum,
-    amountToXTZ
-  )(data)
+  return pipe(toDiffsInDays, groupBy('diffInDays'), sum, amountToXTZ)(data)
 }
 
 export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
@@ -106,7 +102,9 @@ export class ListComponent extends BaseComponent implements OnInit {
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly route: ActivatedRoute,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -114,7 +112,9 @@ export class ListComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
-
+    this.route.paramMap.subscribe(paramMap => {
+      this.titleService.setTitle(`Tezos ${paramMap.get('route').replace(/^\w/, c => c.toUpperCase())}s - tezblock`)
+    })
     this.routeName$.subscribe(routeName => {
       try {
         switch (routeName) {
@@ -129,6 +129,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
             )
             this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$, blockOrderBy$)
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Blocks on tezblock with information about bakers, timestamp, transaction volume, fees, number of transactions and fitness of each block.">`
+            })
 
             break
           case 'transaction':
@@ -163,10 +167,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               //this.store$.select(state => state.list.transactionsChartDatasets)
               this.store$
                 .select(state => state.list.transactionsChartData)
-                .pipe(
-                  filter(Array.isArray),
-                  map(toTransactionsChartDataSource('Transactions', 'Volume'))
-                )
+                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume')))
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(
@@ -188,6 +189,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               transactionLoading$,
               transactionOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Transactions on tezblock with total number of transactions and volume of the last 24 hours, the latest transactions with information about source, destination, timestamp, amount, fees, parameters and level of each transaction.">`
+            })
             break
           case 'activation':
             this.subscriptions.push(
@@ -203,11 +208,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.activationsCountLast24h$ = this.store$.select(state => state.list.activationsCountLast24h)
             this.activationsChartDatasets$ = this.store$
               .select(state => state.list.activationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Activations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Activations')), map(toArray))
             const activationsLoading$ = this.store$.select(state => state.list.activations.loading)
             const activationsData$ = this.store$.select(state => state.list.activations.data)
             const activationsOrderBy$ = this.store$.select(state => state.list.activations.orderBy)
@@ -223,6 +224,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               activationsLoading$,
               activationsOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Activations on tezblock with the total number of activations in the last 24 hours and the last 7 days, the latest activations with information about account, timestamp, secret and level of each activation.">`
+            })
             break
           case 'origination':
             this.subscriptions.push(
@@ -238,11 +243,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.originationsCountLast24h$ = this.store$.select(state => state.list.originationsCountLast24h)
             this.originationsChartDatasets$ = this.store$
               .select(state => state.list.originationsCountLastXd)
-              .pipe(
-                filter(Array.isArray),
-                map(timestampsToChartDataSource('Originations')),
-                map(toArray)
-              )
+              .pipe(filter(Array.isArray), map(timestampsToChartDataSource('Originations')), map(toArray))
             const originationsLoading$ = this.store$.select(state => state.list.originations.loading)
             const originationsData$ = this.store$.select(state => state.list.originations.data)
             const originationsOrderBy$ = this.store$.select(state => state.list.originations.orderBy)
@@ -259,6 +260,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               originationsLoading$,
               originationsOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Originations on tezblock with the total number of originations in the last 24 hours and the last 7 days, the latest originations with information about the new account, timestamp, originator, baker, fee and level of each origination.">`
+            })
             break
           case 'delegation':
             const delegationsLoading$ = this.store$.select(state => state.list.delegations.loading)
@@ -277,6 +282,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               delegationsLoading$,
               delegationsOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Delegations on tezblock with the latest delegations with information about delegator, baker, timestamp, value, fee, gas limit and level of each delegation.">`
+            })
             break
           case 'endorsement':
             const endorsementsLoading$ = this.store$.select(state => state.list.endorsements.loading)
@@ -295,6 +304,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               endorsementsLoading$,
               endorsementsOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Endorsements on tezblock with the latest endorsements with information about endorser, timestamp, slots and level of each endorsement.">`
+            })
             break
           case 'vote':
             const votesLoading$ = this.store$.select(state => state.list.votes.loading)
@@ -308,6 +321,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadVotes()))
             )
             this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$, votesOrderBy$)
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Votes on tezblock with the latest votes with information about baker, ballot, timestamp, kind, voting period, number of votes, proposal and level of each vote.">`
+            })
             break
           case 'double-baking':
             const dbLoading$ = this.store$.select(state => state.list.doubleBakings.loading)
@@ -326,6 +343,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               dbLoading$,
               dbOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Double Baking Evidences on tezblock with the latest double baking evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double baking evidence.">`
+            })
             break
           case 'double-endorsement':
             const deLoading$ = this.store$.select(state => state.list.doubleEndorsements.loading)
@@ -344,6 +365,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               deLoading$,
               deOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Double Endorsement Evidences on tezblock with the latest double endorsement evidences with information about baker, timestamp, reward, offender, denounced level, lost amount and level of each double endorsement evidence.">`
+            })
             break
           case 'bakers':
             const bakersLoading$ = this.store$.select(state => state.list.activeBakers.loading)
@@ -362,6 +387,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               bakersLoading$,
               bakersOrderBy$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Top 25 Tezos bakers on tezblock with information about balance, number of votes, staking balance and number of delegators.">`
+            })
             break
           case 'proposal':
             const showLoadMore$ = this.store$
@@ -390,6 +419,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               proposalOrderBy$,
               showLoadMore$
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Proposals on tezblock with all the proposals with information about hash and period of each proposal.">`
+            })
             break
           case 'contract':
             const loadingContracts$ = this.store$.select(state => state.list.contracts.loading)
@@ -406,6 +439,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               null,
               'No Contracts'
             )
+            this.metaTagService.updateTag({
+              name: 'description',
+              content: `Tezos Contracts on tezblock with all the contracts with information about account, balance and baker of each contract.">`
+            })
             break
 
           default:

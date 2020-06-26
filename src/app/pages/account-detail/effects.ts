@@ -61,7 +61,7 @@ export class AccountDetailEffects {
       ofType(actions.loadRewardAmont),
       switchMap(action =>
         this.rewardService.getRewardAmount(action.accountAddress, action.bakerAddress).pipe(
-          map(rewardAmont => actions.loadRewardAmontSucceeded({ rewardAmont })),
+          map(rewardAmount => actions.loadRewardAmontSucceeded({ rewardAmount })),
           catchError(error => of(actions.loadRewardAmontFailed({ error })))
         )
       )

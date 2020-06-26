@@ -326,7 +326,7 @@
                       type="button"
                       target="_blank"
                       [ngClass]="{ 'btn-link': !(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null }"
-                      [href]="'https://www.tezos-nodes.com/baker/' + accountAddress"
+                      [href]="'https://tezos-nodes.com/baker/' + accountAddress"
                     >
                       <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
                         {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}

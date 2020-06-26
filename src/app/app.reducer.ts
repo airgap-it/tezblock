@@ -44,7 +44,6 @@ export interface State {
 
   // XTZ -> USD
   fiatCurrencyInfo: CurrencyInfo
-
 }
 
 export const initialState: State = {
@@ -115,23 +114,23 @@ export const reducer = createReducer(
   on(actions.loadProtocolVariables, state => ({
     ...state,
     busy: {
-        ...state.busy,
-        protocolVariables: true
+      ...state.busy,
+      protocolVariables: true
     }
   })),
   on(actions.loadProtocolVariablesSucceeded, (state, { protocolVariables }) => ({
     ...state,
     protocolVariables,
     busy: {
-        ...state.busy,
-        protocolVariables: false
+      ...state.busy,
+      protocolVariables: false
     }
   })),
   on(actions.loadProtocolVariablesFailed, state => ({
     ...state,
     busy: {
-        ...state.busy,
-        protocolVariables: false
+      ...state.busy,
+      protocolVariables: false
     }
   }))
 )
