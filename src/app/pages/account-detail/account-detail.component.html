@@ -209,13 +209,18 @@
                 <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
                 <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
 
-                <div class="float-left">
-                  <span>Delegate to</span>
-                  <address-item [address]="selectedDelegation" [clickableButton]="false"></address-item>
+                <div class="d-flex align-items-center mb-2">
+                  <p class="d-inline-block m-0">Delegate to</p>
+                  <div class="d-inline-block ml-1">
+                    <address-item [address]="selectedDelegation" [clickableButton]="false"></address-item>
+                  </div>
                 </div>
-                <button class="btn btn-sm btn-primary-light w-100 mb-2" type="button" (click)="delegate()">
+                <button class="btn btn-sm btn-primary-light w-100" type="button" (click)="delegate()">
                   Delegate Now
                 </button>
+                <div class="d-flex justify-content-center">
+                  <small class="text-muted">or</small>
+                </div>
                 <ng-template #delegationControlTemplate let-model="item" let-index="index">
                   <address-item [address]="model" [clickableButton]="false"></address-item>
                 </ng-template>
@@ -229,7 +234,7 @@
                   [typeaheadScrollable]="true"
                   [typeaheadOptionsInScrollableView]="10"
                   [typeaheadOptionsLimit]="10000"
-                  placeholder="Search by Address / Alias"
+                  placeholder="Search Baker by name or address"
                   class="form-control form-control--focus-white"
                   (typeaheadOnSelect)="onDelegationControlSelect($event)"
                   [typeaheadIsFirstItemActive]="false"
