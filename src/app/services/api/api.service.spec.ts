@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { of } from 'rxjs'
+import { omit } from 'lodash'
 
 import { ApiService } from './api.service'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
@@ -18,6 +19,8 @@ import { getProposalServiceMock } from '@tezblock/services/proposal/proposal.ser
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
 import { Predicate } from '@tezblock/services/base.service'
+import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { getCacheServiceMock } from '@tezblock/services/cache/cache.service.mock'
 
 describe('ApiService', () => {
   let service: ApiService
@@ -29,6 +32,7 @@ describe('ApiService', () => {
   const rewardServiceMock = getRewardServiceMock()
   const proposalServiceMock = getProposalServiceMock()
   const accountServiceMock = getAccountServiceMock()
+  const cacheServiceMock = getCacheServiceMock()
   const mockedTransactions: Transaction[] = [
     {
       timestamp: 1,
@@ -77,7 +81,8 @@ describe('ApiService', () => {
         { provide: ProtocolVariablesService, useValue: protocolVariablesServiceMock },
         { provide: RewardService, useValue: rewardServiceMock },
         { provide: ProposalService, useValue: proposalServiceMock },
-        { provide: AccountService, useValue: accountServiceMock }
+        { provide: AccountService, useValue: accountServiceMock },
+        { provide: CacheService, useValue: cacheServiceMock }
       ]
     })
 
@@ -157,6 +162,11 @@ describe('ApiService', () => {
       accountServiceMock.getAccountsByIds.calls.reset()
     })
 
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
     it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
       const fakeSourceName = 'fakeSourceName'
       const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
@@ -229,6 +239,11 @@ describe('ApiService', () => {
       accountServiceMock.getAccountsByIds.calls.reset()
     })
 
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
     it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
       const fakeSourceName = 'fakeSourceName'
       const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
@@ -243,7 +258,6 @@ describe('ApiService', () => {
       service.getTransactionsByField('fake_value', 'fake_field', 'fake_kind', 10).subscribe(transactions => {
         expect(transactions).toEqual(<any>expectedTransactions)
         expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeSourceName])
-        
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
@@ -299,6 +313,11 @@ describe('ApiService', () => {
       accountServiceMock.getAccountsByIds.calls.reset()
     })
 
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
     it('calls getAccountsByIds with transaction of kind Delegation to set delegatedBalance', () => {
       const fakeSourceName = 'fakeSourceName'
       const mockedTransactions = [{ kind: OperationTypes.Transaction }, { kind: OperationTypes.Delegation, source: fakeSourceName }]
@@ -313,7 +332,6 @@ describe('ApiService', () => {
       service.getTransactionsByPredicates([predicate], 10).subscribe(transactions => {
         expect(transactions).toEqual(<any>expectedTransactions)
         expect(accountServiceMock.getAccountsByIds).toHaveBeenCalledWith([fakeSourceName])
-        
       })
 
       const req = httpMock.expectOne((<any>service).getUrl('operations'))
@@ -359,7 +377,177 @@ describe('ApiService', () => {
     })
   })
 
-  xdescribe('getLatestBlocksWithData', () => {
+  describe('getLatestBlocksWithData', () => {
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
+    it('gets blocks and appends volume, fee and txcount properties', () => {
+      const fake_level = 'fake_level'
+      const fakeBlock = {
+        level: fake_level
+      }
+      const fakeGetAdditionalBlockFieldObservableResult = {
+        block_level: fake_level,
+        sum_amount: 1,
+        sum_fee: 2,
+        count_operation_group_hash: 3
+      }
+
+      spyOn(service, 'getAdditionalBlockField').and.returnValue(of([fakeGetAdditionalBlockFieldObservableResult]))
+
+      service.getLatestBlocksWithData(1).subscribe(blocks => {
+        expect(blocks).toEqual([
+          <any>{
+            ...fakeBlock,
+            volume: fakeGetAdditionalBlockFieldObservableResult.sum_amount,
+            fee: fakeGetAdditionalBlockFieldObservableResult.sum_fee,
+            txcount: fakeGetAdditionalBlockFieldObservableResult.count_operation_group_hash
+          }
+        ])
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('blocks'))
+      expect(req.request.method).toBe('POST')
+      req.flush([fakeBlock])
+    })
+  })
+
+  describe('getAdditionalBlockField', () => {
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
+    it('when field is "operation_group_hash" then attach to request body predicate for kind', () => {
+      service.getAdditionalBlockField([], 'operation_group_hash', 'sum').subscribe(() => {})
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body.predicates).toContain({
+        field: 'kind',
+        operation: 'in',
+        set: ['transaction']
+      })
+      req.flush([])
+    })
+
+    it('when field is NOT "operation_group_hash" then does not attach to request body predicate for kind', () => {
+      service.getAdditionalBlockField([], 'foo', 'sum').subscribe(() => {})
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      expect(req.request.body.predicates).not.toContain({
+        field: 'kind',
+        operation: 'in',
+        set: ['transaction']
+      })
+      req.flush([])
+    })
+  })
+
+  describe('getFrozenBalance', () => {
+    afterEach(() => {
+      // We also run HttpTestingController#verify to make sure that there are no outstanding requests:
+      httpMock.verify()
+    })
+
+    it('when cache contains frozenBalance for current cycle then does not trigger http request', done => {
+      const fakeAddress = 'fake_address'
+      const fakeCycle = 50
+      const fakeFrozenBalance = 100
+
+      cacheServiceMock.get.and.returnValue(
+        of({
+          [fakeAddress]: {
+            frozenBalance: {
+              value: fakeFrozenBalance,
+              cycle: fakeCycle
+            }
+          }
+        })
+      )
+      storeMock.setState({
+        app: {
+          ...appInitialState,
+          latestBlock: {
+            meta_cycle: fakeCycle
+          }
+        }
+      })
+
+      service.getFrozenBalance(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byAddress)
+        httpMock.expectNone((<any>service).getUrl('delegates'))
+
+        done()
+      })
+    })
+
+    it('when cache contains frozenBalance NOT for current cycle then trigger http request', () => {
+      const fakeAddress = 'fake_address'
+      const fakeCycle = 50
+      const fakeFrozenBalance = 100
+
+      cacheServiceMock.get.and.returnValue(
+        of({
+          [fakeAddress]: {
+            frozenBalance: {
+              value: fakeFrozenBalance,
+              cycle: 13
+            }
+          }
+        })
+      )
+      storeMock.setState({
+        app: {
+          ...appInitialState,
+          latestBlock: {
+            meta_cycle: fakeCycle
+          }
+        }
+      })
+
+      service.getFrozenBalance(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byAddress)
+        expect(cacheServiceMock.update).toHaveBeenCalled()        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('delegates'))
+      expect(req.request.method).toBe('POST')
+      req.flush([{ frozen_balance: fakeFrozenBalance }])
+    })
+
+    it('when cache does not contain frozenBalance then trigger http request', () => {
+      const fakeAddress = 'fake_address'
+      const fakeCycle = 50
+      const fakeFrozenBalance = 100
+
+      cacheServiceMock.get.and.returnValue(
+        of(undefined)
+      )
+      storeMock.setState({
+        app: {
+          ...appInitialState,
+          latestBlock: {
+            meta_cycle: fakeCycle
+          }
+        }
+      })
+
+      service.getFrozenBalance(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byAddress)
+        expect(cacheServiceMock.update).toHaveBeenCalled()        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('delegates'))
+      expect(req.request.method).toBe('POST')
+      req.flush([{ frozen_balance: fakeFrozenBalance }])
+    })
+  })
+
+  xdescribe('getProposal', () => {
 
   })
 })

@@ -463,9 +463,9 @@ export class ApiService {
       .pipe(
         switchMap(blocks => {
           const blockRange = blocks.map(blocksList => blocksList.level)
-          const amountObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'amount', 'sum', limit)
-          const feeObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'fee', 'sum', limit)
-          const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
+          const amountObservable$ = this.getAdditionalBlockField(blockRange, 'amount', 'sum', limit)
+          const feeObservable$ = this.getAdditionalBlockField(blockRange, 'fee', 'sum', limit)
+          const operationGroupObservable$ = this.getAdditionalBlockField(blockRange, 'operation_group_hash', 'count', limit)
 
           return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
             map(([amount, fee, operationGroup]) =>
@@ -473,6 +473,7 @@ export class ApiService {
                 const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
                 const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
                 const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
+
                 return {
                   ...block,
                   volume: blockAmount ? blockAmount.sum_amount : 0,
@@ -486,128 +487,40 @@ export class ApiService {
       )
   }
 
-  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Promise<T[]> {
-    let headers
-    if (field === 'operation_group_hash') {
-      // then we only care about spend transactions
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          },
-          {
-            field: 'kind',
-            operation: 'in',
-            set: ['transaction']
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ]
-      }
-    } else {
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ]
-      }
+  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit?: number): Observable<T[]> {
+    const body = {
+      fields: [field, 'block_level'],
+      predicates: [
+        {
+          field,
+          operation: 'isnull',
+          inverse: true
+        },
+        {
+          field: 'block_level',
+          operation: 'in',
+          set: blockRange
+        }
+      ].concat(
+        field === 'operation_group_hash'
+          ? <any>{
+              field: 'kind',
+              operation: 'in',
+              set: ['transaction']
+            }
+          : []
+      ),
+      orderBy: [sort('block_level', 'desc')],
+      aggregation: [
+        {
+          field,
+          function: operation
+        }
+      ],
+      limit
     }
 
-    return new Promise((resolve, reject) => {
-      this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
-        resolve(volumePerBlock)
-      })
-    })
-  }
-
-  getAdditionalBlockFieldObservable<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
-    let headers
-    if (field === 'operation_group_hash') {
-      // then we only care about spend transactions
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          },
-          {
-            field: 'kind',
-            operation: 'in',
-            set: ['transaction']
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ],
-        limit
-      }
-    } else {
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ],
-        limit
-      }
-    }
-
-    return this.http.post<T[]>(this.transactionsApiUrl, headers, this.options)
+    return this.http.post<T[]>(this.transactionsApiUrl, body, this.options)
   }
 
   getOperationCount(field: string, value: string): Observable<OperationCount[]> {
