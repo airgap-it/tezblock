@@ -23,7 +23,8 @@
   },
   "tz1KtvGSYU5hdKD288a1koTBURWYuADJGrLE": {
     "alias": "Ø Crypto Pool",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1KzSC1J9aBxKp7u8TUnpN8L7S65PBRkgdF": {
     "alias": "HashQuark",
@@ -31,7 +32,8 @@
   },
   "tz1L3vFD8mFzBaS8yLHFsd7qDJY1t276Dh8i": {
     "alias": "Zednode",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1LBEKXaxQbd5Gtzbc1ATCwc3pppu81aWGc": {
     "alias": "Tez-Baking",
@@ -53,7 +55,8 @@
   },
   "tz1Lc87p6zRaDwzJs9kHvdpm7XzeWE8QTwVB": {
     "alias": "Dash Master",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Ldzz6k1BHdhuKvAtMRX7h5kJSMHESMHLC": {
     "alias": "PayTezos",
@@ -74,11 +77,13 @@
   },
   "tz1LesY3S4wfe15SNm1W3qJmQzWxLqVjTruH": {
     "alias": "Xtez",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Lh9jeLSWDHYy8AshvG2dpNQseDaHg7cms": {
     "alias": "TezosSpanish",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Lhf4J9Qxoe3DZ2nfe8FGDnvVj7oKjnMY6": {
     "alias": "Tez Baker",
@@ -90,7 +95,8 @@
   },
   "tz1LsuPvP2u63nouVGAPi13AYqqB2VQjhoSF": {
     "alias": "Drunk Tortuga Bakery",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1MDKr36woXfVtrtXfV1ppPJERxPcm2wU6V": {
     "alias": "Stack Tezos",
@@ -128,11 +134,13 @@
   },
   "tz1MkaTVYdM9QvXxKvYEwG9BPN2XxriTs7Jh": {
     "alias": "Tezos.bi23",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1MowoYvqgxhKToQMAmGgTtjfZcRfS733JY": {
     "alias": "StakeBake",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1NRGxXV9h6SdNaZLcgmjuLx3hyy2f8YoGN": {
     "alias": "Bake ꜩ For Me",
@@ -140,11 +148,13 @@
   },
   "tz1NkFRjmkqqcGkAhqe78fdgemDNKXvL7Bod": {
     "alias": "BakeMyStake",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Nn14BBsDULrPXtkM9UQeXaE4iqJhmqmK5": {
     "alias": "Tezos Kitchen",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1NortRftucvAkD1J58L32EhSVrQEWJCEnB": {
     "alias": "Bake'n'Rolls",
@@ -159,7 +169,8 @@
   },
   "tz1NqKH9D5HdfvoEQssMS5Up13CVypVxLA1k": {
     "alias": "Cypher-Baker",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1P2Po7YM526ughEsRbY4oR9zaUPDZjxFrb": {
     "alias": "P2P Validator",
@@ -167,23 +178,28 @@
   },
   "tz1P6kxtzRrJ8KfXE4kKqR1RBiSpEgimxN5o": {
     "alias": "Fractalide",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1P9GwUWeAyPoT3ZwBc6gWCTP9exEPaVU3w": {
     "alias": "XTZ Bakery I",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1PK8bNrfPbc73BtHH1A63jfU5UtbRFkvU4": {
     "alias": "EON",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1PPUo28B8BroqmVCMMNDudG4ShA2bzicrU": {
     "alias": "Tezos Korea",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1PYLN9TsKZHfn2GtrXnxkeGvahmYdBTG5v": {
     "alias": "Tezos Bakes 2",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1PeZx7FXy7QRuMREGXGxeipb24RsMMzUNe": {
     "alias": "Tezos Panda",
@@ -191,11 +207,13 @@
   },
   "tz1PesW5khQNhy4revu2ETvMtWPtuVyH2XkZ": {
     "alias": "Tz Dutch",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Pv7ha8wzAyRHkR9RahWapdopK1tt6nVz1": {
     "alias": "Baking co-operative",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1Pwgj6j55akKCyvTwwr9X4np1RskSXpQY4": {
     "alias": "Validators.com",
@@ -203,7 +221,8 @@
   },
   "tz1QGZ3dD2YpRKZ4APeso6EXTeyCUUkw6MQC": {
     "alias": "TezosBC_old",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1QLXqnfN51dkjeghXvKHkJfhvGiM5gK4tc": {
     "alias": "Fresh Tezos",
@@ -245,7 +264,8 @@
   },
   "tz1SkU5S3dDRi6f8LHCvYeK3H3Mjq4MS8uHW": {
     "alias": "Tezos OTC",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1SohptP53wDPZhzTWzDUFAUcWF6DMBpaJV": {
     "alias": "Hayek Lab",
@@ -253,11 +273,13 @@
   },
   "tz1Suih9uWEnubDeqCTCEfueSCGWYohjyaA5": {
     "alias": "XTZ Black",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1TAzNBtnq6vF6kg34ApectxXoxZVTyapq3": {
     "alias": "Tezos Gold",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1TDSmoZXwVevLTEvKCTHWpomG76oC9S2fJ": {
     "alias": "Tezos Capital Legacy",
@@ -273,11 +295,13 @@
   },
   "tz1TgvirXEwVJPg1cCrxT9zFubdzw7Ng6Ke9": {
     "alias": "Tezos Moon",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1TnYeuR4HhUTapQiXvzcjmcpvZYwR1B5S3": {
     "alias": "XTZ Bakery II",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Tnjaxk6tbAeC2TmMApPh8UsrEVQvhHvx5": {
     "alias": "Crypto Delegate",
@@ -285,7 +309,8 @@
   },
   "tz1TzaNn7wSQSP5gYPXCnNzBCpyMiidCq1PX": {
     "alias": "Flippin' tacos",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1U638Z3xWRiXDDKx2S125MCCaAeGDdA896": {
     "alias": "Tezos France",
@@ -309,7 +334,8 @@
   },
   "tz1VHFxUuBhwopxC9YC9gm5s2MHBHLyCtvN1": {
     "alias": "Hyperblocks",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1VYQpZvjVhv1CdcENuCNWJQXu1TWBJ8KTD": {
     "alias": "Tezos Tokyo",
@@ -344,7 +370,8 @@
   },
   "tz1RAzdkp1x5ZDqms4ZUrSdfJuUYGH9JTPK2": {
     "alias": "Tezos Spanish",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1W5VkdB5s7ENMESVBtwyt9kyvLqPcUczRT": {
     "alias": "Tezgate",
@@ -360,7 +387,8 @@
   },
   "tz1W1qbXXJrtLWwaaoXhe8LYGZqmNnpKaH9q": {
     "alias": "01No.de",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1WBfwbT66FC6BTLexc2BoyCCBM9LG7pnVW": {
     "alias": "888 XTZ",
@@ -395,11 +423,13 @@
   },
   "tz1X1fpAZtwQk94QXUgZwfgsvkQgyc2KHp9d": {
     "alias": "ownBLOCK",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1XQ7SRj4QQWjaeebNd8dFwuTrCot3GGDRF": {
     "alias": "Tz Baker",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1XXayQohB8XRXN7kMoHbf2NFwNiH3oMRQQ": {
     "alias": "Bit Cat",
@@ -411,7 +441,8 @@
   },
   "tz1Y42aKCk53vMbaJNpf1hBg1rznGdBxHJ5C": {
     "alias": "Tezos Berlin",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1YKh8T79LAtWxX29N5VedCSmaZGw9LNVxQ": {
     "alias": "TezosBr",
@@ -419,15 +450,23 @@
   },
   "tz1YTyvABUyhE7JHpxMVBVqjZnZM4ofMrWKE": {
     "alias": "Tezos Delegate EU",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Yc6ATtfUJyDjHwJ8WoVL22sJueDenueke": {
     "alias": "TezDele Baker A",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1YdCPrYbksK7HCoYKDyzgfXwY16Fy9rrGa": {
+    "alias": "Norn Delegate Old",
+    "hasLogo": true,
+    "acceptsDelegations": false
+  },
+  "tz1cSj7fTex3JPd1p1LN1fwek6AV1kH93Wwc": {
     "alias": "Norn Delegate",
-    "hasLogo": true
+    "hasLogo": true,
+    "logoReference": "tz1YdCPrYbksK7HCoYKDyzgfXwY16Fy9rrGa"
   },
   "tz1YgNQBeLTgbwRb7QiyvHrx7hwN7AUbdqpB": {
     "alias": "Baker Avenue",
@@ -435,7 +474,8 @@
   },
   "tz1Yh1nLXfwqVpP8btykuRguu61n3veVmADa": {
     "alias": "TzBakeOven",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1Yju7jmmsaUiG9qQLoYv35v5pHgnWoLWbt": {
     "alias": "Polychain Labs",
@@ -443,7 +483,8 @@
   },
   "tz1YvG6poSGhPLTdzbzCmqShMndzoyhyVg7J": {
     "alias": "tezosbaking.club",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Z1WwoqgRFbLE3YNdYRpCx44NSfiMJzeAG": {
     "alias": "Bakemon",
@@ -459,11 +500,13 @@
   },
   "tz1ZKi4VrDMEQpypn2NTn9pPbZL3xLRkETLA": {
     "alias": "XTZ-Baker",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1ZQppA6UerMz5CJtGvZmmB6z8L9syq7ixu": {
     "alias": "First Block",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1ZRWFLgT9sz8iFi1VYWPfRYeUvUSFAaDao": {
     "alias": "Delegated Capital",
@@ -471,7 +514,8 @@
   },
   "tz1ZTG13gkvouxSANka3HG3uys8C5gu3DPXZ": {
     "alias": "Just a Baker",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1Zcxkfa5jKrRbBThG765GP29bUCU3C4ok5": {
     "alias": "Tezz City",
@@ -483,11 +527,13 @@
   },
   "tz1ZuxNqUk7odhMC4Bfx2NXXeej9ReXKewa8": {
     "alias": "SNZ Holding",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1aRhFErGMgL57DYHMT1vYwv7PzsJN1chrk": {
     "alias": "Baked Tezos",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1abTjX2tjtMdaq5VCzkDtBnMSCFPW2oRPa": {
     "alias": "TEZ Rocket",
@@ -509,11 +555,13 @@
   },
   "tz1b2mCFQm8isfJRGUctgyxHhHcmTNTRPdps": {
     "alias": "Tezos Barcelona",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1b3SaPHFSw51r92ARcV5mGyYbSSsdFd5Gz": {
     "alias": "Tezos MX",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1b7YSEeNRqgmjuX4d4aiai2sQTF4A7WBZf": {
     "alias": "Tezos Japan",
@@ -556,7 +604,8 @@
   },
   "tz1c7pVR4w3KSQarJdBeh4NS2WxMUFBy1rHQ": {
     "alias": "MyBakerSpace",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1cX93Q3KsiTADpCC4f12TBvAmS5tw7CW19": {
     "alias": "Tz Bakery",
@@ -572,7 +621,8 @@
   },
   "tz1d2EwsrmoCPmhNUjt7unCQ8a9RwVsVXEmd": {
     "alias": "BTFD",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1d6Fx42mYgVFnHUW8T8A7WBfJ6nD9pVok8": {
     "alias": "MyTezosBaking",
@@ -591,7 +641,8 @@
   },
   "tz1dp3tScJZy8Go3byPdioSujgDi5CdemiuZ": {
     "alias": "iBakeTezos",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1e2meErj7eEfXwqr7bDK6N1YatmLaugfMp": {
     "alias": "STB",
@@ -610,11 +661,13 @@
   },
   "tz1eFXLaCUcKbhXkLBGUGMGNY9tKHjWGG25V": {
     "alias": "Tezos Node Spain",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1eZwq8b5cvE2bPKokatLkVMzkxz24z3Don": {
     "alias": "You Loaf We Bake",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1ei4WtWEMEJekSv8qDnu9PExG6Q8HgRGr3": {
     "alias": "Bake Tz",
@@ -634,7 +687,8 @@
   },
   "tz1gk3TDbU7cJuiBRMhwQXVvgDnjsxuWhcEA": {
     "alias": "Airfoil",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1go7f6mEQfT2xX2LuHAqgnRGN6c2zHPf5c": {
     "alias": "Stakery",
@@ -657,11 +711,13 @@
   },
   "tz1iJ4qgGTzyhaYEzd1RnC6duEkLBd1nzexh": {
     "alias": "Tz Envoy",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1iLbZZ9uoRuVJCrZ9ZwiJMpfzhy3c67mav": {
     "alias": "AirBie",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1iMAHAVpkCVegF9FLGWUpQQeiAHh4ffdLQ": {
     "alias": "Wetez Wallet",
@@ -669,7 +725,8 @@
   },
   "tz1iZEKy4LaAjnTmn2RuGDf2iqdAQKnRi8kY": {
     "alias": "Tezzigator Legacy",
-    "hasLogo": false
+    "hasLogo": false,
+    "acceptsDelegations": false
   },
   "tz1irJKkXS2DBWkU1NnmFQx1c1L7pbGg4yhk": {
     "alias": "Coinbase Custody",
@@ -679,7 +736,8 @@
   },
   "tz1isXamBXpTUgbByQ6gXgZQg4GWNW7r6rKE": {
     "alias": "Tez Whale",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz2FCNBrERXtaTtNX6iimR1UJ5JSDxvdHM93": {
     "alias": "Stake.fish",
@@ -687,7 +745,8 @@
   },
   "tz2LBtbMMvvguWQupgEmtfjtXy77cHgdr5TE": {
     "alias": "Tezcentral",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz2PdGc7U5tiyqPgTSgqCDct94qd6ovQwP6u": {
     "alias": "Tezos Capital",
@@ -818,7 +877,8 @@
   },
   "tz1dhwJY5B1jKdkF7zcyu1v6EBEQjpGmAp1E": {
     "alias": "Tezzz",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1XhnCdVENzgko5x1MMswLHSoQbJ5NPwLZ6": {
     "alias": "Anonstake",
@@ -830,11 +890,18 @@
   },
   "tz1fvBC1cHJzPtUW3ZKd2GZDj7P4XVuLk9vW": {
     "alias": "Steaker",
-    "hasLogo": true
+    "hasLogo": true,
+    "acceptsDelegations": false
   },
   "tz1egbN6RK2bM5vt4aAZw6r9j4nL8z49bPdS": {
-    "alias": "Money Every 3 Days",
-    "hasLogo": true
+    "alias": "Money Every 3 Days Old",
+    "hasLogo": true,
+    "acceptsDelegations": false
+  },
+  "tz1NEKxGEHsFufk87CVZcrqWu8o22qh46GK6": {
+    "alias": "Money Every 3 Days Old",
+    "hasLogo": true,
+    "logoReference": "tz1egbN6RK2bM5vt4aAZw6r9j4nL8z49bPdS"
   },
   "tz1V3yg82mcrPJbegqVCPn6bC8w1CSTRp3f8": {
     "alias": "TezoShop",
@@ -907,6 +974,10 @@
   },
   "tz3QCNyySViKHmeSr45kzDxzchys7NiXCWoa": {
     "alias": "Proofofbake.com",
+    "hasLogo": true
+  },
+  "tz1S5WxdZR5f9NzsPXhr7L9L1vrEb5spZFur": {
+    "alias": "Baking Benjamins",
     "hasLogo": true
   }
 }
