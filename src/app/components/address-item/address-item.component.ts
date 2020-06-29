@@ -80,7 +80,7 @@ export class AddressItemComponent implements OnInit {
 
   ngOnInit() {}
 
-  private getFormattedAddress() {
+  private getFormattedAddress(): string {
     const getAliasOrShorten = () => this.aliasPipe.transform(this.address) || this.shortenStringPipe.transform(this.address)
 
     if (!this.options) {

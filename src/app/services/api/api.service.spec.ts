@@ -2,7 +2,6 @@ import { TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
 import { of } from 'rxjs'
-import { omit } from 'lodash'
 
 import { ApiService } from './api.service'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
@@ -547,7 +546,64 @@ describe('ApiService', () => {
     })
   })
 
-  xdescribe('getProposal', () => {
+  describe('getProposal', () => {
+    it('when cache contains period for given address then does not trigger http request', done => {
+      const fakeAddress = 'fake_address'
+      const fakePeriod = 13
 
+      cacheServiceMock.get.and.returnValue(
+        of({
+          [fakeAddress]: fakePeriod
+        })
+      )
+
+      service.getProposal(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byProposal)
+        httpMock.expectNone((<any>service).getUrl('operations'))
+
+        done()
+      })
+    })
+
+    it('when cache contains period NOT for given address then trigger http request', () => {
+      const fakeAddress = 'fake_address'
+      const fakePeriod = 13
+
+      cacheServiceMock.get.and.returnValue(
+        of({
+          'anotherAddress': fakePeriod
+        })
+      )
+
+      service.getProposal(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byProposal)
+        expect(cacheServiceMock.update).toHaveBeenCalled()        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush([{ proposal: '[proposal]', period: 14 }])
+    })
+
+    it('when cache does not contain period then trigger http request', () => {
+      const fakeAddress = 'fake_address'
+
+      cacheServiceMock.get.and.returnValue(
+        of(undefined)
+      )
+
+      service.getProposal(fakeAddress).subscribe(value => {
+        expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byProposal)
+        expect(cacheServiceMock.update).toHaveBeenCalled()        
+      })
+
+      const req = httpMock.expectOne((<any>service).getUrl('operations'))
+      expect(req.request.method).toBe('POST')
+      req.flush([{ proposal: '[proposal]', period: 14 }])
+    })
+  })
+
+  // TODO: refactor Tim's code in this method (and next) first
+  xdescribe('getBalanceForLast30Days', () => {
   })
 })
