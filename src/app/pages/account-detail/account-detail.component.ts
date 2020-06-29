@@ -608,7 +608,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   delegate() {
     this.beaconService
-      .delegate(this.address)
+      .delegate(this.selectedDelegation)
       .then((response: OperationResponseOutput) => {
         this.store$.dispatch(actions.loadDelegation())
       })
