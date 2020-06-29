@@ -61,9 +61,9 @@ describe('BeaconService', () => {
       })
     })
 
-    // it randomly passes or fails ( maybe requestPermissions is triggered internaly by beacon .. )
-    xit('when account in active, then does not call DAppClient.requestPermissions', done => {
+    it('when account in active, then does not call DAppClient.requestPermissions', done => {
       dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(true))
+      dAppClientMock.requestPermissions.calls.reset()
 
       service.delegate('foo').then(() => {
         expect(dAppClientMock.requestPermissions).not.toHaveBeenCalled()
