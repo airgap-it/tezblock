@@ -111,7 +111,7 @@ export class ProposalDetailEffects {
       switchMap(([{ periodKind }, proposalHash, pagination]) =>
         this.proposalService.getProposalVotes(proposalHash, pagination).pipe(
           switchMap((votes: Transaction[]) =>
-            this.apiService.addVoteData(votes).pipe(
+            this.proposalService.addVoteData(votes).pipe(
               map(votes => actions.loadVotesSucceeded({ votes })),
               catchError(error => of(actions.loadVotesFailed({ error })))
             )

@@ -118,6 +118,23 @@
               </ng-container>
 
               <div class="row">
+                <div class="col-md-12 mb-4">
+                  <span class="badge badge-pill badge-light mr-2">
+                    <fa-icon
+                      [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
+                      [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
+                    ></fa-icon>
+                  </span>
+                  <ng-container *ngIf="data?.acceptsDelegations">
+                    Accepts Delegations
+                  </ng-container>
+                  <ng-container *ngIf="!data?.acceptsDelegations">
+                    Does Not Accept Delegations
+                  </ng-container>
+                </div>
+              </div>
+
+              <div class="row">
                 <div class="col-md-12">
                   <div class="mb-4">
                     <h5 class="card-title__secondary mb-3">
@@ -296,7 +313,7 @@
                       type="button"
                       target="_blank"
                       [ngClass]="{ 'btn-link': !(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null }"
-                      [href]="'https://www.tezos-nodes.com/baker/' + accountAddress"
+                      [href]="'https://tezos-nodes.com/baker/' + accountAddress"
                     >
                       <ng-container *ngIf="!(efficiencyLast10CyclesLoading$ | async) && (efficiencyLast10Cycles$ | async) !== null">
                         {{ (efficiencyLast10Cycles$ | async) / 100 | percentage }}

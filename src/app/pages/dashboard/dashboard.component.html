@@ -106,14 +106,14 @@
                 <h5 class="card-title__secondary mb-3 ">
                   Circulating Supply
                 </h5>
-                <h3>837,306,031 ꜩ</h3>
+                <h3>839,352,372 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 Market Cap
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('837306031').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('839352372').toFormat(0) }}</h3>
             </div>
             <div class=" col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
@@ -170,6 +170,37 @@
       </div>
     </div>
   </div>
+
+  <div class="container p-0 my-5">
+    <div class="row mb-4">
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card latest py-4 h-100">
+          <div class="card-body p-4 ">
+            <h5 class="card-title mb-4 ">
+              Latest Blocks
+            </h5>
+            <block-item [blocks$]="blocks$"></block-item>
+            <button type="button" routerLink="/block/list" class="btn btn-primary-light btn-sm btn-block">
+              All Blocks
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="card latest py-4 h-100">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-4 ">
+              Latest Transactions
+            </h5>
+            <transaction-item [data]="transactions$"></transaction-item>
+            <button type="button" routerLink="/transaction/list" class="btn btn-primary-light btn-sm btn-block">
+              All Transactions
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="container p-0 my-5">
     <div class="card py-4 h-100">
       <div class="card-body p-4 ">
@@ -188,36 +219,6 @@
               Latest Transfers
             </h5>
             <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="container p-0 my-5">
-    <div class="row mb-4">
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="card latest py-4 h-100">
-          <div class="card-body p-4 ">
-            <h5 class="card-title mb-4 ">
-              Latest Blocks
-            </h5>
-            <block-item [blocks$]="blocks$"></block-item>
-            <button type="button" [routerLink]="['/block/list']" class="btn btn-primary-light btn-sm btn-block">
-              All Blocks
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 mb-4 mb-lg-0">
-        <div class="card latest py-4 h-100">
-          <div class="card-body p-4">
-            <h5 class="card-title mb-4 ">
-              Latest Transactions
-            </h5>
-            <transaction-item [data]="transactions$"></transaction-item>
-            <button type="button" [routerLink]="['/transaction/list']" class="btn btn-primary-light btn-sm btn-block">
-              All Transactions
-            </button>
           </div>
         </div>
       </div>

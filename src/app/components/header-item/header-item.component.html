@@ -4,7 +4,7 @@
       <nav class="navbar navbar-expand-lg py-4 px-0">
         <div class="d-block">
           <div class="d-flex align-items-end">
-            <a class="navbar-brand mr-0 p-0" [routerLink]="['/']">
+            <a class="navbar-brand mr-0 p-0" routerLink="/">
               <img src="/assets/img/tezblock_logo.svg" width="160px" height="auto" />
             </a>
             <a href="https://airgap.it" target="_blank" class="text-dark">
@@ -48,13 +48,7 @@
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
-                <button
-                  type="button"
-                  class="btn"
-                  routerLinkActive="btn-link"
-                  [routerLinkActiveOptions]="{ exact: true }"
-                  [routerLink]="['/']"
-                >
+                <button type="button" class="btn" routerLinkActive="btn-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="/">
                   Overview
                 </button>
               </li>
@@ -82,23 +76,18 @@
                           Operations
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/transaction/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/transaction/list">
                             Transactions
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/activation/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/activation/list">
                             Activations
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/origination/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/origination/list">
                             Originations
-                          </a>
-                        </li>
-                        <li>
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
-                            Accounts
                           </a>
                         </li>
                       </ul>
@@ -108,32 +97,32 @@
                         </li>
 
                         <li>
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/baker/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/baker/list">
                             Bakers
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/block/list']">Blocks</a>
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/block/list">Blocks</a>
                         </li>
 
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/endorsement/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/endorsement/list">
                             Endorsements
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/delegation/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/delegation/list">
                             Delegations
                           </a>
                         </li>
                         <hr />
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-baking/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/double-baking/list">
                             Double Baking Evidence
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/double-endorsement/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/double-endorsement/list">
                             Double Endorsement Evidence
                           </a>
                         </li>
@@ -143,28 +132,27 @@
                           Governance
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/vote/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/vote/list">
                             Votes
                           </a>
                         </li>
                         <li>
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/proposal/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/proposal/list">
                             Proposals
                           </a>
                         </li>
                       </ul>
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
-                          Smart Contracts
+                          Accounts
                         </li>
-
-                        <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/token-contract/list']">
-                            Asset Contracts
+                        <li>
+                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
+                            Top Accounts
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/contract/list']">
+                          <a class="dropdown-item" routerLinkActive="active" routerLink="/contract/list">
                             Contracts
                           </a>
                         </li>
@@ -173,6 +161,17 @@
                   </ul>
                 </span>
               </div>
+              <li class="nav-item">
+                <button
+                  type="button"
+                  class="btn"
+                  routerLinkActive="btn-link"
+                  [ngClass]="{ 'btn-link': activeLinkAssets }"
+                  [routerLink]="['/token-contract/list']"
+                >
+                  Assets
+                </button>
+              </li>
               <li class="nav-item dropdown">
                 <span class="d-block" dropdown [triggers]="triggers" #dp2="bs-dropdown">
                   <a
@@ -191,17 +190,17 @@
                   </a>
                   <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources" (mouseleave)="dp2.hide()">
                     <li role="menuitem">
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/wallets']">
+                      <a class="dropdown-item" routerLinkActive="active" routerLink="/resources/wallets">
                         Wallets
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/constants']">
+                      <a class="dropdown-item" routerLinkActive="active" routerLink="/constants">
                         Constants
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/health']">
+                      <a class="dropdown-item" routerLinkActive="active" routerLink="/health">
                         tezblock Health
                       </a>
                     </li>

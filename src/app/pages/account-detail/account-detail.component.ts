@@ -31,13 +31,16 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
 import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
-import { get } from '@tezblock/services/fp'
+import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 
@@ -126,6 +129,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   contractAssetsBalance$: Observable<number>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
+  isExchange: boolean
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -229,7 +233,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly toastrService: ToastrService,
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private aliasService: AliasService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -253,8 +260,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               .select(state => state.accountDetails.bakerReward)
               .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
           : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
-              map(([rewardAmont, tezosBakerFee]) =>
-                rewardAmont && tezosBakerFee ? getRewardAmountMinusFee(rewardAmont, tezosBakerFee) : null
+              map(([rewardAmount, tezosBakerFee]) =>
+                rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
               )
             )
       )
@@ -265,13 +272,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         account.is_baker
           ? this.store$.select(state => state.accountDetails.busy.bakerReward)
           : combineLatest(
-              this.store$.select(state => state.accountDetails.busy.rewardAmont),
+              this.store$.select(state => state.accountDetails.busy.rewardAmount),
               this.store$.select(state => state.accountDetails.rewardAmount),
               this.tezosBakerFee$
             ).pipe(
               map(
-                ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) =>
-                  !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+                ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
+                  !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
               )
             )
       )
@@ -351,15 +358,22 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
+        const jsonAccount = accounts[address]
 
         this.reset()
         this.setTabs(address)
         this.store$.dispatch(actions.loadBalanceForLast30Days({ address }))
         this.getBakingInfos(address)
 
-        if (accounts.hasOwnProperty(address) && !!this.aliasPipe.transform(address)) {
-          this.hasAlias = true
-          this.hasLogo = accounts[address].hasLogo
+        if (jsonAccount) {
+          this.hasAlias = !!this.aliasPipe.transform(address)
+          this.hasLogo = jsonAccount.hasLogo
+          this.isExchange = jsonAccount.isExchange
+        }
+
+        this.bakerTableInfos = {
+          ...this.bakerTableInfos,
+          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -369,22 +383,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .select(state => state.accountDetails.delegatedAccounts)
         .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
         .subscribe(delegatedAccounts => {
-          if (!delegatedAccounts) {
+          const delegatedAccount: Account = first(delegatedAccounts)
+
+          if (!delegatedAccounts /* null */) {
             this.delegatedAccountAddress = undefined
 
             return
           }
 
-          if (delegatedAccounts.length > 0) {
-            this.delegatedAccountAddress = delegatedAccounts[0].account_id
-            this.bakerAddress = delegatedAccounts[0].delegate_value
-            this.delegatedAmount = delegatedAccounts[0].balance
-            this.setRewardAmont()
+          if (!delegatedAccount /* delegatedAccounts is [<empty> | null | undefined] */) {
+            this.delegatedAccountAddress = ''
 
             return
           }
 
-          this.delegatedAccountAddress = ''
+          this.delegatedAccountAddress = delegatedAccount.account_id
+          this.bakerAddress = delegatedAccount.delegate_value
+          this.delegatedAmount = delegatedAccount.balance
+          this.setRewardAmont()
         }),
 
       // refresh account
@@ -440,6 +456,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+
+    this.titleService.setTitle(`Tezos Address: ${this.aliasService.getFormattedAddress(this.address)} - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Account Address ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
+    })
   }
 
   private getBakingInfos(address: string) {
@@ -479,7 +501,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           )
         )
         .subscribe(bakerInfos => {
-          this.bakerTableInfos = bakerInfos ?? {
+          this.bakerTableInfos = {
+            ...this.bakerTableInfos,
+            ...bakerInfos,
             payoutAddress
           }
         })
@@ -501,7 +525,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     }
 
     this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
-    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
+    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmount: null }))
   }
 
   tabSelected(kind: string) {

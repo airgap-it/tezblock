@@ -18,6 +18,7 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Baker } from '@tezblock/services/api/api.service'
 import { OrderBy } from '@tezblock/services/base.service'
+import { Title, Meta } from '@angular/platform-browser'
 
 const labelsParams = {
   display: true,
@@ -51,7 +52,6 @@ const palette = [
   '#3f51b5',
   '#5c6bc0',
   '#0d47a1',
-  // plus some 6 random ones ...
   '#e91e63',
   '#d81b60',
   '#c2185b',
@@ -84,7 +84,9 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     private readonly aliasPipe: AliasPipe,
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
   }
@@ -135,6 +137,12 @@ export class BakerOverviewComponent extends BaseComponent implements OnInit {
     )
 
     this.columns = columns
+
+    this.titleService.setTitle(`Tezos Bakers - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Top 25 Tezos bakers on tezblock with information about balance, number of votes, staking balance and number of delegators.">`
+    })
   }
 
   loadMore() {
