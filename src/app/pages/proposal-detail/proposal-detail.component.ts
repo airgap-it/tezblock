@@ -122,7 +122,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
     )
-    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.proposalHash)} Proposal - tezblock`)
+    this.titleService.setTitle(`Proposal ${this.aliasService.getFormattedAddress(this.proposalHash)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Proposal Hash ${this.proposalHash}. The name, period, discussion, features, documentation, exploration, testing and promotion of the proposal are detailed on tezblock.">`
