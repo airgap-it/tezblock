@@ -8,6 +8,10 @@ import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 export const columns: { [key: string]: (options: { showFiatValue: boolean }) => Column[] } = {
   [OperationTypes.BakingRights]: (options?: { showFiatValue?: boolean }) => [
     {
+      name: 'Status',
+      field: 'rightStatus'
+    },
+    {
       name: 'Cycle',
       field: 'cycle',
       template: Template.basic
@@ -38,6 +42,10 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
   ],
 
   [OperationTypes.EndorsingRights]: (options?: { showFiatValue?: boolean }) => [
+    {
+      name: 'Status',
+      field: 'rightStatus'
+    },
     {
       name: 'Cycle',
       field: 'cycle',

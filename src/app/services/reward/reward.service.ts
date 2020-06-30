@@ -67,6 +67,10 @@ export class RewardService {
     )
   }
 
+  getCycles4Rewards(): Observable<number[]> {
+    return this.getCurrentCycle().pipe(map(currentCycle => range(0, 6).map(index => currentCycle - 2 + index)))
+  }
+
   getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
     return this.getLastCycles(pagination).pipe(switchMap(cycles => forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle)))))
   }
@@ -152,7 +156,7 @@ export class RewardService {
     return this.calculateRewards(address, cycle).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
   }
 
-  private getCurrentCycle(): Observable<number> {
+  getCurrentCycle(): Observable<number> {
     return this.store$.select(fromRoot.app.currentCycle).pipe(filter(negate(isNil)), take(1))
   }
 
@@ -198,7 +202,6 @@ export class RewardService {
     const indexForEvidenceOperations = 2
     const operationGroups: any[] = block.operations[indexForEvidenceOperations]
     const operationGroup = operationGroups.find(operationGroup => operationGroup.hash === operationGroupHash)
-
     return operationGroup.contents.find((operation: { kind: string }) => operation.kind === kind)
   }
 
