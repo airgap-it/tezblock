@@ -90,7 +90,28 @@ export const operationErrorToMessage = (
   if (operationError.id.indexOf('cannot_pay_storage_fee') !== -1) {
     return {
       title: 'Cannot pay storage fees',
-      description: 'The storage fee is higher than the account balance'
+      description: `The storage fee is higher than the account balance`
+    }
+  }
+
+  if (operationError.id.indexOf('delegate.unchanged') !== -1) {
+    return {
+      title: 'Unchanged delegated',
+      description: `The contract is already delegated to the given delegate`
+    }
+  }
+
+  if (operationError.id.indexOf('delegate.no_deletion') !== -1) {
+    return {
+      title: 'Forbidden delegate deletion',
+      description: `Tried to unregister a delegate`
+    }
+  }
+
+  if (operationError.id.indexOf('michelson_v1.runtime_error') !== -1) {
+    return {
+      title: 'Script runtime error',
+      description: 'Toplevel error for all runtime script errors'
     }
   }
 
