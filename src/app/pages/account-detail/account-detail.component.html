@@ -213,7 +213,39 @@
                 <h5 class="text-secondary pt-3">
                   <strong>{{ 'account-detail.not-delegated' | translate }}</strong>
                 </h5>
-                <p class="text-secondary pt-3">{{ 'account-detail.not-delegated_teyt' | translate }}</p>
+                <p class="text-secondary pt-3">{{ 'account-detail.not-delegated_text' | translate }}</p>
+
+                <div class="d-flex align-items-center mb-2">
+                  <p class="d-inline-block m-0">{{ 'account-detail.delegate-to' | translate }}</p>
+                  <div class="d-inline-block ml-2">
+                    <address-item [address]="selectedDelegation" [clickableButton]="false"></address-item>
+                  </div>
+                </div>
+                <button class="btn btn-sm btn-primary-light w-100" type="button" (click)="delegate()">
+                  {{ 'account-detail.delegate-now' | translate }}
+                </button>
+                <div class="d-flex justify-content-center">
+                  <small class="text-muted">{{ 'account-detail.or' | translate }}</small>
+                </div>
+                <ng-template #delegationControlTemplate let-model="item" let-index="index">
+                  <address-item [address]="model" [clickableButton]="false"></address-item>
+                </ng-template>
+                <input
+                  [formControl]="delegationControl"
+                  [typeahead]="delegationControlDataSource$"
+                  [typeaheadAsync]="true"
+                  [typeaheadItemTemplate]="delegationControlTemplate"
+                  [adaptivePosition]="true"
+                  [typeaheadMinLength]="0"
+                  [typeaheadScrollable]="true"
+                  [typeaheadOptionsInScrollableView]="10"
+                  [typeaheadOptionsLimit]="10000"
+                  placeholder="Search Baker by name or address"
+                  class="form-control form-control--focus-white"
+                  (typeaheadOnSelect)="onDelegationControlSelect($event)"
+                  [typeaheadIsFirstItemActive]="false"
+                  [isAnimated]="true"
+                />
               </ng-container>
               <ng-container *ngIf="delegatedAccountAddress">
                 <div class="row mb-3">

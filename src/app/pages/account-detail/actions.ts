@@ -37,6 +37,7 @@ export const loadAccount = createAction(`[${featureName}] Load Account`, props<{
 export const loadAccountSucceeded = createAction(`[${featureName}] Load Account Succeeded`, props<{ account: Account }>())
 export const loadAccountFailed = createAction(`[${featureName}] Load Account Failed`, props<{ error: any }>())
 
+export const loadDelegation = createAction(`[${featureName}] Refresh Delegation`)
 export const loadDelegatedAccountsSucceeded = createAction(
   `[${featureName}] Load Delegated Accounts Succeeded`,
   props<{ accounts: GetDelegatedAccountsResponseDto }>()

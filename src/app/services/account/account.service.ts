@@ -3,12 +3,35 @@ import { forkJoin, Observable, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { HttpClient } from '@angular/common/http'
 
-import { Account } from '../../interfaces/Account'
+import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
 import { ApiService } from '../api/api.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { sort } from '@tezblock/domain/table'
+import { get } from '@tezblock/services/fp'
+
+const accounts = require('../../../assets/bakers/json/accounts.json')
+
+export const getAddressesFilteredBy = (phrase: string) =>
+  Object.keys(accounts).filter(address => {
+    if (!phrase) {
+      return true
+    }
+
+    return address.toLowerCase().includes(phrase.toLowerCase())
+  })
+
+export const getAddressByAlias = (alias: string) => Object.keys(accounts).find(address => accounts[address].alias === alias)
+
+export const getBakers = (): JsonAccountData[] =>
+  Object.keys(accounts)
+    .map(address => ({ ...accounts[address], address }))
+    .filter(
+      account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
+    )
+
+export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean => jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
