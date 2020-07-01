@@ -36,6 +36,7 @@ export interface OperationError {
   contract?: string
   balance?: string
   amount?: string
+  delegate?: string
 }
 
 export interface RPCContent {
@@ -104,14 +105,14 @@ export const operationErrorToMessage = (
   if (operationError.id.indexOf('delegate.no_deletion') !== -1) {
     return {
       title: 'Forbidden delegate deletion',
-      description: `Tried to unregister a delegate`
+      description: `Tried to unregister a delegate: ${operationError.delegate}`
     }
   }
 
   if (operationError.id.indexOf('michelson_v1.runtime_error') !== -1) {
     return {
       title: 'Script runtime error',
-      description: 'Toplevel error for all runtime script errors'
+      description: `Toplevel error for all runtime script errors`
     }
   }
 
