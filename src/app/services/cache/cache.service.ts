@@ -87,7 +87,7 @@ export class CacheService {
 
   set<T>(key: CacheKeys, value: T): Observable<undefined> {
     if (!this.isMainnet) {
-      return of()
+      return of(undefined)
     }
 
     return this.storage.set(key, value)
@@ -95,7 +95,7 @@ export class CacheService {
 
   get<T>(key: CacheKeys): Observable<T> {
     if (!this.isMainnet) {
-      return of()
+      return of(undefined)
     }
 
     return <Observable<T>>this.storage.get(key)
@@ -123,7 +123,7 @@ export class CacheService {
 
   executeUpdate<T>(key: CacheKeys, change: (value: T) => T): Observable<undefined> {
     if (!this.isMainnet) {
-      return of()
+      return of(undefined)
     }
 
     this.isBusy[key] = true
