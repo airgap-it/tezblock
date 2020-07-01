@@ -22,6 +22,8 @@ import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { OrderBy } from '@tezblock/services/base.service'
 import { TranslateService } from '@ngx-translate/core'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -31,6 +33,10 @@ import { TranslateService } from '@ngx-translate/core'
 export class TransactionDetailComponent extends BaseComponent implements OnInit {
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
+  }
+
+  get transactionHash(): string {
+    return this.activatedRoute.snapshot.params.id
   }
 
   tabs: Tab[]
@@ -54,7 +60,12 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private readonly activatedRoute: ActivatedRoute,
+    private titleService: Title,
+    private metaTagService: Meta,
+
+    private aliasService: AliasService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -111,6 +122,11 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.transactionHash)} Operation - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Transaction ${this.transactionHash}. The transaction hash, block level, timestamp, value, fees and and tranfers are detailed on tezblock.">`
+    })
   }
 
   copyToClipboard(val: string) {

@@ -1,5 +1,9 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
+    <h1 hidden="true">
+      contract detail page with information about name, symbol, total supply, manager, description, website, transfers and other calls of
+      transactions
+    </h1>
     <ng-container *ngIf="contract$ | async as contract; else noContract">
       <div class="row mb-4">
         <!-- TODO: create component ( the same as in account-detail ) -->

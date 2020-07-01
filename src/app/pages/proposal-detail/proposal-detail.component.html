@@ -1,6 +1,10 @@
 <ng-container *ngIf="proposal$ | async as proposal; else noProposal">
   <div class="mb-5 pt-5">
     <div class="container p-0">
+      <h1 hidden="true">
+        proposal detail page with information about hash, name, period, discussion, features, documentation, exploration, testing and
+        promotion
+      </h1>
       <div class="card h-100 pt-3 ">
         <div class="card-body p-4">
           <h5 class="card-title mb-4 ">
@@ -66,7 +70,7 @@
                   <a
                     role="button"
                     class="btn btn-link py-0 text-capitalize"
-                    [href]="'https://www.tezosagora.org/period/' + proposal.period"
+                    [href]="'https://tezosagora.org/period/' + proposal.period"
                     target="_blank"
                   >
                     {{ 'proposal-detail.details-of-proposal' | translate }}

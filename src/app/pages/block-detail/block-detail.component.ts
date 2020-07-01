@@ -23,6 +23,7 @@ import { ApiService } from '@tezblock/services/api/api.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
 import { columns } from './table-definitions'
+import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-block-detail',
@@ -55,7 +56,10 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private readonly activatedRoute: ActivatedRoute
   ) {
     super()
   }
@@ -113,6 +117,15 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         .pipe(filter(counts => !!counts))
         .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
     )
+    this.store$
+      .select(state => state.blockDetails.id)
+      .subscribe(id => {
+        this.titleService.setTitle(`${id} Block - tezblock`)
+        this.metaTagService.updateTag({
+          name: 'description',
+          content: `Tezos Block Height ${id}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`
+        })
+      })
   }
 
   tabSelected(kind: string) {

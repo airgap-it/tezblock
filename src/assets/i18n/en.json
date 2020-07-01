@@ -391,6 +391,7 @@
       "next-endorsing-right": "Next Endorsing Right"
     },
     "baking-rights": {
+      "status": "Status",
       "baking-rights": "Baking Rights",
       "cycle": "Cycle",
       "number-of-bakings": "# of Bakings",
@@ -409,6 +410,7 @@
       }
     },
     "endorsing-rights": {
+      "status": "Status",
       "endorsing-rights": "Endorsing Rights",
       "cycle": "Cycle",
       "number-of-endorsements": "# of Endorsements",

@@ -44,17 +44,14 @@ export const loadMoreOtherOperations = createAction(`[${featureName}] Load More 
 export const sortOtherOperations = createAction(`[${featureName}] Sort Other Operations`, props<{ orderBy: OrderBy }>())
 
 export const loadTokenHolders = createAction(`[${featureName}] Load Token Holders`, props<{ contract: TokenContract }>())
-export const loadTokenHoldersSucceeded = createAction(
-  `[${featureName}] Load Token Holders Succeeded`,
-  props<{ data: TokenHolder[] }>()
-)
+export const loadTokenHoldersSucceeded = createAction(`[${featureName}] Load Token Holders Succeeded`, props<{ data: TokenHolder[] }>())
 export const loadTokenHoldersFailed = createAction(`[${featureName}] Load Token Holders Failed`, props<{ error: any }>())
 export const loadMoreTokenHolders = createAction(`[${featureName}] Load More Token Holders`)
 
 export const loadOperationsCount = createAction(`[${featureName}] Load Operations Count`, props<{ contractHash: string }>())
 export const loadOperationsCountSucceeded = createAction(
   `[${featureName}] Load Operations Count Succeeded`,
-  props<{ transferTotal: number, otherTotal: number }>()
+  props<{ transferTotal: number; otherTotal: number }>()
 )
 export const loadOperationsCountFailed = createAction(`[${featureName}] Load Operations Count Failed`, props<{ error: any }>())
 

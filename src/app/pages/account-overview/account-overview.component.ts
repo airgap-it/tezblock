@@ -14,6 +14,7 @@ import { filter, map } from 'rxjs/operators'
 import * as actions from './actions'
 import { columns } from './table-definitions'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { Title, Meta } from '@angular/platform-browser'
 
 const labelsParams = {
   display: true,
@@ -78,7 +79,9 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
     private readonly amountConverterPipe: AmountConverterPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private readonly shortenStringPipe: ShortenStringPipe
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
   }
@@ -123,6 +126,12 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
       .pipe(map(breakpointState => breakpointState.matches))
     this.top25ChartOptions$ = this.isMobile$.pipe(map(this.getOptions.bind(this)))
     this.top25ChartSize$ = this.isMobile$.pipe(map(isMobile => (isMobile ? { width: 200, height: 200 } : { width: 800, height: 500 })))
+
+    this.titleService.setTitle(`Tezos Accounts - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Top 25 Tezos accounts on tezblock visualized and with information about accounts and their balance.">`
+    })
   }
   public loadMore() {
     this.store$.dispatch(actions.increasePageOfAccounts())
@@ -179,7 +188,7 @@ export class AccountOverviewComponent extends BaseComponent implements OnInit {
       }
     }
   }
-  
+
   private getFormattedAddress(address: string) {
     const getAliasOrShorten = () => this.aliasPipe.transform(address) || this.shortenStringPipe.transform(address)
 

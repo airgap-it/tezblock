@@ -32,6 +32,9 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { TranslateService } from '@ngx-translate/core'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
 import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
 import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
@@ -232,7 +235,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private aliasService: AliasService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -256,8 +262,8 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
               .select(state => state.accountDetails.bakerReward)
               .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
           : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
-              map(([rewardAmont, tezosBakerFee]) =>
-                rewardAmont && tezosBakerFee ? getRewardAmountMinusFee(rewardAmont, tezosBakerFee) : null
+              map(([rewardAmount, tezosBakerFee]) =>
+                rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
               )
             )
       )
@@ -269,13 +275,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         account.is_baker
           ? this.store$.select(state => state.accountDetails.busy.bakerReward)
           : combineLatest(
-              this.store$.select(state => state.accountDetails.busy.rewardAmont),
+              this.store$.select(state => state.accountDetails.busy.rewardAmount),
               this.store$.select(state => state.accountDetails.rewardAmount),
               this.tezosBakerFee$
             ).pipe(
               map(
-                ([isRewardAmontBusy, rewardAmont, tezosBakerFee]) =>
-                  !(rewardAmont === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
+                ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
+                  !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
               )
             )
       )
@@ -453,6 +459,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+
+    this.titleService.setTitle(`Tezos Address: ${this.aliasService.getFormattedAddress(this.address)} - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Account Address ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
+    })
   }
 
   private getBakingInfos(address: string) {
@@ -492,7 +504,9 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           )
         )
         .subscribe(bakerInfos => {
-          this.bakerTableInfos = bakerInfos ?? {
+          this.bakerTableInfos = {
+            ...this.bakerTableInfos,
+            ...bakerInfos,
             payoutAddress
           }
         })
@@ -514,7 +528,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     }
 
     this.rewardAmountSetFor = { account: this.address, baker: this.bakerAddress }
-    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmont: null }))
+    this.store$.dispatch(actions.loadRewardAmontSucceeded({ rewardAmount: null }))
   }
 
   tabSelected(kind: string) {

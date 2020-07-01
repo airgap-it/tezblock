@@ -1,11 +1,11 @@
 <div>
   <div class="card-body p-4">
-    <h5 class="card-title mb-4 ">
+    <h1 class="card-title mb-4 ">
       {{ 'transaction-detail.transaction-details' | translate }}
       <span *ngIf="statusLabel" class="badge badge-pill badge-primary-light ml-1 cursor--pointer">
         {{ statusLabel | titlecase }}
       </span>
-    </h5>
+    </h1>
 
     <div class="row mb-3">
       <div class="col-md-3">
@@ -80,7 +80,10 @@
       </div>
       <ng-container *ngIf="totalAmount !== undefined; else loadingTemplate">
         <div class="col col-md-9">
-          <amount-cell [data]="totalAmount" [options]="{ showFiatValue: isMainnet, comparisonTimestamp: latestTransaction?.timestamp, maxDigits: 8 }"></amount-cell>
+          <amount-cell
+            [data]="totalAmount"
+            [options]="{ showFiatValue: isMainnet, comparisonTimestamp: latestTransaction?.timestamp, maxDigits: 8 }"
+          ></amount-cell>
         </div>
       </ng-container>
       <ng-template #hideValue>

@@ -22,6 +22,9 @@ import { columns } from './table-definitions'
 import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { Account } from '@tezblock/interfaces/Account'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
 import { get } from '@tezblock/services/fp'
@@ -95,6 +98,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     }
   ]
 
+  get contractAddress(): string {
+    return this.activatedRoute.snapshot.params.id
+  }
+
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
@@ -107,7 +114,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
     private readonly iconPipe: IconPipe,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private aliasService: AliasService
   ) {
     super()
 
@@ -226,6 +236,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.contractAddress)} Contract - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Contract Address ${this.contractAddress}. The name, symbol, total supply, manager, description, website, transfers and other calls of transactions of the contract are detailed on tezblock.">`
+    })
   }
 
   showQr() {

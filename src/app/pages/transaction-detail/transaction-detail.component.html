@@ -1,5 +1,8 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
+    <h1 hidden="true">
+      transaction detail page with information about hash, block level, timestamp, value, fees and and tranfers
+    </h1>
     <ng-container *ngIf="latestTx$ | async">
       <div class="card h-100 pt-3 mb-">
         <transaction-detail-wrapper

@@ -12,6 +12,8 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
 import { Slot } from './reducer'
 import { get } from '@tezblock/services/fp'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
   selector: 'app-endorsement-detail',
@@ -29,11 +31,18 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
   endorsedSlots$: Observable<string>
   endorsedSlotsCount$: Observable<number>
 
+  get endorsementHash(): string {
+    return this.activatedRoute.snapshot.params.id
+  }
+
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>,
     private readonly copyService: CopyService,
-    private readonly router: Router
+    private readonly router: Router,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private aliasService: AliasService
   ) {
     super()
   }
@@ -61,6 +70,11 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
       }),
       timer(refreshRate, refreshRate).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
     )
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.endorsementHash)} Endorsement - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Endorsement Hash ${this.endorsementHash}. The hash, endorser, block, cycle, deposit, reward and endorsed slots are detailed on tezblock.">`
+    })
   }
 
   copyToClipboard() {

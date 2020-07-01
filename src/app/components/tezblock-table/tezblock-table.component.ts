@@ -11,8 +11,8 @@ import {
 } from '@angular/core'
 
 import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
-import { Options } from '@tezblock/components/address-item/address-item.component'
 import { TranslateService } from '@ngx-translate/core'
+import { Options } from '../address-item/options'
 
 export enum Template {
   address,

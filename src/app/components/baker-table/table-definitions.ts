@@ -9,6 +9,11 @@ import { TranslateService } from '@ngx-translate/core'
 export const columns: { [key: string]: (options: { showFiatValue: boolean }, translateService?: TranslateService) => Column[] } = {
   [OperationTypes.BakingRights]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
     {
+      name: translateService.instant('baker-table.baking-rights.status'),
+      field: 'rightStatus'
+    },
+    ,
+    {
       name: translateService.instant('baker-table.baking-rights.cycle'),
       field: 'cycle',
       template: Template.basic
@@ -39,6 +44,10 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }, tra
   ],
 
   [OperationTypes.EndorsingRights]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
+    {
+      name: translateService.instant('baker-table.endorsing-rights.status'),
+      field: 'rightStatus'
+    },
     {
       name: translateService.instant('baker-table.endorsing-rights.cycle'),
       field: 'cycle',

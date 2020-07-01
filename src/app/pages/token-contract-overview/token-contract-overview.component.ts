@@ -14,6 +14,7 @@ import { Column } from '@tezblock/components/tezblock-table/tezblock-table.compo
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
+import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-token-contract-overview',
@@ -30,7 +31,9 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
   constructor(
     private readonly actions$: Actions,
     private readonly store$: Store<fromRoot.State>,
-    private translateService: TranslateService
+    private translateService: TranslateService,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
 
@@ -61,6 +64,12 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+
+    this.titleService.setTitle(`Tezos Assets - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Assets. The name, contract address, total supply and description of each asset is detailed on tezblock.">`
+    })
   }
 
   loadMore() {

@@ -118,6 +118,7 @@
                 </td>
               </tr>
               <ng-template #noError>
+                <!-- this condition should be configurable by input parameter -->
                 <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
                   <td *ngFor="let column of columns; trackBy: trackByFn">
                     <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
