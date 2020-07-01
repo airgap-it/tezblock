@@ -156,8 +156,7 @@
                         </li>
                         <li>
                           <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
-                            Top Accounts
-                            <!--TODO: translate-->
+                            {{ 'header-item.top-accounts_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
@@ -178,8 +177,7 @@
                   [ngClass]="{ 'btn-link': activeLinkAssets }"
                   [routerLink]="['/token-contract/list']"
                 >
-                  Assets
-                  <!-- TODO: translate-->
+                  {{ 'header-item.assets_button' | translate }}
                 </button>
               </li>
               <li class="nav-item dropdown">

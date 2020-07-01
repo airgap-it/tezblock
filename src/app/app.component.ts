@@ -16,7 +16,6 @@ import { LanguagesService } from './services/translation/languages.service'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  // supportedLanguages = ['en']
   get isActiveLinkBlockchain(): boolean {
     return this.router.url.endsWith('/list') && this.router.url.indexOf('token-contract') === -1
   }

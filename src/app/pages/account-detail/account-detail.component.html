@@ -52,13 +52,12 @@
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
                     <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">
-                      Exchange
-                      <!--TODO: translate-->
+                      {{ 'account-detail.exchange' | translate }}
                     </span>
-                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">
+                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-light ml-1">
                       {{ 'account-detail.revealed' | translate }}
                     </span>
-                    <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
+                    <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-light ml-1">
                       {{ 'account-detail.not-revealed' | translate }}
                     </span>
                   </div>
