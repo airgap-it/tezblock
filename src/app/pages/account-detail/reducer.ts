@@ -81,7 +81,7 @@ export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: 
 })
 
 export interface Busy {
-  rewardAmont: boolean
+  rewardAmount: boolean
   bakerReward: boolean
 }
 
@@ -119,7 +119,7 @@ export const initialState: State = {
   kind: undefined,
   rewardAmount: undefined,
   busy: {
-    rewardAmont: false,
+    rewardAmount: false,
     bakerReward: false
   },
   balanceFromLast30Days: undefined,
@@ -157,15 +157,15 @@ export const reducer = createReducer(
     ...state,
     busy: {
       ...state.busy,
-      rewardAmont: true
+      rewardAmount: true
     }
   })),
-  on(actions.loadRewardAmontSucceeded, (state, { rewardAmont }) => ({
+  on(actions.loadRewardAmontSucceeded, (state, { rewardAmount }) => ({
     ...state,
-    rewardAmount: rewardAmont,
+    rewardAmount: rewardAmount,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      rewardAmount: false
     }
   })),
   on(actions.loadRewardAmontFailed, state => ({
@@ -173,7 +173,7 @@ export const reducer = createReducer(
     rewardAmount: null,
     busy: {
       ...state.busy,
-      rewardAmont: false
+      rewardAmount: false
     }
   })),
   on(actions.loadTransactionsByKind, (state, { kind }) => ({

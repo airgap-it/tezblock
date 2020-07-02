@@ -74,6 +74,33 @@ function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => 
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
 }
 
+/*
+    next 5 cycles: Upcoming
+    current cycle: Active
+    past 5 cycles: Frozen
+    past 5 cycles + : Unfrozen
+*/
+const getRightStatus = (currentCycle: number, cycle: number): string => {
+  if (cycle > currentCycle) {
+    return 'Upcoming'
+  }
+
+  if (cycle === currentCycle) {
+    return 'Active'
+  }
+
+  if (cycle < currentCycle - 5) {
+    return 'Unfrozen'
+  }
+
+  return 'Frozen'
+}
+
+const getRightCycles = (currentCycle: number, limit: number): number[] =>
+  _.range(0, limit)
+    .map(index => currentCycle + 3 - index)
+    .sort((a, b) => b - a)
+
 @Injectable({
   providedIn: 'root'
 })
@@ -640,9 +667,11 @@ export class ApiService {
   }
 
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
-      switchMap(cycles =>
-        forkJoin(
+    return this.rewardService.getCurrentCycle().pipe(
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
           cycles.map(cycle =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
@@ -651,7 +680,8 @@ export class ApiService {
                 blockRewards: reward.bakingRewards,
                 deposits: reward.bakingDeposits,
                 fees: new BigNumber(reward.fees).toNumber(),
-                bakingRewardsDetails: reward.bakingRewardsDetails
+                bakingRewardsDetails: reward.bakingRewardsDetails,
+                rightStatus: getRightStatus(currentCycle, cycle)
               }))
             )
           )
@@ -659,7 +689,7 @@ export class ApiService {
           map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
           map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
         )
-      )
+      })
     )
   }
 
@@ -738,9 +768,11 @@ export class ApiService {
   }
 
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
-      switchMap(cycles =>
-        forkJoin(
+    return this.rewardService.getCurrentCycle().pipe(
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
           cycles.map(cycle =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
@@ -748,7 +780,8 @@ export class ApiService {
                 endorsementRewards: reward.endorsingRewards,
                 deposits: reward.endorsingDeposits,
                 endorsementsCount: reward.endorsingRewardsDetails.length,
-                endorsingRewardsDetails: reward.endorsingRewardsDetails
+                endorsingRewardsDetails: reward.endorsingRewardsDetails,
+                rightStatus: getRightStatus(currentCycle, cycle)
               }))
             )
           )
@@ -756,7 +789,7 @@ export class ApiService {
           map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
           map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
-      )
+      })
     )
   }
 

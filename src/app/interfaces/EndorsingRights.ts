@@ -21,12 +21,14 @@ export interface AggregatedEndorsingRights {
   endorsementRewards: string
   deposits: string
   endorsingRewardsDetails: EndorsingRewardsDetail[]
+  rightStatus: string
 }
 
-export const getEmptyAggregatedEndorsingRight = () => ({
+export const getEmptyAggregatedEndorsingRight = (): AggregatedEndorsingRights => ({
   cycle: null,
   endorsementsCount: 0,
   endorsementRewards: null,
   deposits: null,
-  endorsingRewardsDetails: undefined
+  endorsingRewardsDetails: undefined,
+  rightStatus: undefined
 })

@@ -35,8 +35,8 @@ export interface State {
 export const initialState: State = {
   accountAddress: undefined,
   currentCycle: undefined,
-  bakingRights: getInitialTableState(undefined, 5),
-  endorsingRights: getInitialTableState(undefined, 5),
+  bakingRights: getInitialTableState(undefined, 4),
+  endorsingRights: getInitialTableState(undefined, 4),
   kind: undefined,
   efficiencyLast10Cycles: undefined,
   busy: {

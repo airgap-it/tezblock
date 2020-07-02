@@ -23,14 +23,16 @@ export interface AggregatedBakingRights {
   blockRewards: string
   deposits: string
   fees: number
-  bakingRewardsDetails: BakingRewardsDetail[]
+  bakingRewardsDetails: BakingRewardsDetail[],
+  rightStatus: string
 }
 
-export const getEmptyAggregatedBakingRight = () => ({
+export const getEmptyAggregatedBakingRight = (): AggregatedBakingRights => ({
   cycle: null,
   bakingsCount: 0,
   blockRewards: null,
   deposits: null,
   fees: 0,
-  bakingRewardsDetails: []
+  bakingRewardsDetails: [],
+  rightStatus: undefined
 })

@@ -23,6 +23,8 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import * as moment from 'moment'
 import { get } from '@tezblock/services/fp'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { Title, Meta } from '@angular/platform-browser'
+import { AliasService } from '@tezblock/services/alias/alias.service'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -50,6 +52,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
+  get proposalHash(): string {
+    return this.activatedRoute.snapshot.params.id
+  }
+
   constructor(
     private readonly actions$: Actions,
     private readonly activatedRoute: ActivatedRoute,
@@ -57,7 +63,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly copyService: CopyService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly iconPipe: IconPipe
+    private readonly iconPipe: IconPipe,
+    private titleService: Title,
+    private metaTagService: Meta,
+    private aliasService: AliasService
   ) {
     super()
     this.store$.dispatch(actions.reset())
@@ -113,6 +122,11 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
     )
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.proposalHash)} Proposal - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Proposal Hash ${this.proposalHash}. The name, period, discussion, features, documentation, exploration, testing and promotion of the proposal are detailed on tezblock.">`
+    })
   }
 
   ngOnInit() {

@@ -4,18 +4,8 @@ import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contr
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-
-export interface Options {
-  pageId?: string | number
-  isText?: boolean
-  showFiatValue?: boolean
-  showFullAddress?: boolean
-  showAlliasOrFullAddress?: boolean
-  forceIdenticon?: boolean
-  hideIdenticon?: boolean
-  comparisonTimestamp?: number
-  kind?: string //TODO: not needed probably
-}
+import { AliasService } from '@tezblock/services/alias/alias.service'
+import { Options } from './options'
 
 @Component({
   selector: 'address-item',
@@ -76,25 +66,16 @@ export class AddressItemComponent implements OnInit {
     return this.options && this.options.pageId ? this.options.pageId !== this.address : true
   }
 
-  constructor(private readonly aliasPipe: AliasPipe, private readonly chainNetworkService: ChainNetworkService, private readonly shortenStringPipe: ShortenStringPipe) {}
+  constructor(
+    private readonly aliasPipe: AliasPipe,
+    private readonly chainNetworkService: ChainNetworkService,
+    private readonly shortenStringPipe: ShortenStringPipe,
+    private readonly aliasService: AliasService
+  ) {}
 
   ngOnInit() {}
 
-  private getFormattedAddress(): string {
-    const getAliasOrShorten = () => this.aliasPipe.transform(this.address) || this.shortenStringPipe.transform(this.address)
-
-    if (!this.options) {
-      return getAliasOrShorten()
-    }
-
-    if (this.options.showAlliasOrFullAddress) {
-      return this.formattedAddress = this.aliasPipe.transform(this.address) || this.address
-    }
-
-    if (this.options.showFullAddress) {
-      return this.address
-    }
-
-    return getAliasOrShorten()
+  private getFormattedAddress() {
+    return this.aliasService.getFormattedAddress(this.address, this.options)
   }
 }
