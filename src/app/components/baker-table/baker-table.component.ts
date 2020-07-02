@@ -5,6 +5,7 @@ import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
+import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -24,6 +25,7 @@ import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -132,6 +134,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly beaconService: BeaconService,
     private readonly route: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
@@ -290,6 +293,17 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
+  }
+
+  delegate() {
+    this.beaconService
+      .delegate(this.address)
+      .then((response: OperationResponseOutput) => {
+        // make any action ?
+      })
+      .catch((operationError: BeaconErrorMessage) => {
+        // make any action ?
+      })
   }
 
   private updateSelectedTab(selectedTab: Tab) {

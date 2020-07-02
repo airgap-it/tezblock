@@ -36,10 +36,18 @@ export class AccountDetailEffects {
     )
   )
 
-  getDelegatedAccounts$ = createEffect(() =>
+  onLoadAccountLoadDelegation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadAccount),
-      switchMap(({ address }) =>
+      map(() => actions.loadDelegation())
+    )
+  )
+
+  loadDelegation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadDelegation),
+      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      switchMap(([action, address]) =>
         this.accountService.getDelegatedAccounts(address).pipe(
           map(accounts => actions.loadDelegatedAccountsSucceeded({ accounts })),
           catchError(error => of(actions.loadDelegatedAccountsFailed({ error })))

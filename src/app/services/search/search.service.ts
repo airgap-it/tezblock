@@ -12,8 +12,8 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractBy } from '@tezblock/domain/contract'
 import { SearchOptionType } from './model'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getAddressByAlias } from '@tezblock/services/account/account.service'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
 
 @Injectable({
@@ -35,10 +35,8 @@ export class SearchService {
     const trimmedSearchTerm = searchTerm.trim()
     const result = new Subject<boolean>()
 
-    // if we typed in an alias, we should convert this into an address
-    const getAllies = (term: string) => Object.keys(accounts).find(account => accounts[account].alias === term)
-
-    const _searchTerm = getAllies(trimmedSearchTerm) || trimmedSearchTerm
+    const _searchTerm =
+      getAddressByAlias(trimmedSearchTerm) /* if we typed in an alias, we should convert this into an address */ || trimmedSearchTerm
 
     let found = false
     let counter = 0
