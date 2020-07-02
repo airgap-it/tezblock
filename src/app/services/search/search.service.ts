@@ -6,6 +6,7 @@ import { StorageMap } from '@ngx-pwa/local-storage'
 import { negate, isNil } from 'lodash'
 
 import { ApiService } from './../api/api.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractBy } from '@tezblock/domain/contract'
@@ -20,6 +21,7 @@ const previousSearchesKey = 'previousSearches'
 })
 export class SearchService {
   constructor(
+    private readonly accountService: AccountService,
     private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router,
@@ -72,7 +74,7 @@ export class SearchService {
       processResult([contract], () => this.router.navigateByUrl('/contract/' + contract.id))
     } else {
       subscriptions.push(
-        this.apiService
+        this.accountService
           .getAccountById(_searchTerm)
           .pipe(filter(negate(isNil)))
           .subscribe(account => processResult(account, () => this.router.navigateByUrl('/account/' + _searchTerm))),

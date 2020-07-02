@@ -1,6 +1,8 @@
-import { of } from 'rxjs'
+import { EMPTY } from 'rxjs'
 
 export const getAccountServiceMock = () => jasmine.createSpyObj('AccountService', {
-    getDelegatedAccounts: of(null),
-    getAccountStatus: of(null)
+    getAccountById: EMPTY,
+    getAccountsByIds: EMPTY,
+    getDelegatedAccounts: EMPTY,
+    getAccountStatus: EMPTY
 })

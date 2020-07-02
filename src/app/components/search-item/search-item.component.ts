@@ -12,6 +12,7 @@ import { SearchOption } from 'src/app/services/search/model'
 import { flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
 import { searchTokenContracts } from '@tezblock/domain/contract'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 
 const toPreviousOption = value => ({ name: value, type: 'Recent History' })
 
@@ -38,6 +39,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   private isValueChangedBySelect = false
 
   constructor(
+    private readonly accountService: AccountService,
     private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly searchService: SearchService
@@ -63,7 +65,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
         return merge(
           this.apiService.getTransactionHashesStartingWith(token),
-          this.apiService.getAccountsStartingWith(token), // or bakers .. TODO: separate to look for both
+          this.accountService.getAccountsStartingWith(token), // or bakers .. TODO: separate to look for both
           this.apiService.getBlockHashesStartingWith(token),
           of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))
         ).pipe(

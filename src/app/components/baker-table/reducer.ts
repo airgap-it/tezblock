@@ -32,7 +32,7 @@ export interface State {
   bakingRightItems: { [key: string]: BakingRights[] }
 }
 
-const initialState: State = {
+export const initialState: State = {
   accountAddress: undefined,
   currentCycle: undefined,
   bakingRights: getInitialTableState(undefined, 4),

@@ -81,6 +81,6 @@ export class BlockService {
   }
 
   private getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Observable<T[]> {
-    return from(this.apiService.getAdditionalBlockField<T>(blockRange, field, operation))
+    return this.apiService.getAdditionalBlockField<T>(blockRange, field, operation)
   }
 }
