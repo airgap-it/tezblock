@@ -97,10 +97,6 @@ export class CacheService {
       return of()
     }
 
-    this.storage.get(key).subscribe(x => {
-      const foo = 'xxx'
-    })
-
     return <Observable<T>>this.storage.get(key)
   }
 

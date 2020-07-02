@@ -111,7 +111,7 @@
                   <p class="text-secondary mb-0">Assets</p>
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
-                  <app-assets-value [assets]="assets$ | async"></app-assets-value>
+                  <app-assets-value [assets]="assets$ | async" [useHeader]="true"></app-assets-value>
                   <button
                     (click)="showAssets()"
                     [disabled]="(numberOfContractAssets$ | async) === 0"

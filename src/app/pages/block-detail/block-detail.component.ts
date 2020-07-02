@@ -21,7 +21,6 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
-import { getRefresh } from '@tezblock/domain/synchronization'
 import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
@@ -50,14 +49,13 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly apiService: ApiService,
-    private readonly route: ActivatedRoute,
     private readonly iconPipe: IconPipe,
-    readonly chainNetworkService: ChainNetworkService,
+    private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private titleService: Title,
-    private metaTagService: Meta,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly titleService: Title,
+    private readonly metaTagService: Meta
   ) {
     super()
   }
@@ -79,7 +77,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.orderBy$ = this.store$.select(state => state.blockDetails.transactions.orderBy)
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe(paramMap => {
         const id: string = paramMap.get('id')
 
         this.store$.dispatch(actions.reset())
