@@ -48,7 +48,6 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.29",
     "@fortawesome/free-brands-svg-icons": "^5.13.1",
     "@fortawesome/free-solid-svg-icons": "^5.13.1",
-    "@ng-toolkit/universal": "^8.1.0",
     "@ngrx/effects": "^9.2.0",
     "@ngrx/store": "^9.2.0",
     "@nguniversal/express-engine": "^9.0.1",
