@@ -111,20 +111,7 @@
                   <p class="text-secondary mb-0">Assets</p>
                 </div>
                 <div class="col-md-10 pl-sm-0 d-flex align-items-center">
-                  <h5 class="d-inline-block m-0">
-                    <span>
-                      ${{ contractAssetsBalance$ | async | number: getPrecision(contractAssetsBalance$ | async) | decimalsFormatter }}
-                    </span>
-                  </h5>
-                  <span
-                    class="badge badge-pill ml-2"
-                    [ngClass]="{
-                      'badge-primary': (numberOfContractAssets$ | async) > 0,
-                      'badge-primary-light badge-disabled': (numberOfContractAssets$ | async) === 0
-                    }"
-                  >
-                    {{ numberOfContractAssets$ | async }}
-                  </span>
+                  <app-assets-value [assets]="assets$ | async"></app-assets-value>
                   <button
                     (click)="showAssets()"
                     [disabled]="(numberOfContractAssets$ | async) === 0"

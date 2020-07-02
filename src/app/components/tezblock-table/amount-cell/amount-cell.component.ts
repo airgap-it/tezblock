@@ -133,6 +133,17 @@ export class AmountCellComponent implements OnInit {
         )
       )
     )
+
+    this.options$.pipe(
+      switchMap(options =>
+        this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
+          map(value => [options, value])
+        )
+      )
+    ).subscribe(x => {
+      const foo1 = x
+      const foo2 = this.data
+    })
   }
 
   tooltipClick() {

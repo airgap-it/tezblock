@@ -1,0 +1,19 @@
+<ng-template #value let-context>
+    ${{ context | async | number: getPrecision(context | async) | decimalsFormatter }}
+</ng-template>
+<ng-container *ngTemplateOutlet="value; context: { $implicit: value$ }"></ng-container>
+
+<div class="pl-sm-0 d-flex align-items-center">
+  <h5 class="d-inline-block m-0">
+    ${{ value$ | async | number: getPrecision(value$ | async) | decimalsFormatter }}
+  </h5>
+  <span
+    class="badge badge-pill ml-2"
+    [ngClass]="{
+      'badge-primary': (count$ | async) > 0,
+      'badge-primary-light badge-disabled': (count$ | async) === 0
+    }"
+  >
+    {{ count$ | async }}
+  </span>
+</div>

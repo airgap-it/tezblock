@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ToastrService } from 'ngx-toastr'
+import { BehaviorSubject } from 'rxjs'
 
 import { CopyService } from 'src/app/services/copy/copy.service'
 import { Transaction } from 'src/app/interfaces/Transaction'
@@ -8,6 +9,7 @@ import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.servi
 import { OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
 import { first } from '@tezblock/services/fp'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 
 @Component({
   selector: 'transaction-detail-wrapper',
@@ -61,6 +63,17 @@ export class TransactionDetailWrapperComponent implements OnInit {
 
   @Input()
   isMainnet = true
+
+  @Input()
+  set transactions(value: Transaction[]) {
+    if (value !== this._transactions) {
+      this._transactions = value
+      this.assets$.next((value || []).map(transaction => ({ symbol: transaction.symbol, value: transaction.amount })))
+    }
+  }
+  private _transactions: Transaction[]
+
+  assets$ = new BehaviorSubject<Asset[]>(undefined)
 
   amountFromLatestTransactionFee: { data: any; options: any }
 

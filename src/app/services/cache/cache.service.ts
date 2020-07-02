@@ -7,7 +7,6 @@ import { TezosNetwork, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { Account } from '@tezblock/interfaces/Account'
 import { Block } from '@tezblock/interfaces/Block'
 
 export enum CacheKeys {
@@ -97,6 +96,10 @@ export class CacheService {
     if (!this.isMainnet) {
       return of()
     }
+
+    this.storage.get(key).subscribe(x => {
+      const foo = 'xxx'
+    })
 
     return <Observable<T>>this.storage.get(key)
   }

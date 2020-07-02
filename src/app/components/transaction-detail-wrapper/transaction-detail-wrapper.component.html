@@ -70,7 +70,7 @@
       </div>
     </div>
     <div class="row mb-3">
-      <div class="col-md-3">
+      <div class="col-md-3 pr-0">
         <p class="text-secondary mb-0">
           <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in this transaction.'"></tooltip-item>
         </p>
@@ -85,6 +85,14 @@
           <span>0</span>
         </div>
       </ng-template>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-3 pr-0">
+        <p class="text-secondary mb-0">Assets</p>
+      </div>
+      <div class="col col-md-9">
+        <app-assets-value [assets]="assets$ | async"></app-assets-value>
+      </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
