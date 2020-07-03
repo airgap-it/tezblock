@@ -11,7 +11,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { sort } from '@tezblock/domain/table'
 import { get } from '@tezblock/services/fp'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 export const getAddressesFilteredBy = (phrase: string) =>
   Object.keys(accounts).filter(address => {

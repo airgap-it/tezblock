@@ -65,7 +65,7 @@ export interface Balance {
   asof: number
 }
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 const cycleToLevel = (cycle: number, blocksPerCycle: number): number => cycle * blocksPerCycle
 export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, cycle: Math.floor(right.level / blocksPerCycle) })
 
