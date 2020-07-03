@@ -1,0 +1,3 @@
+[submodule "submodules/tezos_assets"]
+	path = submodules/tezos_assets
+	url = https://github.com/airgap-it/tezos_assets.git
