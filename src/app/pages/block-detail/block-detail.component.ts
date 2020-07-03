@@ -15,13 +15,15 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
-import { refreshRate } from '@tezblock/domain/synchronization'
+import * as appActions from '@tezblock/app.actions'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
 import { Title, Meta } from '@angular/platform-browser'
+import { getRefresh, refreshRate } from '@tezblock/domain/synchronization'
+import { isInBTC } from '@tezblock/domain/airgap'
 
 @Component({
   selector: 'app-block-detail',
@@ -111,7 +113,20 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
       this.store$
         .select(state => state.blockDetails.counts)
         .pipe(filter(counts => !!counts))
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+
+      // when any transaction is in BTC/tzBTC then start getting current exchange rate
+      this.transactions$
+        .pipe(
+          filter(transactions => transactions.some(transaction => isInBTC(transaction.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
     this.store$
       .select(state => state.blockDetails.id)
