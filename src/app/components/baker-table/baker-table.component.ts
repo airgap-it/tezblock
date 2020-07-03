@@ -98,11 +98,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   get tabs() {
-    if (this._tabs) {
-      return this._tabs
-    } else {
-      return []
-    }
+    return this._tabs || []
   }
 
   @Input() address: string
