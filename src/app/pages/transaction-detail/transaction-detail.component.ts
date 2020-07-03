@@ -136,7 +136,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
-    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.transactionHash)} Operation - tezblock`)
+    this.titleService.setTitle(`Operation ${this.aliasService.getFormattedAddress(this.transactionHash)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Transaction ${this.transactionHash}. The transaction hash, block level, timestamp, value, fees and and tranfers are detailed on tezblock.">`

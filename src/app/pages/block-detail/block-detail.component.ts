@@ -131,7 +131,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     this.store$
       .select(state => state.blockDetails.id)
       .subscribe(id => {
-        this.titleService.setTitle(`${id} Block - tezblock`)
+        this.titleService.setTitle(`Block ${id} - tezblock`)
         this.metaTagService.updateTag({
           name: 'description',
           content: `Tezos Block Height ${id}. The timestamp, block reward, baker, value, fees and number of transactions in the block are detailed on tezblock.">`

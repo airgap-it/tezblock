@@ -28,6 +28,8 @@ import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activ
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
+import { getBeaconServiceMock } from '@tezblock/services/beacon/beacon.service.mock'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -45,6 +47,7 @@ describe('AccountDetailComponent', () => {
   const toastrServiceMock = getToastrServiceMock()
   const iconPipeMock = getPipeMock()
   const breakpointObserverMock = getBreakpointObserverMock()
+  const beaconServiceMock = getBeaconServiceMock()
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -66,6 +69,7 @@ describe('AccountDetailComponent', () => {
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: BeaconService, useValue: beaconServiceMock },
         ShortenStringPipe
       ],
       imports: [],

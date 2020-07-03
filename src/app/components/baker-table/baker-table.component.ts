@@ -5,11 +5,11 @@ import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
+import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { Transaction } from './../../interfaces/Transaction'
-import { ApiService } from './../../services/api/api.service'
 import { Reward, Payout } from '@tezblock/domain/reward'
 import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
@@ -25,6 +25,7 @@ import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
@@ -97,11 +98,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   get tabs() {
-    if (this._tabs) {
-      return this._tabs
-    } else {
-      return []
-    }
+    return this._tabs || []
   }
 
   @Input() address: string
@@ -137,7 +134,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   constructor(
     private readonly actions$: Actions,
-    private readonly apiService: ApiService,
+    private readonly beaconService: BeaconService,
     private readonly route: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
@@ -296,6 +293,17 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
+  }
+
+  delegate() {
+    this.beaconService
+      .delegate(this.address)
+      .then((response: OperationResponseOutput) => {
+        // make any action ?
+      })
+      .catch((operationError: BeaconErrorMessage) => {
+        // make any action ?
+      })
   }
 
   private updateSelectedTab(selectedTab: Tab) {

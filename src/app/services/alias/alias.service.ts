@@ -17,7 +17,7 @@ export class AliasService {
     }
 
     if (options.showAlliasOrFullAddress) {
-      return (address = this.aliasPipe.transform(address) || address)
+      return this.aliasPipe.transform(address) || address
     }
 
     if (options.showFullAddress) {
