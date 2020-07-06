@@ -7,6 +7,7 @@ import { Actions } from '@ngrx/effects'
 import { ActivatedRoute } from '@angular/router'
 
 import { BakerTableComponent } from './baker-table.component'
+import * as actions from './actions'
 import { initialState as btInitialState } from './reducer'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
 import { initialState as adInitialState } from '@tezblock/pages/account-detail/reducer'
@@ -16,6 +17,7 @@ import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/cha
 import { RewardService } from '@tezblock/services/reward/reward.service'
 import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.mock'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { DataSource } from '@tezblock/domain/table'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -184,7 +186,109 @@ describe('BakerTableComponent', () => {
     })
   })
 
-  xdescribe('getRewardsInnerDataSource', () => {
+  describe('getRewardsInnerDataSource', () => {
+    it('returns data from rewardService.getRewardsPayouts using rewards  filtered by cycle', () => {
+      const reward1 = { cycle: 1, data: 'foo1' }
+      const reward2 = { cycle: 2, data: 'foo2' }
 
+      storeMock.setState({
+        ...initialState,
+        bakerTable: {
+          ...initialState.bakerTable,
+          rewards: {
+            data: [reward1, reward2]
+          }
+        }
+      })
+
+      const dataSource: DataSource<any> = (<any>component).getRewardsInnerDataSource(2)
+      dataSource.get(null)
+
+      expect(rewardServiceMock.getRewardsPayouts).toHaveBeenCalledWith(reward2, null, undefined)
+    })
+  })
+
+  describe('getEndorsingRightsInnerDataSource', () => {
+    const endorsingRights = { cycle: 3, endorsingRewardsDetails: [] }
+
+    it('dispatches loadEndorsingRightItems  action', () => {
+      const dataSource: DataSource<any> = (<any>component).getEndorsingRightsInnerDataSource(endorsingRights)
+
+      component.address = 'fakeAddress'
+      spyOn(storeMock, 'dispatch')
+      dataSource.get(null)
+
+      expect(storeMock.dispatch).toHaveBeenCalledWith(
+        actions.loadEndorsingRightItems({ baker: 'fakeAddress', cycle: 3, endorsingRewardsDetails: [] })
+      )
+    })
+
+    it('returns pagable response using endorsingRightItems from ngrx store', () => {
+      const fakeEndorsingRightItems = ['foo1', 'foo2', 'foo3', 'foo4', 'foo5', 'foo6', 'foo7', 'foo8', 'foo9']
+
+      storeMock.setState({
+        ...initialState,
+        bakerTable: {
+          ...initialState.bakerTable,
+          endorsingRightItems: {
+            '3': fakeEndorsingRightItems
+          }
+        }
+      })
+
+      const dataSource: DataSource<any> = (<any>component).getEndorsingRightsInnerDataSource(endorsingRights)
+
+      const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 })
+
+      testScheduler.run(helpers => {
+        const { expectObservable } = helpers
+        const expected = 'a'
+        const expectedValues = { a: { data: ['foo4', 'foo5', 'foo6'], total: fakeEndorsingRightItems.length } }
+
+        expectObservable(data$).toBe(expected, expectedValues)
+      })
+    })
+  })
+
+  describe('getBakingRightsInnerDataSource', () => {
+    const bakingRights = { cycle: 3, bakingRewardsDetails: [] }
+
+    it('dispatches loadBakingRightItems  action', () => {
+      const dataSource: DataSource<any> = (<any>component).getBakingRightsInnerDataSource(bakingRights)
+
+      component.address = 'fakeAddress'
+      spyOn(storeMock, 'dispatch')
+      dataSource.get(null)
+
+      expect(storeMock.dispatch).toHaveBeenCalledWith(
+        actions.loadBakingRightItems({ baker: 'fakeAddress', cycle: 3, bakingRewardsDetails: [] })
+      )
+    })
+
+    it('returns pagable response using bakingRightItems from ngrx store', () => {
+      const fakeBakingRightItems = ['foo1', 'foo2', 'foo3', 'foo4', 'foo5', 'foo6', 'foo7', 'foo8', 'foo9']
+
+      storeMock.setState({
+        ...initialState,
+        bakerTable: {
+          ...initialState.bakerTable,
+          bakingRightItems: {
+            '3': fakeBakingRightItems
+          }
+        }
+      })
+
+      const dataSource: DataSource<any> = (<any>component).getBakingRightsInnerDataSource(bakingRights)
+
+      const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 })
+
+      testScheduler.run(helpers => {
+        const { expectObservable } = helpers
+        const expected = 'a'
+        const expectedValues = { a: { data: ['foo4', 'foo5', 'foo6'], total: fakeBakingRightItems.length } }
+
+        expectObservable(data$).toBe(expected, expectedValues)
+      })
+    })
   })
 })
