@@ -12,7 +12,7 @@ import { sort } from '@tezblock/domain/table'
 import { first, get } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 export const getAddressesFilteredBy = (phrase: string) =>
   Object.keys(accounts).filter(address => {
