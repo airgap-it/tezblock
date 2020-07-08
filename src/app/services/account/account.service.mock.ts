@@ -4,5 +4,6 @@ export const getAccountServiceMock = () => jasmine.createSpyObj('AccountService'
     getAccountById: EMPTY,
     getAccountsByIds: EMPTY,
     getDelegatedAccounts: EMPTY,
-    getAccountStatus: EMPTY
+    getAccountStatus: EMPTY,
+    getAccountsStartingWith: EMPTY
 })

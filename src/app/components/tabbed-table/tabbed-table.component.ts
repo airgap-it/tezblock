@@ -95,10 +95,10 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   // on page start (after first api request)
   setInitTabSelection() {
     const hasData = (tab: Tab) => tab.count > 0
-    const tabNameFromQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
-    const tabFromQuery = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
-    const firstTabWithData = this.tabs.find(hasData)
-    const selectedTab = tabFromQuery || firstTabWithData
+    const tabNameFromQuery: string = this.activatedRoute.snapshot.queryParamMap.get('tab')
+    const tabFromQuery: Tab = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
+    const firstTabWithData: Tab = this.tabs.find(hasData)
+    const selectedTab: Tab = tabFromQuery || firstTabWithData
 
     if (selectedTab) {
       this.selectTab(selectedTab)
