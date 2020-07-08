@@ -29,7 +29,8 @@
     "constants_button": "Constants",
     "tezblock-health_button": "tezblock Health",
     "dapps_button": "Dapps",
-    "development_button": "Entwicklung"
+    "development_button": "Entwicklung",
+    "glossary_button": "Glossar"
   },
   "footer-item": {
     "tezblock": "tezblock ist ein Blockexplorer für Tezos, eine open-source Platform für Assets und Applikationen unterstützt von einer globalen Community von Validators, Forschern und Builders.",
@@ -250,7 +251,11 @@
     "baker-split_tooltip": "Der Baker Split ist ein prozentualer Anteil, welcher dem Baker zusteht als Reward für das Betreiben seiner Infrastruktur. Dieser Split wird vom Baker festgelegt, geschieht off-chain und könnte auch 0% betragen.",
     "last30d": "letzte 30 Tage",
     "invalid-address": "Invalide Adresse",
-    "invalid-address_text": "Diese Adresse ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain."
+    "invalid-address_text": "Diese Adresse ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain.",
+    "delegate-to": "Delegieren nach",
+    "delegate-now": "Jetzt delegieren",
+    "or": "oder",
+    "placeholder": "Suche mit Namen oder Addresse nach einem Baker"
   },
   "contract-detail": {
     "revealed": "Revealed",
@@ -315,7 +320,6 @@
     "label": "Suche",
     "placeholder": "Suche nach Adresse / Alias / Transaktion / Block"
   },
-
   "baker-table": {
     "baker-overview": {
       "baker-overview": "Baker Überblick",
@@ -337,6 +341,7 @@
       "baking-bad_tooltip": "Baking Bad erstellt ein Rating für Baker, welches die Genauigkeit und Pünktlichkeit der Rewardpayouts an ihre Delegatoren einbezieht."
     },
     "baking-rights": {
+      "status": "Status",
       "baking-rights": "Baking Rights",
       "cycle": "Cycle",
       "number-of-bakings": "# an Bakings",
@@ -355,6 +360,7 @@
       }
     },
     "endorsing-rights": {
+      "status": "Status",
       "endorsing-rights": "Endorsing Rights",
       "cycle": "Cycle",
       "number-of-endorsements": "# an Endorsements",
@@ -605,5 +611,59 @@
       "asset": "Asset",
       "balance": "Balance"
     }
+  },
+  "glossary-additional-terms": {
+    "glossary": "Glossar",
+    "account": "Account",
+    "account_description": "Ein Account ist ein eindeutiger Kennzeichner innerhalb des Alpha Protokolls. Es gibt verschiedene Arten von Accounts (siehe Originated Account und Delegierter Account). Jeder Account ist assoziiert mit einer Balance (eine Menge an verfügbaren tez).",
+    "amount": "Menge (Amount)",
+    "baker": "Baker",
+    "baker-split": "Baker Split",
+    "baking-endorsing-rights": "Baking/Endorsing Rights",
+    "baking-endorsing-rights_description": "Ein Delegate ist in der Lage einen Block zu baken/endorsen, falls er ein baking/endorsement Right für diesen Block hält. Am Anfang eines Cycles werden baking und endorsement Rights für alle Block Heights berechnet, basierend auf der Proportion der Rolls, welche von jedem Account besitzt werden. Für jede Block Height gibt es ein paar Accounts, welche die Erlaubnis haben, zu Baken. Diesen verschiedenen Accounts werden unterschiedliche Prioritäten zugeteilt. Für jede Block Height gibt es ein paar Accounts, welche die Erlaubnis haben, zu Endorsen. Mehrere Endorsements per Block sind möglich.",
+    "block": "Block",
+    "block_description": "Ein Block ist eine Sammlung von mehreren Operationen. Die Operationen sind in der Payload des Blocks, welche speziefisch zum Economic Protokoll ist. Zusammen mit dem Payload enthält ein Block einen Header mit Metadaten. Die Metadaten sind agnostisch zum Economic Protokoll. Sie enthalten generische Informationen wie der vorherige Block, Zeitstempel etc.",
+    "block-hash": "Block Hash",
+    "block-hash_description": "Ein Kennzeichner, welcher bei Blockerstellung gebildet wird. Gebraucht um einen speziefischen Block eindeutig zu identifizieren.",
+    "block-height": "Block Height",
+    "cycle": "Cycle",
+    "delegate": "Delegate",
+    "delegate_description": "Ein Delegate (Implicit) Account zu welchem ein anderer Account ihre Baking und Endorsement Rights delegiert hat. Die Baking und Endorsement Rights werden berechnet aufgrund der gesamten Balance an tez, welche an diesen Account delegiert wurden.",
+    "delegation": "Delegation",
+    "delegation_description": "Eine Operation in welcher eine Accountbalance einem Delegate geliehen wird. Dies erhöht die Rolls des Delegates und folglich dessen Baking Rights. Der Delegate Account kann die ihm delegierten Mittel nicht kontrollieren.",
+    "delegated-account": "Delegierter Account (Delegated Account)",
+    "double-baking": "Double Baking",
+    "double-baking_description": "Wenn ein Baker zwei verschieden Blöcke zur gleichen Höhe signiert, spricht man von Double Baking. Double baking ist schädlich für das Netzwerk und könnte ein Indiz sein für Double Spending. Daher wird es durch das Netzwerk bestraft: Ein Accuser kann Beweise für Double Baking liefern und mit einem Teil des Deposits des Bakers belohnt werden.",
+    "endorser": "Endorser",
+    "endorser_description": "Wenn ein Block kreiert und ins Netzwerk propagiert wird, können Nodes welche Endorsement Rights für die entsprechende Block Height haben, eine Endorsement Operation abgeben. Diese Accounts sind dann die Endorser dieses Blocks. Die Endorsement Operationen können in den nächsten Block einbezogen werden um den Score des Blocks zu erhöhen.",
+    "fitness": "Fitness",
+    "frozen-balance": "Frozen Balance",
+    "frozen-balance_description": "Die Summe aller Bonds und Rewards welche zurückgehalten werden, wenn ein Baker endorsed.",
+    "gas": "Gas",
+    "gas_description": "Ein Messeinheit der Anzahl an elementaren Operationen, welche während der Ausführen eines Smart Contracts durchgeführt werden. Gas wird gebraucht, um zu messen, wie viel Computingpower gebraucht wird, um einen Smart Contract auszuführen.",
+    "node": "Node",
+    "node_description": "Ein Peer in in einem P2P Netzwerk. Es hält einen lokalen State und propagiert Blöcke und Operationen.",
+    "operation": "Operation",
+    "operation_description": "Operationen transformieren den Kontext, das ist es, was den Zustand der Chain verändert. Operationen sind gruppiert in Blöcken, sodass die Chain schrittweise fortschreitet.",
+    "originated-account": "Originated Account",
+    "originated-account_description": "Auch Smart Contract. Ein Account welcher mit einem Michelson Skript assoziiert ist. Er wird mit einer expliziten Originationsoperation erstellt und wird deshalb auch Originated Account genannt. Die Adresse eines Smart Contracts beginnt immer mit KT1.",
+    "origination": "Origination",
+    "origination_description": "Eine Operation um einen Smart Contract zu kreieren.",
+    "priority": "Priorität (Priority)",
+    "priority_description": "Ein Rang verschiedener Baking Rights. Jeder Rang entspricht einem Zeitabschnitt. Ein Baker mit Baking Rights einer bestimmten Priorität darf nur während der entsprechenden Zeitspanne der Priorität baken. Baking ausserhalb der zugeteilten Priorität bedeutet einen invaliden Block.",
+    "protocol": "Protokoll (Protocol)",
+    "related-accounts": "Related Accounts",
+    "reveal": "Reveal",
+    "reveal_description": "Ein revealed Account bedeutet, dass der Public Key der Blockchain bekannt gemacht wurde. Falls nicht revealed, wird der Account nicht in der Lage sein, Operationen wie Transfers zu vollziehen: der Public Key wird gebraucht um sicherzustellen, dass der Account Operationen korrekt signiert.",
+    "reward": "Reward",
+    "roll": "Roll",
+    "roll_description": "Eine Menge von Tez (z.B. 8000ꜩ), die als eine Einheit dient, um die Baking Rights der Delegates in einem Cycle zu bestimmen. Einem Delegate mit doppelt so vielen Rollen wie ein Anderer werden doppelt so viele Baking Rights zugeteilt.",
+    "signature": "Signatur (Signature)",
+    "signature_description": "Eine Signatur ist das Ergebnis der Unterzeichnung einer Nachricht mit einem privaten Schlüssel unter Verwendung des digitalen Signaturschemas mit elliptischer Kurve.",
+    "smart-contract": "Smart Contract",
+    "smart-contract_description": "Auch Originated Account. Ein Account welcher mit einem Michelson Skript assoziiert ist. Er wird mit einer expliziten Originationsoperation erstellt und wird deshalb auch Originated Account genannt. Die Adresse eines Smart Contracts beginnt immer mit KT1.",
+    "transaction": "Transaktion (Transaction)",
+    "transaction_description": "Eine Operation um Tez zwischen zwei Accounts zu transferieren, oder um den Code eines Smart Contracts laufen zu lassen.",
+    "transaction-hash": "Transaktionshash (Transaction Hash)"
   }
 }
