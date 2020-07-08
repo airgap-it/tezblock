@@ -201,7 +201,7 @@
     "fitness": "Fitness",
     "fitness_tooltip": "Fitness is a metric used to compare contexts. For example, when several blocks claim to be heads of the chain, their context’s fitness are compared. The block with the highest fitness is selected as the head of the chain.",
     "protocol": "Protocol",
-    "protocol_tooltip": "The active protcol of this block. The protocol can be changed through the protocol amendment proccess.",
+    "protocol_tooltip": "The active protocol of this block. The protocol can be changed through the protocol amendment proccess.",
     "more": "More",
     "less": "Less"
   },
@@ -220,7 +220,7 @@
     "value": "Value",
     "value_tooltip": "The total amount of Tezzies included in this transaction.",
     "transaction-fees": "Transaction Fees",
-    "transaction-fees_tooltip": "The total amount of fees spent for transactions in this block."
+    "transaction-fees_tooltip": "The fees spent for this transaction."
   },
   "account-detail": {
     "revealed": "Revealed",
