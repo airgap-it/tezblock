@@ -130,24 +130,23 @@
     },
     "magnum": {
       "title": "Magnum Wallet",
-      "description": "Magnum Wallet ist eine ",
       "description": "Magnum Wallet is a mehrwärhungsfähige Wallet, entwickelt für jene, welche ihr Kryptoportfolio in einer sicheren und benutzerfreundlichen Oberfläche verwalten möchten. Benutzer haben die Möglichkeit, über Staking Rewards zu verdienen. Als Teil ihres “Multiply Your Funds” Modell, ist das Team stets auf der Suche nach neuen Wegen, wie ihre User profitieren können.",
       "features": "Blockchain Agnostic, In-App Austausch, Hardware Wallets, Hohe Sicherheit, Passives Einkommen, Forks & Bounties"
     },
     "paytomat": {
       "title": "paytomat",
-      "description": "paytomat is a non-custodial wallet that brings financial services that modern customers eager. From exchanging assets, to referral programs, to trading BEP-2 tokens or accessing dApps and games, paytomat supports over 14 cryptocurrencies and covers all of a user's wants and needs in one single app.",
-      "features": "reliable, decentralized, convenient"
+      "description": "paytomat ist eine non-custodial Wallet mit Features für moderne Kunden. Von Assetaustausch über Referral Programs bis hin zu BEP-2 Tokenhandel oder dApps und Games unterstützt paytomat über 14 Kryptowährungen und deckt alle Bedürfnisse eines Users in einer einzigen App ab.",
+      "features": "zuverlässig, dezentral, praktisch"
     },
     "simplestacking": {
       "title": "simplestacking.com",
-      "description": "Safe way to store & stake Tezos. Desktop & Web wallet with Trezor support.",
-      "features": "Trezor T, multiple wallets, wallet balance history"
+      "description": "Ein sicherer Weg, um Tezos zu lagern und staken. Desktop & Web Wallet mit Trezor Unterstützung.",
+      "features": "Trezor T, mehrere Wallets, Wallet Balance Verlauf"
     },
     "tezbox": {
       "title": "TezBox",
-      "description": "TezBox was the earliest functional GUI wallet for Tezos. TezBox has grown to be one of the major community developed wallets and will continue to provide users and developers with an easy to use, powerful and secure wallet.",
-      "features": "Secure, Mobile, Developer Friendly, Open Source, Hardware Wallet Support"
+      "description": "TezBox war die erste funktionale GUI Wallet für Tezos. TezBox wurde eine der wichtigsten community-entwickelten Wallets und wird weiterhin eine einfach zu nützende, sichere und mächtige Wallet für Benutzer und Entwickler.",
+      "features": "sicher, mobile, entwicklerfreundlich, Open Source, Hardware Wallet Unterstützung"
     }
   },
   "protocol-constants": {
