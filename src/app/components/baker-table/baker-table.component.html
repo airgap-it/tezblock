@@ -257,10 +257,7 @@
                   {{ 'baker-table.baker-overview.payout-accuracy' | translate }}
                 </h5>
                 <div class="d-block">
-                  <div
-                    class="width--fit-content"
-                    tooltip="Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
-                  >
+                  <div class="width--fit-content" [tooltip]="'baker-table.baker-overview.baking-bad_tooltip' | translate">
                     <img src="/assets/img/bakingbad_logo.png" width="24px" />
                     <a
                       class="btn"

@@ -392,7 +392,8 @@
       "baking-efficiency": "Baking Efficiency",
       "efficiency": "Efficiency",
       "last10cycles": "Last 10 Cycles",
-      "next-endorsing-right": "Next Endorsing Right"
+      "next-endorsing-right": "Next Endorsing Right",
+      "baking-bad_tooltip": "Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
     },
     "baking-rights": {
       "status": "Status",
