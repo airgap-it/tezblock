@@ -10,7 +10,7 @@
     "originations_button": "Originationen",
     "accounts_button": "Accounts",
     "top-accounts_button": "Top Accounts",
-    "network-validation_button": "Netzwerk Validierung",
+    "network-validation_button": "Netzwerkvalidierung",
     "bakers_button": "Bakers",
     "blocks_button": "Blöcke",
     "endorsements_button": "Endorsements",
@@ -49,7 +49,7 @@
     "circulating-supply": "Zirkulierender Supply",
     "market-cap": "Marktkapitalisierung",
     "tezos-price": "Tezos Preis der letzten",
-    "24h_button": "24 St.",
+    "24h_button": "24 S",
     "7d_button": "7 T",
     "90d_button": "90 T",
     "at": "zu",
@@ -82,31 +82,31 @@
   },
   "account-overview": {
     "accounts": "Accounts",
-    "top25": "Top 25 Accounts nach Saldo"
+    "top25": "Top 25 Accounts nach Balance"
   },
   "baker-overview": {
     "bakers": "Bakers",
-    "total-number": "Gesamtzahl an Bakers",
+    "total-number": "Gesamtanzahl an Bakers",
     "top25": "Top 25 Bakers nach Staking Balance"
   },
   "resources-wallets": {
     "wallets": "Wallets",
     "introduction_1": "Eine Liste von Wallets, die das Tezos Protokoll unterstützen. Helft uns, die Liste aktuell zu halten und",
     "introduction_2": "falls eine Wallet fehlt.",
-    "let-us-know_link": "lasst uns wissen,",
+    "let-us-know_link": "lasst es uns wissen,",
     "wallet-item": {
       "features": "Features",
       "download_button": "Download"
     },
     "airgap": {
       "title": "AirGap",
-      "description": "Mit AirGap wird dein altes Smartphone deinen neue 'hardware wallet'. Verstaue deine XTZ sicher mit diesem einzigartigen 2 device approach wobei ein Smartphone komplett offline bleibt. Delegiere Tezzies und verdiene Rewards. Der Fokus von AirGap liegt auf einfacher Handhabung kombiniert mit state of the art Sicherheit, ohne dass dabei die Nutererfahrung leidet.",
-      "features": "Offline Device, höchste Sicherheit, XTZ Delegation, Coin agnostic, sichere Aufbewahrung, Social recovery, Hot wallet Option"
+      "description": "Mit AirGap wird dein altes Smartphone deine neue 'hardware wallet'. Verstaue deine XTZ sicher mit diesem einzigartigen 2 Device Approach, wobei ein Smartphone komplett offline bleibt. Delegiere Tezzies und verdiene Rewards. Der Fokus von AirGap liegt auf einfacher Handhabung kombiniert mit state-of-the-art Sicherheit, ohne dass dabei die Nutzererfahrung leidet.",
+      "features": "offline Device, höchste Sicherheit, XTZ Delegation, Coin agnostic, sichere Aufbewahrung, Social Recovery, Hot Wallet Option"
     },
     "atomic": {
       "title": "Atomic Wallet",
-      "description": "Atomic ist eine dezentrale Wallet und unterstützt über 300 Cryptowährungen. Eine gute Verschlüsselung garantiert dem User ein hohes Mass an Sicherheit. Atomic bieten ausserdem sofortigen Austausch und kauf von Cryptowährungen sowie Cryptowährungen mit einer Kreditkarte zu kaufen.",
-      "features": " Kryptowährungen kaufen (Visa, Master card), Tauschoptionen, XTZ Delegation"
+      "description": "Atomic ist eine dezentrale Wallet und unterstützt über 300 Cryptowährungen. Eine gute Verschlüsselung garantiert dem User ein hohes Mass an Sicherheit. Atomic bieten ausserdem sofortigen Austausch und kauf von Cryptowährungen, sowie Cryptowährungen mit einer Kreditkarte zu kaufen.",
+      "features": " Kryptowährungen kaufen (Visa, Master Card), Tauschoptionen, XTZ Delegation"
     },
     "atomex": {
       "title": "Atomex",
@@ -125,13 +125,13 @@
     },
     "kukai": {
       "title": "Kukai",
-      "description": "Eine der ersten Wallets für Tezos mit offline-signing, KT-Rückwärtskompatibilität und Ledger Support. Kukai ist verfügbar in 6 verschiedenen Sprachen dank der Bemühungen der Tezos Community. Die Wallet würde von einer führenden detuschen Sicherheitsfirma geprüft. Kukai garantiert volle Anonymität mit Verzicht auf Tracking, Cookies oder andere analytische Features.",
-      "features": "Ledger Support, Delegation, Offline-signing"
+      "description": "Eine der ersten Wallets für Tezos mit offline-signing, KT-Rückwärtskompatibilität und Ledger Support. Dank der Tezos Community ist Kukai in 6 verschiedenen Sprachen verfügbar. Die Wallet wurde von einer führenden deutschen Sicherheitsauditfirma geprüft. Kukai garantiert volle Anonymität mit Verzicht auf Tracking, Cookies oder andere analytische Features.",
+      "features": "Ledger Support, Delegation, offline-signing"
     },
     "magnum": {
       "title": "Magnum Wallet",
-      "description": "Magnum Wallet is a mehrwärhungsfähige Wallet, entwickelt für jene, welche ihr Kryptoportfolio in einer sicheren und benutzerfreundlichen Oberfläche verwalten möchten. Benutzer haben die Möglichkeit, über Staking Rewards zu verdienen. Als Teil ihres “Multiply Your Funds” Modell, ist das Team stets auf der Suche nach neuen Wegen, wie ihre User profitieren können.",
-      "features": "Blockchain Agnostic, In-App Austausch, Hardware Wallets, Hohe Sicherheit, Passives Einkommen, Forks & Bounties"
+      "description": "Magnum Wallet ist eine mehrwärhungsfähige Wallet, entwickelt für jene, welche ihr Kryptoportfolio in einer sicheren und benutzerfreundlichen Oberfläche verwalten möchten. Benutzer haben die Möglichkeit, über Staking Rewards zu verdienen. Als Teil ihres “Multiply Your Funds”-Modell, ist das Team stets auf der Suche nach neuen Wegen, wie ihre User profitieren können.",
+      "features": "Blockchain Agnostic, In-App Austausch, Hardwarewallets, Hohe Sicherheit, Passives Einkommen, Forks & Bounties"
     },
     "paytomat": {
       "title": "paytomat",
@@ -145,8 +145,8 @@
     },
     "tezbox": {
       "title": "TezBox",
-      "description": "TezBox war die erste funktionale GUI Wallet für Tezos. TezBox wurde eine der wichtigsten community-entwickelten Wallets und wird weiterhin eine einfach zu nützende, sichere und mächtige Wallet für Benutzer und Entwickler.",
-      "features": "sicher, mobile, entwicklerfreundlich, Open Source, Hardware Wallet Unterstützung"
+      "description": "TezBox war die erste funktionale GUI Wallet für Tezos. TezBox wurde eine der wichtigsten community-entwickelten Wallets und stellt weiterhin eine einfach zu nützende, sichere und mächtige Wallet für Benutzer und Entwickler dar.",
+      "features": "sicher, mobile, entwicklerfreundlich, open-source, Hardwarewallet Unterstützung"
     }
   },
   "protocol-constants": {
@@ -159,9 +159,9 @@
     "block-security-deposit": "Block Sicherheitsdeposit",
     "endorsement-security-deposit": "Endorsement Sicherheitsdeposit",
     "limits": "Limiten",
-    "maximum-revelations-per-block": "Maximale Revelations per Block",
+    "maximum-revelations-per-block": "Maximale Revelationen per Block",
     "maximum-operation-data-length": "Maximale Operation Datenlänge",
-    "hard-gas-limit-per-operation": "Hard gas limit per operation",
+    "hard-gas-limit-per-operation": "Hard Gas Limit per Operation",
     "hard-gas-limit-per-block": "Hard Gas Limit per Block"
   },
   "health": {
@@ -177,36 +177,36 @@
     "invalid-block_text": "Dieses Blocklevel ist nicht valid.",
     "block-details": "Block Details",
     "block-height": "Block Height",
-    "block-height_tooltip": "Die Block Height, welche die Länge der Blockchain angibt, erhöht sich nach der Addition eines neuen Blocks.",
+    "block-height_tooltip": "Die Block Height, welche die Länge der Blockchain angibt, erhöht sich durch die Addition eines neuen Blocks.",
     "block-confirmations": "Block Konfirmationen",
     "baker": "Baker",
     "baker_tooltip": "Ein Baker ist Teil des Validierungsprozesses des Netzwerkes.",
     "timestamp": "Zeitstempel",
-    "timestamp_tooltip": "Das Datum und die Uhrzeit zu welcher ein Block erstellt wurde.",
-    "value": "Value",
+    "timestamp_tooltip": "Das Datum und die Uhrzeit, zu welcher ein Block erstellt wurde.",
+    "value": "Wert",
     "value_tooltip": "Die gesamte Anzahl an Tezzies von allen Transaktionen für diesen Block.",
-    "transaction-fees": "Transaktionsfees",
+    "transaction-fees": "Transaktionsgebühren",
     "transaction-fees_tooltip": "The gesamte Anzahl an ausgegebenen Gebühren für alle Transaktionen dieses Blocks.",
     "details": "Details",
     "endorsed-slots": "Endorsed Slots",
     "endorsed-slots_tooltip": "Ein Block muss von anderen Bakern endorsed werden. Bis zu 32 Bakers bestätigen, dass dieser Block valid ist.",
     "cycle": "Cycle",
-    "cycle_tooltip": "Ein Cycle ist ein Set von aufeinander folgenden Blöcken, bestehend aus 4095 Blöcken. Cycles werden in der Blockchain als Zeiteinheit genutzt. Zum Beispiel sind die verschiedenen Phasen der Voting Perioden der Abänderungsanträge (amendment voting procedures) durch Cycles definiert.",
+    "cycle_tooltip": "Ein Cycle ist ein Set von aufeinanderfolgenden Blöcken, bestehend aus 4095 Blöcken. Cycles werden in der Blockchain als Zeiteinheit genutzt. Zum Beispiel sind die verschiedenen Phasen der Votingperioden der Abänderungsanträge (amendment voting procedures) durch Cycles definiert.",
     "cycle-position": "Cycle Position",
     "cycle-position_tooltip": "Die Position innerhalb von 4095 Blöcken.",
     "of": "von",
     "block-hash": "Block Hash",
     "signature": "Signatur",
     "fitness": "Fitness",
-    "fitness_tooltip": "Fitness ist ein Messwert um Kontexte zu vergleichen. Zum Beispiel, wenn mehrere Blöcke behaupten den Head der Chain zu sein, dann werden die verschiedenen Fitnesses vergleicht. Der Block mit der höchsten Fitness wird dann als Head der Chain gewählt.",
+    "fitness_tooltip": "Die Fitness eines Blocks ist ein Messwert um Kontexte zu vergleichen. Zum Beispiel, wenn mehrere Blöcke behaupten der Head der Chain zu sein, dann werden die verschiedenen Fitnesses vergleicht. Der Block mit der höchsten Fitness wird dann als Head der Chain gewählt.",
     "protocol": "Protokoll",
     "protocol_tooltip": "Das aktive Protokoll dieses Blocks. Das Protokoll kann durch den Protokoll-Veränderungsprozess (protocol amendment process) geändert werden.",
     "more": "Mehr",
     "less": "Weniger"
   },
   "transaction-detail": {
-    "invalid-operation-hash_title": "Invalide Operationhash",
-    "invalid-operation-hash_text": "Diese Hash ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain.",
+    "invalid-operation-hash_title": "Invalider Operationhash",
+    "invalid-operation-hash_text": "Dieses Hash ist momentan invalid. Es ist möglicherweise noch nicht Teil der Blockchain.",
     "invalid-operation-hash_update": "Diese Seite wird kontinuierlich aktualisiert, um den aktuellen Status zu erhalten.",
     "transaction-details": "Transaktionsdetails",
     "transaction-hash": "Transaktionshash",
@@ -215,10 +215,10 @@
     "block_tooltip": "Die Block Height, welche diese Transaktion in der Blockchain beinhaltet.",
     "block-confirmation": "Block Konfirmation",
     "timestamp": "Zeitstempel",
-    "timestamp_tooltip": "Das Datum und Uhrzeit, zu welcher diese Transaktion in einem Block enthalten war.",
-    "value": "Value",
+    "timestamp_tooltip": "Das Datum und die Uhrzeit, zu welcher diese Transaktion in einem Block enthalten war.",
+    "value": "Wert",
     "value_tooltip": "Die gesamte Anzahl an Tezzies dieser Transaktion.",
-    "transaction-fees": "Transaktionsfees",
+    "transaction-fees": "Transaktionsgebühren",
     "transaction-fees_tooltip": "Die ausgegebenen Gebühren für diese Transaktion."
   },
   "account-detail": {
@@ -226,7 +226,7 @@
     "not-revealed": "Not Revealed",
     "exchange": "Exchange",
     "balance": "Balance",
-    "value": "Value",
+    "value": "Wert",
     "related-accounts": "Verwandte Accounts",
     "related-accounts_tooltip": "Accounts welche entweder von diesem Account verwaltet werden oder die Verwalter diese Accounts sind.",
     "no-related-accounts": "Dieser Account hat keine verwandten Accounts.",
@@ -238,23 +238,23 @@
     "delegated-account": "Delegierter Account",
     "delegated-account_tooltip": "Der erste delegierte Account, welcher von diesem Account verwaltet wird. Das kann sowohl der gleiche wie auch ein anderer Account sein, welcher mit KT1 beginnt.",
     "amount": "Menge",
-    "amount_tooltip": "Die Account Balance des delegierten Account oberhalbs.",
+    "amount_tooltip": "Die Account Balance des delegierten Account oberhalb.",
     "next-reward-expected": "Nächster Reward erwartet in",
-    "next-reward-expected_tooltip": "Die Zeit bis zum nächsten Reward, ausbezahlt vom Baker.",
+    "next-reward-expected_tooltip": "Zeit bis zum nächsten Reward, ausbezahlt vom Baker.",
     "not-available": "nicht verfügbar",
     "reward-amount": "Rewardmenge",
     "reward-amount_tooltip": "Die Menge, welche vom Baker als Reward für die Delegation ausbezahlt wird. Dies ist die erwartete Menge, welche ausbezahlt wird. Der Baker Split ist bereits subtrahiert.",
     "baker": "Baker",
     "baker_tooltip": "Ein Baker ist Teil des Validierungsprozesses des Netzwerkes.",
     "baker-split": "Baker Split",
-    "baker-split_tooltip": "Der Baker Split ist ein prozentualer Anteil, welcher dem Baker zusteht als Reward für das Betreiben seiner Infrastruktur. Dieser Split wird vom Baker festgelegt, geschieht offchain und könnte auch 0% betragen.",
+    "baker-split_tooltip": "Der Baker Split ist ein prozentualer Anteil, welcher dem Baker zusteht als Reward für das Betreiben seiner Infrastruktur. Dieser Split wird vom Baker festgelegt, geschieht off-chain und könnte auch 0% betragen.",
     "last30d": "letzte 30 Tage",
     "invalid-address": "Invalide Adresse",
     "invalid-address_text": "Diese Adresse ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain."
   },
   "contract-detail": {
     "revealed": "Revealed",
-    "not-revealed": "Not Revealed",
+    "not-revealed": "Nicht Revealed",
     "name": "Name",
     "symbol": "Symbol",
     "total-supply": "Totaler Supply",
@@ -267,7 +267,7 @@
     "transactions": "Transaktionen",
     "last24h": "letzte 24 Stunden",
     "volume": "Volumen",
-    "invalid-address": "Invalide Adress",
+    "invalid-address": "Invalide Adresse",
     "invalid-address_text": "Diese Adresse ist momentan nicht sichtbar auf der Blockchain."
   },
   "proposal-detail": {
@@ -276,7 +276,7 @@
     "proposal-name": "Proposal Name",
     "period": "Periode",
     "proposal-discussion": "Proposal Diskussion",
-    "discussion-on-tezos": "Disckussion auf Tezos Agora",
+    "discussion-on-tezos": "Diskussion auf Tezos Agora",
     "more-info": "Mehr Informationen",
     "details-of-proposal": "Details des Proposals auf Tezos Agora",
     "more-proposal": "Mehr Proposal",
@@ -313,7 +313,7 @@
   },
   "search-item": {
     "label": "Suche",
-    "placeholder": "Suche nach Addressen / Alias / Transaktion / Block"
+    "placeholder": "Suche nach Adresse / Alias / Transaktion / Block"
   },
 
   "baker-table": {
@@ -334,7 +334,7 @@
       "efficiency": "Effizienz",
       "last10cycles": "Letzte 10 Cycles",
       "next-endorsing-right": "Nächstes Endorsing Right",
-      "baking-bad_tooltip": "Baking Bad erstellt ein Rating für Baker, welches die Genauigkeit und Pünktlichkeit der Rewardpayouts an ihre Delegators einbezieht."
+      "baking-bad_tooltip": "Baking Bad erstellt ein Rating für Baker, welches die Genauigkeit und Pünktlichkeit der Rewardpayouts an ihre Delegatoren einbezieht."
     },
     "baking-rights": {
       "baking-rights": "Baking Rights",
@@ -417,7 +417,7 @@
   },
   "tezblock-table": {
     "load-more_button": "Mehr laden",
-    "download-csv_button": "CSV Export herunterladen",
+    "download-csv_button": "als CSV Export herunterladen",
     "transaction": {
       "from": "Von",
       "to": "Nach",
@@ -438,7 +438,7 @@
       "gas-limit": "Gas Limit",
       "tx-hash": "Tx Hash",
       "age": "Alter",
-      "value": "Value",
+      "value": "Wert",
       "storage-limit": "Storage Limit",
       "block": "Block"
     },
@@ -478,9 +478,9 @@
       "age": "Alter"
     },
     "ballot": {
-      "ballot": "Ballot",
+      "ballot": "Abstimmung",
       "age": "Alter",
-      "kind": "Kind",
+      "kind": "Art",
       "voting-period": "Voting Periode",
       "number-of-votes": "# an Votes",
       "proposal-hash": "Proposal Hash",
@@ -495,15 +495,15 @@
     "block-list": {
       "baker": "Baker",
       "age": "Alter",
-      "transaction-volume": "Transaction Volume",
+      "transaction-volume": "Transaktionsvolumen",
       "fee": "Gebühr",
       "transactions": "Transaktionen",
       "fitness": "Fitness",
       "block": "Block"
     },
     "transaction-list": {
-      "from": "From",
-      "to": "To",
+      "from": "Von",
+      "to": "Nach",
       "age": "Alter",
       "amount": "Menge",
       "fees": "Gebühren",
@@ -526,7 +526,7 @@
       "delegator": "Delegator",
       "baker": "Baker",
       "age": "Alter",
-      "value": "Value",
+      "value": "Wert",
       "fee": "Gebühr",
       "gas-limit": "Gas Limit"
     },
@@ -539,9 +539,9 @@
     },
     "votes-list": {
       "baker": "Baker",
-      "ballot": "Ballot",
+      "ballot": "Abstimmung",
       "age": "Alter",
-      "kind": "Kind",
+      "kind": "Art",
       "voting-period": "Voting Periode",
       "number-of-votes": "# an Votes",
       "proposal": "Proposal"
@@ -574,32 +574,32 @@
     },
     "proposal": {
       "baker": "Baker",
-      "ballot": "Ballot",
+      "ballot": "Abstimmung",
       "age": "Alter",
       "number-of-votes": "# an Votes"
     },
     "transfers": {
-      "from": "From",
-      "to": "To",
+      "from": "Von",
+      "to": "Nach",
       "amount": "Menge",
       "fee": "Gebühr",
       "age": "Alter",
       "block": "Block",
       "tx-hash": "Tx Hash",
-      "entrypoint": "Entry Point"
+      "entrypoint": "Eintrittspunkt"
     },
     "token-contract": {
       "asset": "Asset",
       "contract-address": "Contract Address",
-      "total-supply": "Total Supply",
-      "description": "Description"
+      "total-supply": "Totaler Supply",
+      "description": "Beschreibung"
     },
     "baker-overview": {
       "baker": "Baker",
       "balance": "Balance",
       "number-of-votes": "# an Votes",
       "staking-balance": "Staking Balance",
-      "number-of-delegators": "# an Delegators"
+      "number-of-delegators": "# an Delegatoren"
     },
     "contract": {
       "asset": "Asset",
