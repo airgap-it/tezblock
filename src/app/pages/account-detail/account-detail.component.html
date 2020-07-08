@@ -240,7 +240,7 @@
                   [typeaheadScrollable]="true"
                   [typeaheadOptionsInScrollableView]="10"
                   [typeaheadOptionsLimit]="10000"
-                  placeholder="Search Baker by name or address"
+                  placeholder="{{ 'account-detail.placeholder' | translate }}"
                   class="form-control form-control--focus-white"
                   (typeaheadOnSelect)="onDelegationControlSelect($event)"
                   [typeaheadIsFirstItemActive]="false"

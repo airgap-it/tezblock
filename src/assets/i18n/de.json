@@ -155,7 +155,7 @@
     "blocks-per-cycle": "Blöcke per Cycle",
     "blocks-per-commitment": "Blöcke per Commitment",
     "blocks-per-roll-snapshot": "Blöcke per Roll Snapshot",
-    "time-between-blocks": "Zeit zwischen Blöcke",
+    "time-between-blocks": "Zeit zwischen Blöcken",
     "rewards": "Rewards",
     "block-security-deposit": "Block Sicherheitsdeposit",
     "endorsement-security-deposit": "Endorsement Sicherheitsdeposit",
