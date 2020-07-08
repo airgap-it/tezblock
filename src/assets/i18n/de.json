@@ -7,7 +7,7 @@
     "operations_button": "Operationen",
     "transactions_button": "Transaktionen",
     "activations_button": "Aktivierungen",
-    "originations_button": "Originations",
+    "originations_button": "Originationen",
     "accounts_button": "Accounts",
     "top-accounts_button": "Top Accounts",
     "network-validation_button": "Netzwerk Validierung",
@@ -70,7 +70,7 @@
     },
     "blocks": "Blöcke",
     "activations": "Aktivierungen",
-    "originations": "Originations",
+    "originations": "Originationen",
     "delegations": "Delegationen",
     "endorsements": "Endorsements",
     "votes": "Wahlen",
@@ -186,7 +186,7 @@
     "value": "Value",
     "value_tooltip": "Die gesamte Anzahl an Tezzies von allen Transaktionen für diesen Block.",
     "transaction-fees": "Transaktionsfees",
-    "transaction-fees_tooltip": "The gesamte Anzahl an ausgegebenen Fees für alle Transaktionen dieses Blocks.",
+    "transaction-fees_tooltip": "The gesamte Anzahl an ausgegebenen Gebühren für alle Transaktionen dieses Blocks.",
     "details": "Details",
     "endorsed-slots": "Endorsed Slots",
     "endorsed-slots_tooltip": "Ein Block muss von anderen Bakern endorsed werden. Bis zu 32 Bakers bestätigen, dass dieser Block valid ist.",
@@ -219,7 +219,7 @@
     "value": "Value",
     "value_tooltip": "Die gesamte Anzahl an Tezzies dieser Transaktion.",
     "transaction-fees": "Transaktionsfees",
-    "transaction-fees_tooltip": "Die ausgegebenen Fees für diese Transaktion."
+    "transaction-fees_tooltip": "Die ausgegebenen Gebühren für diese Transaktion."
   },
   "account-detail": {
     "revealed": "Revealed",
@@ -277,7 +277,7 @@
     "period": "Periode",
     "proposal-discussion": "Proposal Diskussion",
     "discussion-on-tezos": "Disckussion auf Tezos Agora",
-    "more-info": "Mehr Information",
+    "more-info": "Mehr Informationen",
     "details-of-proposal": "Details des Proposals auf Tezos Agora",
     "more-proposal": "Mehr Proposal",
     "less-proposal": "Weniger Proposal",
@@ -322,10 +322,10 @@
       "full-balance": "Full Balance",
       "staking-balance": "Staking Balance",
       "staking-capacity": "Staking Kapazität",
-      "payout-account": "Auszahlungsaccount",
-      "no-related-payout": "Kein zugehöriger Auszahlungsaccount.",
+      "payout-account": "Payoutaccount",
+      "no-related-payout": "Kein zugehöriger Payoutaccount.",
       "frozen-balance": "Frozen Balance",
-      "active-delegations": "Aktive Delegations",
+      "active-delegations": "Aktive Delegationen",
       "number-of-rolls": "Anzahl an Rolls",
       "next-baking-right": "Nächstes Baking Right",
       "not-available": "nicht verfügbar",
@@ -341,32 +341,32 @@
       "cycle": "Cycle",
       "number-of-bakings": "# an Bakings",
       "block-rewards": "Block Rewards",
-      "deposits": "Deposists",
-      "fees": "Fees",
+      "deposits": "Deposits",
+      "fees": "Gebühren",
       "expanded-rows": {
         "cycle": "Cycle",
-        "age": "Age",
+        "age": "Alter",
         "level": "Level",
-        "priority": "Priority",
+        "priority": "Priorität",
         "rewards": "Rewards",
-        "fees": "Fees",
-        "deposits": "Deposists",
+        "fees": "Gebühren",
+        "deposits": "Deposits",
         "payout": "Payout"
       }
     },
     "endorsing-rights": {
       "endorsing-rights": "Endorsing Rights",
       "cycle": "Cycle",
-      "number-of-endorsements": "# of Endorsements",
+      "number-of-endorsements": "# an Endorsements",
       "endorsement-rewards": "Endorsement Rewards",
-      "deposits": "Deposists",
+      "deposits": "Deposits",
       "expanded-rows": {
         "cycle": "Cycle",
-        "age": "Age",
+        "age": "Alter",
         "level": "Level",
         "slot": "Slot",
         "rewards": "Rewards",
-        "deposits": "Deposists"
+        "deposits": "Deposits"
       }
     },
     "rewards": {
@@ -376,7 +376,7 @@
       "staking-balance": "Staking Balance",
       "block-rewards": "Block Rewards",
       "endorsement-rewards": "Endorsement Rewards",
-      "fees": "Fees",
+      "fees": "Gebühren",
       "expanded-rows": {
         "delegator-account": "Delegator Account",
         "payout": "Payout",
@@ -388,25 +388,25 @@
   },
   "tabbed-table": {
     "account-detail": {
-      "transactions": "Transactions",
+      "transactions": "Transaktionen",
       "delegations": "Delegationen",
-      "originations": "Originations",
+      "originations": "Originationen",
       "endorsements": "Endorsements"
     },
     "transaction-detail": {
-      "transactions": "Transactions",
+      "transactions": "Transaktionen",
       "delegations": "Delegationen",
-      "originations": "Originations",
+      "originations": "Originationen",
       "reveals": "Reveals",
-      "activations": "Activations",
+      "activations": "Aktivierungen",
       "votes": "Wahlen"
     },
     "block-detail": {
-      "transactions": "Transactions",
+      "transactions": "Transaktionen",
       "delegations": "Delegationen",
-      "originations": "Originations",
+      "originations": "Originationen",
       "endorsements": "Endorsements",
-      "activations": "Activations"
+      "activations": "Aktivierungen"
     },
     "proposal-detail": {
       "proposal": "Proposal",
@@ -416,56 +416,56 @@
     }
   },
   "tezblock-table": {
-    "load-more_button": "Load more",
-    "download-csv_button": "Download CSV Export",
+    "load-more_button": "Mehr laden",
+    "download-csv_button": "CSV Export herunterladen",
     "transaction": {
-      "from": "From",
-      "to": "To",
-      "amount": "Amount",
-      "fee": "Fee",
+      "from": "Von",
+      "to": "Nach",
+      "amount": "Menge",
+      "fee": "Gebühr",
       "gas-limit": "Gas Limit",
       "storage-limit": "Storage Limit",
       "tx-hash": "Tx Hash",
-      "age": "Age",
-      "parameters": "Parameters",
+      "age": "Alter",
+      "parameters": "Parameter",
       "block": "Block"
     },
     "delegation": {
       "delegator": "Delegator",
       "baker": "Baker",
-      "amount": "Amount",
-      "fee": "Fee",
+      "amount": "Menge",
+      "fee": "Gebühr",
       "gas-limit": "Gas Limit",
       "tx-hash": "Tx Hash",
-      "age": "Age",
+      "age": "Alter",
       "value": "Value",
       "storage-limit": "Storage Limit",
       "block": "Block"
     },
     "origination": {
-      "new-account": "New Account",
+      "new-account": "Neuer Account",
       "balance": "Balance",
       "originator": "Originator",
       "baker": "Baker",
-      "fee": "Fee",
+      "fee": "Gebühr",
       "burn": "Burn",
       "gas-limit": "Gas Limit",
       "storage-limit": "Storage Limit",
       "tx-hash": "Tx Hash",
-      "age": "Age",
+      "age": "Alter",
       "block": "Block"
     },
     "reveal": {
       "account": "Account",
       "public-key": "Public Key",
-      "fee": "Fee",
+      "fee": "Gebühr",
       "gas-limit": "Gas Limit",
       "storage-limit": "Storage Limit",
       "block": "Block"
     },
     "endorsement": {
       "endorser": "Endorser",
-      "age": "Age",
+      "age": "Alter",
       "slots": "Slots",
       "tx-hash": "Tx Hash",
       "endorsed-level": "Endorsed Level",
@@ -475,14 +475,14 @@
       "account": "Account",
       "secret": "Secret",
       "tx-hash": "Tx Hash",
-      "age": "Age"
+      "age": "Alter"
     },
     "ballot": {
       "ballot": "Ballot",
-      "age": "Age",
+      "age": "Alter",
       "kind": "Kind",
-      "voting-period": "Voting Period",
-      "number-of-votes": "# of Votes",
+      "voting-period": "Voting Periode",
+      "number-of-votes": "# an Votes",
       "proposal-hash": "Proposal Hash",
       "proposal": "Proposal",
       "baker": "Baker",
@@ -494,45 +494,45 @@
     },
     "block-list": {
       "baker": "Baker",
-      "age": "Age",
+      "age": "Alter",
       "transaction-volume": "Transaction Volume",
-      "fee": "Fee",
-      "transactions": "Transactions",
+      "fee": "Gebühr",
+      "transactions": "Transaktionen",
       "fitness": "Fitness",
       "block": "Block"
     },
     "transaction-list": {
       "from": "From",
       "to": "To",
-      "age": "Age",
-      "amount": "Amount",
-      "fees": "Fees",
-      "parameters": "Parameters"
+      "age": "Alter",
+      "amount": "Menge",
+      "fees": "Gebühren",
+      "parameters": "Parameter"
     },
     "activation-list": {
       "account": "Account",
-      "age": "Age",
+      "age": "Alter",
       "secret": "Secret"
     },
     "origination-list": {
-      "new-account": "New Account",
-      "age": "Age",
+      "new-account": "Neuer Account",
+      "age": "Alter",
       "balance": "Balance",
       "originator": "Originator",
       "baker": "Baker",
-      "fee": "Fee"
+      "fee": "Gebühr"
     },
     "delegation-list": {
       "delegator": "Delegator",
       "baker": "Baker",
-      "age": "Age",
+      "age": "Alter",
       "value": "Value",
-      "fee": "Fee",
+      "fee": "Gebühr",
       "gas-limit": "Gas Limit"
     },
     "endorsement-list": {
       "endorser": "Endorser",
-      "age": "Age",
+      "age": "Alter",
       "slots": "Slots",
       "block": "Block",
       "tx-hash": "Tx Hash"
@@ -540,32 +540,32 @@
     "votes-list": {
       "baker": "Baker",
       "ballot": "Ballot",
-      "age": "Age",
+      "age": "Alter",
       "kind": "Kind",
-      "voting-period": "Voting Period",
-      "number-of-votes": "# of Votes",
+      "voting-period": "Voting Periode",
+      "number-of-votes": "# an Votes",
       "proposal": "Proposal"
     },
     "double-baking-list": {
       "baker": "Baker",
-      "age": "Age",
+      "age": "Alter",
       "reward": "Reward",
       "offender": "Offender",
-      "denounced-level": "Denounced Level",
-      "lost-amount": "Lost Amount"
+      "denounced-level": "Denunziertes Level",
+      "lost-amount": "Verlorene Menge"
     },
     "double-endorsement-list": {
       "baker": "Baker",
-      "age": "Age",
+      "age": "Alter",
       "reward": "Reward",
       "offender": "Offender",
-      "denounced-level": "Denounced Level",
-      "lost-amount": "Lost Amount"
+      "denounced-level": "Denunziertes Level",
+      "lost-amount": "Verlorene Menge"
     },
     "proposal-list": {
       "proposal": "Proposal",
       "proposal-hash": "Proposal Hash",
-      "period": "Period"
+      "period": "Periode"
     },
     "contract-list": {
       "account": "Account",
@@ -575,15 +575,15 @@
     "proposal": {
       "baker": "Baker",
       "ballot": "Ballot",
-      "age": "Age",
-      "number-of-votes": "# of Votes"
+      "age": "Alter",
+      "number-of-votes": "# an Votes"
     },
     "transfers": {
       "from": "From",
       "to": "To",
-      "amount": "Amount",
-      "fee": "Fee",
-      "age": "Age",
+      "amount": "Menge",
+      "fee": "Gebühr",
+      "age": "Alter",
       "block": "Block",
       "tx-hash": "Tx Hash",
       "entrypoint": "Entry Point"
@@ -597,9 +597,9 @@
     "baker-overview": {
       "baker": "Baker",
       "balance": "Balance",
-      "number-of-votes": "# of Votes",
+      "number-of-votes": "# an Votes",
       "staking-balance": "Staking Balance",
-      "number-of-delegators": "# of Delegators"
+      "number-of-delegators": "# an Delegators"
     },
     "contract": {
       "asset": "Asset",
