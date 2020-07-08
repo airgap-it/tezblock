@@ -39,7 +39,7 @@ export class QrModalComponent {
   @Input()
   size: number = 300
 
-  constructor(bsModalRef: BsModalRef, private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
+  constructor(public bsModalRef: BsModalRef, private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
 
   copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
