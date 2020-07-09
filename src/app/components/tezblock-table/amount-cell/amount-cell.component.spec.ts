@@ -1,31 +1,27 @@
-import { CurrencySymbolPipe } from './../../../pipes/currency-symbol/currency-symbol.pipe'
-import { CurrencyConverterPipe } from './../../../pipes/currency-converter/currency-converter.pipe'
-import { AmountConverterPipe } from './../../../pipes/amount-converter/amount-converter.pipe'
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
 
 import { AmountCellComponent } from './amount-cell.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { initialState as appInitialState } from '@tezblock/app.reducer'
 
-xdescribe('AmountCellComponent', () => {
+describe('AmountCellComponent', () => {
   let component: AmountCellComponent
   let fixture: ComponentFixture<AmountCellComponent>
+  const initialState = { app: appInitialState }
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [AmountConverterPipe, CurrencyConverterPipe, CurrencySymbolPipe],
-        declarations: [AmountCellComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
-  beforeEach(() => {
+    TestBed.configureTestingModule({
+      declarations: [AmountCellComponent],
+      providers: [provideMockStore({ initialState }), CurrencyConverterPipe, AmountConverterPipe],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
+
     fixture = TestBed.createComponent(AmountCellComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {
