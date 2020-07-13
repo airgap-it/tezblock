@@ -1,25 +1,27 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
-import { TransactionErrorsComponent } from './transaction-errors.component';
+import { TransactionErrorsComponent } from './transaction-errors.component'
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
 
-xdescribe('TransactionErrorsComponent', () => {
-  let component: TransactionErrorsComponent;
-  let fixture: ComponentFixture<TransactionErrorsComponent>;
+describe('TransactionErrorsComponent', () => {
+  let component: TransactionErrorsComponent
+  let fixture: ComponentFixture<TransactionErrorsComponent>
+  const amountConverterPipeMock = getPipeMock()
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ TransactionErrorsComponent ]
+      declarations: [TransactionErrorsComponent],
+      providers: [{ provide: AmountConverterPipe, useValue: amountConverterPipeMock }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
-    .compileComponents();
-  }));
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(TransactionErrorsComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    fixture = TestBed.createComponent(TransactionErrorsComponent)
+    component = fixture.componentInstance
+  }))
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

@@ -15,8 +15,8 @@ export interface MarketDataSample {
   providedIn: 'root'
 })
 export class ChartDataService {
-  public async fetchHourlyMarketPrices(numberOfHours: number, date: Date, baseSymbol = 'USD'): Promise<MarketDataSample[]> {
-    return await cryptocompare.histoHour('XTZ', baseSymbol, {
+  fetchHourlyMarketPrices(numberOfHours: number, date: Date, baseSymbol = 'USD'): Promise<MarketDataSample[]> {
+    return cryptocompare.histoHour('XTZ', baseSymbol, {
       limit: numberOfHours - 1,
       timestamp: date
     })

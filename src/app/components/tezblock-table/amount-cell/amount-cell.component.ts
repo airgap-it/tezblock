@@ -28,7 +28,6 @@ export const getPrecision = (value: string | number, options?: AmountOptions): s
   const digitsInfo: string = get<AmountOptions>(o => o.digitsInfo)(options)
   const hasDecimals = numericValue - Math.floor(numericValue) !== 0
 
-  // this case overrides options.decimals
   if (numericValue === 0 || !hasDecimals) {
     return '1.0-0'
   }
@@ -162,7 +161,7 @@ export class AmountCellComponent implements OnInit {
     const decimals = pipe<string, number, string>(
       stringNumber => parseFloat(stringNumber.replace(',', '')),
       pipe(
-        numericValue => this.decimalPipe.transform(numericValue, getPrecision(converted)),
+        numericValue => this.decimalPipe.transform(numericValue, getPrecision(numericValue)),
         decimalPiped => (decimalPiped ? decimalPiped.split('.')[1] : decimalPiped)
       )
     )(converted)
