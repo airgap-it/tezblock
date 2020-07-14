@@ -206,3 +206,6 @@ export const getDecimalsForSymbol = (symbol: string, network: TezosNetwork): num
   }
   return getTokenContractBySymbol(symbol, network).decimals ?? 0
 }
+
+// by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function
+export const isAsset = (transaction: Transaction): boolean => !!transaction.symbol

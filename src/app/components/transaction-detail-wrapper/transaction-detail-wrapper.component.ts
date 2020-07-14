@@ -65,15 +65,7 @@ export class TransactionDetailWrapperComponent implements OnInit {
   isMainnet = true
 
   @Input()
-  set transactions(value: Transaction[]) {
-    if (value !== this._transactions) {
-      this._transactions = value
-      this.assets$.next((value || []).map(transaction => ({ symbol: transaction.symbol, value: transaction.amount })))
-    }
-  }
-  private _transactions: Transaction[]
-
-  assets$ = new BehaviorSubject<Asset[]>(undefined)
+  assets: Asset[]
 
   amountFromLatestTransactionFee: { data: any; options: any }
 

@@ -10,11 +10,14 @@ import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 
 export interface Asset {
   value: string | number | BigNumber
   symbol: string
 }
+
+export const transactionToAsset = (transaction: Transaction): Asset => ({ symbol: transaction.symbol, value: transaction.amount })
 
 @Component({
   selector: 'app-assets-value',

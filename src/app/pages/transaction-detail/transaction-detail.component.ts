@@ -26,6 +26,8 @@ import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { isInBTC } from '@tezblock/domain/airgap'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { Asset, transactionToAsset } from '@tezblock/components/assets-value/assets-value.component'
+import { isAsset } from '@tezblock/domain/contract'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -52,6 +54,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   filteredTransactions$: Observable<Transaction[]>
   isInvalidHash$: Observable<boolean>
   orderBy$: Observable<OrderBy>
+  assets$: Observable<Asset[]>
 
   private kind$: Observable<string>
 
@@ -97,6 +100,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
       filter(([latestBlock, transaction]) => !!latestBlock),
       map(([latestBlock, transaction]) => latestBlock.level - transaction.block_level)
     )
+    this.assets$ = this.store$
+      .select(state => state.transactionDetails.transactions.data)
+      .pipe(map(transactions => (transactions || []).filter(isAsset).map(transactionToAsset)))
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
