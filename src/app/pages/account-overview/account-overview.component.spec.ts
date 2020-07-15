@@ -13,6 +13,7 @@ import { getPipeMock } from 'test-config/mocks/pipe.mock'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { getBreakpointObserverMock, getObserveValue } from 'test-config/mocks/breakpoint-observer.mock'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { TranslateService, TranslateModule } from '@ngx-translate/core'
 
 describe('AccountOverviewComponent', () => {
   let component: AccountOverviewComponent
@@ -34,13 +35,15 @@ describe('AccountOverviewComponent', () => {
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
       declarations: [AccountOverviewComponent],
+      imports: [TranslateModule.forRoot()],
       providers: [
         provideMockStore({ initialState }),
         { provide: Actions, useValue: EMPTY },
         { provide: AliasPipe, useValue: aliasPipeMock },
         { provide: AmountConverterPipe, useValue: amountConverterPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
-        { provide: ShortenStringPipe, useValue: shortenStringPipeMock }
+        { provide: ShortenStringPipe, useValue: shortenStringPipeMock },
+        { provide: TranslateService, useValue: TranslateService }
       ]
     })
   }))

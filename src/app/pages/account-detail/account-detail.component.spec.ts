@@ -31,6 +31,7 @@ import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activ
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { TranslateService } from '@ngx-translate/core'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -73,6 +74,7 @@ describe('AccountDetailComponent', () => {
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: TranslateService, useValue: TranslateService },
         ShortenStringPipe
       ],
       imports: [],

@@ -12,6 +12,10 @@ import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { getPipeMock } from 'test-config/mocks/pipe.mock'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { getBreakpointObserverMock, getObserveValue } from 'test-config/mocks/breakpoint-observer.mock'
+import { TranslateService, TranslateModule, TranslateLoader } from '@ngx-translate/core'
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
+import { HttpClient } from '@angular/common/http'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
 describe('BakerOverviewComponent', () => {
   let component: BakerOverviewComponent
@@ -23,6 +27,10 @@ describe('BakerOverviewComponent', () => {
   const amountConverterPipeMock = getPipeMock()
   const breakpointObserverMock = getBreakpointObserverMock()
 
+  function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+  }
+
   beforeEach(async(() => {
     testScheduler = new TestScheduler((actual, expected) => {
       // asserting the two objects are equal
@@ -31,13 +39,24 @@ describe('BakerOverviewComponent', () => {
 
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
+      ],
       declarations: [BakerOverviewComponent],
       providers: [
         provideMockStore({ initialState }),
         { provide: Actions, useValue: EMPTY },
         { provide: AliasPipe, useValue: aliasPipeMock },
         { provide: AmountConverterPipe, useValue: amountConverterPipeMock },
-        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+        { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        TranslateService
       ]
     })
   }))
@@ -71,10 +90,7 @@ describe('BakerOverviewComponent', () => {
         storeMock.setState({
           ...initialState,
           bakers: {
-            top24Bakers: [
-              { pkh: 'Others' },
-              { pkh: 'Others' }
-            ]
+            top24Bakers: [{ pkh: 'Others' }, { pkh: 'Others' }]
           }
         })
 
@@ -91,10 +107,7 @@ describe('BakerOverviewComponent', () => {
         storeMock.setState({
           ...initialState,
           bakers: {
-            top24Bakers: [
-              { pkh: 'A' },
-              { pkh: 'B' }
-            ]
+            top24Bakers: [{ pkh: 'A' }, { pkh: 'B' }]
           }
         })
 
@@ -113,10 +126,7 @@ describe('BakerOverviewComponent', () => {
         storeMock.setState({
           ...initialState,
           bakers: {
-            top24Bakers: [
-              { pkh: 'A' },
-              { pkh: 'B' }
-            ]
+            top24Bakers: [{ pkh: 'A' }, { pkh: 'B' }]
           }
         })
 

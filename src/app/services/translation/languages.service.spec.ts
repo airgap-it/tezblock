@@ -1,12 +1,22 @@
-// import { TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing'
 
-// import { LanguagesService } from './load-languages.service';
+import { LanguagesService } from './languages.service'
+import { UnitHelper } from 'test-config/unit-test-helper'
+import { TranslateService } from '@ngx-translate/core'
 
-// describe('LanguagesService', () => {
-//   beforeEach(() => TestBed.configureTestingModule({}));
+xdescribe('LanguagesService', () => {
+  let unitHelper: UnitHelper
 
-//   it('should be created', () => {
-//     const service: LanguagesService = TestBed.get(LanguagesService);
-//     expect(service).toBeTruthy();
-//   });
-// });
+  beforeEach(() => {
+    unitHelper = new UnitHelper()
+
+    TestBed.configureTestingModule(unitHelper.testBed({ providers: [TranslateService] }))
+      .compileComponents()
+      .catch(console.error)
+  })
+
+  it('should be created', () => {
+    const service: LanguagesService = TestBed.get(LanguagesService)
+    expect(service).toBeTruthy()
+  })
+})

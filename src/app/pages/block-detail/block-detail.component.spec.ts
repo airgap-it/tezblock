@@ -16,6 +16,7 @@ import { initialState as appInitialState } from '@tezblock/app.reducer'
 import * as actions from './actions'
 import { getPipeMock } from 'test-config/mocks/pipe.mock'
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { TranslateService } from '@ngx-translate/core'
 
 describe('BlockDetailComponent', () => {
   let fixture: ComponentFixture<BlockDetailComponent>
@@ -43,7 +44,8 @@ describe('BlockDetailComponent', () => {
         { provide: ApiService, useValue: apiServiceMock },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: IconPipe, useValue: iconPipeMock },
-        { provide: ChainNetworkService, useValue: chainNetworkServiceMock }
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        { provide: TranslateService, useValue: TranslateService }
       ],
       declarations: [BlockDetailComponent]
     })
