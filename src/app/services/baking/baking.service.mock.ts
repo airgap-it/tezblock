@@ -1,8 +1,8 @@
-import { of } from 'rxjs'
+import { EMPTY } from 'rxjs'
 
 export const getBakingServiceMock = () => jasmine.createSpyObj('BakingService', {
-    getBakingBadRatings: of(null),
-    getTezosBakerInfos: of(null).toPromise(),
-    getBakerInfos: of(null).toPromise(),
-    getEfficiencyLast10Cycles: of(null)
+    getBakingBadRatings: EMPTY,
+    getTezosBakerInfos: Promise.resolve(null),
+    getBakerInfos: Promise.resolve(null),
+    getEfficiencyLast10Cycles: EMPTY
 })

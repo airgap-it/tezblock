@@ -49,7 +49,7 @@ import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-t
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 @Component({
   selector: 'app-account-detail',

@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core'
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 const proposals = require('../../../assets/proposals/json/proposals.json')
 
 @Pipe({

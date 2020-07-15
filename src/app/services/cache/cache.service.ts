@@ -81,6 +81,10 @@ export class CacheService {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
   }
 
+  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly storage: StorageMap) {
+    // from(navigator.storage.estimate()).subscribe(x => console.log(`>>>> IndexedDB storage: ${JSON.stringify(x)}`))
+  }
+
   delete(key: CacheKeys): Observable<undefined> {
     return this.storage.delete(key)
   }
@@ -129,9 +133,5 @@ export class CacheService {
     this.isBusy[key] = true
 
     return this.get<T>(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
-  }
-
-  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly storage: StorageMap) {
-    // from(navigator.storage.estimate()).subscribe(x => console.log(`>>>> IndexedDB storage: ${JSON.stringify(x)}`))
   }
 }
