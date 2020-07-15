@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http'
 import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
-import { TezosStaker, TezosBTC } from 'airgap-coin-lib'
+import { TezosStaker, TezosBTC, TezosUSD } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
@@ -78,7 +78,7 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
   const environmentUrls = chainNetworkService.getEnvironment()
 
   // Why airgap implements api interfaces in such a inconsistent way - compare to new TezosFAProtocol where arguments it's an object
-  if (contract.name === 'Staker') {
+  if (contract.symbol === 'STKR') {
     return new TezosStaker(
       contract.id,
       environmentUrls.rpcUrl,
@@ -89,8 +89,19 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
     )
   }
 
-  if (contract.name === 'tzBTC') {
+  if (contract.symbol === 'tzBTC') {
     return new TezosBTC(
+      contract.id,
+      environmentUrls.rpcUrl,
+      environmentUrls.conseilUrl,
+      environmentUrls.conseilApiKey,
+      chainNetworkService.getEnvironmentVariable(),
+      chainNetworkService.getNetwork()
+    )
+  }
+
+  if (contract.symbol === 'USDtz') {
+    return new TezosUSD(
       contract.id,
       environmentUrls.rpcUrl,
       environmentUrls.conseilUrl,
