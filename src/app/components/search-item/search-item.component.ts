@@ -54,18 +54,18 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     const narrowOptions = (countPerType: number) =>
       pipe<SearchOption[], { [key: string]: SearchOption[] }, SearchOption[]>(groupBy('type'), takeFromEach(countPerType))
     const getSearchSources = (token: string): Observable<SearchOption[]>[] => {
-      const result = [of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))]
-
+      const matchByAccountIds = ['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))
+      const result = [
+        of(searchTokenContracts(token, this.chainNetworkService.getNetwork())),
+        this.accountService.getAccountsStartingWith(token, matchByAccountIds)
+      ]
+      
       if (token?.startsWith('o')) {
         result.push(this.apiService.getTransactionHashesStartingWith(token))
       }
 
       if (token?.startsWith('b') || token?.startsWith('B')) {
         result.push(this.apiService.getBlockHashesStartingWith(token))
-      }
-
-      if (['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))) {
-        result.push(this.accountService.getAccountsStartingWith(token))
       }
 
       return result

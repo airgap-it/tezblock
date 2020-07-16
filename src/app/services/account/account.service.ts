@@ -162,7 +162,7 @@ export class AccountService extends BaseService {
     )
   }
 
-  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
+  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOption[]> {
     const bakers: SearchOption[] = Object.keys(accounts)
       .map(key => accounts[key])
       .filter(
@@ -172,7 +172,7 @@ export class AccountService extends BaseService {
       )
       .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
 
-    if (bakers.length === 0) {
+    if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>(
           'accounts',
           {
