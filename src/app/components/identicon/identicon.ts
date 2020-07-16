@@ -3,7 +3,7 @@ import { createIcon } from '@download/blockies'
 import { BigNumber } from 'bignumber.js'
 import { toDataUrl } from 'myetherwallet-blockies'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 @Component({
   selector: 'identicon',
@@ -68,7 +68,7 @@ export class IdenticonComponent implements OnInit {
       if (displayLogo) {
         const logoReference = accounts[address].logoReference || address
 
-        return `assets/bakers/img/${logoReference}.png`
+        return `submodules/tezos_assets/imgs/${logoReference}.png`
       }
 
       if (address.startsWith('ak_')) {
