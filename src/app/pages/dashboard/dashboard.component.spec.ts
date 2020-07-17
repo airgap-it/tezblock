@@ -19,7 +19,7 @@ import { bind, numberToDate, multiplyBy } from '@tezblock/services/fp'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { PeriodKind } from '@tezblock/domain/vote'
 
-fdescribe('DashboardComponent', () => {
+describe('DashboardComponent', () => {
   let component: DashboardComponent
   let fixture: ComponentFixture<DashboardComponent>
   let testScheduler: TestScheduler
