@@ -1,28 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { SymbolCellComponent } from './symbol-cell.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
 
-xdescribe('SymbolCellComponent', () => {
+describe('SymbolCellComponent', () => {
   let component: SymbolCellComponent
   let fixture: ComponentFixture<SymbolCellComponent>
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [],
-        declarations: [SymbolCellComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
-  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [],
+      declarations: [SymbolCellComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
+
     fixture = TestBed.createComponent(SymbolCellComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

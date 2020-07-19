@@ -54,7 +54,7 @@
               </li>
 
               <div class="nav-item dropdown mega-dropdown">
-                <span class="d-block" dropdown [triggers]="triggers" #dp1="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp1="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -173,7 +173,7 @@
                 </button>
               </li>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown [triggers]="triggers" #dp2="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp2="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -218,7 +218,7 @@
                 </span>
               </li>
               <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown [triggers]="triggers" #dp3="bs-dropdown">
+                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp3="bs-dropdown">
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href

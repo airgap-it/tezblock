@@ -38,7 +38,7 @@ export interface State {
   busy: Busy
 }
 
-const initialState: State = {
+export const initialState: State = {
   blocks: undefined,
   contracts: undefined,
   proposal: undefined,

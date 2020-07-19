@@ -1,35 +1,81 @@
-import { SearchService } from './../../services/search/search.service'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { RouterTestingModule } from '@angular/router/testing'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
+import { TestScheduler } from 'rxjs/testing'
+import { of } from 'rxjs'
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core'
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown'
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { initialState as appInitialState } from '@tezblock/app.reducer'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
+
 import { HeaderItemComponent } from './header-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { UnitHelper } from '../../../../test-config/unit-test-helper'
 
-xdescribe('HeaderItemComponent', () => {
+describe('HeaderItemComponent', () => {
   let component: HeaderItemComponent
   let fixture: ComponentFixture<HeaderItemComponent>
-
-  let unitHelper: UnitHelper
-  beforeEach(() => {
-    unitHelper = new UnitHelper()
-
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [SearchService],
-        imports: [FontAwesomeModule],
-        declarations: [HeaderItemComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
+  let storeMock: MockStore<any>
+  let testScheduler: TestScheduler
+  const initialState = { app: appInitialState }
+  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  const breakpointObserverMock = getBreakpointObserverMock()
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
+      imports: [RouterTestingModule.withRoutes([]), BrowserAnimationsModule, BsDropdownModule.forRoot()],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+      ],
+      declarations: [HeaderItemComponent]
+    })
+
+    testScheduler = new TestScheduler((actual, expected) => {
+      // asserting the two objects are equal
+      expect(actual).toEqual(expected)
+    })
+
     fixture = TestBed.createComponent(HeaderItemComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
+    storeMock = TestBed.inject(MockStore)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  // dummy tests : P
+  describe('triggers$', () => {
+    it('when is mobile then returns empty string', () => {
+      breakpointObserverMock.observe.and.returnValue(of({ matches: true }))
+      component.ngOnInit()
+
+      testScheduler.run(helpers => {
+        const { expectObservable } = helpers
+        const expected = '(a|)'
+        const expectedValues = { a: '' }
+
+        expectObservable(component.triggers$).toBe(expected, expectedValues)
+      })
+    })
+
+    it('when is NOT mobile then returns "hover"', () => {
+      breakpointObserverMock.observe.and.returnValue(of({ matches: false }))
+      component.ngOnInit()
+
+      testScheduler.run(helpers => {
+        const { expectObservable } = helpers
+        const expected = '(a|)'
+        const expectedValues = { a: 'hover' }
+
+        expectObservable(component.triggers$).toBe(expected, expectedValues)
+      })
+    })
   })
 })

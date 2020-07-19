@@ -28,24 +28,24 @@ import { CopyService } from '../../services/copy/copy.service'
   ]
 })
 export class QrModalComponent {
-  public current: string = 'copyGrey'
+  current: string = 'copyGrey'
 
   @Input()
-  public level: string = 'L'
+  level: string = 'L'
 
   @Input()
-  public qrdata: string | undefined
+  qrdata: string | undefined
 
   @Input()
-  public size: number = 300
+  size: number = 300
 
   constructor(public bsModalRef: BsModalRef, private readonly copyService: CopyService, private readonly toastrService: ToastrService) {}
 
-  public copyToClipboard(val: string) {
+  copyToClipboard(val: string) {
     this.copyService.copyToClipboard(val)
   }
 
-  public changeState(address: string) {
+  changeState(address: string) {
     this.current = this.current === 'copyGrey' ? 'copyTick' : 'copyGrey'
     setTimeout(() => {
       this.current = 'copyGrey'

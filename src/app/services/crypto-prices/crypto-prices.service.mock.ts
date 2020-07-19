@@ -1,8 +1,8 @@
-import { of } from 'rxjs'
+import { EMPTY } from 'rxjs'
 
 export const getCryptoPricesServiceMock = () => jasmine.createSpyObj('CryptoPricesService', {
-    getCryptoPrices: of(null),
-    getHistoricCryptoPrices: of([]),
-    getCurrencyConverterArgs: of(null),
-    getEfficiencyLast10Cycles: of(null)
+    getCryptoPrices: EMPTY,
+    getHistoricCryptoPrices: EMPTY,
+    getCurrencyConverterArgs: EMPTY,
+    getEfficiencyLast10Cycles: EMPTY
 })
