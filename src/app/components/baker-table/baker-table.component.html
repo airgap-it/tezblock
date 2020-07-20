@@ -86,11 +86,14 @@
                       [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
                     ></fa-icon>
                   </span>
-                  <ng-container *ngIf="data?.acceptsDelegations">
+                  <ng-container *ngIf="data?.acceptsDelegations === true">
                     Accepts Delegations
                   </ng-container>
-                  <ng-container *ngIf="!data?.acceptsDelegations">
+                  <ng-container *ngIf="data?.acceptsDelegations === false">
                     Does Not Accept Delegations
+                  </ng-container>
+                  <ng-container *ngIf="data?.acceptsDelegations === undefined">
+                    Unknown
                   </ng-container>
                 </div>
               </div>
