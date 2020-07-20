@@ -1,65 +1,90 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
 import { Store } from '@ngrx/store'
-import { ModalModule } from 'ngx-bootstrap/modal'
-import { TabsetConfig, TabsModule } from 'ngx-bootstrap/tabs'
-import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
 
 import { ProposalDetailComponent } from './proposal-detail.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
-import { storeMock } from 'test-config/mocks'
-import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
-import { TabbedTableComponent } from './../../components/tabbed-table/tabbed-table.component'
-import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { AddressItemComponent } from './../../components/address-item/address-item.component'
-import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
-import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
-import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
-import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
-import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
-import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
-import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { initialState as pdInitialState } from './reducer'
+import { initialState as appInitialState } from '@tezblock/app.reducer'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './actions'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { CopyService } from 'src/app/services/copy/copy.service'
+import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 
-xdescribe('ProposalDetailComponent', () => {
+describe('ProposalDetailComponent', () => {
   let component: ProposalDetailComponent
   let fixture: ComponentFixture<ProposalDetailComponent>
-
-  beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
-
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        imports: [FontAwesomeModule, TooltipModule.forRoot(), TabsModule, ModalModule.forRoot()],
-        declarations: [
-          ProposalDetailComponent,
-          LoadingSkeletonComponent,
-          TabbedTableComponent,
-          TezblockTableComponent,
-          IdenticonComponent,
-          AddressItemComponent,
-          AmountCellComponent,
-          BlockCellComponent,
-          TooltipItemComponent,
-          SymbolCellComponent,
-          HashCellComponent,
-          ModalCellComponent,
-          ExtendTableCellComponent
-        ],
-        providers: [{ provide: Store, useValue: storeMock }, { provide: Actions, useValue: EMPTY }, TabsetConfig]
-      })
-    ).compileComponents()
-  }))
+  let storeMock: MockStore<any>
+  let store: Store<fromRoot.State>
+  const initialState = { proposalDetails: pdInitialState, app: appInitialState }
+  const activatedRouteMock = getActivatedRouteMock()
+  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  const copyServiceMock = getCopyServiceMock()
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [],
+      declarations: [ProposalDetailComponent],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: Actions, useValue: EMPTY },
+        AliasPipe,
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        { provide: CopyService, useValue: copyServiceMock },
+        IconPipe,
+        ShortenStringPipe
+      ]
+    })
+
     fixture = TestBed.createComponent(ProposalDetailComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
+    storeMock = TestBed.inject(MockStore)
+    store = TestBed.inject(Store)
   })
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  // TODO: fix
+  xdescribe('startLoadingVotes', () => {
+    let dispatchSpy: jasmine.Spy
+
+    beforeEach(() => {
+      dispatchSpy = spyOn(store, 'dispatch')
+      component.tabs = [{ title: 'foo', active: true, count: 1, kind: 'fooKind', disabled: () => false }]
+    })
+
+    describe('when is loaded proposal and is id in url address ', () => {
+      beforeEach(() => {
+       
+      })
+
+      it('and query has tab info then call action startLoadingVotes with that tab', () => {
+        activatedRouteMock.snapshot.queryParamMap.get.and.returnValue('foo')
+
+        component.ngOnInit()
+
+        activatedRouteMock.paramMap.next(getParamMapValue('1'))
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            proposal: 'whatever'
+          }
+        })
+
+        expect(dispatchSpy.calls.all()[1].args[0]).toEqual(actions.startLoadingVotes({ periodKind: 'fooKind' }))
+      })
+    })
   })
 })
