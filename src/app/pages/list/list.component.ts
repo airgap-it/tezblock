@@ -28,13 +28,13 @@ const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
 const protocol = tryGetProtocolByIdentifier('xtz')
 
-const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
+export const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
 
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
-const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
+export const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
   const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
     data.map(item => ({
       diffInDays: moment().diff(moment(item.timestamp), 'days'),
@@ -91,7 +91,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   )
 
   private get routeName(): string {
-    return this.route.snapshot.paramMap.get('route')
+    return this.activatedRoute.snapshot.paramMap.get('route')
   }
 
   private get isMainnet(): boolean {
@@ -101,7 +101,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly route: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>,
     private titleService: Title,
     private metaTagService: Meta
@@ -111,8 +111,8 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
-    this.route.paramMap.subscribe(paramMap => {
+    this.routeName$ = this.activatedRoute.paramMap.pipe(map(paramMap => paramMap.get('route')))
+    this.activatedRoute.paramMap.subscribe(paramMap => {
       this.titleService.setTitle(`Tezos ${paramMap.get('route').replace(/^\w/, c => c.toUpperCase())}s - tezblock`)
     })
     this.routeName$.subscribe(routeName => {
