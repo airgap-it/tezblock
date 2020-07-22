@@ -32,7 +32,7 @@ export const getBakers = (): JsonAccountData[] =>
       account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
     )
 
-export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean => jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean => jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : undefined
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
