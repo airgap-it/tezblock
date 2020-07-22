@@ -3,7 +3,7 @@ import { createIcon } from '@download/blockies'
 import { BigNumber } from 'bignumber.js'
 import { toDataUrl } from 'myetherwallet-blockies'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 @Component({
   selector: 'identicon',
@@ -62,20 +62,26 @@ export class IdenticonComponent implements OnInit {
       return
     }
 
-    const displayLogo: boolean = accounts.hasOwnProperty(address) && accounts[address].hasLogo && !this.forceIdenticon
+    const getIdenticon = (): string => {
+      const displayLogo: boolean = accounts.hasOwnProperty(address) && accounts[address].hasLogo && !this.forceIdenticon
 
-    if (displayLogo) {
-      const logoReference = accounts[address].logoReference || address
+      if (displayLogo) {
+        const logoReference = accounts[address].logoReference || address
 
-      this.identicon = `assets/bakers/img/${logoReference}.png`
-    } else {
-      if (address.startsWith('ak_')) {
-        this.identicon = createIcon({ seed: address }).toDataURL()
-      } else if (address.startsWith('tz') || address.startsWith('kt')) {
-        this.identicon = createIcon({ seed: `0${this.b582int(address)}`, spotcolor: '#000' }).toDataURL()
-      } else {
-        this.identicon = toDataUrl(address)
+        return `submodules/tezos_assets/imgs/${logoReference}.png`
       }
+
+      if (address.startsWith('ak_')) {
+        return createIcon({ seed: address }).toDataURL()
+      }
+
+      if (address.startsWith('tz') || address.startsWith('kt')) {
+        return createIcon({ seed: `0${this.b582int(address)}`, spotcolor: '#000' }).toDataURL()
+      }
+
+      return toDataUrl(address)
     }
+
+    this.identicon = getIdenticon()
   }
 }

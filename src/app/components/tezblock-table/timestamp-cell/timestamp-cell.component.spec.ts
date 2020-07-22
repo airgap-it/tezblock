@@ -1,32 +1,24 @@
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { TimestampCellComponent } from './timestamp-cell.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
 import { MomentModule } from 'ngx-moment'
 
-xdescribe('TimestampCellComponent', () => {
+describe('TimestampCellComponent', () => {
   let component: TimestampCellComponent
   let fixture: ComponentFixture<TimestampCellComponent>
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [],
-        imports: [MomentModule, TooltipModule.forRoot()],
-        declarations: [TimestampCellComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
+    TestBed.configureTestingModule({
+      providers: [],
+      imports: [MomentModule, TooltipModule.forRoot()],
+      declarations: [TimestampCellComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(TimestampCellComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

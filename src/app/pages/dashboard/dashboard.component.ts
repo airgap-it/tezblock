@@ -1,4 +1,4 @@
-import { Component } from '@angular/core'
+import { Component, OnInit } from '@angular/core'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { combineLatest, BehaviorSubject, Observable } from 'rxjs'
 import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
@@ -22,14 +22,14 @@ import { Block } from '@tezblock/interfaces/Block'
 import { Title, Meta } from '@angular/platform-browser'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent extends BaseComponent {
+export class DashboardComponent extends BaseComponent implements OnInit {
   blocks$: Observable<Block[]>
   transactions$: Observable<Transaction[]>
   currentCycle$: Observable<number>
@@ -69,6 +69,9 @@ export class DashboardComponent extends BaseComponent {
     private metaTagService: Meta
   ) {
     super()
+  }
+
+  ngOnInit() {
     this.store$.dispatch(actions.loadContracts())
     this.store$.dispatch(actions.loadLatestProposal())
 
@@ -88,15 +91,13 @@ export class DashboardComponent extends BaseComponent {
     this.historicData$ = this.store$.select(state => state.dashboard.cryptoHistoricData)
     this.percentage$ = this.store$.select(fromRoot.dashboard.currencyGrowthPercentage)
 
-    this.isMainnet()
-
     this.priceChartDatasets$ = this.historicData$.pipe(map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }]))
     this.priceChartLabels$ = this.pricePeriod$.pipe(
       switchMap(pricePeriod =>
         this.historicData$.pipe(
           map(data =>
             data.map(dataItem =>
-              pricePeriod === 0 ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
+              pricePeriod === PricePeriod.day ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
             )
           )
         )
@@ -202,6 +203,7 @@ export class DashboardComponent extends BaseComponent {
 
   isMainnet() {
     const selectedNetwork = this.chainNetworkService.getNetwork()
+
     return selectedNetwork === TezosNetwork.MAINNET
   }
 

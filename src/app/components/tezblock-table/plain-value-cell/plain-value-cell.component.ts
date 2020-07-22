@@ -6,5 +6,5 @@ import { Component } from '@angular/core'
   styleUrls: ['./plain-value-cell.component.scss']
 })
 export class PlainValueCellComponent {
-  public data: any // TODO: any
+  data: any
 }

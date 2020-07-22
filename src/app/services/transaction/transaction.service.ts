@@ -6,6 +6,7 @@ import { ApiService } from '../api/api.service'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { andGroup, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 
 const kindToFieldsMap = {
   transaction: ['source', 'destination'],
@@ -20,7 +21,11 @@ const kindToFieldsMap = {
   providedIn: 'root'
 })
 export class TransactionService {
-  constructor(private readonly apiService: ApiService, private readonly proposalService: ProposalService) {}
+  constructor(
+    private readonly accountService: AccountService,
+    private readonly apiService: ApiService,
+    private readonly proposalService: ProposalService
+  ) {}
 
   getAllTransactionsByAddress(address: string, kind: string, limit: number, orderBy?: OrderBy): Observable<Transaction[]> {
     const fields = kindToFieldsMap[kind]
@@ -73,7 +78,7 @@ export class TransactionService {
         const sources: string[] = transactions.map(transaction => transaction.source)
 
         if (kind === 'delegation' && sources.length > 0) {
-          return this.apiService.getAccountsByIds(sources).pipe(
+          return this.accountService.getAccountsByIds(sources).pipe(
             map(delegators =>
               transactions.map(transaction => {
                 const match = delegators.find(delegator => delegator.account_id === transaction.source)
@@ -91,7 +96,7 @@ export class TransactionService {
           const originatedSources: string[] = transactions.map(transaction => transaction.originated_contracts)
 
           if (originatedSources.length > 0) {
-            this.apiService.getAccountsByIds(originatedSources).pipe(
+            this.accountService.getAccountsByIds(originatedSources).pipe(
               map(originators =>
                 transactions.map(transaction => {
                   const match = originators.find(originator => originator.account_id === transaction.originated_contracts)

@@ -3,7 +3,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { from, Observable, combineLatest, forkJoin, of } from 'rxjs'
+import { BehaviorSubject, Observable, combineLatest, forkJoin, of } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
@@ -11,13 +11,16 @@ import { negate, isNil, isNumber, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
+import { FormControl } from '@angular/forms'
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
+import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService } from '@tezblock/services/account/account.service'
+import { AccountService, getBakers, doesAcceptsDelegations } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -31,20 +34,19 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
-import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
-import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
-import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { isInBTC } from '@tezblock/domain/airgap'
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
+import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
+const accounts = require('src/submodules/tezos_assets/accounts.json')
 
 @Component({
   selector: 'app-account-detail',
@@ -126,10 +128,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
   contractAssets$: Observable<ContractAsset[]>
-  contractAssetsBalance$: Observable<number>
+  assets$: Observable<Asset[]>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
   isExchange: boolean
+  delegationControl: FormControl
+  delegationControlDataSource$: BehaviorSubject<string[]>
+  selectedDelegation: string
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -225,8 +230,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
-    private readonly cryptoPricesService: CryptoPricesService,
-    private readonly currencyConverterPipe: CurrencyConverterPipe,
+    private readonly beaconService: BeaconService,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
@@ -243,6 +247,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   async ngOnInit() {
+    this.setupDelegation()
     this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
     this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
     this.account$ = this.store$.select(state => state.accountDetails.account)
@@ -326,33 +331,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         distinctUntilChanged(),
         map(contractAssets => contractAssets || [])
       )
+    this.assets$ = this.contractAssets$.pipe(
+      filter(Array.isArray),
+      map(contractAssets =>
+        contractAssets.map((contractAsset: ContractAsset) => ({ value: contractAsset.amount, symbol: contractAsset.contract.symbol }))
+      )
+    )
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
-    )
-    this.contractAssetsBalance$ = combineLatest(
-      this.contractAssets$,
-      this.store$.select(state => state.app.exchangeRates)
-    ).pipe(
-      map(([contractAssets]) => contractAssets),
-      switchMap(contractAssets =>
-        get<ContractAsset[]>(_contractAssets => _contractAssets.length > 0)(contractAssets)
-          ? forkJoin(
-              contractAssets.map(contractAsset =>
-                isConvertableToUSD(contractAsset.contract.symbol)
-                  ? this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
-                  : of(null)
-              )
-            ).pipe(
-              map(currencyConverterArgs =>
-                currencyConverterArgs
-                  .map((currencyConverterArg, index) =>
-                    currencyConverterArg ? this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg) : 0
-                  )
-                  .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
-              )
-            )
-          : of(0)
-      )
     )
 
     this.subscriptions.push(
@@ -373,7 +359,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.bakerTableInfos = {
           ...this.bakerTableInfos,
-          acceptsDelegations: jsonAccount && jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+          acceptsDelegations: get<JsonAccountData>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -457,7 +443,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
 
-    this.titleService.setTitle(`Tezos Address: ${this.aliasService.getFormattedAddress(this.address)} - tezblock`)
+    this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.address)} - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
       content: `Tezos Account Address ${this.address}. The transactions, balances, rewards, baker information, value, baking & endorsing rights and a number of transactions of the account are detailed on tezblock.">`
@@ -590,6 +576,46 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.store$.dispatch(actions.setKind({ kind }))
     this.tabbedTableComponent.onSelectTab(tab)
+  }
+
+  onDelegationControlSelect(e: TypeaheadMatch) {
+    this.selectedDelegation = e.value
+    this.delegationControl.setValue(null)
+  }
+
+  delegate() {
+    this.beaconService
+      .delegate(this.selectedDelegation)
+      .then((response: OperationResponseOutput) => {
+        this.store$.dispatch(actions.loadDelegation())
+      })
+      .catch((operationError: BeaconErrorMessage) => {
+        // make any action ?
+      })
+  }
+
+  private setupDelegation() {
+    const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
+    const bakers = getBakers()
+      .filter(doesAcceptsDelegations)
+      .sort(sortBakersAlphabeticaly)
+
+    this.delegationControl = new FormControl(null)
+    this.delegationControlDataSource$ = new BehaviorSubject(bakers.map(baker => baker.address))
+    this.selectedDelegation = get<JsonAccountData>(baker => baker.address)(bakers.find(baker => baker.alias === 'AirGap'))
+
+    this.subscriptions.push(
+      this.delegationControl.valueChanges.subscribe(value => {
+        if (!value) {
+          this.delegationControlDataSource$.next(bakers.map(baker => baker.address))
+        }
+
+        const filteredBakers = bakers
+          .filter(baker => baker.alias.toLowerCase().indexOf(value.toLowerCase()) !== -1)
+          .map(baker => baker.address)
+        this.delegationControlDataSource$.next(filteredBakers)
+      })
+    )
   }
 
   private setTabs(pageId: string) {

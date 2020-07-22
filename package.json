@@ -33,6 +33,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@airgap/beacon-sdk": "^1.1.0",
     "@angular/animations": "^9.1.2",
     "@angular/cdk": "^9.1.3",
     "@angular/common": "^9.1.2",
@@ -53,7 +54,7 @@
     "@ngrx/store": "^9.1.0",
     "@nguniversal/express-engine": "^9.0.1",
     "@ngx-pwa/local-storage": "^9.0.2",
-    "airgap-coin-lib": "^0.8.2",
+    "airgap-coin-lib": "^0.8.8",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",
@@ -80,10 +81,10 @@
   },
   "optionalDependencies": {
     "@fortawesome/fontawesome-pro": "^5.9.0",
-    "@fortawesome/pro-light-svg-icons": "5.10.0"
+    "@fortawesome/pro-light-svg-icons": "^5.10.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^0.900.7",
+    "@angular-devkit/build-angular": "^0.901.8",
     "@angular/cli": "^9.1.1",
     "@angular/compiler-cli": "^9.1.2",
     "@angular/platform-server": "^9.1.2",

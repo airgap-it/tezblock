@@ -12,6 +12,7 @@ import { SearchOption } from 'src/app/services/search/model'
 import { flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
 import { searchTokenContracts } from '@tezblock/domain/contract'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 
 const toPreviousOption = value => ({ name: value, type: 'Recent History' })
 
@@ -38,6 +39,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   private isValueChangedBySelect = false
 
   constructor(
+    private readonly accountService: AccountService,
     private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly searchService: SearchService
@@ -51,6 +53,23 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       flatten(Object.keys(groupedOptions).map(key => groupedOptions[key].slice(0, countPerType)))
     const narrowOptions = (countPerType: number) =>
       pipe<SearchOption[], { [key: string]: SearchOption[] }, SearchOption[]>(groupBy('type'), takeFromEach(countPerType))
+    const getSearchSources = (token: string): Observable<SearchOption[]>[] => {
+      const matchByAccountIds = ['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))
+      const result = [
+        of(searchTokenContracts(token, this.chainNetworkService.getNetwork())),
+        this.accountService.getAccountsStartingWith(token, matchByAccountIds)
+      ]
+      
+      if (token?.startsWith('o')) {
+        result.push(this.apiService.getTransactionHashesStartingWith(token))
+      }
+
+      if (token?.startsWith('b') || token?.startsWith('B')) {
+        result.push(this.apiService.getBlockHashesStartingWith(token))
+      }
+
+      return result
+    }
 
     this.searchControl = new FormControl('')
 
@@ -61,12 +80,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       switchMap(token => {
         let options: SearchOption[] = []
 
-        return merge(
-          this.apiService.getTransactionHashesStartingWith(token),
-          this.apiService.getAccountsStartingWith(token), // or bakers .. TODO: separate to look for both
-          this.apiService.getBlockHashesStartingWith(token),
-          of(searchTokenContracts(token, this.chainNetworkService.getNetwork()))
-        ).pipe(
+        return merge(...getSearchSources(token)).pipe(
           filter(isNotEmptyArray),
           map(partialOptions => (options = options.concat(partialOptions)))
         )

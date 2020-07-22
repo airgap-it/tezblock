@@ -78,8 +78,27 @@
                 </ng-container>
               </div>
 
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <span class="badge badge-pill badge-light mr-2">
+                    <fa-icon *ngIf="data?.acceptsDelegations === true" [icon]="'check' | iconPipe" class="text-primary"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === false" [icon]="'times' | iconPipe" class="text-danger"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === undefined" [icon]="'circle' | iconPipe" class="text-primary"></fa-icon>
+                  </span>
+                  <ng-container *ngIf="data?.acceptsDelegations === true">
+                    Accepts Delegations
+                  </ng-container>
+                  <ng-container *ngIf="data?.acceptsDelegations === false">
+                    Does Not Accept Delegations
+                  </ng-container>
+                  <ng-container *ngIf="data?.acceptsDelegations === undefined">
+                    Delegation Acceptance Unknown
+                  </ng-container>
+                </div>
+              </div>
+
               <ng-container *ngIf="data?.stakingBalance; else loadingGraph">
-                <div class="mb-4">
+                <div class="mb-3">
                   <div class="container p-0">
                     <div class="row mb-2">
                       <div class="col">
@@ -119,18 +138,14 @@
 
               <div class="row">
                 <div class="col-md-12 mb-4">
-                  <span class="badge badge-pill badge-light mr-2">
-                    <fa-icon
-                      [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
-                      [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
-                    ></fa-icon>
-                  </span>
-                  <ng-container *ngIf="data?.acceptsDelegations">
-                    Accepts Delegations
-                  </ng-container>
-                  <ng-container *ngIf="!data?.acceptsDelegations">
-                    Does Not Accept Delegations
-                  </ng-container>
+                  <button
+                    (click)="delegate()"
+                    [disabled]="!data?.acceptsDelegations"
+                    class="btn btn-sm btn-primary-light w-100"
+                    type="button"
+                  >
+                    Delegate Now
+                  </button>
                 </div>
               </div>
 

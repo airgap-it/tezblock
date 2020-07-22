@@ -6,13 +6,14 @@ import { StorageMap } from '@ngx-pwa/local-storage'
 import { negate, isNil } from 'lodash'
 
 import { ApiService } from './../api/api.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractBy } from '@tezblock/domain/contract'
 import { SearchOptionType } from './model'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getAddressByAlias } from '@tezblock/services/account/account.service'
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
 const previousSearchesKey = 'previousSearches'
 
 @Injectable({
@@ -20,6 +21,7 @@ const previousSearchesKey = 'previousSearches'
 })
 export class SearchService {
   constructor(
+    private readonly accountService: AccountService,
     private readonly apiService: ApiService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router,
@@ -33,10 +35,8 @@ export class SearchService {
     const trimmedSearchTerm = searchTerm.trim()
     const result = new Subject<boolean>()
 
-    // if we typed in an alias, we should convert this into an address
-    const getAllies = (term: string) => Object.keys(accounts).find(account => accounts[account].alias === term)
-
-    const _searchTerm = getAllies(trimmedSearchTerm) || trimmedSearchTerm
+    const _searchTerm =
+      getAddressByAlias(trimmedSearchTerm) /* if we typed in an alias, we should convert this into an address */ || trimmedSearchTerm
 
     let found = false
     let counter = 0
@@ -74,7 +74,7 @@ export class SearchService {
       processResult([contract], () => this.router.navigateByUrl('/contract/' + contract.id))
     } else {
       subscriptions.push(
-        this.apiService
+        this.accountService
           .getAccountById(_searchTerm)
           .pipe(filter(negate(isNil)))
           .subscribe(account => processResult(account, () => this.router.navigateByUrl('/account/' + _searchTerm))),

@@ -1,30 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { QRCodeModule } from 'angularx-qrcode'
 
 import { QrItemComponent } from './qr-item.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { CopyService } from 'src/app/services/copy/copy.service'
+import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
 
-xdescribe('QrItemComponent', () => {
+describe('QrItemComponent', () => {
   let component: QrItemComponent
   let fixture: ComponentFixture<QrItemComponent>
-
-  let unitHelper: UnitHelper
-  beforeEach(() => {
-    unitHelper = new UnitHelper()
-
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [],
-        declarations: [QrItemComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
+  const copyServiceMock = getCopyServiceMock()
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [QRCodeModule],
+      declarations: [QrItemComponent],
+      providers: [{ provide: CopyService, useValue: copyServiceMock }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
+
     fixture = TestBed.createComponent(QrItemComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

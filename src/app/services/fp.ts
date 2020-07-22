@@ -35,3 +35,9 @@ export function distinctFilter<T>(value: T, index: number, _array: T[]) {
 export function flatten<T>(value: T[][]): T[] {
   return value.reduce((accumulator, currentItem) => currentItem.concat(accumulator), [])
 }
+
+export const bind = (_function: Function, ...args: any[]) => (value: any) => _function.bind(value)(args)
+
+export const numberToDate = (value: number): Date => new Date(value)
+
+export const multiplyBy = (multiplier: number) => (value: number): number => value * multiplier

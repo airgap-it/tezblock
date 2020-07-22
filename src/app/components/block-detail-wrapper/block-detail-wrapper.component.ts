@@ -1,6 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { BehaviorSubject } from 'rxjs'
 
 import { Block } from 'src/app/interfaces/Block'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 
 @Component({
   selector: 'block-detail-wrapper',
@@ -24,6 +27,9 @@ export class BlockDetailWrapperComponent implements OnInit {
 
   @Input()
   latestBlock: Block
+
+  @Input()
+  assets: Asset[]
 
   @Output()
   blockChangeClicked: EventEmitter<number> = new EventEmitter()

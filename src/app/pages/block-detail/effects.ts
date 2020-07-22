@@ -31,31 +31,67 @@ export class BlockDetailEffects {
   getTransactionsOnBlockLoaded$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBlockSucceeded),
-      withLatestFrom(
-        this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash),
-        this.store$.select(state => state.blockDetails.kind)
-      ),
+      withLatestFrom(this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)),
       filter(([{ block }, transactionsLoadedByBlockHash]) => block && block.hash !== transactionsLoadedByBlockHash),
-      map(([{ block }, transactionsLoadedByBlockHash, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind: kind }))
+      map(([{ block }]) => actions.loadTransactions({ blockHash: block.hash }))
     )
   )
 
-  getTransactions$ = createEffect(() =>
+  loadOperationsByKind$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadTransactionsByKind),
+      ofType(actions.loadOperationsByKind),
       withLatestFrom(
-        this.store$.select(state => state.blockDetails.transactions.pagination),
-        this.store$.select(state => state.blockDetails.transactions.orderBy)
+        this.store$.select(state => state.blockDetails.operations.pagination),
+        this.store$.select(state => state.blockDetails.operations.orderBy)
       ),
       switchMap(([{ blockHash, kind }, pagination, orderBy]) =>
         this.apiService
           .getTransactionsByField(blockHash, 'block_hash', kind, pagination.currentPage * pagination.selectedSize, orderBy)
           .pipe(
-            switchMap(data => kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data)),
-            map(data => actions.loadTransactionsByKindSucceeded({ data })),
-            catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
+            switchMap(data => (kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data))),
+            map(data => actions.loadOperationsByKindSucceeded({ data })),
+            catchError(error => of(actions.loadOperationsByKindFailed({ error })))
           )
       )
+    )
+  )
+
+  loadTransactions$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactions),
+      withLatestFrom(
+        this.store$.select(state => state.blockDetails.operations.pagination),
+        this.store$.select(state => state.blockDetails.operations.orderBy)
+      ),
+      switchMap(([{ blockHash }, pagination, orderBy]) =>
+        this.apiService
+          .getTransactionsByField(
+            blockHash,
+            'block_hash',
+            OperationTypes.Transaction,
+            pagination.currentPage * pagination.selectedSize,
+            orderBy
+          )
+          .pipe(
+            switchMap(data => fillTransferOperations(data, this.chainNetworkService)),
+            map(data => actions.loadTransactionsSucceeded({ data })),
+            catchError(error => of(actions.loadTransactionsFailed({ error })))
+          )
+      )
+    )
+  )
+
+  onLoadTransactionsSucceededEmitLoadOperationsByKindSucceeded$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsSucceeded),
+      map(({ data }) => actions.loadOperationsByKindSucceeded({ data }))
+    )
+  )
+
+  onLoadTransactionsFailedEmitLoadOperationsByKindFailed$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadTransactionsFailed),
+      map(({ error }) => actions.loadOperationsByKindFailed({ error }))
     )
   )
 
@@ -66,37 +102,37 @@ export class BlockDetailEffects {
         this.store$.select(state => state.blockDetails.block),
         this.store$.select(state => state.blockDetails.kind)
       ),
-      map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
+      map(([action, block, kind]) => actions.loadOperationsByKind({ blockHash: block.hash, kind }))
     )
   )
 
   onSorting$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.sortTransactionsByKind),
+      ofType(actions.sortOperationsByKind),
       withLatestFrom(
         this.store$.select(state => state.blockDetails.block),
         this.store$.select(state => state.blockDetails.kind)
       ),
-      map(([action, block, kind]) => actions.loadTransactionsByKind({ blockHash: block.hash, kind }))
+      map(([action, block, kind]) => actions.loadOperationsByKind({ blockHash: block.hash, kind }))
     )
   )
 
   onLoadTransactionLoadCounts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadTransactionsByKind),
-      map(() => actions.loadTransactionsCounts())
+      ofType(actions.loadOperationsByKind, actions.loadTransactions),
+      map(() => actions.loadOperationsCounts())
     )
   )
 
   loadTransactionsCounts$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadTransactionsCounts),
+      ofType(actions.loadOperationsCounts),
       withLatestFrom(this.store$.select(state => state.blockDetails.id)),
       switchMap(([action, address]) =>
         this.apiService.getOperationCount('block_level', address).pipe(
           map(aggregateOperationCounts),
-          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
-          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+          map(counts => actions.loadOperationsCountsSucceeded({ counts })),
+          catchError(error => of(actions.loadOperationsCountsFailed({ error })))
         )
       )
     )
@@ -104,7 +140,7 @@ export class BlockDetailEffects {
 
   onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(actions.loadTransactionsByKindSucceeded),
+      ofType(actions.loadOperationsByKindSucceeded),
       filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
       map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
     )

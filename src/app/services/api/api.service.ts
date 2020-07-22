@@ -8,6 +8,7 @@ import { map, switchMap, filter, tap } from 'rxjs/operators'
 import { TezosProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 import { Store } from '@ngrx/store'
 import { isNil, negate, get as _get } from 'lodash'
+import * as moment from 'moment'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight, BakingRewardsDetail } from '@tezblock/interfaces/BakingRights'
 import {
@@ -35,6 +36,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 
 export interface OperationCount {
   [key: string]: string
@@ -65,13 +67,39 @@ export interface Balance {
   asof: number
 }
 
-const accounts = require('../../../assets/bakers/json/accounts.json')
 const cycleToLevel = (cycle: number, blocksPerCycle: number): number => cycle * blocksPerCycle
 export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, cycle: Math.floor(right.level / blocksPerCycle) })
 
 function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
 }
+
+/*
+    next 5 cycles: Upcoming
+    current cycle: Active
+    past 5 cycles: Frozen
+    past 5 cycles + : Unfrozen
+*/
+const getRightStatus = (currentCycle: number, cycle: number): string => {
+  if (cycle > currentCycle) {
+    return 'Upcoming'
+  }
+
+  if (cycle === currentCycle) {
+    return 'Active'
+  }
+
+  if (cycle < currentCycle - 5) {
+    return 'Unfrozen'
+  }
+
+  return 'Frozen'
+}
+
+const getRightCycles = (currentCycle: number, limit: number): number[] =>
+  _.range(0, limit)
+    .map(index => currentCycle + 3 - index)
+    .sort((a, b) => b - a)
 
 @Injectable({
   providedIn: 'root'
@@ -91,6 +119,7 @@ export class ApiService {
   private options: Options
 
   constructor(
+    private readonly accountService: AccountService,
     private readonly cacheService: CacheService,
     private readonly http: HttpClient,
     readonly chainNetworkService: ChainNetworkService,
@@ -182,7 +211,7 @@ export class ApiService {
             .map(transaction => transaction.originated_contracts)
 
           if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
+            return this.accountService.getAccountsByIds(originatedAccounts).pipe(
               map(originators =>
                 transactions.map(transaction => {
                   const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
@@ -219,42 +248,8 @@ export class ApiService {
       )
       .pipe(
         map(transactions => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map(delegators =>
-                transactions.map(transaction => {
-                  const match = delegators.find(delegator => delegator.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map(originators =>
-                transactions.map(transaction => {
-                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.proposalService.addVoteData(transactions))
       )
   }
@@ -345,43 +340,47 @@ export class ApiService {
       )
       .pipe(
         map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        })
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
+  }
+
+  private fillDelegatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
+    const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+
+    if (sources.length > 0) {
+      return this.accountService.getAccountsByIds(sources).pipe(
+        map((accounts: Account[]) =>
+          transactions.map(transaction => {
+            const match = accounts.find(account => account.account_id === transaction.source)
+
+            return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+          })
+        )
+      )
+    }
+
+    return of(transactions)
+  }
+
+  private fillOriginatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
+    const originatedAccounts = transactions
+      .filter(transaction => transaction.kind === 'origination')
+      .map(transaction => transaction.originated_contracts)
+
+    if (originatedAccounts.length > 0) {
+      return this.accountService.getAccountsByIds(originatedAccounts).pipe(
+        map((accounts: Account[]) =>
+          transactions.map(transaction => {
+            const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+
+            return match ? { ...transaction, originatedBalance: match.balance } : transaction
+          })
+        )
+      )
+    }
+
+    return of(transactions)
   }
 
   getTransactionsByPredicates(predicates: Predicate[], limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
@@ -397,138 +396,9 @@ export class ApiService {
       )
       .pipe(
         map((transactions: Transaction[]) => transactions.slice(0, limit)),
-        switchMap((transactions: Transaction[]) => {
-          const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
-
-          if (sources.length > 0) {
-            return this.getAccountsByIds(sources).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.source)
-
-                  return match ? { ...transaction, delegatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        }),
-        switchMap((transactions: Transaction[]) => {
-          const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
-
-          if (originatedAccounts.length > 0) {
-            return this.getAccountsByIds(originatedAccounts).pipe(
-              map((accounts: Account[]) =>
-                transactions.map(transaction => {
-                  const match = accounts.find(account => account.account_id === transaction.originated_contracts)
-
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
-          }
-
-          return of(transactions)
-        })
+        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
+        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
-  }
-
-  getLatestAccounts(limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        limit
-      },
-      this.options
-    )
-  }
-
-  getAccountById(id: string): Observable<Account> {
-    return this.http
-      .post<Account[]>(
-        this.accountsApiUrl,
-        {
-          predicates: [
-            {
-              field: 'account_id',
-              operation: 'eq',
-              set: [id],
-              inverse: false
-            }
-          ],
-          limit: 1
-        },
-        this.options
-      )
-      .pipe(map(first))
-  }
-  
-  getAccountsByIds(ids: string[]): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: 'in',
-            set: ids,
-            inverse: false
-          }
-        ]
-      },
-      this.options
-    )
-  }
-
-  getAccountsStartingWith(id: string): Observable<SearchOption[]> {
-    const bakers: SearchOption[] = Object.keys(accounts)
-      .map(key => accounts[key])
-      .filter(
-        account =>
-          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
-          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
-      )
-      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
-
-    if (bakers.length === 0) {
-      return this.http
-        .post<Account[]>(
-          this.accountsApiUrl,
-          {
-            fields: ['account_id'],
-            predicates: [
-              {
-                field: 'account_id',
-                operation: 'startsWith',
-                set: [id],
-                inverse: false
-              }
-            ],
-            limit: 5
-          },
-          this.options
-        )
-        .pipe(
-          map(_accounts =>
-            _accounts
-              .filter(account => {
-                const isContract = Object.keys(accounts)
-                  .map(key => ({ ...accounts[key], id: key }))
-                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
-
-                return !isContract
-              })
-              .map(account => {
-                return { name: account.account_id, type: SearchOptionType.account }
-              })
-          )
-        )
-    }
-
-    return of(bakers)
   }
 
   getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
@@ -585,102 +455,6 @@ export class ApiService {
       )
   }
 
-  getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
-    if (address.startsWith('tz')) {
-      return this.http.post<Transaction[]>(
-        this.transactionsApiUrl,
-        {
-          predicates: [
-            {
-              field: 'manager_pubkey',
-              operation: 'eq',
-              set: [address],
-              inverse: false
-            },
-            {
-              field: 'originated_contracts',
-              operation: 'isnull',
-              set: [''],
-              inverse: true
-            },
-            {
-              field: 'status',
-              operation: 'eq',
-              set: ['applied'],
-              inverse: false
-            }
-          ],
-          orderBy: [
-            {
-              field: 'balance',
-              direction: 'desc'
-            }
-          ],
-          limit
-        },
-        this.options
-      )
-    } else {
-      return this.http.post<Transaction[]>(
-        this.transactionsApiUrl,
-        {
-          predicates: [
-            {
-              field: 'originated_contracts',
-              operation: 'eq',
-              set: [address],
-              inverse: false
-            },
-            {
-              field: 'manager_pubkey',
-              operation: 'isnull',
-              set: [''],
-              inverse: true
-            },
-            {
-              field: 'status',
-              operation: 'eq',
-              set: ['applied'],
-              inverse: false
-            }
-          ],
-          orderBy: [
-            {
-              field: 'balance',
-              direction: 'desc'
-            }
-          ],
-          limit
-        },
-        this.options
-      )
-    }
-  }
-
-  getManagerAccount(ktAddress: string, limit: number): Observable<Account[]> {
-    return this.http.post<Account[]>(
-      this.accountsApiUrl,
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: 'eq',
-            set: [ktAddress],
-            inverse: false
-          }
-        ],
-        orderBy: [
-          {
-            field: 'balance',
-            direction: 'desc'
-          }
-        ],
-        limit
-      },
-      this.options
-    )
-  }
-
   getLatestBlocks(
     limit: number,
     orderBy = {
@@ -717,9 +491,9 @@ export class ApiService {
       .pipe(
         switchMap(blocks => {
           const blockRange = blocks.map(blocksList => blocksList.level)
-          const amountObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'amount', 'sum', limit)
-          const feeObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'fee', 'sum', limit)
-          const operationGroupObservable$ = this.getAdditionalBlockFieldObservable(blockRange, 'operation_group_hash', 'count', limit)
+          const amountObservable$ = this.getAdditionalBlockField(blockRange, 'amount', 'sum', limit)
+          const feeObservable$ = this.getAdditionalBlockField(blockRange, 'fee', 'sum', limit)
+          const operationGroupObservable$ = this.getAdditionalBlockField(blockRange, 'operation_group_hash', 'count', limit)
 
           return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
             map(([amount, fee, operationGroup]) =>
@@ -727,6 +501,7 @@ export class ApiService {
                 const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
                 const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
                 const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
+
                 return {
                   ...block,
                   volume: blockAmount ? blockAmount.sum_amount : 0,
@@ -740,128 +515,40 @@ export class ApiService {
       )
   }
 
-  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string): Promise<T[]> {
-    let headers
-    if (field === 'operation_group_hash') {
-      // then we only care about spend transactions
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          },
-          {
-            field: 'kind',
-            operation: 'in',
-            set: ['transaction']
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ]
-      }
-    } else {
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ]
-      }
+  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit?: number): Observable<T[]> {
+    const body = {
+      fields: [field, 'block_level'],
+      predicates: [
+        {
+          field,
+          operation: 'isnull',
+          inverse: true
+        },
+        {
+          field: 'block_level',
+          operation: 'in',
+          set: blockRange
+        }
+      ].concat(
+        field === 'operation_group_hash'
+          ? <any>{
+              field: 'kind',
+              operation: 'in',
+              set: ['transaction']
+            }
+          : []
+      ),
+      orderBy: [sort('block_level', 'desc')],
+      aggregation: [
+        {
+          field,
+          function: operation
+        }
+      ],
+      limit
     }
 
-    return new Promise((resolve, reject) => {
-      this.http.post<T[]>(this.transactionsApiUrl, headers, this.options).subscribe((volumePerBlock: T[]) => {
-        resolve(volumePerBlock)
-      })
-    })
-  }
-
-  getAdditionalBlockFieldObservable<T>(blockRange: number[], field: string, operation: string, limit: number): Observable<T[]> {
-    let headers
-    if (field === 'operation_group_hash') {
-      // then we only care about spend transactions
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          },
-          {
-            field: 'kind',
-            operation: 'in',
-            set: ['transaction']
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ],
-        limit
-      }
-    } else {
-      headers = {
-        fields: [field, 'block_level'],
-        predicates: [
-          {
-            field,
-            operation: 'isnull',
-            inverse: true
-          },
-          {
-            field: 'block_level',
-            operation: 'in',
-            set: blockRange
-          }
-        ],
-        orderBy: [sort('block_level', 'desc')],
-        aggregation: [
-          {
-            field,
-            function: operation
-          }
-        ],
-        limit
-      }
-    }
-
-    return this.http.post<T[]>(this.transactionsApiUrl, headers, this.options)
+    return this.http.post<T[]>(this.transactionsApiUrl, body, this.options)
   }
 
   getOperationCount(field: string, value: string): Observable<OperationCount[]> {
@@ -980,9 +667,11 @@ export class ApiService {
   }
 
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
-      switchMap(cycles =>
-        forkJoin(
+    return this.rewardService.getCurrentCycle().pipe(
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
           cycles.map(cycle =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
@@ -991,7 +680,8 @@ export class ApiService {
                 blockRewards: reward.bakingRewards,
                 deposits: reward.bakingDeposits,
                 fees: new BigNumber(reward.fees).toNumber(),
-                bakingRewardsDetails: reward.bakingRewardsDetails
+                bakingRewardsDetails: reward.bakingRewardsDetails,
+                rightStatus: getRightStatus(currentCycle, cycle)
               }))
             )
           )
@@ -999,7 +689,7 @@ export class ApiService {
           map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
           map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
         )
-      )
+      })
     )
   }
 
@@ -1078,9 +768,11 @@ export class ApiService {
   }
 
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
-    return this.rewardService.getLastCycles({ selectedSize: limit, currentPage: 1 }).pipe(
-      switchMap(cycles =>
-        forkJoin(
+    return this.rewardService.getCurrentCycle().pipe(
+      switchMap(currentCycle => {
+        const cycles = getRightCycles(currentCycle, limit)
+
+        return forkJoin(
           cycles.map(cycle =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
@@ -1088,7 +780,8 @@ export class ApiService {
                 endorsementRewards: reward.endorsingRewards,
                 deposits: reward.endorsingDeposits,
                 endorsementsCount: reward.endorsingRewardsDetails.length,
-                endorsingRewardsDetails: reward.endorsingRewardsDetails
+                endorsingRewardsDetails: reward.endorsingRewardsDetails,
+                rightStatus: getRightStatus(currentCycle, cycle)
               }))
             )
           )
@@ -1096,7 +789,7 @@ export class ApiService {
           map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
           map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
         )
-      )
+      })
     )
   }
 
