@@ -81,18 +81,9 @@
               <div class="row">
                 <div class="col-md-12 mb-3">
                   <span class="badge badge-pill badge-light mr-2">
-                    <fa-icon *ngIf="data?.acceptsDelegations === true"
-                      [icon]="'check' | iconPipe"
-                      class="text-primary"
-                    ></fa-icon>
-                    <fa-icon *ngIf="data?.acceptsDelegations === false"
-                      [icon]="'times' | iconPipe"
-                      class="text-danger"
-                    ></fa-icon>
-                    <fa-icon *ngIf="data?.acceptsDelegations === undefined"
-                      [icon]="'circle' | iconPipe"
-                      class="text-primary"
-                    ></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === true" [icon]="'check' | iconPipe" class="text-primary"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === false" [icon]="'times' | iconPipe" class="text-danger"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === undefined" [icon]="'circle' | iconPipe" class="text-primary"></fa-icon>
                   </span>
                   <ng-container *ngIf="data?.acceptsDelegations === true">
                     Accepts Delegations
@@ -101,7 +92,7 @@
                     Does Not Accept Delegations
                   </ng-container>
                   <ng-container *ngIf="data?.acceptsDelegations === undefined">
-                    Unknown
+                    Delegation Acceptance Unknown
                   </ng-container>
                 </div>
               </div>
