@@ -81,7 +81,7 @@
   },
   "optionalDependencies": {
     "@fortawesome/fontawesome-pro": "^5.9.0",
-    "@fortawesome/pro-light-svg-icons": "5.10.0"
+    "@fortawesome/pro-light-svg-icons": "^5.10.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.901.8",

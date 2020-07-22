@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
+import { combineLatest, merge, Observable, timer, forkJoin } from 'rxjs'
 import { map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -15,6 +15,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
+import * as appActions from '@tezblock/app.actions'
 import { first } from '@tezblock/services/fp'
 import { refreshRate } from '@tezblock/domain/synchronization'
 import { negate, isNil } from 'lodash'
@@ -23,6 +24,10 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { OrderBy } from '@tezblock/services/base.service'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
+import { isInBTC } from '@tezblock/domain/airgap'
+import { getRefresh } from '@tezblock/domain/synchronization'
+import { Asset, transactionToAsset } from '@tezblock/components/assets-value/assets-value.component'
+import { isAsset } from '@tezblock/domain/contract'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -49,6 +54,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
   filteredTransactions$: Observable<Transaction[]>
   isInvalidHash$: Observable<boolean>
   orderBy$: Observable<OrderBy>
+  assets$: Observable<Asset[]>
 
   private kind$: Observable<string>
 
@@ -94,6 +100,9 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
       filter(([latestBlock, transaction]) => !!latestBlock),
       map(([latestBlock, transaction]) => latestBlock.level - transaction.block_level)
     )
+    this.assets$ = this.store$
+      .select(state => state.transactionDetails.transactions.data)
+      .pipe(map(transactions => (transactions || []).filter(isAsset).map(transactionToAsset)))
 
     this.subscriptions.push(
       this.route.paramMap.subscribe(paramMap => {
@@ -118,7 +127,20 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
       this.store$
         .select(state => state.transactionDetails.counts)
         .pipe(filter(counts => !!counts))
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts)))
+        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+
+      // when any transaction is in BTC/tzBTC then start getting current exchange rate
+      this.filteredTransactions$
+        .pipe(
+          filter(transactions => transactions.some(transaction => isInBTC(transaction.symbol))),
+          switchMap(() =>
+            getRefresh([
+              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
+              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed))
+            ])
+          )
+        )
+        .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
     this.titleService.setTitle(`Operation ${this.aliasService.getFormattedAddress(this.transactionHash)} - tezblock`)
     this.metaTagService.updateTag({

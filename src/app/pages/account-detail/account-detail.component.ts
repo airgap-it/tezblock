@@ -34,19 +34,17 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
-import { isConvertableToUSD, isInBTC } from '@tezblock/domain/airgap'
-import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
-import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { isInBTC } from '@tezblock/domain/airgap'
 import * as appActions from '@tezblock/app.actions'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { first, get } from '@tezblock/services/fp'
 import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-table.component'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
+import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 
 const accounts = require('src/submodules/tezos_assets/accounts.json')
 
@@ -130,7 +128,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   balanceChartLabels$: Observable<string[]>
   orderBy$: Observable<OrderBy>
   contractAssets$: Observable<ContractAsset[]>
-  contractAssetsBalance$: Observable<number>
+  assets$: Observable<Asset[]>
   numberOfContractAssets$: Observable<number>
   getPrecision = getPrecision
   isExchange: boolean
@@ -233,8 +231,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly accountService: AccountService,
     private readonly bakingService: BakingService,
     private readonly beaconService: BeaconService,
-    private readonly cryptoPricesService: CryptoPricesService,
-    private readonly currencyConverterPipe: CurrencyConverterPipe,
     private readonly modalService: BsModalService,
     private readonly copyService: CopyService,
     private readonly aliasPipe: AliasPipe,
@@ -335,33 +331,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         distinctUntilChanged(),
         map(contractAssets => contractAssets || [])
       )
+    this.assets$ = this.contractAssets$.pipe(
+      filter(Array.isArray),
+      map(contractAssets =>
+        contractAssets.map((contractAsset: ContractAsset) => ({ value: contractAsset.amount, symbol: contractAsset.contract.symbol }))
+      )
+    )
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
-    )
-    this.contractAssetsBalance$ = combineLatest(
-      this.contractAssets$,
-      this.store$.select(state => state.app.exchangeRates)
-    ).pipe(
-      map(([contractAssets]) => contractAssets),
-      switchMap(contractAssets =>
-        get<ContractAsset[]>(_contractAssets => _contractAssets.length > 0)(contractAssets)
-          ? forkJoin(
-              contractAssets.map(contractAsset =>
-                isConvertableToUSD(contractAsset.contract.symbol)
-                  ? this.cryptoPricesService.getCurrencyConverterArgs(contractAsset.contract.symbol).pipe(take(1))
-                  : of(null)
-              )
-            ).pipe(
-              map(currencyConverterArgs =>
-                currencyConverterArgs
-                  .map((currencyConverterArg, index) =>
-                    currencyConverterArg ? this.currencyConverterPipe.transform(contractAssets[index].amount, currencyConverterArg) : 0
-                  )
-                  .reduce((accumulator, currentItem) => accumulator + currentItem, 0)
-              )
-            )
-          : of(0)
-      )
     )
 
     this.subscriptions.push(
