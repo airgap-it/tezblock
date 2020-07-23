@@ -278,4 +278,12 @@ export class ContractService extends BaseService {
 
     return from(protocol.getTotalSupply())
   }
+
+  loadEntrypoints() {
+    // return this.post<ContractOperation[]>('accounts', {
+    //   predicates: transferPredicates(contract.id),
+    //   orderBy: [orderBy],
+    //   limit
+    // })
+  }
 }

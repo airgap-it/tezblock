@@ -10,6 +10,7 @@ const featureName = 'Contract Detail'
 export enum OperationTab {
   transfers = 'transfers',
   other = 'other',
+  entrypoints = 'entrypoints',
   tokenHolders = 'token holders'
 }
 

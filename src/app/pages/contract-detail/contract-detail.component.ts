@@ -94,6 +94,17 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       disabled: function() {
         return !this.count
       }
+    },
+    {
+      title: 'Entrypoints',
+      active: false,
+      kind: actions.OperationTab.entrypoints,
+      count: undefined,
+      icon: this.iconPipe.transform('link'),
+      columns: columns.entrypoints(),
+      disabled: function() {
+        return !this.count
+      }
     }
   ]
 

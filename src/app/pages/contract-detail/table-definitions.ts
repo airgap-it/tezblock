@@ -1,17 +1,15 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 
+export interface Options {
+  pageId: string
+  showFiatValue: boolean
+  symbol: string
+}
+
 export const columns: {
-  [key: string]: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => Column[]
+  [key: string]: (options?: Options) => Column[]
 } = {
-  transfers: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => [
+  transfers: (options: Options) => [
     {
       name: 'From',
       field: 'from',
@@ -48,7 +46,7 @@ export const columns: {
       name: 'Fee',
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8'} }),
+      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: false
     },
     {
@@ -70,11 +68,7 @@ export const columns: {
       template: Template.hash
     }
   ],
-  other: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => [
+  other: (options: Options) => [
     {
       name: 'From',
       field: 'source',
@@ -136,11 +130,13 @@ export const columns: {
       template: Template.hash
     }
   ],
-  tokenHolders: (options: {
-    pageId: string
-    showFiatValue: boolean
-    symbol: string
-  }) => [
+  entrypoints: (options?: Options) => [
+    {
+      name: 'Entrypoint',
+      field: 'value'
+    }
+  ],
+  tokenHolders: (options: Options) => [
     {
       name: 'Account',
       field: 'address',
