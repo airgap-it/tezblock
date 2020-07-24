@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { Store } from '@ngrx/store'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
@@ -9,7 +11,6 @@ import { ProposalDetailComponent } from './proposal-detail.component'
 import { initialState as pdInitialState } from './reducer'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
 import * as fromRoot from '@tezblock/reducers'
-import * as actions from './actions'
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -18,12 +19,14 @@ import { CopyService } from 'src/app/services/copy/copy.service'
 import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { PeriodKind } from '@tezblock/domain/vote'
 
 describe('ProposalDetailComponent', () => {
   let component: ProposalDetailComponent
   let fixture: ComponentFixture<ProposalDetailComponent>
   let storeMock: MockStore<any>
   let store: Store<fromRoot.State>
+  let testScheduler: TestScheduler
   const initialState = { proposalDetails: pdInitialState, app: appInitialState }
   const activatedRouteMock = getActivatedRouteMock()
   const chainNetworkServiceMock = getChainNetworkServiceMock()
@@ -32,7 +35,7 @@ describe('ProposalDetailComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      declarations: [ProposalDetailComponent],
+      declarations: [ProposalDetailComponent, AliasPipe, IconPipe],
       providers: [
         provideMockStore({ initialState }),
         { provide: ActivatedRoute, useValue: activatedRouteMock },
@@ -42,8 +45,11 @@ describe('ProposalDetailComponent', () => {
         { provide: CopyService, useValue: copyServiceMock },
         IconPipe,
         ShortenStringPipe
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
+
+    testScheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected))
 
     fixture = TestBed.createComponent(ProposalDetailComponent)
     component = fixture.componentInstance
@@ -55,36 +61,39 @@ describe('ProposalDetailComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  // TODO: fix
-  xdescribe('startLoadingVotes', () => {
-    let dispatchSpy: jasmine.Spy
-
+  describe('ngOnInit', () => {
     beforeEach(() => {
-      dispatchSpy = spyOn(store, 'dispatch')
-      component.tabs = [{ title: 'foo', active: true, count: 1, kind: 'fooKind', disabled: () => false }]
+      component.ngOnInit()
     })
 
-    describe('when is loaded proposal and is id in url address ', () => {
-      beforeEach(() => {
-       
+    describe('periodTimespan$', () => {
+      it('does not emmit value when periodKind & periodsTimespans is not truthy', () => {
+        testScheduler.run(({ expectObservable }) => {
+          expectObservable(component.periodTimespan$).toBe('---')
+        })
       })
 
-      it('and query has tab info then call action startLoadingVotes with that tab', () => {
-        activatedRouteMock.snapshot.queryParamMap.get.and.returnValue('foo')
-
-        component.ngOnInit()
-
-        activatedRouteMock.paramMap.next(getParamMapValue('1'))
+      it('returns periodsTimespan based on periodKind value', () => {
         storeMock.setState({
           ...initialState,
           proposalDetails: {
             ...initialState.proposalDetails,
-            proposal: 'whatever'
+            periodKind: PeriodKind.Exploration,
+            periodsTimespans: [10, 20]
           }
         })
 
-        expect(dispatchSpy.calls.all()[1].args[0]).toEqual(actions.startLoadingVotes({ periodKind: 'fooKind' }))
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: 20 }
+
+          expectObservable(component.periodTimespan$).toBe(expected, expectedValues)
+        })
       })
+    })
+
+    xdescribe('noDataLabel$', () => {
+
     })
   })
 })
