@@ -54,7 +54,6 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
   constructor(
     private readonly actions$: Actions,
-    private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
@@ -96,7 +95,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     )
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe(paramMap => {
         this.store$.dispatch(actions.loadTransactionsByHash({ transactionHash: paramMap.get('id') }))
         this.setTabs(paramMap.get('id'))
       }),
