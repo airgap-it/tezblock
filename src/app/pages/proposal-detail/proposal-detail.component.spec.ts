@@ -92,8 +92,116 @@ describe('ProposalDetailComponent', () => {
       })
     })
 
-    xdescribe('noDataLabel$', () => {
+    describe('noDataLabel$', () => {
+      it('does not emit value when proposal is not truthy', () => {
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            periodKind: PeriodKind.Testing
+          }
+        })
 
+        testScheduler.run(({ expectObservable }) => expectObservable(component.noDataLabel$).toBe('---'))
+      })
+
+      it('when periodKind is not Testing then returns undefined', () => {
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            periodKind: PeriodKind.Promotion,
+            proposal: 'foo'
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: undefined }
+
+          expectObservable(component.noDataLabel$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when periodKind is Testing then returns alias pipe transform + static string', () => {
+        const aliasPipe: AliasPipe = TestBed.get(AliasPipe)
+        spyOn(aliasPipe, 'transform').and.returnValue('FOO')
+
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            periodKind: PeriodKind.Testing,
+            proposal: {
+              proposal: 'foo'
+            }
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: `FOO upgrade is investigated by the community.` }
+
+          expectObservable(component.noDataLabel$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('showRolls$', () => {
+      it('when periodKind is not Exploration or Promotion then retuns false', () => {
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            periodKind: PeriodKind.Testing
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: false }
+
+          expectObservable(component.showRolls$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when yayRolls is undefined then retuns false', () => {
+        // initialState.proposalDetails.yayRolls is by default undefined, but wanted be explicit
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            yayRolls: undefined
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: false }
+
+          expectObservable(component.showRolls$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when periodKind is Exploration or Promotion and yayRolls is not undefined then retuns true', () => {
+        storeMock.setState({
+          ...initialState,
+          proposalDetails: {
+            ...initialState.proposalDetails,
+            periodKind: PeriodKind.Exploration,
+
+            // yayRolls is selector to this:
+            divisionOfVotes: [{ max_yay_rolls: 1 }]
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: true }
+
+          expectObservable(component.showRolls$).toBe(expected, expectedValues)
+        })
+      })
     })
   })
 })
