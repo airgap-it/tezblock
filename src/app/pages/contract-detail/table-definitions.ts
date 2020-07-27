@@ -133,7 +133,7 @@ export const columns: {
   entrypoints: (options?: Options) => [
     {
       name: 'Entrypoint',
-      field: 'value'
+      data: (item: string) => ({ data: item })
     }
   ],
   tokenHolders: (options: Options) => [

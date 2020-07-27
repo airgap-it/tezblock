@@ -14,6 +14,7 @@ export interface State {
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
   tokenHolders: TableState<TokenHolder>
+  entrypoints: TableState<string>,
   currentTabKind: actions.OperationTab
 }
 
@@ -31,7 +32,8 @@ const initialState: State = {
     direction: 'desc'
   }),
   tokenHolders: getInitialTableState(),
-  currentTabKind: actions.OperationTab.transfers
+  currentTabKind: actions.OperationTab.transfers,
+  entrypoints: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -196,6 +198,42 @@ export const reducer = createReducer(
       pagination: {
         ...state.tokenHolders.pagination,
         currentPage: state.tokenHolders.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.loadEntrypoints, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      loading: true
+    }
+  })),
+  on(actions.loadEntrypointsSucceeded, (state, { data }) => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      data,
+      pagination: {
+        ...state.entrypoints.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadEntrypointsFailed, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      loading: false
+    }
+  })),
+  on(actions.loadMoreEntrypoints, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      pagination: {
+        ...state.entrypoints.pagination,
+        currentPage: state.entrypoints.pagination.currentPage + 1
       }
     }
   })),

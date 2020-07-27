@@ -230,6 +230,8 @@ export class ContractDetailEffects {
             return actions.loadMoreTransferOperations()
           case actions.OperationTab.other:
             return actions.loadMoreOtherOperations()
+          case actions.OperationTab.entrypoints:
+            return actions.loadMoreEntrypoints()
           default:
             return actions.loadMoreTokenHolders()
         }
