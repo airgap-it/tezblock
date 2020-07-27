@@ -4,12 +4,15 @@ import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC, TezosUSD } from 'airgap-coin-lib'
+import { TezosContractIntrospector } from 'conseiljs'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { ContractOperation, TokenContract, TokenHolder } from '@tezblock/domain/contract'
 import { getFaProtocol } from '@tezblock/domain/airgap'
+import { getAccountByIdBody } from '@tezblock/domain/account'
+import { Account } from '@tezblock/interfaces/Account'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -215,7 +218,10 @@ export class ContractService extends BaseService {
               map(response =>
                 contractOperations.map((contractOperation, index) => ({
                   ...contractOperation,
-                  entrypoint: contractOperation.parameters_entrypoints === 'default' ? _get(response[index], 'entrypoint') : contractOperation.parameters_entrypoints,
+                  entrypoint:
+                    contractOperation.parameters_entrypoints === 'default'
+                      ? _get(response[index], 'entrypoint')
+                      : contractOperation.parameters_entrypoints,
                   symbol: contract.symbol,
                   decimals: contract.decimals
                 }))
@@ -242,26 +248,28 @@ export class ContractService extends BaseService {
               )
             ).pipe(
               map(response =>
-                contractOperations.map((contractOperation, index) => {
-                  try {
-                    const details = faProtocol.transferDetailsFromParameters({
-                      entrypoint: contractOperation.parameters_entrypoints,
-                      value: response[index].value
-                    })
-                    return {
-                      ...contractOperation,
-                      from: details.from,
-                      to: details.to,
-                      amount: details.amount,
-                      symbol: contract.symbol,
-                      decimals: contract.decimals
+                contractOperations
+                  .map((contractOperation, index) => {
+                    try {
+                      const details = faProtocol.transferDetailsFromParameters({
+                        entrypoint: contractOperation.parameters_entrypoints,
+                        value: response[index].value
+                      })
+                      return {
+                        ...contractOperation,
+                        from: details.from,
+                        to: details.to,
+                        amount: details.amount,
+                        symbol: contract.symbol,
+                        decimals: contract.decimals
+                      }
+                    } catch {
+                      // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
+                      // in this case we return undefined because we cannot list it as a transfer operation since we cannot get out the details
+                      return undefined
                     }
-                  } catch {
-                    // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
-                    // in this case we return undefined because we cannot list it as a transfer operation since we cannot get out the details
-                    return undefined
-                  }
-                }).filter(tx => tx !== undefined)
+                  })
+                  .filter(tx => tx !== undefined)
               )
             )
           : of([])
@@ -279,11 +287,29 @@ export class ContractService extends BaseService {
     return from(protocol.getTotalSupply())
   }
 
-  loadEntrypoints() {
-    // return this.post<ContractOperation[]>('accounts', {
-    //   predicates: transferPredicates(contract.id),
-    //   orderBy: [orderBy],
-    //   limit
-    // })
+  loadEntrypoints(id: string) {
+    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(
+      map(first),
+      map(account => {
+        const foo = TezosContractIntrospector.generateEntryPointsFromParams(account.script)
+        
+        return []
+      })
+    )
   }
 }
+
+/*
+
+setLogLevel('debug');
+const tezosNode = '';
+async function interrogateContract() {
+    const contractParameters = `parameter (or (or (or (pair %transfer (address :from) (pair (address :to) (nat :value))) (or (pair %transferViaProxy (address :sender) (pair (address :from) (pair (address :to) (nat :value)))) (pair %approve (address :spender) (nat :value)))) (or (pair %approveViaProxy (address :sender) (pair (address :spender) (nat :value))) (or (pair %getAllowance (pair (address :owner) (address :spender)) (contract nat)) (pair %getBalance (address :owner) (contract nat))))) (or (or (pair %getTotalSupply unit (contract nat)) (or (bool %setPause) (address %setAdministrator))) (or (or (pair %getAdministrator unit (contract address)) (pair %mint (address :to) (nat :value))) (or (pair %burn (address :from) (nat :value)) (address %setProxy)))));`;
+    const entryPoints = await TezosContractIntrospector.generateEntryPointsFromParams(contractParameters);
+    entryPoints.forEach(p => {
+        console.log(`${p.name}(${p.parameters.map(pp => (pp.name || 'unnamed') + '/' + pp.type).join(', ')})`);
+    });
+    console.log(entryPoints[0].generateParameter('', '', 999));
+}
+interrogateContract();
+*/

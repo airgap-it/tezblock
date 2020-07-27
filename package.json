@@ -65,6 +65,7 @@
     "canvas": "^2.6.1",
     "chart.js": "^2.9.3",
     "chartjs-plugin-piechart-outlabels": "^0.1.4",
+    "conseiljs": "^5.0.3",
     "cryptocompare": "^1.0.0",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",

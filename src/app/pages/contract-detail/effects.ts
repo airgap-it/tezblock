@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
-import { of, from } from 'rxjs'
+import { of } from 'rxjs'
 import { catchError, delay, filter, map, tap, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { BsModalService } from 'ngx-bootstrap/modal'
@@ -263,6 +263,25 @@ export class ContractDetailEffects {
         this.contractService.loadTokenHolders(contract).pipe(
           map(data => actions.loadTokenHoldersSucceeded({ data })),
           catchError(error => of(actions.loadTokenHoldersFailed({ error })))
+        )
+      )
+    )
+  )
+
+  onContractLoadEntrypoints$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadContractSucceeded),
+      map(({ contract }) => actions.loadEntrypoints({ id: contract.id }))
+    )
+  )
+
+  loadEntrypoints$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadEntrypoints),
+      switchMap(({ id }) =>
+        this.contractService.loadEntrypoints(id).pipe(
+          map(data => actions.loadEntrypointsSucceeded({ data })),
+          catchError(error => of(actions.loadEntrypointsFailed({ error })))
         )
       )
     )
