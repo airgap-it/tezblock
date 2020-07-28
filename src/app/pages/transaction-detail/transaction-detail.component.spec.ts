@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Actions } from '@ngrx/effects'
@@ -19,6 +20,7 @@ describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
   let fixture: ComponentFixture<TransactionDetailComponent>
   let storeMock: MockStore<any>
+  let testScheduler: TestScheduler
   const initialState = { app: appInitialState, transactionDetails: tdInitialState }
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const activatedRouteMock = getActivatedRouteMock()
@@ -39,6 +41,8 @@ describe('TransactionDetailComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 
+    testScheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected))
+
     fixture = TestBed.createComponent(TransactionDetailComponent)
     storeMock = TestBed.get(MockStore)
     component = fixture.componentInstance
@@ -46,5 +50,17 @@ describe('TransactionDetailComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  describe('ngOnInit', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    describe('filteredTransactions$', () => {
+      it('when transactions is not an array then does not emit value', () => {
+        testScheduler.run(({ expectObservable }) => expectObservable(component.filteredTransactions$).toBe('---'))
+      })
+    })
   })
 })

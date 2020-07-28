@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
+import { combineLatest, merge, Observable, timer } from 'rxjs'
 import { map, filter, switchMap, withLatestFrom } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
@@ -61,10 +61,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly activatedRoute: ActivatedRoute,
     private titleService: Title,
     private metaTagService: Meta,
-
     private aliasService: AliasService
   ) {
     super()
+    
     this.store$.dispatch(actions.reset())
   }
 
