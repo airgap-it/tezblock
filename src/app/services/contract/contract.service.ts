@@ -287,15 +287,10 @@ export class ContractService extends BaseService {
   }
 
   loadEntrypoints(id: string): Observable<string[]> {
-    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(
-      map(first),
-      switchMap(account =>
-        this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${account.account_id}/entrypoints`, true).pipe(
-          map((response: any) => {
-            return Object.keys(response.entrypoints)
-          })
-        )
-      )
+    return this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`, true).pipe(
+      map((response: any) => {
+        return Object.keys(response.entrypoints)
+      })
     )
   }
 }
