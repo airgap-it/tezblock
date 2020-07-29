@@ -97,7 +97,9 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         this.historicData$.pipe(
           map(data =>
             data.map(dataItem =>
-              pricePeriod === PricePeriod.day ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
+              pricePeriod === PricePeriod.day
+                ? new Date(dataItem.time * 1000).toLocaleTimeString()
+                : new Date(dataItem.time * 1000).toLocaleDateString()
             )
           )
         )
