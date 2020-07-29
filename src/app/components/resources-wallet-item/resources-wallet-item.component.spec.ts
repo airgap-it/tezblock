@@ -1,31 +1,30 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
-import { ResourcesWalletItemComponent } from './resources-wallet-item.component';
-import { UnitHelper } from 'test-config/unit-test-helper';
-import { Wallet } from "../../interfaces/Wallet";
+import { ResourcesWalletItemComponent } from './resources-wallet-item.component'
+import { Wallet } from '@tezblock/interfaces/Wallet'
 
-xdescribe('WalletComponent', () => {
-  let component: ResourcesWalletItemComponent;
-  let fixture: ComponentFixture<ResourcesWalletItemComponent>;
-  let mockedWallet: Wallet;
+describe('ResourcesWalletItemComponent', () => {
+  let component: ResourcesWalletItemComponent
+  let fixture: ComponentFixture<ResourcesWalletItemComponent>
+  let mockedWallet: Wallet
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper();
-
     TestBed.configureTestingModule(
-      unitHelper.testBed({
+      {
         imports: [FontAwesomeModule],
         declarations: [ResourcesWalletItemComponent],
-        providers: [IconPipe]
-      })
+        providers: [IconPipe],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA]
+      }
     )
-      .compileComponents()
-      .catch(console.error);
-  }));
 
-  beforeEach(() => {
+    fixture = TestBed.createComponent(ResourcesWalletItemComponent)
+    component = fixture.componentInstance
+    component.wallet = mockedWallet
+
     mockedWallet = {
       title: 'fooTitle',
       description: `fooDescription`,
@@ -34,15 +33,10 @@ xdescribe('WalletComponent', () => {
       platforms: [],
       features: [],
       downloadLink: 'fooDownloadLink'
-    };
-
-    fixture = TestBed.createComponent(ResourcesWalletItemComponent);
-    component = fixture.componentInstance;
-    component.wallet = mockedWallet;
-    fixture.detectChanges();
-  });
+    }
+  }))
 
   it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+    expect(component).toBeTruthy()
+  })
+})

@@ -1,37 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { MomentModule } from 'ngx-moment'
-import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { RouterTestingModule } from '@angular/router/testing'
 
-import { AddressItemComponent } from './../address-item/address-item.component'
-import { IdenticonComponent } from './../identicon/identicon'
+import { ShortenStringPipe } from 'src/app/pipes/shorten-string/shorten-string.pipe'
 import { TransactionItemComponent } from './transaction-item.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 
-xdescribe('TransactionItemComponent', () => {
+describe('TransactionItemComponent', () => {
   let component: TransactionItemComponent
   let fixture: ComponentFixture<TransactionItemComponent>
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      providers: [ShortenStringPipe, IconPipe],
+      imports: [MomentModule, TooltipModule, FontAwesomeModule, RouterTestingModule.withRoutes([])],
+      declarations: [TransactionItemComponent],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [ShortenStringPipe, IconPipe],
-        imports: [MomentModule, TooltipModule, FontAwesomeModule],
-        declarations: [TransactionItemComponent, AddressItemComponent, IdenticonComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
-  beforeEach(() => {
     fixture = TestBed.createComponent(TransactionItemComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

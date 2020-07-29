@@ -127,7 +127,7 @@ export class TezblockTableComponent implements OnInit {
   ngOnInit() {}
 
   isExpanded(row: any): boolean {
-    return this.expandedRow && this.expandedRows.includes(row[this.expandedRow.primaryKey])
+    return !!this.expandedRow && this.expandedRows.includes(row[this.expandedRow.primaryKey])
   }
 
   expand(row: any) {

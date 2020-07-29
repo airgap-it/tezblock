@@ -1,35 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { MomentModule } from 'ngx-moment'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { RouterTestingModule } from '@angular/router/testing'
 
-import { IdenticonComponent } from '../identicon/identicon'
-
-import { AddressItemComponent } from './../address-item/address-item.component'
 import { BlockItemComponent } from './block-item.component'
 
-xdescribe('ListItemComponent', () => {
+describe('BlockItemComponent', () => {
   let component: BlockItemComponent
   let fixture: ComponentFixture<BlockItemComponent>
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule.withRoutes([])],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      declarations: [BlockItemComponent]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [],
-        imports: [MomentModule],
-        declarations: [BlockItemComponent, AddressItemComponent, IdenticonComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(BlockItemComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

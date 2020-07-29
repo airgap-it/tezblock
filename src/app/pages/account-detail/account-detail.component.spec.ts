@@ -1,37 +1,36 @@
+import { BreakpointObserver } from '@angular/cdk/layout'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { provideMockStore, MockStore } from '@ngrx/store/testing'
-import { TestScheduler } from 'rxjs/testing'
-import { Actions } from '@ngrx/effects'
-import { EMPTY, of } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
+import { Actions } from '@ngrx/effects'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { BreakpointObserver } from '@angular/cdk/layout'
+import { EMPTY } from 'rxjs'
+import { TestScheduler } from 'rxjs/testing'
 
-import { AccountDetailComponent } from './account-detail.component'
+import { TranslateService } from '@ngx-translate/core'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
-import { initialState as adInitialState } from './reducer'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { getBakingServiceMock } from '@tezblock/services/baking/baking.service.mock'
-import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
-import { getCryptoPricesServiceMock } from '@tezblock/services/crypto-prices/crypto-prices.service.mock'
-import { CurrencyConverterPipe } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
+import { BeaconService } from '@tezblock/services/beacon/beacon.service'
+import { getBeaconServiceMock } from '@tezblock/services/beacon/beacon.service.mock'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { getCopyServiceMock } from '@tezblock/services/copy/copy.service.mock'
-import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
-import { getPipeMock } from 'test-config/mocks/pipe.mock'
-import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
-import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
-import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
 import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
-import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
-import { TranslateService } from '@ngx-translate/core'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
+import { AccountDetailComponent } from './account-detail.component'
+import { initialState as adInitialState } from './reducer'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -43,14 +42,13 @@ describe('AccountDetailComponent', () => {
   const activatedRouteMock = getActivatedRouteMock()
   const accountServiceMock = getAccountServiceMock()
   const bakingServiceMock = getBakingServiceMock()
-  const cryptoPricesServiceMock = getCryptoPricesServiceMock()
-  const currencyConverterPipeMock = getPipeMock()
   const bsModalServiceMock = getBsModalServiceMock()
   const copyServiceMock = getCopyServiceMock()
   const aliasPipeMock = getPipeMock()
   const toastrServiceMock = getToastrServiceMock()
   const iconPipeMock = getPipeMock()
   const breakpointObserverMock = getBreakpointObserverMock()
+  const beaconServiceMock = getBeaconServiceMock()
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -66,8 +64,6 @@ describe('AccountDetailComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: AccountService, useValue: accountServiceMock },
         { provide: BakingService, useValue: bakingServiceMock },
-        { provide: CryptoPricesService, useValue: cryptoPricesServiceMock },
-        { provide: CurrencyConverterPipe, useValue: currencyConverterPipeMock },
         { provide: BsModalService, useValue: bsModalServiceMock },
         { provide: CopyService, useValue: copyServiceMock },
         { provide: AliasPipe, useValue: aliasPipeMock },
@@ -75,6 +71,7 @@ describe('AccountDetailComponent', () => {
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
         { provide: TranslateService, useValue: TranslateService },
+        { provide: BeaconService, useValue: beaconServiceMock },
         ShortenStringPipe
       ],
       imports: [],
@@ -420,62 +417,6 @@ describe('AccountDetailComponent', () => {
           const expectedValues = { a: 3 }
 
           expectObservable(component.numberOfContractAssets$).toBe(expected, expectedValues)
-        })
-      })
-    })
-
-    describe('contractAssetsBalance$', () => {
-      it('when contractAssets are empty then returns 0', () => {
-        storeMock.setState({
-          ...initialState,
-          accountDetails: {
-            ...initialState.accountDetails,
-            contractAssets: { data: [] }
-          }
-        })
-
-        testScheduler.run(helpers => {
-          const { expectObservable } = helpers
-          const expected = 'a'
-          const expectedValues = { a: 0 }
-
-          expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
-        })
-      })
-
-      describe('when contractAssets are NOT empty', () => {
-        const asset1 = { contract: { amount: 1, symbol: 'tzBTC' } }
-        const asset2 = { contract: { amount: 2, symbol: 'STKR' } }
-        const asset3 = { contract: { amount: 3, symbol: 'xtz' } }
-
-        beforeEach(() => {
-          storeMock.setState({
-            ...initialState,
-            accountDetails: {
-              ...initialState.accountDetails,
-              contractAssets: { data: [asset1, asset2, asset3] }
-            }
-          })
-        })
-
-        it('then cryptoPricesService.getCurrencyConverterArgs is called with convertable contracts symbol', () => {
-          component.contractAssetsBalance$.subscribe(() => {})
-
-          expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[0].args[0]).toEqual(asset1.contract.symbol)
-          expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[1].args[0]).toEqual(asset3.contract.symbol)
-        })
-
-        it('returns sum of currencyConverterPipe.transform only for concertable to $ assets', () => {
-          cryptoPricesServiceMock.getCurrencyConverterArgs.and.returnValue(of('mocked currencyConverterArgs'))
-          currencyConverterPipeMock.transform.and.returnValue(4)
-
-          testScheduler.run(helpers => {
-            const { expectObservable } = helpers
-            const expected = 'a'
-            const expectedValues = { a: 8 }
-
-            expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
-          })
         })
       })
     })

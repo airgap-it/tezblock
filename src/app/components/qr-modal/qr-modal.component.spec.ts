@@ -1,33 +1,37 @@
-import { QrItemComponent } from './../qr-item/qr-item.component'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
-import { AddressItemComponent } from './../address-item/address-item.component'
-import { IdenticonComponent } from './../identicon/identicon'
-import { QrModalComponent } from './qr-modal.component'
-
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core'
+import { QRCodeModule } from 'angularx-qrcode'
+import { ToastrService } from 'ngx-toastr'
+import { BsModalRef } from 'ngx-bootstrap/modal'
 
-xdescribe('QrModalComponent', () => {
+import { QrModalComponent } from './qr-modal.component'
+import { CopyService } from 'src/app/services/copy/copy.service'
+import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
+import { getBsModalRefMock } from 'test-config/mocks/bs-modal-ref.mock'
+import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+
+describe('QrModalComponent', () => {
   let component: QrModalComponent
   let fixture: ComponentFixture<QrModalComponent>
+  const copyServiceMock = getCopyServiceMock()
+  const bsModalRefMock = getBsModalRefMock()
+  const toastrServiceMock = getToastrServiceMock()
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [],
-        imports: [FontAwesomeModule],
-        declarations: [QrModalComponent, IdenticonComponent, AddressItemComponent, QrItemComponent]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-  })
-  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [QRCodeModule],
+      declarations: [QrModalComponent, IconPipe],
+      providers: [
+        { provide: CopyService, useValue: copyServiceMock },
+        { provide: BsModalRef, useValue: bsModalRefMock },
+        { provide: ToastrService, useValue: toastrServiceMock }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
+    })
+
     fixture = TestBed.createComponent(QrModalComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

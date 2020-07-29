@@ -11,6 +11,7 @@
           [confirmations]="numberOfConfirmations$ | async"
           [blockLoading]="blockLoading$ | async"
           [latestBlock]="latestBlock$ | async"
+          [assets]="assets$ | async"
           (blockChangeClicked)="changeBlock($event)"
         ></block-detail-wrapper>
       </div>

@@ -23,11 +23,15 @@ import { NgxJsonViewerModule } from 'ngx-json-viewer'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
 
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import { VarDirective } from '@tezblock/directives/var.directive'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
 import { AccountItemComponent } from './components/account-item/account-item.component'
 import { AddressItemComponent } from './components/address-item/address-item.component'
+import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { BakerTableEffects } from './components/baker-table/effects'
 import { BlockDetailWrapperComponent } from './components/block-detail-wrapper/block-detail-wrapper.component'
@@ -85,6 +89,8 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -94,11 +100,6 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
-import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
-import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
-import { VarDirective } from '@tezblock/directives/var.directive'
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core'
-import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -216,7 +217,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     TransactionErrorsComponent,
     TokenContractOverviewComponent,
     GlossaryComponent,
-    VarDirective
+    VarDirective,
+    AssetsValueComponent
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
