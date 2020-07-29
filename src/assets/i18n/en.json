@@ -245,7 +245,7 @@
     "amount": "Amount",
     "amount_tooltip": "The account balance of the delegated account shown above.",
     "next-reward-expected": "Next Reward Expected",
-    "next-reward-expected_tooltip": "The time until the next reward is exptected to be paid out by the baker.",
+    "next-reward-expected_tooltip": "Shown is the expected time till to the end of the current cycle. Bakers normally pay out rewards a few hours into the new cycle.",
     "not-available": "not available",
     "reward-amount": "Reward Amount",
     "reward-amount_tooltip": "The amount being paid out as reward by the baker for the delegation. This is the expected amount to be paid out, the baker split is alreay subtracted.",

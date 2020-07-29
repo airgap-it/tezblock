@@ -241,7 +241,7 @@
     "amount": "Menge",
     "amount_tooltip": "Die Account Balance des delegierten Account oberhalb.",
     "next-reward-expected": "Nächster Reward erwartet in",
-    "next-reward-expected_tooltip": "Zeit bis zum nächsten Reward, ausbezahlt vom Baker.",
+    "next-reward-expected_tooltip": "Gezeigt wird die erwartete Zeit bis zum Ende des aktuellen Cycles. Bakers zahlen ihre Rewards normalerweise ein paar Stunden nach Beginn des neuen Cycles aus.",
     "not-available": "nicht verfügbar",
     "reward-amount": "Rewardmenge",
     "reward-amount_tooltip": "Die Menge, welche vom Baker als Reward für die Delegation ausbezahlt wird. Dies ist die erwartete Menge, welche ausbezahlt wird. Der Baker Split ist bereits subtrahiert.",
