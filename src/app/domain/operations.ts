@@ -1,3 +1,4 @@
+import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TableState } from '@tezblock/domain/table'
 
@@ -82,7 +83,10 @@ export const getTransactionsWithErrors = (
 })
 
 // tslint:disable-next-line: cyclomatic-complexity
-export const operationErrorToMessage = (operationError: OperationError): OperationErrorMessage => {
+export const operationErrorToMessage = (
+  operationError: OperationError,
+  amountConverterPipe: AmountConverterPipe
+): OperationErrorMessage => {
   const amountConverterArgs = {
     protocolIdentifier: 'xtz',
     maxDigits: 6,
