@@ -2,15 +2,14 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
 import { forkJoin, from, Observable, of } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { map, switchMap } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
-import { first } from '@tezblock/services/fp'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { get as fpGet, isNotEmptyArray } from '@tezblock/services/fp'
+import { get as fpGet, first, isEmptyArray } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
-import { Currency, isInBTC, getFaProtocol, tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { OperationTypes } from '@tezblock/domain/operations'
@@ -128,6 +127,7 @@ export const getTokenContractBySymbol = (symbol: string, tezosNetwork: TezosNetw
   if (!symbol) {
     return undefined
   }
+
   return getTokenContracts(tezosNetwork).data.find(tokenContract => tokenContract.symbol === symbol)
 }
 
@@ -156,55 +156,50 @@ export interface TokenHolder {
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
 export const fillTransferOperations = (
   transactions: Transaction[],
-  chainNetworkService: ChainNetworkService
+  chainNetworkService: ChainNetworkService,
+  onNoAssetValue = (transaction: Transaction) => transaction,
+  tokenContract?: TokenContract
 ): Observable<Transaction[]> => {
-  if (!isNotEmptyArray(transactions)) {
+  if (isEmptyArray(transactions)) {
     return of([])
   }
 
   return forkJoin(
     transactions.map(transaction => {
-      const contract: TokenContract = getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
+      const contract: TokenContract = tokenContract ?? getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
       if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
-        const faProtocol = getFaProtocol(contract, chainNetworkService)
+        const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
+
         return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
-          map(normalizedParameters => {
+          switchMap(normalizedParameters => {
             if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
-              try {
-                const transferDetails = faProtocol.transferDetailsFromParameters({
-                  entrypoint: 'transfer',
+              return from(
+                faProtocol.transactionDetailsFromParameters({
+                  entrypoint: 'transfer', // I had to force 'transfer', without it with 'default' value exception is alwayes triggered
                   value: normalizedParameters.value
                 })
-                return {
+              ).pipe(
+                map(first),
+                map(details => ({
                   ...transaction,
-                  source: transferDetails.from,
-                  destination: transferDetails.to,
-                  amount: parseFloat(transferDetails.amount),
-                  symbol: contract.symbol
-                }
-              } catch (error) { 
-                // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
-                // in this case we return the normal operation so that at least it can be listed
-                return transaction
-              }
+                  source: first(details.from),
+                  destination: first(details.to),
+                  amount: parseFloat(details.amount),
+                  symbol: contract.symbol,
+                  decimals: contract.decimals
+                }))
+              )
             }
 
-            return transaction
+            return of(onNoAssetValue(transaction))
           })
         )
       }
-      return of(transaction)
-    })
-  )
-}
 
-export const getDecimalsForSymbol = (symbol: string, network: TezosNetwork): number => {
-  const protocol = tryGetProtocolByIdentifier(symbol)
-  if (protocol) {
-    return protocol.decimals
-  }
-  return getTokenContractBySymbol(symbol, network).decimals ?? 0
+      return of(onNoAssetValue(transaction))
+    })
+  ).pipe(map(transactions => transactions.filter(negate(isNil))))
 }
 
 // by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function
