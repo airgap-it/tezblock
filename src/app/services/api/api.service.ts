@@ -37,6 +37,7 @@ import * as fromApp from '@tezblock/app.reducer'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { AccountService } from '@tezblock/services/account/account.service'
+import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface OperationCount {
   [key: string]: string
@@ -72,28 +73,6 @@ export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...righ
 
 function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
-}
-
-/*
-    next 5 cycles: Upcoming
-    current cycle: Active
-    past 5 cycles: Frozen
-    past 5 cycles + : Unfrozen
-*/
-const getRightStatus = (currentCycle: number, cycle: number): string => {
-  if (cycle > currentCycle) {
-    return 'Upcoming'
-  }
-
-  if (cycle === currentCycle) {
-    return 'Active'
-  }
-
-  if (cycle < currentCycle - 5) {
-    return 'Unfrozen'
-  }
-
-  return 'Frozen'
 }
 
 const getRightCycles = (currentCycle: number, limit: number): number[] =>

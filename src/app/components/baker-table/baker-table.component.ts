@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { TezosNetwork, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
@@ -22,7 +22,7 @@ import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/dom
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
-import { RewardService } from '@tezblock/services/reward/reward.service'
+import { ExtendedTezosRewards, RewardService } from '@tezblock/services/reward/reward.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
@@ -58,7 +58,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   rightsLoading$: Observable<boolean>
   accountLoading$: Observable<boolean>
 
-  rewards$: Observable<TezosRewards[]>
+  rewards$: Observable<ExtendedTezosRewards[]>
   bakerReward$: Observable<{ [key: string]: TezosPayoutInfo }>
   isBakerRewardBusy$: Observable<{ [key: string]: boolean }>
   rights$: Observable<(AggregatedBakingRights | AggregatedEndorsingRights)[]>
@@ -75,7 +75,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   activeDelegations$: Observable<number>
   isRightsTabAvailable$: Observable<boolean>
 
-  rewardsExpandedRow: ExpandedRow<TezosRewards>
+  rewardsExpandedRow: ExpandedRow<ExtendedTezosRewards>
 
   get rightsExpandedRow(): ExpandedRow<AggregatedBakingRights> | ExpandedRow<AggregatedEndorsingRights> {
     return this.selectedTab.kind === OperationTypes.BakingRights ? this.bakingRightsExpandedRow : this.endorsingRightsExpandedRow
@@ -289,7 +289,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     return tab.disabled()
   }
 
-  onRowExpanded(reward: TezosRewards) {
+  onRowExpanded(reward: ExtendedTezosRewards) {
     const { baker, cycle } = reward
 
     this.store$.dispatch(actions.loadBakerReward({ baker, cycle }))
@@ -325,7 +325,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private setupExpandedRows() {
     this.rewardsExpandedRow = {
       template: this.expandedRowTemplate,
-      getContext: (item: TezosRewards) => ({
+      getContext: (item: ExtendedTezosRewards) => ({
         columns: [
           {
             name: 'Delegator Account',
