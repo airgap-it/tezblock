@@ -24,92 +24,73 @@
   <app-modal-cell [data]="context?.data"></app-modal-cell>
 </ng-template>
 
-<div class="container p-0" *ngIf="loading; else loaded">
-  <table class="table" style="border-collapse: initial">
-    <thead>
-      <tr>
-        <loading-skeleton [class]="'ph'"></loading-skeleton>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="p-0">
-          <loading-skeleton [class]="'ph'"></loading-skeleton>
-        </td>
-      </tr>
-      <tr>
-        <td class="p-0">
-          <loading-skeleton [class]="'ph'"></loading-skeleton>
-        </td>
-      </tr>
-      <tr>
-        <td class="p-0">
-          <loading-skeleton [class]="'ph'"></loading-skeleton>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<ng-template #loaded>
-  <div class="table-responsive mb-3">
-    <table class="table table-hover">
-      <ng-container *ngIf="data">
-        <ng-container *ngIf="data.length > 0; then thenTemplate; else elseTemplate"></ng-container>
-      </ng-container>
-      <ng-template #thenTemplate>
-        <thead>
-          <tr>
-            <ng-container *ngFor="let column of columns">
-              <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
-                <th [width]="column.width" (click)="sorting(column.field)">
-                  <button
-                    class="btn btn-link p-0 collapse--btn"
-                    [ngClass]="{
-                      'text-primary': getDirection(column.field) === 'asc' || getDirection(column.field) === 'desc'
-                    }"
-                    id="sortingColumn"
-                  >
-                    {{ column.name }}
-                  </button>
-                  <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
-                    <ng-container *ngIf="!getDirection(column.field); else arrow">
-                      <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
-                    </ng-container>
-                    <ng-template #arrow>
-                      <fa-icon
-                        [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe"
-                        class="ml-1"
-                      ></fa-icon>
-                    </ng-template>
-                  </button>
-                </th>
-              </ng-container>
-              <ng-template #notSortable>
-                <th [width]="column.width">
+<div class="table-responsive mb-3">
+  <table class="table table-hover">
+    <ng-container *ngIf="data?.length > 0; then thenTemplate; else elseTemplate"></ng-container>
+    <ng-template #thenTemplate>
+      <thead>
+        <tr>
+          <ng-container *ngFor="let column of columns">
+            <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
+              <th [width]="column.width" (click)="sorting(column.field)">
+                <button
+                  class="btn btn-link p-0 collapse--btn"
+                  [ngClass]="{
+                    'text-primary': getDirection(column.field) === 'asc' || getDirection(column.field) === 'desc'
+                  }"
+                  id="sortingColumn"
+                >
                   {{ column.name }}
-                </th>
-              </ng-template>
+                </button>
+                <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
+                  <ng-container *ngIf="!getDirection(column.field); else arrow">
+                    <fa-icon [icon]="'circle' | iconPipe" class="ml-1" style="font-size: 0.5em;"></fa-icon>
+                  </ng-container>
+                  <ng-template #arrow>
+                    <fa-icon
+                      [icon]="(getDirection(column.field) === 'desc' ? 'longArrowAltDown' : 'longArrowAltUp') | iconPipe"
+                      class="ml-1"
+                    ></fa-icon>
+                  </ng-template>
+                </button>
+              </th>
             </ng-container>
-            <th *ngIf="expandedRow"></th>
-          </tr>
-        </thead>
-        <tbody>
-          <ng-container *ngIf="data">
-            <ng-container *ngFor="let item of data; let i = index">
-              <ng-template #tooltipTemplate>
-                <ng-container *ngIf="item.errors as errors">
-                  <app-transaction-errors [errors]="errors"></app-transaction-errors>
-                </ng-container>
-              </ng-template>
-              <tr
-                *ngIf="!!item.errors; else noError"
-                class="table-danger"
-                (click)="expand(item)"
-                [tooltip]="tooltipTemplate"
-                placement="bottom"
-                [adaptivePosition]="false"
-              >
+            <ng-template #notSortable>
+              <th [width]="column.width">
+                {{ column.name }}
+              </th>
+            </ng-template>
+          </ng-container>
+          <th *ngIf="expandedRow"></th>
+        </tr>
+        <app-progressbar *ngIf="loading"></app-progressbar>
+      </thead>
+      <tbody>
+        <ng-container *ngIf="data">
+          <ng-container *ngFor="let item of data; let i = index">
+            <ng-template #tooltipTemplate>
+              <ng-container *ngIf="item.errors as errors">
+                <app-transaction-errors [errors]="errors"></app-transaction-errors>
+              </ng-container>
+            </ng-template>
+            <tr
+              *ngIf="!!item.errors; else noError"
+              class="table-danger"
+              (click)="expand(item)"
+              [tooltip]="tooltipTemplate"
+              placement="bottom"
+              [adaptivePosition]="false"
+            >
+              <td *ngFor="let column of columns; trackBy: trackByFn">
+                <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
+              </td>
+              <td *ngIf="expandedRow">
+                <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
+              </td>
+            </tr>
+            <ng-template #noError>
+              <!-- this condition should be configurable by input parameter -->
+              <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
                 <td *ngFor="let column of columns; trackBy: trackByFn">
                   <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
                 </td>
@@ -117,46 +98,36 @@
                   <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
                 </td>
               </tr>
-              <ng-template #noError>
-                <!-- this condition should be configurable by input parameter -->
-                <tr [ngClass]="{ 'table-danger': item.status && item.status !== 'applied' }" (click)="expand(item)">
-                  <td *ngFor="let column of columns; trackBy: trackByFn">
-                    <ng-container *ngTemplateOutlet="template(column.template); context: { $implicit: column.data(item) }"></ng-container>
-                  </td>
-                  <td *ngIf="expandedRow">
-                    <app-extend-table-cell [data]="isExpanded(item)"></app-extend-table-cell>
-                  </td>
-                </tr>
-              </ng-template>
-              <tr *ngIf="isExpanded(item)" class="table-extended__active">
-                <td colspan="10" class="py-3 px-0">
-                  <ng-container
-                    *ngTemplateOutlet="expandedRow.template; context: { $implicit: expandedRow.getContext(item) }"
-                  ></ng-container>
-                </td>
-              </tr>
-            </ng-container>
+            </ng-template>
+            <tr *ngIf="isExpanded(item)" class="table-extended__active">
+              <td colspan="10" class="py-3 px-0">
+                <ng-container *ngTemplateOutlet="expandedRow.template; context: { $implicit: expandedRow.getContext(item) }"></ng-container>
+              </td>
+            </tr>
           </ng-container>
-        </tbody>
-      </ng-template>
-      <ng-template #elseTemplate>
-        <thead width="180">
-          <tr>
-            <th>{{ noDataLabel || 'No Transactions' }}</th>
-          </tr>
-        </thead>
-      </ng-template>
-    </table>
-    <div class="w-100" [ngClass]="downloadable && enableDownload ? 'pb-2' : 'pb-3'">
-      <ng-container *ngIf="downloadable && enableDownload && data.length > 0">
-        <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
-          <small>
-            <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>
-            Download CSV Export
-          </small>
-        </button>
-      </ng-container>
-    </div>
-    <button *ngIf="pagination" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
+        </ng-container>
+      </tbody>
+    </ng-template>
+    <ng-template #elseTemplate>
+      <thead>
+        <tr *ngIf="!loading; else loading">
+          <th>{{ noDataLabel || 'No Transactions' }}</th>
+        </tr>
+        <ng-template #loading>
+          <app-progressbar></app-progressbar>
+        </ng-template>
+      </thead>
+    </ng-template>
+  </table>
+  <div class="w-100" [ngClass]="downloadable && enableDownload ? 'pb-2' : 'pb-3'">
+    <ng-container *ngIf="downloadable && enableDownload && data?.length > 0">
+      <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
+        <small>
+          <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>
+          Download CSV Export
+        </small>
+      </button>
+    </ng-container>
   </div>
-</ng-template>
+  <button *ngIf="pagination && data?.length > 0" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
+</div>
