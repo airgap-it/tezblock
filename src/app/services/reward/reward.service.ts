@@ -13,6 +13,7 @@ import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { isNotEmptyArray } from '@tezblock/services/fp'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -72,7 +73,9 @@ export class RewardService {
   }
 
   getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
-    return this.getLastCycles(pagination).pipe(switchMap(cycles => forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle)))))
+    return this.getLastCycles(pagination).pipe(
+      switchMap(cycles => (isNotEmptyArray(cycles) ? forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle))) : of([])))
+    )
   }
 
   getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
@@ -132,9 +135,9 @@ export class RewardService {
                   [address]: {
                     ...get(byAddressCache, address),
                     byCycle: {
-                      ...<any>get(byAddressCache, `${address}.byCycle`),
+                      ...(<any>get(byAddressCache, `${address}.byCycle`)),
                       [cycle]: {
-                        ...<any>get(byAddressCache, `${address}.byCycle.${cycle}`),
+                        ...(<any>get(byAddressCache, `${address}.byCycle.${cycle}`)),
                         rewards: result
                       }
                     }
@@ -217,7 +220,7 @@ export class RewardService {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
     const baker = bakerRewards.pop().delegate
-    
+
     return {
       lostAmount: lostAmount.toFixed(),
       offender: deposits.delegate,

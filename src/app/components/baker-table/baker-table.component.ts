@@ -343,7 +343,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         ],
         dataSource: this.getRewardsInnerDataSource(item.cycle),
         headerTemplate: this.rewardsExpandedRowHeaderTemplate,
-        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
+        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle)),
+        key: 'rewards-inner'
       }),
       primaryKey: 'cycle'
     }
