@@ -2,7 +2,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import { negate, isNil, get } from 'lodash'
 import BigNumber from 'bignumber.js'
 import { forkJoin, from, Observable, of } from 'rxjs'
-import { map, switchMap } from 'rxjs/operators'
+import { map, switchMap, catchError } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
@@ -13,6 +13,9 @@ import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { TezosFA12Protocol } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosFA12Protocol'
+import { TezosTransactionParameters } from 'airgap-coin-lib/dist/protocols/tezos/types/operations/Transaction'
+import { IAirGapTransaction } from 'airgap-coin-lib'
 
 export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
 
@@ -153,6 +156,25 @@ export interface TokenHolder {
   amount: string
 }
 
+const normalizeParameters = async (faProtocol: TezosFA12Protocol, parameters: string, fallbackEntrypoint?: string): Promise<TezosTransactionParameters> => {
+  try {
+    return await faProtocol.normalizeTransactionParameters(parameters, fallbackEntrypoint)
+  } catch {
+    return {
+      entrypoint: "default",
+      value: null
+    }
+  }
+}
+
+const transactionDetailsFromParameters = async (faProtocol: TezosFA12Protocol, parameters: TezosTransactionParameters): Promise<Partial<IAirGapTransaction>[]> => {
+  try {
+    return await faProtocol.transactionDetailsFromParameters(parameters)
+  } catch {
+    return []
+  }
+}
+
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
 export const fillTransferOperations = (
   transactions: Transaction[],
@@ -170,25 +192,27 @@ export const fillTransferOperations = (
 
       if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
         const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
-
-        return from(faProtocol.normalizeTransactionParameters(transaction.parameters_micheline ?? transaction.parameters)).pipe(
+        
+        return from(normalizeParameters(faProtocol, transaction.parameters_micheline ?? transaction.parameters, transaction.parameters_entrypoints)).pipe(
           switchMap(normalizedParameters => {
-            if (normalizedParameters.entrypoint === 'transfer' || transaction.parameters_entrypoints === 'transfer') {
+            if (normalizedParameters.entrypoint === 'transfer') {
               return from(
-                faProtocol.transactionDetailsFromParameters({
-                  entrypoint: 'transfer', // I had to force 'transfer', without it with 'default' value exception is alwayes triggered
-                  value: normalizedParameters.value
-                })
+                transactionDetailsFromParameters(faProtocol, normalizedParameters)
               ).pipe(
                 map(first),
-                map(details => ({
-                  ...transaction,
-                  source: first(details.from),
-                  destination: first(details.to),
-                  amount: parseFloat(details.amount),
-                  symbol: contract.symbol,
-                  decimals: contract.decimals
-                }))
+                map(details => {
+                  if (details === undefined) {
+                    return onNoAssetValue(transaction)
+                  }
+                  return {
+                    ...transaction,
+                    source: first(details.from),
+                    destination: first(details.to),
+                    amount: parseFloat(details.amount),
+                    symbol: contract.symbol,
+                    decimals: contract.decimals
+                  }
+                })
               )
             }
 
@@ -199,7 +223,9 @@ export const fillTransferOperations = (
 
       return of(onNoAssetValue(transaction))
     })
-  ).pipe(map(transactions => transactions.filter(negate(isNil))))
+  ).pipe(map(transactions => {
+    return transactions.filter(negate(isNil))
+  }))
 }
 
 // by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function

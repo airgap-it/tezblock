@@ -48,10 +48,10 @@ export const isInBTC = (symbol: string): boolean => ['tzBTC', 'BTC'].includes(sy
 
 const getTezosProtocolNetwork = (environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosProtocolNetwork =>
   new TezosProtocolNetwork(
-    'Carthagenet',
-    NetworkType.TESTNET,
+    tezosNetwork == TezosNetwork.MAINNET ? "Mainnet" : "Carthagenet",
+    tezosNetwork == TezosNetwork.MAINNET ? NetworkType.MAINNET : NetworkType.TESTNET,
     environmentUrls.rpcUrl,
-    new TezblockBlockExplorer('https://carthagenet.tezblock.io'),
+    undefined,
     new TezosProtocolNetworkExtras(tezosNetwork, environmentUrls.conseilUrl, tezosNetwork, environmentUrls.conseilApiKey)
   )
 
@@ -69,7 +69,7 @@ export const getTezosFAProtocolOptions = (
     contract.symbol,
     contract.name,
     contract.symbol,
-    SubProtocolSymbols.XTZ_KT,
+    'xtz-fa' as SubProtocolSymbols,
     contract.id,
     feeDefaults,
     contract.decimals
@@ -78,8 +78,15 @@ export const getTezosFAProtocolOptions = (
   return new TezosFAProtocolOptions(getTezosProtocolNetwork(environmentUrls, tezosNetwork), config)
 }
 
+const faProtocolCache = new Map<String, TezosFA12Protocol>();
+
 export const getFaProtocol = (contract: TokenContract, environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosFA12Protocol => {
-  return new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
+  let result = faProtocolCache.get(contract.id)
+  if (!result) {
+    result = new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
+    faProtocolCache.set(contract.id, result)
+  }
+  return result
 }
 
 // (1,000,000 mutez = 1 tez/XTZ)
