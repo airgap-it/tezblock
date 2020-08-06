@@ -1,6 +1,5 @@
 import { TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import {
-  TezblockBlockExplorer,
   TezosProtocolNetwork,
   TezosProtocolNetworkExtras,
   TezosProtocolOptions
@@ -48,7 +47,7 @@ export const isInBTC = (symbol: string): boolean => ['tzBTC', 'BTC'].includes(sy
 
 const getTezosProtocolNetwork = (environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosProtocolNetwork =>
   new TezosProtocolNetwork(
-    tezosNetwork == TezosNetwork.MAINNET ? "Mainnet" : "Carthagenet",
+    tezosNetwork == TezosNetwork.MAINNET ? 'Mainnet' : 'Carthagenet',
     tezosNetwork == TezosNetwork.MAINNET ? NetworkType.MAINNET : NetworkType.TESTNET,
     environmentUrls.rpcUrl,
     undefined,
@@ -78,14 +77,16 @@ export const getTezosFAProtocolOptions = (
   return new TezosFAProtocolOptions(getTezosProtocolNetwork(environmentUrls, tezosNetwork), config)
 }
 
-const faProtocolCache = new Map<String, TezosFA12Protocol>();
+const faProtocolCache = new Map<String, TezosFA12Protocol>()
 
 export const getFaProtocol = (contract: TokenContract, environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosFA12Protocol => {
   let result = faProtocolCache.get(contract.id)
+
   if (!result) {
     result = new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
     faProtocolCache.set(contract.id, result)
   }
+  
   return result
 }
 

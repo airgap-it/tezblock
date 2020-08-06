@@ -204,6 +204,7 @@ export const fillTransferOperations = (
                   if (details === undefined) {
                     return onNoAssetValue(transaction)
                   }
+                  
                   return {
                     ...transaction,
                     source: first(details.from),
