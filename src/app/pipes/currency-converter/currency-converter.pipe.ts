@@ -1,7 +1,9 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { BigNumber } from 'bignumber.js'
-import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
-import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+
+import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
 export interface CurrencyConverterPipeArgs {
   currInfo: CurrencyInfo
@@ -13,6 +15,8 @@ export interface CurrencyConverterPipeArgs {
   pure: true
 })
 export class CurrencyConverterPipe implements PipeTransform {
+  constructor(private readonly chainNetworkService: ChainNetworkService) {}
+
   public transform(value: string | number | BigNumber, args?: CurrencyConverterPipeArgs): number {
     if (!BigNumber.isBigNumber(value)) {
       value = new BigNumber(value)
@@ -22,7 +26,7 @@ export class CurrencyConverterPipe implements PipeTransform {
       return null
     }
 
-    const protocol: { decimals: number } = tryGetProtocolByIdentifier(args.protocolIdentifier) || { decimals: 0 }
+    const decimals = getDecimalsForSymbol(args.protocolIdentifier, this.chainNetworkService.getNetwork())
 
     const BN = BigNumber.clone({
       FORMAT: {
@@ -31,7 +35,7 @@ export class CurrencyConverterPipe implements PipeTransform {
         groupSize: 3
       }
     })
-    const amount = new BN(value).shiftedBy(protocol.decimals * -1)
+    const amount = new BN(value).shiftedBy(decimals * -1)
 
     return this.transformToCurrency(amount, args.currInfo)
     /*

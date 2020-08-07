@@ -13,6 +13,8 @@ import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { isNotEmptyArray } from '@tezblock/services/fp'
+import { getTezosProtocol } from '@tezblock/domain/airgap'
 import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface DoubleEvidence {
@@ -60,13 +62,7 @@ export class RewardService {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
 
-    this.protocol = new TezosProtocol(
-      environmentUrls.rpcUrl,
-      environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      environmentUrls.conseilApiKey
-    )
+    this.protocol = getTezosProtocol(environmentUrls, network)
   }
   environmentUrls = this.chainNetworkService.getEnvironment()
 

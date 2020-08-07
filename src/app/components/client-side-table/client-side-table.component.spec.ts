@@ -2,14 +2,18 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { TestScheduler } from 'rxjs/testing'
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { of } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
+import { RouterTestingModule } from '@angular/router/testing'
 
 import { ClientSideTableComponent } from './client-side-table.component'
 import { Pagination } from '@tezblock/domain/table'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
 
 describe('ClientSideTableComponent', () => {
   let component: ClientSideTableComponent
   let fixture: ComponentFixture<ClientSideTableComponent>
   let testScheduler: TestScheduler
+  const activatedRouteMock = getActivatedRouteMock()
 
   beforeEach(() => {
     testScheduler = new TestScheduler((actual, expected) => {
@@ -21,8 +25,10 @@ describe('ClientSideTableComponent', () => {
     })
 
     TestBed.configureTestingModule({
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-      declarations: [ClientSideTableComponent]
+      imports: [RouterTestingModule.withRoutes([])],
+      declarations: [ClientSideTableComponent],
+      providers: [{ provide: ActivatedRoute, useValue: activatedRouteMock }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 
     fixture = TestBed.createComponent(ClientSideTableComponent)

@@ -57,7 +57,7 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     )
     this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
-      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : slots)),
+      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : '')),
       map((slots: string) => slots.split(',').length)
     )
 

@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core'
 import * as moment from 'moment'
 import { Observable, of, from } from 'rxjs'
 import { map, switchMap, tap } from 'rxjs/operators'
-import { TezosProtocol } from 'airgap-coin-lib'
 
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
 import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
@@ -13,6 +12,7 @@ import { first } from '@tezblock/services/fp'
 import { get as _get } from 'lodash'
 import { CacheService, CacheKeys, CurrentCycleState } from '@tezblock/services/cache/cache.service'
 import { BaseService, Operation } from '@tezblock/services/base.service'
+import { getTezosProtocol } from '@tezblock/domain/airgap'
 
 interface TezosNodesApiResponse {
   name: string
@@ -119,13 +119,7 @@ export class BakingService extends BaseService {
 
   getStakingCapacityFromTezosProtocol(tzAddress: string): Observable<number> {
     const network = this.chainNetworkService.getNetwork()
-    const tezosProtocol = new TezosProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      this.environmentUrls.conseilApiKey
-    )
+    const tezosProtocol = getTezosProtocol(this.environmentUrls, network)
 
     return from(tezosProtocol.bakerInfo(tzAddress)).pipe(map(response => response.bakerCapacity.multipliedBy(0.7).toNumber()))
   }
