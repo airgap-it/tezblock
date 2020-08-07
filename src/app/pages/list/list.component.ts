@@ -22,11 +22,10 @@ import { defaultOptions } from '@tezblock/components/chart-item/chart-item.compo
 import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
 import { Title, Meta } from '@angular/platform-browser'
-import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
-const protocol = tryGetProtocolByIdentifier('xtz')
 
 const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
@@ -34,7 +33,7 @@ const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
-const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
+const toAmountPerDay = (data: actions.TransactionChartItem[], network: TezosNetwork): number[] => {
   const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
     data.map(item => ({
       diffInDays: moment().diff(moment(item.timestamp), 'days'),
@@ -46,16 +45,17 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
 
       return match ? match.map(item => item.amount).reduce((a, b) => a + b) : 0
     })
-  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
+  const decimals = getDecimalsForSymbol('xtz', network)
+  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, decimals) / 1000)
 
   return pipe(toDiffsInDays, groupBy('diffInDays'), sum, amountToXTZ)(data)
 }
 
-export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
+export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string, network: TezosNetwork) => (
   data: actions.TransactionChartItem[]
 ): { data: number[]; label: string }[] => [
   { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
-  { data: toAmountPerDay(data), label: amountLabel }
+  { data: toAmountPerDay(data, network), label: amountLabel }
 ]
 const timestampsToChartDataSource = (label: string) => (timestamps: number[]): { data: number[]; label: string } => ({
   data: timestampsToCountsPerDay(timestamps),
@@ -167,7 +167,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               //this.store$.select(state => state.list.transactionsChartDatasets)
               this.store$
                 .select(state => state.list.transactionsChartData)
-                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume')))
+                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume', this.chainNetworkService.getNetwork())))
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(

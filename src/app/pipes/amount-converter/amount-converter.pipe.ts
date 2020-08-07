@@ -1,12 +1,11 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { ICoinProtocol } from 'airgap-coin-lib'
 import { BigNumber } from 'bignumber.js'
 import { isNil } from 'lodash'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getDecimalsForSymbol } from '@tezblock/domain/contract'
+import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
 
-export const toXTZ = (value: number, protocol: ICoinProtocol): number => {
+export const toXTZ = (value: number, decimals: number): number => {
   const BN = BigNumber.clone({
     FORMAT: {
       decimalSeparator: `.`,
@@ -15,7 +14,7 @@ export const toXTZ = (value: number, protocol: ICoinProtocol): number => {
     }
   })
 
-  return protocol ? new BN(value).shiftedBy(protocol.decimals * -1).toNumber() : undefined
+  return decimals ? new BN(value).shiftedBy(decimals * -1).toNumber() : undefined
 }
 
 const formatBigNumber = (value: BigNumber, maxDigits?: number): string => {
