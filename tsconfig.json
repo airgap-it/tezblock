@@ -34,7 +34,8 @@
     "paths": {
       "@tezblock/*": ["./src/app/*"]
     },
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

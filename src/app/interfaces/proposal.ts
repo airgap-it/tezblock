@@ -1,6 +1,7 @@
 // interfaces folder should be renamed to model
 
-import * as data from '../../assets/proposals/json/proposals.json'
+// I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
+import data from '../../assets/proposals/json/proposals.json'
 
 export const proposals: {
   [key: string]: { alias: string; discussionLink?: string }

@@ -1,4 +1,6 @@
-import * as data from 'src/submodules/tezos_assets/accounts.json'
+// I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
+import data from 'src/submodules/tezos_assets/accounts.json'
+
 import { get } from '@tezblock/services/fp'
 
 export interface JsonAccount {

@@ -17,8 +17,8 @@ import { TezosFA12Protocol } from 'airgap-coin-lib/dist/protocols/tezos/fa/Tezos
 import { TezosTransactionParameters } from 'airgap-coin-lib/dist/protocols/tezos/types/operations/Transaction'
 import { IAirGapTransaction } from 'airgap-coin-lib'
 
-//TODO data is of type: { default: { ... } }
-import * as data from '../../assets/contracts/json/contracts.json'
+// I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
+import data from '../../assets/contracts/json/contracts.json'
 
 export const tokenContracts = data as { [key: string]: TokenContract }
 
