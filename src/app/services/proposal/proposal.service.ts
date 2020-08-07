@@ -21,6 +21,7 @@ import {
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Pagination } from '@tezblock/domain/table'
 import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
+import { getTezosProtocol } from '@tezblock/domain/airgap'
 
 @Injectable({
   providedIn: 'root'
@@ -32,13 +33,8 @@ export class ProposalService extends BaseService {
     super(chainNetworkService, httpClient)
 
     const network = this.chainNetworkService.getNetwork()
-    this.protocol = new TezosProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      this.environmentUrls.conseilApiKey
-    )
+
+    this.protocol = getTezosProtocol(this.environmentUrls, network)
   }
 
   addVoteData(transactions: Transaction[], kindList?: string[]): Observable<Transaction[]> {

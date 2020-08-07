@@ -14,10 +14,10 @@ export const columns: {
   }) => [
     {
       name: 'From',
-      field: 'from',
+      field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.from, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -26,10 +26,10 @@ export const columns: {
     },
     {
       name: 'To',
-      field: 'to',
+      field: 'destination',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.to, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: 'Amount',
