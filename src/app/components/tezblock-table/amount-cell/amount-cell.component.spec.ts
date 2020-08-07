@@ -63,7 +63,7 @@ describe('AmountCellComponent', () => {
 
     fixture = TestBed.createComponent(AmountCellComponent)
     component = fixture.componentInstance
-    changeDetectorRef = TestBed.get(ChangeDetectorRef)
+    changeDetectorRef = TestBed.inject(ChangeDetectorRef)
   })
 
   it('should create', () => {

@@ -11,7 +11,7 @@ xdescribe('ContractService', () => {
   });
 
   it('should be created', () => {
-    const service: ContractService = TestBed.get(ContractService);
+    const service: ContractService = TestBed.inject(ContractService);
     expect(service).toBeTruthy();
   });
 });

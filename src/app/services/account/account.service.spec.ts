@@ -8,7 +8,7 @@ xdescribe('AccountService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({ providers: [] })
 
-    service = TestBed.get(AccountService)
+    service = TestBed.inject(AccountService)
   })
 
   it('should be created', () => {

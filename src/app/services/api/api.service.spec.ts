@@ -85,9 +85,9 @@ describe('ApiService', () => {
       ]
     })
 
-    service = TestBed.get(ApiService)
-    storeMock = TestBed.get(MockStore)
-    httpMock = TestBed.get(HttpTestingController)
+    service = TestBed.inject(ApiService)
+    storeMock = TestBed.inject(MockStore)
+    httpMock = TestBed.inject(HttpTestingController)
   })
 
   it('should be created', () => {
