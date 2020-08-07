@@ -1,6 +1,10 @@
 // interfaces folder should be renamed to model
 
-export const proposals: { [key: string]: { alias: string; discussionLink?: string } } = require('../../assets/proposals/json/proposals.json')
+import * as data from '../../assets/proposals/json/proposals.json'
+
+export const proposals: {
+  [key: string]: { alias: string; discussionLink?: string }
+} = data
 
 export interface ProposalDto {
   proposal: string

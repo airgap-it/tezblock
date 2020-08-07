@@ -3,7 +3,7 @@ import { createIcon } from '@download/blockies'
 import { BigNumber } from 'bignumber.js'
 import { toDataUrl } from 'myetherwallet-blockies'
 
-const accounts = require('src/submodules/tezos_assets/accounts.json')
+import { jsonAccounts } from '@tezblock/domain/account'
 
 @Component({
   selector: 'identicon',
@@ -63,10 +63,10 @@ export class IdenticonComponent implements OnInit {
     }
 
     const getIdenticon = (): string => {
-      const displayLogo: boolean = accounts.hasOwnProperty(address) && accounts[address].hasLogo && !this.forceIdenticon
+      const displayLogo: boolean = jsonAccounts.hasOwnProperty(address) && jsonAccounts[address].hasLogo && !this.forceIdenticon
 
       if (displayLogo) {
-        const logoReference = accounts[address].logoReference || address
+        const logoReference = jsonAccounts[address].logoReference || address
 
         return `submodules/tezos_assets/imgs/${logoReference}.png`
       }

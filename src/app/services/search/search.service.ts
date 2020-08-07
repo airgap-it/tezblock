@@ -12,7 +12,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { getTokenContractBy } from '@tezblock/domain/contract'
 import { SearchOptionType } from './model'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getAddressByAlias } from '@tezblock/services/account/account.service'
+import { getAddressByAlias } from '@tezblock/domain/account'
 
 const previousSearchesKey = 'previousSearches'
 

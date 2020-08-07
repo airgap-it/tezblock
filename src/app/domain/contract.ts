@@ -15,7 +15,10 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { OperationTypes } from '@tezblock/domain/operations'
 
-export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
+//TODO data is of type: { default: { ... } }
+import * as data from '../../assets/contracts/json/contracts.json'
+
+export const tokenContracts = data as { [key: string]: TokenContract }
 
 export enum SocialType {
   website = 'website',
@@ -183,7 +186,7 @@ export const fillTransferOperations = (
                   amount: parseFloat(transferDetails.amount),
                   symbol: contract.symbol
                 }
-              } catch (error) { 
+              } catch (error) {
                 // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
                 // in this case we return the normal operation so that at least it can be listed
                 return transaction

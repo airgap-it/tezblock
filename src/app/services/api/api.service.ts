@@ -8,7 +8,6 @@ import { map, switchMap, filter, tap } from 'rxjs/operators'
 import { TezosProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 import { Store } from '@ngrx/store'
 import { isNil, negate, get as _get } from 'lodash'
-import * as moment from 'moment'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight, BakingRewardsDetail } from '@tezblock/interfaces/BakingRights'
 import {
@@ -17,7 +16,7 @@ import {
   getEmptyAggregatedEndorsingRight,
   EndorsingRewardsDetail
 } from '@tezblock/interfaces/EndorsingRights'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
