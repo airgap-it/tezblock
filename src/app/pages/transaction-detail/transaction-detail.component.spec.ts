@@ -61,6 +61,57 @@ describe('TransactionDetailComponent', () => {
       it('when transactions is not an array then does not emit value', () => {
         testScheduler.run(({ expectObservable }) => expectObservable(component.filteredTransactions$).toBe('---'))
       })
+
+      it('filters transactions by kind', () => {
+        const transactionA = { kind: 'A' }
+        const transactionB = { kind: 'B' }
+
+        storeMock.setState({
+          ...initialState,
+          transactionDetails: {
+            ...initialState.transactionDetails,
+            transactions: {
+              ...initialState.transactionDetails.transactions,
+              data: [transactionA, transactionB]
+            },
+            kind: 'A'
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: [transactionA] }
+
+          expectObservable(component.filteredTransactions$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe(`numberOfConfirmations$`, () => {
+      it('when latestBlock is not truthy then does not emit value', () => {
+        testScheduler.run(({ expectObservable }) => expectObservable(component.numberOfConfirmations$).toBe('---'))
+      })
+
+      it('returns difference between the latest block level and given block level', () => {
+        storeMock.setState({
+          ...initialState,
+          transactionDetails: {
+            ...initialState.transactionDetails,
+            transactions: {
+              ...initialState.transactionDetails.transactions,
+              data: [{ block_level: 3 }]
+            },
+            latestBlock: { level: 13 }
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: 10 }
+
+          expectObservable(component.numberOfConfirmations$).toBe(expected, expectedValues)
+        })
+      })
     })
   })
 })
