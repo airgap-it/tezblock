@@ -8,12 +8,14 @@ import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Block } from '@tezblock/interfaces/Block'
+import { SearchOptionData } from '@tezblock/services/search/model'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
   exchangeRates = 'exchangeRates',
   byAddress = 'byAddress',
-  byProposal = 'byProposal'
+  byProposal = 'byProposal',
+  previousSearches = 'previousSearches'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -68,6 +70,7 @@ export interface Cache {
 
   // probably in future this entry will replace byPeriod which will contain this data
   [CacheKeys.byProposal]: ByProposalState
+  [CacheKeys.previousSearches]: SearchOptionData[]
 }
 
 @Injectable({

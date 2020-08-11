@@ -1,12 +1,7 @@
-export interface SearchOption {
-  name: string
-  type: string
-}
+import { OperationTypes } from '@tezblock/domain/operations'
 
-export enum SearchOptionType {
-  transaction = 'Transactions',
-  account = 'Accounts',
-  baker = 'Bakers',
-  block = 'Blocks',
-  faContract = 'Asset Contracts'
+export interface SearchOptionData {
+  id: string
+  label?: string
+  type: OperationTypes
 }
