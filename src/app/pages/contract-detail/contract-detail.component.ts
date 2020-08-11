@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
-import { from, Observable, combineLatest } from 'rxjs'
+import { Observable, combineLatest } from 'rxjs'
 import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
@@ -22,7 +22,6 @@ import { columns } from './table-definitions'
 import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Account } from '@tezblock/interfaces/Account'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
@@ -65,7 +64,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   loading$: Observable<boolean>
   transactions$: Observable<any[]>
   orderBy$: Observable<OrderBy>
-  showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   manager$: Observable<string>
   showFiatValue$: Observable<boolean>
@@ -175,15 +173,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     ).pipe(
       map(([currentTabKind, transferOrderBy, otherOrderBy]) =>
         currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
-      )
-    )
-    this.store$.select(state => state.contractDetails.transferOperations.loading)
-    this.showLoadMore$ = combineLatest(
-      this.transactions$,
-      this.store$.select(state => state.contractDetails.transferOperations.pagination)
-    ).pipe(
-      map(([transferOperations, pagination]) =>
-        transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
