@@ -33,7 +33,7 @@ export const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
-const toAmountPerDay = (data: actions.TransactionChartItem[], network: TezosNetwork): number[] => {
+export const toAmountPerDay = (data: actions.TransactionChartItem[], network: TezosNetwork): number[] => {
   const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
     data.map(item => ({
       diffInDays: moment().diff(moment(item.timestamp), 'days'),
