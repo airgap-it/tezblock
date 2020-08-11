@@ -120,10 +120,9 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
 
   onSelect(e: TypeaheadMatch) {
     const item = e.item
-    const { id, type } = item
 
     this.search(item)
-    this.searchService.updatePreviousSearches({ id, type })
+    this.searchService.updatePreviousSearches(item)
   }
 
   onMouseDown() {

@@ -67,7 +67,7 @@ export class SearchService {
     if (option.type === OperationTypes.Transaction) {
       return this.router.navigateByUrl(`/transaction/${option.id}`)
     }
-    
+
     // OperationTypes.Block
     return this.router.navigateByUrl(`/block/${option.id}`)
   }
@@ -78,7 +78,8 @@ export class SearchService {
 
   updatePreviousSearches(option: SearchOptionData) {
     // to ommit optionGroup property
-    const _option = pick(option, ['id', 'label', 'type'])
+    const label = option.label && option.id !== option.label ? ['label'] : []
+    const _option = <SearchOptionData>pick(option, ['id', 'type'].concat(label))
 
     this.cacheService.update(CacheKeys.previousSearches, (previousOptions: SearchOptionData[]) =>
       ((previousOptions || []).some(previousOption => previousOption.id === _option.id) ? [] : [_option])
