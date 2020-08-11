@@ -14,6 +14,7 @@ export interface Busy {
 export interface State {
   id: string
   block: Block
+  operations: TableState<Transaction>
   transactions: TableState<Transaction>
   counts: Count[]
   transactionsLoadedByBlockHash: string
@@ -24,6 +25,7 @@ export interface State {
 export const initialState: State = {
   id: undefined,
   block: undefined,
+  operations: getInitialTableState(),
   transactions: getInitialTableState(),
   counts: undefined,
   transactionsLoadedByBlockHash: undefined,
@@ -59,17 +61,63 @@ export const reducer = createReducer(
       block: false
     }
   })),
-  on(actions.loadTransactionsByKind, (state, { blockHash, kind }) => ({
+  on(actions.loadOperationsByKind, (state, { blockHash, kind }) => ({
     ...state,
     blockHash,
     kind,
     transactionsLoadedByBlockHash: blockHash,
+    operations: {
+      ...state.operations,
+      loading: true
+    }
+  })),
+  on(actions.loadOperationsByKindSucceeded, (state, { data }) => ({
+    ...state,
+    operations: {
+      ...state.operations,
+      data,
+      loading: false
+    },
+    transactions:
+      state.kind === OperationTypes.Transaction
+        ? {
+            ...state.transactions,
+            data,
+            loading: false
+          }
+        : state.transactions
+  })),
+  on(actions.loadOperationsByKindFailed, state => ({
+    ...state,
+    operations: {
+      ...state.operations,
+      loading: false
+    },
+    transactions:
+      state.kind === OperationTypes.Transaction
+        ? {
+            ...state.transactions,
+            loading: false
+          }
+        : state.transactions
+  })),
+  on(actions.loadTransactions, (state, { blockHash }) => ({
+    ...state,
+    blockHash,
+    kind: OperationTypes.Transaction,
+    transactionsLoadedByBlockHash: blockHash,
+
+    // this data(transactions) serves block-details table and assets-value
+    operations: {
+      ...state.operations,
+      loading: true
+    },
     transactions: {
       ...state.transactions,
       loading: true
     }
   })),
-  on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
+  on(actions.loadTransactionsSucceeded, (state, { data }) => ({
     ...state,
     transactions: {
       ...state.transactions,
@@ -77,7 +125,7 @@ export const reducer = createReducer(
       loading: false
     }
   })),
-  on(actions.loadTransactionsByKindFailed, state => ({
+  on(actions.loadTransactionsFailed, state => ({
     ...state,
     transactions: {
       ...state.transactions,
@@ -86,25 +134,25 @@ export const reducer = createReducer(
   })),
   on(actions.increasePageSize, state => ({
     ...state,
-    transactions: {
-      ...state.transactions,
+    operations: {
+      ...state.operations,
       pagination: {
-        ...state.transactions.pagination,
-        currentPage: state.transactions.pagination.currentPage + 1
+        ...state.operations.pagination,
+        currentPage: state.operations.pagination.currentPage + 1
       }
     }
   })),
-  on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
+  on(actions.loadOperationsCountsSucceeded, (state, { counts }) => ({
     ...state,
     counts
   })),
-  on(actions.sortTransactionsByKind, (state, { orderBy }) => ({
+  on(actions.sortOperationsByKind, (state, { orderBy }) => ({
     ...state,
     orderBy
   })),
   on(actions.reset, () => initialState),
   on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
     ...state,
-    transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
+    operations: getTransactionsWithErrors(operationErrorsById, state.operations)
   }))
 )

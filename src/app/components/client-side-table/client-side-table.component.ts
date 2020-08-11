@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core'
 import { FormControl } from '@angular/forms'
+import { ActivatedRoute, Router } from '@angular/router'
 import { PageChangedEvent } from 'ngx-bootstrap/pagination'
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
 import { filter, switchMap } from 'rxjs/operators'
@@ -8,6 +9,8 @@ import { DataSource, Pagination, Pageable } from '@tezblock/domain/table'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { BaseComponent } from '@tezblock/components/base.component'
 import { get } from '@tezblock/services/fp'
+
+const getFilterQueryParameterName = (key: string): string => `${key}-filter`
 
 @Component({
   selector: 'app-client-side-table',
@@ -23,6 +26,8 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
 
   @Input() headerContext: (index: any) => Observable<any>
 
+  @Input() key: string
+
   data: any[]
 
   pagination$ = new BehaviorSubject<Pagination>({
@@ -34,15 +39,18 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
 
   private _data$: Observable<Pageable<any>>
   private filter$ = new BehaviorSubject<string>(undefined)
-  private previousFilter: string = null
   private previousPagination: Pagination
 
-  constructor() {
+  private get queryParameterFilter(): string {
+    return this.activatedRoute.snapshot.queryParamMap.get(getFilterQueryParameterName(this.key))
+  }
+
+  constructor(private readonly activatedRoute: ActivatedRoute, private readonly router: Router) {
     super()
   }
 
   ngOnInit() {
-    this.filterTerm = new FormControl(this.previousFilter)
+    this.setupFilter()
 
     // for some reason only one subscription works ... thats why I'm using data: any[], and not data$: Observable<any[]>, because async pipe doesn't work (2nd subscription)
     this._data$ = combineLatest(
@@ -84,12 +92,26 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
 
   filter() {
     const filter = this.filterTerm.value
+    const previousFilter = this.queryParameterFilter
 
-    if (filter !== this.previousFilter) {
+    if (filter !== previousFilter) {
       this.loading = true
+
+      if (this.key) {
+        this.router.navigate([], { queryParams: { [getFilterQueryParameterName(this.key)]: filter } })
+      }
     }
 
-    this.previousFilter = filter
     this.filter$.next(filter)
+  }
+
+  private setupFilter() {
+    const value = this.key ? this.queryParameterFilter : null
+
+    this.filterTerm = new FormControl(value)
+
+    if (value) {
+      this.filter()
+    }
   }
 }

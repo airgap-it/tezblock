@@ -36,6 +36,7 @@
     [columns]="context.columns"
     [headerTemplate]="context.headerTemplate"
     [headerContext]="context.headerContext"
+    [key]="context.key"
   ></app-client-side-table>
 </ng-template>
 
@@ -81,16 +82,18 @@
               <div class="row">
                 <div class="col-md-12 mb-3">
                   <span class="badge badge-pill badge-light mr-2">
-                    <fa-icon
-                      [icon]="data?.acceptsDelegations ? ('check' | iconPipe) : ('times' | iconPipe)"
-                      [ngClass]="data?.acceptsDelegations ? 'text-primary' : 'text-danger'"
-                    ></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === true" [icon]="'check' | iconPipe" class="text-primary"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === false" [icon]="'times' | iconPipe" class="text-danger"></fa-icon>
+                    <fa-icon *ngIf="data?.acceptsDelegations === undefined" [icon]="'circle' | iconPipe" class="text-primary"></fa-icon>
                   </span>
-                  <ng-container *ngIf="data?.acceptsDelegations">
+                  <ng-container *ngIf="data?.acceptsDelegations === true">
                     Accepts Delegations
                   </ng-container>
-                  <ng-container *ngIf="!data?.acceptsDelegations">
+                  <ng-container *ngIf="data?.acceptsDelegations === false">
                     Does Not Accept Delegations
+                  </ng-container>
+                  <ng-container *ngIf="data?.acceptsDelegations === undefined">
+                    Delegation Acceptance Unknown
                   </ng-container>
                 </div>
               </div>

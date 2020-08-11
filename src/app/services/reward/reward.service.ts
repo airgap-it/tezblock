@@ -13,6 +13,9 @@ import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { isNotEmptyArray } from '@tezblock/services/fp'
+import { getTezosProtocol } from '@tezblock/domain/airgap'
+import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -28,6 +31,18 @@ interface BalanceUpdate {
   delegate: string
   cycle: number
   change: string
+}
+
+export interface ExtendedTezosRewards extends TezosRewards {
+  rightStatus: string
+}
+
+const getCyclesWithOnePageInFuture = (currentCycle: number, pagination: Pagination): number[] => {
+  const count = pagination.currentPage * pagination.selectedSize
+
+  return range(0, count)
+    .map(index => currentCycle + pagination.selectedSize - count + index)
+    .sort((a, b) => b - a)
 }
 
 @Injectable({
@@ -47,32 +62,22 @@ export class RewardService {
     const environmentUrls = this.chainNetworkService.getEnvironment()
     const network = this.chainNetworkService.getNetwork()
 
-    this.protocol = new TezosProtocol(
-      environmentUrls.rpcUrl,
-      environmentUrls.conseilUrl,
-      network,
-      this.chainNetworkService.getEnvironmentVariable(),
-      environmentUrls.conseilApiKey
-    )
+    this.protocol = getTezosProtocol(environmentUrls, network)
   }
   environmentUrls = this.chainNetworkService.getEnvironment()
-
-  getLastCycles(pagination: Pagination): Observable<number[]> {
-    return this.getCurrentCycle().pipe(
-      map(currentCycle =>
-        range(0, pagination.currentPage * pagination.selectedSize)
-          .map(index => currentCycle - (index + 1))
-          .filter(cycle => cycle >= 7)
-      )
-    )
-  }
 
   getCycles4Rewards(): Observable<number[]> {
     return this.getCurrentCycle().pipe(map(currentCycle => range(0, 6).map(index => currentCycle - 2 + index)))
   }
 
-  getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
-    return this.getLastCycles(pagination).pipe(switchMap(cycles => forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle)))))
+  getRewards(address: string, pagination: Pagination, filter?: string): Observable<ExtendedTezosRewards[]> {
+    return this.getCurrentCycle().pipe(
+      switchMap(currentCycle =>
+        forkJoin(getCyclesWithOnePageInFuture(currentCycle, pagination).map(cycle => this.calculateRewards(address, cycle))).pipe(
+          map(response => response.map(tezosReward => ({ ...tezosReward, rightStatus: getRightStatus(currentCycle, tezosReward.cycle) })))
+        )
+      )
+    )
   }
 
   getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
@@ -132,9 +137,9 @@ export class RewardService {
                   [address]: {
                     ...get(byAddressCache, address),
                     byCycle: {
-                      ...<any>get(byAddressCache, `${address}.byCycle`),
+                      ...(<any>get(byAddressCache, `${address}.byCycle`)),
                       [cycle]: {
-                        ...<any>get(byAddressCache, `${address}.byCycle.${cycle}`),
+                        ...(<any>get(byAddressCache, `${address}.byCycle.${cycle}`)),
                         rewards: result
                       }
                     }
@@ -217,7 +222,7 @@ export class RewardService {
       return current.plus(new BigNumber(next.change))
     }, new BigNumber(0))
     const baker = bakerRewards.pop().delegate
-    
+
     return {
       lostAmount: lostAmount.toFixed(),
       offender: deposits.delegate,

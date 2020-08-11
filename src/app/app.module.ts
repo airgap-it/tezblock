@@ -95,7 +95,8 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
-import { VarDirective } from '@tezblock/directives/var.directive'
+import { VarDirective } from '@tezblock/directives/var.directive';
+import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 
 @NgModule({
   imports: [
@@ -200,7 +201,8 @@ import { VarDirective } from '@tezblock/directives/var.directive'
     LatestContractsTransactionsComponent,
     TransactionErrorsComponent,
     TokenContractOverviewComponent,
-    VarDirective
+    VarDirective,
+    AssetsValueComponent
   ],
 
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
