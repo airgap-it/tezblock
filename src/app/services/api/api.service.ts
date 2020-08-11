@@ -8,7 +8,6 @@ import { map, switchMap, filter, tap } from 'rxjs/operators'
 import { TezosProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 import { Store } from '@ngrx/store'
 import { isNil, negate, get as _get } from 'lodash'
-import * as moment from 'moment'
 
 import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight, BakingRewardsDetail } from '@tezblock/interfaces/BakingRights'
 import {
@@ -23,13 +22,14 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { distinctFilter, first, get, flatten } from '@tezblock/services/fp'
 import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate, Operation, Options, EnvironmentUrls } from '../base.service'
+import { Predicate, Operation, Options } from '../base.service'
+import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
 import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
 import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { getFaProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
+import { getFaProtocol, getTezosProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 import { CacheService, CacheKeys, ByAddressState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
 import { squareBrackets } from '@tezblock/domain/pattern'
 import * as fromRoot from '@tezblock/reducers'
@@ -37,6 +37,7 @@ import * as fromApp from '@tezblock/app.reducer'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { AccountService } from '@tezblock/services/account/account.service'
+import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface OperationCount {
   [key: string]: string
@@ -74,28 +75,6 @@ function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => 
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
 }
 
-/*
-    next 5 cycles: Upcoming
-    current cycle: Active
-    past 5 cycles: Frozen
-    past 5 cycles + : Unfrozen
-*/
-const getRightStatus = (currentCycle: number, cycle: number): string => {
-  if (cycle > currentCycle) {
-    return 'Upcoming'
-  }
-
-  if (cycle === currentCycle) {
-    return 'Active'
-  }
-
-  if (cycle < currentCycle - 5) {
-    return 'Unfrozen'
-  }
-
-  return 'Frozen'
-}
-
 const getRightCycles = (currentCycle: number, limit: number): number[] =>
   _.range(0, limit)
     .map(index => currentCycle + 3 - index)
@@ -131,13 +110,7 @@ export class ApiService {
 
     this.environmentUrls = chainNetworkService.getEnvironment()
     this.environmentVariable = chainNetworkService.getEnvironmentVariable()
-    this.protocol = new TezosProtocol(
-      this.environmentUrls.rpcUrl,
-      this.environmentUrls.conseilUrl,
-      network,
-      this.environmentVariable,
-      this.environmentUrls.conseilApiKey
-    )
+    this.protocol = getTezosProtocol(this.environmentUrls, network)
     this.setProperties()
   }
 
@@ -1079,7 +1052,7 @@ export class ApiService {
   }
 
   getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService)
+    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
 
     return from(protocol.getTransactions(10, cursor))
   }

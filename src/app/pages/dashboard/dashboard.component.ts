@@ -5,8 +5,8 @@ import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { $enum } from 'ts-enum-util'
 import { Actions, ofType } from '@ngrx/effects'
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
-import { MarketDataSample } from '../../services/chartdata/chartdata.service'
 import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import * as fromRoot from '@tezblock/reducers'
@@ -97,7 +97,9 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         this.historicData$.pipe(
           map(data =>
             data.map(dataItem =>
-              pricePeriod === PricePeriod.day ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
+              pricePeriod === PricePeriod.day
+                ? new Date(dataItem.time * 1000).toLocaleTimeString()
+                : new Date(dataItem.time * 1000).toLocaleDateString()
             )
           )
         )

@@ -1,15 +1,7 @@
 import { Injectable } from '@angular/core'
-const cryptocompare = require('cryptocompare')
+import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
-export interface MarketDataSample {
-  time: number
-  close: number
-  high: number
-  low: number
-  open: number
-  volumefrom: string
-  volumeto: number
-}
+const cryptocompare = require('cryptocompare')
 
 @Injectable({
   providedIn: 'root'
