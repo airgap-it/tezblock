@@ -110,10 +110,10 @@
     </ng-template>
     <ng-template #elseTemplate>
       <thead>
-        <tr *ngIf="!loading; else loading">
+        <tr *ngIf="!loading; else noDataLoading">
           <th>{{ noDataLabel || 'No Transactions' }}</th>
         </tr>
-        <ng-template #loading>
+        <ng-template #noDataLoading>
           <app-progressbar></app-progressbar>
         </ng-template>
       </thead>
