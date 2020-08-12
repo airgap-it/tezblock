@@ -18,6 +18,7 @@ import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/cha
 import { initialState as cdInitialState } from './reducer'
 import { OperationTab } from './actions'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { SocialType, Social } from '@tezblock/domain/contract'
 
 describe('ContractDetailComponent', () => {
   let component: ContractDetailComponent
@@ -66,11 +67,11 @@ describe('ContractDetailComponent', () => {
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: undefined }
-  
+
           expectObservable(component.hasAlias$).toBe(expected, expectedValues)
         })
       })
-  
+
       it('when for given address is alias then returns true', () => {
         storeMock.setState({
           ...initialState,
@@ -79,11 +80,11 @@ describe('ContractDetailComponent', () => {
             address: 'tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9'
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: true }
-  
+
           expectObservable(component.hasAlias$).toBe(expected, expectedValues)
         })
       })
@@ -102,11 +103,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: ['foo'] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -123,11 +124,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: ['foo'] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -144,11 +145,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -159,7 +160,7 @@ describe('ContractDetailComponent', () => {
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: undefined }
-  
+
           expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
         })
       })
@@ -172,11 +173,11 @@ describe('ContractDetailComponent', () => {
             contract: { symbol: 'tzBTC' }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: true }
-  
+
           expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
         })
       })
@@ -184,9 +185,21 @@ describe('ContractDetailComponent', () => {
 
     describe('transactions24hCount$', () => {
       it('counts transactions number from last 24h', () => {
-        const transferA = { timestamp: moment().add(-25, 'hours').valueOf() }
-        const transferB = { timestamp: moment().add(-20, 'hours').valueOf() }
-        const transferC = { timestamp: moment().add(-3, 'hours').valueOf() }
+        const transferA = {
+          timestamp: moment()
+            .add(-25, 'hours')
+            .valueOf()
+        }
+        const transferB = {
+          timestamp: moment()
+            .add(-20, 'hours')
+            .valueOf()
+        }
+        const transferC = {
+          timestamp: moment()
+            .add(-3, 'hours')
+            .valueOf()
+        }
 
         storeMock.setState({
           ...initialState,
@@ -194,16 +207,84 @@ describe('ContractDetailComponent', () => {
             ...initialState.contractDetails,
             transferOperations: {
               ...initialState.contractDetails.transferOperations,
-              data: [ transferA, transferB, transferC ]
-             }
+              data: [transferA, transferB, transferC]
+            }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: 2 }
-  
+
           expectObservable(component.transactions24hCount$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('transactions24hVolume$', () => {
+      it('sum transactions from last 24h amount', () => {
+        const transferA = {
+          timestamp: moment()
+            .add(-25, 'hours')
+            .valueOf(),
+          amount: 10
+        }
+        const transferB = {
+          timestamp: moment()
+            .add(-20, 'hours')
+            .valueOf(),
+          amount: 10
+        }
+        const transferC = {
+          timestamp: moment()
+            .add(-3, 'hours')
+            .valueOf(),
+          amount: 10
+        }
+
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            transferOperations: {
+              ...initialState.contractDetails.transferOperations,
+              data: [transferA, transferB, transferC]
+            }
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: 20 }
+
+          expectObservable(component.transactions24hVolume$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('getSocial', () => {
+      it('when no contract then does not emit value', () => {
+        testScheduler.run(({ expectObservable }) => {
+          expectObservable((<any>component).getSocial(() => true)).toBe('---')
+        })
+      })
+
+      it('findts contract social by condition', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            contract: {
+              socials: [{ type: SocialType.github, url: 'foo_url_1' }, { type: SocialType.medium, url: 'foo_url_2' }]
+            }
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: 'foo_url_2' }
+
+          expectObservable((<any>component).getSocial((social: Social) => social.type === SocialType.medium)).toBe(expected, expectedValues)
         })
       })
     })
