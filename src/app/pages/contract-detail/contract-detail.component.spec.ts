@@ -1,58 +1,211 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { Actions } from '@ngrx/effects'
+import { EMPTY } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
+import * as moment from 'moment'
 
 import { ContractDetailComponent } from './contract-detail.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
-import { AddressItemComponent } from './../../components/address-item/address-item.component'
-import { IdenticonComponent } from '@tezblock/components/identicon/identicon'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
-import { TezblockTableComponent } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { AmountCellComponent } from 'src/app/components/tezblock-table/amount-cell/amount-cell.component'
-import { BlockCellComponent } from '@tezblock/components/tezblock-table/block-cell/block-cell.component'
-import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
-import { SymbolCellComponent } from '@tezblock/components/tezblock-table/symbol-cell/symbol-cell.component'
-import { HashCellComponent } from '@tezblock/components/tezblock-table/hash-cell/hash-cell.component'
-import { ModalCellComponent } from '@tezblock/components/tezblock-table/modal-cell/modal-cell.component'
-import { ExtendTableCellComponent } from '@tezblock/components/tezblock-table/extend-table-cell/extend-table-cell.component'
+import { AccountService } from '@tezblock/services/account/account.service'
+import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { initialState as cdInitialState } from './reducer'
+import { OperationTab } from './actions'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 
-xdescribe('ContractDetailComponent', () => {
+describe('ContractDetailComponent', () => {
   let component: ContractDetailComponent
   let fixture: ComponentFixture<ContractDetailComponent>
+  let storeMock: MockStore<any>
+  let testScheduler: TestScheduler
+  const accountServiceMock = getAccountServiceMock()
+  const activatedRouteMock = getActivatedRouteMock()
+  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  const initialState = { contractDetails: cdInitialState }
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      declarations: [ContractDetailComponent],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: Actions, useValue: EMPTY },
+        { provide: AccountService, useValue: accountServiceMock },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        IconPipe,
+        AliasPipe,
+        ShortenStringPipe
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        imports: [FontAwesomeModule],
-        declarations: [
-          ContractDetailComponent,
-          LoadingSkeletonComponent,
-          AddressItemComponent,
-          IdenticonComponent,
-          TezblockTableComponent,
-          AmountCellComponent,
-          BlockCellComponent,
-          TooltipItemComponent,
-          SymbolCellComponent,
-          HashCellComponent,
-          ModalCellComponent,
-          ExtendTableCellComponent
-        ],
-        providers: [IconPipe, AliasPipe]
-      })
-    ).compileComponents()
-  }))
+    testScheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected))
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ContractDetailComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+    storeMock = TestBed.inject(MockStore)
+  }))
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  describe('ngOnInit', () => {
+    beforeEach(() => {
+      component.ngOnInit()
+    })
+
+    describe('hasAlias$', () => {
+      it('when address in falsy then returns address value(undefined/false)', () => {
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: undefined }
+  
+          expectObservable(component.hasAlias$).toBe(expected, expectedValues)
+        })
+      })
+  
+      it('when for given address is alias then returns true', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            address: 'tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9'
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: true }
+  
+          expectObservable(component.hasAlias$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('transactions$', () => {
+      it('when kind is transfers then returns transfer operations', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            currentTabKind: OperationTab.transfers,
+            transferOperations: {
+              ...initialState.contractDetails.transferOperations,
+              data: ['foo']
+            }
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: ['foo'] }
+  
+          expectObservable(component.transactions$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when kind is other then returns other operations', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            currentTabKind: OperationTab.other,
+            otherOperations: {
+              ...initialState.contractDetails.otherOperations,
+              data: ['foo']
+            }
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: ['foo'] }
+  
+          expectObservable(component.transactions$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when kind is tokenHolders then returns paged tokenHolder operations', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            currentTabKind: OperationTab.tokenHolders,
+            tokenHolders: {
+              ...initialState.contractDetails.tokenHolders,
+              data: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+            }
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
+  
+          expectObservable(component.transactions$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('showFiatValue$', () => {
+      it('when contract is falsy then return (contract)falsy value', () => {
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: undefined }
+  
+          expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
+        })
+      })
+
+      it('when contract is convertable to USD then returns true', () => {
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            contract: { symbol: 'tzBTC' }
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: true }
+  
+          expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    describe('transactions24hCount$', () => {
+      it('counts transactions number from last 24h', () => {
+        const transferA = { timestamp: moment().add(-25, 'hours').valueOf() }
+        const transferB = { timestamp: moment().add(-20, 'hours').valueOf() }
+        const transferC = { timestamp: moment().add(-3, 'hours').valueOf() }
+
+        storeMock.setState({
+          ...initialState,
+          contractDetails: {
+            ...initialState.contractDetails,
+            transferOperations: {
+              ...initialState.contractDetails.transferOperations,
+              data: [ transferA, transferB, transferC ]
+             }
+          }
+        })
+  
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = { a: 2 }
+  
+          expectObservable(component.transactions24hCount$).toBe(expected, expectedValues)
+        })
+      })
+    })
   })
 })

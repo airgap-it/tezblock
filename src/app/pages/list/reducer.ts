@@ -32,7 +32,7 @@ export interface State {
   transactionsChartDatasets: { data: number[]; label: string }[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   blocks: getInitialTableState(sort('timestamp', 'desc')),
   transactions: getInitialTableState(sort('block_level', 'desc')),
   doubleBakings: getInitialTableState(sort('block_level', 'desc')),

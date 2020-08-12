@@ -18,7 +18,7 @@ export interface State {
   currentTabKind: actions.OperationTab
 }
 
-const initialState: State = {
+export const initialState: State = {
   manager: undefined,
   address: undefined,
   contract: undefined,

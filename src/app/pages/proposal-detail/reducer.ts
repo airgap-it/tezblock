@@ -45,7 +45,7 @@ export interface State {
   divisionOfVotes: DivisionOfVotes[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   id: undefined,
   proposal: undefined,
   loadingProposal: false,

@@ -28,7 +28,7 @@ export interface Sorting {
   value: string
 }
 
-const initialState: State = {
+export const initialState: State = {
   transactionHash: undefined,
   transactions: getInitialTableState(sort('block_level', 'desc')),
   counts: undefined,
