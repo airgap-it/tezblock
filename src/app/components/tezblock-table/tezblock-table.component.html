@@ -26,12 +26,12 @@
 
 <div class="table-responsive mb-3">
   <table class="table table-hover">
-    <ng-container *ngIf="data?.length > 0; then thenTemplate; else elseTemplate"></ng-container>
+    <ng-container *ngIf="data?.length > 0 || loading; then thenTemplate; else elseTemplate"></ng-container>
     <ng-template #thenTemplate>
       <thead>
         <tr>
           <ng-container *ngFor="let column of columns">
-            <ng-container *ngIf="column.sortable && data.length > 1; else notSortable">
+            <ng-container *ngIf="column.sortable && data?.length > 1; else notSortable">
               <th [width]="column.width" (click)="sorting(column.field)">
                 <button
                   class="btn btn-link p-0 collapse--btn"
@@ -110,12 +110,9 @@
     </ng-template>
     <ng-template #elseTemplate>
       <thead>
-        <tr *ngIf="!loading; else noDataLoading">
+        <tr>
           <th>{{ noDataLabel || 'No Transactions' }}</th>
         </tr>
-        <ng-template #noDataLoading>
-          <app-progressbar></app-progressbar>
-        </ng-template>
       </thead>
     </ng-template>
   </table>
