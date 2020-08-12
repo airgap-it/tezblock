@@ -1,5 +1,5 @@
 import { createReducer, on } from '@ngrx/store'
-import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
@@ -7,6 +7,7 @@ import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces
 import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
@@ -25,7 +26,7 @@ export interface State {
   busy: Busy
   upcomingRights: actions.UpcomingRights
   activeDelegations: number
-  rewards: TableState<TezosRewards>
+  rewards: TableState<ExtendedTezosRewards>
   bakerReward: { [key: string]: TezosPayoutInfo }
   votes: TableState<Transaction>
   endorsingRightItems: { [key: string]: EndorsingRights[] }

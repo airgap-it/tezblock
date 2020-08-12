@@ -36,6 +36,7 @@
     [columns]="context.columns"
     [headerTemplate]="context.headerTemplate"
     [headerContext]="context.headerContext"
+    [key]="context.key"
   ></app-client-side-table>
 </ng-template>
 
@@ -86,13 +87,13 @@
                     <fa-icon *ngIf="data?.acceptsDelegations === undefined" [icon]="'circle' | iconPipe" class="text-primary"></fa-icon>
                   </span>
                   <ng-container *ngIf="data?.acceptsDelegations === true">
-                    Accepts Delegations
+                    {{ 'baker-table.baker-overview.accepts-delegations' | translate }}
                   </ng-container>
                   <ng-container *ngIf="data?.acceptsDelegations === false">
-                    Does Not Accept Delegations
+                    {{ 'baker-table.baker-overview.not-accepts-delegations' | translate }}
                   </ng-container>
                   <ng-container *ngIf="data?.acceptsDelegations === undefined">
-                    Delegation Acceptance Unknown
+                    {{ 'baker-table.baker-overview.unknown-accepts-delegations' | translate }}
                   </ng-container>
                 </div>
               </div>
@@ -144,7 +145,7 @@
                     class="btn btn-sm btn-primary-light w-100"
                     type="button"
                   >
-                    Delegate Now
+                    {{ 'baker-table.baker-overview.delegate-now' | translate }}
                   </button>
                 </div>
               </div>

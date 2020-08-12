@@ -74,6 +74,10 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }, tra
 
   [OperationTypes.Rewards]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
     {
+      name: translateService.instant('baker-table.rewards.status'),
+      field: 'rightStatus'
+    },
+    {
       name: translateService.instant('baker-table.rewards.cycle'),
       field: 'cycle',
       template: Template.basic

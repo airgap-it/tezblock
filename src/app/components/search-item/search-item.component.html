@@ -5,8 +5,8 @@
     [typeahead]="dataEmitter"
     [adaptivePosition]="true"
     [typeaheadMinLength]="0"
-    typeaheadOptionField="name"
-    typeaheadGroupField="type"
+    typeaheadOptionField="label"
+    typeaheadGroupField="optionGroup"
     placeholder="{{ 'search-item.placeholder' | translate }}"
     class="form-control form-control--focus-white"
     (keydown.enter)="onKeyEnter()"
@@ -16,7 +16,7 @@
     [isAnimated]="true"
   />
   <div class="input-group-append">
-    <button class="btn btn-primary" type="submit" (click)="search()">
+    <button class="btn btn-primary" type="submit" (click)="onKeyEnter()">
       <fa-icon
         [icon]="'search' | iconPipe"
         class="text-white"

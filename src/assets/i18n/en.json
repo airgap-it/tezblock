@@ -338,7 +338,11 @@
       "efficiency": "Efficiency",
       "last10cycles": "Last 10 Cycles",
       "next-endorsing-right": "Next Endorsing Right",
-      "baking-bad_tooltip": "Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators."
+      "baking-bad_tooltip": "Baking Bad provides a rating for bakers that meassures the accuracy and timeliness of their reward payouts to their delegators.",
+      "accepts-delegations": "Accepts Delegations",
+      "not-accepts-delegations": "Does Not Accept Delegations",
+      "unknown-accepts-delegations": "Delegation Acceptance Unknown",
+      "delegate-now": "Delegate now"
     },
     "baking-rights": {
       "status": "Status",
@@ -356,7 +360,8 @@
         "rewards": "Rewards",
         "fees": "Fees",
         "deposits": "Deposits",
-        "payout": "Payout"
+        "payout": "Payout",
+        "share": "Share"
       }
     },
     "endorsing-rights": {
@@ -377,6 +382,7 @@
     },
     "rewards": {
       "rewards": "Rewards",
+      "status": "Status",
       "cycle": "Cycle",
       "delegations": "Delegations",
       "staking-balance": "Staking Balance",

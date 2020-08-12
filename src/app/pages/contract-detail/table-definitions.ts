@@ -7,10 +7,10 @@ export const columns: {
   transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }, translateService?: TranslateService) => [
     {
       name: 'From',
-      field: 'from',
+      field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.from, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       field: '',
@@ -19,10 +19,10 @@ export const columns: {
     },
     {
       name: translateService.instant('tezblock-table.transfers.to'),
-      field: 'to',
+      field: 'destination',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.to, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
       name: translateService.instant('tezblock-table.transfers.amount'),
