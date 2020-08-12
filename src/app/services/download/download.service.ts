@@ -127,12 +127,14 @@ export class DownloadService {
         index === 'amount' ||
         index === 'delegatedBalance' ||
         index === 'originatedBalance' ||
+        index === 'balance' ||
         index === 'fee' ||
         index === 'block_level' ||
         index === 'block_hash' ||
         index === 'operation_group_hash' ||
         index === 'gas_limit' ||
-        index === 'storage_limit'
+        index === 'storage_limit' ||
+        index === 'parameters_entrypoints'
       ) {
         row += index + ','
         indexTable.push(index)
