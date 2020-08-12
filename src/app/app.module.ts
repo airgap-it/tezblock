@@ -97,6 +97,7 @@ import { TokenContractOverviewComponent } from './pages/token-contract-overview/
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 import { VarDirective } from '@tezblock/directives/var.directive';
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
+import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 
 @NgModule({
   imports: [
@@ -202,9 +203,9 @@ import { AssetsValueComponent } from './components/assets-value/assets-value.com
     TransactionErrorsComponent,
     TokenContractOverviewComponent,
     VarDirective,
-    AssetsValueComponent
+    AssetsValueComponent,
+    ProgressbarComponent
   ],
-
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]
 })
