@@ -9,7 +9,8 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { sort } from '@tezblock/domain/table'
 import { first, get } from '@tezblock/services/fp'
-import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+import { SearchOptionData } from '@tezblock/services/search/model'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { getAccountByIdBody } from '@tezblock/domain/account'
 
 const accounts = require('src/submodules/tezos_assets/accounts.json')
@@ -32,7 +33,8 @@ export const getBakers = (): JsonAccountData[] =>
       account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
     )
 
-export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean => jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean =>
+  jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
@@ -144,15 +146,15 @@ export class AccountService extends BaseService {
     )
   }
 
-  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOption[]> {
-    const bakers: SearchOption[] = Object.keys(accounts)
-      .map(key => accounts[key])
+  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOptionData[]> {
+    const bakers: SearchOptionData[] = Object.keys(accounts)
+      .map(key => ({ id: key, ...accounts[key] }))
       .filter(
         account =>
           (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
           get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
       )
-      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
+      .map(account => ({ id: account.id, label: account.alias, type: OperationTypes.Baker }))
 
     if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>('accounts', {
@@ -177,7 +179,7 @@ export class AccountService extends BaseService {
               return !isContract
             })
             .map(account => {
-              return { name: account.account_id, type: SearchOptionType.account }
+              return { id: account.account_id, type: OperationTypes.Account }
             })
         )
       )
