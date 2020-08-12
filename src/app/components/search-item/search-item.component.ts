@@ -107,15 +107,20 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     // )
 
     merge(...this.searchService.getSearchSources(this.searchControl.value))
-      .pipe(map(first), filter(negate(isNil)))
+      .pipe(map(first))
       .subscribe(this.search.bind(this))
   }
 
   search(option: SearchOptionData) {
-    this.onSearch.emit(option.id)
-    this.searchService.processSearchSelection(option)
-    this.isValueChangedBySelect = true
-    this.searchControl.setValue('')
+    const _option: SearchOptionData = option || { id: this.searchControl.value, type: undefined }
+
+    this.onSearch.emit(_option.id)
+    this.searchService.processSearchSelection(_option)
+
+    if (_option.type) {
+      this.isValueChangedBySelect = true
+      this.searchControl.setValue('')
+    }
   }
 
   onSelect(e: TypeaheadMatch) {
