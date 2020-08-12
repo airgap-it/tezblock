@@ -9,7 +9,11 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
   [OperationTypes.BakingRights]: (options?: { showFiatValue?: boolean }) => [
     {
       name: 'Status',
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: AggregatedBakingRights) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
     {
       name: 'Cycle',

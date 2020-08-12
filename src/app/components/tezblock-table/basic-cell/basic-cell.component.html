@@ -1,0 +1,6 @@
+<span *ngIf="options; else noOptions" [ngClass]="options.cssClass">
+    {{ data }}
+</span>
+<ng-template #noOptions>
+    {{ data }}
+</ng-template>

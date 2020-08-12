@@ -1,4 +1,6 @@
-<ng-template #basicTemplate let-context>{{ context?.data }}</ng-template>
+<ng-template #basicTemplate let-context>
+  <app-basic-cell [data]="context?.data" [options]="context?.options"></app-basic-cell>
+</ng-template>
 <ng-template #amountTemplate let-context>
   <amount-cell [data]="context?.data" [options]="context?.options"></amount-cell>
 </ng-template>
