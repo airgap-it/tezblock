@@ -20,8 +20,6 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 RUN mkdir /app
 WORKDIR /app
 
-RUN npm install -g npm@6.4.1
-
 # install dependencies
 ADD .npmrc /app/.npmrc
 ADD package.json /app/package.json
