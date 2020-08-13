@@ -289,7 +289,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
-    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
+    this.remainingTime$ = this.store$.select(fromRoot.app.roundedRemainingTime)
     this.transactions$ = this.store$
       .select(state => state.accountDetails.kind)
       .pipe(
