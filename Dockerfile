@@ -40,7 +40,7 @@ ARG GA_KEY
 
 RUN npm config set unsafe-perm true
 RUN npm run set-env
-RUN npm install
+RUN npm ci
 
 ENV NODE_ENV production
 
