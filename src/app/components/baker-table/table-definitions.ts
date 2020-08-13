@@ -4,6 +4,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
+import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
 
 export const columns: { [key: string]: (options: { showFiatValue: boolean }) => Column[] } = {
   [OperationTypes.BakingRights]: (options?: { showFiatValue?: boolean }) => [
@@ -48,7 +49,11 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
   [OperationTypes.EndorsingRights]: (options?: { showFiatValue?: boolean }) => [
     {
       name: 'Status',
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: AggregatedEndorsingRights) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
     {
       name: 'Cycle',
@@ -77,7 +82,11 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
   [OperationTypes.Rewards]: (options?: { showFiatValue?: boolean }) => [
     {
       name: 'Status',
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: ExtendedTezosRewards) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
     {
       name: 'Cycle',
@@ -87,31 +96,31 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
     {
       name: 'Delegations',
       field: 'delegatedContracts',
-      data: (item: TezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
+      data: (item: ExtendedTezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
       template: Template.basic
     },
     {
       name: 'Staking Balance',
       field: 'stakingBalance',
-      data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.stakingBalance, options }),
       template: Template.amount
     },
     {
       name: 'Block Rewards',
       field: 'bakingRewards',
-      data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.bakingRewards, options }),
       template: Template.amount
     },
     {
       name: 'Endorsement Rewards',
       field: 'endorsingRewards',
-      data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.endorsingRewards, options }),
       template: Template.amount
     },
     {
       name: 'Fees',
       field: 'fees',
-      data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
       template: Template.amount
     }
   ]
