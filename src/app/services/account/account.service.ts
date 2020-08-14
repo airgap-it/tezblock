@@ -8,8 +8,29 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { sort } from '@tezblock/domain/table'
 import { first, get } from '@tezblock/services/fp'
-import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
-import { Account, accounts } from '@tezblock/domain/account'
+import { SearchOptionData } from '@tezblock/services/search/model'
+import { OperationTypes } from '@tezblock/domain/operations'
+import { getAccountByIdBody, Account, accounts, jsonAccounts, JsonAccountData } from '@tezblock/domain/account'
+
+export const getAddressesFilteredBy = (phrase: string) =>
+  Object.keys(jsonAccounts).filter(address => {
+    if (!phrase) {
+      return true
+    }
+
+    return address.toLowerCase().includes(phrase.toLowerCase())
+  })
+
+export const getAddressByAlias = (alias: string) => Object.keys(jsonAccounts).find(address => accounts[address].alias === alias)
+
+export const getBakers = (): JsonAccountData[] =>
+  accounts
+    .filter(
+      account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
+    )
+
+export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean =>
+  jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
@@ -25,17 +46,7 @@ export class AccountService extends BaseService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.post<Account[]>('accounts', {
-      predicates: [
-        {
-          field: 'account_id',
-          operation: Operation.eq,
-          set: [id],
-          inverse: false
-        }
-      ],
-      limit: 1
-    }).pipe(map(first))
+    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(map(first))
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
@@ -131,14 +142,14 @@ export class AccountService extends BaseService {
     )
   }
 
-  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOption[]> {
-    const bakers: SearchOption[] = accounts
+  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOptionData[]> {
+    const bakers: SearchOptionData[] = accounts
       .filter(
         account =>
           (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
           get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
       )
-      .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
+      .map(account => ({ id: account.address, label: account.alias, type: OperationTypes.Baker }))
 
     if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>('accounts', {
@@ -162,7 +173,7 @@ export class AccountService extends BaseService {
               return !isContract
             })
             .map(account => {
-              return { name: account.account_id, type: SearchOptionType.account }
+              return { id: account.account_id, type: OperationTypes.Account }
             })
         )
       )

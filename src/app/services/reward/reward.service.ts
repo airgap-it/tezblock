@@ -15,6 +15,7 @@ import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
 import { isNotEmptyArray } from '@tezblock/services/fp'
 import { getTezosProtocol } from '@tezblock/domain/airgap'
+import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -30,6 +31,18 @@ interface BalanceUpdate {
   delegate: string
   cycle: number
   change: string
+}
+
+export interface ExtendedTezosRewards extends TezosRewards {
+  rightStatus: string
+}
+
+const getCyclesWithOnePageInFuture = (currentCycle: number, pagination: Pagination): number[] => {
+  const count = pagination.currentPage * pagination.selectedSize
+
+  return range(0, count)
+    .map(index => currentCycle + pagination.selectedSize - count + index)
+    .sort((a, b) => b - a)
 }
 
 @Injectable({
@@ -53,23 +66,17 @@ export class RewardService {
   }
   environmentUrls = this.chainNetworkService.getEnvironment()
 
-  getLastCycles(pagination: Pagination): Observable<number[]> {
-    return this.getCurrentCycle().pipe(
-      map(currentCycle =>
-        range(0, pagination.currentPage * pagination.selectedSize)
-          .map(index => currentCycle - (index + 1))
-          .filter(cycle => cycle >= 7)
-      )
-    )
-  }
-
   getCycles4Rewards(): Observable<number[]> {
     return this.getCurrentCycle().pipe(map(currentCycle => range(0, 6).map(index => currentCycle - 2 + index)))
   }
 
-  getRewards(address: string, pagination: Pagination, filter?: string): Observable<TezosRewards[]> {
-    return this.getLastCycles(pagination).pipe(
-      switchMap(cycles => (isNotEmptyArray(cycles) ? forkJoin(cycles.map(cycle => this.calculateRewards(address, cycle))) : of([])))
+  getRewards(address: string, pagination: Pagination, filter?: string): Observable<ExtendedTezosRewards[]> {
+    return this.getCurrentCycle().pipe(
+      switchMap(currentCycle =>
+        forkJoin(getCyclesWithOnePageInFuture(currentCycle, pagination).map(cycle => this.calculateRewards(address, cycle))).pipe(
+          map(response => response.map(tezosReward => ({ ...tezosReward, rightStatus: getRightStatus(currentCycle, tezosReward.cycle) })))
+        )
+      )
     )
   }
 

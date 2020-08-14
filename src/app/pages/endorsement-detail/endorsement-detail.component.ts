@@ -14,6 +14,7 @@ import { Slot } from './reducer'
 import { get } from '@tezblock/services/fp'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
+import { squareBrackets } from '@tezblock/domain/pattern'
 
 @Component({
   selector: 'app-endorsement-detail',
@@ -53,11 +54,11 @@ export class EndorsementDetailComponent extends BaseComponent implements OnInit 
     this.slots$ = this.store$.select(state => state.endorsementDetails.slots)
     this.endorsedSlots$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
-      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : slots))
+      map(slots => (slots ? slots.replace(squareBrackets, '') : slots))
     )
     this.endorsedSlotsCount$ = this.selectedEndorsement$.pipe(
       map(get(selectedEndorsement => selectedEndorsement.slots)),
-      map(slots => (slots ? slots.replace(/[\[\]']/g, '') : '')),
+      map(slots => (slots ? slots.replace(squareBrackets, '') : slots)),
       map((slots: string) => slots.split(',').length)
     )
 

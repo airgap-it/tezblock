@@ -27,8 +27,8 @@ import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { TokenContract } from '@tezblock/domain/contract'
 import { sort } from '@tezblock/domain/table'
-import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError } from '@tezblock/domain/operations'
-import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError, OperationTypes } from '@tezblock/domain/operations'
+import { SearchOptionData } from '@tezblock/services/search/model'
 import { getFaProtocol, getTezosProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 import { CacheService, CacheKeys, ByAddressState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
 import { squareBrackets } from '@tezblock/domain/pattern'
@@ -37,6 +37,7 @@ import * as fromApp from '@tezblock/app.reducer'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { AccountService } from '@tezblock/services/account/account.service'
+import { getRightStatus } from '@tezblock/domain/reward'
 
 export interface OperationCount {
   [key: string]: string
@@ -72,28 +73,6 @@ export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...righ
 
 function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
-}
-
-/*
-    next 5 cycles: Upcoming
-    current cycle: Active
-    past 5 cycles: Frozen
-    past 5 cycles + : Unfrozen
-*/
-const getRightStatus = (currentCycle: number, cycle: number): string => {
-  if (cycle > currentCycle) {
-    return 'Upcoming'
-  }
-
-  if (cycle === currentCycle) {
-    return 'Active'
-  }
-
-  if (cycle < currentCycle - 5) {
-    return 'Unfrozen'
-  }
-
-  return 'Frozen'
 }
 
 const getRightCycles = (currentCycle: number, limit: number): number[] =>
@@ -395,12 +374,12 @@ export class ApiService {
       )
   }
 
-  getTransactionHashesStartingWith(id: string): Observable<SearchOption[]> {
+  getTransactionHashesStartingWith(id: string): Observable<SearchOptionData[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
         {
-          fields: ['operation_group_hash'],
+          fields: ['operation_group_hash', 'kind'],
           predicates: [
             {
               field: 'operation_group_hash',
@@ -416,13 +395,16 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.operation_group_hash, type: SearchOptionType.transaction }
+            return {
+              id: item.operation_group_hash,
+              type: item.kind === OperationTypes.Endorsement ? OperationTypes.Endorsement : OperationTypes.Transaction
+            }
           })
         )
       )
   }
 
-  getBlockHashesStartingWith(id: string): Observable<SearchOption[]> {
+  getBlockHashesStartingWith(id: string): Observable<SearchOptionData[]> {
     return this.http
       .post<Block[]>(
         this.blocksApiUrl,
@@ -443,7 +425,7 @@ export class ApiService {
       .pipe(
         map(results =>
           results.map(item => {
-            return { name: item.hash, type: SearchOptionType.block }
+            return { id: item.level.toString(), type: OperationTypes.Block }
           })
         )
       )

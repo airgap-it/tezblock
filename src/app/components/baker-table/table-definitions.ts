@@ -72,6 +72,10 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }) => 
 
   [OperationTypes.Rewards]: (options?: { showFiatValue?: boolean }) => [
     {
+      name: 'Status',
+      field: 'rightStatus'
+    },
+    {
       name: 'Cycle',
       field: 'cycle',
       template: Template.basic

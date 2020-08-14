@@ -1,6 +1,6 @@
 // I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
 import data from 'src/submodules/tezos_assets/accounts.json'
-
+import { Body, Operation } from '@tezblock/services/base.service'
 import { get } from '@tezblock/services/fp'
 
 export interface JsonAccount {
@@ -55,3 +55,16 @@ export const getBakers = (): JsonAccountData[] =>
 
 export const doesAcceptsDelegations = (jsonAccount: JsonAccount): boolean =>
   jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+
+export const getAccountByIdBody = (id: string): Body => ({
+  predicates: [
+    {
+      field: 'account_id',
+      operation: Operation.eq,
+      set: [id],
+      inverse: false
+    }
+  ],
+  limit: 1
+})
+

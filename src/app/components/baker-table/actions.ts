@@ -1,9 +1,10 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRewardsDetail, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { Transaction } from '@tezblock/interfaces/Transaction'
+import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
 
 export interface LevelInTime {
   estimated_time: number
@@ -68,7 +69,7 @@ export const loadActiveDelegationsSucceeded = createAction(
 export const loadActiveDelegationsFailed = createAction(`[${featureName}] Load Active Delegations Failed`, props<{ error: any }>())
 
 export const loadRewards = createAction(`[${featureName}] Load Rewards`)
-export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: TezosRewards[] }>())
+export const loadRewardsSucceeded = createAction(`[${featureName}] Load Rewards Succeeded`, props<{ rewards: ExtendedTezosRewards[] }>())
 export const loadRewardsFailed = createAction(`[${featureName}] Load Rewards Failed`, props<{ error: any }>())
 export const increaseRewardsPageSize = createAction(`[${featureName}] Change Rewards Page Size`)
 

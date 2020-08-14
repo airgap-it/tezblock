@@ -141,6 +141,12 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     this.selectedTab = selectedTab
 
     // TODO: refactor
-    this.enableDownload = selectedTab.kind === 'transaction' || selectedTab.kind === 'delegation' || selectedTab.kind === 'origination'
+    this.enableDownload =
+      selectedTab.kind === 'transaction' ||
+      selectedTab.kind === 'delegation' ||
+      selectedTab.kind === 'origination' ||
+      selectedTab.kind === 'transfers' ||
+      selectedTab.kind === 'token holders' ||
+      selectedTab.kind === 'other'
   }
 }

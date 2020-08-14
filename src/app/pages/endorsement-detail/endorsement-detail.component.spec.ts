@@ -1,46 +1,90 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { RouterTestingModule } from '@angular/router/testing'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { TestScheduler } from 'rxjs/testing'
 import { MomentModule } from 'ngx-moment'
-import { Actions } from '@ngrx/effects'
-import { TooltipModule } from 'ngx-bootstrap/tooltip'
-import { EMPTY } from 'rxjs'
+import { ActivatedRoute } from '@angular/router'
 
-import { UnitHelper } from 'test-config/unit-test-helper'
 import { EndorsementDetailComponent } from './endorsement-detail.component'
-import { AddressItemComponent } from './../../components/address-item/address-item.component'
-import { IdenticonComponent } from 'src/app/components/identicon/identicon'
-import { LoadingSkeletonComponent } from 'src/app/components/loading-skeleton/loading-skeleton.component'
-import { TooltipItemComponent } from 'src/app/components/tooltip-item/tooltip-item.component'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { initialState as edInitialState } from './reducer'
+import { CopyService } from 'src/app/services/copy/copy.service'
+import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 
-xdescribe('EndorsementDetailComponent', () => {
+describe('EndorsementDetailComponent', () => {
   let component: EndorsementDetailComponent
   let fixture: ComponentFixture<EndorsementDetailComponent>
+  let storeMock: MockStore<any>
+  let testScheduler: TestScheduler
+  const activatedRouteMock = getActivatedRouteMock()
+  const initialState = { endorsementDetails: edInitialState }
+  const copyServiceMock = getCopyServiceMock()
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule.withRoutes([])],
+      declarations: [EndorsementDetailComponent],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: CopyService, useValue: copyServiceMock },
+        AliasPipe,
+        ShortenStringPipe
+      ]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        imports: [FontAwesomeModule, MomentModule, TooltipModule.forRoot()],
-        declarations: [
-          AddressItemComponent,
-          IdenticonComponent,
-          LoadingSkeletonComponent,
-          EndorsementDetailComponent,
-          TooltipItemComponent
-        ],
-        providers: [{ provide: Actions, useValue: EMPTY }]
-      })
-    ).compileComponents()
-  }))
+    testScheduler = new TestScheduler((actual, expected) => expect(actual).toEqual(expected))
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(EndorsementDetailComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+    storeMock = TestBed.inject(MockStore)
+  }))
 
   it('should create', () => {
     expect(component).toBeTruthy()
+  })
+
+  it('endorsedSlots$: removes brackets from slots', () => {
+    storeMock.setState({
+      ...initialState,
+      endorsementDetails: {
+        ...initialState.endorsementDetails,
+        selectedEndorsement: {
+          slots: '[1,2,3]'
+        }
+      }
+    })
+
+    component.ngOnInit()
+
+    testScheduler.run(({ expectObservable }) => {
+      const expected = 'a'
+      const expectedValues = { a: '1,2,3' }
+
+      expectObservable(component.endorsedSlots$).toBe(expected, expectedValues)
+    })
+  })
+
+  it('endorsedSlotsCount$: counts numbers in string omitting brackets', () => {
+    storeMock.setState({
+      ...initialState,
+      endorsementDetails: {
+        ...initialState.endorsementDetails,
+        selectedEndorsement: {
+          slots: '[1,2,3]'
+        }
+      }
+    })
+
+    component.ngOnInit()
+
+    testScheduler.run(({ expectObservable }) => {
+      const expected = 'a'
+      const expectedValues = { a: 3 }
+
+      expectObservable(component.endorsedSlotsCount$).toBe(expected, expectedValues)
+    })
   })
 })

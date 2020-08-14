@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { Observable, combineLatest } from 'rxjs'
+import { Observable } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
