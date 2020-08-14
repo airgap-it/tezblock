@@ -4,7 +4,7 @@
 
 tezblock is a block explorer for [Tezos](https://tezos.com), an open-source platform for assets and applications, backed by a global community of validators, researchers, and builders. tezblock is being built by [Papers](https://papers.ch/en), the team behind [AirGap](https://airgap.it).
 
-👉 [tezblock.io](https://tezblock.io) for the live version.
+👉 [tezblock.io](https://tezblock.io) for the live version
 
 ## Local Deployment
 
