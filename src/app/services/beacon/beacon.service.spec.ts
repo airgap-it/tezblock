@@ -34,17 +34,7 @@ describe('BeaconService', () => {
         dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(false))
       })
 
-      it('then calls DAppClient.requestPermissions', done => {
-        chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.MAINNET)
-
-        service.delegate('foo').then(() => {
-          expect(dAppClientMock.requestPermissions).toHaveBeenCalledWith(undefined)
-
-          done()
-        })
-      })
-
-      it('and network is not MAINNET then calls DAppClient.requestPermissions with object', done => {
+      it('and network is CARTHAGENET then calls DAppClient.requestPermissions with CARTHAGENET', done => {
         const argument = {
           network: {
             type: NetworkType.CARTHAGENET
