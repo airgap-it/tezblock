@@ -145,6 +145,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       selectedTab.kind === 'transaction' ||
       selectedTab.kind === 'delegation' ||
       selectedTab.kind === 'origination' ||
-      selectedTab.kind === 'transfers'
+      selectedTab.kind === 'transfers' ||
+      selectedTab.kind === 'token holders' ||
+      selectedTab.kind === 'other'
   }
 }

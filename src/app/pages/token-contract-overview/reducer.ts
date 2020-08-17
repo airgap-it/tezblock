@@ -8,7 +8,7 @@ export interface State {
   tokenContracts: TableState<TokenContract>
 }
 
-const initialState: State = {
+export const initialState: State = {
   tokenContracts: getInitialTableState()
 }
 

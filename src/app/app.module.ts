@@ -96,7 +96,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 import { VarDirective } from '@tezblock/directives/var.directive';
-import { AssetsValueComponent } from './components/assets-value/assets-value.component';
+import { AssetsValueComponent } from './components/assets-value/assets-value.component'
+import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 
 @NgModule({
@@ -204,9 +205,9 @@ import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic
     TokenContractOverviewComponent,
     VarDirective,
     AssetsValueComponent,
-    BasicCellComponent
+    ProgressbarComponent,
+	BasicCellComponent
   ],
-
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]
 })

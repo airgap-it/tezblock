@@ -1,30 +1,25 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
-import { TooltipModule } from 'ngx-bootstrap/tooltip'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { HealthComponent } from './health.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
-import { TimestampCellComponent } from '@tezblock/components/tezblock-table/timestamp-cell/timestamp-cell.component'
+import { initialState as hInitialState } from './reducer'
 
-xdescribe('HealthComponent', () => {
+describe('HealthComponent', () => {
   let component: HealthComponent
   let fixture: ComponentFixture<HealthComponent>
+  const initialState = { health: hInitialState }
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      declarations: [HealthComponent],
+      providers: [provideMockStore({ initialState })],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        imports: [TooltipModule.forRoot()],
-        declarations: [TimestampCellComponent, HealthComponent]
-      })
-    ).compileComponents()
-  }))
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(HealthComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+  }))
 
   it('should create', () => {
     expect(component).toBeTruthy()

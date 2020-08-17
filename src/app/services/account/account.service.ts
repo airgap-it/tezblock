@@ -11,6 +11,7 @@ import { sort } from '@tezblock/domain/table'
 import { first, get } from '@tezblock/services/fp'
 import { SearchOptionData } from '@tezblock/services/search/model'
 import { OperationTypes } from '@tezblock/domain/operations'
+import { getAccountByIdBody } from '@tezblock/domain/account'
 
 const accounts = require('src/submodules/tezos_assets/accounts.json')
 
@@ -49,17 +50,7 @@ export class AccountService extends BaseService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.post<Account[]>('accounts', {
-      predicates: [
-        {
-          field: 'account_id',
-          operation: Operation.eq,
-          set: [id],
-          inverse: false
-        }
-      ],
-      limit: 1
-    }).pipe(map(first))
+    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(map(first))
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
