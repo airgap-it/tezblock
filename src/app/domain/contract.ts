@@ -151,8 +151,7 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
   }
 }
 
-// ask Pascal if all contracts can have token holders ( why I had this condition )
-export const hasTokenHolders = (contract: TokenContract): boolean => true // ['Staker', 'tzBTC'].includes(contract.name)
+export const hasTokenHolders = (contract: TokenContract): boolean => ['STKR', 'tzBTC', 'USDtz'].includes(contract.symbol)
 
 export interface TokenHolder {
   address: string
