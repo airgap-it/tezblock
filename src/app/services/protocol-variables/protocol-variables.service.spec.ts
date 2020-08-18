@@ -11,7 +11,7 @@ xdescribe('ProtocolVariablesService', () => {
   });
 
   it('should be created', () => {
-    const service: ProtocolVariablesService = TestBed.get(ProtocolVariablesService);
+    const service: ProtocolVariablesService = TestBed.inject(ProtocolVariablesService);
     expect(service).toBeTruthy();
   });
 });

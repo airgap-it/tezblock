@@ -17,6 +17,14 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "lodash",
+              "bignumber.js",
+              "myetherwallet-blockies",
+              "chartjs-plugin-piechart-outlabels",
+              "@airgap/beacon-sdk",
+              "airgap-coin-lib"
+            ],
             "aot": true,
             "outputPath": "dist/browser",
             "index": "src/index.html",

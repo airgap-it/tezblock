@@ -2,7 +2,7 @@ import { createAction, props } from '@ngrx/store'
 import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { GetDelegatedAccountsResponseDto } from '@tezblock/services/account/account.service'
 import { Balance } from '@tezblock/services/api/api.service'
 import { Count } from '@tezblock/domain/tab'
