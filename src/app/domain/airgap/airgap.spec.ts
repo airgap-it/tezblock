@@ -2,7 +2,7 @@ import { ProtocolSymbols, MainProtocolSymbols, SubProtocolSymbols } from 'airgap
 
 import { convertSymbol, isConvertableToUSD, isInBTC } from './airgap'
 
-fdescribe('airgap', () => {
+describe('airgap', () => {
     describe('convertSymbol', () => {
         it('when executed with nill value returns undefined', () => {
             expect(convertSymbol(null)).toBe(undefined)
