@@ -61,7 +61,6 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
   constructor(
     private readonly actions$: Actions,
-    private readonly route: ActivatedRoute,
     private readonly copyService: CopyService,
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
@@ -70,10 +69,10 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly activatedRoute: ActivatedRoute,
     private titleService: Title,
     private metaTagService: Meta,
-
     private aliasService: AliasService
   ) {
     super()
+    
     this.store$.dispatch(actions.reset())
   }
 
@@ -107,7 +106,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
       .pipe(map(transactions => (transactions || []).filter(isAsset).map(transactionToAsset)))
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe(paramMap => {
         this.store$.dispatch(actions.loadTransactionsByHash({ transactionHash: paramMap.get('id') }))
         this.setTabs(paramMap.get('id'))
       }),

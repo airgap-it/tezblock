@@ -1,10 +1,16 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { TranslateService } from '@ngx-translate/core'
 
+export interface Options {
+  pageId: string
+  showFiatValue: boolean
+  symbol: string
+}
+
 export const columns: {
-  [key: string]: (options: { pageId: string; showFiatValue: boolean; symbol: string }, translateService?: TranslateService) => Column[]
+  [key: string]: (options?: Options, translateService?: TranslateService) => Column[]
 } = {
-  transfers: (options: { pageId: string; showFiatValue: boolean; symbol: string }, translateService?: TranslateService) => [
+  transfers: (options: Options, translateService?: TranslateService) => [
     {
       name: 'From',
       field: 'source',
@@ -63,7 +69,7 @@ export const columns: {
       template: Template.hash
     }
   ],
-  other: (options: { pageId: string; showFiatValue: boolean; symbol: string }, translateService?: TranslateService) => [
+  other: (options: Options, translateService?: TranslateService) => [
     {
       name: translateService.instant('tezblock-table.transfers.from'),
       field: 'source',
@@ -125,7 +131,13 @@ export const columns: {
       template: Template.hash
     }
   ],
-  tokenHolders: (options: { pageId: string; showFiatValue: boolean; symbol: string }) => [
+  entrypoints: (options?: Options) => [
+    {
+      name: 'Entrypoint',
+      data: (item: string) => ({ data: item })
+    }
+  ],
+  tokenHolders: (options: Options) => [
     {
       name: 'Account',
       field: 'address',

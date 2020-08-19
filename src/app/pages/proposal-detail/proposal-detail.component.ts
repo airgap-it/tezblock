@@ -72,6 +72,60 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   ) {
     super()
     this.store$.dispatch(actions.reset())
+  }
+
+  ngOnInit() {
+    this.titleService.setTitle(`Proposal ${this.aliasService.getFormattedAddress(this.proposalHash)} - tezblock`)
+    this.metaTagService.updateTag({
+      name: 'description',
+      content: `Tezos Proposal Hash ${this.proposalHash}. The name, period, discussion, features, documentation, exploration, testing and promotion of the proposal are detailed on tezblock.">`
+    })
+    this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
+    this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
+    this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
+    this.periodTimespan$ = combineLatest(
+      this.store$.select(state => state.proposalDetails.periodKind),
+      this.store$.select(state => state.proposalDetails.periodsTimespans)
+    ).pipe(
+      filter(([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans),
+      map(
+        ([periodKind, periodsTimespans]) =>
+          periodsTimespans[
+            [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
+          ]
+      )
+    )
+    this.noDataLabel$ = this.store$
+      .select(state => state.proposalDetails.periodKind)
+      .pipe(
+        withLatestFrom(this.store$.select(state => state.proposalDetails.proposal)),
+        filter(([periodKind, proposal]) => !!proposal),
+        map(([periodKind, proposal]) =>
+          periodKind === PeriodKind.Testing
+            ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+            : undefined
+        )
+      )
+    this.periodKind$ = this.store$
+      .select(state => state.proposalDetails.periodKind)
+      .pipe(
+        filter(negate(isNil)),
+        map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
+      )
+    this.yayRolls$ = this.store$.select(fromRoot.proposalDetails.yayRolls)
+    this.nayRolls$ = this.store$.select(fromRoot.proposalDetails.nayRolls)
+    this.passRolls$ = this.store$.select(fromRoot.proposalDetails.passRolls)
+    this.yayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.yayRollsPercentage)
+    this.nayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.nayRollsPercentage)
+    this.showRolls$ = combineLatest(
+      this.store$.select(state => state.proposalDetails.periodKind),
+      this.yayRolls$
+    ).pipe(
+      map(
+        ([periodKind, yayRolls]) =>
+          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(periodKind) !== -1 && yayRolls !== undefined
+      )
+    )
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
@@ -123,60 +177,6 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
           })
         )
         .subscribe(([refreshNo, periodKind]) => this.store$.dispatch(actions.loadVotes({ periodKind })))
-    )
-    this.titleService.setTitle(`Proposal ${this.aliasService.getFormattedAddress(this.proposalHash)} - tezblock`)
-    this.metaTagService.updateTag({
-      name: 'description',
-      content: `Tezos Proposal Hash ${this.proposalHash}. The name, period, discussion, features, documentation, exploration, testing and promotion of the proposal are detailed on tezblock.">`
-    })
-  }
-
-  ngOnInit() {
-    this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
-    this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
-    this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
-    this.periodTimespan$ = combineLatest(
-      this.store$.select(state => state.proposalDetails.periodKind),
-      this.store$.select(state => state.proposalDetails.periodsTimespans)
-    ).pipe(
-      filter(([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans),
-      map(
-        ([periodKind, periodsTimespans]) =>
-          periodsTimespans[
-            [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
-          ]
-      )
-    )
-    this.noDataLabel$ = this.store$
-      .select(state => state.proposalDetails.periodKind)
-      .pipe(
-        withLatestFrom(this.store$.select(state => state.proposalDetails.proposal)),
-        filter(([periodKind, proposal]) => !!proposal),
-        map(([periodKind, proposal]) =>
-          periodKind === PeriodKind.Testing
-            ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
-            : undefined
-        )
-      )
-    this.periodKind$ = this.store$
-      .select(state => state.proposalDetails.periodKind)
-      .pipe(
-        filter(negate(isNil)),
-        map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
-      )
-    this.yayRolls$ = this.store$.select(fromRoot.proposalDetails.yayRolls)
-    this.nayRolls$ = this.store$.select(fromRoot.proposalDetails.nayRolls)
-    this.passRolls$ = this.store$.select(fromRoot.proposalDetails.passRolls)
-    this.yayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.yayRollsPercentage)
-    this.nayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.nayRollsPercentage)
-    this.showRolls$ = combineLatest(
-      this.store$.select(state => state.proposalDetails.periodKind),
-      this.yayRolls$
-    ).pipe(
-      map(
-        ([periodKind, yayRolls]) =>
-          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(periodKind) !== -1 && yayRolls !== undefined
-      )
     )
   }
 

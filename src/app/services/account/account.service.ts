@@ -3,7 +3,6 @@ import { forkJoin, Observable, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { HttpClient } from '@angular/common/http'
 
-import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
 import { Transaction } from 'src/app/interfaces/Transaction'
 import { BaseService, Operation } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -11,11 +10,10 @@ import { sort } from '@tezblock/domain/table'
 import { first, get } from '@tezblock/services/fp'
 import { SearchOptionData } from '@tezblock/services/search/model'
 import { OperationTypes } from '@tezblock/domain/operations'
-
-const accounts = require('src/submodules/tezos_assets/accounts.json')
+import { getAccountByIdBody, Account, accounts, jsonAccounts, JsonAccountData } from '@tezblock/domain/account'
 
 export const getAddressesFilteredBy = (phrase: string) =>
-  Object.keys(accounts).filter(address => {
+  Object.keys(jsonAccounts).filter(address => {
     if (!phrase) {
       return true
     }
@@ -23,11 +21,10 @@ export const getAddressesFilteredBy = (phrase: string) =>
     return address.toLowerCase().includes(phrase.toLowerCase())
   })
 
-export const getAddressByAlias = (alias: string) => Object.keys(accounts).find(address => accounts[address].alias === alias)
+export const getAddressByAlias = (alias: string) => Object.keys(jsonAccounts).find(address => accounts[address].alias === alias)
 
 export const getBakers = (): JsonAccountData[] =>
-  Object.keys(accounts)
-    .map(address => ({ ...accounts[address], address }))
+  accounts
     .filter(
       account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
     )
@@ -49,17 +46,7 @@ export class AccountService extends BaseService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.post<Account[]>('accounts', {
-      predicates: [
-        {
-          field: 'account_id',
-          operation: Operation.eq,
-          set: [id],
-          inverse: false
-        }
-      ],
-      limit: 1
-    }).pipe(map(first))
+    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(map(first))
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
@@ -156,14 +143,13 @@ export class AccountService extends BaseService {
   }
 
   getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOptionData[]> {
-    const bakers: SearchOptionData[] = Object.keys(accounts)
-      .map(key => ({ id: key, ...accounts[key] }))
+    const bakers: SearchOptionData[] = accounts
       .filter(
         account =>
           (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
           get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
       )
-      .map(account => ({ id: account.id, label: account.alias, type: OperationTypes.Baker }))
+      .map(account => ({ id: account.address, label: account.alias, type: OperationTypes.Baker }))
 
     if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>('accounts', {
@@ -181,9 +167,8 @@ export class AccountService extends BaseService {
         map(_accounts =>
           _accounts
             .filter(account => {
-              const isContract = Object.keys(accounts)
-                .map(key => ({ ...accounts[key], id: key }))
-                .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
+              const isContract = accounts
+                .some(_account => _account.address === account.account_id && _account.accountType === 'contract')
 
               return !isContract
             })

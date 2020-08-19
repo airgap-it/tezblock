@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common'
-import { HttpClientModule, HttpClient } from '@angular/common/http'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -43,6 +43,7 @@ import { HeaderItemComponent } from './components/header-item/header-item.compon
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
+import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -104,7 +105,6 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
 }
-
 @NgModule({
   imports: [
     AlertModule.forRoot(),
@@ -218,9 +218,9 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     TokenContractOverviewComponent,
     GlossaryComponent,
     VarDirective,
-    AssetsValueComponent
+    AssetsValueComponent,
+    ProgressbarComponent
   ],
-
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]
 })

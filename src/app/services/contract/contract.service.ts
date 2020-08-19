@@ -6,7 +6,7 @@ import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC, TezosUSD, IAirGapTransaction } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
+import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
 import { getFaProtocol, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
@@ -231,5 +231,13 @@ export class ContractService extends BaseService {
     const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
 
     return from(protocol.getTotalSupply())
+  }
+
+  loadEntrypoints(id: string): Observable<string[]> {
+    return this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`, true).pipe(
+      map((response: any) => {
+        return Object.keys(response.entrypoints)
+      })
+    )
   }
 }

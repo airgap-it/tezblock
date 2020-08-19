@@ -3,7 +3,7 @@ import { Column, Template, blockAndTxHashColumns } from '@tezblock/components/te
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { squareBrackets } from '@tezblock/domain/pattern'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { TranslateService } from '@ngx-translate/core'
 
 export const columns: { [key: string]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => Column[] } = {

@@ -7,7 +7,7 @@ import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
 import { Block } from '@tezblock/interfaces/Block'
 import { sort } from '@tezblock/domain/table'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 
 export interface State {
@@ -32,7 +32,7 @@ export interface State {
   transactionsChartDatasets: { data: number[]; label: string }[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   blocks: getInitialTableState(sort('timestamp', 'desc')),
   transactions: getInitialTableState(sort('block_level', 'desc')),
   doubleBakings: getInitialTableState(sort('block_level', 'desc')),

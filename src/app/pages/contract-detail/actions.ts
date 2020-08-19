@@ -10,6 +10,7 @@ const featureName = 'Contract Detail'
 export enum OperationTab {
   transfers = 'transfers',
   other = 'other',
+  entrypoints = 'entrypoints',
   tokenHolders = 'token holders'
 }
 
@@ -47,6 +48,11 @@ export const loadTokenHolders = createAction(`[${featureName}] Load Token Holder
 export const loadTokenHoldersSucceeded = createAction(`[${featureName}] Load Token Holders Succeeded`, props<{ data: TokenHolder[] }>())
 export const loadTokenHoldersFailed = createAction(`[${featureName}] Load Token Holders Failed`, props<{ error: any }>())
 export const loadMoreTokenHolders = createAction(`[${featureName}] Load More Token Holders`)
+
+export const loadEntrypoints = createAction(`[${featureName}] Load Entrypoints`, props<{ id: string }>())
+export const loadEntrypointsSucceeded = createAction(`[${featureName}] Load Entrypoints Succeeded`, props<{ data: string[] }>())
+export const loadEntrypointsFailed = createAction(`[${featureName}] Load Entrypoints Failed`, props<{ error: any }>())
+export const loadMoreEntrypoints = createAction(`[${featureName}] Load More Entrypoints`)
 
 export const loadOperationsCount = createAction(`[${featureName}] Load Operations Count`, props<{ contractHash: string }>())
 export const loadOperationsCountSucceeded = createAction(
