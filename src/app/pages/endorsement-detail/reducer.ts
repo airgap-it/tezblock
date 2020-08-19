@@ -41,7 +41,7 @@ export interface State {
   slots: Slot[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   endorsements: undefined,
   selectedEndorsement: undefined,
   slots: undefined

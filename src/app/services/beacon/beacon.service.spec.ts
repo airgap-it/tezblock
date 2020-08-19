@@ -17,7 +17,7 @@ describe('BeaconService', () => {
       providers: [{ provide: ChainNetworkService, useValue: chainNetworkServiceMock }]
     })
 
-    service = TestBed.get(BeaconService)
+    service = TestBed.inject(BeaconService)
   })
 
   it('should be created', () => {

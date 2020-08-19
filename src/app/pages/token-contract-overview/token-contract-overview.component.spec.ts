@@ -1,27 +1,27 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { provideMockStore, MockStore } from '@ngrx/store/testing'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
+import { Actions } from '@ngrx/effects'
+import { EMPTY } from 'rxjs'
 
 import { TokenContractOverviewComponent } from './token-contract-overview.component'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { initialState as tcoInitialState } from './reducer'
 
-xdescribe('TokenContractOverviewComponent', () => {
+describe('TokenContractOverviewComponent', () => {
   let component: TokenContractOverviewComponent
   let fixture: ComponentFixture<TokenContractOverviewComponent>
+  const initialState = { tokenContractOveview: tcoInitialState }
 
   beforeEach(async(() => {
-    const unitHelper = new UnitHelper()
+    TestBed.configureTestingModule({
+      declarations: [TokenContractOverviewComponent],
+      providers: [provideMockStore({ initialState }), { provide: Actions, useValue: EMPTY }],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        declarations: [TokenContractOverviewComponent]
-      })
-    ).compileComponents()
-  }))
-
-  beforeEach(() => {
     fixture = TestBed.createComponent(TokenContractOverviewComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+  }))
 
   it('should create', () => {
     expect(component).toBeTruthy()
