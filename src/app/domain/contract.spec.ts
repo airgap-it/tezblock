@@ -2,7 +2,8 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 import BigNumber from 'bignumber.js'
 
 import { getCurrencyConverterPipeArgs, getTokenContractByAddress, isAsset, searchTokenContracts } from './contract'
-import { SearchOptionType } from '@tezblock/services/search/model'
+import { SearchOptionData } from '@tezblock/services/search/model'
+import { OperationTypes } from '@tezblock/domain/operations'
 import { Currency } from '@tezblock/domain/airgap'
 
 const tzBTCaddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
@@ -28,7 +29,9 @@ describe('contract', () => {
     })
 
     it('when contract by part name exist in given network then returns array with option for that contract', () => {
-      expect(searchTokenContracts('btc', TezosNetwork.MAINNET)).toEqual([{ name: 'tzBTC', type: SearchOptionType.faContract }])
+      const response = searchTokenContracts('btc', TezosNetwork.MAINNET)
+      
+      expect(<any>response[0]).toEqual(jasmine.objectContaining({ label: 'tzBTC', type: OperationTypes.TokenContract }))
     })
   })
 
