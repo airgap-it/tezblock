@@ -63,10 +63,11 @@ export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T
     get: (pagination: Pagination, filter?: any) => {
       const startItem = (pagination.currentPage - 1) * pagination.selectedSize
       const endItem = pagination.currentPage * pagination.selectedSize
+      const _data = data.filter(_filterCondition(filter))
       
       return of({
-        data: data.slice(startItem, endItem).filter(_filterCondition(filter)),
-        total: data.filter(_filterCondition(filter)).length
+        data: _data.slice(startItem, endItem),
+        total: _data.length
       })
     },
     isFilterable: !!filterCondition
