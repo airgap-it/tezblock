@@ -4,6 +4,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { ResourcesWalletsComponent } from './resources-wallets.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ResourcesWalletsComponent', () => {
   let component: ResourcesWalletsComponent
@@ -11,9 +14,13 @@ describe('ResourcesWalletsComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [IconPipe],
+      providers: [
+        IconPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
+      ],
       imports: [FontAwesomeModule],
-      declarations: [ResourcesWalletsComponent],
+      declarations: [ResourcesWalletsComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 

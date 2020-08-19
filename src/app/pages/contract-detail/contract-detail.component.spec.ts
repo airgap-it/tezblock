@@ -5,7 +5,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { ContractDetailComponent } from './contract-detail.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
@@ -18,6 +18,9 @@ import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/cha
 import { initialState as cdInitialState } from './reducer'
 import { OperationTab } from './actions'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ContractDetailComponent', () => {
   let component: ContractDetailComponent
@@ -31,7 +34,7 @@ describe('ContractDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ContractDetailComponent],
+      declarations: [ContractDetailComponent, TranslatePipe],
       providers: [
         provideMockStore({ initialState }),
         { provide: Actions, useValue: EMPTY },
@@ -40,7 +43,9 @@ describe('ContractDetailComponent', () => {
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         IconPipe,
         AliasPipe,
-        ShortenStringPipe
+        ShortenStringPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -66,11 +71,11 @@ describe('ContractDetailComponent', () => {
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: undefined }
-  
+
           expectObservable(component.hasAlias$).toBe(expected, expectedValues)
         })
       })
-  
+
       it('when for given address is alias then returns true', () => {
         storeMock.setState({
           ...initialState,
@@ -79,11 +84,11 @@ describe('ContractDetailComponent', () => {
             address: 'tz1LJycSuCT25AA5VJwNW1QYXVGyy7YLwZh9'
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: true }
-  
+
           expectObservable(component.hasAlias$).toBe(expected, expectedValues)
         })
       })
@@ -102,11 +107,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: ['foo'] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -123,11 +128,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: ['foo'] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -144,11 +149,11 @@ describe('ContractDetailComponent', () => {
             }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] }
-  
+
           expectObservable(component.transactions$).toBe(expected, expectedValues)
         })
       })
@@ -159,7 +164,7 @@ describe('ContractDetailComponent', () => {
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: undefined }
-  
+
           expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
         })
       })
@@ -172,11 +177,11 @@ describe('ContractDetailComponent', () => {
             contract: { symbol: 'tzBTC' }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: true }
-  
+
           expectObservable(component.showFiatValue$).toBe(expected, expectedValues)
         })
       })
@@ -184,9 +189,21 @@ describe('ContractDetailComponent', () => {
 
     describe('transactions24hCount$', () => {
       it('counts transactions number from last 24h', () => {
-        const transferA = { timestamp: moment().add(-25, 'hours').valueOf() }
-        const transferB = { timestamp: moment().add(-20, 'hours').valueOf() }
-        const transferC = { timestamp: moment().add(-3, 'hours').valueOf() }
+        const transferA = {
+          timestamp: moment()
+            .add(-25, 'hours')
+            .valueOf()
+        }
+        const transferB = {
+          timestamp: moment()
+            .add(-20, 'hours')
+            .valueOf()
+        }
+        const transferC = {
+          timestamp: moment()
+            .add(-3, 'hours')
+            .valueOf()
+        }
 
         storeMock.setState({
           ...initialState,
@@ -194,15 +211,15 @@ describe('ContractDetailComponent', () => {
             ...initialState.contractDetails,
             transferOperations: {
               ...initialState.contractDetails.transferOperations,
-              data: [ transferA, transferB, transferC ]
-             }
+              data: [transferA, transferB, transferC]
+            }
           }
         })
-  
+
         testScheduler.run(({ expectObservable }) => {
           const expected = 'a'
           const expectedValues = { a: 2 }
-  
+
           expectObservable(component.transactions24hCount$).toBe(expected, expectedValues)
         })
       })

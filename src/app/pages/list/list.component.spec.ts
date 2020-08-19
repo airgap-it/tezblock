@@ -6,7 +6,7 @@ import { MomentModule } from 'ngx-moment'
 import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 import { Actions } from '@ngrx/effects'
-import * as moment from 'moment'
+import moment from 'moment'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
@@ -16,6 +16,9 @@ import { initialState as lInitialState } from './reducer'
 import { TransactionChartItem } from './actions'
 
 import { ListComponent, timestampsToCountsPerDay, toAmountPerDay } from './list.component'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ListComponent', () => {
   let component: ListComponent
@@ -34,10 +37,12 @@ describe('ListComponent', () => {
           provide: ActivatedRoute,
           useValue: activatedRouteMock
         },
-        provideMockStore({ initialState })
+        provideMockStore({ initialState }),
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       imports: [RouterTestingModule.withRoutes([]), MomentModule],
-      declarations: [ListComponent],
+      declarations: [ListComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 
@@ -100,41 +105,45 @@ describe('ListComponent', () => {
         component.ngOnInit()
         activatedRouteMock.paramMap.next(getParamMapValue('transaction'))
 
-        expect(component.transactionsChartOptions.tooltips.callbacks.label(
-          {
-            datasetIndex: 1,
-            index: 0
-          },
-          {
-            datasets: [
-              null,
-              { 
-                label: 'foo',
-                data: [7]
-              }
-            ]
-          }
-        )).toBe('foo: 7K ꜩ')
+        expect(
+          component.transactionsChartOptions.tooltips.callbacks.label(
+            {
+              datasetIndex: 1,
+              index: 0
+            },
+            {
+              datasets: [
+                null,
+                {
+                  label: 'foo',
+                  data: [7]
+                }
+              ]
+            }
+          )
+        ).toBe('foo: 7K ꜩ')
       })
 
       it('when tooltipItems datasetIndex is 0 then returns data in pattern "{label}: {value}"', () => {
         component.ngOnInit()
         activatedRouteMock.paramMap.next(getParamMapValue('transaction'))
 
-        expect(component.transactionsChartOptions.tooltips.callbacks.label(
-          {
-            datasetIndex: 0,
-            index: 0
-          },
-          {
-            datasets: [
-              { 
-                label: 'foo',
-                data: [7]
-              }
-            ]
-          }
-        )).toBe('foo: 7')
+        expect(
+          component.transactionsChartOptions.tooltips.callbacks.label(
+            {
+              datasetIndex: 0,
+              index: 0
+            },
+            {
+              datasets: [
+                {
+                  label: 'foo',
+                  data: [7]
+                }
+              ]
+            }
+          )
+        ).toBe('foo: 7')
       })
     })
   })
