@@ -18,11 +18,12 @@ import { RewardService } from '@tezblock/services/reward/reward.service'
 import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.mock'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { DataSource } from '@tezblock/domain/table'
-import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core'
+import { TranslateModule, TranslateService, TranslateLoader, TranslatePipe } from '@ngx-translate/core'
 import { HttpClient } from '@angular/common/http'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { HttpClientTestingModule } from '@angular/common/http/testing'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -58,9 +59,10 @@ describe('BakerTableComponent', () => {
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         { provide: RewardService, useValue: rewardServiceMock },
 
-        { provide: TranslateService, useClass: TranslateServiceStub }
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
-      declarations: [BakerTableComponent]
+      declarations: [BakerTableComponent, TranslatePipe]
     })
 
     testScheduler = new TestScheduler((actual, expected) => {

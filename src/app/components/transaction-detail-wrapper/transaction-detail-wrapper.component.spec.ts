@@ -9,8 +9,9 @@ import { AmountConverterPipe } from 'src/app/pipes/amount-converter/amount-conve
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule, ToastrService } from 'ngx-toastr'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { TranslateService, TranslateModule } from '@ngx-translate/core'
+import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('TransactionDetailWrapperComponent', () => {
   let component: TransactionDetailWrapperComponent
@@ -23,7 +24,8 @@ describe('TransactionDetailWrapperComponent', () => {
         BsModalService,
         ToastrService,
         IconPipe,
-        { provide: TranslateService, useClass: TranslateServiceStub }
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       imports: [
         FontAwesomeModule,
@@ -33,7 +35,7 @@ describe('TransactionDetailWrapperComponent', () => {
         TooltipModule.forRoot(),
         TranslateModule.forRoot()
       ],
-      declarations: [TransactionDetailWrapperComponent],
+      declarations: [TransactionDetailWrapperComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 

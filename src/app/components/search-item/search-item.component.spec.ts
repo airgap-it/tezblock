@@ -13,8 +13,9 @@ import { getAccountServiceMock } from '@tezblock/services/account/account.servic
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { TranslateService, TranslateModule } from '@ngx-translate/core'
+import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('SearchItemComponent', () => {
   let component: SearchItemComponent
@@ -27,14 +28,15 @@ describe('SearchItemComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [SearchItemComponent, IconPipe],
+      declarations: [SearchItemComponent, IconPipe, TranslatePipe],
       imports: [TranslateModule.forRoot()],
       providers: [
         { provide: ApiService, useValue: apiServiceMock },
         { provide: SearchService, useValue: searchServiceMock },
         { provide: AccountService, useValue: accountServiceMock },
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
-        { provide: TranslateService, useClass: TranslateServiceStub }
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

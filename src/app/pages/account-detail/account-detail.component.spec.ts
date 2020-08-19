@@ -8,7 +8,7 @@ import { ToastrService } from 'ngx-toastr'
 import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 
-import { TranslateService } from '@ngx-translate/core'
+import { TranslateService, TranslatePipe } from '@ngx-translate/core'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
@@ -31,6 +31,8 @@ import { getPipeMock } from 'test-config/mocks/pipe.mock'
 import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
 import { AccountDetailComponent } from './account-detail.component'
 import { initialState as adInitialState } from './reducer'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -70,12 +72,13 @@ describe('AccountDetailComponent', () => {
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
-        { provide: TranslateService, useValue: TranslateService },
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock },
         { provide: BeaconService, useValue: beaconServiceMock },
         ShortenStringPipe
       ],
       imports: [],
-      declarations: [AccountDetailComponent]
+      declarations: [AccountDetailComponent, TranslatePipe]
     })
 
     fixture = TestBed.createComponent(AccountDetailComponent)

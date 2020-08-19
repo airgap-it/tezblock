@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing'
 import { LanguagesService } from './languages.service'
 import { UnitHelper } from 'test-config/unit-test-helper'
 import { TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from './translate.service.stub'
 
 xdescribe('LanguagesService', () => {
   let unitHelper: UnitHelper
@@ -10,7 +11,7 @@ xdescribe('LanguagesService', () => {
   beforeEach(() => {
     unitHelper = new UnitHelper()
 
-    TestBed.configureTestingModule(unitHelper.testBed({ providers: [TranslateService] }))
+    TestBed.configureTestingModule(unitHelper.testBed({ providers: [{ provide: TranslateService, useClass: TranslateServiceStub }] }))
       .compileComponents()
       .catch(console.error)
   })

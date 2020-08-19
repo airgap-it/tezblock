@@ -18,8 +18,9 @@ import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/cha
 import { bind, numberToDate, multiplyBy } from '@tezblock/services/fp'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { PeriodKind } from '@tezblock/domain/vote'
-import { TranslateService, TranslateModule } from '@ngx-translate/core'
+import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('DashboardComponent', () => {
   let component: DashboardComponent
@@ -37,10 +38,11 @@ describe('DashboardComponent', () => {
         { provide: ApiService, useValue: getApiServiceMock() },
         { provide: Actions, useValue: EMPTY },
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
-        { provide: TranslateService, useClass: TranslateServiceStub }
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       imports: [MomentModule, TranslateModule.forRoot()],
-      declarations: [BaseChartDirective, DashboardComponent],
+      declarations: [BaseChartDirective, DashboardComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA]
     })
 
