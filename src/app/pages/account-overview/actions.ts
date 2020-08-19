@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { OrderBy } from '@tezblock/services/base.service'
 
 const featureName = 'New Accounts'

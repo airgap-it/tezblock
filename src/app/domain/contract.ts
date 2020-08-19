@@ -5,7 +5,7 @@ import { forkJoin, from, Observable, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 
 import { Pageable } from '@tezblock/domain/table'
-import { SearchOption, SearchOptionType } from '@tezblock/services/search/model'
+import { SearchOptionData } from '@tezblock/services/search/model'
 import { get as fpGet, first, isEmptyArray } from '@tezblock/services/fp'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
@@ -17,7 +17,10 @@ import { TezosFA12Protocol } from 'airgap-coin-lib/dist/protocols/tezos/fa/Tezos
 import { TezosTransactionParameters } from 'airgap-coin-lib/dist/protocols/tezos/types/operations/Transaction'
 import { IAirGapTransaction } from 'airgap-coin-lib'
 
-export const tokenContracts: { [key: string]: TokenContract } = require('../../assets/contracts/json/contracts.json')
+// I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
+import data from '../../assets/contracts/json/contracts.json'
+
+export const tokenContracts = data as { [key: string]: TokenContract }
 
 export enum SocialType {
   website = 'website',
@@ -86,25 +89,27 @@ export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): P
   }
 }
 
-export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOption[] => {
+export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetwork): SearchOptionData[] => {
   if (!searchTerm) {
     return []
   }
 
-  const type = SearchOptionType.faContract
+  const type = OperationTypes.TokenContract
   const tokenContractByAddress = getTokenContractByAddress(searchTerm, tezosNetwork)
 
   return getTokenContracts(tezosNetwork)
     .data.filter(tokenContract => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
     .map(tokenContract => ({
-      name: tokenContract.name,
+      id: tokenContract.id,
+      label: tokenContract.name,
       type
     }))
     .concat(
       tokenContractByAddress
         ? [
             {
-              name: tokenContractByAddress.name,
+              id: tokenContractByAddress.id,
+              label: tokenContractByAddress.name,
               type
             }
           ]

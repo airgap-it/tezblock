@@ -60,8 +60,8 @@ describe('ProposalService', () => {
       ]
     })
 
-    service = TestBed.get(ProposalService)
-    httpMock = TestBed.get(HttpTestingController)
+    service = TestBed.inject(ProposalService)
+    httpMock = TestBed.inject(HttpTestingController)
   })
 
   it('should be created', () => {

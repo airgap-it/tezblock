@@ -36,7 +36,7 @@ describe('BakingService', () => {
     })
 
     service = TestBed.inject(BakingService)
-    httpMock = TestBed.get(HttpTestingController)
+    httpMock = TestBed.inject(HttpTestingController)
   })
 
   it('should be created', () => {

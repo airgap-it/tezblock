@@ -22,7 +22,7 @@ describe('AliasService', () => {
     TestBed.configureTestingModule(unitHelper.testBed({ providers: [ShortenStringPipe], imports: [], declarations: [] }))
       .compileComponents()
       .catch(console.error)
-    service = TestBed.get(AliasService)
+    service = TestBed.inject(AliasService)
   })
 
   it('should be created', () => {

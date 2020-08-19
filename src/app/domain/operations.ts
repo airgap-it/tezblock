@@ -2,6 +2,7 @@ import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-con
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { TableState } from '@tezblock/domain/table'
 
+// TODO: refactor this enum: exclude page ids from entity types..
 export enum OperationTypes {
   Transaction = 'transaction',
   Delegation = 'delegation',
@@ -13,10 +14,6 @@ export enum OperationTypes {
   BakingRights = 'baking_rights',
   EndorsingRights = 'endorsing_rights',
   Activation = 'activate_account',
-  Overview = 'overview',
-  OriginationOverview = 'origination_overview',
-  DelegationOverview = 'delegation_overview',
-  EndorsementOverview = 'endorsement_overview',
   Rewards = 'rewards',
   DoubleBakingEvidenceOverview = 'double_baking_evidence_overview',
   DoubleEndorsementEvidenceOverview = 'double_endorsement_evidence_overview',
@@ -27,7 +24,8 @@ export enum OperationTypes {
   Block = 'block',
   TokenContract = 'token contract',
   Contract = 'contract',
-  Account = 'account'
+  Account = 'account',
+  Baker = 'baker'
 }
 
 export interface OperationError {

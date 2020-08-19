@@ -1,10 +1,12 @@
-import { OnDestroy } from '@angular/core'
-import { Subscription } from 'rxjs';
+import { Component, OnDestroy } from '@angular/core'
+import { Subscription } from 'rxjs'
 
+@Component({ template: '' })
 export class BaseComponent implements OnDestroy {
-    protected readonly subscriptions: Subscription[] = [];
+  protected readonly subscriptions: Subscription[] = []
 
-    ngOnDestroy() {
-        this.subscriptions.forEach(subscription => subscription.unsubscribe());
-    }
+  // TODO: check if it works..
+  ngOnDestroy() {
+    this.subscriptions.forEach(subscription => subscription.unsubscribe())
+  }
 }

@@ -7,7 +7,7 @@ import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operato
 
 import { getTokenContracts } from '@tezblock/domain/contract'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'

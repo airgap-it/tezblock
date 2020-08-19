@@ -21,8 +21,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { Title, Meta } from '@angular/platform-browser'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
-
-const accounts = require('src/submodules/tezos_assets/accounts.json')
+import { jsonAccounts } from '@tezblock/domain/account'
 
 @Component({
   selector: 'app-dashboard',
@@ -76,7 +75,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.loadLatestProposal())
 
     this.contracts$ = this.store$.select(state => state.dashboard.contracts)
-    this.bakers = Object.keys(accounts)
+    this.bakers = Object.keys(jsonAccounts)
     this.blocks$ = this.store$.select(state => state.dashboard.blocks)
     this.transactions$ = this.store$.select(state => state.dashboard.transactions)
 
