@@ -13,6 +13,8 @@ import { getAccountServiceMock } from '@tezblock/services/account/account.servic
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+import { TranslateService, TranslateModule } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
 
 describe('SearchItemComponent', () => {
   let component: SearchItemComponent
@@ -24,18 +26,18 @@ describe('SearchItemComponent', () => {
   const chainNetworkServiceMock = getChainNetworkServiceMock()
 
   beforeEach(() => {
-    TestBed.configureTestingModule(
-      {
-        declarations: [SearchItemComponent, IconPipe],
-        providers: [
-          { provide: ApiService, useValue: apiServiceMock },
-          { provide: SearchService, useValue: searchServiceMock },
-          { provide: AccountService, useValue: accountServiceMock },
-          { provide: ChainNetworkService, useValue: chainNetworkServiceMock }
-        ],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      }
-    )
+    TestBed.configureTestingModule({
+      declarations: [SearchItemComponent, IconPipe],
+      imports: [TranslateModule.forRoot()],
+      providers: [
+        { provide: ApiService, useValue: apiServiceMock },
+        { provide: SearchService, useValue: searchServiceMock },
+        { provide: AccountService, useValue: accountServiceMock },
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+        { provide: TranslateService, useClass: TranslateServiceStub }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
     testScheduler = new TestScheduler((actual, expected) => {
       // asserting the two objects are equal

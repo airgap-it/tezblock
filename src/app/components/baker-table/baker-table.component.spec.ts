@@ -18,6 +18,11 @@ import { RewardService } from '@tezblock/services/reward/reward.service'
 import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.mock'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { DataSource } from '@tezblock/domain/table'
+import { TranslateModule, TranslateService, TranslateLoader } from '@ngx-translate/core'
+import { HttpClient } from '@angular/common/http'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
+import { HttpClientTestingModule } from '@angular/common/http/testing'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
 
 describe('BakerTableComponent', () => {
   let component: BakerTableComponent
@@ -29,15 +34,31 @@ describe('BakerTableComponent', () => {
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const rewardServiceMock = getRewardServiceMock()
 
+  function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
+    return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+  }
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      imports: [
+        HttpClientTestingModule,
+        TranslateModule.forRoot({
+          loader: {
+            provide: TranslateLoader,
+            useFactory: createTranslateLoader,
+            deps: [HttpClient]
+          }
+        })
+      ],
       providers: [
         provideMockStore({ initialState }),
         { provide: Actions, useValue: EMPTY },
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
-        { provide: RewardService, useValue: rewardServiceMock }
+        { provide: RewardService, useValue: rewardServiceMock },
+
+        { provide: TranslateService, useClass: TranslateServiceStub }
       ],
       declarations: [BakerTableComponent]
     })
