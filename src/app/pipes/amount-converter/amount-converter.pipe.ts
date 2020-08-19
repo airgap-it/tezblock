@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core'
 import { BigNumber } from 'bignumber.js'
 import { isNil } from 'lodash'
+
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
 

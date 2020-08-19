@@ -33,7 +33,9 @@
     "noFallthroughCasesInSwitch": true /* OK Report errors for fallthrough cases in switch statement. */,
     "paths": {
       "@tezblock/*": ["./src/app/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": true,

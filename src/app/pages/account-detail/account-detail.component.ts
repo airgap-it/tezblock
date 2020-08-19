@@ -3,7 +3,7 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, Observable, combineLatest, forkJoin, of } from 'rxjs'
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
@@ -18,9 +18,9 @@ import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
+import { Account, JsonAccount, JsonAccountData, getBakers, doesAcceptsDelegations } from '@tezblock/domain/account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService, getBakers, doesAcceptsDelegations } from '@tezblock/services/account/account.service'
+import { AccountService,  } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -45,8 +45,7 @@ import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-t
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { Asset } from '@tezblock/components/assets-value/assets-value.component'
-
-const accounts = require('src/submodules/tezos_assets/accounts.json')
+import { jsonAccounts } from '@tezblock/domain/account'
 
 @Component({
   selector: 'app-account-detail',
@@ -344,7 +343,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
-        const jsonAccount = accounts[address]
+        const jsonAccount = jsonAccounts[address]
 
         this.reset()
         this.setTabs(address)
@@ -359,7 +358,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.bakerTableInfos = {
           ...this.bakerTableInfos,
-          acceptsDelegations: get<JsonAccountData>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
+          acceptsDelegations: get<JsonAccount>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -451,7 +450,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   private getBakingInfos(address: string) {
-    const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
+    const payoutAddress = jsonAccounts.hasOwnProperty(address) ? jsonAccounts[address].hasPayoutAddress : null
 
     this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
