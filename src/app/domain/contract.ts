@@ -154,7 +154,7 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
   }
 }
 
-export const hasTokenHolders = (contract: TokenContract): boolean => ['Staker', 'tzBTC'].includes(contract.name)
+export const hasTokenHolders = (contract: TokenContract): boolean => ['STKR', 'tzBTC', 'USDtz'].includes(contract.symbol)
 
 export interface TokenHolder {
   address: string
