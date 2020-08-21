@@ -11,6 +11,17 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 
+const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
+  switch (tezosNetwork) {
+    case TezosNetwork.MAINNET:
+      return NetworkType.MAINNET
+    case TezosNetwork.CARTHAGENET:
+      return NetworkType.CARTHAGENET
+    default:
+      return NetworkType.CUSTOM
+  }
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -19,15 +30,12 @@ export class BeaconService {
 
   async delegate(address: string): Promise<OperationResponseOutput> {
     const client = this.getDAppClient()
-    const isMainnet = this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
     const requestPermissions = async () => {
-      const input: RequestPermissionInput = isMainnet
-        ? undefined
-        : {
-            network: {
-              type: NetworkType.CARTHAGENET
-            }
-          }
+      const input: RequestPermissionInput = {
+        network: {
+          type: tezosNetworkToNetworkType(this.chainNetworkService.getNetwork())
+        }
+      }
 
       await client.requestPermissions(input)
     }
@@ -46,10 +54,9 @@ export class BeaconService {
       delegate: address
     }
 
-    return client
-      .requestOperation({
-        operationDetails: [operation]
-      })
+    return client.requestOperation({
+      operationDetails: [operation]
+    })
   }
 
   // for testing (mainly)

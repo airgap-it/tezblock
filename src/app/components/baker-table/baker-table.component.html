@@ -141,7 +141,7 @@
                 <div class="col-md-12 mb-4">
                   <button
                     (click)="delegate()"
-                    [disabled]="!data?.acceptsDelegations"
+                    [disabled]="isMainnet && !data?.acceptsDelegations"
                     class="btn btn-sm btn-primary-light w-100"
                     type="button"
                   >
