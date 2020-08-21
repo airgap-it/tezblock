@@ -12,6 +12,18 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { CacheKeys, CacheService } from '@tezblock/services/cache/cache.service'
 import { SearchOptionData } from './model'
 
+const guessType = (token: string): OperationTypes => {
+  if (token?.startsWith('o')) {
+    return OperationTypes.Transaction
+  }
+
+  if (token?.toLowerCase().startsWith('b') || !isNaN(<any>token)) {
+    return OperationTypes.Block
+  }
+
+  return OperationTypes.Account
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -52,24 +64,26 @@ export class SearchService {
 
   // TODO: now contract is looked first, is it OK (what if searchTerm matches account and contract ?)
   processSearchSelection(option: SearchOptionData) {
-    if (option.type === OperationTypes.TokenContract) {
-      return this.router.navigateByUrl(`/contract/${option.id}`)
+    const _option: SearchOptionData = option.type ? option : { ...option, type: guessType(option.id) }
+
+    if (_option.type === OperationTypes.TokenContract) {
+      return this.router.navigateByUrl(`/contract/${_option.id}`)
     }
 
-    if (option.type === OperationTypes.Account || option.type === OperationTypes.Baker) {
-      return this.router.navigateByUrl(`/account/${option.id}`)
+    if (_option.type === OperationTypes.Account || _option.type === OperationTypes.Baker) {
+      return this.router.navigateByUrl(`/account/${_option.id}`)
     }
 
-    if (option.type === OperationTypes.Endorsement) {
-      return this.router.navigateByUrl(`/endorsement/${option.id}`)
+    if (_option.type === OperationTypes.Endorsement) {
+      return this.router.navigateByUrl(`/endorsement/${_option.id}`)
     }
 
-    if (option.type === OperationTypes.Transaction) {
-      return this.router.navigateByUrl(`/transaction/${option.id}`)
+    if (_option.type === OperationTypes.Transaction) {
+      return this.router.navigateByUrl(`/transaction/${_option.id}`)
     }
 
     // OperationTypes.Block
-    return this.router.navigateByUrl(`/block/${option.id}`)
+    return this.router.navigateByUrl(`/block/${_option.id}`)
   }
 
   getPreviousSearches(): Observable<SearchOptionData[]> {
