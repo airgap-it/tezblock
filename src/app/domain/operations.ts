@@ -1504,7 +1504,7 @@ export const operationErrorToMessage = (
   }
 
   const startId = operationError.id.indexOf('proto.006-PsCARTHA.')
-  let id = operationError.id.slice(startId + 19, operationError.id.length)
+  const id = operationError.id.slice(startId + 19, operationError.id.length)
 
   return ErrorDescriptions.get(id)
 }
