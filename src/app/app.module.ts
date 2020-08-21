@@ -98,6 +98,7 @@ import { TokenContractOverviewEffects } from './pages/token-contract-overview/ef
 import { VarDirective } from '@tezblock/directives/var.directive';
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
+import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 
 @NgModule({
   imports: [
@@ -204,7 +205,8 @@ import { ProgressbarComponent } from './components/progressbar/progressbar.compo
     TokenContractOverviewComponent,
     VarDirective,
     AssetsValueComponent,
-    ProgressbarComponent
+    ProgressbarComponent,
+	BasicCellComponent
   ],
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]
