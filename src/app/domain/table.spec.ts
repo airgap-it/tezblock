@@ -11,7 +11,7 @@ import {
   toPagable
 } from './table'
 
-fdescribe('table', () => {
+describe('table', () => {
   let testScheduler: TestScheduler
 
   beforeEach(() => {
