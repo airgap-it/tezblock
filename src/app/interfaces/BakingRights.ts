@@ -11,10 +11,10 @@ export interface BakingRights {
 }
 
 export interface BakingRewardsDetail {
-  level: number;
-  amount: string;
-  deposit: string;
-  fees?: string;
+  level: number
+  amount: string
+  deposit: string
+  fees?: string
 }
 
 export interface AggregatedBakingRights {
@@ -23,7 +23,7 @@ export interface AggregatedBakingRights {
   blockRewards: string
   deposits: string
   fees: number
-  bakingRewardsDetails: BakingRewardsDetail[],
+  bakingRewardsDetails: BakingRewardsDetail[]
   rightStatus: string
 }
 

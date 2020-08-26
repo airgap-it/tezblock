@@ -137,7 +137,7 @@ export class TezblockTableComponent implements OnInit {
 
       // collapse
       if (isExpaned) {
-        this.expandedRows = this.expandedRows.filter(expandedRow => expandedRow !== key)
+        this.expandedRows = this.expandedRows.filter((expandedRow) => expandedRow !== key)
 
         return
       }

@@ -5,14 +5,18 @@ import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-t
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'
 import { AggregatedEndorsingRights } from '@tezblock/interfaces/EndorsingRights'
 import { TranslateService } from '@ngx-translate/core'
+import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
 
 export const columns: { [key: string]: (options: { showFiatValue: boolean }, translateService?: TranslateService) => Column[] } = {
   [OperationTypes.BakingRights]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
     {
       name: translateService.instant('baker-table.baking-rights.status'),
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: AggregatedBakingRights) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
-    ,
     {
       name: translateService.instant('baker-table.baking-rights.cycle'),
       field: 'cycle',
@@ -46,8 +50,13 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }, tra
   [OperationTypes.EndorsingRights]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
     {
       name: translateService.instant('baker-table.endorsing-rights.status'),
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: AggregatedEndorsingRights) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
+
     {
       name: translateService.instant('baker-table.endorsing-rights.cycle'),
       field: 'cycle',
@@ -75,7 +84,11 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }, tra
   [OperationTypes.Rewards]: (options?: { showFiatValue?: boolean }, translateService?: TranslateService) => [
     {
       name: translateService.instant('baker-table.rewards.status'),
-      field: 'rightStatus'
+      field: 'rightStatus',
+      data: (item: ExtendedTezosRewards) => ({
+        data: item.rightStatus,
+        options: item.rightStatus === 'Active' ? { cssClass: 'text-primary' } : undefined
+      })
     },
     {
       name: translateService.instant('baker-table.rewards.cycle'),
