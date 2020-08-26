@@ -94,28 +94,20 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       })
   }
 
-  onKeyEnter() {
-    // this.subscriptions.push(
-    //   this.dataSource$.subscribe((val: TypeAheadObject[]) => {
-    //     if (val.length > 0 && val[0].name !== this.searchControl.value) {
-    //       // there are typeahead suggestions. upon hitting enter, we first autocomplete the suggestion
-    //       return
-    //     } else {
-    //       this.search(this.searchControl.value)
-    //     }
-    //   })
-    // )
+  search(option: SearchOptionData) {
+    const _option: SearchOptionData = option || { id: this.searchControl.value, type: undefined }
 
-    merge(...this.searchService.getSearchSources(this.searchControl.value))
-      .pipe(map(first), filter(negate(isNil)))
-      .subscribe(this.search.bind(this))
+    this.onSearch.emit(_option.id)
+    this.searchService.processSearchSelection(_option)
+
+    if (_option.type) {
+      this.isValueChangedBySelect = true
+      this.searchControl.setValue('')
+    }
   }
 
-  search(option: SearchOptionData) {
-    this.onSearch.emit(option.id)
-    this.searchService.processSearchSelection(option)
-    this.isValueChangedBySelect = true
-    this.searchControl.setValue('')
+  onKeyEnter() {
+    this.search(undefined)
   }
 
   onSelect(e: TypeaheadMatch) {
@@ -124,6 +116,8 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
     this.search(item)
     this.searchService.updatePreviousSearches(item)
   }
+
+  // there is no point to handle search button click case ( options will apear anyways )
 
   onMouseDown() {
     this.searchService

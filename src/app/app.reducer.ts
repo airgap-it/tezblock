@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store'
 import { NavigationEnd } from '@angular/router'
 import BigNumber from 'bignumber.js'
+import * as moment from 'moment'
 
 import * as actions from './app.actions'
 import { Block } from '@tezblock/interfaces/Block'
@@ -137,14 +138,20 @@ export const reducer = createReducer(
 
 const getRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number): string => {
   const remainingBlocks = cycleEndingBlockLevel - currentBlockLevel
-  let totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
-  let hours = Math.floor(totalSeconds / 3600)
-  totalSeconds %= 3600
-  const minutes = Math.floor(totalSeconds / 60)
-  const days = Math.floor(hours / 24)
-  hours %= 24
+  const totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
+  const duration = moment.duration(totalSeconds * 1000)
 
-  return days >= 1 ? `~${days}d ${hours}h ${minutes}m` : `~${hours}h ${minutes}m`
+  return duration.days() >= 1
+    ? `~${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`
+    : `~${duration.hours()}h ${duration.minutes()}m`
+}
+const getRoundedRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number): string => {
+  const remainingBlocks = cycleEndingBlockLevel - currentBlockLevel
+  const totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
+  const duration = moment.duration(totalSeconds * 1000)
+  const days = duration.hours() > 0 || duration.minutes() > 0 ? duration.days() + 1 : duration.days()
+
+  return `~${days}d`
 }
 
 export const currentCycleSelector = (state: State): number => (state.latestBlock ? state.latestBlock.meta_cycle : undefined)
@@ -160,4 +167,8 @@ export const cycleProgressSelector = (state: State): number =>
 export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
     ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
+    : undefined
+export const roundedRemainingTimeSelector = (state: State): string =>
+  state.firstBlockOfCurrentCycle && state.latestBlock.level
+    ? getRoundedRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
     : undefined

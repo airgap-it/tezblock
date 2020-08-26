@@ -98,31 +98,31 @@ export const columns: { [key: string]: (options: { showFiatValue: boolean }, tra
     {
       name: translateService.instant('baker-table.rewards.delegations'),
       field: 'delegatedContracts',
-      data: (item: TezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
+      data: (item: ExtendedTezosRewards) => ({ data: Array.isArray(item.delegatedContracts) ? item.delegatedContracts.length : null }),
       template: Template.basic
     },
     {
       name: translateService.instant('baker-table.rewards.staking-balance'),
       field: 'stakingBalance',
-      data: (item: TezosRewards) => ({ data: item.stakingBalance, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.stakingBalance, options }),
       template: Template.amount
     },
     {
       name: translateService.instant('baker-table.rewards.block-rewards'),
       field: 'bakingRewards',
-      data: (item: TezosRewards) => ({ data: item.bakingRewards, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.bakingRewards, options }),
       template: Template.amount
     },
     {
       name: translateService.instant('baker-table.rewards.endorsement-rewards'),
       field: 'endorsingRewards',
-      data: (item: TezosRewards) => ({ data: item.endorsingRewards, options }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.endorsingRewards, options }),
       template: Template.amount
     },
     {
       name: translateService.instant('baker-table.rewards.fees'),
       field: 'fees',
-      data: (item: TezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
+      data: (item: ExtendedTezosRewards) => ({ data: item.fees, options: { showFiatValue: false } }),
       template: Template.amount
     }
   ]

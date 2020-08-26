@@ -6,8 +6,8 @@
     <ng-container *ngIf="account$ | async as account; else noAccount">
       <div class="row">
         <div class="col-lg-6 mb-4 mb-lg-0 card__top">
-          <div class="card h-100 pt-3 ">
-            <div class="card-body p-4 ">
+          <div class="card h-100 pt-3">
+            <div class="card-body p-4">
               <div class="row mb-4">
                 <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
                   <identicon [address]="account.account_id" [sizeLarge]="true"></identicon>
@@ -68,11 +68,11 @@
               </div>
 
               <div class="row mb-3">
-                <div class=" col-md-2 pr-0">
+                <div class="col-md-2 pr-0">
                   <p class="text-secondary mb-0">{{ 'account-detail.balance' | translate }}</p>
                 </div>
                 <div
-                  class=" col-md-10 pl-sm-0"
+                  class="col-md-10 pl-sm-0"
                   *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
@@ -80,7 +80,7 @@
                   </h5>
                 </div>
                 <ng-template #hideValue>
-                  <div class=" col-md-10 pl-sm-0">
+                  <div class="col-md-10 pl-sm-0">
                     <h5 class="mb-0">0</h5>
                   </div>
                 </ng-template>
@@ -88,11 +88,11 @@
 
               <div class="row mb-3">
                 <ng-container *ngIf="isMainnet">
-                  <div class=" col-md-2 pr-0">
+                  <div class="col-md-2 pr-0">
                     <p class="text-secondary mb-0">{{ 'account-detail.value' | translate }}</p>
                   </div>
                   <div
-                    class=" col-md-10 pl-sm-0"
+                    class="col-md-10 pl-sm-0"
                     *ngIf="
                       (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
                       else hideValue
@@ -168,10 +168,10 @@
             </div>
           </div>
         </div>
-        <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
-          <div class="card h-100 pt-3 ">
+        <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3">
             <div class="card-body p-4">
-              <h5 class="card-title mb-4 ">
+              <h5 class="card-title mb-4">
                 {{ 'account-detail.delegation' | translate }}
               </h5>
 
@@ -236,7 +236,7 @@
               </ng-container>
               <ng-container *ngIf="delegatedAccountAddress">
                 <div class="row mb-3">
-                  <div class=" col-md-5">
+                  <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
                         [title]="'account-detail.delegated-account' | translate"
@@ -244,7 +244,7 @@
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7">
+                  <div class="col-md-7">
                     <address-item
                       [address]="delegatedAccountAddress"
                       [clickableButton]="delegatedAccountAddress !== account.account_id"
@@ -335,11 +335,11 @@
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
+                  <div class="col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
                     <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
-                    <div class=" col-md-7">
+                    <div class="col-md-7">
                       <loading-skeleton [loadingWidth]="'150px'"></loading-skeleton>
                     </div>
                   </ng-template>
@@ -406,7 +406,7 @@
 
     <ng-template #noAccount>
       <div class="card p-3" *ngIf="(account$ | async) === null">
-        <h5 class="card-title mb-4 ">
+        <h5 class="card-title mb-4">
           {{ 'account-detail.invalid-address' | translate }}
         </h5>
         <p>

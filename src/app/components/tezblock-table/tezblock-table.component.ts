@@ -30,7 +30,7 @@ export interface Column {
   name?: string
   field?: string
   width?: string
-  data?: (item: any) => { data?: any; options?: Options }
+  data?: (item: any) => { data?: any; options?: any }
   template?: TemplateRef<any> | Template
   sortable?: boolean | undefined
 }

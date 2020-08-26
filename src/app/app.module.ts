@@ -25,13 +25,11 @@ import { ToastrModule } from 'ngx-toastr'
 
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
 import { TranslateHttpLoader } from '@ngx-translate/http-loader'
-import { VarDirective } from '@tezblock/directives/var.directive'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
 import { AccountItemComponent } from './components/account-item/account-item.component'
 import { AddressItemComponent } from './components/address-item/address-item.component'
-import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { BakerTableComponent } from './components/baker-table/baker-table.component'
 import { BakerTableEffects } from './components/baker-table/effects'
 import { BlockDetailWrapperComponent } from './components/block-detail-wrapper/block-detail-wrapper.component'
@@ -43,7 +41,6 @@ import { HeaderItemComponent } from './components/header-item/header-item.compon
 import { IdenticonComponent } from './components/identicon/identicon'
 import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-skeleton.component'
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
-import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
 import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
@@ -90,8 +87,6 @@ import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
-import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
-import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -101,6 +96,12 @@ import { BakingService } from './services/baking/baking.service'
 import { ChainNetworkService } from './services/chain-network/chain-network.service'
 import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
+import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
+import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
+import { VarDirective } from '@tezblock/directives/var.directive'
+import { AssetsValueComponent } from './components/assets-value/assets-value.component'
+import { ProgressbarComponent } from './components/progressbar/progressbar.component'
+import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -219,7 +220,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     GlossaryComponent,
     VarDirective,
     AssetsValueComponent,
-    ProgressbarComponent
+    ProgressbarComponent,
+    BasicCellComponent
   ],
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]

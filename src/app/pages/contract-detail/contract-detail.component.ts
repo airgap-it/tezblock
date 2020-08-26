@@ -307,7 +307,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       showFiatValue,
       symbol: contract.symbol
     }
-    const customTabs = hasTokenHolders ? [this.getTokenHoldersTab(options)] : []
+    const customTabs = hasTokenHolders(contract) ? [this.getTokenHoldersTab(options)] : []
     const tabs = [
       {
         ...this.tabs[0],
