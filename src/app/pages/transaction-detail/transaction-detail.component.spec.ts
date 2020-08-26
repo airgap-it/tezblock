@@ -15,6 +15,9 @@ import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activ
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('TransactionDetailComponent', () => {
   let component: TransactionDetailComponent
@@ -34,10 +37,12 @@ describe('TransactionDetailComponent', () => {
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         AliasPipe,
         IconPipe,
-        ShortenStringPipe
+        ShortenStringPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       imports: [],
-      declarations: [TransactionDetailComponent],
+      declarations: [TransactionDetailComponent, TranslatePipe],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 

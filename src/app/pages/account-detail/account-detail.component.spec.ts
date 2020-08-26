@@ -1,35 +1,38 @@
+import { BreakpointObserver } from '@angular/cdk/layout'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { provideMockStore, MockStore } from '@ngrx/store/testing'
-import { TestScheduler } from 'rxjs/testing'
-import { Actions } from '@ngrx/effects'
-import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
+import { Actions } from '@ngrx/effects'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { BreakpointObserver } from '@angular/cdk/layout'
+import { EMPTY } from 'rxjs'
+import { TestScheduler } from 'rxjs/testing'
 
-import { AccountDetailComponent } from './account-detail.component'
+import { TranslateService, TranslatePipe } from '@ngx-translate/core'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
-import { initialState as adInitialState } from './reducer'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { getBakingServiceMock } from '@tezblock/services/baking/baking.service.mock'
-import { CopyService } from '@tezblock/services/copy/copy.service'
-import { getCopyServiceMock } from '@tezblock/services/copy/copy.service.mock'
-import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
-import { getPipeMock } from 'test-config/mocks/pipe.mock'
-import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
-import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
-import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
-import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
-import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
-import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { getBeaconServiceMock } from '@tezblock/services/beacon/beacon.service.mock'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { CopyService } from '@tezblock/services/copy/copy.service'
+import { getCopyServiceMock } from '@tezblock/services/copy/copy.service.mock'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
+import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
+import { AccountDetailComponent } from './account-detail.component'
+import { initialState as adInitialState } from './reducer'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
@@ -69,11 +72,13 @@ describe('AccountDetailComponent', () => {
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock },
         { provide: BeaconService, useValue: beaconServiceMock },
         ShortenStringPipe
       ],
       imports: [],
-      declarations: [AccountDetailComponent]
+      declarations: [AccountDetailComponent, TranslatePipe]
     })
 
     fixture = TestBed.createComponent(AccountDetailComponent)

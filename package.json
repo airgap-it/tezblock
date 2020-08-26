@@ -55,6 +55,8 @@
     "@ngrx/store": "^9.2.0",
     "@nguniversal/express-engine": "^10.0.1",
     "@ngx-pwa/local-storage": "^10.0.1",
+    "@ngx-translate/core": "^12.1.2",
+    "@ngx-translate/http-loader": "^4.0.0",
     "airgap-coin-lib": "^0.9.3",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
-import { delay, map, switchMap, filter, withLatestFrom } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
-import { negate, isNil } from 'lodash'
+import { Store } from '@ngrx/store'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { isNil, negate } from 'lodash'
+import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
+import { delay, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Tab } from '@tezblock/domain/tab'
@@ -21,6 +21,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { ApiService } from '@tezblock/services/api/api.service'
+import { TranslateService } from '@ngx-translate/core'
 import { Title, Meta } from '@angular/platform-browser'
 import { getRefresh, refreshRate } from '@tezblock/domain/synchronization'
 import { isInBTC } from '@tezblock/domain/airgap'
@@ -59,8 +60,9 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private readonly titleService: Title,
-    private readonly metaTagService: Meta
+    private translateService: TranslateService,
+    private titleService: Title,
+    private metaTagService: Meta
   ) {
     super()
   }
@@ -162,56 +164,56 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
   private setTabs(pageId: string) {
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.block-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.block-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.block-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Endorsements',
+        title: this.translateService.instant('tabbed-table.block-detail.endorsements'),
         active: false,
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Activations',
+        title: this.translateService.instant('tabbed-table.block-detail.activations'),
         active: false,
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }

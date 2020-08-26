@@ -14,7 +14,7 @@ export interface State {
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
   tokenHolders: TableState<TokenHolder>
-  entrypoints: TableState<string>,
+  entrypoints: TableState<string>
   currentTabKind: actions.OperationTab
 }
 

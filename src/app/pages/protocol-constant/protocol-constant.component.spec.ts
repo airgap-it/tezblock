@@ -4,6 +4,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { ProtocolConstantComponent } from './protocol-constant.component'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ProtocolConstantComponent', () => {
   let component: ProtocolConstantComponent
@@ -13,8 +16,12 @@ describe('ProtocolConstantComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ProtocolConstantComponent],
-      providers: [provideMockStore({ initialState })],
+      declarations: [ProtocolConstantComponent, TranslatePipe],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 

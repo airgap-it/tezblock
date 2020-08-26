@@ -8,4 +8,5 @@ export interface Options {
   hideIdenticon?: boolean
   kind?: string //TODO: not needed probably
   comparisonTimestamp?: number
+  cssClass?: string
 }

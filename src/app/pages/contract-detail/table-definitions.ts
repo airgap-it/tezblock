@@ -1,4 +1,5 @@
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { TranslateService } from '@ngx-translate/core'
 
 export interface Options {
   pageId: string
@@ -7,9 +8,9 @@ export interface Options {
 }
 
 export const columns: {
-  [key: string]: (options?: Options) => Column[]
+  [key: string]: (options?: Options, translateService?: TranslateService) => Column[]
 } = {
-  transfers: (options: Options) => [
+  transfers: (options: Options, translateService?: TranslateService) => [
     {
       name: 'From',
       field: 'source',
@@ -23,14 +24,14 @@ export const columns: {
       template: Template.symbol
     },
     {
-      name: 'To',
+      name: translateService.instant('tezblock-table.transfers.to'),
       field: 'destination',
       width: '1',
       template: Template.address,
       data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
-      name: 'Amount',
+      name: translateService.instant('tezblock-table.transfers.amount'),
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
@@ -43,34 +44,34 @@ export const columns: {
       sortable: false
     },
     {
-      name: 'Fee',
+      name: translateService.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: false
     },
     {
-      name: 'Age',
+      name: translateService.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
       data: (item: any) => ({ data: item.timestamp }),
       sortable: true
     },
     {
-      name: 'Block',
+      name: translateService.instant('tezblock-table.transfers.block'),
       field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
-      name: 'Tx Hash',
+      name: translateService.instant('tezblock-table.transfers.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash
     }
   ],
-  other: (options: Options) => [
+  other: (options: Options, translateService?: TranslateService) => [
     {
-      name: 'From',
+      name: translateService.instant('tezblock-table.transfers.from'),
       field: 'source',
       width: '1',
       template: Template.address,
@@ -82,14 +83,14 @@ export const columns: {
       template: Template.symbol
     },
     {
-      name: 'To',
+      name: translateService.instant('tezblock-table.transfers.to'),
       field: 'destination',
       width: '1',
       template: Template.address,
       data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
     },
     {
-      name: 'Amount',
+      name: translateService.instant('tezblock-table.transfers.amount'),
       field: 'amount',
       template: Template.amount,
       data: (item: any) => ({
@@ -102,30 +103,30 @@ export const columns: {
       sortable: true
     },
     {
-      name: 'Fee',
+      name: translateService.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
       data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
       sortable: true
     },
     {
-      name: 'Age',
+      name: translateService.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
       sortable: true
     },
     {
-      name: 'Entry Point',
+      name: translateService.instant('tezblock-table.transfers.entrypoint'),
       field: 'entrypoint'
     },
     {
-      name: 'Block',
+      name: translateService.instant('tezblock-table.transfers.block'),
       field: 'block_level',
       template: Template.block,
       sortable: true
     },
     {
-      name: 'Tx Hash',
+      name: translateService.instant('tezblock-table.transfers.tx-hash'),
       field: 'operation_group_hash',
       template: Template.hash
     }

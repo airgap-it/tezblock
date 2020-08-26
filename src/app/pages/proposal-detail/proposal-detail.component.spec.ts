@@ -20,6 +20,9 @@ import { getCopyServiceMock } from 'src/app/services/copy/copy.service.mock'
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { PeriodKind } from '@tezblock/domain/vote'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ProposalDetailComponent', () => {
   let component: ProposalDetailComponent
@@ -35,7 +38,7 @@ describe('ProposalDetailComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [],
-      declarations: [ProposalDetailComponent, AliasPipe, IconPipe],
+      declarations: [ProposalDetailComponent, AliasPipe, IconPipe, TranslatePipe],
       providers: [
         provideMockStore({ initialState }),
         { provide: ActivatedRoute, useValue: activatedRouteMock },
@@ -44,7 +47,9 @@ describe('ProposalDetailComponent', () => {
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         { provide: CopyService, useValue: copyServiceMock },
         IconPipe,
-        ShortenStringPipe
+        ShortenStringPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })

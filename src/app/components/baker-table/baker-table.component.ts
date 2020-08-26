@@ -22,6 +22,7 @@ import { Count, kindToOperationTypes, Tab, updateTabCounts } from '@tezblock/dom
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { first } from '@tezblock/services/fp'
 import { DataSource, Pagination, toPagable } from '@tezblock/domain/table'
+import { TranslateService } from '@ngx-translate/core'
 import { ExtendedTezosRewards, RewardService } from '@tezblock/services/reward/reward.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
@@ -138,7 +139,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly rewardService: RewardService,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService
   ) {
     super()
 
@@ -312,13 +314,18 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   private setupTables() {
-    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet })
+    this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet }, this.translateService)
     this.bakingRightsFields = this.bakingRightsColumns.map(column => column.field)
 
-    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights]({ showFiatValue: this.isMainnet })
+    this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights](
+      {
+        showFiatValue: this.isMainnet
+      },
+      this.translateService
+    )
     this.endorsingRightsFields = this.endorsingRightsColumns.map(column => column.field)
 
-    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet })
+    this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet }, this.translateService)
     this.rewardsFields = this.rewardsColumns.map(column => column.field)
   }
 
@@ -328,23 +335,22 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       getContext: (item: ExtendedTezosRewards) => ({
         columns: [
           {
-            name: 'Delegator Account',
+            name: this.translateService.instant('baker-table.rewards.expanded-rows.delegator-account'),
             field: 'delegator',
             template: Template.address,
             data: (item: Payout) => ({ data: item.delegator })
           },
           {
-            name: 'Payout',
+            name: this.translateService.instant('baker-table.rewards.expanded-rows.payout'),
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: item.payout })
+            data: (item: Payout) => ({ data: { amount: item.payout } })
           },
-          { name: 'Share', field: 'share', template: Template.percentage }
+          { name: this.translateService.instant('baker-table.rewards.expanded-rows.share'), field: 'share', template: Template.percentage }
         ],
         dataSource: this.getRewardsInnerDataSource(item.cycle),
         headerTemplate: this.rewardsExpandedRowHeaderTemplate,
-        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle)),
-        key: 'rewards-inner'
+        headerContext: this.store$.select(fromRoot.bakerTable.bakerReward(item.cycle))
       }),
       primaryKey: 'cycle'
     }
@@ -353,24 +359,32 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       template: this.expandedRowTemplate,
       getContext: (item: AggregatedBakingRights) => ({
         columns: [
-          { name: 'Cycle', field: 'cycle' },
-          { name: 'Age', field: 'estimated_time', template: Template.timestamp },
-          { name: 'Level', field: 'level', template: Template.block },
-          { name: 'Priority', field: 'priority' },
+          { name: this.translateService.instant('baker-table.baking-rights.expanded-rows.cycle'), field: 'cycle' },
           {
-            name: 'Rewards',
+            name: this.translateService.instant('baker-table.baking-rights.expanded-rows.age'),
+            field: 'estimated_time',
+            template: Template.timestamp
+          },
+          {
+            name: this.translateService.instant('baker-table.baking-rights.expanded-rows.level'),
+            field: 'level',
+            template: Template.block
+          },
+          { name: this.translateService.instant('baker-table.baking-rights.expanded-rows.priority'), field: 'priority' },
+          {
+            name: this.translateService.instant('baker-table.baking-rights.expanded-rows.rewards'),
             field: 'rewards',
             template: Template.amount,
             data: (item: BakingRights) => ({ data: item.rewards })
           },
           {
-            name: 'Fees',
+            name: this.translateService.instant('baker-table.baking-rights.expanded-rows.fees'),
             field: 'fees',
             template: Template.amount,
             data: (item: BakingRights) => ({ data: item.fees, options: { digitsInfo: '1.2-2' } })
           },
           {
-            name: 'Deposits',
+            name: this.translateService.instant('baker-table.baking-rights.expanded-rows.deposits'),
             field: 'deposit',
             template: Template.amount,
             data: (item: BakingRights) => ({ data: item.deposit })
@@ -385,18 +399,26 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       template: this.expandedRowTemplate,
       getContext: (item: AggregatedEndorsingRights) => ({
         columns: [
-          { name: 'Cycle', field: 'cycle' },
-          { name: 'Age', field: 'estimated_time', template: Template.timestamp },
-          { name: 'Level', field: 'level', template: Template.block },
-          { name: 'Slot', field: 'slot' },
+          { name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.cycle'), field: 'cycle' },
           {
-            name: 'Rewards',
+            name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.age'),
+            field: 'estimated_time',
+            template: Template.timestamp
+          },
+          {
+            name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.level'),
+            field: 'level',
+            template: Template.block
+          },
+          { name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.slot'), field: 'slot' },
+          {
+            name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.rewards'),
             field: 'rewards',
             template: Template.amount,
             data: (item: EndorsingRights) => ({ data: item.rewards, options: { showFiatValue: true } })
           },
           {
-            name: 'Deposits',
+            name: this.translateService.instant('baker-table.endorsing-rights.expanded-rows.deposits'),
             field: 'deposit',
             template: Template.amount,
             data: (item: EndorsingRights) => ({ data: item.deposit, options: { showFiatValue: true } })

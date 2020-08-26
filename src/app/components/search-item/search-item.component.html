@@ -7,7 +7,7 @@
     [typeaheadMinLength]="0"
     typeaheadOptionField="label"
     typeaheadGroupField="optionGroup"
-    placeholder="Search by Address / Alias / Transaction / Block"
+    placeholder="{{ 'search-item.placeholder' | translate }}"
     class="form-control form-control--focus-white"
     (keydown.enter)="onKeyEnter()"
     (typeaheadOnSelect)="onSelect($event)"

@@ -22,6 +22,7 @@ import { negate, isNil } from 'lodash'
 import { columns } from './table-definitions'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { OrderBy } from '@tezblock/services/base.service'
+import { TranslateService } from '@ngx-translate/core'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { isInBTC } from '@tezblock/domain/airgap'
@@ -64,6 +65,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private readonly iconPipe: IconPipe,
     readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService,
     private readonly activatedRoute: ActivatedRoute,
     private titleService: Title,
     private metaTagService: Meta,
@@ -169,67 +171,67 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
 
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.transaction-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.transaction-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.transaction-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Reveals',
+        title: this.translateService.instant('tabbed-table.transaction-detail.reveals'),
         active: false,
         kind: 'reveal',
         count: undefined,
         icon: this.iconPipe.transform('eye'),
-        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Activations',
+        title: this.translateService.instant('tabbed-table.transaction-detail.activations'),
         active: false,
         kind: 'activate_account',
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
-        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Votes',
+        title: this.translateService.instant('tabbed-table.transaction-detail.votes'),
         active: false,
         kind: ['ballot', 'proposals'],
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }, this.translateService),
         disabled: function() {
           return !this.count
         }

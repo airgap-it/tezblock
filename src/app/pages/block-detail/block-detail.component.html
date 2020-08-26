@@ -38,10 +38,10 @@
     <ng-template #noBlock>
       <div class="card p-3" *ngIf="(block$ | async) === null">
         <h5 class="card-title mb-4">
-          Invalid Block Level
+          {{ 'block-detail.invalid-block_title' | translate }}
         </h5>
         <p>
-          This block level is not valid.
+          {{ 'block-detail.invalid-block_text' | translate }}
         </p>
       </div>
     </ng-template>

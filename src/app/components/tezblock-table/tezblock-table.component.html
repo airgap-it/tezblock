@@ -42,7 +42,7 @@
                   }"
                   id="sortingColumn"
                 >
-                  {{ column.name }}
+                  {{ column.name | translate }}
                 </button>
                 <button class="btn btn-link  p-0 collapse--btn" id="sortingButton">
                   <ng-container *ngIf="!getDirection(column.field); else arrow">
@@ -59,7 +59,7 @@
             </ng-container>
             <ng-template #notSortable>
               <th [width]="column.width">
-                {{ column.name }}
+                {{ column.name | translate }}
               </th>
             </ng-template>
           </ng-container>
@@ -123,10 +123,12 @@
       <button type="button" class="btn btn-sm pl-md-3 pl-0" (click)="downloadCSV()">
         <small>
           <fa-icon [icon]="'download' | iconPipe" class="mr-1"></fa-icon>
-          Download CSV Export
+          {{ 'tezblock-table.download-csv_button' | translate }}
         </small>
       </button>
     </ng-container>
   </div>
-  <button *ngIf="pagination && data?.length > 0" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">Load more</button>
+  <button *ngIf="pagination && data?.length > 0" type="button" class="btn btn-sm btn-primary-light w-100" (click)="loadMore()">
+    {{ 'tezblock-table.load-more_button' | translate }}
+  </button>
 </div>

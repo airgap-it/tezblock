@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common'
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClient, HttpClientModule } from '@angular/common/http'
 import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
@@ -19,10 +19,12 @@ import { SortableModule } from 'ngx-bootstrap/sortable'
 import { TabsModule } from 'ngx-bootstrap/tabs'
 import { TooltipModule } from 'ngx-bootstrap/tooltip'
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead'
+import { NgxJsonViewerModule } from 'ngx-json-viewer'
 import { MomentModule } from 'ngx-moment'
 import { ToastrModule } from 'ngx-toastr'
-import { NgxJsonViewerModule } from 'ngx-json-viewer'
 
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core'
+import { TranslateHttpLoader } from '@ngx-translate/http-loader'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { AppEffects } from './app.effects'
@@ -76,6 +78,7 @@ import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-c
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component'
 import { EndorsementDetailEffects } from './pages/endorsement-detail/effects'
 import { EndorsementDetailComponent } from './pages/endorsement-detail/endorsement-detail.component'
+import { GlossaryComponent } from './pages/glossary/glossary.component'
 import { HealthEffects } from './pages/health/effects'
 import { HealthComponent } from './pages/health/health.component'
 import { ListEffects } from './pages/list/effects'
@@ -95,11 +98,14 @@ import { ChartDataService } from './services/chartdata/chartdata.service'
 import { CryptoPricesService } from './services/crypto-prices/crypto-prices.service'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
-import { VarDirective } from '@tezblock/directives/var.directive';
+import { VarDirective } from '@tezblock/directives/var.directive'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 
+function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http, './assets/i18n/', '.json')
+}
 @NgModule({
   imports: [
     AlertModule.forRoot(),
@@ -151,7 +157,15 @@ import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic
       DashboardLatestContractsTransactionsEffects,
       TokenContractOverviewEffects
     ]),
-    StorageModule.forRoot({ IDBNoWrap: true })
+    StorageModule.forRoot({ IDBNoWrap: true }),
+    TranslateModule.forRoot({
+      defaultLanguage: 'en',
+      loader: {
+        provide: TranslateLoader,
+        useFactory: createTranslateLoader,
+        deps: [HttpClient]
+      }
+    })
   ],
   declarations: [
     AppComponent,
@@ -203,10 +217,11 @@ import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic
     LatestContractsTransactionsComponent,
     TransactionErrorsComponent,
     TokenContractOverviewComponent,
+    GlossaryComponent,
     VarDirective,
     AssetsValueComponent,
     ProgressbarComponent,
-	BasicCellComponent
+    BasicCellComponent
   ],
   providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
   bootstrap: [AppComponent]

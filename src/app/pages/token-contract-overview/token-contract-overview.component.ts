@@ -13,6 +13,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
@@ -30,6 +31,7 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
   constructor(
     private readonly actions$: Actions,
     private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService,
     private titleService: Title,
     private metaTagService: Meta
   ) {
@@ -45,7 +47,7 @@ export class TokenContractOverviewComponent extends BaseComponent implements OnI
       .select(state => state.tokenContractOveview.tokenContracts)
       .pipe(map(contracts => (contracts.data || []).length < contracts.pagination.total))
     this.orderBy$ = this.store$.select(state => state.tokenContractOveview.tokenContracts.orderBy)
-    this.columns = columns()
+    this.columns = columns(this.translateService)
 
     this.store$.dispatch(actions.loadTokenContracts())
 

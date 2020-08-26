@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } 
 import { DecimalPipe } from '@angular/common'
 import { Observable, BehaviorSubject, pipe } from 'rxjs'
 import { switchMap, filter, map } from 'rxjs/operators'
-import * as moment from 'moment'
+import moment from 'moment'
 import BigNumber from 'bignumber.js'
 
 import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'

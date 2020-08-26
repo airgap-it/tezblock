@@ -6,7 +6,7 @@ import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -25,6 +25,7 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 import { get } from '@tezblock/services/fp'
 import { dataSelector } from '@tezblock/domain/table'
 
@@ -123,6 +124,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
     private readonly iconPipe: IconPipe,
+    private translateService: TranslateService,
     private titleService: Title,
     private metaTagService: Meta,
     private aliasService: AliasService
@@ -309,11 +311,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     const tabs = [
       {
         ...this.tabs[0],
-        columns: columns.transfers(options)
+        columns: columns.transfers(options, this.translateService)
       },
       {
         ...this.tabs[1],
-        columns: columns.other(options)
+        columns: columns.other(options, this.translateService)
       },
       {
         ...this.tabs[2],

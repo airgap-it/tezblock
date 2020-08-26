@@ -6,7 +6,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
 import { BlockStatus } from '@tezblock/services/health/health.service'
 import { map } from 'rxjs/operators'
-import * as moment from 'moment'
+import moment from 'moment'
 import { Title, Meta } from '@angular/platform-browser'
 
 const isOlderThan4Mins = (time: moment.Moment): boolean => {

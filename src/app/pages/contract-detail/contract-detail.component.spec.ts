@@ -5,7 +5,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 import { Actions } from '@ngrx/effects'
 import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { ContractDetailComponent } from './contract-detail.component'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
@@ -18,6 +18,9 @@ import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/cha
 import { initialState as cdInitialState } from './reducer'
 import { OperationTab } from './actions'
 import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 import { SocialType, Social } from '@tezblock/domain/contract'
 
 describe('ContractDetailComponent', () => {
@@ -32,7 +35,7 @@ describe('ContractDetailComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ContractDetailComponent],
+      declarations: [ContractDetailComponent, TranslatePipe],
       providers: [
         provideMockStore({ initialState }),
         { provide: Actions, useValue: EMPTY },
@@ -41,7 +44,9 @@ describe('ContractDetailComponent', () => {
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         IconPipe,
         AliasPipe,
-        ShortenStringPipe
+        ShortenStringPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
@@ -186,19 +191,13 @@ describe('ContractDetailComponent', () => {
     describe('transactions24hCount$', () => {
       it('counts transactions number from last 24h', () => {
         const transferA = {
-          timestamp: moment()
-            .add(-25, 'hours')
-            .valueOf()
+          timestamp: moment().add(-25, 'hours').valueOf()
         }
         const transferB = {
-          timestamp: moment()
-            .add(-20, 'hours')
-            .valueOf()
+          timestamp: moment().add(-20, 'hours').valueOf()
         }
         const transferC = {
-          timestamp: moment()
-            .add(-3, 'hours')
-            .valueOf()
+          timestamp: moment().add(-3, 'hours').valueOf()
         }
 
         storeMock.setState({
@@ -224,21 +223,15 @@ describe('ContractDetailComponent', () => {
     describe('transactions24hVolume$', () => {
       it('sum transactions from last 24h amount', () => {
         const transferA = {
-          timestamp: moment()
-            .add(-25, 'hours')
-            .valueOf(),
+          timestamp: moment().add(-25, 'hours').valueOf(),
           amount: 10
         }
         const transferB = {
-          timestamp: moment()
-            .add(-20, 'hours')
-            .valueOf(),
+          timestamp: moment().add(-20, 'hours').valueOf(),
           amount: 10
         }
         const transferC = {
-          timestamp: moment()
-            .add(-3, 'hours')
-            .valueOf(),
+          timestamp: moment().add(-3, 'hours').valueOf(),
           amount: 10
         }
 
@@ -275,7 +268,10 @@ describe('ContractDetailComponent', () => {
           contractDetails: {
             ...initialState.contractDetails,
             contract: {
-              socials: [{ type: SocialType.github, url: 'foo_url_1' }, { type: SocialType.medium, url: 'foo_url_2' }]
+              socials: [
+                { type: SocialType.github, url: 'foo_url_1' },
+                { type: SocialType.medium, url: 'foo_url_2' }
+              ]
             }
           }
         })

@@ -4,6 +4,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { HealthComponent } from './health.component'
 import { initialState as hInitialState } from './reducer'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('HealthComponent', () => {
   let component: HealthComponent
@@ -12,8 +15,12 @@ describe('HealthComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [HealthComponent],
-      providers: [provideMockStore({ initialState })],
+      declarations: [HealthComponent, TranslatePipe],
+      providers: [
+        provideMockStore({ initialState }),
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
+      ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 

@@ -5,6 +5,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { ResourcesWalletItemComponent } from './resources-wallet-item.component'
 import { Wallet } from '@tezblock/interfaces/Wallet'
+import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ResourcesWalletItemComponent', () => {
   let component: ResourcesWalletItemComponent
@@ -12,14 +15,16 @@ describe('ResourcesWalletItemComponent', () => {
   let mockedWallet: Wallet
 
   beforeEach(async(() => {
-    TestBed.configureTestingModule(
-      {
-        imports: [FontAwesomeModule],
-        declarations: [ResourcesWalletItemComponent],
-        providers: [IconPipe],
-        schemas: [CUSTOM_ELEMENTS_SCHEMA]
-      }
-    )
+    TestBed.configureTestingModule({
+      imports: [FontAwesomeModule, TranslateModule.forRoot()],
+      declarations: [ResourcesWalletItemComponent, TranslatePipe],
+      providers: [
+        IconPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
     fixture = TestBed.createComponent(ResourcesWalletItemComponent)
     component = fixture.componentInstance
