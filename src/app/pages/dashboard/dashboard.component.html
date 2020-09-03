@@ -11,7 +11,7 @@
   </alert>
   -->
   <div class="card py-4 search--container">
-    <div class="card-body p-4 ">
+    <div class="card-body p-4">
       <h5 class="card-title mb-3 text-primary">
         Explore the Tezos Blockchain
       </h5>
@@ -22,12 +22,12 @@
 
 <div class="mb-5">
   <div class="card py-4">
-    <div class="card-body p-4 ">
+    <div class="card-body p-4">
       <div class="container p-0">
         <div class="row justify-content-lg-between">
           <div class="col-md-6 col-lg-4">
             <div class="mb-4">
-              <h5 class="card-title__secondary mb-3 ">
+              <h5 class="card-title__secondary mb-3">
                 Current Cycle
               </h5>
               <div class="container p-0">
@@ -37,7 +37,7 @@
                   </div>
                   <div class="col">
                     <ng-container *ngIf="cycleStartingBlockLevel$">
-                      <p class="text-right text-secondary m-0 ">
+                      <p class="text-right text-secondary m-0">
                         {{ cycleStartingBlockLevel$ | async }} -
                         {{ cycleEndingBlockLevel$ | async }}
                       </p>
@@ -45,7 +45,7 @@
                   </div>
                 </div>
               </div>
-              <progressbar [value]="cycleProgress$ | async" style="height:6px"></progressbar>
+              <progressbar [value]="cycleProgress$ | async" style="height: 6px;"></progressbar>
               <div class="mt-2 container">
                 <div class="row">
                   <div class="col p-0">
@@ -63,10 +63,15 @@
               Governance
             </h5>
             <p>{{ currentPeriodKind$ | async }} Period until {{ (currentPeriodTimespan$ | async)?.end | amDateFormat: 'LL' }}</p>
-            <progressbar [value]="25 * (currentPeriodIndex$ | async)" style="height:6px" class="my-2"></progressbar>
+            <progressbar [value]="25 * (currentPeriodIndex$ | async)" style="height: 6px;" class="my-2"></progressbar>
             <div class="mt-2 container">
               <div class="row">
                 <div class="col-9 p-0">
+                  <app-hash-cell
+                    [data]="'PsDELPH1Kxsxt8f9eWbxQeRxkjfbxoqM52jvs5Y5fBxWWh4ifpo'"
+                    [options]="{ kind: 'proposal' }"
+                  ></app-hash-cell>
+                  <!--TODO: needs to be fixed
                   <app-hash-cell
                     *ngIf="proposalHash$ | async as proposalHash"
                     [data]="proposalHash"
@@ -75,6 +80,7 @@
                   <ng-container *ngIf="(proposalHash$ | async) === null">
                     <p class="text-secondary m-0">No Proposal submitted yet.</p>
                   </ng-container>
+                  -->
                 </div>
                 <div class="col col-3 p-0">
                   <div class="float-right">
@@ -103,19 +109,19 @@
           <ng-container *ngIf="isMainnet()">
             <div class="col-md-6 col-lg-3 col-xl-2 p-sm-0 p-3">
               <div class="mb-3">
-                <h5 class="card-title__secondary mb-3 ">
+                <h5 class="card-title__secondary mb-3">
                   Circulating Supply
                 </h5>
-                <h3>839,352,372 ꜩ</h3>
+                <h3>848,339,041 ꜩ</h3>
                 <!--TODO-->
               </div>
 
-              <h5 class="card-title__secondary mb-3 ">
+              <h5 class="card-title__secondary mb-3">
                 Market Cap
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('839352372').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('848339041').toFormat(0) }}</h3>
             </div>
-            <div class=" col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
                 Tezos Price Last
                 <button
@@ -175,8 +181,8 @@
     <div class="row mb-4">
       <div class="col-lg-6 mb-4 mb-lg-0">
         <div class="card latest py-4 h-100">
-          <div class="card-body p-4 ">
-            <h5 class="card-title mb-4 ">
+          <div class="card-body p-4">
+            <h5 class="card-title mb-4">
               Latest Blocks
             </h5>
             <block-item [blocks$]="blocks$"></block-item>
@@ -189,7 +195,7 @@
       <div class="col-lg-6 mb-4 mb-lg-0">
         <div class="card latest py-4 h-100">
           <div class="card-body p-4">
-            <h5 class="card-title mb-4 ">
+            <h5 class="card-title mb-4">
               Latest Transactions
             </h5>
             <transaction-item [data]="transactions$"></transaction-item>
@@ -203,10 +209,10 @@
   </div>
   <div class="container p-0 my-5">
     <div class="card py-4 h-100">
-      <div class="card-body p-4 ">
+      <div class="card-body p-4">
         <div class="row">
           <div class="col-lg-6 pr-3 pr-md-5 pb-5 pb-md-0">
-            <h5 class="card-title__secondary mb-3 ">
+            <h5 class="card-title__secondary mb-3">
               Latest Asset Contracts
             </h5>
             <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
@@ -215,7 +221,7 @@
             </button>
           </div>
           <div class="col-lg-6 pl-3 pl-md-5">
-            <h5 class="card-title__secondary mb-3 ">
+            <h5 class="card-title__secondary mb-3">
               Latest Transfers
             </h5>
             <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
