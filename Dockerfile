@@ -1,4 +1,4 @@
-FROM node:10 as angular-build
+FROM node:14 as angular-build
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
@@ -20,12 +20,10 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 RUN mkdir /app
 WORKDIR /app
 
-RUN npm install -g npm@6.4.1
-
 # install dependencies
 ADD .npmrc /app/.npmrc
 ADD package.json /app/package.json
-# ADD package-lock.json /app/package-lock.json
+ADD package-lock.json /app/package-lock.json
 COPY ./scripts /app/scripts
 
 ARG FONTAWESOME_NPM_AUTH_TOKEN
@@ -42,7 +40,7 @@ ARG GA_KEY
 
 RUN npm config set unsafe-perm true
 RUN npm run set-env
-RUN npm install
+RUN npm ci
 
 ENV NODE_ENV production
 
