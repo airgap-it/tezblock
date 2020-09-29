@@ -1,9 +1,14 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: tezblock-carthagenet-frontend
   namespace: tezblock
+  labels:
+    app: tezblock-carthagenet-frontend
 spec:
+  selector:
+    matchLabels:
+      app: tezblock-carthagenet-frontend
   replicas: 1
   revisionHistoryLimit: 3
   strategy:
