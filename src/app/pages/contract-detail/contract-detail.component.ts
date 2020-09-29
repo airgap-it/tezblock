@@ -143,12 +143,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias$ = this.store$
       .select(state => state.contractDetails.address)
       .pipe(map(address => address && !!this.aliasPipe.transform(address)))
-    this.transactions$ = combineLatest(
+    this.transactions$ = combineLatest([
       this.store$.select(state => state.contractDetails.currentTabKind),
       this.store$.select(fromRoot.contractDetails.transferOperations),
       this.store$.select(state => state.contractDetails.otherOperations.data),
       this.store$.select(state => state.contractDetails.tokenHolders)
-    ).pipe(
+    ]).pipe(
       map(([currentTabKind, transferOperations, otherOperations, tokenHolders]) => {
         if (currentTabKind === actions.OperationTab.transfers) {
           return transferOperations
@@ -164,24 +164,24 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
       })
     )
-    this.loading$ = combineLatest(
+    this.loading$ = combineLatest([
       this.store$.select(state => state.contractDetails.transferOperations.loading),
       this.store$.select(state => state.contractDetails.otherOperations.loading)
-    ).pipe(map(([transferOperationsLoading, otherOperationsLoading]) => transferOperationsLoading || otherOperationsLoading))
-    this.orderBy$ = combineLatest(
+    ]).pipe(map(([transferOperationsLoading, otherOperationsLoading]) => transferOperationsLoading || otherOperationsLoading))
+    this.orderBy$ = combineLatest([
       this.store$.select(state => state.contractDetails.currentTabKind),
       this.store$.select(state => state.contractDetails.transferOperations.orderBy),
       this.store$.select(state => state.contractDetails.otherOperations.orderBy)
-    ).pipe(
+    ]).pipe(
       map(([currentTabKind, transferOrderBy, otherOrderBy]) =>
         currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
       )
     )
     this.store$.select(state => state.contractDetails.transferOperations.loading)
-    this.showLoadMore$ = combineLatest(
+    this.showLoadMore$ = combineLatest([
       this.transactions$,
       this.store$.select(state => state.contractDetails.transferOperations.pagination)
-    ).pipe(
+    ]).pipe(
       map(([transferOperations, pagination]) =>
         transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
       )
@@ -204,21 +204,21 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       )
 
     this.subscriptions.push(
-      combineLatest(
+      combineLatest([
         this.address$,
         this.contract$,
-        combineLatest(
+        combineLatest([
           this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
           this.store$.select(state => state.contractDetails.otherOperations.pagination.total),
           this.store$.select(state => state.contractDetails.tokenHolders.pagination.total)
-        ).pipe(
+        ]).pipe(
           map(([transferCount, otherCount, tokenHoldersCount]) => [
             { key: actions.OperationTab.transfers, count: transferCount },
             { key: actions.OperationTab.other, count: otherCount },
             { key: actions.OperationTab.tokenHolders, count: tokenHoldersCount }
           ])
         )
-      )
+      ])
         .pipe(filter(([address, contract]) => !!address && !!contract))
         .subscribe(([address, contract, counts]) => this.updateTabs(address, contract, counts)),
 

@@ -54,10 +54,7 @@ export class AssetsValueComponent implements OnInit {
       map(assets => (Array.isArray(assets) ? assets.filter(asset => isConvertableToUSD(asset.symbol)).length : 0))
     )
 
-    this.value$ = combineLatest(
-      this.assets$,
-      this.store$.select(state => state.app.exchangeRates)
-    ).pipe(
+    this.value$ = combineLatest([this.assets$, this.store$.select(state => state.app.exchangeRates)]).pipe(
       map(([assets]) => assets),
       switchMap(assets =>
         get<Asset[]>(_assets => _assets.length > 0)(assets)

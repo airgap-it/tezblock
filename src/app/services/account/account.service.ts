@@ -32,7 +32,8 @@ export const getBakers = (): JsonAccountData[] =>
       account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
     )
 
-export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean => jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean =>
+  jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
 
 export interface GetDelegatedAccountsResponseDto {
   delegated: Account[]
@@ -48,37 +49,38 @@ export class AccountService extends BaseService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.post<Account[]>(
-      'accounts',
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: Operation.eq,
-            set: [id],
-            inverse: false
-          }
-        ],
-        limit: 1
-      }
+    return this.post<Account[]>('accounts', {
+      predicates: [
+        {
+          field: 'account_id',
+          operation: Operation.eq,
+          set: [id],
+          inverse: false
+        }
+      ],
+      limit: 1
+    }).pipe(
+      switchMap(accounts => {
+        return this.isBaker(accounts[0].account_id).pipe(
+          map(bakingStatus => {
+            return { ...accounts[0], is_baker: bakingStatus } // CONSEIL currently does not reliably provide the correct value for is_baker
+          })
+        )
+      })
     )
-    .pipe(map(first))
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
-    return this.post<Account[]>(
-      'accounts',
-      {
-        predicates: [
-          {
-            field: 'account_id',
-            operation: Operation.in,
-            set: ids,
-            inverse: false
-          }
-        ]
-      }
-    )
+    return this.post<Account[]>('accounts', {
+      predicates: [
+        {
+          field: 'account_id',
+          operation: Operation.in,
+          set: ids,
+          inverse: false
+        }
+      ]
+    })
   }
 
   getDelegatedAccounts(address: string): Observable<GetDelegatedAccountsResponseDto> {
@@ -103,7 +105,7 @@ export class AccountService extends BaseService {
 
           const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
 
-          return forkJoin(this.getAccountById(address), this.getAccountsByIds(originatedContracts)).pipe(
+          return forkJoin([this.getAccountById(address), this.getAccountsByIds(originatedContracts)]).pipe(
             map(([account, relatedAccounts]) => {
               const delegatedAccounts = account.delegate_value ? [account] : []
 
@@ -120,10 +122,9 @@ export class AccountService extends BaseService {
 
         const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
 
-        return forkJoin(this.getAccountById(address), this.getAccountsByIds(managerPubKeys)).pipe(
+        return forkJoin([this.getAccountById(address), this.getAccountsByIds(managerPubKeys)]).pipe(
           map(([account, relatedAccounts]) => {
             const delegated = account.delegate_value ? [account] : []
-
 
             return {
               delegated,
@@ -173,36 +174,32 @@ export class AccountService extends BaseService {
       .map(account => ({ name: account.alias, type: SearchOptionType.baker }))
 
     if (bakers.length === 0 && matchByAccountIds) {
-      return this.post<Account[]>(
-          'accounts',
+      return this.post<Account[]>('accounts', {
+        fields: ['account_id'],
+        predicates: [
           {
-            fields: ['account_id'],
-            predicates: [
-              {
-                field: 'account_id',
-                operation: Operation.startsWith,
-                set: [id],
-                inverse: false
-              }
-            ],
-            limit: 5
+            field: 'account_id',
+            operation: Operation.startsWith,
+            set: [id],
+            inverse: false
           }
-        )
-        .pipe(
-          map(_accounts =>
-            _accounts
-              .filter(account => {
-                const isContract = Object.keys(accounts)
-                  .map(key => ({ ...accounts[key], id: key }))
-                  .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
+        ],
+        limit: 5
+      }).pipe(
+        map(_accounts =>
+          _accounts
+            .filter(account => {
+              const isContract = Object.keys(accounts)
+                .map(key => ({ ...accounts[key], id: key }))
+                .some(_account => _account.id === account.account_id && _account.accountType === 'contract')
 
-                return !isContract
-              })
-              .map(account => {
-                return { name: account.account_id, type: SearchOptionType.account }
-              })
-          )
+              return !isContract
+            })
+            .map(account => {
+              return { name: account.account_id, type: SearchOptionType.account }
+            })
         )
+      )
     }
 
     return of(bakers)

@@ -155,7 +155,7 @@ export class ProposalDetailEffects {
   loadPeriodsTimespansTrigger$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriodsSucceeded),
-      combineLatest(this.actions$.pipe(ofType(appActions.loadPeriodInfosSucceeded))),
+      combineLatest(this.actions$.pipe(ofType(appActions.loadPeriodInfosSucceeded))), // TODO JGD
       map(() => actions.loadPeriodsTimespans())
     )
   )
