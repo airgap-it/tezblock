@@ -91,10 +91,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
           ))
       ),
 
-      combineLatest(
+      combineLatest([
         this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
         this.store$.select(state => state.proposalDetails.proposal)
-      )
+      ])
         .pipe(filter(([paramMap, proposal]) => !!proposal))
         .subscribe(() => {
           const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
@@ -133,10 +133,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
     this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
     this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
-    this.periodTimespan$ = combineLatest(
+    this.periodTimespan$ = combineLatest([
       this.store$.select(state => state.proposalDetails.periodKind),
       this.store$.select(state => state.proposalDetails.periodsTimespans)
-    ).pipe(
+    ]).pipe(
       filter(([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans),
       map(
         ([periodKind, periodsTimespans]) =>
@@ -167,10 +167,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.passRolls$ = this.store$.select(fromRoot.proposalDetails.passRolls)
     this.yayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.yayRollsPercentage)
     this.nayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.nayRollsPercentage)
-    this.showRolls$ = combineLatest(
-      this.store$.select(state => state.proposalDetails.periodKind),
-      this.yayRolls$
-    ).pipe(
+    this.showRolls$ = combineLatest([this.store$.select(state => state.proposalDetails.periodKind), this.yayRolls$]).pipe(
       map(
         ([periodKind, yayRolls]) =>
           [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(periodKind) !== -1 && yayRolls !== undefined

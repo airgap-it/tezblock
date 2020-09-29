@@ -3,6 +3,8 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
 
 import { ChainNetworkService } from './chain-network/chain-network.service'
 import { Observable } from 'rxjs'
+import { catchError, map } from 'rxjs/operators'
+import BigNumber from 'bignumber.js'
 
 export const maxLimit = 100000
 
@@ -122,6 +124,11 @@ export class BaseService {
     return this.httpClient.post<T>(_url, body, this.options)
   }
 
+  isBaker(address: string): Observable<boolean> {
+    const _url = `${this.environmentUrls.rpcUrl}/chains/main/blocks/head/context/delegates/${address}/staking_balance`
+    return this.httpClient.get<string>(_url).pipe(catchError(_error => "0")).pipe(map(stakingBalance => (new BigNumber(stakingBalance)).gt(0)))
+  }
+
   get<T>(url: string, isFullUrl = false, useOptions = false): Observable<T> {
     const _url: string = this.getUrl(url, isFullUrl)
     const options: Options = useOptions ? this.options : undefined
@@ -131,11 +138,11 @@ export class BaseService {
 
   protected getUrl(url: string, isFullUrl = false): string {
     return isFullUrl
-    ? url
-        .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
-        .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
-        .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
-        .replace(ENVIRONMENT_VAR, this.environmentVariable)
-    : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
+      ? url
+          .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
+          .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
+          .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
+          .replace(ENVIRONMENT_VAR, this.environmentVariable)
+      : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
   }
 }

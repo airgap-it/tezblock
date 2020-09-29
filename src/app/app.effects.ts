@@ -44,7 +44,10 @@ export class AppEffects {
 
   onCurrentCycleChaneResetCache$ = createEffect(
     () =>
-      combineLatest(this.store$.select(fromRoot.app.currentCycle), this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)).pipe(
+      combineLatest([
+        this.store$.select(fromRoot.app.currentCycle),
+        this.cacheService.get<CurrentCycleState>(CacheKeys.fromCurrentCycle)
+      ]).pipe(
         filter(([currentCycle, cycleCache]) => currentCycle && (!cycleCache || (cycleCache && cycleCache.cycleNumber !== currentCycle))),
         tap(([currentCycle, cycleCache]) => {
           this.cacheService

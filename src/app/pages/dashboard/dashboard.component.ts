@@ -97,7 +97,9 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         this.historicData$.pipe(
           map(data =>
             data.map(dataItem =>
-              pricePeriod === PricePeriod.day ? new Date(dataItem.time * 1000).toLocaleTimeString() : new Date(dataItem.time * 1000).toLocaleDateString()
+              pricePeriod === PricePeriod.day
+                ? new Date(dataItem.time * 1000).toLocaleTimeString()
+                : new Date(dataItem.time * 1000).toLocaleDateString()
             )
           )
         )
@@ -131,10 +133,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     this.passRolls$ = this.store$.select(fromRoot.dashboard.passRolls)
     this.yayRollsPercentage$ = this.store$.select(fromRoot.dashboard.yayRollsPercentage)
     this.nayRollsPercentage$ = this.store$.select(fromRoot.dashboard.nayRollsPercentage)
-    this.showRolls$ = combineLatest(
-      this.store$.select(state => state.app.latestBlock),
-      this.yayRolls$
-    ).pipe(
+    this.showRolls$ = combineLatest([this.store$.select(state => state.app.latestBlock), this.yayRolls$]).pipe(
       map(
         ([latestBlock, yayRolls]) =>
           latestBlock &&
