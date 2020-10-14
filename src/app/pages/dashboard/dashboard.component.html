@@ -10,14 +10,27 @@
     </span>
   </alert>
   -->
-  <div class="card py-4 search--container">
-    <div class="card-body p-4">
-      <h5 class="card-title mb-3 text-primary">
-        {{ 'dashboard.explore' | translate }}
-      </h5>
-      <app-search-item buttonLabel="{{ 'search-item.label' | translate }}"></app-search-item>
+  <div class="row mb-5">
+  <div class="col-md-8 mb-3 mb-md-0">
+    <div class="card py-4 search--container h-100">
+      <div class="card-body p-4 d-flex flex-column justify-content-center">
+        <h5 class="card-title mb-3 text-primary">
+          {{ 'dashboard.explore' | translate }}
+        </h5>
+        <app-search-item buttonLabel="{{ 'search-item.label' | translate }}"></app-search-item>
+      </div>
     </div>
   </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body p-4">
+        <small class="text-muted">Sponsored</small>
+        <p class="mb-3">Delegating crypto was never so easy!
+        </p>
+        <p class="m-0"><a href="https://airgap.it?source=tezblock" target="_blank">AirGap</a> the self-custody solution offers One-click delegation to the baker of your choice. The AirGap wallet was designed to store Tezos in an easy and safe manner. AirGap is an OpenSource wallet made for the people!</p>
+    </div>
+  </div>
+</div>
 </div>
 
 <div class="mb-5">
@@ -115,14 +128,14 @@
                 <h5 class="card-title__secondary mb-3 ">
                   {{ 'dashboard.circulating-supply' | translate }}
                 </h5>
-                <h3>848,339,041 ꜩ</h3>
+                <h3>852,879,227 ꜩ</h3>
                 <!--TODO-->
               </div>
 
               <h5 class="card-title__secondary mb-3 ">
                 {{ 'dashboard.market-cap' | translate }}
               </h5>
-              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('848339041').toFormat(0) }}</h3>
+              <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('852879227').toFormat(0) }}</h3>
             </div>
             <div class="col-md-6 col-lg-4">
               <h5 class="card-title__secondary mb-3">
