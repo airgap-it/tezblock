@@ -53,7 +53,7 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
     this.setupFilter()
 
     // for some reason only one subscription works ... thats why I'm using data: any[], and not data$: Observable<any[]>, because async pipe doesn't work (2nd subscription)
-    this._data$ = combineLatest(
+    this._data$ = combineLatest([
       this.pagination$.pipe(
         // this elegant approach doesn't work ( html binding seems not subscribing to data$ with this, but in code .subscribe(..) does.. )
         // pairwise(),
@@ -67,7 +67,7 @@ export class ClientSideTableComponent extends BaseComponent implements OnInit {
         })
       ),
       this.filter$
-    ).pipe(switchMap(([pagination, filter]) => this.dataSource.get(pagination, filter)))
+    ]).pipe(switchMap(([pagination, filter]) => this.dataSource.get(pagination, filter)))
 
     this.subscriptions.push(
       this._data$.subscribe(response => {

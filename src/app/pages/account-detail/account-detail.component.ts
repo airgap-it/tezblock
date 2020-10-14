@@ -266,7 +266,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           ? this.store$
               .select(state => state.accountDetails.bakerReward)
               .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
-          : combineLatest(this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$).pipe(
+          : combineLatest([this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$]).pipe(
               map(([rewardAmount, tezosBakerFee]) =>
                 rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
               )
@@ -279,11 +279,11 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       switchMap(account =>
         account.is_baker
           ? this.store$.select(state => state.accountDetails.busy.bakerReward)
-          : combineLatest(
+          : combineLatest([
               this.store$.select(state => state.accountDetails.busy.rewardAmount),
               this.store$.select(state => state.accountDetails.rewardAmount),
               this.tezosBakerFee$
-            ).pipe(
+            ]).pipe(
               map(
                 ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
                   !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
@@ -407,13 +407,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
-      combineLatest(
+      combineLatest([
         this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
         getRefresh([
           this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
           this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
         ])
-      )
+      ])
         .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
         .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind: kind || OperationTypes.Transaction }))),
 
