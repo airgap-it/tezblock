@@ -118,6 +118,7 @@ k8s-deploy-development:
     - kubectl apply -f k8s/tezblock/common/ --recursive
   only:
     - develop
+    - master
   tags:
     - docker
 
