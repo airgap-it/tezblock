@@ -5,19 +5,19 @@
 export const environment = {
   production: false,
   mainnet: {
-    rpcUrl: 'https://tezos-node.prod.gke.papers.tech',
-    conseilUrl: 'https://tezos-mainnet-conseil.prod.gke.papers.tech',
-    conseilApiKey: 'airgap00391',
-    targetUrl: 'https://mvp.tezblock.io'
+    rpcUrl: 'MAINNET_RPC_URL',
+    conseilUrl: 'MAINNET_CONSEIL_URL',
+    conseilApiKey: 'MAINNET_CONSEIL_API_KEY',
+    targetUrl: 'MAINNET_TARGET_URL'
   },
   carthagenet: {
-    rpcUrl: 'https://tezos-carthagenet-node.prod.gke.papers.tech',
-    conseilUrl: 'https://tezos-carthagenet-conseil.prod.gke.papers.tech',
-    conseilApiKey: 'airgap00391',
-    targetUrl: 'https://carthagenet.tezblock.io'
+    rpcUrl: 'CARTHAGENET_RPC_URL',
+    conseilUrl: 'CARTHAGENET_CONSEIL_URL',
+    conseilApiKey: 'CARTHAGENET_CONSEIL_API_KEY',
+    targetUrl: 'CARTHAGENET_TARGET_URL'
   },
   googleAnalyticsKey: undefined,
-  proFontAwesomeAvailable: true
+  proFontAwesomeAvailable: false
 }
 
 /*
