@@ -185,10 +185,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     // )
     this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
     this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
-    this.rightsLoading$ = combineLatest(
+    this.rightsLoading$ = combineLatest([
       this.store$.select(state => state.bakerTable.bakingRights.loading),
       this.store$.select(state => state.bakerTable.endorsingRights.loading)
-    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
+    ]).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
     this.rewardsLoading$ = this.store$.select(state => state.bakerTable.rewards.loading)
     this.accountLoading$ = this.store$.select(state => state.bakerTable.busy.activeDelegations)
     this.activeDelegations$ = this.store$.select(state => state.bakerTable.activeDelegations)

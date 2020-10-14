@@ -46,7 +46,25 @@ export class AccountService extends BaseService {
   }
 
   getAccountById(id: string): Observable<Account> {
-    return this.post<Account[]>('accounts', getAccountByIdBody(id)).pipe(map(first))
+    return this.post<Account[]>('accounts', {
+      predicates: [
+        {
+          field: 'account_id',
+          operation: Operation.eq,
+          set: [id],
+          inverse: false
+        }
+      ],
+      limit: 1
+    }).pipe(
+      switchMap(accounts => {
+        return this.isBaker(accounts[0].account_id).pipe(
+          map(bakingStatus => {
+            return { ...accounts[0], is_baker: bakingStatus } // CONSEIL currently does not reliably provide the correct value for is_baker
+          })
+        )
+      })
+    )
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
@@ -84,7 +102,7 @@ export class AccountService extends BaseService {
 
           const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
 
-          return forkJoin(this.getAccountById(address), this.getAccountsByIds(originatedContracts)).pipe(
+          return forkJoin([this.getAccountById(address), this.getAccountsByIds(originatedContracts)]).pipe(
             map(([account, relatedAccounts]) => {
               const delegatedAccounts = account.delegate_value ? [account] : []
 
@@ -101,7 +119,7 @@ export class AccountService extends BaseService {
 
         const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
 
-        return forkJoin(this.getAccountById(address), this.getAccountsByIds(managerPubKeys)).pipe(
+        return forkJoin([this.getAccountById(address), this.getAccountsByIds(managerPubKeys)]).pipe(
           map(([account, relatedAccounts]) => {
             const delegated = account.delegate_value ? [account] : []
 
