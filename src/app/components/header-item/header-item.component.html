@@ -196,6 +196,11 @@
                         {{ 'header-item.wallets_button' | translate }}
                       </a>
                     </li>
+                     <li>
+                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/glossary']">
+                        {{ 'header-item.glossary_button' | translate }}
+                      </a>
+                    </li>
                     <li>
                       <a class="dropdown-item" routerLinkActive="active" routerLink="/constants">
                         {{ 'header-item.constants_button' | translate }}
@@ -216,12 +221,7 @@
                         {{ 'header-item.development_button' | translate }}
                       </a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/glossary']">
-                        {{ 'header-item.glossary_button' | translate }}
-                      </a>
-                    </li>
-                  </ul>
+                                     </ul>
                 </span>
               </li>
               <li class="nav-item dropdown pl-2 pl-sm-0">

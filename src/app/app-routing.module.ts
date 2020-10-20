@@ -32,7 +32,7 @@ const routes: Routes = [
   { path: 'proposal/:id', component: ProposalDetailComponent },
   { path: 'contract/:id', component: ContractDetailComponent },
   { path: 'health', component: HealthComponent },
-  { path: 'glossary', component: GlossaryComponent }
+  { path: 'resources/glossary', component: GlossaryComponent }
 ]
 
 @NgModule({

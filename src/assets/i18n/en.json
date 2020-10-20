@@ -620,6 +620,8 @@
   },
   "glossary-additional-terms": {
     "glossary": "Glossary",
+    "introduction": "A comprehensive glossary for the various terminology used in the Tezos ecosystem.",
+    "search_placeholder": "Search by term",
     "account": "Account",
     "account_description": "An account is a unique identifier within protocol Alpha. There are different kinds of accounts (see Originated account and Delegate account). In the Context, each account is associated with a balance (an amount of tez available).",
     "amount": "Amount",
