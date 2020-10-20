@@ -300,8 +300,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           kind !== 'assets'
             ? this.store$.select(state => state.accountDetails.transactions.data)
             : this.store$.select(state => state.accountDetails.contractAssets.data)
-        ),
-        filter(negate(isNil))
+        )
       )
     this.areTransactionsLoading$ = this.store$
       .select(state => state.accountDetails.kind)

@@ -70,7 +70,7 @@ export const getTransactionsWithErrors = (
   tableState: TableState<Transaction>
 ): TableState<Transaction> => ({
   ...tableState,
-  data: tableState.data.map(transaction => {
+  data: tableState.data?.map(transaction => {
     const match = operationErrorsById.find(error => error.id === transaction.operation_group_hash)
 
     return {
