@@ -378,6 +378,44 @@
                       ></chart-item>
                     </ng-container>
                   </div>
+                  <div *ngIf="account.is_baker" class="col-md-6 col-lg-8 px-0 px-sm-3">
+                    <h5 class="card-title__secondary mb-3">
+                      Bakings / Endorsings
+                      <small>in current cycle</small>
+                    </h5>
+                    <ng-template #rightsPerBlockLevelTemplate>
+                      <div *appVar="rightsPerBlockLevelTooltipContext as context">
+                        <div class="mb-3">Blocks {{ context?.from }} - {{ context?.to }}</div>
+                        <ng-container [ngSwitch]="areRightsForBlockRange(context)">
+                          <ng-container *ngSwitchCase="true">
+                            <div>Baking Rights: {{ context?.bakes || '-' }}</div>
+                            <div>Endorsing Rights: {{ context?.endorsements || '-' }}</div>
+                          </ng-container>
+                          <ng-container *ngSwitchCase="false">
+                            No rights
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                    </ng-template>
+                    <div class="rights-chart">
+                      <ng-container *ngIf="areBusyRightsPerBlockLevel$ | async; else rightsGraph">
+                        <div *ngFor="let item of rightsPerBlockLevelBusy$ | async"></div>
+                      </ng-container>
+                      <ng-template #rightsGraph>
+                        <div
+                          (mouseenter)="setTooltip(item)"
+                          [tooltip]="rightsPerBlockLevelTemplate"
+                          *ngFor="let item of rightsPerBlockLevel$ | async"
+                          [ngClass]="{
+                            active: areRightsForBlockRange(item),
+                            'super-active': item.bakes > 0,
+                            past: item.isInFuture === -1,
+                            now: item.isInFuture === 0
+                          }"
+                        ></div>
+                      </ng-template>
+                    </div>
+                  </div>
                 </div>
               </div>
             </ng-container>

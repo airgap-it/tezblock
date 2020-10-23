@@ -7,7 +7,7 @@ import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
-import { negate, isNil, isNumber, uniqBy } from 'lodash'
+import { negate, isNil, isNumber, range, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
@@ -48,6 +48,14 @@ import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 import { jsonAccounts } from '@tezblock/domain/account'
+
+interface RightsPerBlockLevel {
+  isInFuture: number
+  from: number
+  to: number
+  endorsements: number
+  bakes: number
+}
 
 @Component({
   selector: 'app-account-detail',
@@ -98,7 +106,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
-  is_baker: boolean | undefined
 
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
@@ -136,6 +143,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   delegationControl: FormControl
   delegationControlDataSource$: BehaviorSubject<string[]>
   selectedDelegation: string
+  rightsPerBlockLevel$: Observable<RightsPerBlockLevel[]>
+  rightsPerBlockLevelBusy$: Observable<RightsPerBlockLevel[]>
+  rightsPerBlockLevelTooltipContext: RightsPerBlockLevel
+  areBusyRightsPerBlockLevel$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -341,6 +352,70 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
+    )
+    this.areBusyRightsPerBlockLevel$ = combineLatest(
+      this.store$.select(state => state.bakerTable.bakingRights.loading),
+      this.store$.select(state => state.bakerTable.endorsingRights.loading)
+    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
+    this.rightsPerBlockLevel$ = combineLatest(
+      this.store$.select(state => state.app.latestBlock),
+      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
+      this.store$.select(state => state.app.protocolVariables),
+      this.store$.select(state => state.bakerTable.bakingRights.data),
+      this.store$.select(state => state.bakerTable.endorsingRights.data)
+    ).pipe(
+      filter(
+        ([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) =>
+          latestBlock && firstBlockOfCurrentCycle && protocolVariables && bakingRights !== undefined && endorsingRights !== undefined
+      ),
+      map(([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) => {
+        /*
+          looks like bakingRewardsDetails/endorsingRewardsDetails property contains data for unique level(s)
+          so grouping no needed
+        */
+        const step = 6
+        const bakingRightsFromCurrentCycle = bakingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const endorsingRightsFromCurrentCycle = endorsingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
+        const isInLevelRange = (level: number) => (entity: { level: number }): boolean =>
+          entity.level >= level && entity.level <= level + step - 1
+
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+          const to = Math.min(level + step - 1, lastBlockLevelInCycle)
+
+          return {
+            isInFuture: to < latestBlock.level ? -1 : level > latestBlock.level ? 1 : 0,
+            from: level,
+            to,
+            endorsements: endorsingRightsFromCurrentCycle?.endorsingRewardsDetails.filter(isInLevelRange(level)).length,
+            bakes: bakingRightsFromCurrentCycle?.bakingRewardsDetails.filter(isInLevelRange(level)).length
+          }
+        })
+      })
+    )
+    this.rightsPerBlockLevelBusy$ = combineLatest(
+      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
+      this.store$.select(state => state.app.protocolVariables)
+    ).pipe(
+      filter(
+        ([firstBlockOfCurrentCycle, protocolVariables]) => !!firstBlockOfCurrentCycle && !!protocolVariables
+      ),
+      map(([firstBlockOfCurrentCycle, protocolVariables]) => {
+        const step = 6
+        const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
+
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+          const to = Math.min(level + step - 1, lastBlockLevelInCycle)
+
+          return {
+            isInFuture: undefined,
+            from: level,
+            to,
+            endorsements: undefined,
+            bakes: undefined
+          }
+        })
+      })
     )
 
     this.subscriptions.push(
@@ -596,6 +671,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       })
   }
 
+  setTooltip(item: RightsPerBlockLevel) {
+    this.rightsPerBlockLevelTooltipContext = item
+  }
+
+  areRightsForBlockRange(item: RightsPerBlockLevel): boolean {
+    return item?.bakes > 0 || item?.endorsements > 0
+  }
+
   private setupDelegation() {
     const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
     const bakers = getBakers()
@@ -745,7 +828,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
-    this.is_baker = false
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }
