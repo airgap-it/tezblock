@@ -221,7 +221,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: this.translateService.instant('tabbed-table.proposal-detail.exploration'),
+        title: this.translateService.instant('tabbed-table.proposal-detail.testing'),
         active: selectedTitle === 'Testing',
         kind: PeriodKind.Testing,
         count: undefined,

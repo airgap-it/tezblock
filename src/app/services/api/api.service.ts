@@ -1193,7 +1193,7 @@ export class ApiService {
   }
 
   getErrorsForOperations(operations: Transaction[]): Observable<OperationErrorsById[]> {
-    const distinctBlockLevels = operations.map(operation => operation.block_level).filter(distinctFilter)
+    const distinctBlockLevels = operations.filter(operation => operation.status !== 'applied').map(operation => operation.block_level).filter(distinctFilter)
     const contentWithError = (content: RPCContent): boolean =>
       _.get(content, 'metadata.operation_result.errors') ||
       get<{ result: { errors?: OperationError[] } }[]>(internal_operation_results =>

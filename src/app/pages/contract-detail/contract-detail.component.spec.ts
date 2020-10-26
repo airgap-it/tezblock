@@ -204,10 +204,7 @@ describe('ContractDetailComponent', () => {
           ...initialState,
           contractDetails: {
             ...initialState.contractDetails,
-            transferOperations: {
-              ...initialState.contractDetails.transferOperations,
-              data: [transferA, transferB, transferC]
-            }
+            transfer24hCount: 2
           }
         })
 
@@ -239,10 +236,7 @@ describe('ContractDetailComponent', () => {
           ...initialState,
           contractDetails: {
             ...initialState.contractDetails,
-            transferOperations: {
-              ...initialState.contractDetails.transferOperations,
-              data: [transferA, transferB, transferC]
-            }
+            transfer24hVolume: 20
           }
         })
 
