@@ -614,6 +614,8 @@
   },
   "glossary-additional-terms": {
     "glossary": "Glossar",
+    "introduction": "Ein ausführliche Zusammenfassungen, der Begriffe welche im Tezos Ökosystem verwendet werden.",
+    "search_placeholder": "Nach Begriff suchen",
     "account": "Account",
     "account_description": "Ein Account ist ein eindeutiger Kennzeichner innerhalb des Alpha Protokolls. Es gibt verschiedene Arten von Accounts (siehe Originated Account und Delegierter Account). Jeder Account ist assoziiert mit einer Balance (eine Menge an verfügbaren tez).",
     "amount": "Menge (Amount)",
