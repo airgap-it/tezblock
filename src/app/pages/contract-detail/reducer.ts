@@ -5,12 +5,15 @@ import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { get } from '@tezblock/services/fp'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import BigNumber from 'bignumber.js'
 
 export interface State {
   manager: string
   address: string
   contract: TokenContract
   copyToClipboardState: string
+  transfer24hVolume: string,
+  transfer24hCount: number,
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
   tokenHolders: TableState<TokenHolder>
@@ -23,6 +26,8 @@ export const initialState: State = {
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
+  transfer24hVolume: undefined,
+  transfer24hCount: undefined,
   transferOperations: getInitialTableState({
     field: 'block_level',
     direction: 'desc'
@@ -89,6 +94,25 @@ export const reducer = createReducer(
         currentPage: state.transferOperations.pagination.currentPage + 1
       }
     }
+  })),
+  on(actions.load24hTransferVolume, state => ({
+    ...state
+  })),
+  on(actions.load24hTransferVolumeSucceeded, (state, { data }) => ({
+    ...state,
+    transfer24hVolume: data.reduce((current, operation) => {
+      if (operation === undefined) {
+        return current
+      }
+
+      return current.plus(new BigNumber(operation.amount))
+    }, new BigNumber(0)).toFixed(),
+    transfer24hCount: data.filter(op => op !== undefined).length
+  })),
+  on(actions.load24hTransferVolumeFailed, state => ({
+    ...state,
+    transfer24hVolume: null,
+    transfer24hCount: null
   })),
   // on(actions.sortTransferOperations, (state, { orderBy }) => ({
   //   ...state,

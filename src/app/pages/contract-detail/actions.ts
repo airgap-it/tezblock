@@ -33,7 +33,10 @@ export const loadTransferOperationsSucceeded = createAction(
 )
 export const loadTransferOperationsFailed = createAction(`[${featureName}] Load Transfer Operations Failed`, props<{ error: any }>())
 export const loadMoreTransferOperations = createAction(`[${featureName}] Load More Transfer Operations`)
-// export const sortTransferOperations = createAction(`[${featureName}] Sort Transfer Operations`, props<{ orderBy: OrderBy }>())
+
+export const load24hTransferVolume = createAction(`[${featureName}] Load 24h Transfer Volume`, props<{ contract: TokenContract }>())
+export const load24hTransferVolumeSucceeded = createAction(`[${featureName}] Load 24h Transfer Volume Succeeded`, props<{ data: ContractOperation[] }>())
+export const load24hTransferVolumeFailed = createAction(`[${featureName}] Load 24h Transfer Volume Failed`, props<{ error: any }>())
 
 export const loadOtherOperations = createAction(`[${featureName}] Load Other Operations`, props<{ contract: TokenContract }>())
 export const loadOtherOperationsSucceeded = createAction(

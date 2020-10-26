@@ -70,7 +70,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   manager$: Observable<string>
   showFiatValue$: Observable<boolean>
   transactions24hCount$: Observable<number>
-  transactions24hVolume$: Observable<number>
+  transactions24hVolume$: Observable<string>
 
   tabs: Tab[] = [
     {
@@ -137,7 +137,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
-
+        
         this.revealed$ = this.accountService.getAccountStatus(address)
       })
     )
@@ -194,20 +194,8 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
     this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
-    this.transactions24hCount$ = this.store$
-      .select(state => state.contractDetails.transferOperations.data)
-      .pipe(
-        filter(negate(isNil)),
-        map((transitions: ContractOperation[]) => transitions.filter(last24)),
-        map(transitions => transitions.length)
-      )
-    this.transactions24hVolume$ = this.store$
-      .select(state => state.contractDetails.transferOperations.data)
-      .pipe(
-        filter(negate(isNil)),
-        map((transitions: ContractOperation[]) => transitions.filter(last24).map(transition => parseFloat(transition.amount.toString()))),
-        map(amounts => amounts.reduce((accumulator, currentItem) => accumulator + currentItem, 0))
-      )
+    this.transactions24hCount$ = this.store$.select(state => state.contractDetails.transfer24hCount)
+    this.transactions24hVolume$ = this.store$.select(state => state.contractDetails.transfer24hVolume)
 
     this.subscriptions.push(
       combineLatest([
@@ -242,6 +230,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+    
+    this.contract$.pipe(filter(contract => contract !== undefined)).subscribe((contract) => this.store$.dispatch(actions.load24hTransferVolume({ contract })))
+
     this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.contractAddress)} Contract - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',

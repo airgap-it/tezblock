@@ -117,13 +117,24 @@ export class ContractDetailEffects {
   loadTransferOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransferOperations),
-      withLatestFrom(this.store$.select(state => state.contractDetails.transferOperations.orderBy)),
-      switchMap(([{ contract }, orderBy]) =>
-        this.contractService.loadTransferOperations(contract, orderBy, maxLimit).pipe(
+      withLatestFrom(
+        this.store$.select(state => state.contractDetails.transferOperations.orderBy),
+        this.store$.select(state => state.contractDetails.transferOperations.pagination)
+      ),
+      switchMap(([{ contract }, orderBy, pagination]) =>
+        this.contractService.loadTransferOperations(contract, orderBy, pagination.currentPage * pagination.selectedSize).pipe(
           map(data => actions.loadTransferOperationsSucceeded({ data })),
           catchError(error => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
+    )
+  )
+
+  loadMoreTransferOperations$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadMoreTransferOperations),
+      withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
+      map(([action, contract]) => actions.loadTransferOperations({ contract }))
     )
   )
 
@@ -147,13 +158,17 @@ export class ContractDetailEffects {
     )
   )
 
-  // sortTransferOperations$ = createEffect(() =>
-  //   this.actions$.pipe(
-  //     ofType(actions.sortTransferOperations),
-  //     withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
-  //     map(([action, contract]) => actions.loadTransferOperations({ contractHash: contract.id }))
-  //   )
-  // )
+  load24hTransferVolume$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.load24hTransferVolume),
+      switchMap(({ contract }) =>
+        this.contractService.load24hTransferOperations(contract).pipe(
+          map(data => actions.load24hTransferVolumeSucceeded({ data })),
+          catchError(error => of(actions.load24hTransferVolumeFailed({ error })))
+        )
+      )
+    )
+  )
 
   onLoadOperationsLoadCounts$ = createEffect(() =>
     this.actions$.pipe(

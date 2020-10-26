@@ -3,13 +3,14 @@ import { HttpClient } from '@angular/common/http'
 import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
-import { TezosStaker, TezosBTC, TezosUSD, IAirGapTransaction } from 'airgap-coin-lib'
+import { TezosStaker, TezosBTC, TezosUSD } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
 import { getFaProtocol, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
+import moment from 'moment'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -187,24 +188,24 @@ export class ContractService extends BaseService {
       switchMap(contractOperations =>
         contractOperations.length > 0
           ? forkJoin(
-              contractOperations.map(contractOperation =>
-                from(
-                  faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
-                ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
-              )
-            ).pipe(
-              map(response =>
-                contractOperations.map((contractOperation, index) => ({
-                  ...contractOperation,
-                  entrypoint:
-                    contractOperation.parameters_entrypoints === 'default'
-                      ? _get(response[index], 'entrypoint')
-                      : contractOperation.parameters_entrypoints,
-                  symbol: contract.symbol,
-                  decimals: contract.decimals
-                }))
-              )
+            contractOperations.map(contractOperation =>
+              from(
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
             )
+          ).pipe(
+            map(response =>
+              contractOperations.map((contractOperation, index) => ({
+                ...contractOperation,
+                entrypoint:
+                  contractOperation.parameters_entrypoints === 'default'
+                    ? _get(response[index], 'entrypoint')
+                    : contractOperation.parameters_entrypoints,
+                symbol: contract.symbol,
+                decimals: contract.decimals
+              }))
+            )
+          )
           : of([])
       )
     )
@@ -219,6 +220,65 @@ export class ContractService extends BaseService {
       switchMap(
         contractOperations =>
           <Observable<ContractOperation[]>>fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract)
+      )
+    )
+  }
+
+  load24hTransferOperations(contract: TokenContract): Observable<ContractOperation[]> {
+    const cutoff = moment().subtract(24, 'hours')
+
+    return this.post<ContractOperation[]>('operations', {
+      fields: ['timestamp', 'parameters_entrypoints', 'parameters_micheline', 'parameters', 'kind'],
+      predicates: [
+        {
+          field: 'parameters_entrypoints',
+          operation: Operation.eq,
+          set: [
+            'transfer'
+          ],
+          inverse: false
+        },
+        {
+          field: 'parameters',
+          operation: Operation.isnull,
+          set: [],
+          inverse: true
+        },
+        {
+          field: 'kind',
+          operation: Operation.eq,
+          set: [
+            'transaction'
+          ],
+          inverse: false
+        },
+        {
+          field: 'destination',
+          operation: Operation.eq,
+          set: [
+            contract.id
+          ],
+          inverse: false
+        },
+        {
+          field: 'status',
+          operation: Operation.eq,
+          set: ['applied'],
+          inverse: false
+        },
+        {
+          field: 'timestamp',
+          operation: Operation.gt,
+          set: [
+            cutoff.toDate().getTime()
+          ],
+          inverse: false
+        }
+      ]
+    }).pipe(
+      switchMap(
+        contractOperations =>
+          fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract) as Observable<ContractOperation[]>
       )
     )
   }
