@@ -98,8 +98,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const tabNameFromQuery: string = this.activatedRoute.snapshot.queryParamMap.get('tab')
     const tabFromQuery: Tab = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
     const firstTabWithData: Tab = this.tabs.find(hasData)
-    const selectedTab: Tab = tabFromQuery || firstTabWithData
-
+    const firstActiveTab: Tab = this.tabs.find(tab => tab.active && (tab.count === undefined || tab.count > 0))
+    const selectedTab: Tab = tabFromQuery || firstActiveTab || firstTabWithData
     if (selectedTab) {
       this.selectTab(selectedTab)
     }
@@ -131,7 +131,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     if (this.selectedTab && selectedTab.title === this.selectedTab.title) {
       return
     }
-
     this.updateSelectedTab(selectedTab)
     this.tabClicked.emit(selectedTab.kind)
   }

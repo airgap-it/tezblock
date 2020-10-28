@@ -313,7 +313,6 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         columns: columns.entrypoints()
       }
     ].concat(customTabs)
-
     this.tabs = updateTabCounts(tabs, counts)
   }
 }
