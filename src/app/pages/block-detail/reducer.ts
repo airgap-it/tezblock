@@ -61,16 +61,20 @@ export const reducer = createReducer(
       block: false
     }
   })),
-  on(actions.loadOperationsByKind, (state, { blockHash, kind }) => ({
+  on(actions.loadOperationsByKind, (state, { blockHash, kind }) => {
+    const hasKindChanged = kind !== state.kind
+
+    return {
     ...state,
     blockHash,
     kind,
     transactionsLoadedByBlockHash: blockHash,
     operations: {
       ...state.operations,
+      data: hasKindChanged ? undefined : state.operations.data,
       loading: true
     }
-  })),
+  }}),
   on(actions.loadOperationsByKindSucceeded, (state, { data }) => ({
     ...state,
     operations: {
