@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core'
 
 import { OperationError, OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
 import { first } from '@tezblock/services/fp'
-import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 
 @Component({
   selector: 'app-transaction-errors',
@@ -14,10 +13,10 @@ export class TransactionErrorsComponent implements OnInit {
 
   // TODO: display multiple errors in tooltip ?
   get error(): OperationErrorMessage {
-    return this.errors ? operationErrorToMessage(first(this.errors), this.amountConverterPipe) : null
+    return this.errors && this.errors.length > 0 ? operationErrorToMessage(first(this.errors)) : null
   }
 
-  constructor(private readonly amountConverterPipe: AmountConverterPipe) {}
+  constructor() {}
 
   ngOnInit() {}
 }

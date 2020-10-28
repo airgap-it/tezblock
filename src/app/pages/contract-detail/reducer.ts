@@ -114,13 +114,6 @@ export const reducer = createReducer(
     transfer24hVolume: null,
     transfer24hCount: null
   })),
-  // on(actions.sortTransferOperations, (state, { orderBy }) => ({
-  //   ...state,
-  //   transferOperations: {
-  //     ...state.transferOperations,
-  //     orderBy
-  //   }
-  // })),
   on(actions.loadOtherOperations, state => ({
     ...state,
     otherOperations: {

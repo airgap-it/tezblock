@@ -8,7 +8,6 @@ import { Transaction } from 'src/app/interfaces/Transaction'
 import { CurrencyInfo } from 'src/app/services/crypto-prices/crypto-prices.service'
 import { OperationErrorMessage, operationErrorToMessage } from '@tezblock/domain/operations'
 import { first } from '@tezblock/services/fp'
-import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 
 @Component({
@@ -72,13 +71,12 @@ export class TransactionDetailWrapperComponent implements OnInit {
   statusLabel: string
 
   get error(): OperationErrorMessage {
-    return this.latestTransaction && this.latestTransaction.errors
-      ? operationErrorToMessage(first(this.latestTransaction.errors), this.amountConverterPipe)
+    return this.latestTransaction && this.latestTransaction.errors && this.latestTransaction.errors.length > 0
+      ? operationErrorToMessage(first(this.latestTransaction.errors))
       : null
   }
 
   constructor(
-    private readonly amountConverterPipe: AmountConverterPipe,
     private readonly copyService: CopyService,
     private readonly toastrService: ToastrService
   ) {}
