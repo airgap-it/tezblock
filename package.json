@@ -56,7 +56,7 @@
     "@ngx-pwa/local-storage": "^10.0.1",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^4.0.0",
-    "airgap-coin-lib": "^0.9.8-beta.5",
+    "airgap-coin-lib": "^0.9.8",
     "angular-in-memory-web-api": "github:brandonroberts/in-memory-web-api-bazel#50a34d8",
     "angularx-qrcode": "^1.6.4",
     "big-number": "^2.0.0",
