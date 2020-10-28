@@ -225,7 +225,7 @@ export class ContractDetailEffects {
   onChangeOperationsTabLoadOperations$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.changeOperationsTab),
-      filter(({ currentTabKind }) => currentTabKind !== actions.OperationTab.tokenHolders),
+      filter(({ currentTabKind }) => currentTabKind !== actions.OperationTab.tokenHolders && currentTabKind !== actions.OperationTab.entrypoints),
       withLatestFrom(this.store$.select(state => state.contractDetails.contract)),
       map(([{ currentTabKind }, contract]) =>
         currentTabKind === actions.OperationTab.transfers
