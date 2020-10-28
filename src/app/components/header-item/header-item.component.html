@@ -264,8 +264,8 @@
                   </ul>
                 </span>
               </li>
-              <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown #dp4="bs-dropdown">
+              <li class="nav-item dropdown pl-2 pl-sm-0 ml-md-2 mt-2 mt-md-0">
+                <span class="d-block dropdown__settings" dropdown #dp4="bs-dropdown">
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -275,24 +275,25 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     (mouseover)="dp1.hide(); dp2.hide()"
-                  >
-                    {{ translate.currentLang }}
+                  >      <fa-icon [icon]="'cog' | iconPipe" ></fa-icon>
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
+                    <div class="pb-2 px-4">
+                      <strong> {{ 'header-item.languages_label' | translate }}</strong></div>
                     <li role="menuitem">
-                      <a
+                                  <a
                         class="dropdown-item"
                         [ngClass]="'en' === translate.currentLang ? 'active' : ''"
                         (click)="changeLanguage('en'); dp4.hide()"
                       >
-                        EN
+                        English
                       </a>
                       <a
                         class="dropdown-item"
                         [ngClass]="'de' === translate.currentLang ? 'active' : ''"
                         (click)="changeLanguage('de'); dp4.hide()"
                       >
-                        DE
+                        Deutsch
                       </a>
                     </li>
                   </ul>

@@ -30,7 +30,8 @@
     "tezblock-health_button": "tezblock Health",
     "dapps_button": "Dapps",
     "development_button": "Entwicklung",
-    "glossary_button": "Glossar"
+    "glossary_button": "Glossar",
+    "languages_label": "Sprachen"
   },
   "footer-item": {
     "tezblock": "tezblock ist ein Blockexplorer für Tezos, eine open-source Platform für Assets und Applikationen unterstützt von einer globalen Community von Validators, Forschern und Builders.",

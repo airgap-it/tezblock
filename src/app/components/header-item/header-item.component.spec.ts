@@ -16,6 +16,8 @@ import { HeaderItemComponent } from './header-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { TranslateModule, TranslateService } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 
 describe('HeaderItemComponent', () => {
   let component: HeaderItemComponent
@@ -25,6 +27,7 @@ describe('HeaderItemComponent', () => {
   const initialState = { app: appInitialState }
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const breakpointObserverMock = getBreakpointObserverMock()
+  const iconPipeMock = getPipeMock()
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -34,9 +37,10 @@ describe('HeaderItemComponent', () => {
         provideMockStore({ initialState }),
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
-        { provide: TranslateService, useClass: TranslateServiceStub }
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: IconPipe, useValue: iconPipeMock },
       ],
-      declarations: [HeaderItemComponent]
+      declarations: [HeaderItemComponent, IconPipe]
     })
 
     testScheduler = new TestScheduler((actual, expected) => {
