@@ -5,7 +5,7 @@ import { catchError, map, switchMap, tap, filter, withLatestFrom } from 'rxjs/op
 import { Store } from '@ngrx/store'
 import { get, isNil, negate } from 'lodash'
 import BigNumber from 'bignumber.js'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import * as actions from './app.actions'
 import { BaseService, Operation, ENVIRONMENT_URL } from '@tezblock/services/base.service'

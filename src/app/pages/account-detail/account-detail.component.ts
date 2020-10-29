@@ -3,11 +3,11 @@ import { animate, state, style, transition, trigger } from '@angular/animations'
 import { ActivatedRoute } from '@angular/router'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { BehaviorSubject, Observable, combineLatest, forkJoin, of } from 'rxjs'
+import { BehaviorSubject, Observable, combineLatest } from 'rxjs'
 import { delay, distinctUntilChanged, map, filter, withLatestFrom, switchMap, take } from 'rxjs/operators'
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
-import { negate, isNil, isNumber, uniqBy } from 'lodash'
+import { negate, isNil, isNumber, range, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
@@ -18,9 +18,9 @@ import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { Account, JsonAccountData } from '@tezblock/interfaces/Account'
+import { Account, JsonAccount, JsonAccountData, getBakers, doesAcceptsDelegations } from '@tezblock/domain/account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService, getBakers, doesAcceptsDelegations } from '@tezblock/services/account/account.service'
+import { AccountService,  } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -34,6 +34,8 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
+import { TranslateService } from '@ngx-translate/core'
+import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
@@ -45,8 +47,15 @@ import { TabbedTableComponent } from '@tezblock/components/tabbed-table/tabbed-t
 import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { Asset } from '@tezblock/components/assets-value/assets-value.component'
+import { jsonAccounts } from '@tezblock/domain/account'
 
-const accounts = require('src/submodules/tezos_assets/accounts.json')
+interface RightsPerBlockLevel {
+  isInFuture: number
+  from: number
+  to: number
+  endorsements: number
+  bakes: number
+}
 
 @Component({
   selector: 'app-account-detail',
@@ -97,7 +106,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   revealed$: Observable<string>
   hasAlias: boolean | undefined
   hasLogo: boolean | undefined
-  is_baker: boolean | undefined
 
   fiatCurrencyInfo$: Observable<CurrencyInfo>
 
@@ -135,6 +143,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   delegationControl: FormControl
   delegationControlDataSource$: BehaviorSubject<string[]>
   selectedDelegation: string
+  rightsPerBlockLevel$: Observable<RightsPerBlockLevel[]>
+  rightsPerBlockLevelBusy$: Observable<RightsPerBlockLevel[]>
+  rightsPerBlockLevelTooltipContext: RightsPerBlockLevel
+  areBusyRightsPerBlockLevel$: Observable<boolean>
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET
@@ -238,6 +250,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     private readonly iconPipe: IconPipe,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService,
     private titleService: Title,
     private metaTagService: Meta,
     private aliasService: AliasService
@@ -271,6 +284,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             )
       )
     )
+
     this.isRewardAmountMinusFeeBusy$ = this.account$.pipe(
       filter(negate(isNil)),
       switchMap(account =>
@@ -289,7 +303,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       )
     )
     this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
-    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
+    this.remainingTime$ = this.store$.select(fromRoot.app.roundedRemainingTime)
     this.transactions$ = this.store$
       .select(state => state.accountDetails.kind)
       .pipe(
@@ -297,8 +311,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           kind !== 'assets'
             ? this.store$.select(state => state.accountDetails.transactions.data)
             : this.store$.select(state => state.accountDetails.contractAssets.data)
-        ),
-        filter(negate(isNil))
+        )
       )
     this.areTransactionsLoading$ = this.store$
       .select(state => state.accountDetails.kind)
@@ -340,11 +353,75 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
     )
+    this.areBusyRightsPerBlockLevel$ = combineLatest(
+      this.store$.select(state => state.bakerTable.bakingRights.loading),
+      this.store$.select(state => state.bakerTable.endorsingRights.loading)
+    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
+    this.rightsPerBlockLevel$ = combineLatest(
+      this.store$.select(state => state.app.latestBlock),
+      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
+      this.store$.select(state => state.app.protocolVariables),
+      this.store$.select(state => state.bakerTable.bakingRights.data),
+      this.store$.select(state => state.bakerTable.endorsingRights.data)
+    ).pipe(
+      filter(
+        ([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) =>
+          latestBlock && firstBlockOfCurrentCycle && protocolVariables && bakingRights !== undefined && endorsingRights !== undefined
+      ),
+      map(([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) => {
+        /*
+          looks like bakingRewardsDetails/endorsingRewardsDetails property contains data for unique level(s)
+          so grouping no needed
+        */
+        const step = 6
+        const bakingRightsFromCurrentCycle = bakingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const endorsingRightsFromCurrentCycle = endorsingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
+        const isInLevelRange = (level: number) => (entity: { level: number }): boolean =>
+          entity.level >= level && entity.level <= level + step - 1
+
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+          const to = Math.min(level + step - 1, lastBlockLevelInCycle)
+
+          return {
+            isInFuture: to < latestBlock.level ? -1 : level > latestBlock.level ? 1 : 0,
+            from: level,
+            to,
+            endorsements: endorsingRightsFromCurrentCycle?.endorsingRewardsDetails.filter(isInLevelRange(level)).length,
+            bakes: bakingRightsFromCurrentCycle?.bakingRewardsDetails.filter(isInLevelRange(level)).length
+          }
+        })
+      })
+    )
+    this.rightsPerBlockLevelBusy$ = combineLatest(
+      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
+      this.store$.select(state => state.app.protocolVariables)
+    ).pipe(
+      filter(
+        ([firstBlockOfCurrentCycle, protocolVariables]) => !!firstBlockOfCurrentCycle && !!protocolVariables
+      ),
+      map(([firstBlockOfCurrentCycle, protocolVariables]) => {
+        const step = 6
+        const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
+
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+          const to = Math.min(level + step - 1, lastBlockLevelInCycle)
+
+          return {
+            isInFuture: undefined,
+            from: level,
+            to,
+            endorsements: undefined,
+            bakes: undefined
+          }
+        })
+      })
+    )
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe(paramMap => {
         const address = paramMap.get('id')
-        const jsonAccount = accounts[address]
+        const jsonAccount = jsonAccounts[address]
 
         this.reset()
         this.setTabs(address)
@@ -359,7 +436,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.bakerTableInfos = {
           ...this.bakerTableInfos,
-          acceptsDelegations: get<JsonAccountData>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
+          acceptsDelegations: get<JsonAccount>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
@@ -451,7 +528,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   }
 
   private getBakingInfos(address: string) {
-    const payoutAddress = accounts.hasOwnProperty(address) ? accounts[address].hasPayoutAddress : null
+    const payoutAddress = jsonAccounts.hasOwnProperty(address) ? jsonAccounts[address].hasPayoutAddress : null
 
     this.store$.dispatch(actions.loadBakingBadRatings({ address }))
     this.store$.dispatch(actions.loadTezosBakerRating({ address, updateFee: false }))
@@ -563,7 +640,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     setTimeout(() => {
       this.current = 'copyGrey'
     }, 1500)
-    this.toastrService.success('has been copied to clipboard', address)
+    this.toastrService.success(this.translateService.instant('copy-modal.has-been-copied'), address)
   }
 
   sortBy(orderBy: OrderBy) {
@@ -594,6 +671,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       })
   }
 
+  setTooltip(item: RightsPerBlockLevel) {
+    this.rightsPerBlockLevelTooltipContext = item
+  }
+
+  areRightsForBlockRange(item: RightsPerBlockLevel): boolean {
+    return item?.bakes > 0 || item?.endorsements > 0
+  }
+
   private setupDelegation() {
     const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
     const bakers = getBakers()
@@ -621,45 +706,45 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   private setTabs(pageId: string) {
     this.tabs = [
       {
-        title: 'Transactions',
+        title: this.translateService.instant('tabbed-table.account-detail.transactions'),
         active: true,
         kind: 'transaction',
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
-        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Delegations',
+        title: this.translateService.instant('tabbed-table.account-detail.delegations'),
         active: false,
         kind: 'delegation',
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
-        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Originations',
+        title: this.translateService.instant('tabbed-table.account-detail.originations'),
         active: false,
         kind: 'origination',
         count: undefined,
         icon: this.iconPipe.transform('link'),
-        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
       },
       {
-        title: 'Endorsements',
+        title: this.translateService.instant('tabbed-table.account-detail.endorsements'),
         active: false,
         kind: 'endorsement',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -670,7 +755,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'assets',
         count: undefined,
         icon: this.iconPipe.transform('coins'),
-        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return !this.count
         }
@@ -679,7 +764,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.bakerTabs = [
       {
-        title: 'Baker Overview',
+        title: this.translateService.instant('baker-table.baker-overview.baker-overview'),
         active: true,
         kind: 'baker_overview',
         count: undefined,
@@ -689,7 +774,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Baking Rights',
+        title: this.translateService.instant('baker-table.baking-rights.baking-rights'),
         active: false,
         kind: 'baking_rights',
         count: undefined,
@@ -699,7 +784,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Endorsing Rights',
+        title: this.translateService.instant('baker-table.endorsing-rights.endorsing-rights'),
         active: false,
         kind: 'endorsing_rights',
         count: undefined,
@@ -709,7 +794,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Rewards',
+        title: this.translateService.instant('baker-table.rewards.rewards'),
         active: false,
         kind: 'rewards',
         count: undefined,
@@ -719,12 +804,12 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }
       },
       {
-        title: 'Votes',
+        title: this.translateService.instant('baker-table.votes'),
         active: false,
         kind: 'ballot',
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
-        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }),
+        columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
         disabled: function() {
           return this.count === 0
         }
@@ -743,7 +828,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.hasAlias = undefined
     this.hasLogo = undefined
     this.isCollapsed = true
-    this.is_baker = false
     this.rewardAmountSetFor = { account: undefined, baker: undefined }
     this.scrolledToTransactions = false
   }

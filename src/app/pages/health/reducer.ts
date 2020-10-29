@@ -21,7 +21,7 @@ export interface State {
   latestConseilBlock: BlockStatus
 }
 
-const initialState: State = {
+export const initialState: State = {
   latestNodeBlock: undefined,
   latestConseilBlock: undefined
 }

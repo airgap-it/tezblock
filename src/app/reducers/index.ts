@@ -117,7 +117,8 @@ export const app = {
   cycleStartingBlockLevel: createSelector(selectApp, fromApp.cycleStartingBlockLevelSelector),
   cycleEndingBlockLevel: createSelector(selectApp, fromApp.cycleEndingBlockLevelSelector),
   cycleProgress: createSelector(selectApp, fromApp.cycleProgressSelector),
-  remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector)
+  remainingTime: createSelector(selectApp, fromApp.remainingTimeSelector),
+  roundedRemainingTime: createSelector(selectApp, fromApp.roundedRemainingTimeSelector)
 }
 
 export const blockDetails = {

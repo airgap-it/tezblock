@@ -1,7 +1,7 @@
 <div>
   <div class="card-body p-4">
     <h1 class="card-title mb-4 ">
-      Transaction Details
+      {{ 'transaction-detail.transaction-details' | translate }}
       <span *ngIf="statusLabel" class="badge badge-pill badge-primary-light ml-1 cursor--pointer">
         {{ statusLabel | titlecase }}
       </span>
@@ -11,8 +11,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Transaction Hash'"
-            [tooltip]="'An identifier that is generated on transaction creation, used to uniquely identify a particular transaction.'"
+            [title]="'transaction-detail.transaction-hash' | translate"
+            [tooltip]="'transaction-detail.transaction-hash_tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>
@@ -39,8 +39,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Block'"
-            [tooltip]="'The block height at which this transaction was included into the blockchain.'"
+            [title]="'transaction-detail.block' | translate"
+            [tooltip]="'transaction-detail.block_tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>
@@ -48,7 +48,7 @@
         <button type="button" class="btn btn-link p-0" ng-href="#here" [routerLink]="['/block', latestTransaction.block_level]">
           {{ latestTransaction.block_level }}
           <span *ngIf="blockConfirmations" class="text-secondary ml-1">
-            {{ blockConfirmations }} Block Confirmation{{ blockConfirmations > 0 ? 's' : '' }}
+            {{ blockConfirmations }} {{ 'transaction-detail.block-confirmation' | translate }}{{ blockConfirmations > 0 ? 's' : '' }}
           </span>
         </button>
       </div>
@@ -57,8 +57,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Timestamp'"
-            [tooltip]="'The date an time at which this transaction was included in a block.'"
+            [title]="'transaction-detail.timestamp' | translate"
+            [tooltip]="'transaction-detail.timestamp_tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>
@@ -72,12 +72,18 @@
     <div class="row mb-3">
       <div class="col-md-3 pr-0">
         <p class="text-secondary mb-0">
-          <tooltip-item [title]="'Value'" [tooltip]="'The total amount of Tezzies included in this transaction.'"></tooltip-item>
+          <tooltip-item
+            [title]="'transaction-detail.value' | translate"
+            [tooltip]="'transaction-detail.value_tooltip' | translate"
+          ></tooltip-item>
         </p>
       </div>
       <ng-container *ngIf="totalAmount !== undefined; else loadingTemplate">
         <div class="col col-md-9">
-          <amount-cell [data]="totalAmount" [options]="{ showFiatValue: isMainnet, comparisonTimestamp: latestTransaction?.timestamp, maxDigits: 8 }"></amount-cell>
+          <amount-cell
+            [data]="totalAmount"
+            [options]="{ showFiatValue: isMainnet, comparisonTimestamp: latestTransaction?.timestamp, maxDigits: 8 }"
+          ></amount-cell>
         </div>
       </ng-container>
       <ng-template #hideValue>
@@ -98,8 +104,8 @@
       <div class="col-md-3">
         <p class="text-secondary mb-0">
           <tooltip-item
-            [title]="'Transaction Fees'"
-            [tooltip]="'The total amount of fees spent for transactions in this block.'"
+            [title]="'transaction-detail.transaction-fees' | translate"
+            [tooltip]="'transaction-detail.transaction-fees_tooltip' | translate"
           ></tooltip-item>
         </p>
       </div>

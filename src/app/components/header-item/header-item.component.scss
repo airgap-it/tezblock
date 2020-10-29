@@ -31,6 +31,12 @@
       box-shadow: none;
     }
   }
+  .dropdown__settings {
+    .dropdown-toggle::after {
+      display: none;
+    }
+  }
+
   /* fixes css overwrite for adding "active" class with [ngClass] */
   .dropdown-item.active {
     color: #fff !important;

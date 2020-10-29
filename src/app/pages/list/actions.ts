@@ -4,7 +4,7 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Baker } from '@tezblock/services/api/api.service'
 import { Block } from '@tezblock/interfaces/Block'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { OrderBy } from '@tezblock/services/base.service'
 import { OperationErrorsById } from '@tezblock/domain/operations'
 

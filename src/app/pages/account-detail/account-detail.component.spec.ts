@@ -1,42 +1,46 @@
+import { BreakpointObserver } from '@angular/cdk/layout'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
-import { provideMockStore, MockStore } from '@ngrx/store/testing'
-import { TestScheduler } from 'rxjs/testing'
-import { Actions } from '@ngrx/effects'
-import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
+import { Actions } from '@ngrx/effects'
+import { MockStore, provideMockStore } from '@ngrx/store/testing'
 import { BsModalService } from 'ngx-bootstrap/modal'
 import { ToastrService } from 'ngx-toastr'
-import { BreakpointObserver } from '@angular/cdk/layout'
+import { EMPTY } from 'rxjs'
+import { TestScheduler } from 'rxjs/testing'
 
-import { AccountDetailComponent } from './account-detail.component'
+import { TranslateService, TranslatePipe } from '@ngx-translate/core'
 import { initialState as appInitialState } from '@tezblock/app.reducer'
 import { initialState as adInitialState } from './reducer'
+import { initialState as btInitialState } from '@tezblock/components/baker-table/reducer'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
+import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getAccountServiceMock } from '@tezblock/services/account/account.service.mock'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { getBakingServiceMock } from '@tezblock/services/baking/baking.service.mock'
-import { CopyService } from '@tezblock/services/copy/copy.service'
-import { getCopyServiceMock } from '@tezblock/services/copy/copy.service.mock'
-import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
-import { getPipeMock } from 'test-config/mocks/pipe.mock'
-import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
-import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
-import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
-import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
-import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
-import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { getBeaconServiceMock } from '@tezblock/services/beacon/beacon.service.mock'
+import { CopyService } from '@tezblock/services/copy/copy.service'
+import { getCopyServiceMock } from '@tezblock/services/copy/copy.service.mock'
+import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
+import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer.mock'
+import { getBsModalServiceMock } from 'test-config/mocks/bs-modal-service.mock'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { getToastrServiceMock } from 'test-config/mocks/toastr-service.mock'
+import { AccountDetailComponent } from './account-detail.component'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('AccountDetailComponent', () => {
   let component: AccountDetailComponent
   let fixture: ComponentFixture<AccountDetailComponent>
   let testScheduler: TestScheduler
   let storeMock: MockStore<any>
-  const initialState = { accountDetails: adInitialState, app: appInitialState }
+  const initialState = { accountDetails: adInitialState, app: appInitialState, bakerTable: btInitialState }
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const activatedRouteMock = getActivatedRouteMock()
   const accountServiceMock = getAccountServiceMock()
@@ -69,11 +73,13 @@ describe('AccountDetailComponent', () => {
         { provide: ToastrService, useValue: toastrServiceMock },
         { provide: IconPipe, useValue: iconPipeMock },
         { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock },
         { provide: BeaconService, useValue: beaconServiceMock },
         ShortenStringPipe
       ],
       imports: [],
-      declarations: [AccountDetailComponent]
+      declarations: [AccountDetailComponent, TranslatePipe]
     })
 
     fixture = TestBed.createComponent(AccountDetailComponent)
@@ -415,6 +421,111 @@ describe('AccountDetailComponent', () => {
           const expectedValues = { a: 3 }
 
           expectObservable(component.numberOfContractAssets$).toBe(expected, expectedValues)
+        })
+      })
+    })
+
+    // describe('contractAssetsBalance$', () => {
+    //   it('when contractAssets are empty then returns 0', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       accountDetails: {
+    //         ...initialState.accountDetails,
+    //         contractAssets: { data: [] }
+    //       }
+    //     })
+
+    //     testScheduler.run(helpers => {
+    //       const { expectObservable } = helpers
+    //       const expected = 'a'
+    //       const expectedValues = { a: 0 }
+
+    //       expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
+    //     })
+    //   })
+
+    //   describe('when contractAssets are NOT empty', () => {
+    //     const asset1 = { contract: { amount: 1, symbol: 'tzBTC' } }
+    //     const asset2 = { contract: { amount: 2, symbol: 'STKR' } }
+    //     const asset3 = { contract: { amount: 3, symbol: 'xtz' } }
+
+    //     beforeEach(() => {
+    //       storeMock.setState({
+    //         ...initialState,
+    //         accountDetails: {
+    //           ...initialState.accountDetails,
+    //           contractAssets: { data: [asset1, asset2, asset3] }
+    //         }
+    //       })
+    //     })
+
+    //     it('then cryptoPricesService.getCurrencyConverterArgs is called with convertable contracts symbol', () => {
+    //       component.contractAssetsBalance$.subscribe(() => {})
+
+    //       expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[0].args[0]).toEqual(asset1.contract.symbol)
+    //       expect(cryptoPricesServiceMock.getCurrencyConverterArgs.calls.all()[1].args[0]).toEqual(asset3.contract.symbol)
+    //     })
+
+    //     it('returns sum of currencyConverterPipe.transform only for concertable to $ assets', () => {
+    //       cryptoPricesServiceMock.getCurrencyConverterArgs.and.returnValue(of('mocked currencyConverterArgs'))
+    //       currencyConverterPipeMock.transform.and.returnValue(4)
+
+    //       testScheduler.run(helpers => {
+    //         const { expectObservable } = helpers
+    //         const expected = 'a'
+    //         const expectedValues = { a: 8 }
+
+    //         expectObservable(component.contractAssetsBalance$).toBe(expected, expectedValues)
+    //       })
+    //     })
+    //   })
+    // })
+
+    describe('rightsPerBlockLevel$', () => {
+      it('when any of: latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights is empty then does not trigger', () => {
+        testScheduler.run(({ expectObservable }) => {
+          expectObservable(component.rightsPerBlockLevel$).toBe('---')
+        })
+      })
+
+      it('creates ranges by 6 levels but not exceedes last level of cycle', () => {
+        storeMock.setState({
+          ...initialState,
+          app: {
+            ...initialState.app,
+            latestBlock: { level: 3 },
+            firstBlockOfCurrentCycle: { level: 1, meta_cycle: 6 },
+            protocolVariables: { blocks_per_cycle: 8 }
+          },
+          bakerTable: {
+            ...initialState.bakerTable,
+            bakingRights: { data: [{ cycle: 6, bakingRewardsDetails: [{ level: 5 }] }] },
+            endorsingRights: { data: [{ cycle: 7 }] }
+          }
+        })
+
+        testScheduler.run(({ expectObservable }) => {
+          const expected = 'a'
+          const expectedValues = {
+            a: [
+              {
+                isInFuture: 0,
+                from: 1,
+                to: 6,
+                endorsements: undefined,
+                bakes: 1
+              },
+              {
+                isInFuture: 1,
+                from: 7,
+                to: 8,
+                endorsements: undefined,
+                bakes: 0
+              }
+            ]
+          }
+
+          expectObservable(component.rightsPerBlockLevel$).toBe(expected, expectedValues)
         })
       })
     })

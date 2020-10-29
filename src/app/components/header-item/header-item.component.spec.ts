@@ -5,7 +5,7 @@ import { TestScheduler } from 'rxjs/testing'
 import { of } from 'rxjs'
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core'
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import { initialState as appInitialState } from '@tezblock/app.reducer'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -14,6 +14,10 @@ import { getBreakpointObserverMock } from 'test-config/mocks/breakpoint-observer
 
 import { HeaderItemComponent } from './header-item.component'
 import { ComponentFixture, TestBed } from '@angular/core/testing'
+import { TranslateModule, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
+import { IconPipe } from '@tezblock/pipes/icon/icon.pipe'
 
 describe('HeaderItemComponent', () => {
   let component: HeaderItemComponent
@@ -23,17 +27,20 @@ describe('HeaderItemComponent', () => {
   const initialState = { app: appInitialState }
   const chainNetworkServiceMock = getChainNetworkServiceMock()
   const breakpointObserverMock = getBreakpointObserverMock()
+  const iconPipeMock = getPipeMock()
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       schemas: [CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA],
-      imports: [RouterTestingModule.withRoutes([]), BrowserAnimationsModule, BsDropdownModule.forRoot()],
+      imports: [RouterTestingModule.withRoutes([]), BrowserAnimationsModule, BsDropdownModule.forRoot(), TranslateModule.forRoot()],
       providers: [
         provideMockStore({ initialState }),
         { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
-        { provide: BreakpointObserver, useValue: breakpointObserverMock }
+        { provide: BreakpointObserver, useValue: breakpointObserverMock },
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: IconPipe, useValue: iconPipeMock },
       ],
-      declarations: [HeaderItemComponent]
+      declarations: [HeaderItemComponent, IconPipe]
     })
 
     testScheduler = new TestScheduler((actual, expected) => {

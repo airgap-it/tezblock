@@ -45,7 +45,7 @@ export interface State {
   divisionOfVotes: DivisionOfVotes[]
 }
 
-const initialState: State = {
+export const initialState: State = {
   id: undefined,
   proposal: undefined,
   loadingProposal: false,
@@ -74,10 +74,17 @@ export const reducer = createReducer(
     proposal: null,
     loadingProposal: false
   })),
-  on(actions.startLoadingVotes, (state, { periodKind }) => ({
+  on(actions.startLoadingVotes, (state, { periodKind }) => {
+    const hasKindChanged = periodKind !== state.periodKind
+    
+    return {
     ...state,
-    periodKind
-  })),
+    periodKind,
+    votes: {
+      ...state.votes,
+      data: hasKindChanged ? undefined : state.votes.data
+    }
+  }}),
   on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
     ...state,
     metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'value')

@@ -1,6 +1,7 @@
 import { Observable, of } from 'rxjs'
 
 import { OrderBy, Direction } from '@tezblock/services/base.service'
+import { get } from '@tezblock/services/fp'
 
 export interface Pagination {
   currentPage: number
@@ -62,10 +63,11 @@ export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T
     get: (pagination: Pagination, filter?: any) => {
       const startItem = (pagination.currentPage - 1) * pagination.selectedSize
       const endItem = pagination.currentPage * pagination.selectedSize
+      const _data = data.filter(_filterCondition(filter))
       
       return of({
-        data: data.slice(startItem, endItem).filter(_filterCondition(filter)),
-        total: data.filter(_filterCondition(filter)).length
+        data: _data.slice(startItem, endItem),
+        total: _data.length
       })
     },
     isFilterable: !!filterCondition
@@ -82,4 +84,12 @@ export function toPagable<T>(data: T[], pagination: Pagination): Pageable<T> {
         total: data.length
       }
     : { data: undefined, total: 0 }
+}
+
+export function dataSelector<T>(state: TableState<T>): T[] {
+  return get<T[]>(_data => _data.slice(0, state.pagination.currentPage * state.pagination.selectedSize))(state.data)
+}
+
+export function showLoadMoreSelector(state: TableState<any>): boolean {
+  return get<any[]>(_data => _data.length)(state.data) !== state.pagination.total
 }

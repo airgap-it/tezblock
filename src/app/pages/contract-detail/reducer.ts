@@ -5,23 +5,29 @@ import { TokenContract, ContractOperation, TokenHolder } from '@tezblock/domain/
 import { TableState, getInitialTableState } from '@tezblock/domain/table'
 import { get } from '@tezblock/services/fp'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
+import BigNumber from 'bignumber.js'
 
 export interface State {
   manager: string
   address: string
   contract: TokenContract
   copyToClipboardState: string
+  transfer24hVolume: string,
+  transfer24hCount: number,
   transferOperations: TableState<ContractOperation>
   otherOperations: TableState<ContractOperation>
   tokenHolders: TableState<TokenHolder>
+  entrypoints: TableState<string>
   currentTabKind: actions.OperationTab
 }
 
-const initialState: State = {
+export const initialState: State = {
   manager: undefined,
   address: undefined,
   contract: undefined,
   copyToClipboardState: 'copyGrey',
+  transfer24hVolume: undefined,
+  transfer24hCount: undefined,
   transferOperations: getInitialTableState({
     field: 'block_level',
     direction: 'desc'
@@ -31,7 +37,8 @@ const initialState: State = {
     direction: 'desc'
   }),
   tokenHolders: getInitialTableState(),
-  currentTabKind: actions.OperationTab.transfers
+  currentTabKind: actions.OperationTab.transfers,
+  entrypoints: getInitialTableState()
 }
 
 export const reducer = createReducer(
@@ -88,13 +95,25 @@ export const reducer = createReducer(
       }
     }
   })),
-  // on(actions.sortTransferOperations, (state, { orderBy }) => ({
-  //   ...state,
-  //   transferOperations: {
-  //     ...state.transferOperations,
-  //     orderBy
-  //   }
-  // })),
+  on(actions.load24hTransferVolume, state => ({
+    ...state
+  })),
+  on(actions.load24hTransferVolumeSucceeded, (state, { data }) => ({
+    ...state,
+    transfer24hVolume: data.reduce((current, operation) => {
+      if (operation === undefined) {
+        return current
+      }
+
+      return current.plus(new BigNumber(operation.amount))
+    }, new BigNumber(0)).toFixed(),
+    transfer24hCount: data.filter(op => op !== undefined).length
+  })),
+  on(actions.load24hTransferVolumeFailed, state => ({
+    ...state,
+    transfer24hVolume: null,
+    transfer24hCount: null
+  })),
   on(actions.loadOtherOperations, state => ({
     ...state,
     otherOperations: {
@@ -196,6 +215,42 @@ export const reducer = createReducer(
       pagination: {
         ...state.tokenHolders.pagination,
         currentPage: state.tokenHolders.pagination.currentPage + 1
+      }
+    }
+  })),
+  on(actions.loadEntrypoints, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      loading: true
+    }
+  })),
+  on(actions.loadEntrypointsSucceeded, (state, { data }) => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      data,
+      pagination: {
+        ...state.entrypoints.pagination,
+        total: data.length
+      },
+      loading: false
+    }
+  })),
+  on(actions.loadEntrypointsFailed, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      loading: false
+    }
+  })),
+  on(actions.loadMoreEntrypoints, state => ({
+    ...state,
+    entrypoints: {
+      ...state.entrypoints,
+      pagination: {
+        ...state.entrypoints.pagination,
+        currentPage: state.entrypoints.pagination.currentPage + 1
       }
     }
   })),

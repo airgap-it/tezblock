@@ -1,39 +1,31 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
 import { ResourcesWalletsComponent } from './resources-wallets.component'
-import { ResourcesWalletItemComponent } from "../../components/resources-wallet-item/resources-wallet-item.component";
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { TranslatePipe, TranslateService } from '@ngx-translate/core'
+import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
+import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
-xdescribe('ResourcesWalletsComponent', () => {
+describe('ResourcesWalletsComponent', () => {
   let component: ResourcesWalletsComponent
   let fixture: ComponentFixture<ResourcesWalletsComponent>
 
-  let unitHelper: UnitHelper
   beforeEach(() => {
-    unitHelper = new UnitHelper()
-    TestBed.configureTestingModule(
-      unitHelper.testBed({
-        providers: [IconPipe],
-        imports: [FontAwesomeModule],
-        declarations: [
-          ResourcesWalletItemComponent,
-          ResourcesWalletsComponent
-        ]
-      })
-    )
-      .compileComponents()
-      .catch(console.error)
-    fixture = TestBed.createComponent(ResourcesWalletsComponent)
-    component = fixture.componentInstance
-    fixture.detectChanges()
-  })
+    TestBed.configureTestingModule({
+      providers: [
+        IconPipe,
+        { provide: TranslateService, useClass: TranslateServiceStub },
+        { provide: TranslatePipe, useClass: TranslatePipeMock }
+      ],
+      imports: [FontAwesomeModule],
+      declarations: [ResourcesWalletsComponent, TranslatePipe],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    })
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(ResourcesWalletsComponent)
     component = fixture.componentInstance
-    fixture.detectChanges()
   })
 
   it('should create', () => {

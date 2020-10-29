@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core'
-import { Store }from '@ngrx/store'
 import { Router } from '@angular/router'
+import { Store } from '@ngrx/store'
 import { ToastrService } from 'ngx-toastr'
 
 import * as fromRoot from '@tezblock/reducers'
 import { ApiService } from '../api/api.service'
+import { ContractService } from '../contract/contract.service'
 import { TransactionService } from '../transaction/transaction.service'
 
 @Injectable({
@@ -16,13 +17,16 @@ export class DownloadService {
     private readonly apiService: ApiService,
     private readonly newTransactionService: TransactionService,
     private readonly router: Router,
-    private readonly toastrService: ToastrService
+    private readonly toastrService: ToastrService,
+    private readonly contractService: ContractService
   ) {}
 
-  download(layoutPage: string = 'account', limit: number = 100, kind: any) {
+  public download(layoutPage: string = 'account', limit: number = 100, kind: any) {
     const account$ = this.store$.select(state => state.accountDetails.account.account_id)
     const block$ = this.store$.select(state => state.blockDetails.transactionsLoadedByBlockHash)
     const hash$ = this.store$.select(state => state.transactionDetails.transactionHash)
+    const contract$ = this.store$.select(state => state.contractDetails.contract)
+
     this.toastrService.show(
       '<div class="spinner-border spinner-border-sm d-inline-block" role="status"></div><span class="ml-3">Preparing Download</span>',
       '',
@@ -85,6 +89,26 @@ export class DownloadService {
           }, 1000)
         })
       })
+    } else if (layoutPage === 'token-contract') {
+      contract$.subscribe(contract => {
+        this.contractService
+          .loadTransferOperations(contract, { field: 'block_level', direction: 'desc' }, limit)
+          .subscribe(transactions => {
+            setTimeout(() => {
+              const data = transactions
+              const csvData = this.ConvertToCSV(data)
+              const a = document.createElement('a')
+              a.setAttribute('style', 'display:none;')
+              document.body.appendChild(a)
+              const blob = new Blob([csvData], { type: 'text/csv' })
+              const url = window.URL.createObjectURL(blob)
+              a.href = url
+              a.download = 'tezblock_' + kind + '_' + this.router.url.substring(1) + '.csv'
+              a.click()
+              this.toastrService.clear()
+            }, 1000)
+          })
+      })
     }
   }
 
@@ -103,12 +127,14 @@ export class DownloadService {
         index === 'amount' ||
         index === 'delegatedBalance' ||
         index === 'originatedBalance' ||
+        index === 'balance' ||
         index === 'fee' ||
         index === 'block_level' ||
+        index === 'block_hash' ||
         index === 'operation_group_hash' ||
         index === 'gas_limit' ||
         index === 'storage_limit' ||
-        index === 'parameters'
+        index === 'parameters_entrypoints'
       ) {
         row += index + ','
         indexTable.push(index)
@@ -120,7 +146,7 @@ export class DownloadService {
     for (let i = 0; i < array.length; i++) {
       let line = ''
       indexTable.forEach(index => {
-        if (line != '') {
+        if (line !== '') {
           line += ','
         }
 

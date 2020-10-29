@@ -39,7 +39,8 @@ import {
   faThumbsDown,
   faHandRock,
   faCheck,
-  faTimes
+  faTimes,
+  faCog
 } from '@fortawesome/pro-light-svg-icons'
 
 export const addFontAwesome = () => {
@@ -88,6 +89,7 @@ export const addFontAwesome = () => {
     faThumbsDown,
     faHandRock,
     faCheck,
-    faTimes
+    faTimes,
+    faCog
   )
 }

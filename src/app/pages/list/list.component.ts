@@ -5,7 +5,7 @@ import { filter, map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range, negate, isNil } from 'lodash'
-import * as moment from 'moment'
+import moment from 'moment'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
@@ -22,19 +22,19 @@ import { defaultOptions } from '@tezblock/components/chart-item/chart-item.compo
 import { toXTZ } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { OrderBy } from '@tezblock/services/base.service'
 import { Title, Meta } from '@angular/platform-browser'
-import { tryGetProtocolByIdentifier } from '@tezblock/domain/airgap'
+import { TranslateService } from '@ngx-translate/core'
+import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
-const protocol = tryGetProtocolByIdentifier('xtz')
 
-const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
+export const timestampsToCountsPerDay = (timestamps: number[]): number[] => {
   const diffsInDays = timestamps.map(timestamp => moment().diff(moment(timestamp), 'days'))
 
   return range(0, noOfDays).map(index => diffsInDays.filter(diffsInDay => diffsInDay === index).length)
 }
 
-const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
+export const toAmountPerDay = (data: actions.TransactionChartItem[], network: TezosNetwork): number[] => {
   const toDiffsInDays = (data: actions.TransactionChartItem[]): { diffInDays: number; amount: number }[] =>
     data.map(item => ({
       diffInDays: moment().diff(moment(item.timestamp), 'days'),
@@ -46,16 +46,17 @@ const toAmountPerDay = (data: actions.TransactionChartItem[]): number[] => {
 
       return match ? match.map(item => item.amount).reduce((a, b) => a + b) : 0
     })
-  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, protocol) / 1000)
+  const decimals = getDecimalsForSymbol('xtz', network)
+  const amountToXTZ = (data: number[]): number[] => data.map(item => toXTZ(item, decimals) / 1000)
 
   return pipe(toDiffsInDays, groupBy('diffInDays'), sum, amountToXTZ)(data)
 }
 
-export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string) => (
+export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string, network: TezosNetwork) => (
   data: actions.TransactionChartItem[]
 ): { data: number[]; label: string }[] => [
   { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
-  { data: toAmountPerDay(data), label: amountLabel }
+  { data: toAmountPerDay(data, network), label: amountLabel }
 ]
 const timestampsToChartDataSource = (label: string) => (timestamps: number[]): { data: number[]; label: string } => ({
   data: timestampsToCountsPerDay(timestamps),
@@ -91,7 +92,7 @@ export class ListComponent extends BaseComponent implements OnInit {
   )
 
   private get routeName(): string {
-    return this.route.snapshot.paramMap.get('route')
+    return this.activatedRoute.snapshot.paramMap.get('route')
   }
 
   private get isMainnet(): boolean {
@@ -101,8 +102,9 @@ export class ListComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly route: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute,
     private readonly store$: Store<fromRoot.State>,
+    private translateService: TranslateService,
     private titleService: Title,
     private metaTagService: Meta
   ) {
@@ -111,8 +113,8 @@ export class ListComponent extends BaseComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.routeName$ = this.route.paramMap.pipe(map(paramMap => paramMap.get('route')))
-    this.route.paramMap.subscribe(paramMap => {
+    this.routeName$ = this.activatedRoute.paramMap.pipe(map(paramMap => paramMap.get('route')))
+    this.activatedRoute.paramMap.subscribe(paramMap => {
       this.titleService.setTitle(`Tezos ${paramMap.get('route').replace(/^\w/, c => c.toUpperCase())}s - tezblock`)
     })
     this.routeName$.subscribe(routeName => {
@@ -128,7 +130,13 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.actions$.pipe(ofType(actions.loadBlocksSucceeded))
               ]).subscribe(() => this.store$.dispatch(actions.loadBlocks()))
             )
-            this.setupTable(columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }), blockData$, blockLoading$, blockOrderBy$)
+            this.setupTable(
+              columns[OperationTypes.Block]({ showFiatValue: this.isMainnet }, this.translateService),
+              blockData$,
+              blockLoading$,
+              blockOrderBy$
+            )
+
             this.metaTagService.updateTag({
               name: 'description',
               content: `Tezos Blocks on tezblock with information about bakers, timestamp, transaction volume, fees, number of transactions and fitness of each block.">`
@@ -167,7 +175,10 @@ export class ListComponent extends BaseComponent implements OnInit {
               //this.store$.select(state => state.list.transactionsChartDatasets)
               this.store$
                 .select(state => state.list.transactionsChartData)
-                .pipe(filter(Array.isArray), map(toTransactionsChartDataSource('Transactions', 'Volume')))
+                .pipe(
+                  filter(Array.isArray),
+                  map(toTransactionsChartDataSource('Transactions', 'Volume', this.chainNetworkService.getNetwork()))
+                )
             this.transactionsTotalXTZ$ = this.store$
               .select(state => state.list.transactionsChartData)
               .pipe(
@@ -184,7 +195,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadTransactions()))
             )
             this.setupTable(
-              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Transaction]({ showFiatValue: this.isMainnet }, this.translateService),
               transactionData$,
               transactionLoading$,
               transactionOrderBy$
@@ -219,7 +230,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadActivations()))
             )
             this.setupTable(
-              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Activation]({ showFiatValue: this.isMainnet }, this.translateService),
               activationsData$,
               activationsLoading$,
               activationsOrderBy$
@@ -255,7 +266,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadOriginations()))
             )
             this.setupTable(
-              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Origination]({ showFiatValue: this.isMainnet }, this.translateService),
               originationsData$,
               originationsLoading$,
               originationsOrderBy$
@@ -277,7 +288,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDelegations()))
             )
             this.setupTable(
-              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Delegation]({ showFiatValue: this.isMainnet }, this.translateService),
               delegationsData$,
               delegationsLoading$,
               delegationsOrderBy$
@@ -299,7 +310,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Endorsement]({ showFiatValue: this.isMainnet }, this.translateService),
               endorsementsData$,
               endorsementsLoading$,
               endorsementsOrderBy$
@@ -320,7 +331,12 @@ export class ListComponent extends BaseComponent implements OnInit {
                 this.actions$.pipe(ofType(actions.loadVotesSucceeded))
               ]).subscribe(() => this.store$.dispatch(actions.loadVotes()))
             )
-            this.setupTable(columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }), votesData$, votesLoading$, votesOrderBy$)
+            this.setupTable(
+              columns[OperationTypes.Ballot]({ showFiatValue: this.isMainnet }, this.translateService),
+              votesData$,
+              votesLoading$,
+              votesOrderBy$
+            )
             this.metaTagService.updateTag({
               name: 'description',
               content: `Tezos Votes on tezblock with the latest votes with information about baker, ballot, timestamp, kind, voting period, number of votes, proposal and level of each vote.">`
@@ -338,7 +354,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleBakings()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleBakingEvidenceOverview]({ showFiatValue: this.isMainnet }, this.translateService),
               dbData$,
               dbLoading$,
               dbOrderBy$
@@ -360,7 +376,12 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview](
+                {
+                  showFiatValue: this.isMainnet
+                },
+                this.translateService
+              ),
               deData$,
               deLoading$,
               deOrderBy$
@@ -382,7 +403,12 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadDoubleEndorsements()))
             )
             this.setupTable(
-              columns[OperationTypes.DoubleEndorsementEvidenceOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.DoubleEndorsementEvidenceOverview](
+                {
+                  showFiatValue: this.isMainnet
+                },
+                this.translateService
+              ),
               bakersData$,
               bakersLoading$,
               bakersOrderBy$
@@ -413,7 +439,7 @@ export class ListComponent extends BaseComponent implements OnInit {
               ]).subscribe(() => this.store$.dispatch(actions.loadProposals()))
             )
             this.setupTable(
-              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.ProposalOverview]({ showFiatValue: this.isMainnet }, this.translateService),
               proposalData$,
               proposalLoading$,
               proposalOrderBy$,
@@ -432,7 +458,7 @@ export class ListComponent extends BaseComponent implements OnInit {
             this.store$.dispatch(actions.loadContracts())
 
             this.setupTable(
-              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }),
+              columns[OperationTypes.Contract]({ showFiatValue: this.isMainnet }, this.translateService),
               contractsData$,
               loadingContracts$,
               contractsOrderBy$,

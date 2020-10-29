@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
-
-import { ChainNetworkService } from './chain-network/chain-network.service'
 import { Observable } from 'rxjs'
+import { ChainNetworkService } from './chain-network/chain-network.service'
+import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls'
 import { catchError, map } from 'rxjs/operators'
 import BigNumber from 'bignumber.js'
 
@@ -74,13 +74,6 @@ export enum ENVIRONMENT_URL {
 }
 
 export const ENVIRONMENT_VAR = '{environmentVariable}'
-
-export interface EnvironmentUrls {
-  rpcUrl: string
-  conseilUrl: string
-  conseilApiKey: string
-  targetUrl: string
-}
 
 export interface Options {
   headers?:

@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
-import * as moment from 'moment'
+import moment from 'moment'
 import { forkJoin, Observable, of, combineLatest } from 'rxjs'
 import { catchError, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import { getTokenContracts } from '@tezblock/domain/contract'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { Block } from '@tezblock/interfaces/Block'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import * as fromRoot from '@tezblock/reducers'
@@ -239,7 +238,7 @@ export class ListEffects {
                   denouncedLevel: additionalData.denouncedBlockLevel,
                   baker: additionalData.baker
                 }
-              }),
+              })
             )
           })
         ).pipe(
@@ -293,18 +292,20 @@ export class ListEffects {
       switchMap(([action, temporaryData]) => {
         return combineLatest(
           temporaryData.map(doubleEndorsement => {
-            return this.rewardService.getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash).pipe(
-              map(additionalData => {
-                return {
-                  ...doubleEndorsement,
-                  reward: additionalData.bakerReward,
-                  offender: additionalData.offender,
-                  lostAmount: additionalData.lostAmount,
-                  denouncedLevel: additionalData.denouncedBlockLevel,
-                  baker: additionalData.baker
-                }
-              })
-            )
+            return this.rewardService
+              .getDoubleEndorsingEvidenceData(doubleEndorsement.block_level, doubleEndorsement.operation_group_hash)
+              .pipe(
+                map(additionalData => {
+                  return {
+                    ...doubleEndorsement,
+                    reward: additionalData.bakerReward,
+                    offender: additionalData.offender,
+                    lostAmount: additionalData.lostAmount,
+                    denouncedLevel: additionalData.denouncedBlockLevel,
+                    baker: additionalData.baker
+                  }
+                })
+              )
           })
         ).pipe(
           map(doubleEndorsements => {

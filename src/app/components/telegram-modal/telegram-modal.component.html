@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h5 class="modal-title pull-left">
-    Telegram Tezos Notifier Bot
+    {{ 'telegram-modal-component.title' | translate }}
   </h5>
   <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
     <span aria-hidden="true">&times;</span>
@@ -8,12 +8,12 @@
 </div>
 
 <div class="modal-body">
-  With the Telegram
-  <a href="https://tzsnt.fr/" target="_blank">Tezos Notifier Bot</a>
-  , you can stay up-to-date about accounts and be notified for delegations, transactions and much more directly in Telegram.
+  {{ 'telegram-modal-component.text_1' | translate }}
+  <a href="https://tzsnt.fr/" target="_blank">{{ 'telegram-modal-component.telegram_link' | translate }}</a>
+  {{ 'telegram-modal-component.text_2' | translate }}
   <br />
   <br />
-  <strong>You'll be notified about the following address</strong>
+  <strong>{{ 'telegram-modal-component.notified-about' | translate }}</strong>
   <div class="row py-2">
     <div class="col">
       <address-item
@@ -26,13 +26,13 @@
   </div>
   <div class="row py-2">
     <div class="col">
-      <strong>Choose a corresponding name</strong>
+      <strong>{{ 'telegram-modal-component.choose-name' | translate }}</strong>
     </div>
   </div>
   <form [formGroup]="form">
     <div class="form-group">
-      <input formControlName="botName" class="form-control" placeholder="Enter a name for this address" />
-      <div *ngIf="botNameInvalid" class="text-danger">The name can have only 18 characters.</div>
+      <input formControlName="botName" class="form-control" placeholder="{{ 'telegram-modal-component.placeholder' | translate }}" />
+      <div *ngIf="botNameInvalid" class="text-danger">{{ 'telegram-modal-component.name-too-long' | translate }}</div>
     </div>
 
     <button
@@ -41,7 +41,7 @@
       (click)="createTelegramBot()"
       [ngClass]="{ disabled: !botNameControl.value || botNameInvalid }"
     >
-      Start Notifications
+      {{ 'telegram-modal-component.start-notifications_button' | translate }}
     </button>
   </form>
 </div>

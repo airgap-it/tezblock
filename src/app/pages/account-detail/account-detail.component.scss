@@ -1,3 +1,7 @@
+$light-blue: #d6dfff;
+$light-grey: #f4f6fc;
+$blue: #2e5bff;
+
 ::ng-deep app-account-detail {
   .chart__container {
     min-height: 125px;
@@ -29,4 +33,40 @@
 
 .float-left > * {
   float: left;
+}
+
+.rights-chart {
+  display: grid;
+  grid-auto-rows: 10px;
+  grid-template-columns: repeat(auto-fit, 10px);
+  grid-gap: 2px;
+  min-height: 145px;
+
+  div {
+    background-color: $light-grey;
+
+    &.active {
+      background-color: darken($light-grey, 10%);
+    }
+
+    &.super-active {
+      background-color: darken($light-grey, 20%);
+    }
+
+    &.now {
+      background-color: $blue;
+    }
+
+    &.past {
+      background-color: $light-blue;
+
+      &.active {
+        background-color: darken($light-blue, 10%);
+      }
+
+      &.super-active {
+        background-color: darken($light-blue, 20%);
+      }
+    }
+  }
 }

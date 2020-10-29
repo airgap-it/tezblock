@@ -6,8 +6,8 @@
     <ng-container *ngIf="account$ | async as account; else noAccount">
       <div class="row">
         <div class="col-lg-6 mb-4 mb-lg-0 card__top">
-          <div class="card h-100 pt-3 ">
-            <div class="card-body p-4 ">
+          <div class="card h-100 pt-3">
+            <div class="card-body p-4">
               <div class="row mb-4">
                 <div class="d-flex align-items-end col-md-2 pr-0 mb-sm-0 pb-1 pb-sm-3">
                   <identicon [address]="account.account_id" [sizeLarge]="true"></identicon>
@@ -54,21 +54,25 @@
                       [address]="account.account_id"
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
-                    <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">Exchange</span>
-                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-light ml-1">Revealed</span>
+                    <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">
+                      {{ 'account-detail.exchange' | translate }}
+                    </span>
+                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-light ml-1">
+                      {{ 'account-detail.revealed' | translate }}
+                    </span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-light ml-1">
-                      Not Revealed
+                      {{ 'account-detail.not-revealed' | translate }}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div class="row mb-3">
-                <div class=" col-md-2 pr-0">
-                  <p class="text-secondary mb-0">Balance</p>
+                <div class="col-md-2 pr-0">
+                  <p class="text-secondary mb-0">{{ 'account-detail.balance' | translate }}</p>
                 </div>
                 <div
-                  class=" col-md-10 pl-sm-0"
+                  class="col-md-10 pl-sm-0"
                   *ngIf="(account.balance | amountConverter: { protocolIdentifier: 'xtz' }) > '0'; else hideValue"
                 >
                   <h5 class="mb-0">
@@ -76,7 +80,7 @@
                   </h5>
                 </div>
                 <ng-template #hideValue>
-                  <div class=" col-md-10 pl-sm-0">
+                  <div class="col-md-10 pl-sm-0">
                     <h5 class="mb-0">0</h5>
                   </div>
                 </ng-template>
@@ -84,11 +88,11 @@
 
               <div class="row mb-3">
                 <ng-container *ngIf="isMainnet">
-                  <div class=" col-md-2 pr-0">
-                    <p class="text-secondary mb-0">Value</p>
+                  <div class="col-md-2 pr-0">
+                    <p class="text-secondary mb-0">{{ 'account-detail.value' | translate }}</p>
                   </div>
                   <div
-                    class=" col-md-10 pl-sm-0"
+                    class="col-md-10 pl-sm-0"
                     *ngIf="
                       (account.balance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' }) > 0;
                       else hideValue
@@ -124,13 +128,13 @@
 
               <h5 class="card-title__secondary mb-3 pt-3">
                 <tooltip-item
-                  [title]="'Related Accounts'"
-                  [tooltip]="'Accounts that are either managed by this account or are the manager of this account.'"
+                  [title]="'account-detail.related-accounts' | translate"
+                  [tooltip]="'account-detail.related-accounts_tooltip' | translate"
                 ></tooltip-item>
               </h5>
               <ng-container *ngIf="relatedAccounts$ | async as relatedAccountsList">
                 <p *ngIf="relatedAccountsList.length === 0" class="text-secondary m-0">
-                  This account has no related accounts.
+                  {{ 'account-detail.no-related-accounts' | translate }}
                 </p>
                 <div class="mb-2" *ngFor="let relatedAccount of relatedAccounts$ | async | slice: 0:paginationLimit" [@AnimateList]>
                   <address-item
@@ -146,7 +150,7 @@
                     (click)="showMoreItems()"
                     [ngClass]="{ 'btn--rotated': !isCollapsed }"
                   >
-                    <span>Show All Accounts</span>
+                    <span>{{ 'account-detail.show-all-accounts' | translate }}</span>
                     <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                   </button>
 
@@ -156,7 +160,7 @@
                     (click)="showLessItems()"
                     [ngClass]="{ 'btn--rotated': isCollapsed }"
                   >
-                    <span>Minimize</span>
+                    <span>{{ 'account-detail.minimize' | translate }}</span>
                     <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
                   </button>
                 </div>
@@ -164,11 +168,11 @@
             </div>
           </div>
         </div>
-        <div class=" col-lg-6 mb-4 mb-lg-0 card__top">
-          <div class="card h-100 pt-3 ">
+        <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+          <div class="card h-100 pt-3">
             <div class="card-body p-4">
-              <h5 class="card-title mb-4 ">
-                Delegation
+              <h5 class="card-title mb-4">
+                {{ 'account-detail.delegation' | translate }}
               </h5>
 
               <ng-container *ngIf="delegatedAccountAddress === undefined">
@@ -193,20 +197,22 @@
               </ng-container>
 
               <ng-container *ngIf="delegatedAccountAddress === ''">
-                <h5 class="text-secondary pt-3"><strong>This account has not been delegated.</strong></h5>
-                <p class="text-secondary pt-3">Delegate to a baker and contribute to the network validation and receive a reward back.</p>
+                <h5 class="text-secondary pt-3">
+                  <strong>{{ 'account-detail.not-delegated' | translate }}</strong>
+                </h5>
+                <p class="text-secondary pt-3">{{ 'account-detail.not-delegated_text' | translate }}</p>
 
                 <div class="d-flex align-items-center mb-2">
-                  <p class="d-inline-block m-0">Delegate to</p>
+                  <p class="d-inline-block m-0">{{ 'account-detail.delegate-to' | translate }}</p>
                   <div class="d-inline-block ml-2">
                     <address-item [address]="selectedDelegation" [clickableButton]="false"></address-item>
                   </div>
                 </div>
                 <button class="btn btn-sm btn-primary-light w-100" type="button" (click)="delegate()">
-                  Delegate Now
+                  {{ 'account-detail.delegate-now' | translate }}
                 </button>
                 <div class="d-flex justify-content-center">
-                  <small class="text-muted">or</small>
+                  <small class="text-muted">{{ 'account-detail.or' | translate }}</small>
                 </div>
                 <ng-template #delegationControlTemplate let-model="item" let-index="index">
                   <address-item [address]="model" [clickableButton]="false"></address-item>
@@ -221,7 +227,7 @@
                   [typeaheadScrollable]="true"
                   [typeaheadOptionsInScrollableView]="10"
                   [typeaheadOptionsLimit]="10000"
-                  placeholder="Search Baker by name or address"
+                  placeholder="{{ 'account-detail.placeholder' | translate }}"
                   class="form-control form-control--focus-white"
                   (typeaheadOnSelect)="onDelegationControlSelect($event)"
                   [typeaheadIsFirstItemActive]="false"
@@ -230,17 +236,15 @@
               </ng-container>
               <ng-container *ngIf="delegatedAccountAddress">
                 <div class="row mb-3">
-                  <div class=" col-md-5">
+                  <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Delegated Account'"
-                        [tooltip]="
-                          'The first delegated account that is managed by this account. This can be the same account or an account that starts with KT1.'
-                        "
+                        [title]="'account-detail.delegated-account' | translate"
+                        [tooltip]="'account-detail.delegated-account_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7">
+                  <div class="col-md-7">
                     <address-item
                       [address]="delegatedAccountAddress"
                       [clickableButton]="delegatedAccountAddress !== account.account_id"
@@ -251,8 +255,8 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Amount'"
-                        [tooltip]="'The account balance of the delegated account shown above.'"
+                        [title]="'account-detail.amount' | translate"
+                        [tooltip]="'account-detail.amount_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
@@ -266,8 +270,8 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Next Reward Expected'"
-                        [tooltip]="'The time until the next reward is exptected to be paid out by the baker.'"
+                        [title]="'account-detail.next-reward-expected' | translate"
+                        [tooltip]="'account-detail.next-reward-expected_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
@@ -279,7 +283,7 @@
                           {{ remainingTime$ | async }}
                         </ng-container>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
-                          not available
+                          {{ 'account-detail.not-available' | translate }}
                         </ng-container>
                       </ng-container>
                     </p>
@@ -289,10 +293,8 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Reward Amount'"
-                        [tooltip]="
-                          'The amount being paid out as reward by the baker for the delegation. This is the expected amount to be paid out, the baker split is alreay subtracted.'
-                        "
+                        [title]="'account-detail.reward-amount' | translate"
+                        [tooltip]="'account-detail.reward-amount_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
@@ -305,7 +307,7 @@
                           [data]="rewardAmountMinusFee"
                         ></amount-cell>
                         <ng-container *ngIf="(rewardAmountMinusFee$ | async) === null">
-                          not available
+                          {{ 'account-detail.not-available' | translate }}
                         </ng-container>
                       </ng-container>
                     </p>
@@ -315,8 +317,8 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Baker'"
-                        [tooltip]="'A Baker takes part in the validation of the network with his balance and the balances of delegations.'"
+                        [title]="'account-detail.baker' | translate"
+                        [tooltip]="'account-detail.baker_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
@@ -328,18 +330,16 @@
                   <div class="col-md-5">
                     <p class="text-secondary mb-0">
                       <tooltip-item
-                        [title]="'Baker Split'"
-                        [tooltip]="
-                          'The baker split is a percentage taken by the baker as a reward for running his infrastrucutre. This split is decided by the baker, happens offchain and could also be 0%.'
-                        "
+                        [title]="'account-detail.baker-split' | translate"
+                        [tooltip]="'account-detail.baker-split_tooltip' | translate"
                       ></tooltip-item>
                     </p>
                   </div>
-                  <div class=" col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
+                  <div class="col-md-7" *ngIf="tezosBakerFeeLabel$ | async as tezosBakerFeeLabel; else loading">
                     <p class="mb-0">{{ tezosBakerFeeLabel }}</p>
                   </div>
                   <ng-template #loading>
-                    <div class=" col-md-7">
+                    <div class="col-md-7">
                       <loading-skeleton [loadingWidth]="'150px'"></loading-skeleton>
                     </div>
                   </ng-template>
@@ -367,8 +367,8 @@
                 <div class="row">
                   <div class="col-md-6 col-lg-4 px-0 px-sm-3">
                     <h5 class="card-title__secondary mb-3">
-                      Balance
-                      <small>last 30 days</small>
+                      {{ 'account-detail.balance' | translate }}
+                      <small>{{ 'account-detail.last30d' | translate }}</small>
                     </h5>
                     <ng-container *ngIf="balanceChartDatasets$ | async">
                       <chart-item
@@ -377,6 +377,44 @@
                         [options]="balanceChartOptions"
                       ></chart-item>
                     </ng-container>
+                  </div>
+                  <div *ngIf="account.is_baker" class="col-md-6 col-lg-8 px-0 px-sm-3">
+                    <h5 class="card-title__secondary mb-3">
+                      Bakings / Endorsings
+                      <small>in current cycle</small>
+                    </h5>
+                    <ng-template #rightsPerBlockLevelTemplate>
+                      <div *appVar="rightsPerBlockLevelTooltipContext as context">
+                        <div class="mb-3">Blocks {{ context?.from }} - {{ context?.to }}</div>
+                        <ng-container [ngSwitch]="areRightsForBlockRange(context)">
+                          <ng-container *ngSwitchCase="true">
+                            <div>Baking Rights: {{ context?.bakes || '-' }}</div>
+                            <div>Endorsing Rights: {{ context?.endorsements || '-' }}</div>
+                          </ng-container>
+                          <ng-container *ngSwitchCase="false">
+                            No rights
+                          </ng-container>
+                        </ng-container>
+                      </div>
+                    </ng-template>
+                    <div class="rights-chart">
+                      <ng-container *ngIf="areBusyRightsPerBlockLevel$ | async; else rightsGraph">
+                        <div *ngFor="let item of rightsPerBlockLevelBusy$ | async"></div>
+                      </ng-container>
+                      <ng-template #rightsGraph>
+                        <div
+                          (mouseenter)="setTooltip(item)"
+                          [tooltip]="rightsPerBlockLevelTemplate"
+                          *ngFor="let item of rightsPerBlockLevel$ | async"
+                          [ngClass]="{
+                            active: areRightsForBlockRange(item),
+                            'super-active': item.bakes > 0,
+                            past: item.isInFuture === -1,
+                            now: item.isInFuture === 0
+                          }"
+                        ></div>
+                      </ng-template>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -406,11 +444,11 @@
 
     <ng-template #noAccount>
       <div class="card p-3" *ngIf="(account$ | async) === null">
-        <h5 class="card-title mb-4 ">
-          Invalid Address
+        <h5 class="card-title mb-4">
+          {{ 'account-detail.invalid-address' | translate }}
         </h5>
         <p>
-          This address is currently not visible on the blockchain.
+          {{ 'account-detail.invalid-address_text' | translate }}
         </p>
       </div>
     </ng-template>

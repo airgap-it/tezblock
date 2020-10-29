@@ -1,20 +1,26 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
-import { Observable, of, pipe, merge } from 'rxjs'
+import { Observable, pipe, merge } from 'rxjs'
 import { debounceTime, switchMap, take, map, filter } from 'rxjs/operators'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
 import { FormControl } from '@angular/forms'
+import { capitalize, negate, isNil } from 'lodash'
 
 import { BaseComponent } from '../base.component'
-import { ApiService } from '@tezblock/services/api/api.service'
 import { TypeAheadObject } from '@tezblock/interfaces/TypeAheadObject'
 import { SearchService } from 'src/app/services/search/search.service'
-import { SearchOption } from 'src/app/services/search/model'
-import { flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
-import { searchTokenContracts } from '@tezblock/domain/contract'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { AccountService } from '@tezblock/services/account/account.service'
+import { SearchOptionData } from 'src/app/services/search/model'
+import { first, flatten, get, groupBy, isNotEmptyArray } from '@tezblock/services/fp'
 
-const toPreviousOption = value => ({ name: value, type: 'Recent History' })
+const toOption = (optionGroup?: string) => (value: SearchOptionData): Option => ({
+  ...value,
+  label: value.label || value.id,
+  optionGroup: optionGroup || capitalize(value.type)
+})
+
+interface Option extends SearchOptionData {
+  label: string
+  optionGroup: string
+}
 
 @Component({
   selector: 'app-search-item',
@@ -28,48 +34,26 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
   // ngx-bootstrap is weak, so walkaround: https://stackoverflow.com/questions/50840415/typeahead-on-reactive-forms-typeahead-doesnt-show-up
   dataEmitter: EventEmitter<any[]> = new EventEmitter<any[]>()
   searchControl: FormControl
-  dataSource$: Observable<SearchOption[]>
-  get dataSourceSnapshot(): any[] {
+  dataSource$: Observable<SearchOptionData[]>
+  get dataSourceSnapshot(): Option[] {
     return this._dataSourceSnapshot || []
   }
-  set dataSourceSnapshot(value: any[]) {
+  set dataSourceSnapshot(value: Option[]) {
     this._dataSourceSnapshot = value
   }
-  private _dataSourceSnapshot: any[]
+  private _dataSourceSnapshot: Option[]
   private isValueChangedBySelect = false
 
-  constructor(
-    private readonly accountService: AccountService,
-    private readonly apiService: ApiService,
-    private readonly chainNetworkService: ChainNetworkService,
-    private readonly searchService: SearchService
-  ) {
+  constructor(private readonly searchService: SearchService) {
     super()
   }
 
   ngOnInit() {
     const initialSearchGreaterThanOneCharacter = value => (this._dataSourceSnapshot ? true : value && value.length > 1)
-    const takeFromEach = (countPerType: number) => (groupedOptions: { [key: string]: SearchOption[] }): SearchOption[] =>
+    const takeFromEach = (countPerType: number) => (groupedOptions: { [key: string]: SearchOptionData[] }): SearchOptionData[] =>
       flatten(Object.keys(groupedOptions).map(key => groupedOptions[key].slice(0, countPerType)))
     const narrowOptions = (countPerType: number) =>
-      pipe<SearchOption[], { [key: string]: SearchOption[] }, SearchOption[]>(groupBy('type'), takeFromEach(countPerType))
-    const getSearchSources = (token: string): Observable<SearchOption[]>[] => {
-      const matchByAccountIds = ['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))
-      const result = [
-        of(searchTokenContracts(token, this.chainNetworkService.getNetwork())),
-        this.accountService.getAccountsStartingWith(token, matchByAccountIds)
-      ]
-      
-      if (token?.startsWith('o')) {
-        result.push(this.apiService.getTransactionHashesStartingWith(token))
-      }
-
-      if (token?.startsWith('b') || token?.startsWith('B')) {
-        result.push(this.apiService.getBlockHashesStartingWith(token))
-      }
-
-      return result
-    }
+      pipe<SearchOptionData[], { [key: string]: SearchOptionData[] }, SearchOptionData[]>(groupBy('type'), takeFromEach(countPerType))
 
     this.searchControl = new FormControl('')
 
@@ -78,9 +62,9 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       filter(initialSearchGreaterThanOneCharacter),
       filter(this.skipValueSetBySelects.bind(this)),
       switchMap(token => {
-        let options: SearchOption[] = []
+        let options: SearchOptionData[] = []
 
-        return merge(...getSearchSources(token)).pipe(
+        return merge(...this.searchService.getSearchSources(token)).pipe(
           filter(isNotEmptyArray),
           map(partialOptions => (options = options.concat(partialOptions)))
         )
@@ -95,11 +79,11 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
             map(previousSearches => {
               const value = get<any>(value => value.toLowerCase())(this.searchControl.value)
               const matches = previousSearches
-                .filter(previousItem => (value ? previousItem.toLowerCase().indexOf(value) !== -1 : false))
-                .filter(previousItem => !data.some(dataItem => dataItem.name === previousItem))
-                .map(toPreviousOption)
+                .filter(previousItem => (value ? previousItem.id.toLowerCase().indexOf(value) !== -1 : false))
+                .filter(previousItem => !data.some(dataItem => dataItem.id === previousItem.id))
+                .map(toOption('Recent History'))
 
-              return data.concat(matches)
+              return data.map(toOption()).concat(matches)
             })
           )
         )
@@ -110,53 +94,39 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
       })
   }
 
-  onKeyEnter() {
-    // this.subscriptions.push(
-    //   this.dataSource$.subscribe((val: TypeAheadObject[]) => {
-    //     if (val.length > 0 && val[0].name !== this.searchControl.value) {
-    //       // there are typeahead suggestions. upon hitting enter, we first autocomplete the suggestion
-    //       return
-    //     } else {
-    //       this.search(this.searchControl.value)
-    //     }
-    //   })
-    // )
+  search(option: SearchOptionData) {
+    const _option: SearchOptionData = option || { id: this.searchControl.value, type: undefined }
 
-    this.search(this.searchControl.value)
+    this.onSearch.emit(_option.id)
+    this.searchService.processSearchSelection(_option)
+
+    if (_option.type) {
+      this.isValueChangedBySelect = true
+      this.searchControl.setValue('')
+    }
   }
 
-  search(searchTerm?: string, type?: string) {
-    const value = searchTerm || this.searchControl.value
-
-    if (!value) {
-      return
-    }
-
-    this.onSearch.emit(value)
-    this.searchService
-      .processSearchSelection(value, type)
-      .pipe(filter(succeeded => succeeded))
-      .subscribe(() => {
-        this.isValueChangedBySelect = true
-        this.searchControl.setValue('')
-      })
+  onKeyEnter() {
+    this.search(undefined)
   }
 
   onSelect(e: TypeaheadMatch) {
-    this.search(e.value, e.item.type)
-    this.searchService.updatePreviousSearches(e.value)
+    const item = e.item
+
+    this.search(item)
+    this.searchService.updatePreviousSearches(item)
   }
 
-  onMouseDown() {
-    const optionToName = option => option.name
+  // there is no point to handle search button click case ( options will apear anyways )
 
+  onMouseDown() {
     this.searchService
       .getPreviousSearches()
       .pipe(take(1))
       .subscribe(previousSearches => {
         const previousSearchesOptions = previousSearches
-          .filter(previousSearche => this.dataSourceSnapshot.map(optionToName).indexOf(previousSearche) === -1)
-          .map(toPreviousOption)
+          .filter(previousSearch => this.dataSourceSnapshot.every(snapshotItem => snapshotItem.id !== previousSearch.id))
+          .map(toOption('Recent History'))
 
         this.dataEmitter.emit(this.dataSourceSnapshot.concat(previousSearchesOptions))
       })

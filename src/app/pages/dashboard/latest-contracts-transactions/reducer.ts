@@ -12,7 +12,7 @@ export interface State {
   busy: Busy
 }
 
-const initialState: State = {
+export const initialState: State = {
   transferOperations: undefined,
   busy: {
     transferOperations: false

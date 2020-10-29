@@ -1,12 +1,12 @@
 import { createReducer, on } from '@ngrx/store'
 import { pipe } from 'rxjs'
 import { range } from 'lodash'
-import * as moment from 'moment'
+import moment from 'moment'
 import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 import { Balance } from '@tezblock/services/api/api.service'
 import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
@@ -25,15 +25,9 @@ const ensure30Days = (balance: Balance[]): Balance[] => {
       .add(-29 + index, 'days')
       .valueOf()
   const getBalanceFrom = (date: number) => (balanceItem: Balance) =>
-    moment(balanceItem.asof)
-      .startOf('day')
-      .isSame(moment(date).startOf('day'))
+    moment(balanceItem.asof).startOf('day').isSame(moment(date).startOf('day'))
   const getPreviousBalance = (balance: Balance[], date: number) => {
-    const match = balance.find((balanceItem: Balance) =>
-      moment(balanceItem.asof)
-        .startOf('day')
-        .isBefore(moment(date).startOf('day'))
-    )
+    const match = balance.find((balanceItem: Balance) => moment(balanceItem.asof).startOf('day').isBefore(moment(date).startOf('day')))
 
     return match ? { ...match, asof: date } : undefined
   }
@@ -58,7 +52,7 @@ const ratingNumberToLabel = [
 
 const extractFee = pipe<FeeByCycle[], FeeByCycle, number>(
   first,
-  get(feeByCycle => feeByCycle.value * 100)
+  get((feeByCycle) => feeByCycle.value * 100)
 )
 
 export const fromBakingBadResponse = (response: BakingBadResponse, state: State): BakingRatingResponse => ({
@@ -69,7 +63,7 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
         : null
       : null,
   tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
-  stakingCapacity: get<number>(stakingCapacity => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
+  stakingCapacity: get<number>((stakingCapacity) => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
 })
 
 export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
@@ -140,7 +134,7 @@ export const reducer = createReducer(
     ...state,
     account: account || null
   })),
-  on(actions.loadAccountFailed, state => ({
+  on(actions.loadAccountFailed, (state) => ({
     ...state,
     account: null
   })),
@@ -149,11 +143,11 @@ export const reducer = createReducer(
     delegatedAccounts: accounts.delegated,
     relatedAccounts: accounts.related
   })),
-  on(actions.loadDelegatedAccountsFailed, state => ({
+  on(actions.loadDelegatedAccountsFailed, (state) => ({
     ...state,
     delegatedAccounts: null
   })),
-  on(actions.loadRewardAmont, state => ({
+  on(actions.loadRewardAmont, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -168,7 +162,7 @@ export const reducer = createReducer(
       rewardAmount: false
     }
   })),
-  on(actions.loadRewardAmontFailed, state => ({
+  on(actions.loadRewardAmontFailed, (state) => ({
     ...state,
     rewardAmount: null,
     busy: {
@@ -176,14 +170,19 @@ export const reducer = createReducer(
       rewardAmount: false
     }
   })),
-  on(actions.loadTransactionsByKind, (state, { kind }) => ({
-    ...state,
-    kind,
-    transactions: {
-      ...state.transactions,
-      loading: true
+  on(actions.loadTransactionsByKind, (state, { kind }) => {
+    const hasKindChanged = kind !== state.kind
+
+    return {
+      ...state,
+      kind,
+      transactions: {
+        ...state.transactions,
+        data: hasKindChanged ? undefined : state.transactions.data,
+        loading: true
+      }
     }
-  })),
+  }),
   on(actions.loadTransactionsByKindSucceeded, (state, { data }) => ({
     ...state,
     transactions: {
@@ -192,14 +191,14 @@ export const reducer = createReducer(
       loading: false
     }
   })),
-  on(actions.loadTransactionsByKindFailed, state => ({
+  on(actions.loadTransactionsByKindFailed, (state) => ({
     ...state,
     transactions: {
       ...state.transactions,
       loading: false
     }
   })),
-  on(actions.increasePageSize, state => ({
+  on(actions.increasePageSize, (state) => ({
     ...state,
     transactions: {
       ...state.transactions,
@@ -262,7 +261,7 @@ export const reducer = createReducer(
     ...state,
     transactions: getTransactionsWithErrors(operationErrorsById, state.transactions)
   })),
-  on(actions.loadBakerReward, state => ({
+  on(actions.loadBakerReward, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -277,7 +276,7 @@ export const reducer = createReducer(
       bakerReward: false
     }
   })),
-  on(actions.loadBakerRewardFailed, state => ({
+  on(actions.loadBakerRewardFailed, (state) => ({
     ...state,
     bakerReward: null,
     busy: {
@@ -285,7 +284,7 @@ export const reducer = createReducer(
       bakerReward: false
     }
   })),
-  on(actions.loadContractAssets, state => ({
+  on(actions.loadContractAssets, (state) => ({
     ...state,
     contractAssets: {
       ...state.contractAssets,
@@ -294,7 +293,7 @@ export const reducer = createReducer(
   })),
   on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
     ...state,
-    counts: (state.counts || []).filter(count => count.key !== 'assets').concat([{ key: 'assets', count: data.length }]),
+    counts: (state.counts || []).filter((count) => count.key !== 'assets').concat([{ key: 'assets', count: data.length }]),
     contractAssets: {
       ...state.contractAssets,
       data,
@@ -305,7 +304,7 @@ export const reducer = createReducer(
       loading: false
     }
   })),
-  on(actions.loadContractAssetsFailed, state => ({
+  on(actions.loadContractAssetsFailed, (state) => ({
     ...state,
     contractAssets: {
       ...state.contractAssets,

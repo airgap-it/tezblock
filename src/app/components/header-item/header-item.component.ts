@@ -1,13 +1,15 @@
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Component, Input, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
-import { Observable, Subscription } from 'rxjs'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
-import { map } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
+import { TranslateService } from '@ngx-translate/core'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Observable, Subscription } from 'rxjs'
+import { map } from 'rxjs/operators'
 
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import * as fromRoot from '@tezblock/reducers'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { LanguagesService } from '@tezblock/services/translation/languages.service'
 
 @Component({
   selector: 'header-item',
@@ -42,7 +44,9 @@ export class HeaderItemComponent implements OnInit {
     private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>
+    private readonly store$: Store<fromRoot.State>,
+    public translate: TranslateService,
+    private readonly languagesService: LanguagesService
   ) {}
 
   ngOnInit() {
@@ -66,5 +70,8 @@ export class HeaderItemComponent implements OnInit {
 
   changeNetwork(name: TezosNetwork) {
     this.chainNetworkService.changeEnvironment(name)
+  }
+  changeLanguage(language: string) {
+    this.languagesService.loadLanguages(language)
   }
 }

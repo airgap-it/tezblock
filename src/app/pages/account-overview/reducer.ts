@@ -1,6 +1,6 @@
 import { createReducer, on } from '@ngrx/store'
 import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 
 import * as actions from './actions'
 

@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core'
-import { Router, NavigationEnd } from '@angular/router'
-import { filter } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
+import { NavigationEnd, Router } from '@angular/router'
 import { Actions, ofType } from '@ngrx/effects'
+import { Store } from '@ngrx/store'
+import { filter } from 'rxjs/operators'
 
-import * as actions from './app.actions'
-import * as fromRoot from '@tezblock/reducers'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import * as fromRoot from '@tezblock/reducers'
+import * as actions from './app.actions'
 import { AnalyticsService } from './services/analytics/analytics.service'
+import { LanguagesService } from './services/translation/languages.service'
 
 @Component({
   selector: 'app-root',
@@ -23,8 +24,10 @@ export class AppComponent implements OnInit {
     private readonly actions$: Actions,
     readonly router: Router,
     private readonly store$: Store<fromRoot.State>,
-    private readonly analyticsService: AnalyticsService
+    private readonly analyticsService: AnalyticsService,
+    private readonly languagesService: LanguagesService
   ) {
+    this.languagesService.loadLanguages()
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
       .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
@@ -41,10 +44,11 @@ export class AppComponent implements OnInit {
     ]).subscribe(() => this.store$.dispatch(actions.loadCryptoPrice()))
   }
 
-  navigate(entity: string) {
+  public navigate(entity: string) {
     this.router.navigate([`${entity}/list`])
   }
-  ngOnInit() {
+  public ngOnInit() {
     this.analyticsService.init()
+    this.languagesService.loadLanguages()
   }
 }

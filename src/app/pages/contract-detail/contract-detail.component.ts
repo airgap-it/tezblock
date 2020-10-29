@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Store } from '@ngrx/store'
-import { from, Observable, combineLatest } from 'rxjs'
+import { Observable, combineLatest } from 'rxjs'
 import { map, filter, switchMap } from 'rxjs/operators'
 import { animate, state, style, transition, trigger } from '@angular/animations'
 import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
-import * as moment from 'moment'
+import moment from 'moment'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -22,11 +22,12 @@ import { columns } from './table-definitions'
 import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Account } from '@tezblock/interfaces/Account'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { getRefresh } from '@tezblock/domain/synchronization'
+import { TranslateService } from '@ngx-translate/core'
 import { get } from '@tezblock/services/fp'
+import { dataSelector } from '@tezblock/domain/table'
 
 const last24 = (transaction: ContractOperation): boolean => {
   const hoursAgo = moment().diff(moment(transaction.timestamp), 'hours', true)
@@ -65,12 +66,11 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   loading$: Observable<boolean>
   transactions$: Observable<any[]>
   orderBy$: Observable<OrderBy>
-  showLoadMore$: Observable<boolean>
   current: string = 'copyGrey'
   manager$: Observable<string>
   showFiatValue$: Observable<boolean>
   transactions24hCount$: Observable<number>
-  transactions24hVolume$: Observable<number>
+  transactions24hVolume$: Observable<string>
 
   tabs: Tab[] = [
     {
@@ -94,6 +94,17 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       disabled: function() {
         return !this.count
       }
+    },
+    {
+      title: 'Entrypoints',
+      active: false,
+      kind: actions.OperationTab.entrypoints,
+      count: undefined,
+      icon: this.iconPipe.transform('link'),
+      columns: columns.entrypoints(),
+      disabled: function() {
+        return !this.count
+      }
     }
   ]
 
@@ -113,6 +124,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
     private readonly iconPipe: IconPipe,
+    private translateService: TranslateService,
     private titleService: Title,
     private metaTagService: Meta,
     private aliasService: AliasService
@@ -125,7 +137,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
-
+        
         this.revealed$ = this.accountService.getAccountStatus(address)
       })
     )
@@ -147,9 +159,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       this.store$.select(state => state.contractDetails.currentTabKind),
       this.store$.select(fromRoot.contractDetails.transferOperations),
       this.store$.select(state => state.contractDetails.otherOperations.data),
-      this.store$.select(state => state.contractDetails.tokenHolders)
+      this.store$.select(state => state.contractDetails.tokenHolders),
+      this.store$.select(state => state.contractDetails.entrypoints)
     ]).pipe(
-      map(([currentTabKind, transferOperations, otherOperations, tokenHolders]) => {
+      map(([currentTabKind, transferOperations, otherOperations, tokenHolders, entrypoints]) => {
         if (currentTabKind === actions.OperationTab.transfers) {
           return transferOperations
         }
@@ -158,10 +171,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
           return otherOperations
         }
 
-        // client-side paging
-        return get<TokenHolder[]>(data => data.slice(0, tokenHolders.pagination.currentPage * tokenHolders.pagination.selectedSize))(
-          tokenHolders.data
-        )
+        if (currentTabKind === actions.OperationTab.tokenHolders) {
+          // client-side paging
+          return dataSelector(tokenHolders)
+        }
+
+        return dataSelector(entrypoints)
       })
     )
     this.loading$ = combineLatest([
@@ -177,31 +192,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
       )
     )
-    this.store$.select(state => state.contractDetails.transferOperations.loading)
-    this.showLoadMore$ = combineLatest([
-      this.transactions$,
-      this.store$.select(state => state.contractDetails.transferOperations.pagination)
-    ]).pipe(
-      map(([transferOperations, pagination]) =>
-        transferOperations ? transferOperations.length === pagination.currentPage * pagination.selectedSize : true
-      )
-    )
     this.manager$ = this.store$.select(state => state.contractDetails.manager)
     this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
-    this.transactions24hCount$ = this.store$
-      .select(state => state.contractDetails.transferOperations.data)
-      .pipe(
-        filter(negate(isNil)),
-        map((transitions: ContractOperation[]) => transitions.filter(last24)),
-        map(transitions => transitions.length)
-      )
-    this.transactions24hVolume$ = this.store$
-      .select(state => state.contractDetails.transferOperations.data)
-      .pipe(
-        filter(negate(isNil)),
-        map((transitions: ContractOperation[]) => transitions.filter(last24).map(transition => parseFloat(transition.amount.toString()))),
-        map(amounts => amounts.reduce((accumulator, currentItem) => accumulator + currentItem, 0))
-      )
+    this.transactions24hCount$ = this.store$.select(state => state.contractDetails.transfer24hCount)
+    this.transactions24hVolume$ = this.store$.select(state => state.contractDetails.transfer24hVolume)
 
     this.subscriptions.push(
       combineLatest([
@@ -210,12 +204,14 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         combineLatest([
           this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
           this.store$.select(state => state.contractDetails.otherOperations.pagination.total),
-          this.store$.select(state => state.contractDetails.tokenHolders.pagination.total)
+          this.store$.select(state => state.contractDetails.tokenHolders.pagination.total),
+          this.store$.select(state => state.contractDetails.entrypoints.pagination.total)
         ]).pipe(
-          map(([transferCount, otherCount, tokenHoldersCount]) => [
+          map(([transferCount, otherCount, tokenHoldersCount, entrypointsCount]) => [
             { key: actions.OperationTab.transfers, count: transferCount },
             { key: actions.OperationTab.other, count: otherCount },
-            { key: actions.OperationTab.tokenHolders, count: tokenHoldersCount }
+            { key: actions.OperationTab.tokenHolders, count: tokenHoldersCount },
+            { key: actions.OperationTab.entrypoints, count: entrypointsCount }
           ])
         )
       ])
@@ -234,6 +230,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
+    
+    this.contract$.pipe(filter(contract => contract !== undefined)).subscribe((contract) => this.store$.dispatch(actions.load24hTransferVolume({ contract })))
+
     this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.contractAddress)} Contract - tezblock`)
     this.metaTagService.updateTag({
       name: 'description',
@@ -299,18 +298,21 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       showFiatValue,
       symbol: contract.symbol
     }
-    const customTabs = hasTokenHolders ? [this.getTokenHoldersTab(options)] : []
+    const customTabs = hasTokenHolders(contract) ? [this.getTokenHoldersTab(options)] : []
     const tabs = [
       {
         ...this.tabs[0],
-        columns: columns.transfers(options)
+        columns: columns.transfers(options, this.translateService)
       },
       {
         ...this.tabs[1],
-        columns: columns.other(options)
+        columns: columns.other(options, this.translateService)
+      },
+      {
+        ...this.tabs[2],
+        columns: columns.entrypoints()
       }
     ].concat(customTabs)
-
     this.tabs = updateTabCounts(tabs, counts)
   }
 }

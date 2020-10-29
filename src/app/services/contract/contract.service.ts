@@ -6,10 +6,11 @@ import { get as _get } from 'lodash'
 import { TezosStaker, TezosBTC, TezosUSD } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { BaseService, Operation, Predicate, OrderBy } from '@tezblock/services/base.service'
+import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
-import { ContractOperation, TokenContract, TokenHolder } from '@tezblock/domain/contract'
-import { getFaProtocol } from '@tezblock/domain/airgap'
+import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
+import { getFaProtocol, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
+import moment from 'moment'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -76,39 +77,20 @@ export interface ContractProtocol {
 
 export const getContractProtocol = (contract: TokenContract, chainNetworkService: ChainNetworkService): ContractProtocol => {
   const environmentUrls = chainNetworkService.getEnvironment()
+  const tezosNetwork = chainNetworkService.getNetwork()
+  const options = getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork)
 
   // Why airgap implements api interfaces in such a inconsistent way - compare to new TezosFAProtocol where arguments it's an object
   if (contract.symbol === 'STKR') {
-    return new TezosStaker(
-      contract.id,
-      environmentUrls.rpcUrl,
-      environmentUrls.conseilUrl,
-      environmentUrls.conseilApiKey,
-      chainNetworkService.getEnvironmentVariable(),
-      chainNetworkService.getNetwork()
-    )
+    return new TezosStaker(options)
   }
 
   if (contract.symbol === 'tzBTC') {
-    return new TezosBTC(
-      contract.id,
-      environmentUrls.rpcUrl,
-      environmentUrls.conseilUrl,
-      environmentUrls.conseilApiKey,
-      chainNetworkService.getEnvironmentVariable(),
-      chainNetworkService.getNetwork()
-    )
+    return new TezosBTC(options)
   }
 
   if (contract.symbol === 'USDtz') {
-    return new TezosUSD(
-      contract.id,
-      environmentUrls.rpcUrl,
-      environmentUrls.conseilUrl,
-      environmentUrls.conseilApiKey,
-      chainNetworkService.getEnvironmentVariable(),
-      chainNetworkService.getNetwork()
-    )
+    return new TezosUSD(options)
   }
 
   return undefined
@@ -196,7 +178,7 @@ export class ContractService extends BaseService {
   }
 
   loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
-    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
+    const faProtocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
 
     return this.post<ContractOperation[]>('operations', {
       predicates: otherPredicates(contract.id),
@@ -206,65 +188,97 @@ export class ContractService extends BaseService {
       switchMap(contractOperations =>
         contractOperations.length > 0
           ? forkJoin(
-              contractOperations.map(contractOperation =>
-                from(
-                  faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
-                ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
-              )
-            ).pipe(
-              map(response =>
-                contractOperations.map((contractOperation, index) => ({
-                  ...contractOperation,
-                  entrypoint: contractOperation.parameters_entrypoints === 'default' ? _get(response[index], 'entrypoint') : contractOperation.parameters_entrypoints,
-                  symbol: contract.symbol,
-                  decimals: contract.decimals
-                }))
-              )
+            contractOperations.map(contractOperation =>
+              from(
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+              ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
             )
+          ).pipe(
+            map(response =>
+              contractOperations.map((contractOperation, index) => ({
+                ...contractOperation,
+                entrypoint:
+                  contractOperation.parameters_entrypoints === 'default'
+                    ? _get(response[index], 'entrypoint')
+                    : contractOperation.parameters_entrypoints,
+                symbol: contract.symbol,
+                decimals: contract.decimals
+              }))
+            )
+          )
           : of([])
       )
     )
   }
 
   loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
-    const faProtocol = getFaProtocol(contract, this.chainNetworkService)
-
     return this.post<ContractOperation[]>('operations', {
       predicates: transferPredicates(contract.id),
       orderBy: [orderBy],
       limit
     }).pipe(
-      switchMap(contractOperations =>
-        contractOperations.length > 0
-          ? forkJoin(
-              contractOperations.map(contractOperation =>
-                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
-              )
-            ).pipe(
-              map(response =>
-                contractOperations.map((contractOperation, index) => {
-                  try {
-                    const details = faProtocol.transferDetailsFromParameters({
-                      entrypoint: contractOperation.parameters_entrypoints,
-                      value: response[index].value
-                    })
-                    return {
-                      ...contractOperation,
-                      from: details.from,
-                      to: details.to,
-                      amount: details.amount,
-                      symbol: contract.symbol,
-                      decimals: contract.decimals
-                    }
-                  } catch {
-                    // an error can happen if Conseil does not return valid values for parameters_micheline, like it is happening now for operation with hash opKYnbone62mtx6tNhkbPRbawmHzXZXwuAmHoSZKtGjhtUjpSaM,
-                    // in this case we return undefined because we cannot list it as a transfer operation since we cannot get out the details
-                    return undefined
-                  }
-                }).filter(tx => tx !== undefined)
-              )
-            )
-          : of([])
+      switchMap(
+        contractOperations =>
+          <Observable<ContractOperation[]>>fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract)
+      )
+    )
+  }
+
+  load24hTransferOperations(contract: TokenContract): Observable<ContractOperation[]> {
+    const cutoff = moment().subtract(24, 'hours')
+
+    return this.post<ContractOperation[]>('operations', {
+      fields: ['timestamp', 'parameters_entrypoints', 'parameters_micheline', 'parameters', 'kind'],
+      predicates: [
+        {
+          field: 'parameters_entrypoints',
+          operation: Operation.eq,
+          set: [
+            'transfer'
+          ],
+          inverse: false
+        },
+        {
+          field: 'parameters',
+          operation: Operation.isnull,
+          set: [],
+          inverse: true
+        },
+        {
+          field: 'kind',
+          operation: Operation.eq,
+          set: [
+            'transaction'
+          ],
+          inverse: false
+        },
+        {
+          field: 'destination',
+          operation: Operation.eq,
+          set: [
+            contract.id
+          ],
+          inverse: false
+        },
+        {
+          field: 'status',
+          operation: Operation.eq,
+          set: ['applied'],
+          inverse: false
+        },
+        {
+          field: 'timestamp',
+          operation: Operation.gt,
+          set: [
+            cutoff.toDate().getTime()
+          ],
+          inverse: false
+        }
+      ]
+    }).pipe(
+      switchMap(
+        contractOperations =>
+          fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract) as Observable<ContractOperation[]>
       )
     )
   }
@@ -274,8 +288,16 @@ export class ContractService extends BaseService {
   }
 
   getTotalSupplyByContract(contract: TokenContract): Observable<string> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService)
+    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
 
     return from(protocol.getTotalSupply())
+  }
+
+  loadEntrypoints(id: string): Observable<string[]> {
+    return this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`, true).pipe(
+      map((response: any) => {
+        return Object.keys(response.entrypoints)
+      })
+    )
   }
 }

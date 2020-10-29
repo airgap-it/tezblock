@@ -48,6 +48,7 @@ export type IconRef =
   | 'handRock'
   | 'check'
   | 'times'
+  | 'cog'
 
 @Pipe({
   name: 'iconPipe'
@@ -119,7 +120,8 @@ export class IconPipe implements PipeTransform {
       thumbsDown: { prefix, iconName: 'thumbs-down' },
       handRock: { prefix, iconName: 'hand-rock' },
       check: { prefix, iconName: 'check' },
-      times: { prefix, iconName: 'times' }
+      times: { prefix, iconName: 'times' },
+      cog: { prefix, iconName: 'cog' }
     }
   }
 

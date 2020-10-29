@@ -1,0 +1,672 @@
+{
+  "header-item": {
+    "by": "von AirGap",
+    "cycle": "Cycle",
+    "overview_button": "Überblick",
+    "blockchain_button": "Blockchain",
+    "operations_button": "Operationen",
+    "transactions_button": "Transaktionen",
+    "activations_button": "Aktivierungen",
+    "originations_button": "Originationen",
+    "accounts_button": "Accounts",
+    "top-accounts_button": "Top Accounts",
+    "network-validation_button": "Netzwerkvalidierung",
+    "bakers_button": "Bakers",
+    "blocks_button": "Blöcke",
+    "endorsements_button": "Endorsements",
+    "delegations_button": "Delegationen",
+    "double-baking-evidence_button": "Double Baking Nachweis",
+    "double-endorsement-evidence_button": "Double Endorsement Nachweis",
+    "governance_button": "Governance",
+    "votes_button": "Wahlen",
+    "proposals_button": "Proposals",
+    "smart-contracts_button": "Smart Contracts",
+    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "contracts_button": "Contracts",
+    "assets_button": "Assets",
+    "resources_button": "Ressourcen",
+    "wallets_button": "Wallets",
+    "constants_button": "Constants",
+    "tezblock-health_button": "tezblock Health",
+    "dapps_button": "Dapps",
+    "development_button": "Entwicklung",
+    "glossary_button": "Glossar",
+    "languages_label": "Sprachen"
+  },
+  "footer-item": {
+    "tezblock": "tezblock ist ein Blockexplorer für Tezos, eine open-source Platform für Assets und Applikationen unterstützt von einer globalen Community von Validators, Forschern und Builders.",
+    "behind": "behind tezblock",
+    "about": "über",
+    "social-links": "Social Links",
+    "donations": "Spenden"
+  },
+  "dashboard": {
+    "explore": "Entdecke die Tezos Blockchain",
+    "current-cycle": "Aktueller Cycle",
+    "cycle": "Cycle",
+    "governance": "Governance",
+    "period": "Periode bis",
+    "no-proposal": "Noch kein Proposal eingereicht",
+    "of": "von",
+    "circulating-supply": "Zirkulierender Supply",
+    "market-cap": "Marktkapitalisierung",
+    "tezos-price": "Tezos Preis der letzten",
+    "24h_button": "24 S",
+    "7d_button": "7 T",
+    "90d_button": "90 T",
+    "at": "zu",
+    "latest-asset": "Aktuellste Asset Contracts",
+    "all-assets_button": "Alle Assets",
+    "latest-transfers": "Aktuellste Transfers",
+    "latest-blocks": "Aktuellste Blöcke",
+    "all-blocks_button": "Alle Blöcke",
+    "latest-transactions": "Aktuellste Transaktionen",
+    "all-transactions_button": "Alle Transaktionen"
+  },
+  "list": {
+    "transactions": {
+      "transactions": "Transaktionen",
+      "last24h": "letzte 24 Stunden",
+      "transaction-volume": "Transaktionsvolumen",
+      "last7d": "letzte 7 Tage"
+    },
+    "blocks": "Blöcke",
+    "activations": "Aktivierungen",
+    "originations": "Originationen",
+    "delegations": "Delegationen",
+    "endorsements": "Endorsements",
+    "votes": "Wahlen",
+    "proposals": "Proposals",
+    "double-baking-evidence": "Double Baking Nachweis",
+    "double-endorsement-evidence": "Double Endorsement Nachweis",
+    "assets-smart-contracts": "Assets Smart Contracts",
+    "contracts": "Contracts"
+  },
+  "account-overview": {
+    "accounts": "Accounts",
+    "top25": "Top 25 Accounts nach Balance"
+  },
+  "baker-overview": {
+    "bakers": "Bakers",
+    "total-number": "Gesamtanzahl an Bakers",
+    "top25": "Top 25 Bakers nach Staking Balance"
+  },
+  "resources-wallets": {
+    "wallets": "Wallets",
+    "introduction_1": "Eine Liste von Wallets, die das Tezos Protokoll unterstützen. Helft uns, die Liste aktuell zu halten und",
+    "introduction_2": "falls eine Wallet fehlt.",
+    "let-us-know_link": "lasst es uns wissen,",
+    "wallet-item": {
+      "features": "Features",
+      "download_button": "Download"
+    },
+    "airgap": {
+      "title": "AirGap",
+      "description": "Mit AirGap wird dein altes Smartphone deine neue 'hardware wallet'. Verstaue deine XTZ sicher mit diesem einzigartigen 2 Device Approach, wobei ein Smartphone komplett offline bleibt. Delegiere Tezzies und verdiene Rewards. Der Fokus von AirGap liegt auf einfacher Handhabung kombiniert mit state-of-the-art Sicherheit, ohne dass dabei die Nutzererfahrung leidet.",
+      "features": "offline Device, höchste Sicherheit, XTZ Delegation, Coin agnostic, sichere Aufbewahrung, Social Recovery, Hot Wallet Option"
+    },
+    "atomic": {
+      "title": "Atomic Wallet",
+      "description": "Atomic ist eine dezentrale Wallet und unterstützt über 300 Cryptowährungen. Eine gute Verschlüsselung garantiert dem User ein hohes Mass an Sicherheit. Atomic bieten ausserdem sofortigen Austausch und kauf von Cryptowährungen, sowie Cryptowährungen mit einer Kreditkarte zu kaufen.",
+      "features": " Kryptowährungen kaufen (Visa, Master Card), Tauschoptionen, XTZ Delegation"
+    },
+    "atomex": {
+      "title": "Atomex",
+      "description": "Mehrwärhungsfähige HD Wallet mit eingebautem Atomic-Swap-Exchange.",
+      "features": "HD Wallet, Atomic-Swap-Exchange"
+    },
+    "cortez": {
+      "title": "Cortez",
+      "description": "Mobile Wallet entwickelt von Nomadic Labs.",
+      "features": "Mobile"
+    },
+    "galleon": {
+      "title": "Galleon",
+      "description": "Galleon ist eine Smartwallet für Tezos. Galleon wird bereitgestellt von Tezori, ein open-source Walletframework für Tezos, welches sowohl Software- wie auch Hardwarewallets in 8 Sprachen unterstützt, verfügbar auf Mac, Windows und Linux.",
+      "features": "Ledger Support, Delegation"
+    },
+    "kukai": {
+      "title": "Kukai",
+      "description": "Eine der ersten Wallets für Tezos mit offline-signing, KT-Rückwärtskompatibilität und Ledger Support. Dank der Tezos Community ist Kukai in 6 verschiedenen Sprachen verfügbar. Die Wallet wurde von einer führenden deutschen Sicherheitsauditfirma geprüft. Kukai garantiert volle Anonymität mit Verzicht auf Tracking, Cookies oder andere analytische Features.",
+      "features": "Ledger Support, Delegation, offline-signing"
+    },
+    "magnum": {
+      "title": "Magnum Wallet",
+      "description": "Magnum Wallet ist eine mehrwärhungsfähige Wallet, entwickelt für jene, welche ihr Kryptoportfolio in einer sicheren und benutzerfreundlichen Oberfläche verwalten möchten. Benutzer haben die Möglichkeit, über Staking Rewards zu verdienen. Als Teil ihres “Multiply Your Funds”-Modell, ist das Team stets auf der Suche nach neuen Wegen, wie ihre User profitieren können.",
+      "features": "Blockchain Agnostic, In-App Austausch, Hardwarewallets, Hohe Sicherheit, Passives Einkommen, Forks & Bounties"
+    },
+    "paytomat": {
+      "title": "paytomat",
+      "description": "paytomat ist eine non-custodial Wallet mit Features für moderne Kunden. Von Assetaustausch über Referral Programs bis hin zu BEP-2 Tokenhandel oder dApps und Games unterstützt paytomat über 14 Kryptowährungen und deckt alle Bedürfnisse eines Users in einer einzigen App ab.",
+      "features": "zuverlässig, dezentral, praktisch"
+    },
+    "simplestacking": {
+      "title": "simplestacking.com",
+      "description": "Ein sicherer Weg, um Tezos zu lagern und staken. Desktop & Web Wallet mit Trezor Unterstützung.",
+      "features": "Trezor T, mehrere Wallets, Wallet Balance Verlauf"
+    },
+    "tezbox": {
+      "title": "TezBox",
+      "description": "TezBox war die erste funktionale GUI Wallet für Tezos. TezBox wurde eine der wichtigsten community-entwickelten Wallets und stellt weiterhin eine einfach zu nützende, sichere und mächtige Wallet für Benutzer und Entwickler dar.",
+      "features": "sicher, mobile, entwicklerfreundlich, open-source, Hardwarewallet Unterstützung"
+    }
+  },
+  "protocol-constants": {
+    "periods": "Perioden",
+    "blocks-per-cycle": "Blöcke per Cycle",
+    "blocks-per-commitment": "Blöcke per Commitment",
+    "blocks-per-roll-snapshot": "Blöcke per Roll Snapshot",
+    "time-between-blocks": "Zeit zwischen Blöcken",
+    "rewards": "Rewards",
+    "block-security-deposit": "Block Sicherheitsdeposit",
+    "endorsement-security-deposit": "Endorsement Sicherheitsdeposit",
+    "limits": "Limiten",
+    "maximum-revelations-per-block": "Maximale Revelationen per Block",
+    "maximum-operation-data-length": "Maximale Operation Datenlänge",
+    "hard-gas-limit-per-operation": "Hard Gas Limit per Operation",
+    "hard-gas-limit-per-block": "Hard Gas Limit per Block"
+  },
+  "health": {
+    "tezos-node-health": "Tezos Node Health",
+    "conseil-health": "Conseil Health",
+    "status": "Status",
+    "up": "Up",
+    "down": "Down",
+    "latest-block-seen": "Letzter Block"
+  },
+  "block-detail": {
+    "invalid-block_title": "Invalides Blocklevel",
+    "invalid-block_text": "Dieses Blocklevel ist nicht valid.",
+    "block-details": "Block Details",
+    "block-height": "Block Height",
+    "block-height_tooltip": "Die Block Height, welche die Länge der Blockchain angibt, erhöht sich durch die Addition eines neuen Blocks.",
+    "block-confirmations": "Block Konfirmationen",
+    "baker": "Baker",
+    "baker_tooltip": "Ein Baker ist Teil des Validierungsprozesses des Netzwerkes.",
+    "timestamp": "Zeitstempel",
+    "timestamp_tooltip": "Das Datum und die Uhrzeit, zu welcher ein Block erstellt wurde.",
+    "value": "Wert",
+    "value_tooltip": "Die gesamte Anzahl an Tezzies von allen Transaktionen für diesen Block.",
+    "transaction-fees": "Transaktionsgebühren",
+    "transaction-fees_tooltip": "The gesamte Anzahl an ausgegebenen Gebühren für alle Transaktionen dieses Blocks.",
+    "details": "Details",
+    "endorsed-slots": "Endorsed Slots",
+    "endorsed-slots_tooltip": "Ein Block muss von anderen Bakern endorsed werden. Bis zu 32 Bakers bestätigen, dass dieser Block valid ist.",
+    "cycle": "Cycle",
+    "cycle_tooltip": "Ein Cycle ist ein Set von aufeinanderfolgenden Blöcken, bestehend aus 4095 Blöcken. Cycles werden in der Blockchain als Zeiteinheit genutzt. Zum Beispiel sind die verschiedenen Phasen der Votingperioden der Abänderungsanträge (amendment voting procedures) durch Cycles definiert.",
+    "cycle-position": "Cycle Position",
+    "cycle-position_tooltip": "Die Position innerhalb von 4095 Blöcken.",
+    "of": "von",
+    "block-hash": "Block Hash",
+    "signature": "Signatur",
+    "fitness": "Fitness",
+    "fitness_tooltip": "Die Fitness eines Blocks ist ein Messwert um Kontexte zu vergleichen. Zum Beispiel, wenn mehrere Blöcke behaupten der Head der Chain zu sein, dann werden die verschiedenen Fitnesses vergleicht. Der Block mit der höchsten Fitness wird dann als Head der Chain gewählt.",
+    "protocol": "Protokoll",
+    "protocol_tooltip": "Das aktive Protokoll dieses Blocks. Das Protokoll kann durch den Protokoll-Veränderungsprozess (protocol amendment process) geändert werden.",
+    "more": "Mehr",
+    "less": "Weniger"
+  },
+  "transaction-detail": {
+    "invalid-operation-hash_title": "Invalider Operationhash",
+    "invalid-operation-hash_text": "Dieses Hash ist momentan invalid. Es ist möglicherweise noch nicht Teil der Blockchain.",
+    "invalid-operation-hash_update": "Diese Seite wird kontinuierlich aktualisiert, um den aktuellen Status zu erhalten.",
+    "transaction-details": "Transaktionsdetails",
+    "transaction-hash": "Transaktionshash",
+    "transaction-hash_tooltip": "Ein Identifikationsmerkmal, welches bei Transaktionserstellung generiert wird, um eine bestimmte Transaktion zu kennzeichnen.",
+    "block": "Block",
+    "block_tooltip": "Die Block Height, welche diese Transaktion in der Blockchain beinhaltet.",
+    "block-confirmation": "Block Konfirmation",
+    "timestamp": "Zeitstempel",
+    "timestamp_tooltip": "Das Datum und die Uhrzeit, zu welcher diese Transaktion in einem Block enthalten war.",
+    "value": "Wert",
+    "value_tooltip": "Die gesamte Anzahl an Tezzies dieser Transaktion.",
+    "transaction-fees": "Transaktionsgebühren",
+    "transaction-fees_tooltip": "Die ausgegebenen Gebühren für diese Transaktion."
+  },
+  "account-detail": {
+    "revealed": "Revealed",
+    "not-revealed": "Not Revealed",
+    "exchange": "Exchange",
+    "balance": "Balance",
+    "value": "Wert",
+    "related-accounts": "Verwandte Accounts",
+    "related-accounts_tooltip": "Accounts welche entweder von diesem Account verwaltet werden oder die Verwalter diese Accounts sind.",
+    "no-related-accounts": "Dieser Account hat keine verwandten Accounts.",
+    "show-all-accounts": "Zeige alle Accounts",
+    "minimize": "Minimieren",
+    "delegation": "Delegation",
+    "not-delegated": "Dieser Account wurde nicht delegiert.",
+    "not-delegated_text": "Delegiere zu einem Baker und leiste einen Beitrag zur Netzwerkvaliduerung und erhalte einen Reward.",
+    "delegated-account": "Delegierter Account",
+    "delegated-account_tooltip": "Der erste delegierte Account, welcher von diesem Account verwaltet wird. Das kann sowohl der gleiche wie auch ein anderer Account sein, welcher mit KT1 beginnt.",
+    "amount": "Menge",
+    "amount_tooltip": "Die Account Balance des delegierten Account oberhalb.",
+    "next-reward-expected": "Nächster Reward erwartet in",
+    "next-reward-expected_tooltip": "Gezeigt wird die erwartete Zeit bis zum Ende des aktuellen Cycles. Bakers zahlen ihre Rewards normalerweise ein paar Stunden nach Beginn des neuen Cycles aus.",
+    "not-available": "nicht verfügbar",
+    "reward-amount": "Rewardmenge",
+    "reward-amount_tooltip": "Die Menge, welche vom Baker als Reward für die Delegation ausbezahlt wird. Dies ist die erwartete Menge, welche ausbezahlt wird. Der Baker Split ist bereits subtrahiert.",
+    "baker": "Baker",
+    "baker_tooltip": "Ein Baker ist Teil des Validierungsprozesses des Netzwerkes.",
+    "baker-split": "Baker Split",
+    "baker-split_tooltip": "Der Baker Split ist ein prozentualer Anteil, welcher dem Baker zusteht als Reward für das Betreiben seiner Infrastruktur. Dieser Split wird vom Baker festgelegt, geschieht off-chain und könnte auch 0% betragen.",
+    "last30d": "letzte 30 Tage",
+    "invalid-address": "Invalide Adresse",
+    "invalid-address_text": "Diese Adresse ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain.",
+    "delegate-to": "Delegieren nach",
+    "delegate-now": "Jetzt delegieren",
+    "or": "oder",
+    "placeholder": "Suche mit Namen oder Addresse nach einem Baker"
+  },
+  "contract-detail": {
+    "revealed": "Revealed",
+    "not-revealed": "Nicht Revealed",
+    "name": "Name",
+    "symbol": "Symbol",
+    "total-supply": "Totaler Supply",
+    "decimals": "Dezimale",
+    "manager": "Manager",
+    "contract-overview": "Contract Überblick",
+    "description": "Beschreibung",
+    "website": "Webseite",
+    "social-profiles": "Social Profiles",
+    "transactions": "Transaktionen",
+    "last24h": "letzte 24 Stunden",
+    "volume": "Volumen",
+    "invalid-address": "Invalide Adresse",
+    "invalid-address_text": "Diese Adresse ist momentan nicht sichtbar auf der Blockchain."
+  },
+  "proposal-detail": {
+    "proposal": "Proposal",
+    "proposal-hash": "Proposal Hash",
+    "proposal-name": "Proposal Name",
+    "period": "Periode",
+    "proposal-discussion": "Proposal Diskussion",
+    "discussion-on-tezos": "Diskussion auf Tezos Agora",
+    "more-info": "Mehr Informationen",
+    "details-of-proposal": "Details des Proposals auf Tezos Agora",
+    "more-proposal": "Mehr Proposal",
+    "less-proposal": "Weniger Proposal",
+    "details": "Details",
+    "period-has-ended": "Periode ist beendet. Die Periode war zwischen",
+    "and": "und",
+    "the-current": "Die aktuelle",
+    "period-ends": "Periode endet am",
+    "period-will-start": "Periode wird beginnen am",
+    "invalid-proposal-hash": "Invalides Proposal Hash",
+    "invalid-proposal-text": "Dieses Operationshash ist invalid."
+  },
+  "token-contract-overview": {
+    "asset-smart-contracts": "Asset Smart Contracts"
+  },
+  "modal-component": {
+    "none": "Keine",
+    "show_button": "Show"
+  },
+  "copy-modal": {
+    "has-been-copied": "wurde kopiert"
+  },
+  "telegram-modal-component": {
+    "title": "Telegram Tezos Notifier Bot",
+    "text_1": "Mit dem Telegram",
+    "text_2": "bleibst du up-to-date über Accounts und wirst benachrichtigt bei Delegationen, Transaktionen und vielem mehr direkt in Telegram.",
+    "telegram_link": "Tezos Notifier Bot",
+    "notified-about": "Du erhälst Benachrichtigungen zur folgenden Adresse",
+    "choose-name": "Wähle einen entsprechenden Namen",
+    "placeholder": "Gib einen Namen für diese Adresse ein",
+    "name-too-long": "Der Name kann nur 18 Zeichen lang sein",
+    "start-notifications_button": "Starte Benachrichtigungen"
+  },
+  "search-item": {
+    "label": "Suche",
+    "placeholder": "Suche nach Adresse / Alias / Transaktion / Block"
+  },
+  "baker-table": {
+    "baker-overview": {
+      "baker-overview": "Baker Überblick",
+      "full-balance": "Full Balance",
+      "staking-balance": "Staking Balance",
+      "staking-capacity": "Staking Kapazität",
+      "payout-account": "Payoutaccount",
+      "no-related-payout": "Kein zugehöriger Payoutaccount.",
+      "frozen-balance": "Frozen Balance",
+      "active-delegations": "Aktive Delegationen",
+      "number-of-rolls": "Anzahl an Rolls",
+      "next-baking-right": "Nächstes Baking Right",
+      "not-available": "nicht verfügbar",
+      "payout-accuracy": "Payout Genauigkeit",
+      "baking-efficiency": "Baking Effizienz",
+      "efficiency": "Effizienz",
+      "last10cycles": "Letzte 10 Cycles",
+      "next-endorsing-right": "Nächstes Endorsing Right",
+      "baking-bad_tooltip": "Baking Bad erstellt ein Rating für Baker, welches die Genauigkeit und Pünktlichkeit der Rewardpayouts an ihre Delegatoren einbezieht."
+    },
+    "baking-rights": {
+      "status": "Status",
+      "baking-rights": "Baking Rights",
+      "cycle": "Cycle",
+      "number-of-bakings": "# an Bakings",
+      "block-rewards": "Block Rewards",
+      "deposits": "Deposits",
+      "fees": "Gebühren",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Alter",
+        "level": "Level",
+        "priority": "Priorität",
+        "rewards": "Rewards",
+        "fees": "Gebühren",
+        "deposits": "Deposits",
+        "payout": "Payout"
+      }
+    },
+    "endorsing-rights": {
+      "status": "Status",
+      "endorsing-rights": "Endorsing Rights",
+      "cycle": "Cycle",
+      "number-of-endorsements": "# an Endorsements",
+      "endorsement-rewards": "Endorsement Rewards",
+      "deposits": "Deposits",
+      "expanded-rows": {
+        "cycle": "Cycle",
+        "age": "Alter",
+        "level": "Level",
+        "slot": "Slot",
+        "rewards": "Rewards",
+        "deposits": "Deposits"
+      }
+    },
+    "rewards": {
+      "rewards": "Rewards",
+      "cycle": "Cycle",
+      "delegations": "Delegationen",
+      "staking-balance": "Staking Balance",
+      "block-rewards": "Block Rewards",
+      "endorsement-rewards": "Endorsement Rewards",
+      "fees": "Gebühren",
+      "expanded-rows": {
+        "delegator-account": "Delegator Account",
+        "payout": "Payout",
+        "share": "Share",
+        "baker-account": "Baker Account"
+      }
+    },
+    "votes": "Wahlen"
+  },
+  "tabbed-table": {
+    "account-detail": {
+      "transactions": "Transaktionen",
+      "delegations": "Delegationen",
+      "originations": "Originationen",
+      "endorsements": "Endorsements"
+    },
+    "transaction-detail": {
+      "transactions": "Transaktionen",
+      "delegations": "Delegationen",
+      "originations": "Originationen",
+      "reveals": "Reveals",
+      "activations": "Aktivierungen",
+      "votes": "Wahlen"
+    },
+    "block-detail": {
+      "transactions": "Transaktionen",
+      "delegations": "Delegationen",
+      "originations": "Originationen",
+      "endorsements": "Endorsements",
+      "activations": "Aktivierungen"
+    },
+    "proposal-detail": {
+      "proposal": "Proposal",
+      "exploration": "Exploration",
+      "testing": "Testing",
+      "promotion": "Promotion"
+    }
+  },
+  "tezblock-table": {
+    "load-more_button": "Mehr laden",
+    "download-csv_button": "als CSV Export herunterladen",
+    "transaction": {
+      "from": "Von",
+      "to": "Nach",
+      "amount": "Menge",
+      "fee": "Gebühr",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Alter",
+      "parameters": "Parameter",
+      "block": "Block"
+    },
+    "delegation": {
+      "delegator": "Delegator",
+      "baker": "Baker",
+      "amount": "Menge",
+      "fee": "Gebühr",
+      "gas-limit": "Gas Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Alter",
+      "value": "Wert",
+      "storage-limit": "Storage Limit",
+      "block": "Block"
+    },
+    "origination": {
+      "new-account": "Neuer Account",
+      "balance": "Balance",
+      "originator": "Originator",
+      "baker": "Baker",
+      "fee": "Gebühr",
+      "burn": "Burn",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "tx-hash": "Tx Hash",
+      "age": "Alter",
+      "block": "Block"
+    },
+    "reveal": {
+      "account": "Account",
+      "public-key": "Public Key",
+      "fee": "Gebühr",
+      "gas-limit": "Gas Limit",
+      "storage-limit": "Storage Limit",
+      "block": "Block"
+    },
+    "endorsement": {
+      "endorser": "Endorser",
+      "age": "Alter",
+      "slots": "Slots",
+      "tx-hash": "Tx Hash",
+      "endorsed-level": "Endorsed Level",
+      "block": "Block"
+    },
+    "activation": {
+      "account": "Account",
+      "secret": "Secret",
+      "tx-hash": "Tx Hash",
+      "age": "Alter"
+    },
+    "ballot": {
+      "ballot": "Abstimmung",
+      "age": "Alter",
+      "kind": "Art",
+      "voting-period": "Voting Periode",
+      "number-of-votes": "# an Votes",
+      "proposal-hash": "Proposal Hash",
+      "proposal": "Proposal",
+      "baker": "Baker",
+      "block": "Block"
+    },
+    "block-and-txhash": {
+      "block": "Block",
+      "tx-hash": "Tx Hash"
+    },
+    "block-list": {
+      "baker": "Baker",
+      "age": "Alter",
+      "transaction-volume": "Transaktionsvolumen",
+      "fee": "Gebühr",
+      "transactions": "Transaktionen",
+      "fitness": "Fitness",
+      "block": "Block"
+    },
+    "transaction-list": {
+      "from": "Von",
+      "to": "Nach",
+      "age": "Alter",
+      "amount": "Menge",
+      "fees": "Gebühren",
+      "parameters": "Parameter"
+    },
+    "activation-list": {
+      "account": "Account",
+      "age": "Alter",
+      "secret": "Secret"
+    },
+    "origination-list": {
+      "new-account": "Neuer Account",
+      "age": "Alter",
+      "balance": "Balance",
+      "originator": "Originator",
+      "baker": "Baker",
+      "fee": "Gebühr"
+    },
+    "delegation-list": {
+      "delegator": "Delegator",
+      "baker": "Baker",
+      "age": "Alter",
+      "value": "Wert",
+      "fee": "Gebühr",
+      "gas-limit": "Gas Limit"
+    },
+    "endorsement-list": {
+      "endorser": "Endorser",
+      "age": "Alter",
+      "slots": "Slots",
+      "block": "Block",
+      "tx-hash": "Tx Hash"
+    },
+    "votes-list": {
+      "baker": "Baker",
+      "ballot": "Abstimmung",
+      "age": "Alter",
+      "kind": "Art",
+      "voting-period": "Voting Periode",
+      "number-of-votes": "# an Votes",
+      "proposal": "Proposal"
+    },
+    "double-baking-list": {
+      "baker": "Baker",
+      "age": "Alter",
+      "reward": "Reward",
+      "offender": "Offender",
+      "denounced-level": "Denunziertes Level",
+      "lost-amount": "Verlorene Menge"
+    },
+    "double-endorsement-list": {
+      "baker": "Baker",
+      "age": "Alter",
+      "reward": "Reward",
+      "offender": "Offender",
+      "denounced-level": "Denunziertes Level",
+      "lost-amount": "Verlorene Menge"
+    },
+    "proposal-list": {
+      "proposal": "Proposal",
+      "proposal-hash": "Proposal Hash",
+      "period": "Periode"
+    },
+    "contract-list": {
+      "account": "Account",
+      "balance": "Balance",
+      "baker": "Baker"
+    },
+    "proposal": {
+      "baker": "Baker",
+      "ballot": "Abstimmung",
+      "age": "Alter",
+      "number-of-votes": "# an Votes"
+    },
+    "transfers": {
+      "from": "Von",
+      "to": "Nach",
+      "amount": "Menge",
+      "fee": "Gebühr",
+      "age": "Alter",
+      "block": "Block",
+      "tx-hash": "Tx Hash",
+      "entrypoint": "Eintrittspunkt"
+    },
+    "token-contract": {
+      "asset": "Asset",
+      "contract-address": "Contract Address",
+      "total-supply": "Totaler Supply",
+      "description": "Beschreibung"
+    },
+    "baker-overview": {
+      "baker": "Baker",
+      "balance": "Balance",
+      "number-of-votes": "# an Votes",
+      "staking-balance": "Staking Balance",
+      "number-of-delegators": "# an Delegatoren"
+    },
+    "contract": {
+      "asset": "Asset",
+      "balance": "Balance"
+    }
+  },
+  "glossary-additional-terms": {
+    "glossary": "Glossar",
+    "introduction": "Ein ausführliche Zusammenfassungen, der Begriffe welche im Tezos Ökosystem verwendet werden.",
+    "search_placeholder": "Nach Begriff suchen",
+    "account": "Account",
+    "account_description": "Ein Account ist ein eindeutiger Kennzeichner innerhalb des Alpha Protokolls. Es gibt verschiedene Arten von Accounts (siehe Originated Account und Delegierter Account). Jeder Account ist assoziiert mit einer Balance (eine Menge an verfügbaren tez).",
+    "amount": "Menge (Amount)",
+    "baker": "Baker",
+    "baker-split": "Baker Split",
+    "baking-endorsing-rights": "Baking/Endorsing Rights",
+    "baking-endorsing-rights_description": "Ein Delegate ist in der Lage einen Block zu baken/endorsen, falls er ein baking/endorsement Right für diesen Block hält. Am Anfang eines Cycles werden baking und endorsement Rights für alle Block Heights berechnet, basierend auf der Proportion der Rolls, welche von jedem Account besitzt werden. Für jede Block Height gibt es ein paar Accounts, welche die Erlaubnis haben, zu Baken. Diesen verschiedenen Accounts werden unterschiedliche Prioritäten zugeteilt. Für jede Block Height gibt es ein paar Accounts, welche die Erlaubnis haben, zu Endorsen. Mehrere Endorsements per Block sind möglich.",
+    "block": "Block",
+    "block_description": "Ein Block ist eine Sammlung von mehreren Operationen. Die Operationen sind in der Payload des Blocks, welche speziefisch zum Economic Protokoll ist. Zusammen mit dem Payload enthält ein Block einen Header mit Metadaten. Die Metadaten sind agnostisch zum Economic Protokoll. Sie enthalten generische Informationen wie der vorherige Block, Zeitstempel etc.",
+    "block-hash": "Block Hash",
+    "block-hash_description": "Ein Kennzeichner, welcher bei Blockerstellung gebildet wird. Gebraucht um einen speziefischen Block eindeutig zu identifizieren.",
+    "block-height": "Block Height",
+    "cycle": "Cycle",
+    "delegate": "Delegate",
+    "delegate_description": "Ein Delegate (Implicit) Account zu welchem ein anderer Account ihre Baking und Endorsement Rights delegiert hat. Die Baking und Endorsement Rights werden berechnet aufgrund der gesamten Balance an tez, welche an diesen Account delegiert wurden.",
+    "delegation": "Delegation",
+    "delegation_description": "Eine Operation in welcher eine Accountbalance einem Delegate geliehen wird. Dies erhöht die Rolls des Delegates und folglich dessen Baking Rights. Der Delegate Account kann die ihm delegierten Mittel nicht kontrollieren.",
+    "delegated-account": "Delegierter Account (Delegated Account)",
+    "double-baking": "Double Baking",
+    "double-baking_description": "Wenn ein Baker zwei verschieden Blöcke zur gleichen Höhe signiert, spricht man von Double Baking. Double baking ist schädlich für das Netzwerk und könnte ein Indiz sein für Double Spending. Daher wird es durch das Netzwerk bestraft: Ein Accuser kann Beweise für Double Baking liefern und mit einem Teil des Deposits des Bakers belohnt werden.",
+    "endorser": "Endorser",
+    "endorser_description": "Wenn ein Block kreiert und ins Netzwerk propagiert wird, können Nodes welche Endorsement Rights für die entsprechende Block Height haben, eine Endorsement Operation abgeben. Diese Accounts sind dann die Endorser dieses Blocks. Die Endorsement Operationen können in den nächsten Block einbezogen werden um den Score des Blocks zu erhöhen.",
+    "fitness": "Fitness",
+    "frozen-balance": "Frozen Balance",
+    "frozen-balance_description": "Die Summe aller Bonds und Rewards welche zurückgehalten werden, wenn ein Baker endorsed.",
+    "gas": "Gas",
+    "gas_description": "Ein Messeinheit der Anzahl an elementaren Operationen, welche während der Ausführen eines Smart Contracts durchgeführt werden. Gas wird gebraucht, um zu messen, wie viel Computingpower gebraucht wird, um einen Smart Contract auszuführen.",
+    "node": "Node",
+    "node_description": "Ein Peer in in einem P2P Netzwerk. Es hält einen lokalen State und propagiert Blöcke und Operationen.",
+    "operation": "Operation",
+    "operation_description": "Operationen transformieren den Kontext, das ist es, was den Zustand der Chain verändert. Operationen sind gruppiert in Blöcken, sodass die Chain schrittweise fortschreitet.",
+    "originated-account": "Originated Account",
+    "originated-account_description": "Auch Smart Contract. Ein Account welcher mit einem Michelson Skript assoziiert ist. Er wird mit einer expliziten Originationsoperation erstellt und wird deshalb auch Originated Account genannt. Die Adresse eines Smart Contracts beginnt immer mit KT1.",
+    "origination": "Origination",
+    "origination_description": "Eine Operation um einen Smart Contract zu kreieren.",
+    "priority": "Priorität (Priority)",
+    "priority_description": "Ein Rang verschiedener Baking Rights. Jeder Rang entspricht einem Zeitabschnitt. Ein Baker mit Baking Rights einer bestimmten Priorität darf nur während der entsprechenden Zeitspanne der Priorität baken. Baking ausserhalb der zugeteilten Priorität bedeutet einen invaliden Block.",
+    "protocol": "Protokoll (Protocol)",
+    "related-accounts": "Related Accounts",
+    "reveal": "Reveal",
+    "reveal_description": "Ein revealed Account bedeutet, dass der Public Key der Blockchain bekannt gemacht wurde. Falls nicht revealed, wird der Account nicht in der Lage sein, Operationen wie Transfers zu vollziehen: der Public Key wird gebraucht um sicherzustellen, dass der Account Operationen korrekt signiert.",
+    "reward": "Reward",
+    "roll": "Roll",
+    "roll_description": "Eine Menge von Tez (z.B. 8000ꜩ), die als eine Einheit dient, um die Baking Rights der Delegates in einem Cycle zu bestimmen. Einem Delegate mit doppelt so vielen Rollen wie ein Anderer werden doppelt so viele Baking Rights zugeteilt.",
+    "signature": "Signatur (Signature)",
+    "signature_description": "Eine Signatur ist das Ergebnis der Unterzeichnung einer Nachricht mit einem privaten Schlüssel unter Verwendung des digitalen Signaturschemas mit elliptischer Kurve.",
+    "smart-contract": "Smart Contract",
+    "smart-contract_description": "Auch Originated Account. Ein Account welcher mit einem Michelson Skript assoziiert ist. Er wird mit einer expliziten Originationsoperation erstellt und wird deshalb auch Originated Account genannt. Die Adresse eines Smart Contracts beginnt immer mit KT1.",
+    "transaction": "Transaktion (Transaction)",
+    "transaction_description": "Eine Operation um Tez zwischen zwei Accounts zu transferieren, oder um den Code eines Smart Contracts laufen zu lassen.",
+    "transaction-hash": "Transaktionshash (Transaction Hash)"
+  }
+}

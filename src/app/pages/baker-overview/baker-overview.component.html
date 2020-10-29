@@ -6,13 +6,13 @@
     <div class="card h-100 pt-3">
       <div class="card-body p-4">
         <h5 class="card-title mb-3">
-          Bakers
+          {{ 'baker-overview.bakers' | translate }}
         </h5>
         <div class="row pb-3">
           <div class="col">
             <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
               <h5 class="card-title__secondary mb-3 ">
-                Total Number of Bakers
+                {{ 'baker-overview.total-number' | translate }}
               </h5>
               <h3>
                 {{ totalActiveBakers }}
@@ -24,7 +24,7 @@
         <div class="row pb-5">
           <div class="col col-12">
             <h5 class="card-title__secondary mb-3 ">
-              Top 25 bakers by Staking Balance
+              {{ 'baker-overview.top25' | translate }}
             </h5>
           </div>
           <div class="col col-12 d-flex justify-content-center">

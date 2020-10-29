@@ -9,7 +9,7 @@ import { BaseService, Operation } from '@tezblock/services/base.service'
 import * as fromRoot from '@tezblock/reducers'
 import { toNotNilArray } from '@tezblock/services/fp'
 import { of } from 'rxjs'
-import { Account } from '@tezblock/interfaces/Account'
+import { Account } from '@tezblock/domain/account'
 
 @Injectable()
 export class AccountsEffects {

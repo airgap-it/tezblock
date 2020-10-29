@@ -56,16 +56,18 @@
                       [address]="contract.id"
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
-                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">Revealed</span>
+                    <span *ngIf="(revealed$ | async) === 'Revealed'" class="badge badge-pill badge-primary-light ml-1">
+                      {{ 'contract-detail.revealed' | translate }}
+                    </span>
                     <span *ngIf="(revealed$ | async) === 'Not Revealed'" class="badge badge-pill badge-primary-light ml-1">
-                      Not Revealed
+                      {{ 'contract-detail.not-revealed' | translate }}
                     </span>
                   </div>
                 </div>
               </div>
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Name</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.name' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <p class="mb-0">{{ contract.name }}</p>
@@ -73,7 +75,7 @@
               </div>
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Symbol</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.symbol' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <p class="mb-0">{{ contract.symbol }}</p>
@@ -81,7 +83,7 @@
               </div>
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Total Supply</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.total-supply' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <p class="mb-0">
@@ -98,7 +100,7 @@
               </div>
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Decimals</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.decimals' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   {{ contract.decimals }}
@@ -106,7 +108,7 @@
               </div>
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Manager</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.manager' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <address-item [address]="manager$ | async"></address-item>
@@ -119,12 +121,12 @@
           <div class="card h-100 pt-3 ">
             <div class="card-body right p-4">
               <h5 class="card-title mb-4 ">
-                Contract Overview
+                {{ 'contract-detail.contract-overview' | translate }}
               </h5>
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Description</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.description' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <p class="mb-0">{{ contract.description }}</p>
@@ -133,7 +135,7 @@
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Website</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.website' | translate }}</p>
                 </div>
                 <div class="col-md-9">
                   <a [href]="website$ | async" target="_blank">
@@ -144,7 +146,7 @@
 
               <div class="row mb-3">
                 <div class="col-md-3">
-                  <p class="text-secondary mb-0">Social Profiles</p>
+                  <p class="text-secondary mb-0">{{ 'contract-detail.social-profiles' | translate }}</p>
                 </div>
                 <div class=" col-md-9">
                   <a
@@ -161,9 +163,9 @@
               <div class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
-                    Transactions
+                    {{ 'contract-detail.transactions' | translate }}
                     <br />
-                    <small>Last 24 Hours</small>
+                    <small>{{ 'contract-detail.last24h' | translate }}</small>
                   </p>
                 </div>
                 <div class=" col-md-9">
@@ -174,13 +176,16 @@
               <div class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
-                    Volume
+                    {{ 'contract-detail.volume' | translate }}
                     <br />
-                    <small>Last 24 Hours</small>
+                    <small>{{ 'contract-detail.last24h' | translate }}</small>
                   </p>
                 </div>
                 <div class=" col-md-9">
-                  <amount-cell [data]="transactions24hVolume$ | async" [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"></amount-cell>
+                  <amount-cell
+                    [data]="transactions24hVolume$ | async"
+                    [options]="{ showFiatValue: false, symbol: (contract$ | async)?.symbol }"
+                  ></amount-cell>
                 </div>
               </div>
             </div>
@@ -212,10 +217,10 @@
     <ng-template #noContract>
       <div class="card p-3" *ngIf="(contract$ | async) === null">
         <h5 class="card-title mb-4 ">
-          Invalid Address
+          {{ 'contract-detail.invalid-address' | translate }}
         </h5>
         <p>
-          This contract is currently not visible on the blockchain.
+          {{ 'contract-detail.invalid-address_text' | translate }}
         </p>
       </div>
     </ng-template>
