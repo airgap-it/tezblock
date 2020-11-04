@@ -70,7 +70,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
         )
       })
     )
-
+  
     this.dataSource$
       .pipe(
         map(narrowOptions(5)),
@@ -79,7 +79,7 @@ export class SearchItemComponent extends BaseComponent implements OnInit {
             map(previousSearches => {
               const value = get<any>(value => value.toLowerCase())(this.searchControl.value)
               const matches = previousSearches
-                .filter(previousItem => (value ? previousItem.id.toLowerCase().indexOf(value) !== -1 : false))
+                .filter(previousItem => (value && previousItem.id ? previousItem.id.toLowerCase().indexOf(value) !== -1 : false))
                 .filter(previousItem => !data.some(dataItem => dataItem.id === previousItem.id))
                 .map(toOption('Recent History'))
 
