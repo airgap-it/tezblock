@@ -34,7 +34,7 @@ export class SearchService {
     private readonly cacheService: CacheService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router
-  ) {}
+  ) { }
 
   getSearchSources(token: string): Observable<SearchOptionData[]>[] {
     const matchByAccountIds = ['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))
