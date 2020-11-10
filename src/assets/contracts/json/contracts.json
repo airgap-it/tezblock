@@ -39,7 +39,7 @@
     "symbol": "USDtz",
     "name": "USD Tez",
     "website": "https://USDtz.com",
-    "description": "USD Tez is a Tezos stablecoin pegged to the US Dollar and backed by FIAT collateral, targeting a maximum growth cap of 4:1 overcollateralization with both FIAT and XTZ.",
+    "description": "USDtez (USDtz) is the first USD-pegged stablecoin and first FIAT-pegged stablecoin on Tezos. It is backed 1-1 with FIAT, keeping full and transparent reserves and enabling a secure, scalable, and [financial instrument] programmable source of liquidity. USDtez is an open-source project built by multiple firms in the Tezos ecosystem, and is coordinated by Tezos Stable Technologies (StableTech) which operates under the aegis of the Tezos Stablecoin Foundation — a non-shareholder foundation.",
     "socials": [
       {
         "type": "website",
