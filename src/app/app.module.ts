@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from '@angular/common'
 import { HttpClient, HttpClientModule } from '@angular/common/http'
-import { APP_ID, Inject, NgModule, PLATFORM_ID } from '@angular/core'
+import { APP_ID, Inject, NgModule, PLATFORM_ID, APP_INITIALIZER } from '@angular/core'
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
@@ -99,6 +99,7 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 import { VarDirective } from '@tezblock/directives/var.directive'
+import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
@@ -223,7 +224,21 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ProgressbarComponent,
     BasicCellComponent
   ],
-  providers: [BakingService, CryptoPricesService, ChartDataService, BsModalService, ChainNetworkService, AnalyticsService],
+
+  providers: [
+    BakingService,
+    CryptoPricesService,
+    ChartDataService,
+    BsModalService,
+    ChainNetworkService,
+    AnalyticsService,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (themeService: ThemeService) => () => themeService.setTheme(),
+      deps: [ThemeService],
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
