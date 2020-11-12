@@ -8,6 +8,7 @@ import { Observable, Subscription } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import * as fromRoot from '@tezblock/reducers'
+import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { LanguagesService } from '@tezblock/services/translation/languages.service'
 
@@ -34,6 +35,8 @@ export class HeaderItemComponent implements OnInit {
   currentCycle$: Observable<number>
   cycleProgress$: Observable<number>
   remainingTime$: Observable<string>
+  triggers: string = ''
+  title = 'tezblock'
   triggers$: Observable<string>
   isCollapsed = true
   hideDropdown = true
@@ -45,6 +48,7 @@ export class HeaderItemComponent implements OnInit {
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly store$: Store<fromRoot.State>,
+    public readonly themeService: ThemeService,
     public translate: TranslateService,
     private readonly languagesService: LanguagesService
   ) {}
@@ -56,7 +60,7 @@ export class HeaderItemComponent implements OnInit {
     this.selectedNetwork = this.chainNetworkService.getNetwork()
     this.triggers$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
-      .pipe(map(breakpointState => (breakpointState.matches ? '' : 'hover')))
+      .pipe(map((breakpointState) => (breakpointState.matches ? '' : 'hover')))
   }
 
   navigate(entity: string) {
@@ -71,6 +75,11 @@ export class HeaderItemComponent implements OnInit {
   changeNetwork(name: TezosNetwork) {
     this.chainNetworkService.changeEnvironment(name)
   }
+
+  changeTheme() {
+    this.themeService.switch()
+  }
+
   changeLanguage(language: string) {
     this.languagesService.loadLanguages(language)
   }

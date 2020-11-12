@@ -31,7 +31,10 @@
     "dapps_button": "Dapps",
     "development_button": "Development",
     "glossary_button": "Glossary",
-    "languages_label": "Languages"
+    "languages_label": "Languages",
+    "theme_label": "Theme",
+    "light-mode_label": "Light Mode",
+    "dark-mode_label": "Dark Mode"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",

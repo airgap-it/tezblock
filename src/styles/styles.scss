@@ -1,21 +1,19 @@
-/* Global Styles */
-
 /* Manrope font imports*/
 @font-face {
   font-family: 'Manrope';
-  src: url(/assets/fonts/Manrope/manrope-regular.woff) format('truetype');
+  src: url(../assets/fonts/Manrope/manrope-regular.woff) format('truetype');
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'Manrope';
-  src: url(/assets/fonts/Manrope/manrope-light.woff) format('truetype');
+  src: url(../assets/fonts/Manrope/manrope-light.woff) format('truetype');
   font-weight: 200;
 }
 
 @font-face {
   font-family: 'Manrope';
-  src: url(/assets/fonts/Manrope/manrope-bold.woff) format('truetype');
+  src: url(../assets/fonts/Manrope/manrope-bold.woff) format('truetype');
   font-weight: 600;
 }
 
@@ -23,55 +21,28 @@ th {
   font-weight: 400;
 }
 
-$primary-light-color: #d6dfff;
-$primary-dark-color: #2e384d;
-$box-shadow: 0 10px 20px 0 rgba(46, 91, 255, 0.07);
-
-/* custom tezblock colors */
-$theme-colors: (
-  'primary': #2e5bff,
-  'primary-light': $primary-light-color,
-  'primary-dark': $primary-dark-color,
-  'secondary': #8798ad,
-  'light': #f4f6fc
-);
-
 /* Sass overwrites */
-$body-bg: #f4f6fc;
-$card-cap-bg: #fff;
-$card-border-color: rgba(46, 91, 255, 0.08);
-$dropdown-border-color: rgba(46, 91, 255, 0.08);
+$font-family-base: 'Manrope';
 $card-border-radius: 0;
 $alert-border-radius: 0;
 $dropdown-border-radius: 0;
 $link-decoration: none;
 $link-hover-decoration: none;
-$link-color: map_get($theme-colors, 'primary');
-$navbar-light-active-color: map_get($theme-colors, 'primary');
 $badge-pill-padding-x: 1em;
 $badge-padding-y: 0.5em;
 $badge-padding-x: 0.5em;
-$table-hover-bg: rgba(46, 91, 255, 0.04);
-$font-family-sans-serif: 'Manrope', sans-serif;
 $font-size-base: 14;
-$dropdown-link-hover-color: map_get($theme-colors, 'primary');
 $dropdown-link-hover-bg: none;
 $nav-tabs-border-width: 0;
-$nav-tabs-link-active-color: map_get($theme-colors, 'primary');
-$nav-tabs-link-active-bg: none;
-$navbar-light-toggler-border-color: transparent;
 $navbar-toggler-font-size: 14px;
 $input-btn-focus-box-shadow: none;
-$tooltip-bg: #fff;
+// $tooltip-bg: #fff;
 $tooltip-color: #000;
 $tooltip-border-radius: 0;
+$badge-font-weight: 400;
 $list-group-item-padding-y: 0.25rem;
 $list-group-item-padding-x: 0;
-$modal-header-border-color: transparent;
-$badge-font-weight: 400;
-$dropdown-link-hover-bg: #fff;
 $modal-content-border-radius: 0;
-$modal-content-border-color: rgba(46, 91, 255, 0.08);
 $modal-xl: 1100px;
 
 /* identicon image size */
@@ -104,27 +75,24 @@ tabset {
   outline: none;
 }
 
-.card,
-.dropdown-menu {
-  box-shadow: $box-shadow;
-}
-
 /* card specific styling */
 .card {
   .card-title__secondary {
     text-transform: uppercase;
     font-size: 14px;
-    color: var(--secondary);
   }
   .card-title {
     font-size: 16px;
-    color: var(--dark);
   }
   .card-header,
   .table thead th,
   .table > tbody > tr:first-child > td {
-    border: none;
+    border: none !important;
   }
+}
+
+.dropdown-item {
+  cursor: pointer;
 }
 
 .typeahead {
@@ -163,14 +131,6 @@ app-latest-contracts {
   }
 }
 
-ngx-json-viewer {
-  overflow: auto !important;
-  section {
-    background: map_get($theme-colors, 'light');
-    overflow: auto !important;
-  }
-}
-
 .modal,
 .modal-open,
 .modal-content,
@@ -201,4 +161,6 @@ transaction-item div:nth-of-type(5) hr {
   border-top: 1px solid transparent;
 }
 
-@import '../node_modules/bootstrap/scss/bootstrap';
+/* Global Styles */
+@import './styles-dark.scss';
+@import './styles-light.scss';

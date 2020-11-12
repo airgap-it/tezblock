@@ -1,5 +1,4 @@
 <header-item
-  class="bg-white"
   [isMinimized]="router.url === '/'"
   [activeLinkBlockchain]="isActiveLinkBlockchain"
   [activeLinkAssets]="router.url.startsWith('/token-contract/list/')"
@@ -8,4 +7,4 @@
 <div class="container">
   <router-outlet></router-outlet>
 </div>
-<app-footer class="mt-auto pt-5"></app-footer>
+<app-footer class="mt-auto"></app-footer>
