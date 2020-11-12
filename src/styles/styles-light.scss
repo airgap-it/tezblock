@@ -1,0 +1,103 @@
+.light-theme {
+  $primary-light-color: #d6dfff;
+  $primary-dark-color: #2e384d;
+  $box-shadow: 0 10px 20px 0 rgba(46, 91, 255, 0.07);
+
+  /* custom tezblock colors */
+  $theme-colors: (
+    'primary': #2e5bff,
+    'primary-light': $primary-light-color,
+    'primary-dark': $primary-dark-color,
+    'secondary': #8798ad,
+    'light': #f4f6fc
+  );
+
+  /* Sass overwrites */
+  $body-bg: #f4f6fc;
+  $card-cap-bg: #fff;
+  $card-border-color: rgba(46, 91, 255, 0.08);
+  $dropdown-border-color: rgba(46, 91, 255, 0.08);
+  $link-color: map_get($theme-colors, 'primary');
+  $navbar-light-active-color: map_get($theme-colors, 'primary');
+  $table-hover-bg: rgba(46, 91, 255, 0.04);
+  $font-family-sans-serif: 'Manrope', sans-serif;
+  $dropdown-link-hover-color: map_get($theme-colors, 'primary');
+  $nav-tabs-link-active-color: map_get($theme-colors, 'primary');
+  $nav-tabs-link-active-bg: #fff;
+  $navbar-light-toggler-border-color: transparent;
+  $tooltip-bg: map_get($theme-colors, 'secondary');
+  $modal-header-border-color: transparent;
+  $dropdown-link-hover-bg: #fff;
+  $modal-content-border-color: rgba(46, 91, 255, 0.08);
+
+  $ngx-json-viewer-background: map_get($theme-colors, 'light');
+
+  .card,
+  .dropdown-menu {
+    box-shadow: $box-shadow;
+  }
+
+  .card {
+    .card-title__secondary {
+      color: map_get($theme-colors, 'secondary');
+    }
+  }
+
+  .search--container {
+    background: linear-gradient(-180deg, rgba(91, 148, 255, 0.2) 0%, rgba(46, 91, 255, 0.2) 100%);
+  }
+
+  #sortingColumn {
+    color: #000;
+  }
+
+  /* header background color */
+  header-item {
+    background: #fff;
+  }
+  /* footer background color */
+  app-footer {
+    background: linear-gradient(90deg, #2e5bff 0%, #1b3f92 50%);
+  }
+
+  ngx-json-viewer {
+    overflow: auto !important;
+    section {
+      background: $ngx-json-viewer-background;
+      overflow: auto !important;
+    }
+  }
+
+  app-account-detail {
+    .rights-chart {
+      div {
+        background-color: map_get($theme-colors, 'light');
+        &.active {
+          background-color: darken(map_get($theme-colors, 'light'), 10%);
+        }
+
+        &.super-active {
+          background-color: darken(map_get($theme-colors, 'light'), 20%);
+        }
+
+        &.now {
+          background-color: map_get($theme-colors, 'primary');
+        }
+
+        &.past {
+          background-color: map_get($theme-colors, 'primary-light');
+
+          &.active {
+            background-color: darken(map_get($theme-colors, 'primary-light'), 10%);
+          }
+
+          &.super-active {
+            background-color: darken(map_get($theme-colors, 'primary-light'), 20%);
+          }
+        }
+      }
+    }
+  }
+
+  @import '../../node_modules/bootstrap/scss/bootstrap';
+}

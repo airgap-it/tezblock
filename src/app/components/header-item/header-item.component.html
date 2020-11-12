@@ -5,7 +5,12 @@
         <div class="d-block">
           <div class="d-flex align-items-end">
             <a class="navbar-brand mr-0 p-0" routerLink="/">
-              <img src="/assets/img/tezblock_logo.svg" width="160px" height="auto" />
+              <ng-container *ngIf="themeService.isLightMode()">
+                <img src="/assets/img/tezblock_logo.svg" width="160px" height="auto" />
+              </ng-container>
+              <ng-container *ngIf="themeService.isDarkMode()">
+                <img src="/assets/img/tezblock_logo-dark.svg" width="160px" height="auto" />
+              </ng-container>
             </a>
             <a href="https://airgap.it" target="_blank" class="text-dark">
               <small>
@@ -69,7 +74,7 @@
                   >
                     {{ 'header-item.blockchain_button' | translate }}
                   </a>
-                  <ul class="dropdown-menu mega-dropdown-menu pb-4 " *dropdownMenu role="menu" id="blockchain" (mouseleave)="dp1.hide()">
+                  <ul class="dropdown-menu mega-dropdown-menu pb-4" *dropdownMenu role="menu" id="blockchain" (mouseleave)="dp1.hide()">
                     <li class="row">
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
@@ -196,7 +201,7 @@
                         {{ 'header-item.wallets_button' | translate }}
                       </a>
                     </li>
-                     <li>
+                    <li>
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/glossary']">
                         {{ 'header-item.glossary_button' | translate }}
                       </a>
@@ -221,7 +226,7 @@
                         {{ 'header-item.development_button' | translate }}
                       </a>
                     </li>
-                                     </ul>
+                  </ul>
                 </span>
               </li>
               <li class="nav-item dropdown pl-2 pl-sm-0">
@@ -275,13 +280,15 @@
                     id="button-basic"
                     routerLinkActive="btn-link"
                     (mouseover)="dp1.hide(); dp2.hide()"
-                  >      <fa-icon [icon]="'cog' | iconPipe" ></fa-icon>
+                  >
+                    <fa-icon [icon]="'cog' | iconPipe"></fa-icon>
                   </a>
                   <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
                     <div class="pb-2 px-4">
-                      <strong> {{ 'header-item.languages_label' | translate }}</strong></div>
+                      <strong>{{ 'header-item.languages_label' | translate }}</strong>
+                    </div>
                     <li role="menuitem">
-                                  <a
+                      <a
                         class="dropdown-item"
                         [ngClass]="'en' === translate.currentLang ? 'active' : ''"
                         (click)="changeLanguage('en'); dp4.hide()"
@@ -294,6 +301,17 @@
                         (click)="changeLanguage('de'); dp4.hide()"
                       >
                         Deutsch
+                      </a>
+                    </li>
+                    <div class="py-2 px-4">
+                      <strong>{{ 'header-item.theme_label' | translate }}</strong>
+                    </div>
+                    <li class="nav-item">
+                      <a class="dropdown-item" (click)="changeTheme()" [ngClass]="true === themeService.isDarkMode() ? '' : 'active'">
+                        {{ 'header-item.light-mode_label' | translate }}
+                      </a>
+                      <a class="dropdown-item" (click)="changeTheme()" [ngClass]="true === themeService.isLightMode() ? '' : 'active'">
+                        {{ 'header-item.dark-mode_label' | translate }}
                       </a>
                     </li>
                   </ul>
