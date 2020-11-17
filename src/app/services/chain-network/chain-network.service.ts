@@ -8,7 +8,7 @@ import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol
 export class ChainNetworkService implements OnInit {
   private chainName: TezosNetwork
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET
-  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.CARTHAGENET]
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.CARTHAGENET, TezosNetwork.DELPHINET]
 
   constructor() {
     const origin = new URL(location.href).origin
@@ -18,6 +18,9 @@ export class ChainNetworkService implements OnInit {
         break
       case environment.carthagenet.targetUrl:
         this.chainName = TezosNetwork.CARTHAGENET
+        break
+      case environment.delphinet.targetUrl:
+        this.chainName = TezosNetwork.DELPHINET
         break
       default:
         this.chainName = this.defaultChain
@@ -31,15 +34,14 @@ export class ChainNetworkService implements OnInit {
         return environment.mainnet
       case TezosNetwork.CARTHAGENET:
         return environment.carthagenet
+      case TezosNetwork.DELPHINET:
+        return environment.delphinet
       default:
         return environment.mainnet
     }
   }
 
   public getEnvironmentVariable(): string {
-    // if (this.chainName === TezosNetwork.CARTHAGENET) {
-    //   return TezosNetwork.MAINNET
-    // }
     return this.chainName
   }
 
