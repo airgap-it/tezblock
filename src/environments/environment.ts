@@ -16,6 +16,12 @@ export const environment = {
     conseilApiKey: 'CARTHAGENET_CONSEIL_API_KEY',
     targetUrl: 'CARTHAGENET_TARGET_URL'
   },
+  delphinet: {
+    rpcUrl: 'DELPHINET_RPC_URL',
+    conseilUrl: 'DELPHINET_CONSEIL_URL',
+    conseilApiKey: 'DELPHINET_CONSEIL_API_KEY',
+    targetUrl: 'DELPHINET_TARGET_URL'
+  },
   googleAnalyticsKey: undefined,
   proFontAwesomeAvailable: false
 }
