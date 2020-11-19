@@ -61,7 +61,7 @@
                     </div>
                   </div>
                 </div>
-                <progressbar [value]="cycleProgress$ | async" style="height: 6px"></progressbar>
+                <progressbar [value]="cycleProgress$ | async" style="height: 6px;"></progressbar>
                 <div class="mt-2 container">
                   <div class="row">
                     <div class="col p-0">
@@ -82,16 +82,10 @@
                 {{ currentPeriodKind$ | async }} {{ 'dashboard.period' | translate }}
                 {{ (currentPeriodTimespan$ | async)?.end | amDateFormat: 'LL' }}
               </p>
-              <progressbar [value]="25 * (currentPeriodIndex$ | async)" style="height: 6px" class="my-2"></progressbar>
+              <progressbar [value]="25 * (currentPeriodIndex$ | async)" style="height: 6px;" class="my-2"></progressbar>
               <div class="mt-2 container">
                 <div class="row">
                   <div class="col-9 p-0">
-                    <!--TODO: resolve issues
-                  <app-hash-cell
-                    [data]="'PsDELPH1Kxsxt8f9eWbxQeRxkjfbxoqM52jvs5Y5fBxWWh4ifpo'"
-                    [options]="{ kind: 'proposal' }"
-                  ></app-hash-cell>
-                -->
                     <app-hash-cell
                       *ngIf="proposalHash$ | async as proposalHash"
                       [data]="proposalHash"
