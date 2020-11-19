@@ -1,27 +1,27 @@
 import { Component, OnInit } from '@angular/core'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { combineLatest, BehaviorSubject, Observable } from 'rxjs'
-import { map, filter, withLatestFrom, switchMap } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
-import { $enum } from 'ts-enum-util'
 import { Actions, ofType } from '@ngrx/effects'
+import { Store } from '@ngrx/store'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
+import { BehaviorSubject, combineLatest, forkJoin, Observable } from 'rxjs'
+import { filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
+import { $enum } from 'ts-enum-util'
 
-import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import * as fromRoot from '@tezblock/reducers'
-import * as actions from './actions'
+import { Meta, Title } from '@angular/platform-browser'
 import * as appActions from '@tezblock/app.actions'
+import { BaseComponent } from '@tezblock/components/base.component'
+import { jsonAccounts } from '@tezblock/domain/account'
 import { TokenContract } from '@tezblock/domain/contract'
 import { squareBrackets } from '@tezblock/domain/pattern'
-import { PeriodTimespan, PeriodKind } from '@tezblock/domain/vote'
 import { getRefresh } from '@tezblock/domain/synchronization'
-import { BaseComponent } from '@tezblock/components/base.component'
-import { Transaction } from '@tezblock/interfaces/Transaction'
+import { PeriodKind, PeriodTimespan } from '@tezblock/domain/vote'
 import { Block } from '@tezblock/interfaces/Block'
-import { Title, Meta } from '@angular/platform-browser'
+import { Transaction } from '@tezblock/interfaces/Transaction'
+import * as fromRoot from '@tezblock/reducers'
 import { PricePeriod } from '@tezblock/services/crypto-prices/crypto-prices.service'
-import { jsonAccounts } from '@tezblock/domain/account'
+import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service'
+import * as actions from './actions'
 
 @Component({
   selector: 'app-dashboard',
@@ -29,55 +29,55 @@ import { jsonAccounts } from '@tezblock/domain/account'
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent extends BaseComponent implements OnInit {
-  blocks$: Observable<Block[]>
-  transactions$: Observable<Transaction[]>
-  currentCycle$: Observable<number>
-  cycleProgress$: Observable<number>
-  cycleStartingBlockLevel$: Observable<number>
-  cycleEndingBlockLevel$: Observable<number>
-  remainingTime$: Observable<string>
+  public blocks$: Observable<Block[]>
+  public transactions$: Observable<Transaction[]>
+  public currentCycle$: Observable<number>
+  public cycleProgress$: Observable<number>
+  public cycleStartingBlockLevel$: Observable<number>
+  public cycleEndingBlockLevel$: Observable<number>
+  public remainingTime$: Observable<string>
 
-  fiatInfo$: Observable<CurrencyInfo>
-  cryptoInfo$: Observable<CurrencyInfo>
-  percentage$: Observable<number>
-  historicData$: Observable<MarketDataSample[]>
+  public fiatInfo$: Observable<CurrencyInfo>
+  public cryptoInfo$: Observable<CurrencyInfo>
+  public percentage$: Observable<number>
+  public historicData$: Observable<MarketDataSample[]>
 
-  bakers: string[]
+  public bakers: string[]
 
-  priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
-  priceChartLabels$: Observable<string[]>
-  contracts$: Observable<TokenContract[]>
-  proposalHash$: Observable<string>
-  currentPeriodTimespan$: Observable<PeriodTimespan>
-  currentPeriodKind$: Observable<string>
-  currentPeriodIndex$: Observable<number>
-  pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day)
+  public priceChartDatasets$: Observable<{ data: number[]; label: string }[]>
+  public priceChartLabels$: Observable<string[]>
+  public contracts$: Observable<TokenContract[]>
+  public proposalHash$: Observable<string>
+  public currentPeriodTimespan$: Observable<PeriodTimespan>
+  public currentPeriodKind$: Observable<string>
+  public currentPeriodIndex$: Observable<number>
+  public pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day)
 
-  yayRolls$: Observable<number>
-  nayRolls$: Observable<number>
-  passRolls$: Observable<number>
-  yayRollsPercentage$: Observable<number>
-  nayRollsPercentage$: Observable<number>
-  showRolls$: Observable<boolean>
+  public yayRolls$: Observable<number>
+  public nayRolls$: Observable<number>
+  public passRolls$: Observable<number>
+  public yayRollsPercentage$: Observable<number>
+  public nayRollsPercentage$: Observable<number>
+  public showRolls$: Observable<boolean>
 
   constructor(
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly store$: Store<fromRoot.State>,
-    private titleService: Title,
-    private metaTagService: Meta
+    private readonly titleService: Title,
+    private readonly metaTagService: Meta
   ) {
     super()
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.store$.dispatch(actions.loadContracts())
     this.store$.dispatch(actions.loadLatestProposal())
 
-    this.contracts$ = this.store$.select(state => state.dashboard.contracts)
+    this.contracts$ = this.store$.select((state) => state.dashboard.contracts)
     this.bakers = Object.keys(jsonAccounts)
-    this.blocks$ = this.store$.select(state => state.dashboard.blocks)
-    this.transactions$ = this.store$.select(state => state.dashboard.transactions)
+    this.blocks$ = this.store$.select((state) => state.dashboard.blocks)
+    this.transactions$ = this.store$.select((state) => state.dashboard.transactions)
 
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
     this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress)
@@ -85,17 +85,17 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     this.cycleEndingBlockLevel$ = this.store$.select(fromRoot.app.cycleEndingBlockLevel)
     this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
 
-    this.fiatInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
-    this.cryptoInfo$ = this.store$.select(state => state.app.cryptoCurrencyInfo)
-    this.historicData$ = this.store$.select(state => state.dashboard.cryptoHistoricData)
+    this.fiatInfo$ = this.store$.select((state) => state.app.fiatCurrencyInfo)
+    this.cryptoInfo$ = this.store$.select((state) => state.app.cryptoCurrencyInfo)
+    this.historicData$ = this.store$.select((state) => state.dashboard.cryptoHistoricData)
     this.percentage$ = this.store$.select(fromRoot.dashboard.currencyGrowthPercentage)
 
-    this.priceChartDatasets$ = this.historicData$.pipe(map(data => [{ data: data.map(dataItem => dataItem.open), label: 'Price' }]))
+    this.priceChartDatasets$ = this.historicData$.pipe(map((data) => [{ data: data.map((dataItem) => dataItem.open), label: 'Price' }]))
     this.priceChartLabels$ = this.pricePeriod$.pipe(
-      switchMap(pricePeriod =>
+      switchMap((pricePeriod) =>
         this.historicData$.pipe(
-          map(data =>
-            data.map(dataItem =>
+          map((data) =>
+            data.map((dataItem) =>
               pricePeriod === PricePeriod.day
                 ? new Date(dataItem.time * 1000).toLocaleTimeString()
                 : new Date(dataItem.time * 1000).toLocaleDateString()
@@ -104,27 +104,32 @@ export class DashboardComponent extends BaseComponent implements OnInit {
         )
       )
     )
-    this.proposalHash$ = this.store$
-      .select(state => state.dashboard.proposal)
-      .pipe(
-        withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),
-        filter(([proposal, currentVotingPeriod]) => !!proposal && !!currentVotingPeriod),
-        map(([proposal, currentVotingPeriod]) =>
-          proposal.period === currentVotingPeriod ? proposal.proposal.replace(squareBrackets, '') : null
-        )
-      )
-    this.currentPeriodTimespan$ = this.store$.select(state => state.dashboard.currentPeriodTimespan)
+
+    this.currentPeriodTimespan$ = this.store$.select((state) => state.dashboard.currentPeriodTimespan)
     this.currentPeriodKind$ = this.store$
-      .select(state => state.app.latestBlock)
+      .select((state) => state.app.latestBlock)
       .pipe(
-        filter(latestBlock => !!latestBlock),
-        map(latestBlock => $enum(PeriodKind).getKeyOrThrow(latestBlock.period_kind))
+        filter((latestBlock) => !!latestBlock),
+        map((latestBlock) => $enum(PeriodKind).getKeyOrThrow(latestBlock.period_kind))
       )
     this.currentPeriodIndex$ = this.store$
-      .select(state => state.app.latestBlock)
+      .select((state) => state.app.latestBlock)
       .pipe(
-        filter(latestBlock => !!latestBlock),
-        map(latestBlock => $enum(PeriodKind).indexOfValue(<PeriodKind>latestBlock.period_kind) + 1)
+        filter((latestBlock) => !!latestBlock),
+        map((latestBlock) => {
+          if ($enum(PeriodKind).indexOfValue(latestBlock.period_kind as PeriodKind) >= 0) {
+            return $enum(PeriodKind).indexOfValue(latestBlock.period_kind as PeriodKind) + 1
+          } else {
+            return -1
+          }
+        })
+      )
+
+    this.proposalHash$ = this.store$
+      .select((state) => state.app.latestBlock)
+      .pipe(
+        filter((latestBlock) => !!latestBlock),
+        map((latestBlock) => latestBlock.active_proposal)
       )
 
     this.yayRolls$ = this.store$.select(fromRoot.dashboard.yayRolls)
@@ -132,11 +137,11 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     this.passRolls$ = this.store$.select(fromRoot.dashboard.passRolls)
     this.yayRollsPercentage$ = this.store$.select(fromRoot.dashboard.yayRollsPercentage)
     this.nayRollsPercentage$ = this.store$.select(fromRoot.dashboard.nayRollsPercentage)
-    this.showRolls$ = combineLatest([this.store$.select(state => state.app.latestBlock), this.yayRolls$]).pipe(
+    this.showRolls$ = combineLatest([this.store$.select((state) => state.app.latestBlock), this.yayRolls$]).pipe(
       map(
         ([latestBlock, yayRolls]) =>
           latestBlock &&
-          [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(latestBlock.period_kind) !== -1 &&
+          [PeriodKind.Exploration as string, PeriodKind.Promotion as string].indexOf(latestBlock.period_kind) !== -1 &&
           yayRolls !== undefined
       )
     )
@@ -154,14 +159,14 @@ export class DashboardComponent extends BaseComponent implements OnInit {
 
       this.pricePeriod$
         .pipe(
-          switchMap(periodIndex =>
+          switchMap((periodIndex) =>
             getRefresh([
               this.actions$.pipe(ofType(actions.loadCryptoHistoricDataSucceeded)),
               this.actions$.pipe(ofType(actions.loadCryptoHistoricDataFailed))
             ]).pipe(map(() => periodIndex))
           )
         )
-        .subscribe(periodIndex => this.store$.dispatch(actions.loadCryptoHistoricData({ periodIndex }))),
+        .subscribe((periodIndex) => this.store$.dispatch(actions.loadCryptoHistoricData({ periodIndex }))),
 
       this.actions$
         .pipe(ofType(appActions.loadPeriodInfosSucceeded))
@@ -169,7 +174,7 @@ export class DashboardComponent extends BaseComponent implements OnInit {
 
       this.contracts$
         .pipe(
-          filter(data => Array.isArray(data) && data.some(item => ['tzBTC', 'BTC'].includes(item.symbol))),
+          filter((data) => Array.isArray(data) && data.some((item) => ['tzBTC', 'BTC'].includes(item.symbol))),
           switchMap(() =>
             getRefresh([
               this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
@@ -199,13 +204,13 @@ export class DashboardComponent extends BaseComponent implements OnInit {
     })
   }
 
-  isMainnet() {
+  public isMainnet() {
     const selectedNetwork = this.chainNetworkService.getNetwork()
 
     return selectedNetwork === TezosNetwork.MAINNET
   }
 
-  changePricePeriod(periodIndex: number) {
+  public changePricePeriod(periodIndex: number) {
     this.pricePeriod$.next(periodIndex)
   }
 }
