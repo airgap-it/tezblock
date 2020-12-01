@@ -125,18 +125,14 @@ describe('DashboardComponent', () => {
       })
     })
 
-    it('when proposals period is not equal to currentVotingPeriod then returns null', () => {
+    it('when active_proposal of latestBlock is null then returns null', () => {
       storeMock.setState({
         ...initialState,
-        dashboard: {
-          ...initialState.dashboard,
-          proposal: {
-            period: 2
-          }
-        },
         app: {
           ...initialState.app,
-          currentVotingPeriod: 1
+          latestBlock: {
+            active_proposal: null
+          }
         }
       })
 
@@ -150,19 +146,14 @@ describe('DashboardComponent', () => {
       })
     })
 
-    it('when proposals period is equal to currentVotingPeriod then returns proposals proposal without brackets', () => {
+    it('when active_proposal of latestBlock is not null then returns propoal without brackets', () => {
       storeMock.setState({
         ...initialState,
-        dashboard: {
-          ...initialState.dashboard,
-          proposal: {
-            period: 1,
-            proposal: '[foo]'
-          }
-        },
         app: {
           ...initialState.app,
-          currentVotingPeriod: 1
+          latestBlock: {
+            active_proposal: 'foo'
+          }
         }
       })
 
