@@ -478,7 +478,7 @@ describe('ApiService', () => {
 
       service.getFrozenBalance(fakeAddress).subscribe(value => {
         expect(cacheServiceMock.get).toHaveBeenCalledWith(CacheKeys.byAddress)
-        httpMock.expectNone((<any>service).getUrl('delegates'))
+        httpMock.expectNone((<any>service).getUrl('bakers')) /* delegates (previously) */
 
         done()
       })
@@ -513,7 +513,7 @@ describe('ApiService', () => {
         expect(cacheServiceMock.update).toHaveBeenCalled()        
       })
 
-      const req = httpMock.expectOne((<any>service).getUrl('delegates'))
+      const req = httpMock.expectOne((<any>service).getUrl('bakers')) /* delegates (previously) */
       expect(req.request.method).toBe('POST')
       req.flush([{ frozen_balance: fakeFrozenBalance }])
     })
@@ -540,7 +540,7 @@ describe('ApiService', () => {
         expect(cacheServiceMock.update).toHaveBeenCalled()        
       })
 
-      const req = httpMock.expectOne((<any>service).getUrl('delegates'))
+      const req = httpMock.expectOne((<any>service).getUrl('bakers')) /* delegates (previously) */
       expect(req.request.method).toBe('POST')
       req.flush([{ frozen_balance: fakeFrozenBalance }])
     })

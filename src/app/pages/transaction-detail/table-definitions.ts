@@ -70,7 +70,7 @@ export const columns: {
       field: 'parameters',
       template: Template.modal,
       data: (item: Transaction) => ({
-        data: item.parameters_micheline ?? item.parameters
+        data: item.parameters_micheline
       }),
       sortable: false
     },

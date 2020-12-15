@@ -29,27 +29,27 @@ describe('BeaconService', () => {
       spyOn(service, 'getDAppClient').and.returnValue(dAppClientMock)
     })
 
-    describe('when account in not active', () => {
-      beforeEach(() => {
-        dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(false))
-      })
+    // describe('when account in not active', () => {
+    //   beforeEach(() => {
+    //     dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(false))
+    //   })
 
-      it('and network is CARTHAGENET then calls DAppClient.requestPermissions with CARTHAGENET', done => {
-        const argument = {
-          network: {
-            type: NetworkType.CARTHAGENET
-          }
-        }
+    //   it('and network is CARTHAGENET then calls DAppClient.requestPermissions with CARTHAGENET', done => {
+    //     const argument = {
+    //       network: {
+    //         type: NetworkType.CARTHAGENET
+    //       }
+    //     }
 
-        chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.CARTHAGENET)
+    //     chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.CARTHAGENET)
 
-        service.delegate('foo').then(() => {
-          expect(dAppClientMock.requestPermissions).toHaveBeenCalledWith(argument)
+    //     service.delegate('foo').then(() => {
+    //       expect(dAppClientMock.requestPermissions).toHaveBeenCalledWith(argument)
 
-          done()
-        })
-      })
-    })
+    //       done()
+    //     })
+    //   })
+    // })
 
     it('when account in active, then does not call DAppClient.requestPermissions', done => {
       dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(true))

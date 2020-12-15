@@ -11,7 +11,7 @@ const tzBTCaddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
 describe('contract', () => {
   describe('getTokenContractByAddress', () => {
     it('when contract does not exist in given network then returns undefined', () => {
-      expect(getTokenContractByAddress(tzBTCaddress, TezosNetwork.CARTHAGENET)).toBe(undefined)
+      expect(getTokenContractByAddress(tzBTCaddress, TezosNetwork.DELPHINET)).toBe(undefined)
     })
 
     it('when contract exist in given network then returns that contract', () => {
@@ -25,12 +25,12 @@ describe('contract', () => {
 
   describe('searchTokenContracts', () => {
     it('when contract by part name does not exist in given network then returns empty array', () => {
-      expect(searchTokenContracts('btc', TezosNetwork.CARTHAGENET)).toEqual([])
+      expect(searchTokenContracts('btc', TezosNetwork.DELPHINET)).toEqual([])
     })
 
     it('when contract by part name exist in given network then returns array with option for that contract', () => {
       const response = searchTokenContracts('btc', TezosNetwork.MAINNET)
-      
+
       expect(<any>response[0]).toEqual(jasmine.objectContaining({ label: 'tzBTC', type: OperationTypes.TokenContract }))
     })
   })

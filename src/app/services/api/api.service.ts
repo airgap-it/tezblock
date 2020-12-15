@@ -69,7 +69,7 @@ export interface Balance {
 }
 
 const cycleToLevel = (cycle: number, blocksPerCycle: number): number => cycle * blocksPerCycle
-export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, cycle: Math.floor(right.level / blocksPerCycle) })
+export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, level: right.block_level, cycle: Math.floor(right.block_level / blocksPerCycle) })
 
 function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
@@ -131,7 +131,7 @@ export class ApiService {
     this.blocksApiUrl = this.getUrl('blocks')
     this.transactionsApiUrl = this.getUrl('operations')
     this.accountsApiUrl = this.getUrl('accounts')
-    this.delegatesApiUrl = this.getUrl('delegates')
+    this.delegatesApiUrl = this.getUrl('bakers') /* delegates (previously) */
     this.accountHistoryApiUrl = this.getUrl('accounts_history')
   }
 
@@ -508,10 +508,10 @@ export class ApiService {
       ].concat(
         field === 'operation_group_hash'
           ? <any>{
-              field: 'kind',
-              operation: 'in',
-              set: ['transaction']
-            }
+            field: 'kind',
+            operation: 'in',
+            set: ['transaction']
+          }
           : []
       ),
       orderBy: [sort('block_level', 'desc')],
@@ -631,7 +631,7 @@ export class ApiService {
           predicates: _predicates,
           orderBy: [
             {
-              field: 'level',
+              field: 'block_level',
               direction: 'desc'
             }
           ],
@@ -691,12 +691,12 @@ export class ApiService {
           const maxLevel = cycleToLevel(cycle + 1, blocks_per_cycle)
           const predicates = [
             {
-              field: 'level',
+              field: 'block_level',
               operation: Operation.gt,
               set: [minLevel]
             },
             {
-              field: 'level',
+              field: 'block_level',
               operation: Operation.lt,
               set: [maxLevel]
             }
@@ -728,11 +728,11 @@ export class ApiService {
       .post<EndorsingRights[]>(
         this.endorsingRightsApiUrl,
         {
-          fields: ['level', 'slot', 'estimated_time'],
+          fields: ['block_level', 'slot', 'estimated_time'],
           predicates: _predicates,
           orderBy: [
             {
-              field: 'level',
+              field: 'block_level',
               direction: 'desc'
             }
           ],
@@ -790,12 +790,12 @@ export class ApiService {
           const maxLevel = cycleToLevel(cycle + 1, blocks_per_cycle)
           const predicates = [
             {
-              field: 'level',
+              field: 'block_level',
               operation: Operation.gt,
               set: [minLevel]
             },
             {
-              field: 'level',
+              field: 'block_level',
               operation: Operation.lt,
               set: [maxLevel]
             }
@@ -1204,14 +1204,14 @@ export class ApiService {
     const contentToErrors = (content: RPCContent): OperationError[] =>
       content.metadata
         ? (_.get(content, 'metadata.operation_result.errors') || []).concat(
-            content.metadata.internal_operation_results
-              ? flatten(
-                  content.metadata.internal_operation_results
-                    .filter(internal_operation_result => !!internal_operation_result.result.errors)
-                    .map(internal_operation_result => internal_operation_result.result.errors)
-                )
-              : []
-          )
+          content.metadata.internal_operation_results
+            ? flatten(
+              content.metadata.internal_operation_results
+                .filter(internal_operation_result => !!internal_operation_result.result.errors)
+                .map(internal_operation_result => internal_operation_result.result.errors)
+            )
+            : []
+        )
         : []
 
     return forkJoin(

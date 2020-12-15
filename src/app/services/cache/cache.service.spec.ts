@@ -30,7 +30,7 @@ describe('CacheService', () => {
 
   describe('update', () => {
     it('when network is not Mainnet then does not run executeUpdate or update updateQueue', () => {
-      chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.CARTHAGENET)
+      chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.DELPHINET)
       spyOn(service, 'executeUpdate')
 
       service.update(CacheKeys.fromCurrentCycle, () => null)
@@ -47,7 +47,7 @@ describe('CacheService', () => {
       chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.MAINNET)
       spyOn(service, 'executeUpdate')
 
-      ;(<any>service).isBusy[CacheKeys.fromCurrentCycle] = true
+        ; (<any>service).isBusy[CacheKeys.fromCurrentCycle] = true
       service.update(CacheKeys.fromCurrentCycle, change)
 
       expect(service.executeUpdate).not.toHaveBeenCalled()
@@ -83,7 +83,7 @@ describe('CacheService', () => {
       const updateSpy = spyOn(service, 'update').and.callThrough()
       storageMapMock.get.and.returnValue(of('X'))
       storageMapMock.set.and.returnValue(of(undefined))
-      ;(<any>service).updateQueue[CacheKeys.fromCurrentCycle] = [awaitingChange]
+        ; (<any>service).updateQueue[CacheKeys.fromCurrentCycle] = [awaitingChange]
 
       service.update(CacheKeys.fromCurrentCycle, change)
 

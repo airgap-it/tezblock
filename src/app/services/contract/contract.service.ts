@@ -190,7 +190,7 @@ export class ContractService extends BaseService {
           ? forkJoin(
             contractOperations.map(contractOperation =>
               from(
-                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline ?? contractOperation.parameters)
+                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)
               ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
             )
           ).pipe(
