@@ -75,7 +75,7 @@ export class BakersEffects {
       switchMap(() =>
         forkJoin(
           this.apiService.getActiveBakers(24),
-          this.baseService.post('delegates', {
+          this.baseService.post('bakers'/* delegates (previously) */, {
             fields: ['staking_balance'],
             aggregation: [
               {

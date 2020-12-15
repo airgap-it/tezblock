@@ -144,7 +144,7 @@ k8s-deploy-production:
   tags:
     - docker
 
-k8s-deploy-carthagenet-prod:
+k8s-deploy-delphinet-prod:
   stage: deploy
   when: manual
   image: google/cloud-sdk
@@ -156,11 +156,10 @@ k8s-deploy-carthagenet-prod:
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/carthagenet/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/delphinet/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
-    - kubectl apply -f k8s/tezblock/carthagenet/ --recursive
+    - kubectl apply -f k8s/tezblock/delphinet/ --recursive
   only:
-    - master
-    - develop
+    - feat/delphinet
   tags:
     - docker

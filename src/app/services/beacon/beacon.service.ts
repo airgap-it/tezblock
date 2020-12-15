@@ -15,8 +15,8 @@ const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   switch (tezosNetwork) {
     case TezosNetwork.MAINNET:
       return NetworkType.MAINNET
-    case TezosNetwork.CARTHAGENET:
-      return NetworkType.CARTHAGENET
+    case TezosNetwork.DELPHINET:
+      return NetworkType.CUSTOM
     default:
       return NetworkType.CUSTOM
   }
@@ -26,7 +26,7 @@ const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   providedIn: 'root'
 })
 export class BeaconService {
-  constructor(private readonly chainNetworkService: ChainNetworkService) {}
+  constructor(private readonly chainNetworkService: ChainNetworkService) { }
 
   async delegate(address: string): Promise<OperationResponseOutput> {
     const client = this.getDAppClient()

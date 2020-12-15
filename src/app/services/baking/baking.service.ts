@@ -105,7 +105,7 @@ export class BakingService extends BaseService {
   }
 
   getBakerInfos(tzAddress: string): Observable<any> {
-    return this.post<any[]>('delegates', {
+    return this.post<any[]>('bakers'/* delegates (previously) */, {
       predicates: [
         {
           field: 'pkh',

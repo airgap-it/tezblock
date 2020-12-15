@@ -203,8 +203,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
           !upcomingRights
             ? true
             : this.selectedTab.kind === 'baking_rights'
-            ? upcomingRights.baking !== null
-            : upcomingRights.endorsing !== null
+              ? upcomingRights.baking !== null
+              : upcomingRights.endorsing !== null
         )
       )
     this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
@@ -344,7 +344,9 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
             name: this.translateService.instant('baker-table.rewards.expanded-rows.payout'),
             field: 'payout',
             template: Template.amount,
-            data: (item: Payout) => ({ data: { amount: item.payout } })
+            data: (item: Payout) => {
+              return { data: item.payout }
+            }
           },
           { name: this.translateService.instant('baker-table.rewards.expanded-rows.share'), field: 'share', template: Template.percentage }
         ],
