@@ -120,7 +120,6 @@ k8s-deploy-development:
   only:
     - develop
     - master
-    - feat/delphinet
   tags:
     - docker
 
