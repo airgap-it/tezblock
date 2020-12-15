@@ -47,7 +47,7 @@ export const isInBTC = (symbol: string): boolean => ['tzBTC', 'BTC'].includes(sy
 
 const getTezosProtocolNetwork = (environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosProtocolNetwork =>
   new TezosProtocolNetwork(
-    tezosNetwork == TezosNetwork.MAINNET ? 'Mainnet' : 'Carthagenet',
+    tezosNetwork == TezosNetwork.MAINNET ? 'Mainnet' : 'Delphinet',
     tezosNetwork == TezosNetwork.MAINNET ? NetworkType.MAINNET : NetworkType.TESTNET,
     environmentUrls.rpcUrl,
     undefined,
@@ -86,7 +86,7 @@ export const getFaProtocol = (contract: TokenContract, environmentUrls: Environm
     result = new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
     faProtocolCache.set(contract.id, result)
   }
-  
+
   return result
 }
 

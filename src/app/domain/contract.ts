@@ -195,10 +195,10 @@ export const fillTransferOperations = (
     transactions.map(transaction => {
       const contract: TokenContract = tokenContract ?? getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
-      if (contract && transaction.kind === OperationTypes.Transaction && (transaction.parameters_micheline ?? transaction.parameters)) {
+      if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters_micheline) {
         const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
         
-        return from(normalizeParameters(faProtocol, transaction.parameters_micheline ?? transaction.parameters, transaction.parameters_entrypoints)).pipe(
+        return from(normalizeParameters(faProtocol, transaction.parameters_micheline, transaction.parameters_entrypoints)).pipe(
           switchMap(normalizedParameters => {
             if (normalizedParameters.entrypoint === 'transfer') {
               return from(

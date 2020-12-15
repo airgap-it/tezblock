@@ -128,7 +128,7 @@ export class BakerTableEffects {
 
   loadUpcomingRights$ = createEffect(() => {
     const body = (address: string, /*blockLevel: number,*/ endorsing?: boolean): Body => ({
-      fields: ['estimated_time', 'level'],
+      fields: ['estimated_time', 'block_level'],
       predicates: [
         { field: 'estimated_time', operation: Operation.after, set: [moment.utc().valueOf()], inverse: false },
         //{ field: 'level', operation: 'gt', set: [blockLevel], inverse: false },
@@ -141,17 +141,11 @@ export class BakerTableEffects {
     return this.actions$.pipe(
       ofType(actions.loadUpcomingRights),
       withLatestFrom(this.store$.select(state => state.accountDetails.address)),
-      // switchMap(([action, accountAddress]) =>
-      //   this.apiService.getLatestBlocks(1).pipe(
-      //     map(first),
-      //     map<Block, [string, Block]>(block => [accountAddress, block])
-      //   )
-      // ),
       switchMap(([action, accountAddress]) =>
-        forkJoin(
+        forkJoin([
           this.baseService.post<any>('baking_rights', body(accountAddress)).pipe(map(first)),
           this.baseService.post<any>('endorsing_rights', body(accountAddress, true)).pipe(map(first))
-        ).pipe(
+        ]).pipe(
           map(([baking, endorsing]: [any, any]) =>
             actions.loadUpcomingRightsSucceeded({ upcomingRights: { baking: baking || null, endorsing: endorsing || null } })
           ),
