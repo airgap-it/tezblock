@@ -1,4 +1,4 @@
-FROM node:14 as angular-build
+FROM node:14.5.0 as angular-build
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
