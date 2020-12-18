@@ -3,6 +3,7 @@ import { Action, ActionReducer, ActionReducerMap, createSelector, MetaReducer, S
 import { take } from 'rxjs/operators'
 
 import { environment } from '../../environments/environment'
+import { dataSelector, showLoadMoreSelector } from '@tezblock/domain/table'
 import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer'
 import * as fromList from '../pages/list/reducer'
 import * as fromAccountDetails from '../pages/account-detail/reducer'
@@ -18,6 +19,7 @@ import * as fromApp from '../app.reducer'
 import * as fromDashboard from '../pages/dashboard/reducer'
 import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer'
 import * as fromTokenContractOveview from '../pages/token-contract-overview/reducer'
+import * as fromConnectedNodes from '../pages/nodes-on-map/reducer'
 
 export interface State {
   app: fromApp.State
@@ -35,6 +37,7 @@ export interface State {
   contractDetails: fromContractDetails.State
   list: fromList.State
   health: fromHealth.State
+  connectedNodes: fromConnectedNodes.State
 }
 
 /**
@@ -58,7 +61,8 @@ export const ROOT_REDUCERS = new InjectionToken<ActionReducerMap<State, Action>>
     proposalDetails: fromProposalDetails.reducer,
     contractDetails: fromContractDetails.reducer,
     list: fromList.reducer,
-    health: fromHealth.reducer
+    health: fromHealth.reducer,
+    connectedNodes: fromConnectedNodes.reducer
   })
 })
 
@@ -93,6 +97,7 @@ export const selectBakerTable = (state: State) => state.bakerTable
 export const selectProposalDetails = (state: State) => state.proposalDetails
 export const selectDashboard = (state: State) => state.dashboard
 export const selectContractDetails = (state: State) => state.contractDetails
+export const selectConnectedNodes = (state: State) => state.connectedNodes
 
 export const dashboard = {
   currencyGrowthPercentage: createSelector(selectGlobal, fromDashboard.currencyGrowthPercentageSelector),
@@ -132,4 +137,9 @@ export const bakerTable = {
 
 export const contractDetails = {
   transferOperations: createSelector(selectContractDetails, fromContractDetails.transferOperationsSelector)
+}
+
+export const connectedNodes = {
+  data: createSelector(selectConnectedNodes, state => dataSelector(state.connectedNodes)),
+  showLoadMore: createSelector(selectConnectedNodes, state => showLoadMoreSelector(state.connectedNodes))
 }

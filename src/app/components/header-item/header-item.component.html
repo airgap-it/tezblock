@@ -207,10 +207,16 @@
                       </a>
                     </li>
                     <li>
+                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/connected-nodes']">
+                        {{ 'header-item.connected-nodes' | translate }}
+                      </a>
+                    </li>
+                    <li>
                       <a class="dropdown-item" routerLinkActive="active" routerLink="/constants">
                         {{ 'header-item.constants_button' | translate }}
                       </a>
                     </li>
+
                     <li>
                       <a class="dropdown-item" routerLinkActive="active" routerLink="/health">
                         {{ 'header-item.tezblock-health_button' | translate }}
