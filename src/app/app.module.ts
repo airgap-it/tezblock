@@ -99,6 +99,8 @@ import { CryptoPricesService } from './services/crypto-prices/crypto-prices.serv
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { TokenContractOverviewEffects } from './pages/token-contract-overview/effects'
 import { VarDirective } from '@tezblock/directives/var.directive'
+import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component'
+import { NodesOnMapEffects } from '@tezblock/pages/nodes-on-map/effects'
 import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
@@ -156,7 +158,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
       AccountsEffects,
       DashboarEffects,
       DashboardLatestContractsTransactionsEffects,
-      TokenContractOverviewEffects
+      TokenContractOverviewEffects,
+      NodesOnMapEffects
     ]),
     StorageModule.forRoot({ IDBNoWrap: true }),
     TranslateModule.forRoot({
@@ -222,6 +225,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     VarDirective,
     AssetsValueComponent,
     ProgressbarComponent,
+    NodesOnMapComponent,
     BasicCellComponent
   ],
 
