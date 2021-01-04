@@ -57,14 +57,14 @@ export interface DataSource<T> {
 }
 
 export function toClientsideDataScource<T>(data: T[], filterCondition?: (item: T, filter: any) => boolean): DataSource<T> {
-  const _filterCondition = (filter?: any) => filter && filterCondition ? (item: T) => filterCondition(item, filter) : () => true
+  const _filterCondition = (filter?: any) => (filter && filterCondition ? (item: T) => filterCondition(item, filter) : () => true)
 
   return {
     get: (pagination: Pagination, filter?: any) => {
       const startItem = (pagination.currentPage - 1) * pagination.selectedSize
       const endItem = pagination.currentPage * pagination.selectedSize
       const _data = data.filter(_filterCondition(filter))
-      
+
       return of({
         data: _data.slice(startItem, endItem),
         total: _data.length
@@ -80,9 +80,9 @@ export function toPagable<T>(data: T[], pagination: Pagination): Pageable<T> {
 
   return data
     ? {
-        data: data.slice(offset, Math.min(offset + limit, data.length)),
-        total: data.length
-      }
+      data: data.slice(offset, Math.min(offset + limit, data.length)),
+      total: data.length
+    }
     : { data: undefined, total: 0 }
 }
 

@@ -34,7 +34,8 @@
     "languages_label": "Sprachen",
     "theme_label": "Gestaltung",
     "light-mode_label": "Hell",
-    "dark-mode_label": "Dunkel"
+    "dark-mode_label": "Dunkel",
+    "connected-nodes": "Verbundene Nodes"
   },
   "footer-item": {
     "tezblock": "tezblock ist ein Blockexplorer für Tezos, eine open-source Platform für Assets und Applikationen unterstützt von einer globalen Community von Validators, Forschern und Builders.",

@@ -15,6 +15,7 @@ import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
 import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
+import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 
 const routes: Routes = [
@@ -32,6 +33,7 @@ const routes: Routes = [
   { path: 'proposal/:id', component: ProposalDetailComponent },
   { path: 'contract/:id', component: ContractDetailComponent },
   { path: 'health', component: HealthComponent },
+  { path: 'connected-nodes', component: NodesOnMapComponent },
   { path: 'resources/glossary', component: GlossaryComponent }
 ]
 
@@ -39,4 +41,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
