@@ -130,14 +130,14 @@
                   <h5 class="card-title__secondary mb-3">
                     {{ 'dashboard.circulating-supply' | translate }}
                   </h5>
-                  <h3>858,194,450 ꜩ</h3>
+                  <h3>862,023,478 ꜩ</h3>
                   <!--TODO-->
                 </div>
 
                 <h5 class="card-title__secondary mb-3">
                   {{ 'dashboard.market-cap' | translate }}
                 </h5>
-                <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('858194450').toFormat(0) }}</h3>
+                <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('862023478').toFormat(0) }}</h3>
               </div>
               <div class="col-md-6 col-lg-4">
                 <h5 class="card-title__secondary mb-3">
