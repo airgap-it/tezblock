@@ -15,10 +15,6 @@ stages:
 
 build:
   stage: build
-  before_script:
-    - which git || (apk --no-cache add git)
-    - git submodule sync --recursive
-    - git submodule update  --remote --recursive
   script:
     - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg DELPHINET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg DELPHINET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg DELPHINET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL --build-arg DELPHINET_TARGET_URL --build-arg GA_KEY --target angular-build -t $TEST_TAG .
   tags:
@@ -27,10 +23,6 @@ build:
 build_serve:
   stage: build_serve
   when: manual
-  before_script:
-    - which git || (apk --no-cache add git)
-    - git submodule sync --recursive
-    - git submodule update  --remote --recursive
   script:
     - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg DELPHINET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg DELPHINET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg DELPHINET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL --build-arg DELPHINET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
   tags:
@@ -86,9 +78,9 @@ publish:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set project $GCLOUD_PROJECT
     - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud config set project $GCLOUD_PROJECT
     - gcloud auth configure-docker
   script:
     - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST
@@ -108,8 +100,8 @@ k8s-deploy-development:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
     - gcloud container clusters get-credentials papers-cluster-development
   script:
@@ -130,8 +122,8 @@ k8s-deploy-production:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
@@ -151,8 +143,8 @@ k8s-deploy-delphinet-prod:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:

@@ -87,19 +87,15 @@
                 <div class="row">
                   <div class="col-9 p-0">
                     <app-hash-cell
-                      [data]="'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq'"
-                      [options]="{ kind: 'proposal' }"
-                    ></app-hash-cell>
-                    <!-- TODO: need to be fixed
-                    <app-hash-cell
                       *ngIf="proposalHash$ | async as proposalHash"
-                      [data]="PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq"
+                      [data]="proposalHash"
                       [options]="{ kind: 'proposal' }"
                     ></app-hash-cell>
+
                     <ng-container *ngIf="(proposalHash$ | async) === null">
                       <p class="text-secondary m-0">{{ 'dashboard.no-proposal' | translate }}</p>
                     </ng-container>
-                  --></div>
+                  </div>
                   <div class="col col-3 p-0">
                     <div class="float-right">
                       <p class="m-0">{{ currentPeriodIndex$ | async }} {{ 'dashboard.of' | translate }} 4</p>
@@ -130,14 +126,14 @@
                   <h5 class="card-title__secondary mb-3">
                     {{ 'dashboard.circulating-supply' | translate }}
                   </h5>
-                  <h3>862,023,478 ꜩ</h3>
+                  <h3>866,080,651 ꜩ</h3>
                   <!--TODO-->
                 </div>
 
                 <h5 class="card-title__secondary mb-3">
                   {{ 'dashboard.market-cap' | translate }}
                 </h5>
-                <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('862023478').toFormat(0) }}</h3>
+                <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('866080651').toFormat(0) }}</h3>
               </div>
               <div class="col-md-6 col-lg-4">
                 <h5 class="card-title__secondary mb-3">
