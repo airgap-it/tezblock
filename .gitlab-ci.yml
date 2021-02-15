@@ -78,9 +78,9 @@ publish:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
+    - gcloud config set project $GCLOUD_PROJECT
     - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud config set project $GCLOUD_PROJECT
     - gcloud auth configure-docker
   script:
     - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST
@@ -100,8 +100,8 @@ k8s-deploy-development:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
     - gcloud container clusters get-credentials papers-cluster-development
   script:
@@ -122,8 +122,8 @@ k8s-deploy-production:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
@@ -143,8 +143,8 @@ k8s-deploy-delphinet-prod:
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set project $GCLOUD_PROJECT
+    - gcloud config set account $GCLOUD_ACCOUNT
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
