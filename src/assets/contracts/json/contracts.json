@@ -1,25 +1,51 @@
 {
-  "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
-    "symbol": "STKR",
-    "name": "Staker",
-    "website": "https://stakerdao.com",
-    "description": "The Staker token is the governance token for the StakerDAO ecosystem.  STKR holders participate in StakerDAO decision making and elect the Staker Council.",
+  "KT19at7rQUvyjxnZ2fBv7D9zc8rkyG7gAoU8": {
+    "symbol": "ETHtz",
+    "name": "ETH Tez",
+    "website": "https://ethtz.io/",
+    "description": "Ethereum wrapped in a Tezos FA-standard token, for trading on Tezos DeFi markets.",
     "socials": [
       {
         "type": "website",
-        "url": "https://stakerdao.com"
+        "url": "https://ethtz.io/"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/ETH_Tez"
+      },
+      {
+        "type": "telegram",
+        "url": "https://t.me/stakercommunity"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/StableTechnologies/ETHtz"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 18
+  },
+  "KT1VYsVfmobT7rsMVivvZ4J8i3bPiqz12NaH": {
+    "symbol": "wXTZ",
+    "name": "Wrapped Tez",
+    "website": "http://wrapped-xtz.com/",
+    "description": "Wrapped Tezos (wXTZ) is a fully collateralized representation of XTZ conforming to the FA1.2 token standard — a collateralized staking position that unlocks the power of DeFi.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "http://wrapped-xtz.com/"
       },
       {
         "type": "twitter",
         "url": "https://twitter.com/stakerdao"
       },
       {
-        "type": "medium",
-        "url": "https://medium.com/stakerdao"
+        "type": "telegram",
+        "url": "https://t.me/stakercommunity"
       }
     ],
     "tezosNetwork": ["mainnet"],
-    "decimals": 0
+    "decimals": 6
   },
   "KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn": {
     "symbol": "tzBTC",
@@ -60,5 +86,44 @@
     ],
     "tezosNetwork": ["mainnet"],
     "decimals": 6
+  },
+  "KT1EctCuorV2NfVb1XTQgvzJ88MQtWP8cMMv": {
+    "symbol": "STKR",
+    "name": "Staker",
+    "website": "https://stakerdao.com",
+    "description": "The Staker token is the governance token for the StakerDAO ecosystem.  STKR holders participate in StakerDAO decision making and elect the Staker Council.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://stakerdao.com"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/stakerdao"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/stakerdao"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 0
+  },
+  "KT1SovvF5KRQjBiVX8cHFmEoMc7H54ehxstV": {
+    "symbol": "weCHF",
+    "name": "Wetzikoin",
+    "website": "https://ecoo.ch",
+    "description": "ecoo is a platform that unites you with your customers and partners in an agile financial platform. You use the ecoo platform to provide earmarked funds in the form of coins or points. Customers can utilise these funds to purchase goods or services from your partners. Your partners exchange the funds received through ecoo back into real money with you.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://ecoo.ch"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 2,
+    "type": "fa2",
+    "tokenID": 0,
+    "totalSupply": "25160000"
   }
 }

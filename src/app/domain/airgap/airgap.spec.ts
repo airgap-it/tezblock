@@ -1,5 +1,4 @@
-import { ProtocolSymbols, MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
-
+import { SubProtocolSymbols } from '@airgap/coinlib-core'
 import { convertSymbol, isConvertableToUSD, isInBTC } from './airgap'
 
 describe('airgap', () => {

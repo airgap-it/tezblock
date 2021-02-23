@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from '@angular/core'
 import { Router } from '@angular/router'
 import { Store } from '@ngrx/store'
 import { TranslateService } from '@ngx-translate/core'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Observable, Subscription } from 'rxjs'
 import { map } from 'rxjs/operators'
 
@@ -11,6 +10,7 @@ import * as fromRoot from '@tezblock/reducers'
 import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { LanguagesService } from '@tezblock/services/translation/languages.service'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'header-item',
@@ -51,7 +51,7 @@ export class HeaderItemComponent implements OnInit {
     public readonly themeService: ThemeService,
     public translate: TranslateService,
     private readonly languagesService: LanguagesService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)

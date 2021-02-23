@@ -1,7 +1,7 @@
-import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { TokenContract } from '@tezblock/domain/contract'
-import { isConvertableToUSD } from '@tezblock/domain/airgap'
 import { TranslateService } from '@ngx-translate/core'
+import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
+import { TokenContract } from '@tezblock/domain/contract'
 
 export const columns = (translate: TranslateService): Column[] => [
   {

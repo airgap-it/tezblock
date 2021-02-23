@@ -2,7 +2,6 @@ import { createReducer, on } from '@ngrx/store'
 import { pipe } from 'rxjs'
 import { range } from 'lodash'
 import moment from 'moment'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
@@ -17,6 +16,7 @@ import { BakingRatingResponse, ContractAsset } from './model'
 import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>

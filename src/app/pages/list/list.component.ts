@@ -6,7 +6,6 @@ import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
 import { range, negate, isNil } from 'lodash'
 import moment from 'moment'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions, ChartTooltipItem, ChartData } from 'chart.js'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -24,6 +23,7 @@ import { OrderBy } from '@tezblock/services/base.service'
 import { Title, Meta } from '@angular/platform-browser'
 import { TranslateService } from '@ngx-translate/core'
 import { getDecimalsForSymbol } from '@tezblock/domain/airgap/get-decimals-for-symbol'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 const noOfDays = 7
 const thousandSeparator = /\B(?=(\d{3})+(?!\d))/g
@@ -55,9 +55,9 @@ export const toAmountPerDay = (data: actions.TransactionChartItem[], network: Te
 export const toTransactionsChartDataSource = (countLabel: string, amountLabel: string, network: TezosNetwork) => (
   data: actions.TransactionChartItem[]
 ): { data: number[]; label: string }[] => [
-  { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
-  { data: toAmountPerDay(data, network), label: amountLabel }
-]
+    { data: timestampsToCountsPerDay(data.map(item => item.timestamp)), label: countLabel },
+    { data: toAmountPerDay(data, network), label: amountLabel }
+  ]
 const timestampsToChartDataSource = (label: string) => (timestamps: number[]): { data: number[]; label: string } => ({
   data: timestampsToCountsPerDay(timestamps),
   label: label

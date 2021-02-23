@@ -1,10 +1,9 @@
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import BigNumber from 'bignumber.js'
 
 import { getCurrencyConverterPipeArgs, getTokenContractByAddress, isAsset, searchTokenContracts } from './contract'
-import { SearchOptionData } from '@tezblock/services/search/model'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Currency } from '@tezblock/domain/airgap'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 const tzBTCaddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
 

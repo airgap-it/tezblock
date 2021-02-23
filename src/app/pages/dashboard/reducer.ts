@@ -1,5 +1,4 @@
 import { createReducer, on } from '@ngrx/store'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 import * as actions from './actions'
 import { TokenContract } from '@tezblock/domain/contract'
@@ -18,6 +17,7 @@ import { first } from '@tezblock/services/fp'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Block } from '@tezblock/interfaces/Block'
 import { State as appState } from '@tezblock/reducers/index'
+import { MarketDataSample } from '@tezblock/services/crypto-prices/crypto-prices.service'
 
 interface Busy {
   blocks: boolean
@@ -58,7 +58,7 @@ export const initialState: State = {
 export const reducer = createReducer(
   initialState,
 
-  on(actions.loadContracts, state => ({
+  on(actions.loadContracts, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -73,14 +73,14 @@ export const reducer = createReducer(
       contracts: false
     }
   })),
-  on(actions.loadContractsFailed, state => ({
+  on(actions.loadContractsFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
       contracts: false
     }
   })),
-  on(actions.loadLatestProposal, state => ({
+  on(actions.loadLatestProposal, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -95,14 +95,14 @@ export const reducer = createReducer(
       proposal: false
     }
   })),
-  on(actions.loadLatestProposalFailed, state => ({
+  on(actions.loadLatestProposalFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
       proposal: false
     }
   })),
-  on(actions.loadCurrentPeriodTimespan, state => ({
+  on(actions.loadCurrentPeriodTimespan, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -117,14 +117,14 @@ export const reducer = createReducer(
       currentPeriodTimespan: false
     }
   })),
-  on(actions.loadCurrentPeriodTimespanFailed, state => ({
+  on(actions.loadCurrentPeriodTimespanFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
       currentPeriodTimespan: false
     }
   })),
-  on(actions.loadTransactions, state => ({
+  on(actions.loadTransactions, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -139,7 +139,7 @@ export const reducer = createReducer(
       transactions: false
     }
   })),
-  on(actions.loadTransactionsFailed, state => ({
+  on(actions.loadTransactionsFailed, (state) => ({
     ...state,
     transactions: null,
     busy: {
@@ -147,7 +147,7 @@ export const reducer = createReducer(
       transactions: false
     }
   })),
-  on(actions.loadBlocks, state => ({
+  on(actions.loadBlocks, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -162,7 +162,7 @@ export const reducer = createReducer(
       blocks: false
     }
   })),
-  on(actions.loadBlocksFailed, state => ({
+  on(actions.loadBlocksFailed, (state) => ({
     ...state,
     blocks: null,
     busy: {
@@ -178,7 +178,7 @@ export const reducer = createReducer(
     ...state,
     divisionOfVotes
   })),
-  on(actions.loadDivisionOfVotesFailed, state => ({
+  on(actions.loadDivisionOfVotesFailed, (state) => ({
     ...state,
     divisionOfVotes: null
   })),
@@ -206,9 +206,5 @@ export const currencyGrowthPercentageSelector = (state: appState): number => {
     return 0
   }
 
-  return priceNow
-    .minus(startingPrice[0].open)
-    .multipliedBy(100)
-    .dividedBy(startingPrice[0].open)
-    .toNumber()
+  return priceNow.minus(startingPrice[0].open).multipliedBy(100).dividedBy(startingPrice[0].open).toNumber()
 }

@@ -78,8 +78,9 @@ export class AccountDetailEffects {
         this.store$.select(state => state.accountDetails.transactions.orderBy)
       ),
       switchMap(([{ kind }, pagination, address, orderBy]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
-          switchMap(data => (kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data))),
+        this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy, getTokenContracts(this.chainNetworkService.getNetwork()).data).pipe(
+          switchMap(data => (kind === OperationTypes.Transaction ? from(fillTransferOperations(data, this.chainNetworkService)) : of(data))),
+          map(data => kind === OperationTypes.Transaction ? data.filter(transaction => transaction.source === address || transaction.destination === address) : data),
           map(data => actions.loadTransactionsByKindSucceeded({ data })),
           catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
         )
@@ -115,13 +116,14 @@ export class AccountDetailEffects {
       ofType(actions.loadTransactionsCounts),
       withLatestFrom(this.store$.select(state => state.accountDetails.address)),
       switchMap(([action, address]) =>
-        forkJoin(
+        forkJoin([
           this.apiService.getOperationCount('source', address),
           this.apiService.getOperationCount('destination', address),
+          this.apiService.getTokenTransferCount(address, getTokenContracts(this.chainNetworkService.getNetwork()).data),
           this.apiService
             .getOperationCount('delegate', address)
             .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
-        ).pipe(
+        ]).pipe(
           map(flatten),
           map(aggregateOperationCounts),
           map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
@@ -384,5 +386,5 @@ export class AccountDetailEffects {
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>,
     private readonly transactionService: TransactionService
-  ) {}
+  ) { }
 }

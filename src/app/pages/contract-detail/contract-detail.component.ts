@@ -1,33 +1,33 @@
-import { Component, OnInit } from '@angular/core'
-import { ActivatedRoute } from '@angular/router'
-import { Store } from '@ngrx/store'
-import { Observable, combineLatest } from 'rxjs'
-import { map, filter, switchMap } from 'rxjs/operators'
+import { TezosNetwork } from '@airgap/coinlib-core'
 import { animate, state, style, transition, trigger } from '@angular/animations'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { Component, OnInit } from '@angular/core'
+import { Meta, Title } from '@angular/platform-browser'
+import { ActivatedRoute } from '@angular/router'
 import { Actions, ofType } from '@ngrx/effects'
-import moment from 'moment'
-
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { BaseComponent } from '@tezblock/components/base.component'
-import * as fromRoot from '@tezblock/reducers'
-import * as actions from './actions'
-import * as appActions from '@tezblock/app.actions'
-import { TokenContract, Social, SocialType, ContractOperation, hasTokenHolders, TokenHolder } from '@tezblock/domain/contract'
-import { isConvertableToUSD } from '@tezblock/domain/airgap'
-import { AccountService } from '../../services/account/account.service'
-import { isNil, negate } from 'lodash'
-import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { columns } from './table-definitions'
-import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
-import { OrderBy } from '@tezblock/services/base.service'
-import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
-import { Title, Meta } from '@angular/platform-browser'
-import { AliasService } from '@tezblock/services/alias/alias.service'
-import { getRefresh } from '@tezblock/domain/synchronization'
+import { Store } from '@ngrx/store'
 import { TranslateService } from '@ngx-translate/core'
-import { get } from '@tezblock/services/fp'
+import * as appActions from '@tezblock/app.actions'
+import { BaseComponent } from '@tezblock/components/base.component'
+import { isConvertableToUSD } from '@tezblock/domain/airgap'
+import { ContractOperation, hasTokenHolders, Social, SocialType, TokenContract } from '@tezblock/domain/contract'
+import { getRefresh } from '@tezblock/domain/synchronization'
+import { Count, Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { dataSelector } from '@tezblock/domain/table'
+import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
+import * as fromRoot from '@tezblock/reducers'
+import { AliasService } from '@tezblock/services/alias/alias.service'
+import { OrderBy } from '@tezblock/services/base.service'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { isNil, negate } from 'lodash'
+import moment from 'moment'
+import { combineLatest, Observable } from 'rxjs'
+import { filter, map, switchMap } from 'rxjs/operators'
+import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
+
+import { AccountService } from '../../services/account/account.service'
+
+import * as actions from './actions'
+import { columns } from './table-definitions'
 
 const last24 = (transaction: ContractOperation): boolean => {
   const hoursAgo = moment().diff(moment(transaction.timestamp), 'hours', true)
@@ -53,26 +53,26 @@ const last24 = (transaction: ContractOperation): boolean => {
   ]
 })
 export class ContractDetailComponent extends BaseComponent implements OnInit {
-  address$: Observable<string>
-  contract$: Observable<TokenContract>
-  website$: Observable<string>
-  twitter$: Observable<string>
-  telegram$: Observable<string>
-  medium$: Observable<string>
-  github$: Observable<string>
-  copyToClipboardState$: Observable<string>
-  revealed$: Observable<string>
-  hasAlias$: Observable<boolean>
-  loading$: Observable<boolean>
-  transactions$: Observable<any[]>
-  orderBy$: Observable<OrderBy>
-  current: string = 'copyGrey'
-  manager$: Observable<string>
-  showFiatValue$: Observable<boolean>
-  transactions24hCount$: Observable<number>
-  transactions24hVolume$: Observable<string>
+  public address$: Observable<string>
+  public contract$: Observable<TokenContract>
+  public website$: Observable<string>
+  public twitter$: Observable<string>
+  public telegram$: Observable<string>
+  public medium$: Observable<string>
+  public github$: Observable<string>
+  public copyToClipboardState$: Observable<string>
+  public revealed$: Observable<string>
+  public hasAlias$: Observable<boolean>
+  public loading$: Observable<boolean>
+  public transactions$: Observable<any[]>
+  public orderBy$: Observable<OrderBy>
+  public current: string = 'copyGrey'
+  public manager$: Observable<string>
+  public showFiatValue$: Observable<boolean>
+  public transactions24hCount$: Observable<number>
+  public transactions24hVolume$: Observable<string>
 
-  tabs: Tab[] = [
+  public tabs: Tab[] = [
     {
       title: 'Transfers',
       active: true,
@@ -80,7 +80,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       count: undefined,
       icon: this.iconPipe.transform('exchangeAlt'),
       columns: undefined,
-      disabled: function() {
+      disabled: function () {
         return !this.count
       }
     },
@@ -91,7 +91,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       count: undefined,
       icon: this.iconPipe.transform('link'),
       columns: undefined,
-      disabled: function() {
+      disabled: function () {
         return !this.count
       }
     },
@@ -102,7 +102,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       count: undefined,
       icon: this.iconPipe.transform('link'),
       columns: columns.entrypoints(),
-      disabled: function() {
+      disabled: function () {
         return !this.count
       }
     }
@@ -137,13 +137,13 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
         this.store$.dispatch(actions.reset())
         this.store$.dispatch(actions.loadContract({ address }))
-        
+
         this.revealed$ = this.accountService.getAccountStatus(address)
       })
     )
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.address$ = this.store$.select(state => state.contractDetails.address)
     this.contract$ = this.store$.select(state => state.contractDetails.contract)
     this.website$ = this.getSocial(social => social.type === SocialType.website)
@@ -230,7 +230,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         )
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
-    
+
     this.contract$.pipe(filter(contract => contract !== undefined)).subscribe((contract) => this.store$.dispatch(actions.load24hTransferVolume({ contract })))
 
     this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.contractAddress)} Contract - tezblock`)
@@ -240,27 +240,27 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     })
   }
 
-  showQr() {
+  public showQr() {
     this.store$.dispatch(actions.showQr())
   }
 
-  showTelegramModal() {
+  public showTelegramModal() {
     this.store$.dispatch(actions.showTelegramModal())
   }
 
-  copyToClipboard(address: string) {
+  public copyToClipboard(address: string) {
     this.store$.dispatch(actions.copyAddressToClipboard({ address }))
   }
 
-  loadMore() {
+  public loadMore() {
     this.store$.dispatch(actions.loadMore())
   }
 
-  tabSelected(currentTabKind: actions.OperationTab) {
+  public tabSelected(currentTabKind: actions.OperationTab) {
     setTimeout(() => this.store$.dispatch(actions.changeOperationsTab({ currentTabKind })), 0)
   }
 
-  sortBy(orderBy: OrderBy) {
+  public sortBy(orderBy: OrderBy) {
     this.store$.dispatch(actions.sortOperations({ orderBy }))
   }
 
@@ -272,7 +272,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       count: undefined,
       icon: this.iconPipe.transform('link'),
       columns: columns.tokenHolders(options),
-      disabled: function() {
+      disabled: function () {
         return !this.count
       }
     }
