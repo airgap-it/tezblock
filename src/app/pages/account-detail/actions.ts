@@ -1,5 +1,4 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/domain/account'
@@ -9,6 +8,7 @@ import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { OperationErrorsById } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 const featureName = 'Account Detail'
 

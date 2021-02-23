@@ -1,10 +1,10 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { AggregatedEndorsingRights, EndorsingRights, EndorsingRewardsDetail } from '@tezblock/interfaces/EndorsingRights'
 import { AggregatedBakingRights, BakingRewardsDetail, BakingRights } from '@tezblock/interfaces/BakingRights'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 export interface LevelInTime {
   estimated_time: number

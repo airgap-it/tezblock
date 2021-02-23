@@ -9,7 +9,6 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
 import { Store } from '@ngrx/store'
 import { negate, isNil, isNumber, range, uniqBy } from 'lodash'
 import { Actions, ofType } from '@ngrx/effects'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { ChartOptions } from 'chart.js'
 import { FormControl } from '@angular/forms'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
@@ -20,7 +19,7 @@ import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.compone
 import { Tab, updateTabCounts } from '@tezblock/domain/tab'
 import { Account, JsonAccount, JsonAccountData, getBakers, doesAcceptsDelegations } from '@tezblock/domain/account'
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { AccountService,  } from '@tezblock/services/account/account.service'
+import { AccountService } from '@tezblock/services/account/account.service'
 import { BakingService } from '@tezblock/services/baking/baking.service'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
@@ -35,7 +34,6 @@ import { columns } from './table-definitions'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { OrderBy } from '@tezblock/services/base.service'
 import { TranslateService } from '@ngx-translate/core'
-import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { ContractAsset } from './model'
@@ -48,6 +46,7 @@ import { getRewardAmountMinusFee } from '@tezblock/domain/reward'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
 import { Asset } from '@tezblock/components/assets-value/assets-value.component'
 import { jsonAccounts } from '@tezblock/domain/account'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 interface RightsPerBlockLevel {
   isInFuture: number
@@ -212,14 +211,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       displayColors: false, // removes color box and label
 
       callbacks: {
-        title: function(data) {
+        title: function (data) {
           if (data[0].label.includes(':')) {
             return data[0].label.slice(0, -3)
           } else {
             return data[0].label
           }
         },
-        label: function(data, labels): string {
+        label: function (data, labels): string {
           if (Number(data.value) % 1 !== 0) {
             let value = parseFloat(data.value).toFixed(2)
             if (labels.datasets[0].label === 'Balance') {
@@ -261,108 +260,109 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   async ngOnInit() {
     this.setupDelegation()
-    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
-    this.relatedAccounts$ = this.store$.select(state => state.accountDetails.relatedAccounts)
-    this.account$ = this.store$.select(state => state.accountDetails.account)
+    this.fiatCurrencyInfo$ = this.store$.select((state) => state.app.fiatCurrencyInfo)
+    this.relatedAccounts$ = this.store$.select((state) => state.accountDetails.relatedAccounts)
+    this.account$ = this.store$.select((state) => state.accountDetails.account)
     this.isMobile$ = this.breakpointObserver
       .observe([Breakpoints.Handset, Breakpoints.Small])
-      .pipe(map(breakpointState => breakpointState.matches))
-    this.bakerTableRatings$ = this.store$.select(state => state.accountDetails.bakerTableRatings)
-    this.tezosBakerFee$ = this.store$.select(state => state.accountDetails.tezosBakerFee)
-    this.rewardAmount$ = this.store$.select(state => state.accountDetails.rewardAmount)
+      .pipe(map((breakpointState) => breakpointState.matches))
+    this.bakerTableRatings$ = this.store$.select((state) => state.accountDetails.bakerTableRatings)
+    this.tezosBakerFee$ = this.store$.select((state) => state.accountDetails.tezosBakerFee)
+    this.rewardAmount$ = this.store$.select((state) => state.accountDetails.rewardAmount)
     this.rewardAmountMinusFee$ = this.account$.pipe(
       filter(negate(isNil)),
-      switchMap(account =>
+      switchMap((account) =>
         account.is_baker
           ? this.store$
-              .select(state => state.accountDetails.bakerReward)
-              .pipe(map(reward => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
+            .select((state) => state.accountDetails.bakerReward)
+            .pipe(map((reward) => (reward ? parseFloat(reward.payout) : reward === undefined ? undefined : null)))
           : combineLatest([this.rewardAmount$.pipe(map(parseFloat)), this.tezosBakerFee$]).pipe(
-              map(([rewardAmount, tezosBakerFee]) =>
-                rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
-              )
+            map(([rewardAmount, tezosBakerFee]) =>
+              rewardAmount && tezosBakerFee ? getRewardAmountMinusFee(rewardAmount, tezosBakerFee) : null
             )
+          )
       )
     )
 
     this.isRewardAmountMinusFeeBusy$ = this.account$.pipe(
       filter(negate(isNil)),
-      switchMap(account =>
+      switchMap((account) =>
         account.is_baker
-          ? this.store$.select(state => state.accountDetails.busy.bakerReward)
+          ? this.store$.select((state) => state.accountDetails.busy.bakerReward)
           : combineLatest([
-              this.store$.select(state => state.accountDetails.busy.rewardAmount),
-              this.store$.select(state => state.accountDetails.rewardAmount),
-              this.tezosBakerFee$
-            ]).pipe(
-              map(
-                ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
-                  !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
-              )
+            this.store$.select((state) => state.accountDetails.busy.rewardAmount),
+            this.store$.select((state) => state.accountDetails.rewardAmount),
+            this.tezosBakerFee$
+          ]).pipe(
+            map(
+              ([isRewardAmontBusy, rewardAmount, tezosBakerFee]) =>
+                !(rewardAmount === null) && (isRewardAmontBusy || tezosBakerFee === undefined)
             )
+          )
       )
     )
-    this.isBusy$ = this.store$.select(state => state.accountDetails.busy)
+    this.isBusy$ = this.store$.select((state) => state.accountDetails.busy)
     this.remainingTime$ = this.store$.select(fromRoot.app.roundedRemainingTime)
     this.transactions$ = this.store$
-      .select(state => state.accountDetails.kind)
+      .select((state) => state.accountDetails.kind)
       .pipe(
-        switchMap(kind =>
-          kind !== 'assets'
-            ? this.store$.select(state => state.accountDetails.transactions.data)
-            : this.store$.select(state => state.accountDetails.contractAssets.data)
-        )
+        switchMap((kind) => {
+          return kind === 'assets' //HERE
+            ? this.store$.select((state) => state.accountDetails.contractAssets.data)
+            : this.store$.select((state) => state.accountDetails.transactions.data)
+        })
       )
+
     this.areTransactionsLoading$ = this.store$
-      .select(state => state.accountDetails.kind)
+      .select((state) => state.accountDetails.kind)
       .pipe(
-        switchMap(kind =>
+        switchMap((kind) =>
           kind !== 'assets'
-            ? this.store$.select(state => state.accountDetails.transactions.loading)
-            : this.store$.select(state => state.accountDetails.contractAssets.loading)
+            ? this.store$.select((state) => state.accountDetails.transactions.loading)
+            : this.store$.select((state) => state.accountDetails.contractAssets.loading)
         )
       )
     this.tezosBakerFeeLabel$ = this.tezosBakerFee$.pipe(
-      map(tezosBakerFee => (isNumber(tezosBakerFee) ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
+      map((tezosBakerFee) => (isNumber(tezosBakerFee) ? tezosBakerFee + ' %' : tezosBakerFee === null ? 'not available' : undefined))
     )
     this.balanceChartDatasets$ = this.store$
-      .select(state => state.accountDetails.balanceFromLast30Days)
+      .select((state) => state.accountDetails.balanceFromLast30Days)
       .pipe(
         filter(Array.isArray),
-        map(data => [{ data: data.map(dataItem => dataItem.balance), label: 'Balance' }])
+        map((data) => [{ data: data.map((dataItem) => dataItem.balance), label: 'Balance' }])
       )
     this.balanceChartLabels$ = this.store$
-      .select(state => state.accountDetails.balanceFromLast30Days)
+      .select((state) => state.accountDetails.balanceFromLast30Days)
       .pipe(
         filter(Array.isArray),
-        map(data => data.map(dataItem => new Date(dataItem.asof).toDateString()))
+        map((data) => data.map((dataItem) => new Date(dataItem.asof).toDateString()))
       )
-    this.orderBy$ = this.store$.select(state => state.accountDetails.transactions.orderBy)
+    this.orderBy$ = this.store$.select((state) => state.accountDetails.transactions.orderBy)
     this.contractAssets$ = this.store$
-      .select(state => state.accountDetails.contractAssets.data)
+      .select((state) => state.accountDetails.contractAssets.data)
       .pipe(
         distinctUntilChanged(),
-        map(contractAssets => contractAssets || [])
+        map((contractAssets) => contractAssets || [])
       )
     this.assets$ = this.contractAssets$.pipe(
       filter(Array.isArray),
-      map(contractAssets =>
+      map((contractAssets) =>
         contractAssets.map((contractAsset: ContractAsset) => ({ value: contractAsset.amount, symbol: contractAsset.contract.symbol }))
       )
     )
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
-      map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, contractAsset => contractAsset.contract.name).length)
+      map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, (contractAsset) => contractAsset.contract.name).length)
     )
     this.areBusyRightsPerBlockLevel$ = combineLatest(
-      this.store$.select(state => state.bakerTable.bakingRights.loading),
-      this.store$.select(state => state.bakerTable.endorsingRights.loading)
+      this.store$.select((state) => state.bakerTable.bakingRights.loading),
+      this.store$.select((state) => state.bakerTable.endorsingRights.loading)
     ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
     this.rightsPerBlockLevel$ = combineLatest(
-      this.store$.select(state => state.app.latestBlock),
-      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
-      this.store$.select(state => state.app.protocolVariables),
-      this.store$.select(state => state.bakerTable.bakingRights.data),
-      this.store$.select(state => state.bakerTable.endorsingRights.data)
+      this.store$.select((state) => state.app.latestBlock),
+      this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
+      this.store$.select((state) => state.app.protocolVariables),
+      this.store$.select((state) => state.bakerTable.bakingRights.data),
+      this.store$.select((state) => state.bakerTable.endorsingRights.data)
     ).pipe(
       filter(
         ([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) =>
@@ -374,13 +374,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           so grouping no needed
         */
         const step = 6
-        const bakingRightsFromCurrentCycle = bakingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
-        const endorsingRightsFromCurrentCycle = endorsingRights.find(right => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const bakingRightsFromCurrentCycle = bakingRights.find((right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
+        const endorsingRightsFromCurrentCycle = endorsingRights.find((right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle)
         const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
         const isInLevelRange = (level: number) => (entity: { level: number }): boolean =>
           entity.level >= level && entity.level <= level + step - 1
 
-        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map((level) => {
           const to = Math.min(level + step - 1, lastBlockLevelInCycle)
 
           return {
@@ -394,17 +394,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       })
     )
     this.rightsPerBlockLevelBusy$ = combineLatest(
-      this.store$.select(state => state.app.firstBlockOfCurrentCycle),
-      this.store$.select(state => state.app.protocolVariables)
+      this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
+      this.store$.select((state) => state.app.protocolVariables)
     ).pipe(
-      filter(
-        ([firstBlockOfCurrentCycle, protocolVariables]) => !!firstBlockOfCurrentCycle && !!protocolVariables
-      ),
+      filter(([firstBlockOfCurrentCycle, protocolVariables]) => !!firstBlockOfCurrentCycle && !!protocolVariables),
       map(([firstBlockOfCurrentCycle, protocolVariables]) => {
         const step = 6
         const lastBlockLevelInCycle = firstBlockOfCurrentCycle.level + protocolVariables.blocks_per_cycle - 1
 
-        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map(level => {
+        return range(firstBlockOfCurrentCycle.level, lastBlockLevelInCycle + 1 /* range doesn't include end */, step).map((level) => {
           const to = Math.min(level + step - 1, lastBlockLevelInCycle)
 
           return {
@@ -419,7 +417,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     )
 
     this.subscriptions.push(
-      this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe((paramMap) => {
         const address = paramMap.get('id')
         const jsonAccount = jsonAccounts[address]
 
@@ -436,16 +434,16 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
         this.bakerTableInfos = {
           ...this.bakerTableInfos,
-          acceptsDelegations: get<JsonAccount>(_jsonAccount => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
+          acceptsDelegations: get<JsonAccount>((_jsonAccount) => doesAcceptsDelegations(_jsonAccount))(jsonAccount)
         }
 
         this.revealed$ = this.accountService.getAccountStatus(address)
       }),
 
       this.store$
-        .select(state => state.accountDetails.delegatedAccounts)
-        .pipe(filter(delegatedAccounts => delegatedAccounts !== undefined))
-        .subscribe(delegatedAccounts => {
+        .select((state) => state.accountDetails.delegatedAccounts)
+        .pipe(filter((delegatedAccounts) => delegatedAccounts !== undefined))
+        .subscribe((delegatedAccounts) => {
           const delegatedAccount: Account = first(delegatedAccounts)
 
           if (!delegatedAccounts /* null */) {
@@ -469,31 +467,31 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       // refresh account
       this.activatedRoute.paramMap
         .pipe(
-          map(paramMap => paramMap.get('id')),
+          map((paramMap) => paramMap.get('id')),
           filter(negate(isNil)),
-          switchMap(address =>
+          switchMap((address) =>
             getRefresh([
               this.actions$.pipe(ofType(actions.loadAccountSucceeded)),
               this.actions$.pipe(ofType(actions.loadAccountFailed))
-            ]).pipe(map(refreshIndex => address))
+            ]).pipe(map((refreshIndex) => address))
           )
         )
-        .subscribe(address => this.store$.dispatch(actions.loadAccount({ address }))),
+        .subscribe((address) => this.store$.dispatch(actions.loadAccount({ address }))),
 
       // refresh transactions
       combineLatest([
-        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
+        this.activatedRoute.paramMap.pipe(filter((paramMap) => !!paramMap.get('id'))),
         getRefresh([
           this.actions$.pipe(ofType(actions.loadTransactionsByKindSucceeded)),
           this.actions$.pipe(ofType(actions.loadTransactionsByKindFailed))
         ])
       ])
-        .pipe(withLatestFrom(this.store$.select(state => state.accountDetails.kind)))
+        .pipe(withLatestFrom(this.store$.select((state) => state.accountDetails.kind)))
         .subscribe(([action, kind]) => this.store$.dispatch(actions.loadTransactionsByKind({ kind: kind || OperationTypes.Transaction }))),
 
       this.account$
         .pipe(
-          withLatestFrom(this.store$.select(state => state.app.navigationHistory)),
+          withLatestFrom(this.store$.select((state) => state.app.navigationHistory)),
           filter(([account, navigationHistory]) => !this.scrolledToTransactions && account && navigationHistory.length === 1),
           delay(500)
         )
@@ -503,13 +501,15 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         }),
 
       this.store$
-        .select(state => state.accountDetails.counts)
-        .pipe(filter(counts => !!counts))
-        .subscribe(counts => (this.tabs = updateTabCounts(this.tabs, counts))),
+        .select((state) => state.accountDetails.counts)
+        .pipe(filter((counts) => !!counts))
+        .subscribe((counts) => {
+          return (this.tabs = updateTabCounts(this.tabs, counts))
+        }),
 
       this.contractAssets$
         .pipe(
-          filter(contractAssets => contractAssets.some(contractAsset => isInBTC(contractAsset.contract.symbol))),
+          filter((contractAssets) => contractAssets.some((contractAsset) => isInBTC(contractAsset.contract.symbol))),
           switchMap(() =>
             getRefresh([
               this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
@@ -535,14 +535,14 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
     this.subscriptions.push(
       this.store$
-        .select(state => state.accountDetails.bakerTableRatings)
+        .select((state) => state.accountDetails.bakerTableRatings)
         .pipe(
-          map(bakerTableRatings => get<BakerTableRatings>(bakerTableRatings => bakerTableRatings.stakingCapacity)(bakerTableRatings)),
+          map((bakerTableRatings) => get<BakerTableRatings>((bakerTableRatings) => bakerTableRatings.stakingCapacity)(bakerTableRatings)),
           filter(negate(isNil)),
           take(1),
-          switchMap(stakingCapacity =>
+          switchMap((stakingCapacity) =>
             this.bakingService.getBakerInfos(address).pipe(
-              map(bakerInfos => {
+              map((bakerInfos) => {
                 if (!bakerInfos) {
                   return null
                 }
@@ -563,7 +563,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             )
           )
         )
-        .subscribe(bakerInfos => {
+        .subscribe((bakerInfos) => {
           this.bakerTableInfos = {
             ...this.bakerTableInfos,
             ...bakerInfos,
@@ -649,7 +649,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   showAssets() {
     const kind = 'assets'
-    const tab = this.tabs.find(_tab => _tab.kind === kind)
+    const tab = this.tabs.find((_tab) => _tab.kind === kind)
 
     this.store$.dispatch(actions.setKind({ kind }))
     this.tabbedTableComponent.onSelectTab(tab)
@@ -681,23 +681,21 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
 
   private setupDelegation() {
     const sortBakersAlphabeticaly = (a: JsonAccountData, b: JsonAccountData): number => a.alias.localeCompare(b.alias)
-    const bakers = getBakers()
-      .filter(doesAcceptsDelegations)
-      .sort(sortBakersAlphabeticaly)
+    const bakers = getBakers().filter(doesAcceptsDelegations).sort(sortBakersAlphabeticaly)
 
     this.delegationControl = new FormControl(null)
-    this.delegationControlDataSource$ = new BehaviorSubject(bakers.map(baker => baker.address))
-    this.selectedDelegation = get<JsonAccountData>(baker => baker.address)(bakers.find(baker => baker.alias === 'AirGap'))
+    this.delegationControlDataSource$ = new BehaviorSubject(bakers.map((baker) => baker.address))
+    this.selectedDelegation = get<JsonAccountData>((baker) => baker.address)(bakers.find((baker) => baker.alias === 'AirGap'))
 
     this.subscriptions.push(
-      this.delegationControl.valueChanges.subscribe(value => {
+      this.delegationControl.valueChanges.subscribe((value) => {
         if (!value) {
-          this.delegationControlDataSource$.next(bakers.map(baker => baker.address))
+          this.delegationControlDataSource$.next(bakers.map((baker) => baker.address))
         }
 
         const filteredBakers = bakers
-          .filter(baker => baker.alias.toLowerCase().indexOf(value.toLowerCase()) !== -1)
-          .map(baker => baker.address)
+          .filter((baker) => baker.alias.toLowerCase().indexOf(value.toLowerCase()) !== -1)
+          .map((baker) => baker.address)
         this.delegationControlDataSource$.next(filteredBakers)
       })
     )
@@ -712,7 +710,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -723,7 +721,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -734,7 +732,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -745,7 +743,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -756,7 +754,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('coins'),
         columns: columns[OperationTypes.Contract]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       }
@@ -769,7 +767,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'baker_overview',
         count: undefined,
         icon: this.iconPipe.transform('hatChef'),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -779,7 +777,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'baking_rights',
         count: undefined,
         icon: this.iconPipe.transform('breadLoaf'),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -789,7 +787,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'endorsing_rights',
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -799,7 +797,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         kind: 'rewards',
         count: undefined,
         icon: this.iconPipe.transform('coin'),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -810,7 +808,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
         columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return this.count === 0
         }
       }

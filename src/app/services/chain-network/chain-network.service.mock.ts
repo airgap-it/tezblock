@@ -1,4 +1,4 @@
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
+import { TezosNetwork } from "@airgap/coinlib-core";
 
 export const getChainNetworkServiceMock = () =>
   jasmine.createSpyObj('ChainNetworkService', {

@@ -3,7 +3,6 @@ import { Store } from '@ngrx/store'
 import { ActivatedRoute } from '@angular/router'
 import { Observable, combineLatest } from 'rxjs'
 import { filter, map, withLatestFrom } from 'rxjs/operators'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { Actions, ofType } from '@ngrx/effects'
 import { isNil, negate } from 'lodash'
 import { $enum } from 'ts-enum-util'
@@ -26,6 +25,7 @@ import { getRefresh } from '@tezblock/domain/synchronization'
 import { TranslateService } from '@ngx-translate/core'
 import { Title, Meta } from '@angular/platform-browser'
 import { AliasService } from '@tezblock/services/alias/alias.service'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'app-proposal-detail',
@@ -91,7 +91,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       map(
         ([periodKind, periodsTimespans]) =>
           periodsTimespans[
-            [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
+          [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
           ]
       )
     )
@@ -135,13 +135,13 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
         ({ metaVotingPeriods }) =>
-          (this.tabs = updateTabCounts(
-            this.tabs,
-            metaVotingPeriods.map(metaVotingPeriod => ({
-              key: metaVotingPeriod.periodKind,
-              count: metaVotingPeriod.count
-            }))
-          ))
+        (this.tabs = updateTabCounts(
+          this.tabs,
+          metaVotingPeriods.map(metaVotingPeriod => ({
+            key: metaVotingPeriod.periodKind,
+            count: metaVotingPeriod.count
+          }))
+        ))
       ),
 
       combineLatest(

@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http'
 import { forkJoin, from, Observable, pipe, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
 import { get as _get } from 'lodash'
-import { TezosStaker, TezosBTC, TezosUSD } from 'airgap-coin-lib'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
@@ -11,6 +10,9 @@ import { first, get } from '@tezblock/services/fp'
 import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
 import { getFaProtocol, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
 import moment from 'moment'
+import { WetziKoin } from '@tezblock/domain/airgap/wetzikoin'
+import { TezosBTC, TezosFA1Protocol, TezosStaker, TezosUSD, TezosWrapped } from '@airgap/coinlib-core'
+import { TezosETHtz } from '@airgap/coinlib-core/protocols/tezos/fa/TezosETHtz'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -80,7 +82,6 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
   const tezosNetwork = chainNetworkService.getNetwork()
   const options = getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork)
 
-  // Why airgap implements api interfaces in such a inconsistent way - compare to new TezosFAProtocol where arguments it's an object
   if (contract.symbol === 'STKR') {
     return new TezosStaker(options)
   }
@@ -91,6 +92,18 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
 
   if (contract.symbol === 'USDtz') {
     return new TezosUSD(options)
+  }
+
+  if (contract.symbol === 'weCHF') {
+    return new WetziKoin(options)
+  }
+
+  if (contract.symbol === 'ETHtz') {
+    return new TezosETHtz(options)
+  }
+
+  if (contract.symbol === 'wXTZ') {
+    return new TezosWrapped(options)
   }
 
   return undefined
@@ -104,7 +117,7 @@ export class ContractService extends BaseService {
     super(chainNetworkService, httpClient)
   }
 
-  loadManagerAddress(address: string): Observable<string> {
+  public loadManagerAddress(address: string): Observable<string> {
     return this.post<{ source: string }[]>('operations', {
       fields: ['source'],
       predicates: [
@@ -138,8 +151,8 @@ export class ContractService extends BaseService {
     )
   }
 
-  loadOperationsCount(contractHash: string): Observable<ContractOperationsCount> {
-    return forkJoin(
+  public loadOperationsCount(contractHash: string): Observable<ContractOperationsCount> {
+    return forkJoin([
       this.post<any[]>('operations', {
         fields: ['destination'],
         predicates: transferPredicates(contractHash),
@@ -174,10 +187,10 @@ export class ContractService extends BaseService {
           )
         )
       )
-    ).pipe(map(([transferTotal, otherTotal]) => ({ transferTotal, otherTotal })))
+    ]).pipe(map(([transferTotal, otherTotal]) => ({ transferTotal, otherTotal })))
   }
 
-  loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+  public loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
     const faProtocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
 
     return this.post<ContractOperation[]>('operations', {
@@ -211,7 +224,7 @@ export class ContractService extends BaseService {
     )
   }
 
-  loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+  public loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
     return this.post<ContractOperation[]>('operations', {
       predicates: transferPredicates(contract.id),
       orderBy: [orderBy],
@@ -219,12 +232,12 @@ export class ContractService extends BaseService {
     }).pipe(
       switchMap(
         contractOperations =>
-          <Observable<ContractOperation[]>>fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract)
+          <Observable<ContractOperation[]>>from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
       )
     )
   }
 
-  load24hTransferOperations(contract: TokenContract): Observable<ContractOperation[]> {
+  public load24hTransferOperations(contract: TokenContract): Observable<ContractOperation[]> {
     const cutoff = moment().subtract(24, 'hours')
 
     return this.post<ContractOperation[]>('operations', {
@@ -278,22 +291,27 @@ export class ContractService extends BaseService {
     }).pipe(
       switchMap(
         contractOperations =>
-          fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract) as Observable<ContractOperation[]>
+          <Observable<ContractOperation[]>>from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
       )
     )
   }
 
-  loadTokenHolders(contract: TokenContract): Observable<TokenHolder[]> {
+  public loadTokenHolders(contract: TokenContract): Observable<TokenHolder[]> {
     return from(getContractProtocol(contract, this.chainNetworkService).fetchTokenHolders())
   }
 
-  getTotalSupplyByContract(contract: TokenContract): Observable<string> {
+  public getTotalSupplyByContract(contract: TokenContract): Observable<string> {
     const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
+    if (protocol instanceof TezosFA1Protocol) {
+      return from(protocol.getTotalSupply())
+    }
 
-    return from(protocol.getTotalSupply())
+    return from(new Promise<string>((resolve) => {
+      resolve(contract.totalSupply)
+    }))
   }
 
-  loadEntrypoints(id: string): Observable<string[]> {
+  public loadEntrypoints(id: string): Observable<string[]> {
     return this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`, true).pipe(
       map((response: any) => {
         return Object.keys(response.entrypoints)

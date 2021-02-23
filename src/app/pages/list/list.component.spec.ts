@@ -7,7 +7,6 @@ import { EMPTY } from 'rxjs'
 import { ActivatedRoute } from '@angular/router'
 import { Actions } from '@ngrx/effects'
 import moment from 'moment'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { getActivatedRouteMock, getParamMapValue } from 'test-config/mocks/activated-route.mock'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -19,6 +18,7 @@ import { ListComponent, timestampsToCountsPerDay, toAmountPerDay } from './list.
 import { TranslatePipe, TranslateService } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
 import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 describe('ListComponent', () => {
   let component: ListComponent

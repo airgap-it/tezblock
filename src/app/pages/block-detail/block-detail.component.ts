@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
 import { Actions, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { isNil, negate } from 'lodash'
 import { BehaviorSubject, combineLatest, merge, Observable, timer } from 'rxjs'
 import { delay, filter, map, switchMap, withLatestFrom } from 'rxjs/operators'
@@ -27,6 +26,7 @@ import { getRefresh, refreshRate } from '@tezblock/domain/synchronization'
 import { isInBTC } from '@tezblock/domain/airgap'
 import { Asset, transactionToAsset } from '@tezblock/components/assets-value/assets-value.component'
 import { isAsset } from '@tezblock/domain/contract'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'app-block-detail',
@@ -170,7 +170,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -181,7 +181,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -192,7 +192,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -203,7 +203,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('stamp'),
         columns: columns[OperationTypes.Endorsement]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -214,7 +214,7 @@ export class BlockDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
         columns: columns[OperationTypes.Activation]({ pageId, showFiatValue: this.isMainnet }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       }

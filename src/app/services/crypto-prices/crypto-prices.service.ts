@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 import BigNumber from 'bignumber.js'
 import * as cryptocompare from 'cryptocompare'
 import { Observable, from, of } from 'rxjs'
@@ -12,6 +11,16 @@ import * as fromRoot from '@tezblock/reducers'
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
 import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract'
 import { isConvertableToUSD } from '@tezblock/domain/airgap'
+
+export interface MarketDataSample {
+  time: number
+  close: number
+  high: number
+  low: number
+  open: number
+  volumefrom: number
+  volumeto: number
+}
 
 export enum PricePeriod {
   day = 0,
@@ -35,14 +44,14 @@ export class CryptoPricesService {
     const fromCurrency = protocolIdentifier.toUpperCase()
 
     return from(<Promise<{ [key: string]: number }>>cryptocompare.price(fromCurrency, baseSymbols)).pipe(
-      tap(prices => {
+      tap((prices) => {
         const change: ExchangeRates = {
           [fromCurrency]: baseSymbols
-            .map(baseSymbol => ({ [baseSymbol]: prices[baseSymbol] }))
+            .map((baseSymbol) => ({ [baseSymbol]: prices[baseSymbol] }))
             .reduce((accumulator, currentValue) => ({ ...currentValue, ...accumulator }), {})
         }
 
-        this.cacheService.update<ExchangeRates>(CacheKeys.exchangeRates, value => ({ ...value, ...change }))
+        this.cacheService.update<ExchangeRates>(CacheKeys.exchangeRates, (value) => ({ ...value, ...change }))
       })
     )
   }
@@ -87,18 +96,18 @@ export class CryptoPricesService {
 
     if (!symbol) {
       return this.store$
-        .select(state => state.app.fiatCurrencyInfo)
+        .select((state) => state.app.fiatCurrencyInfo)
         .pipe(
           filter(negate(isNil)),
-          map(currInfo => ({ currInfo, protocolIdentifier: 'xtz' }))
+          map((currInfo) => ({ currInfo, protocolIdentifier: 'xtz' }))
         )
     }
 
     return this.store$
-      .select(state => state.app.exchangeRates)
+      .select((state) => state.app.exchangeRates)
       .pipe(
         filter(negate(isNil)),
-        map(exchangeRates => getCurrencyConverterPipeArgs({ symbol }, exchangeRates))
+        map((exchangeRates) => getCurrencyConverterPipeArgs({ symbol }, exchangeRates))
       )
   }
 }

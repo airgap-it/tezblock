@@ -1,6 +1,6 @@
+import { TezosNetwork } from '@airgap/coinlib-core'
 import { Injectable, OnInit } from '@angular/core'
 import { environment } from 'src/environments/environment'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 @Injectable({
   providedIn: 'root'

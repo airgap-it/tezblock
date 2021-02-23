@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing'
 import { StorageMap } from '@ngx-pwa/local-storage'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { of } from 'rxjs'
 
 import { CacheService, CacheKeys } from './cache.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
 import { getStorageMapMock } from 'test-config/mocks/storage-map.mock'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 describe('CacheService', () => {
   let service: CacheService

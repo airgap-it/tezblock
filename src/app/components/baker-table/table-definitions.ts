@@ -1,5 +1,3 @@
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-
 import { OperationTypes } from '@tezblock/domain/operations'
 import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
 import { AggregatedBakingRights } from '@tezblock/interfaces/BakingRights'

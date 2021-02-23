@@ -1,20 +1,10 @@
-import { TezosProtocol } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import {
-  TezosProtocolNetwork,
-  TezosProtocolNetworkExtras,
-  TezosProtocolOptions
-} from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocolOptions'
-import { NetworkType } from 'airgap-coin-lib/dist/utils/ProtocolNetwork'
-import { ProtocolSymbols, MainProtocolSymbols, SubProtocolSymbols } from 'airgap-coin-lib/dist/utils/ProtocolSymbols'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { TezosFA12Protocol } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosFA12Protocol'
-import { TezosFAProtocolOptions, TezosFAProtocolConfig } from 'airgap-coin-lib/dist/protocols/tezos/fa//TezosFAProtocolOptions'
 import { $enum } from 'ts-enum-util'
 import { pipe } from 'rxjs'
 
 import { TokenContract } from '@tezblock/domain/contract'
 import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls'
 import { bind, get } from '@tezblock/services/fp'
+import { MainProtocolSymbols, NetworkType, ProtocolSymbols, SubProtocolSymbols, TezosFA12Protocol, TezosFA2Protocol, TezosFA2ProtocolConfig, TezosFA2ProtocolOptions, TezosFAProtocol, TezosFAProtocolConfig, TezosFAProtocolOptions, TezosNetwork, TezosProtocol, TezosProtocolNetwork, TezosProtocolNetworkExtras, TezosProtocolOptions } from '@airgap/coinlib-core'
 
 export enum Currency {
   BTC = 'BTC',
@@ -77,13 +67,37 @@ export const getTezosFAProtocolOptions = (
   return new TezosFAProtocolOptions(getTezosProtocolNetwork(environmentUrls, tezosNetwork), config)
 }
 
-const faProtocolCache = new Map<String, TezosFA12Protocol>()
+export const getTezosFA2ProtocolOptions = (
+  contract: TokenContract,
+  environmentUrls: EnvironmentUrls,
+  tezosNetwork: TezosNetwork
+): TezosFAProtocolOptions => {
+  const feeDefaults = {
+    low: '0',
+    medium: '0',
+    high: '0'
+  }
+  const config = new TezosFA2ProtocolConfig(
+    contract.symbol,
+    contract.name,
+    contract.symbol,
+    'xtz-fa2' as SubProtocolSymbols,
+    contract.id,
+    feeDefaults,
+    contract.decimals ?? 0,
+    contract.tokenID ?? 0
+  )
 
-export const getFaProtocol = (contract: TokenContract, environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosFA12Protocol => {
+  return new TezosFA2ProtocolOptions(getTezosProtocolNetwork(environmentUrls, tezosNetwork), config)
+}
+
+const faProtocolCache = new Map<String, TezosFAProtocol>()
+
+export const getFaProtocol = (contract: TokenContract, environmentUrls: EnvironmentUrls, tezosNetwork: TezosNetwork): TezosFAProtocol => {
   let result = faProtocolCache.get(contract.id)
 
   if (!result) {
-    result = new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
+    result = contract.type && contract.type === 'fa2' ? new TezosFA2Protocol(getTezosFA2ProtocolOptions(contract, environmentUrls, tezosNetwork)) : new TezosFA12Protocol(getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork))
     faProtocolCache.set(contract.id, result)
   }
 

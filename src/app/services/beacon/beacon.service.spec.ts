@@ -1,6 +1,5 @@
 import { TestBed } from '@angular/core/testing'
 import { NetworkType } from '@airgap/beacon-sdk'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { BeaconService } from './beacon.service'
 import { getDAppClientMock } from 'test-config/mocks/d-app-client.mock'

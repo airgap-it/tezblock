@@ -11,7 +11,6 @@ import { Transaction } from '@tezblock/interfaces/Transaction'
 import { CopyService } from '@tezblock/services/copy/copy.service'
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { BaseComponent } from '@tezblock/components/base.component'
 import * as fromRoot from '@tezblock/reducers'
 import * as actions from './actions'
@@ -29,6 +28,7 @@ import { isInBTC } from '@tezblock/domain/airgap'
 import { getRefresh } from '@tezblock/domain/synchronization'
 import { Asset, transactionToAsset } from '@tezblock/components/assets-value/assets-value.component'
 import { isAsset } from '@tezblock/domain/contract'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 @Component({
   selector: 'app-transaction-detail',
@@ -72,7 +72,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
     private aliasService: AliasService
   ) {
     super()
-    
+
     this.store$.dispatch(actions.reset())
   }
 
@@ -177,7 +177,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('exchangeAlt'),
         columns: columns[OperationTypes.Transaction]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -188,7 +188,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('handReceiving'),
         columns: columns[OperationTypes.Delegation]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -199,7 +199,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('link'),
         columns: columns[OperationTypes.Origination]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -210,7 +210,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('eye'),
         columns: columns[OperationTypes.Reveal]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -221,7 +221,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('handHoldingSeedling'),
         columns: columns[OperationTypes.Activation]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       },
@@ -232,7 +232,7 @@ export class TransactionDetailComponent extends BaseComponent implements OnInit 
         count: undefined,
         icon: this.iconPipe.transform('boxBallot'),
         columns: columns[OperationTypes.Ballot]({ pageId, showFiatValue }, this.translateService),
-        disabled: function() {
+        disabled: function () {
           return !this.count
         }
       }

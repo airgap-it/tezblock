@@ -7,9 +7,9 @@ import {
   TezosDelegationOperation,
   TezosOperationType
 } from '@airgap/beacon-sdk'
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { TezosNetwork } from '@airgap/coinlib-core'
 
 const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   switch (tezosNetwork) {
