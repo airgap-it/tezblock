@@ -32,7 +32,7 @@ export class DashboardLatestContractsTransactionsEffects {
             return actions.loadTransferOperationsSucceeded({
               transferOperations: transferOperations
                 .sort((a, b) => (a.timestamp < b.timestamp ? 1 : b.timestamp < a.timestamp ? -1 : 0))
-                .slice(0, 5)
+                .slice(0, 6)
             })
           }),
           catchError((error) => of(actions.loadTransferOperationsFailed({ error })))
