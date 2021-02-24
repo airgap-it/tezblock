@@ -62,16 +62,6 @@ export const loadBakingBadRatingsSucceeded = createAction(
 )
 export const loadBakingBadRatingsFailed = createAction(`[${featureName}] Load Baking Bad Ratings Failed`, props<{ error: any }>())
 
-export const loadTezosBakerRating = createAction(
-  `[${featureName}] Load Tezos Baker Rating`,
-  props<{ address: string; updateFee: boolean }>()
-)
-export const loadTezosBakerRatingSucceeded = createAction(
-  `[${featureName}] Load Tezos Baker Rating Succeeded`,
-  props<{ response: BakingRatingResponse; address: string; updateFee: boolean }>()
-)
-export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Tezos Baker Rating Failed`, props<{ error: any }>())
-
 export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
 export const increasePageSize = createAction(`[${featureName}] Change Page Size`)
