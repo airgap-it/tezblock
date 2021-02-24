@@ -47,7 +47,7 @@
         <span class="d-none d-sm-inline-block">
           {{ tab.title | translate }}
         </span>
-        <fa-icon [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
+        <fa-icon [icon]="tab.icon" size="lg" class="d-sm-none"></fa-icon>
       </button>
     </ng-template>
     <h6 class="pt-3 mr-1 d-sm-none">
@@ -113,10 +113,10 @@
                     </div>
                   </div>
                   <div *ngIf="data?.stakingBalance > data?.stakingCapacity">
-                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height:6px" type="danger"></progressbar>
+                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height: 6px" type="danger"></progressbar>
                   </div>
                   <div *ngIf="data?.stakingBalance <= data?.stakingCapacity">
-                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height:6px"></progressbar>
+                    <progressbar [animate]="true" [value]="data?.stakingProgress" style="height: 6px"></progressbar>
                   </div>
                   <div class="mt-2 container">
                     <div class="row">
@@ -127,7 +127,7 @@
                       </div>
                       <div class="col p-0">
                         <div class="float-right">
-                          <p class="m-0 ">
+                          <p class="m-0">
                             <amount-cell [data]="data?.stakingCapacity" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                           </p>
                         </div>
@@ -178,7 +178,7 @@
                   </div>
                 </div>
                 <div>
-                  <progressbar [value]="0" style="height:6px"></progressbar>
+                  <progressbar [value]="0" style="height: 6px"></progressbar>
                 </div>
                 <div class="mt-2 container">
                   <div class="row">
@@ -189,9 +189,9 @@
                 </div>
               </ng-template>
             </div>
-            <div class=" col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
+            <div class="col-md-6 col-lg-4 pl-sm-5 py-sm-0 py-4">
               <div class="mb-4">
-                <h5 class="card-title__secondary mb-3 ">
+                <h5 class="card-title__secondary mb-3">
                   {{ 'baker-table.baker-overview.frozen-balance' | translate }}
                 </h5>
                 <h5>
@@ -207,7 +207,7 @@
               </div>
 
               <div class="mb-4">
-                <h5 class="card-title__secondary mb-3 ">
+                <h5 class="card-title__secondary mb-3">
                   {{ 'baker-table.baker-overview.active-delegations' | translate }}
                 </h5>
                 <h5>
@@ -254,7 +254,7 @@
                 </ng-template>
               </div>
             </div>
-            <div class=" col-md-6 col-lg-4">
+            <div class="col-md-6 col-lg-4">
               <div class="mb-3">
                 <h5 class="card-title__secondary mb-2">
                   {{ 'baker-table.baker-overview.payout-accuracy' | translate }}
@@ -276,36 +276,6 @@
                         <loading-skeleton [loadingWidth]="'50px'"></loading-skeleton>
                       </ng-container>
                       <ng-container *ngIf="ratings?.bakingBadRating === null">
-                        {{ 'baker-table.baker-overview.not-available' | translate }}
-                      </ng-container>
-                    </a>
-                  </div>
-                </div>
-              </div>
-              <div class="mb-3">
-                <h5 class="card-title__secondary mb-2">
-                  {{ 'baker-table.baker-overview.baking-efficiency' | translate }}
-                </h5>
-                <div class="d-block">
-                  <div
-                    class="width--fit-content"
-                    tooltip="MyTezosBaker is a rating site for bakers that displays an efficency percentage for completed or missed blocks and endorsements of a baker."
-                  >
-                    <img src="/assets/img/mytezosbaker_logo.svg" width="24px" />
-                    <a
-                      class="btn"
-                      type="button"
-                      target="_blank"
-                      [ngClass]="{ 'btn-link': ratings?.tezosBakerRating }"
-                      [href]="'https://mytezosbaker.com/'"
-                    >
-                      <ng-container *ngIf="ratings?.tezosBakerRating">
-                        {{ ratings.tezosBakerRating }}
-                      </ng-container>
-                      <ng-container *ngIf="ratings?.tezosBakerRating === undefined">
-                        <loading-skeleton [loadingWidth]="'65px'"></loading-skeleton>
-                      </ng-container>
-                      <ng-container *ngIf="ratings?.tezosBakerRating === null">
                         {{ 'baker-table.baker-overview.not-available' | translate }}
                       </ng-container>
                     </a>

@@ -5,7 +5,6 @@ import { Observable, of, from } from 'rxjs'
 import { map, switchMap, tap } from 'rxjs/operators'
 
 import { BakingBadResponse } from 'src/app/interfaces/BakingBadResponse'
-import { MyTezosBakerResponse } from 'src/app/interfaces/MyTezosBakerResponse'
 import { TezosBakerResponse, Baker } from 'src/app/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '../chain-network/chain-network.service'
 import { first } from '@tezblock/services/fp'
@@ -51,61 +50,15 @@ export class BakingService extends BaseService {
         params: { configs: 'true', insurance: 'true' }
       })
       .pipe(
-        map(response => ({
+        map((response) => ({
           ...response,
           status: response ? 'success' : 'error'
         }))
       )
   }
 
-  getTezosBakerInfos(address: string): Promise<MyTezosBakerResponse> {
-    return new Promise(resolve => {
-      this.cacheService
-        .get(CacheKeys.fromCurrentCycle)
-        .pipe(
-          switchMap(currentCycleCache => {
-            const myTezosBaker = _get(currentCycleCache, 'myTezosBaker')
-
-            if (myTezosBaker) {
-              return of(myTezosBaker)
-            }
-
-            return this.http.get<TezosBakerResponse>(this.tezosBakerUrl).pipe(
-              tap(myTezosBaker =>
-                this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
-                  ...currentCycleCache,
-                  myTezosBaker
-                }))
-              )
-            )
-          })
-        )
-        .subscribe(
-          (response: TezosBakerResponse) => {
-            const match: Baker = response.bakers.find(baker => baker.delegation_code === address)
-
-            if (match) {
-              resolve({
-                status: 'success',
-                rating: match.baker_efficiency,
-                fee: match.fee,
-                myTB: match.voting,
-                baker_name: match.baker_name,
-                delegation_code: match.delegation_code
-              })
-
-              return
-            }
-
-            resolve({ status: 'error' })
-          },
-          (/* error */) => resolve({ status: 'error' })
-        )
-    })
-  }
-
   getBakerInfos(tzAddress: string): Observable<any> {
-    return this.post<any[]>('bakers'/* delegates (previously) */, {
+    return this.post<any[]>('bakers' /* delegates (previously) */, {
       predicates: [
         {
           field: 'pkh',
@@ -121,7 +74,7 @@ export class BakingService extends BaseService {
     const network = this.chainNetworkService.getNetwork()
     const tezosProtocol = getTezosProtocol(this.environmentUrls, network)
 
-    return from(tezosProtocol.bakerInfo(tzAddress)).pipe(map(response => response.bakerCapacity.multipliedBy(0.7).toNumber()))
+    return from(tezosProtocol.bakerInfo(tzAddress)).pipe(map((response) => response.bakerCapacity.multipliedBy(0.7).toNumber()))
   }
 
   addPayoutDelayToMoment(time: Moment): Moment {
@@ -131,6 +84,6 @@ export class BakingService extends BaseService {
   getEfficiencyLast10Cycles(address: string): Observable<number> {
     return this.http
       .get<TezosNodesApiResponse>(`${this.airgapCorsProxy}${this.efficiencyLast10CyclesUrl}${address}`)
-      .pipe(map(response => response.efficiency_last10cycle))
+      .pipe(map((response) => response.efficiency_last10cycle))
   }
 }
