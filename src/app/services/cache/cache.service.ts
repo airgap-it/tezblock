@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core'
 import { StorageMap } from '@ngx-pwa/local-storage'
 import { Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { TezosNetwork, TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { BakerTableRatings } from '@tezblock/pages/account-detail/reducer'
 import { TezosBakerResponse } from '@tezblock/interfaces/TezosBakerResponse'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { Block } from '@tezblock/interfaces/Block'
 import { SearchOptionData } from '@tezblock/services/search/model'
+import { TezosNetwork, TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 
 export enum CacheKeys {
   fromCurrentCycle = 'fromCurrentCycle',
@@ -16,7 +16,8 @@ export enum CacheKeys {
   byAddress = 'byAddress',
   byProposal = 'byProposal',
   theme = 'theme',
-  previousSearches = 'previousSearches'
+  previousSearches = 'previousSearches',
+  language = 'language'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -136,6 +137,6 @@ export class CacheService {
 
     this.isBusy[key] = true
 
-    return this.get<T>(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
+    return this.get<T>(key).pipe(switchMap((cacheSlice) => this.set(key, change(cacheSlice))))
   }
 }

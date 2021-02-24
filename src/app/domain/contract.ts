@@ -1,5 +1,4 @@
-import { TezosNetwork } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
-import { negate, isNil, get } from 'lodash'
+import { negate, isNil, get, filter } from 'lodash'
 import BigNumber from 'bignumber.js'
 import { forkJoin, from, Observable, of } from 'rxjs'
 import { map, switchMap, catchError } from 'rxjs/operators'
@@ -13,12 +12,10 @@ import { Currency, isInBTC, getFaProtocol } from '@tezblock/domain/airgap'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { OperationTypes } from '@tezblock/domain/operations'
-import { TezosFA12Protocol } from 'airgap-coin-lib/dist/protocols/tezos/fa/TezosFA12Protocol'
-import { TezosTransactionParameters } from 'airgap-coin-lib/dist/protocols/tezos/types/operations/Transaction'
-import { IAirGapTransaction } from 'airgap-coin-lib'
-
 // I'm not using: import * as data from thanks to flag "allowSyntheticDefaultImports": true in tsconfig.jsom ( resolves default property problem )
 import data from '../../assets/contracts/json/contracts.json'
+import { IAirGapTransaction, TezosFAProtocol, TezosNetwork } from '@airgap/coinlib-core'
+import { TezosTransactionParameters } from '@airgap/coinlib-core/protocols/tezos/types/operations/Transaction'
 
 export const tokenContracts = data as { [key: string]: TokenContract }
 
@@ -45,6 +42,8 @@ export interface TokenContract {
   tezosNetwork?: TezosNetwork[]
   totalSupply?: string
   decimals?: number
+  type?: string
+  tokenID?: number
 }
 
 export interface ContractOperation extends Transaction {
@@ -71,9 +70,9 @@ export const getTokenContractByAddress = (address: string, tezosNetwork: TezosNe
 
     return isInNetwork(tokenContract)
       ? {
-          ...tokenContract,
-          id: address
-        }
+        ...tokenContract,
+        id: address
+      }
       : undefined
   })(tokenContracts[address])
 
@@ -107,12 +106,12 @@ export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetw
     .concat(
       tokenContractByAddress
         ? [
-            {
-              id: tokenContractByAddress.id,
-              label: tokenContractByAddress.name,
-              type
-            }
-          ]
+          {
+            id: tokenContractByAddress.id,
+            label: tokenContractByAddress.name,
+            type
+          }
+        ]
         : []
     )
 }
@@ -154,14 +153,14 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
   }
 }
 
-export const hasTokenHolders = (contract: TokenContract): boolean => ['STKR', 'tzBTC', 'USDtz'].includes(contract.symbol)
+export const hasTokenHolders = (contract: TokenContract): boolean => ['STKR', 'tzBTC', 'USDtz', 'weCHF', 'ETHtz', 'wXTZ'].includes(contract.symbol)
 
 export interface TokenHolder {
   address: string
   amount: string
 }
 
-const normalizeParameters = async (faProtocol: TezosFA12Protocol, parameters: string, fallbackEntrypoint?: string): Promise<TezosTransactionParameters> => {
+const normalizeParameters = async (faProtocol: TezosFAProtocol, parameters: string, fallbackEntrypoint?: string): Promise<TezosTransactionParameters> => {
   try {
     return await faProtocol.normalizeTransactionParameters(parameters, fallbackEntrypoint)
   } catch {
@@ -172,66 +171,55 @@ const normalizeParameters = async (faProtocol: TezosFA12Protocol, parameters: st
   }
 }
 
-const transactionDetailsFromParameters = async (faProtocol: TezosFA12Protocol, parameters: TezosTransactionParameters): Promise<Partial<IAirGapTransaction>[]> => {
+const transactionDetailsFromParameters = async (faProtocol: TezosFAProtocol, parameters: TezosTransactionParameters): Promise<Partial<IAirGapTransaction>[]> => {
   try {
-    return await faProtocol.transactionDetailsFromParameters(parameters)
+    return faProtocol.transactionDetailsFromParameters(parameters)
   } catch {
     return []
   }
 }
 
 // fills in Transaction entities which are contract's transfers properties: source, destination, amount from airgap
-export const fillTransferOperations = (
+export const fillTransferOperations = async (
   transactions: Transaction[],
   chainNetworkService: ChainNetworkService,
   onNoAssetValue = (transaction: Transaction) => transaction,
   tokenContract?: TokenContract
-): Observable<Transaction[]> => {
+): Promise<Transaction[]> => {
   if (isEmptyArray(transactions)) {
-    return of([])
+    return []
   }
+  let result: Transaction[] = []
+  for (const transaction of transactions) {
+    const contract: TokenContract = tokenContract ?? getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
 
-  return forkJoin(
-    transactions.map(transaction => {
-      const contract: TokenContract = tokenContract ?? getTokenContractByAddress(transaction.destination, chainNetworkService.getNetwork())
-
-      if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters_micheline) {
-        const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
-        
-        return from(normalizeParameters(faProtocol, transaction.parameters_micheline, transaction.parameters_entrypoints)).pipe(
-          switchMap(normalizedParameters => {
-            if (normalizedParameters.entrypoint === 'transfer') {
-              return from(
-                transactionDetailsFromParameters(faProtocol, normalizedParameters)
-              ).pipe(
-                map(first),
-                map(details => {
-                  if (details === undefined) {
-                    return onNoAssetValue(transaction)
-                  }
-                  
-                  return {
-                    ...transaction,
-                    source: first(details.from),
-                    destination: first(details.to),
-                    amount: parseFloat(details.amount),
-                    symbol: contract.symbol,
-                    decimals: contract.decimals
-                  }
-                })
-              )
-            }
-
-            return of(onNoAssetValue(transaction))
-          })
-        )
+    if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters_micheline) {
+      const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
+      const normalizedParameters = await normalizeParameters(faProtocol, transaction.parameters_micheline, transaction.parameters_entrypoints)
+      if (normalizedParameters.entrypoint !== 'transfer') {
+        result.push(onNoAssetValue(transaction))
+        continue
       }
-
-      return of(onNoAssetValue(transaction))
-    })
-  ).pipe(map(transactions => {
-    return transactions.filter(negate(isNil))
-  }))
+      const details = await transactionDetailsFromParameters(faProtocol, normalizedParameters)
+      const transactionDetails = details.map(detail => {
+        if (detail === undefined) {
+          return onNoAssetValue(transaction)
+        }
+        return {
+          ...transaction,
+          source: first(detail.from),
+          destination: first(detail.to),
+          amount: parseFloat(detail.amount),
+          symbol: contract.symbol,
+          decimals: contract.decimals
+        } as Transaction
+      })
+      result = result.concat(transactionDetails)
+    } else {
+      result.push(onNoAssetValue(transaction))
+    }
+  }
+  return result.filter(item => item !== undefined && item !== null)
 }
 
 // by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function

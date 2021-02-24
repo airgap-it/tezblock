@@ -16,7 +16,7 @@ export class DashboardLatestContractsTransactionsEffects {
       ofType(actions.loadTransferOperations),
       switchMap(({ contracts }) =>
         forkJoin(
-          contracts.map(contract =>
+          contracts.map((contract) =>
             this.contractService.loadTransferOperations(
               contract,
               {
@@ -27,13 +27,15 @@ export class DashboardLatestContractsTransactionsEffects {
             )
           )
         ).pipe(
-          map(response => flatten(response)),
-          map(transferOperations =>
-            actions.loadTransferOperationsSucceeded({
-              transferOperations: transferOperations.slice(0, 3)
+          map((response) => flatten(response)),
+          map((transferOperations) => {
+            return actions.loadTransferOperationsSucceeded({
+              transferOperations: transferOperations
+                .sort((a, b) => (a.timestamp < b.timestamp ? 1 : b.timestamp < a.timestamp ? -1 : 0))
+                .slice(0, 6)
             })
-          ),
-          catchError(error => of(actions.loadTransferOperationsFailed({ error })))
+          }),
+          catchError((error) => of(actions.loadTransferOperationsFailed({ error })))
         )
       )
     )

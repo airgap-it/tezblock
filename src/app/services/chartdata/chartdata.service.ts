@@ -1,5 +1,5 @@
+import { MarketDataSample } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { Injectable } from '@angular/core'
-import { MarketDataSample } from 'airgap-coin-lib/dist/wallet/AirGapMarketWallet'
 
 const cryptocompare = require('cryptocompare')
 

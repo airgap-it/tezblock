@@ -29,8 +29,8 @@ export class AccountDetailEffects {
       ofType(actions.loadAccount),
       switchMap(({ address }) =>
         this.accountService.getAccountById(address).pipe(
-          map(account => actions.loadAccountSucceeded({ account })),
-          catchError(error => of(actions.loadAccountFailed({ error })))
+          map((account) => actions.loadAccountSucceeded({ account })),
+          catchError((error) => of(actions.loadAccountFailed({ error })))
         )
       )
     )
@@ -46,11 +46,11 @@ export class AccountDetailEffects {
   loadDelegation$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadDelegation),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.address)),
       switchMap(([action, address]) =>
         this.accountService.getDelegatedAccounts(address).pipe(
-          map(accounts => actions.loadDelegatedAccountsSucceeded({ accounts })),
-          catchError(error => of(actions.loadDelegatedAccountsFailed({ error })))
+          map((accounts) => actions.loadDelegatedAccountsSucceeded({ accounts })),
+          catchError((error) => of(actions.loadDelegatedAccountsFailed({ error })))
         )
       )
     )
@@ -59,10 +59,10 @@ export class AccountDetailEffects {
   getRewardAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadRewardAmont),
-      switchMap(action =>
+      switchMap((action) =>
         this.rewardService.getRewardAmount(action.accountAddress, action.bakerAddress).pipe(
-          map(rewardAmount => actions.loadRewardAmontSucceeded({ rewardAmount })),
-          catchError(error => of(actions.loadRewardAmontFailed({ error })))
+          map((rewardAmount) => actions.loadRewardAmontSucceeded({ rewardAmount })),
+          catchError((error) => of(actions.loadRewardAmontFailed({ error })))
         )
       )
     )
@@ -73,16 +73,31 @@ export class AccountDetailEffects {
       ofType(actions.loadTransactionsByKind),
       filter(({ kind }) => kind !== 'assets'),
       withLatestFrom(
-        this.store$.select(state => state.accountDetails.transactions.pagination),
-        this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.transactions.orderBy)
+        this.store$.select((state) => state.accountDetails.transactions.pagination),
+        this.store$.select((state) => state.accountDetails.address),
+        this.store$.select((state) => state.accountDetails.transactions.orderBy)
       ),
       switchMap(([{ kind }, pagination, address, orderBy]) =>
-        this.transactionService.getAllTransactionsByAddress(address, kind, pagination.currentPage * pagination.selectedSize, orderBy).pipe(
-          switchMap(data => (kind === OperationTypes.Transaction ? fillTransferOperations(data, this.chainNetworkService) : of(data))),
-          map(data => actions.loadTransactionsByKindSucceeded({ data })),
-          catchError(error => of(actions.loadTransactionsByKindFailed({ error })))
-        )
+        this.transactionService
+          .getAllTransactionsByAddress(
+            address,
+            kind,
+            pagination.currentPage * pagination.selectedSize,
+            orderBy,
+            getTokenContracts(this.chainNetworkService.getNetwork()).data
+          )
+          .pipe(
+            switchMap((data) =>
+              kind === OperationTypes.Transaction ? from(fillTransferOperations(data, this.chainNetworkService)) : of(data)
+            ),
+            map((data) =>
+              kind === OperationTypes.Transaction
+                ? data.filter((transaction) => transaction.source === address || transaction.destination === address)
+                : data
+            ),
+            map((data) => actions.loadTransactionsByKindSucceeded({ data })),
+            catchError((error) => of(actions.loadTransactionsByKindFailed({ error })))
+          )
       )
     )
   )
@@ -90,7 +105,7 @@ export class AccountDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
     )
   )
@@ -98,7 +113,7 @@ export class AccountDetailEffects {
   onSorting$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.sortTransactionsByKind),
-      withLatestFrom(this.store$.select(state => state.accountDetails.kind)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.kind)),
       map(([action, kind]) => actions.loadTransactionsByKind({ kind }))
     )
   )
@@ -113,19 +128,20 @@ export class AccountDetailEffects {
   loadTransactionsCounts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsCounts),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.address)),
       switchMap(([action, address]) =>
-        forkJoin(
+        forkJoin([
           this.apiService.getOperationCount('source', address),
           this.apiService.getOperationCount('destination', address),
+          this.apiService.getTokenTransferCount(address, getTokenContracts(this.chainNetworkService.getNetwork()).data),
           this.apiService
             .getOperationCount('delegate', address)
-            .pipe(map(counts => counts.map(count => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
-        ).pipe(
+            .pipe(map((counts) => counts.map((count) => (count.kind === 'origination' ? { ...count, kind: 'delegation' } : count))))
+        ]).pipe(
           map(flatten),
           map(aggregateOperationCounts),
-          map(counts => actions.loadTransactionsCountsSucceeded({ counts })),
-          catchError(error => of(actions.loadTransactionsCountsFailed({ error })))
+          map((counts) => actions.loadTransactionsCountsSucceeded({ counts })),
+          catchError((error) => of(actions.loadTransactionsCountsFailed({ error })))
         )
       )
     )
@@ -136,14 +152,14 @@ export class AccountDetailEffects {
       ofType(actions.loadBalanceForLast30Days),
       switchMap(({ address }) =>
         this.apiService.getBalanceForLast30Days(address).pipe(
-          map(balanceFromLast30Days => {
+          map((balanceFromLast30Days) => {
             if (balanceFromLast30Days[0].balance === null) {
               return actions.loadExtraBalance({ temporaryBalance: balanceFromLast30Days })
             } else {
               return actions.loadBalanceForLast30DaysSucceeded({ balanceFromLast30Days })
             }
           }),
-          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
+          catchError((error) => of(actions.loadBalanceForLast30DaysFailed({ error })))
         )
       )
     )
@@ -153,15 +169,15 @@ export class AccountDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadExtraBalance),
       withLatestFrom(
-        this.store$.select(state => state.accountDetails.address),
-        this.store$.select(state => state.accountDetails.temporaryBalance)
+        this.store$.select((state) => state.accountDetails.address),
+        this.store$.select((state) => state.accountDetails.temporaryBalance)
       ),
       switchMap(([action, accountAddress, temporaryBalance]) => {
         return this.apiService.getEarlierBalance(accountAddress, temporaryBalance).pipe(
-          map(extraBalance => {
+          map((extraBalance) => {
             return actions.loadExtraBalanceSucceeded({ extraBalance })
           }),
-          catchError(error => of(actions.loadBalanceForLast30DaysFailed({ error })))
+          catchError((error) => of(actions.loadBalanceForLast30DaysFailed({ error })))
         )
       })
     )
@@ -170,10 +186,10 @@ export class AccountDetailEffects {
   loadBakingBadRatings$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadBakingBadRatings),
-      withLatestFrom(this.store$.select(state => state.accountDetails)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails)),
       switchMap(([{ address }, state]) =>
         this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
-          switchMap(currentCycleCache => {
+          switchMap((currentCycleCache) => {
             const bakingBadRating = get(currentCycleCache, `fromAddress[${address}].bakerData.bakingBadRating`)
             const stakingCapacity = get(currentCycleCache, `fromAddress[${address}].bakerData.stakingCapacity`)
             const tezosBakerFee = get(currentCycleCache, `fromAddress[${address}].tezosBakerFee`)
@@ -183,10 +199,12 @@ export class AccountDetailEffects {
               return of(<BakingRatingResponse>{ bakingRating: bakingBadRating, tezosBakerFee, stakingCapacity })
             }
 
-            return this.bakingService.getBakingBadRatings(address).pipe(map(response => fromReducer.fromBakingBadResponse(response, state)))
+            return this.bakingService
+              .getBakingBadRatings(address)
+              .pipe(map((response) => fromReducer.fromBakingBadResponse(response, state)))
           }),
-          map(response => actions.loadBakingBadRatingsSucceeded({ response })),
-          catchError(error => of(actions.loadBakingBadRatingsFailed({ error })))
+          map((response) => actions.loadBakingBadRatingsSucceeded({ response })),
+          catchError((error) => of(actions.loadBakingBadRatingsFailed({ error })))
         )
       )
     )
@@ -196,9 +214,9 @@ export class AccountDetailEffects {
     () =>
       this.actions$.pipe(
         ofType(actions.loadBakingBadRatingsSucceeded),
-        withLatestFrom(this.store$.select(state => state.accountDetails)),
+        withLatestFrom(this.store$.select((state) => state.accountDetails)),
         tap(([action, state]) =>
-          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
+          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, (currentCycleCache) => ({
             ...currentCycleCache,
             fromAddress: {
               ...get(currentCycleCache, 'fromAddress'),
@@ -218,61 +236,10 @@ export class AccountDetailEffects {
     { dispatch: false }
   )
 
-  loadTezosBakerRating$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.loadTezosBakerRating),
-      withLatestFrom(this.store$.select(state => state.accountDetails)),
-      switchMap(([{ address, updateFee }, state]) =>
-        this.cacheService.get(CacheKeys.fromCurrentCycle).pipe(
-          switchMap(currentCycleCache => {
-            const tezosBakerRating = get(currentCycleCache, `fromAddress[${state.address}].bakerData.tezosBakerRating`)
-            const tezosBakerFee = get(currentCycleCache, `fromAddress[${state.address}].tezosBakerFee`)
-
-            // bug was reported so now I compare to undefined OR null, not only undefined
-            if (tezosBakerRating && tezosBakerFee) {
-              return of(<BakingRatingResponse>{ bakingRating: tezosBakerRating, tezosBakerFee: tezosBakerFee })
-            }
-
-            return from(this.bakingService.getTezosBakerInfos(address)).pipe(
-              map(response => fromReducer.fromMyTezosBakerResponse(response, state, updateFee))
-            )
-          }),
-          map(response => actions.loadTezosBakerRatingSucceeded({ response, address, updateFee })),
-          catchError(error => of(actions.loadTezosBakerRatingFailed({ error })))
-        )
-      )
-    )
-  )
-
-  cachTezosBakerRating$ = createEffect(
-    () =>
-      this.actions$.pipe(
-        ofType(actions.loadTezosBakerRatingSucceeded),
-        withLatestFrom(this.store$.select(state => state.accountDetails)),
-        tap(([{ response, address }, state]) =>
-          this.cacheService.update<CurrentCycleState>(CacheKeys.fromCurrentCycle, currentCycleCache => ({
-            ...currentCycleCache,
-            fromAddress: {
-              ...get(currentCycleCache, 'fromAddress'),
-              [address]: {
-                ...get(currentCycleCache, `fromAddress[${address}]`),
-                bakerData: {
-                  ...get(currentCycleCache, `fromAddress[${address}].bakerData`),
-                  tezosBakerRating: state.bakerTableRatings.tezosBakerRating
-                },
-                tezosBakerFee: state.tezosBakerFee
-              }
-            }
-          }))
-        )
-      ),
-    { dispatch: false }
-  )
-
   onLoadTransactionsSucceededLoadErrors$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKindSucceeded),
-      filter(({ data }) => data.some(transaction => transaction.status !== 'applied')),
+      filter(({ data }) => data.some((transaction) => transaction.status !== 'applied')),
       map(({ data }) => actions.loadTransactionsErrors({ transactions: data }))
     )
   )
@@ -282,8 +249,8 @@ export class AccountDetailEffects {
       ofType(actions.loadTransactionsErrors),
       switchMap(({ transactions }) =>
         this.apiService.getErrorsForOperations(transactions).pipe(
-          map(operationErrorsById => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
-          catchError(error => of(actions.loadTransactionsErrorsFailed({ error })))
+          map((operationErrorsById) => actions.loadTransactionsErrorsSucceeded({ operationErrorsById })),
+          catchError((error) => of(actions.loadTransactionsErrorsFailed({ error })))
         )
       )
     )
@@ -304,10 +271,10 @@ export class AccountDetailEffects {
         this.store$.select(fromRoot.app.currentCycle).pipe(
           filter(negate(isNil)),
           take(1),
-          switchMap(currentCycle =>
+          switchMap((currentCycle) =>
             this.rewardService.getRewardsForAddressInCycle(bakerAddress, ++currentCycle).pipe(
-              map(bakerReward => actions.loadBakerRewardSucceeded({ bakerReward })),
-              catchError(error => of(actions.loadBakerRewardFailed({ error })))
+              map((bakerReward) => actions.loadBakerRewardSucceeded({ bakerReward })),
+              catchError((error) => of(actions.loadBakerRewardFailed({ error })))
             )
           )
         )
@@ -318,7 +285,7 @@ export class AccountDetailEffects {
   onLoadAccountLoadContractAssets$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadAccount),
-      withLatestFrom(this.store$.select(state => state.accountDetails.contractAssets.data)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.contractAssets.data)),
       filter(([action, contractAssets]) => contractAssets === undefined),
       map(() => actions.loadContractAssets())
     )
@@ -327,26 +294,26 @@ export class AccountDetailEffects {
   loadContractAssets$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContractAssets),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.address)),
       switchMap(([action, address]) =>
         forkJoin(
           getTokenContracts(this.chainNetworkService.getNetwork())
             .data.filter(hasTokenHolders)
-            .map(contract =>
+            .map((contract) =>
               this.contractService.loadTokenHolders(contract).pipe(
-                map(tokenHolders => ({
+                map((tokenHolders) => ({
                   contract,
                   amount: tokenHolders
-                    .filter(tokenHolder => tokenHolder.address === address)
-                    .map(tokenHolder => parseFloat(tokenHolder.amount))
+                    .filter((tokenHolder) => tokenHolder.address === address)
+                    .map((tokenHolder) => parseFloat(tokenHolder.amount))
                     .reduce((a, b) => a + b, 0)
                 }))
               )
             )
         ).pipe(
-          map(data => data.filter(item => item.amount > 0)),
-          map(data => actions.loadContractAssetsSucceeded({ data })),
-          catchError(error => of(actions.loadContractAssetsFailed({ error })))
+          map((data) => data.filter((item) => item.amount > 0)),
+          map((data) => actions.loadContractAssetsSucceeded({ data })),
+          catchError((error) => of(actions.loadContractAssetsFailed({ error })))
         )
       )
     )
@@ -363,11 +330,11 @@ export class AccountDetailEffects {
   loadStakingCapacityFromTezosProtocol$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadStakingCapacityFromTezosProtocol),
-      withLatestFrom(this.store$.select(state => state.accountDetails.address)),
+      withLatestFrom(this.store$.select((state) => state.accountDetails.address)),
       switchMap(([action, address]) =>
         this.bakingService.getStakingCapacityFromTezosProtocol(address).pipe(
-          map(stakingCapacity => actions.loadStakingCapacityFromTezosProtocolSucceeded({ stakingCapacity })),
-          catchError(error => of(actions.loadStakingCapacityFromTezosProtocolFailed({ error })))
+          map((stakingCapacity) => actions.loadStakingCapacityFromTezosProtocolSucceeded({ stakingCapacity })),
+          catchError((error) => of(actions.loadStakingCapacityFromTezosProtocolFailed({ error })))
         )
       )
     )

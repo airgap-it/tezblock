@@ -1,11 +1,9 @@
 import { BigNumber } from 'bignumber.js'
-import { TezosRewards } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { Injectable } from '@angular/core'
 import * as _ from 'lodash'
 import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
 import { map, switchMap, filter, tap } from 'rxjs/operators'
-import { TezosProtocol, TezosTransactionResult, TezosTransactionCursor } from 'airgap-coin-lib'
 import { Store } from '@ngrx/store'
 import { isNil, negate, get as _get } from 'lodash'
 
@@ -38,6 +36,8 @@ import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { getRightStatus } from '@tezblock/domain/reward'
+import { TezosProtocol, TezosTransactionCursor, TezosTransactionResult } from '@airgap/coinlib-core'
+import { TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 
 export interface OperationCount {
   [key: string]: string
@@ -549,6 +549,47 @@ export class ApiService {
     return this.http
       .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
       .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field }))))
+  }
+
+  getTokenTransferCount(address: string, supportedTokens: TokenContract[]): Observable<OperationCount[]> {
+    const body = {
+      fields: ['source', 'kind'],
+      predicates: [
+        {
+          field: "operation_group_hash",
+          operation: "isnull",
+          inverse: true
+        },
+        {
+          field: "kind",
+          operation: "eq",
+          set: ['transaction'],
+          inverse: false
+        },
+        {
+          field: 'parameters_micheline',
+          operation: 'like',
+          set: [address],
+          inverse: false
+        },
+        {
+          field: 'destination',
+          operation: 'in',
+          set: supportedTokens.map(contract => contract.id),
+          inverse: false
+        }
+      ],
+      aggregation: [
+        {
+          field: 'source',
+          function: 'count'
+        }
+      ]
+    }
+
+    return this.http
+      .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
+      .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field: 'source' }))))
   }
 
   getBlockByLevel(level: string): Observable<Block> {

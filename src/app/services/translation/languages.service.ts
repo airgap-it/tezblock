@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core'
 import { TranslateService } from '@ngx-translate/core'
 import English from '../../../assets/i18n/en.json'
 import German from '../../../assets/i18n/de.json'
+import { CacheKeys, CacheService } from '../cache/cache.service'
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class LanguagesService {
     de: German
   }
 
-  constructor(private readonly translate: TranslateService) {}
+  constructor(private readonly translate: TranslateService, private readonly cacheService: CacheService) {}
 
   loadLanguages(translateTo?: string) {
     const getLanguage = (translateTo?: string): string => {
@@ -30,8 +31,10 @@ export class LanguagesService {
     this.translate.setDefaultLang('en')
 
     if (language) {
-      this.supportedLanguages.filter(supportedLanguage =>
-        supportedLanguage.startsWith(language.toLowerCase()) ? this.translate.use(supportedLanguage) : null
+      this.supportedLanguages.filter((supportedLanguage) =>
+        supportedLanguage.startsWith(language.toLowerCase())
+          ? (this.translate.use(supportedLanguage), this.cacheService.set(CacheKeys.language, supportedLanguage).subscribe(() => {}))
+          : null
       )
     }
   }

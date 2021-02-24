@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
-import { TezosProtocol, TezosRewards, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { forkJoin, from, Observable, of, throwError } from 'rxjs'
 import { map, switchMap, catchError, take, filter } from 'rxjs/operators'
 import { get, isNil, negate, range } from 'lodash'
@@ -13,9 +12,10 @@ import { Pagination } from '@tezblock/domain/table'
 import * as fromRoot from '@tezblock/reducers'
 import * as fromApp from '@tezblock/app.reducer'
 import { ByAddressState, CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
-import { isNotEmptyArray } from '@tezblock/services/fp'
 import { getTezosProtocol } from '@tezblock/domain/airgap'
 import { getRightStatus } from '@tezblock/domain/reward'
+import { TezosProtocol } from '@airgap/coinlib-core'
+import { TezosPayoutInfo, TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
 
 export interface DoubleEvidence {
   lostAmount: string
@@ -49,7 +49,7 @@ const getCyclesWithOnePageInFuture = (currentCycle: number, pagination: Paginati
   providedIn: 'root'
 })
 export class RewardService {
-  protocol: TezosProtocol
+  public protocol: TezosProtocol
 
   private pendingPromises = new Map<String, Promise<TezosRewards>>()
 
@@ -64,13 +64,13 @@ export class RewardService {
 
     this.protocol = getTezosProtocol(environmentUrls, network)
   }
-  environmentUrls = this.chainNetworkService.getEnvironment()
+  public environmentUrls = this.chainNetworkService.getEnvironment()
 
-  getCycles4Rewards(): Observable<number[]> {
+  public getCycles4Rewards(): Observable<number[]> {
     return this.getCurrentCycle().pipe(map(currentCycle => range(0, 6).map(index => currentCycle - 2 + index)))
   }
 
-  getRewards(address: string, pagination: Pagination, filter?: string): Observable<ExtendedTezosRewards[]> {
+  public getRewards(address: string, pagination: Pagination, filter?: string): Observable<ExtendedTezosRewards[]> {
     return this.getCurrentCycle().pipe(
       switchMap(currentCycle =>
         forkJoin(getCyclesWithOnePageInFuture(currentCycle, pagination).map(cycle => this.calculateRewards(address, cycle))).pipe(
@@ -80,7 +80,7 @@ export class RewardService {
     )
   }
 
-  getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
+  public getRewardsPayouts(rewards: TezosRewards, pagination: Pagination, filter: string): Observable<Pageable<TezosPayoutInfo>> {
     const filterCondition = (address: string) => (filter ? address.toLowerCase().indexOf(filter.toLowerCase()) !== -1 : true)
     const offset = pagination ? (pagination.currentPage - 1) * pagination.selectedSize : 0
     const limit = pagination ? pagination.selectedSize : Number.MAX_SAFE_INTEGER
@@ -94,7 +94,7 @@ export class RewardService {
     )
   }
 
-  getRewardAmount(accountAddress: string, bakerAddress: string): Observable<string> {
+  public getRewardAmount(accountAddress: string, bakerAddress: string): Observable<string> {
     return this.getCurrentCycle().pipe(
       switchMap(currentCycle =>
         this.calculateRewards(bakerAddress, currentCycle - 6).pipe(
@@ -114,7 +114,7 @@ export class RewardService {
     )
   }
 
-  calculateRewards(address: string, cycle: number): Observable<TezosRewards> {
+  public calculateRewards(address: string, cycle: number): Observable<TezosRewards> {
     return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
       switchMap(byAddressCache => {
         const rewards: any = get(byAddressCache, `${address}.byCycle.${cycle}.rewards`)
@@ -127,28 +127,28 @@ export class RewardService {
         const promise = this.pendingPromises.has(key)
           ? this.pendingPromises.get(key)
           : this.protocol.calculateRewards(address, cycle).then(result => {
-              this.pendingPromises.delete(key)
+            this.pendingPromises.delete(key)
 
-              const latestCycle = fromApp.currentCycleSelector(fromRoot.getState(this.store$).app)
+            const latestCycle = fromApp.currentCycleSelector(fromRoot.getState(this.store$).app)
 
-              if (cycle < latestCycle) {
-                this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
-                  ...byAddressCache,
-                  [address]: {
-                    ...get(byAddressCache, address),
-                    byCycle: {
-                      ...(<any>get(byAddressCache, `${address}.byCycle`)),
-                      [cycle]: {
-                        ...(<any>get(byAddressCache, `${address}.byCycle.${cycle}`)),
-                        rewards: result
-                      }
+            if (cycle < latestCycle) {
+              this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
+                ...byAddressCache,
+                [address]: {
+                  ...get(byAddressCache, address),
+                  byCycle: {
+                    ...(<any>get(byAddressCache, `${address}.byCycle`)),
+                    [cycle]: {
+                      ...(<any>get(byAddressCache, `${address}.byCycle.${cycle}`)),
+                      rewards: result
                     }
                   }
-                }))
-              }
+                }
+              }))
+            }
 
-              return result
-            })
+            return result
+          })
 
         this.pendingPromises.set(key, promise)
 
@@ -157,15 +157,15 @@ export class RewardService {
     )
   }
 
-  getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
+  public getRewardsForAddressInCycle(address: string, cycle: number): Observable<TezosPayoutInfo> {
     return this.calculateRewards(address, cycle).pipe(switchMap(rewards => from(this.protocol.calculatePayout(address, rewards))))
   }
 
-  getCurrentCycle(): Observable<number> {
+  public getCurrentCycle(): Observable<number> {
     return this.store$.select(fromRoot.app.currentCycle).pipe(filter(negate(isNil)), take(1))
   }
 
-  getDoubleBakingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
+  public getDoubleBakingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
         const operation = this.findEvidenceOperationInBlock(response, operationGroupHash, 'double_baking_evidence')
@@ -182,7 +182,7 @@ export class RewardService {
     )
   }
 
-  getDoubleEndorsingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
+  public getDoubleEndorsingEvidenceData(blockLevel: number, operationGroupHash: string): Observable<DoubleEvidence> {
     return this.http.get(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}`).pipe(
       map((response: any) => {
         const operation = this.findEvidenceOperationInBlock(response, operationGroupHash, 'double_endorsement_evidence')

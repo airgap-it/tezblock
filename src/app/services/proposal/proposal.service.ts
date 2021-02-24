@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 import { from, of, pipe, Observable, forkJoin } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
-import { TezosProtocol } from 'airgap-coin-lib'
 
 import { BaseService, Operation, Predicate } from '@tezblock/services/base.service'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
@@ -22,6 +21,7 @@ import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Pagination } from '@tezblock/domain/table'
 import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
 import { getTezosProtocol } from '@tezblock/domain/airgap'
+import { TezosProtocol } from '@airgap/coinlib-core'
 
 @Injectable({
   providedIn: 'root'
@@ -209,9 +209,9 @@ export class ProposalService extends BaseService {
         metaVotingPeriods.map(period =>
           period.value <= currentVotingPeriod
             ? this.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc')).pipe(
-                map(first),
-                map(get(item => item.timestamp))
-              )
+              map(first),
+              map(get(item => item.timestamp))
+            )
             : of(null)
         )
       ),
@@ -219,9 +219,9 @@ export class ProposalService extends BaseService {
         metaVotingPeriods.map(period =>
           period.value < currentVotingPeriod
             ? this.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
-                map(first),
-                map(get(item => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
-              )
+              map(first),
+              map(get(item => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
+            )
             : of(null)
         )
       )
@@ -242,25 +242,25 @@ export class ProposalService extends BaseService {
       .concat(
         arg.proposalHash
           ? [
-              {
-                field: 'proposal_hash',
-                operation: Operation.eq,
-                set: [arg.proposalHash],
-                inverse: false
-              }
-            ]
+            {
+              field: 'proposal_hash',
+              operation: Operation.eq,
+              set: [arg.proposalHash],
+              inverse: false
+            }
+          ]
           : []
       )
       .concat(
         arg.votingPeriod
           ? [
-              {
-                field: 'voting_period',
-                operation: Operation.eq,
-                set: [arg.votingPeriod],
-                inverse: false
-              }
-            ]
+            {
+              field: 'voting_period',
+              operation: Operation.eq,
+              set: [arg.votingPeriod],
+              inverse: false
+            }
+          ]
           : []
       )
 

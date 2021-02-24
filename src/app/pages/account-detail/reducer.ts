@@ -2,7 +2,6 @@ import { createReducer, on } from '@ngrx/store'
 import { pipe } from 'rxjs'
 import { range } from 'lodash'
 import moment from 'moment'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { Transaction } from '@tezblock/interfaces/Transaction'
@@ -10,13 +9,13 @@ import { Account } from '@tezblock/domain/account'
 import { Balance } from '@tezblock/services/api/api.service'
 import { first, get } from '@tezblock/services/fp'
 import { FeeByCycle, BakingBadResponse } from '@tezblock/interfaces/BakingBadResponse'
-import { MyTezosBakerResponse } from '@tezblock/interfaces/MyTezosBakerResponse'
 import { Count } from '@tezblock/domain/tab'
 import { getTransactionsWithErrors } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
 import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>
@@ -64,14 +63,6 @@ export const fromBakingBadResponse = (response: BakingBadResponse, state: State)
       : null,
   tezosBakerFee: response.status === 'success' ? extractFee(response.config.fee) : null,
   stakingCapacity: get<number>((stakingCapacity) => stakingCapacity * xtzToMutezConvertionRatio)(response.stakingCapacity)
-})
-
-export const fromMyTezosBakerResponse = (response: MyTezosBakerResponse, state: State, updateFee: boolean): BakingRatingResponse => ({
-  bakingRating:
-    response.status === 'success' && response.rating
-      ? (Math.round((Number(response.rating) + 0.00001) * 100) / 100).toString() + ' %'
-      : null,
-  tezosBakerFee: updateFee ? (response.status === 'success' && response.fee ? parseFloat(response.fee) : null) : state.tezosBakerFee
 })
 
 export interface Busy {
@@ -241,18 +232,7 @@ export const reducer = createReducer(
       bakerTableRatings: false
     }
   })),
-  on(actions.loadTezosBakerRatingSucceeded, (state, { response }) => ({
-    ...state,
-    bakerTableRatings: {
-      ...state.bakerTableRatings,
-      tezosBakerRating: response.bakingRating
-    },
-    tezosBakerFee: response.tezosBakerFee,
-    busy: {
-      ...state.busy,
-      bakerTableRatings: false
-    }
-  })),
+
   on(actions.loadTransactionsCountsSucceeded, (state, { counts }) => ({
     ...state,
     counts: (counts || []).concat([{ key: 'assets', count: state.contractAssets.pagination.total }])

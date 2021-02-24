@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router'
-import { TezosNetwork, TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
@@ -27,6 +26,7 @@ import { ExtendedTezosRewards, RewardService } from '@tezblock/services/reward/r
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service'
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component'
 import { BeaconService } from '@tezblock/services/beacon/beacon.service'
+import { TezosNetwork, TezosPayoutInfo } from '@airgap/coinlib-core'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>

@@ -1,5 +1,4 @@
 import { createReducer, on } from '@ngrx/store'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import * as actions from './actions'
 import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
@@ -8,6 +7,7 @@ import { OperationTypes } from '@tezblock/domain/operations'
 import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 interface Busy {
   efficiencyLast10Cycles: boolean
@@ -114,22 +114,22 @@ export const reducer = createReducer(
     endorsingRights:
       state.kind === OperationTypes.EndorsingRights
         ? {
-            ...state.endorsingRights,
-            pagination: {
-              ...state.endorsingRights.pagination,
-              currentPage: state.endorsingRights.pagination.currentPage + 1
-            }
+          ...state.endorsingRights,
+          pagination: {
+            ...state.endorsingRights.pagination,
+            currentPage: state.endorsingRights.pagination.currentPage + 1
           }
+        }
         : state.endorsingRights,
     bakingRights:
       state.kind === OperationTypes.BakingRights
         ? {
-            ...state.bakingRights,
-            pagination: {
-              ...state.bakingRights.pagination,
-              currentPage: state.bakingRights.pagination.currentPage + 1
-            }
+          ...state.bakingRights,
+          pagination: {
+            ...state.bakingRights.pagination,
+            currentPage: state.bakingRights.pagination.currentPage + 1
           }
+        }
         : state.bakingRights
   })),
   on(actions.kindChanged, (state, { kind }) => ({

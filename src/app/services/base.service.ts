@@ -61,7 +61,14 @@ export const getNextOrderBy = (orderBy?: OrderBy, field?: string): OrderBy => {
 }
 
 export const andGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.eq): Predicate[] =>
-  predicates.map(predicate => ({
+  predicates.map((predicate) => ({
+    ...predicate,
+    operation: predicate.operation || operation,
+    group: groupSymbol
+  }))
+
+export const likeGroup = (predicates: Predicate[], groupSymbol: string, operation: Operation = Operation.like): Predicate[] =>
+  predicates.map((predicate) => ({
     ...predicate,
     operation: predicate.operation || operation,
     group: groupSymbol
@@ -77,16 +84,16 @@ export const ENVIRONMENT_VAR = '{environmentVariable}'
 
 export interface Options {
   headers?:
-    | HttpHeaders
-    | {
-        [header: string]: string | string[]
-      }
+  | HttpHeaders
+  | {
+    [header: string]: string | string[]
+  }
   observe?: 'body'
   params?:
-    | HttpParams
-    | {
-        [param: string]: string | string[]
-      }
+  | HttpParams
+  | {
+    [param: string]: string | string[]
+  }
   reportProgress?: boolean
   responseType?: 'json'
   withCredentials?: boolean
@@ -119,7 +126,10 @@ export class BaseService {
 
   isBaker(address: string): Observable<boolean> {
     const _url = `${this.environmentUrls.rpcUrl}/chains/main/blocks/head/context/delegates/${address}/staking_balance`
-    return this.httpClient.get<string>(_url).pipe(catchError(_error => "0")).pipe(map(stakingBalance => (new BigNumber(stakingBalance)).gt(0)))
+    return this.httpClient
+      .get<string>(_url)
+      .pipe(catchError((_error) => '0'))
+      .pipe(map((stakingBalance) => new BigNumber(stakingBalance).gt(0)))
   }
 
   get<T>(url: string, isFullUrl = false, useOptions = false): Observable<T> {
@@ -132,10 +142,10 @@ export class BaseService {
   protected getUrl(url: string, isFullUrl = false): string {
     return isFullUrl
       ? url
-          .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
-          .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
-          .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
-          .replace(ENVIRONMENT_VAR, this.environmentVariable)
+        .replace(ENVIRONMENT_URL.rpcUrl, this.environmentUrls.rpcUrl)
+        .replace(ENVIRONMENT_URL.conseilUrl, this.environmentUrls.conseilUrl)
+        .replace(ENVIRONMENT_URL.targetUrl, this.environmentUrls.targetUrl)
+        .replace(ENVIRONMENT_VAR, this.environmentVariable)
       : `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${url}`
   }
 }

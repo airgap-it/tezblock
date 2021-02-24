@@ -1,19 +1,19 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { Store } from '@ngrx/store'
+import { getTokenContracts } from '@tezblock/domain/contract'
+import * as fromRoot from '@tezblock/reducers'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
+import { ContractService } from '@tezblock/services/contract/contract.service'
 import { forkJoin, of } from 'rxjs'
 import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators'
 
-import { getTokenContracts } from '@tezblock/domain/contract'
-import * as fromRoot from '@tezblock/reducers'
 import * as listActions from './actions'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { ContractService } from '@tezblock/services/contract/contract.service'
 
 @Injectable()
 export class TokenContractOverviewEffects {
 
-  loadTokenContracts$ = createEffect(() =>
+  public loadTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.loadTokenContracts),
       withLatestFrom(this.store$.select(state => state.list.doubleEndorsements.pagination)),
@@ -39,7 +39,7 @@ export class TokenContractOverviewEffects {
     )
   )
 
-  increasePageOfTokenContracts$ = createEffect(() =>
+  public increasePageOfTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfTokenContracts),
       map(() => listActions.loadTokenContracts())

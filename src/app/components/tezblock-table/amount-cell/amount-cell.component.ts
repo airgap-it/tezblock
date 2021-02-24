@@ -1,15 +1,14 @@
-import { ChangeDetectorRef, Component, Input, OnInit, ChangeDetectionStrategy } from '@angular/core'
 import { DecimalPipe } from '@angular/common'
-import { Observable, BehaviorSubject, pipe } from 'rxjs'
-import { switchMap, filter, map } from 'rxjs/operators'
-import moment from 'moment'
-import BigNumber from 'bignumber.js'
-
-import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core'
 import { AmountConverterPipe } from '@tezblock/pipes/amount-converter/amount-converter.pipe'
 import { CurrencyConverterPipe, CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe'
-import { get } from '@tezblock/services/fp'
+import { ChartDataService } from '@tezblock/services/chartdata/chartdata.service'
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service'
+import { get } from '@tezblock/services/fp'
+import BigNumber from 'bignumber.js'
+import moment from 'moment'
+import { BehaviorSubject, Observable, pipe } from 'rxjs'
+import { filter, map, switchMap } from 'rxjs/operators'
 
 const dayDifference = (value: number): number => moment().diff(moment(value), 'days')
 
@@ -90,13 +89,13 @@ export class AmountCellComponent implements OnInit {
 
   private _options: AmountOptions
 
-  historicAmount: string
-  currencyAmount$: Observable<string>
+  public historicAmount: string
+  public currencyAmount$: Observable<string>
 
-  enableComparison = false
+  public enableComparison = false
 
-  amountPipedLeadingChars: string
-  amountPipedTrailingChars: string
+  public amountPipedLeadingChars: string
+  public amountPipedTrailingChars: string
 
   get fontColor(): boolean {
     return this.options.fontColor === undefined ? true : this.options.fontColor
@@ -110,9 +109,9 @@ export class AmountCellComponent implements OnInit {
     return this.options.maxDigits === undefined ? 6 : this.options.maxDigits
   }
 
-  showOldValue = false
+  public showOldValue = false
 
-  private options$ = new BehaviorSubject<any>(null)
+  private readonly options$ = new BehaviorSubject<any>(null)
 
   constructor(
     private readonly amountConverterPipe: AmountConverterPipe,
@@ -123,7 +122,7 @@ export class AmountCellComponent implements OnInit {
     private readonly decimalPipe: DecimalPipe
   ) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     this.currencyAmount$ = this.options$.pipe(
       switchMap(options =>
         this.cryptoPricesService.getCurrencyConverterArgs(get<any>(_options => _options.symbol)(options)).pipe(
@@ -145,7 +144,7 @@ export class AmountCellComponent implements OnInit {
     })
   }
 
-  tooltipClick() {
+  public tooltipClick() {
     if (this.enableComparison) {
       const date = new Date(this.options.comparisonTimestamp)
       this.chartDataService.fetchHourlyMarketPrices(2, date, 'USD').then(response => {

@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy,
   Component,
   EventEmitter,
   Input,
@@ -6,13 +7,10 @@ import {
   Output,
   TemplateRef,
   TrackByFunction,
-  ViewChild,
-  ChangeDetectionStrategy
+  ViewChild
 } from '@angular/core'
-
-import { Direction, OrderBy, getNextOrderBy } from '@tezblock/services/base.service'
 import { TranslateService } from '@ngx-translate/core'
-import { Options } from '../address-item/options'
+import { Direction, getNextOrderBy, OrderBy } from '@tezblock/services/base.service'
 
 export enum Template {
   address,
@@ -66,17 +64,17 @@ const satisfyData = (column: Column): Column =>
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TezblockTableComponent implements OnInit {
-  @ViewChild('basicTemplate', { static: true }) basicTemplate: TemplateRef<any>
-  @ViewChild('amountTemplate', { static: true }) amountTemplate: TemplateRef<any>
-  @ViewChild('addressTemplate', { static: true }) addressTemplate: TemplateRef<any>
-  @ViewChild('percentageTemplate', { static: true }) percentageTemplate: TemplateRef<any>
-  @ViewChild('timestampTemplate', { static: true }) timestampTemplate: TemplateRef<any>
-  @ViewChild('blockTemplate', { static: true }) blockTemplate: TemplateRef<any>
-  @ViewChild('symbolTemplate', { static: true }) symbolTemplate: TemplateRef<any>
-  @ViewChild('hashTemplate', { static: true }) hashTemplate: TemplateRef<any>
-  @ViewChild('modalTemplate', { static: true }) modalTemplate: TemplateRef<any>
+  @ViewChild('basicTemplate', { static: true }) public basicTemplate: TemplateRef<any>
+  @ViewChild('amountTemplate', { static: true }) public amountTemplate: TemplateRef<any>
+  @ViewChild('addressTemplate', { static: true }) public addressTemplate: TemplateRef<any>
+  @ViewChild('percentageTemplate', { static: true }) public percentageTemplate: TemplateRef<any>
+  @ViewChild('timestampTemplate', { static: true }) public timestampTemplate: TemplateRef<any>
+  @ViewChild('blockTemplate', { static: true }) public blockTemplate: TemplateRef<any>
+  @ViewChild('symbolTemplate', { static: true }) public symbolTemplate: TemplateRef<any>
+  @ViewChild('hashTemplate', { static: true }) public hashTemplate: TemplateRef<any>
+  @ViewChild('modalTemplate', { static: true }) public modalTemplate: TemplateRef<any>
 
-  @Input() data: any[]
+  @Input() public data: any[]
 
   @Input() set columns(value: Column[]) {
     if (value !== this._columns) {
@@ -88,25 +86,25 @@ export class TezblockTableComponent implements OnInit {
   }
   private _columns: Column[]
 
-  @Input() loading: boolean
+  @Input() public loading: boolean
 
-  @Input() trackByFn?: TrackByFunction<any>
+  @Input() public trackByFn?: TrackByFunction<any>
 
-  @Input() pagination? = false
+  @Input() public pagination? = false
 
-  @Input() expandedRow?: ExpandedRow<any>
-
-  @Input()
-  downloadable?: boolean = false
+  @Input() public expandedRow?: ExpandedRow<any>
 
   @Input()
-  enableDownload?: boolean = false
+  public downloadable?: boolean = false
 
   @Input()
-  orderBy: OrderBy
+  public enableDownload?: boolean = false
 
   @Input()
-  noDataLabel: string
+  public orderBy: OrderBy
+
+  @Input()
+  public noDataLabel: string
 
   @Output()
   downloadClicked: EventEmitter<void> = new EventEmitter()
@@ -124,13 +122,13 @@ export class TezblockTableComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {}
+  public ngOnInit() {}
 
-  isExpanded(row: any): boolean {
+  public isExpanded(row: any): boolean {
     return !!this.expandedRow && this.expandedRows.includes(row[this.expandedRow.primaryKey])
   }
 
-  expand(row: any) {
+  public expand(row: any) {
     if (this.expandedRow) {
       const key = row[this.expandedRow.primaryKey]
       const isExpaned = this.expandedRows.includes(key)
@@ -148,19 +146,19 @@ export class TezblockTableComponent implements OnInit {
     }
   }
 
-  loadMore() {
+  public loadMore() {
     this.onLoadMore.emit()
   }
 
-  downloadCSV() {
+  public downloadCSV() {
     this.downloadClicked.emit()
   }
 
-  sorting(field: string) {
+  public sorting(field: string) {
     this.onSort.emit(getNextOrderBy(this.orderBy, field))
   }
 
-  template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {
+  public template(templateRef: TemplateRef<any> | Template): TemplateRef<any> {
     if (templateRef instanceof TemplateRef) {
       return templateRef
     }
@@ -189,7 +187,7 @@ export class TezblockTableComponent implements OnInit {
     }
   }
 
-  getDirection(field: string): Direction {
+  public getDirection(field: string): Direction {
     return this.orderBy && this.orderBy.field === field ? this.orderBy.direction : undefined
   }
 }

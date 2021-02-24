@@ -6,7 +6,11 @@ export const isNotEmptyArray = (array: any) => Array.isArray(array) && hasLength
 export const isEmptyArray = (array: any) => Array.isArray(array) && !hasLengthGreaterThanZero(array)
 
 export function first<T>(array: T[]) {
-  return isNotEmptyArray(array) ? array[0] : undefined
+  if (isNotEmptyArray(array)) {
+    return array[0]
+  }
+  return undefined
+  // return isNotEmptyArray(array) ? array[0] : undefined
 }
 export function last<T>(array: T[]) {
   return isNotEmptyArray(array) ? array[array.length - 1] : undefined
@@ -15,10 +19,10 @@ export function get<T>(accessor: (_entity: T) => any) {
   return (entity: T) => (entity ? accessor(entity) : undefined)
 }
 
-export function groupBy<T>(key: string): (array: T[]) =>  { [key: string]: T[] } {
-  return function(array: T[]): { [key: string]: T[] } {
+export function groupBy<T>(key: string): (array: T[]) => { [key: string]: T[] } {
+  return function (array: T[]): { [key: string]: T[] } {
     return array.reduce((accumulator, currentItem) => {
-      ;(accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
+      ; (accumulator[currentItem[key]] = accumulator[currentItem[key]] || []).push(currentItem)
       return accumulator
     }, {})
   }

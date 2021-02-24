@@ -1,5 +1,4 @@
 import { createAction, props } from '@ngrx/store'
-import { TezosPayoutInfo } from 'airgap-coin-lib/dist/protocols/tezos/TezosProtocol'
 
 import { Transaction } from '@tezblock/interfaces/Transaction'
 import { Account } from '@tezblock/domain/account'
@@ -9,6 +8,7 @@ import { Count } from '@tezblock/domain/tab'
 import { OrderBy } from '@tezblock/services/base.service'
 import { OperationErrorsById } from '@tezblock/domain/operations'
 import { BakingRatingResponse, ContractAsset } from './model'
+import { TezosPayoutInfo } from '@airgap/coinlib-core'
 
 const featureName = 'Account Detail'
 
@@ -61,16 +61,6 @@ export const loadBakingBadRatingsSucceeded = createAction(
   props<{ response: BakingRatingResponse }>()
 )
 export const loadBakingBadRatingsFailed = createAction(`[${featureName}] Load Baking Bad Ratings Failed`, props<{ error: any }>())
-
-export const loadTezosBakerRating = createAction(
-  `[${featureName}] Load Tezos Baker Rating`,
-  props<{ address: string; updateFee: boolean }>()
-)
-export const loadTezosBakerRatingSucceeded = createAction(
-  `[${featureName}] Load Tezos Baker Rating Succeeded`,
-  props<{ response: BakingRatingResponse; address: string; updateFee: boolean }>()
-)
-export const loadTezosBakerRatingFailed = createAction(`[${featureName}] Load Tezos Baker Rating Failed`, props<{ error: any }>())
 
 export const sortTransactionsByKind = createAction(`[${featureName}] Sort Transactions`, props<{ orderBy: OrderBy }>())
 
