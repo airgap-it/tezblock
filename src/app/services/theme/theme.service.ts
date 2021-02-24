@@ -2,6 +2,8 @@ import { Inject, Injectable } from '@angular/core'
 import { DOCUMENT } from '@angular/common'
 
 import { CacheService, CacheKeys } from '@tezblock/services/cache/cache.service'
+import { BeaconService } from '../beacon/beacon.service'
+import { ColorMode } from '@airgap/beacon-sdk'
 
 export enum Theme {
   light = 'light',
@@ -16,11 +18,17 @@ const toClassName = (theme: Theme): string => `${theme}-theme`
   providedIn: 'root'
 })
 export class ThemeService {
-  constructor(@Inject(DOCUMENT) private readonly document: Document, private readonly cacheService: CacheService) {}
+  constructor(
+    @Inject(DOCUMENT) private readonly document: Document,
+    private readonly cacheService: CacheService,
+    private readonly beaconService: BeaconService
+  ) {}
 
   switch() {
     const currentTheme: Theme = this.getTheme()
     const newTheme = currentTheme ? (currentTheme === Theme.light ? Theme.dark : Theme.light) : defaultTheme
+
+    this.beaconService.changeTheme(newTheme === 'light' ? ColorMode.LIGHT : ColorMode.DARK)
 
     this.updateDocumentClass(newTheme)
     this.cacheService.set(CacheKeys.theme, newTheme).subscribe(() => {})
@@ -48,6 +56,9 @@ export class ThemeService {
       this.cacheService.get<string>(CacheKeys.theme).subscribe(
         (theme) => {
           this.updateDocumentClass(theme ? Theme[theme] : defaultTheme)
+
+          const beaconTheme = theme ? Theme[theme] : defaultTheme
+          this.beaconService.changeTheme(beaconTheme === 'light' ? ColorMode.LIGHT : ColorMode.DARK)
 
           if (!theme) {
             this.cacheService.set(CacheKeys.theme, defaultTheme).subscribe(() => {

@@ -50,9 +50,10 @@ describe('BeaconService', () => {
     //   })
     // })
 
-    it('when account in active, then does not call DAppClient.requestPermissions', done => {
+    it('when account in active, then does not call DAppClient.requestPermissions', (done) => {
       dAppClientMock.getActiveAccount.and.returnValue(Promise.resolve(true))
       dAppClientMock.requestPermissions.calls.reset()
+      service.constructor()
 
       service.delegate('foo').then(() => {
         expect(dAppClientMock.requestPermissions).not.toHaveBeenCalled()
