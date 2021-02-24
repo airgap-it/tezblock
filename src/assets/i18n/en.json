@@ -35,7 +35,8 @@
     "theme_label": "Theme",
     "light-mode_label": "Light Mode",
     "dark-mode_label": "Dark Mode",
-    "connected-nodes": "Connected Nodes"
+    "connected-nodes": "Connected Nodes",
+    "ecosystem_button": "Ecosystem"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
@@ -106,13 +107,13 @@
     },
     "airgap": {
       "title": "AirGap",
-      "description": "With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your XTZ with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
-      "features": "Offline device, Highest security, XTZ delegation, Coin agnostic, Secure storage, Social recovery, Hot wallet option"
+      "description": "With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your tez with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
+      "features": "Offline device, Highest security, tez delegation, Coin agnostic, Secure storage, Social recovery, Hot wallet option"
     },
     "atomic": {
       "title": "Atomic Wallet",
       "description": "Atomic is a decentralized wallet that supports 300+ cryptocurrency assets. Strong encryption and custody-free solution guarantee their users the highest level of security. Atomic Wallet provides instant exchange and 'buy crypto with a credit card' feature.",
-      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, XTZ delegation"
+      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, tez delegation"
     },
     "atomex": {
       "title": "Atomex",
@@ -131,8 +132,8 @@
     },
     "kukai": {
       "title": "Kukai",
-      "description": "One of the first Tezos wallets with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in their wallet.",
-      "features": "Ledger Support, Delegation, Offline-signing"
+      "description": "Kukai is a Tezos web wallet based on three principles: Security, Community and Reliability. Kukai supports HD wallets, Ledger connection and DirectAuth for one-Click login with your Google, Reddit or Twitter account.",
+      "features": "Direct Auth, Ledger Support, Delegation"
     },
     "magnum": {
       "title": "Magnum Wallet",

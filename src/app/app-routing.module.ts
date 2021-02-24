@@ -17,10 +17,10 @@ import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-w
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
+import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'resources/wallets', component: ResourcesWalletsComponent },
   { path: 'baker/list', component: BakerOverviewComponent },
   { path: 'account/list', component: AccountOverviewComponent },
   { path: 'token-contract/list', component: TokenContractOverviewComponent },
@@ -34,11 +34,13 @@ const routes: Routes = [
   { path: 'contract/:id', component: ContractDetailComponent },
   { path: 'health', component: HealthComponent },
   { path: 'connected-nodes', component: NodesOnMapComponent },
-  { path: 'resources/glossary', component: GlossaryComponent }
+  { path: 'resources/glossary', component: GlossaryComponent },
+  { path: 'ecosystem', component: EcosystemComponent },
+  { path: 'ecosystem/wallets', component: ResourcesWalletsComponent }
 ]
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

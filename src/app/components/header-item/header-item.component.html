@@ -70,7 +70,7 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkBlockchain }"
                     aria-controls="blockchain"
-                    (mouseover)="dp2.hide(); dp3.hide()"
+                    (mouseover)="dp2.hide(); dp3.hide(); dp5.hide()"
                   >
                     {{ 'header-item.blockchain_button' | translate }}
                   </a>
@@ -180,6 +180,41 @@
                 </button>
               </li>
               <li class="nav-item dropdown">
+                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp5="bs-dropdown">
+                  <a
+                    class="btn dropdown-toggle"
+                    href
+                    role="button"
+                    dropdownToggle
+                    (click)="(false)"
+                    id="button-basic"
+                    routerLinkActive="btn-link"
+                    [ngClass]="{ 'btn-link': activeEcosystem }"
+                    aria-controls="resources"
+                    (mouseover)="dp1.hide(); dp3.hide(); dp2.hide()"
+                  >
+                    {{ 'header-item.ecosystem_button' | translate }}
+                  </a>
+                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources" (mouseleave)="dp5.hide()">
+                    <li role="menuitem">
+                      <a class="dropdown-item" routerLinkActive="active" routerLink="/ecosystem/wallets">
+                        {{ 'header-item.wallets_button' | translate }}
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-muted" disabled>
+                        {{ 'header-item.dapps_button' | translate }}
+                      </a>
+                    </li>
+                    <li>
+                      <a class="dropdown-item text-muted" disabled>
+                        {{ 'header-item.development_button' | translate }}
+                      </a>
+                    </li>
+                  </ul>
+                </span>
+              </li>
+              <li class="nav-item dropdown">
                 <span class="d-block" dropdown [triggers]="triggers$ | async" #dp2="bs-dropdown">
                   <a
                     class="btn dropdown-toggle"
@@ -191,16 +226,11 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkResources }"
                     aria-controls="resources"
-                    (mouseover)="dp1.hide(); dp3.hide()"
+                    (mouseover)="dp1.hide(); dp3.hide(); dp5.hide()"
                   >
                     {{ 'header-item.resources_button' | translate }}
                   </a>
                   <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources" (mouseleave)="dp2.hide()">
-                    <li role="menuitem">
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/resources/wallets">
-                        {{ 'header-item.wallets_button' | translate }}
-                      </a>
-                    </li>
                     <li>
                       <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/glossary']">
                         {{ 'header-item.glossary_button' | translate }}
@@ -220,16 +250,6 @@
                     <li>
                       <a class="dropdown-item" routerLinkActive="active" routerLink="/health">
                         {{ 'header-item.tezblock-health_button' | translate }}
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item text-muted" disabled>
-                        {{ 'header-item.dapps_button' | translate }}
-                      </a>
-                    </li>
-                    <li>
-                      <a class="dropdown-item text-muted" disabled>
-                        {{ 'header-item.development_button' | translate }}
                       </a>
                     </li>
                   </ul>

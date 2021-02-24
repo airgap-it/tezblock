@@ -104,7 +104,8 @@ import { NodesOnMapEffects } from '@tezblock/pages/nodes-on-map/effects'
 import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
-import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
+import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component';
+import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -226,7 +227,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     AssetsValueComponent,
     ProgressbarComponent,
     NodesOnMapComponent,
-    BasicCellComponent
+    BasicCellComponent,
+    EcosystemComponent
   ],
 
   providers: [

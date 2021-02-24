@@ -18,7 +18,8 @@ export enum PlatformName {
   Linux = 'Linux',
   LinuxDistribution = 'LinuxDistribution',
   macOS = 'macOS',
-  Windows = 'Windows'
+  Windows = 'Windows',
+  Web = 'Web'
 }
 
 export interface PlatformData {
