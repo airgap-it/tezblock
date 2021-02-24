@@ -16,7 +16,8 @@ export enum CacheKeys {
   byAddress = 'byAddress',
   byProposal = 'byProposal',
   theme = 'theme',
-  previousSearches = 'previousSearches'
+  previousSearches = 'previousSearches',
+  language = 'language'
 }
 
 export interface BakerData extends BakerTableRatings {
@@ -136,6 +137,6 @@ export class CacheService {
 
     this.isBusy[key] = true
 
-    return this.get<T>(key).pipe(switchMap(cacheSlice => this.set(key, change(cacheSlice))))
+    return this.get<T>(key).pipe(switchMap((cacheSlice) => this.set(key, change(cacheSlice))))
   }
 }

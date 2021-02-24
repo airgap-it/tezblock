@@ -9,6 +9,7 @@ import * as fromRoot from '@tezblock/reducers'
 import * as actions from './app.actions'
 import { AnalyticsService } from './services/analytics/analytics.service'
 import { LanguagesService } from './services/translation/languages.service'
+import { CacheKeys, CacheService } from './services/cache/cache.service'
 
 @Component({
   selector: 'app-root',
@@ -25,12 +26,15 @@ export class AppComponent implements OnInit {
     readonly router: Router,
     private readonly store$: Store<fromRoot.State>,
     private readonly analyticsService: AnalyticsService,
-    private readonly languagesService: LanguagesService
+    private readonly languagesService: LanguagesService,
+    private readonly cacheService: CacheService
   ) {
-    this.languagesService.loadLanguages()
+    this.cacheService.get<string>(CacheKeys.language).subscribe((language) => {
+      language ? this.languagesService.loadLanguages(language) : this.languagesService.loadLanguages()
+    })
     this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe(e => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe((e) => this.store$.dispatch(actions.saveLatestRoute({ navigation: <NavigationEnd>e })))
 
     getRefresh([
       this.actions$.pipe(ofType(actions.loadLatestBlockSucceeded)),
