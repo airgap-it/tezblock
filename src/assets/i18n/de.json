@@ -144,8 +144,8 @@
       "description": "paytomat ist eine non-custodial Wallet mit Features für moderne Kunden. Von Assetaustausch über Referral Programs bis hin zu BEP-2 Tokenhandel oder dApps und Games unterstützt paytomat über 14 Kryptowährungen und deckt alle Bedürfnisse eines Users in einer einzigen App ab.",
       "features": "zuverlässig, dezentral, praktisch"
     },
-    "simplestacking": {
-      "title": "simplestacking.com",
+    "simplestaking": {
+      "title": "simplestaking.com",
       "description": "Ein sicherer Weg, um Tezos zu lagern und staken. Desktop & Web Wallet mit Trezor Unterstützung.",
       "features": "Trezor T, mehrere Wallets, Wallet Balance Verlauf"
     },

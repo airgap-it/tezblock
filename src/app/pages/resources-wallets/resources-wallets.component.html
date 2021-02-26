@@ -18,8 +18,8 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12 col-md-6 pb-4" *ngFor="let wallet of wallets$ | async">
-      <app-resources-wallet-item [wallet]="wallet"></app-resources-wallet-item>
+    <div class="col-12 col-md-6 pb-4" *ngFor="let ecosystem of ecosystems$ | async">
+      <app-ecosystem-item [ecosystem]="ecosystem"></app-ecosystem-item>
     </div>
   </div>
 </div>

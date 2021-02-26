@@ -3,21 +3,21 @@ import { IconPipe } from 'src/app/pipes/icon/icon.pipe'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core'
 
-import { ResourcesWalletItemComponent } from './resources-wallet-item.component'
-import { Wallet } from '@tezblock/interfaces/Wallet'
+import { EcosystemItemComponent } from './ecosystem-item.component'
+import { EcosystemCategory, EcosystemItem } from '@tezblock/interfaces/Ecosystem'
 import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
 import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
 
 describe('ResourcesWalletItemComponent', () => {
-  let component: ResourcesWalletItemComponent
-  let fixture: ComponentFixture<ResourcesWalletItemComponent>
-  let mockedWallet: Wallet
+  let component: EcosystemItemComponent
+  let fixture: ComponentFixture<EcosystemItemComponent>
+  let mockedWallet: EcosystemItem
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [FontAwesomeModule, TranslateModule.forRoot()],
-      declarations: [ResourcesWalletItemComponent, TranslatePipe],
+      declarations: [EcosystemItemComponent, TranslatePipe],
       providers: [
         IconPipe,
         { provide: TranslateService, useClass: TranslateServiceStub },
@@ -26,9 +26,9 @@ describe('ResourcesWalletItemComponent', () => {
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
 
-    fixture = TestBed.createComponent(ResourcesWalletItemComponent)
+    fixture = TestBed.createComponent(EcosystemItemComponent)
     component = fixture.componentInstance
-    component.wallet = mockedWallet
+    component.ecosystem = mockedWallet
 
     mockedWallet = {
       title: 'fooTitle',
@@ -37,7 +37,8 @@ describe('ResourcesWalletItemComponent', () => {
       socials: [],
       platforms: [],
       features: [],
-      downloadLink: 'fooDownloadLink'
+      downloadLink: 'fooDownloadLink',
+      category: EcosystemCategory.wallet
     }
   }))
 

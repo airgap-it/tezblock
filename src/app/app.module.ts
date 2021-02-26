@@ -43,7 +43,7 @@ import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
-import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
+import { EcosystemItemComponent } from './components/ecosystem-item/ecosystem-item.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { TabbedTableComponent } from './components/tabbed-table/tabbed-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
@@ -104,7 +104,7 @@ import { NodesOnMapEffects } from '@tezblock/pages/nodes-on-map/effects'
 import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
-import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component';
+import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
@@ -203,7 +203,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     BakerTableComponent,
     ResourcesWalletsComponent,
     ExtendTableCellComponent,
-    ResourcesWalletItemComponent,
+    EcosystemItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,

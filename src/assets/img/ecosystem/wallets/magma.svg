@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 34 34" viewBox="0 0 34 34">
+  <defs/>
+  <circle cx="16.9" cy="17" r="17" fill="#fff"/>
+  <defs>
+    <filter id="a" width="18.9" height="8.2" x="7.5" y="18.7" filterUnits="userSpaceOnUse">
+      <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <mask id="b" width="18.9" height="8.2" x="7.5" y="18.7" maskUnits="userSpaceOnUse">
+    <path fill="#fff" fill-rule="evenodd" d="M7.5 18.7l7.1 7.5 2.3-1.5 2.5 2.2 7-8.2H7.5z" clip-rule="evenodd" filter="url(#a)"/>
+  </mask>
+  <g mask="url(#b)">
+    <linearGradient id="c" x1="16.913" x2="16.913" y1="17.326" y2="9.169" gradientTransform="matrix(1 0 0 -1 0 36)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0bca49"/>
+      <stop offset="1" stop-color="#59db83"/>
+    </linearGradient>
+    <path fill="url(#c)" fill-rule="evenodd" d="M7.5 18.7l7.1 7.5 2.3-1.5 2.5 2.2 7-8.2H7.5z" clip-rule="evenodd"/>
+  </g>
+  <defs>
+    <filter id="d" width="9.4" height="11.6" x="7.5" y="7.1" filterUnits="userSpaceOnUse">
+      <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <mask id="e" width="9.4" height="11.6" x="7.5" y="7.1" maskUnits="userSpaceOnUse">
+    <path fill="#fff" fill-rule="evenodd" d="M14.5 7.1l-7 11.6 9.4-8.5-2.4-3.1z" clip-rule="evenodd" filter="url(#d)"/>
+  </mask>
+  <g mask="url(#e)">
+    <linearGradient id="f" x1="12.191" x2="12.191" y1="17.326" y2="28.917" gradientTransform="matrix(1 0 0 -1 0 36)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ef7031"/>
+      <stop offset="1" stop-color="#f79762"/>
+    </linearGradient>
+    <path fill="url(#f)" fill-rule="evenodd" d="M14.5 7.1l-7 11.6 9.4-8.5-2.4-3.1z" clip-rule="evenodd"/>
+  </g>
+  <defs>
+    <filter id="g" width="18.9" height="10.6" x="7.5" y="8" filterUnits="userSpaceOnUse">
+      <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <mask id="h" width="18.9" height="10.6" x="7.5" y="8" maskUnits="userSpaceOnUse">
+    <path fill="#fff" fill-rule="evenodd" d="M7.5 18.7h18.9L19.3 8 7.5 18.7z" clip-rule="evenodd" filter="url(#g)"/>
+  </mask>
+  <g mask="url(#h)">
+    <linearGradient id="i" x1="16.913" x2="16.913" y1="17.326" y2="27.969" gradientTransform="matrix(1 0 0 -1 0 36)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#e63b49"/>
+      <stop offset="1" stop-color="#eb6b77"/>
+    </linearGradient>
+    <path fill="url(#i)" fill-rule="evenodd" d="M7.5 18.7h18.9L19.3 8 7.5 18.7z" clip-rule="evenodd"/>
+  </g>
+  <defs>
+    <filter id="j" width="18.9" height="5.7" x="7.5" y="12.9" filterUnits="userSpaceOnUse">
+      <feColorMatrix values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0"/>
+    </filter>
+  </defs>
+  <mask id="k" width="18.9" height="5.7" x="7.5" y="12.9" maskUnits="userSpaceOnUse">
+    <path fill="#fff" fill-rule="evenodd" d="M7.5 18.7h18.9L19.7 13 7.5 18.7z" clip-rule="evenodd" filter="url(#j)"/>
+  </mask>
+  <g mask="url(#k)">
+    <linearGradient id="l" x1="16.913" x2="16.913" y1="17.326" y2="23.061" gradientTransform="matrix(1 0 0 -1 0 36)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#6b1c64"/>
+      <stop offset="1" stop-color="#90548a"/>
+    </linearGradient>
+    <path fill="url(#l)" fill-rule="evenodd" d="M7.5 18.7h18.9L19.7 13 7.5 18.7z" clip-rule="evenodd"/>
+  </g>
+</svg>
