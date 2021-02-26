@@ -1,16 +1,17 @@
 import { Component, OnInit } from '@angular/core'
 import { Observable } from 'rxjs'
 
-import { EcosystemService } from '../../services/ecosystem/ecosystem'
-import { EcosystemItem } from '../../interfaces/Ecosystem'
+import { EcosystemService } from '../../../services/ecosystem/ecosystem'
+import { EcosystemItem } from '../../../interfaces/Ecosystem'
 import { Title, Meta } from '@angular/platform-browser'
 
 @Component({
-  selector: 'app-resources-wallets',
-  templateUrl: './resources-wallets.component.html',
-  styleUrls: ['./resources-wallets.component.scss']
+  selector: 'app-wallets',
+  templateUrl: './wallets.component.html',
+  styleUrls: ['./wallets.component.scss']
 })
-export class ResourcesWalletsComponent implements OnInit {
+export class WalletsComponent implements OnInit {
+  categoryFilter = { category: 'wallet' }
   constructor(private ecosystemService: EcosystemService, private titleService: Title, private metaTagService: Meta) {}
 
   get ecosystems$(): Observable<EcosystemItem[]> {

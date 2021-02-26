@@ -506,6 +506,43 @@ export class EcosystemService {
       features: [this.translateService.instant('resources-wallets.trust-wallet.features')],
       downloadLink: 'https://trustwallet.com/',
       category: EcosystemCategory.wallet
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.tzbutton.title'),
+      description: this.translateService.instant('ecosystem-dapps.tzbutton.description'),
+      logo: 'tzbutton.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://tzbutton.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/AirGap_it'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/AirGap'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/airgap-it'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://github.com/tzbutton/tzbutton'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://tzbutton.io/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.tzbutton.features')],
+      downloadLink: 'https://tzbutton.io/',
+      category: EcosystemCategory.dapp
     }
   ]
   constructor(private translateService: TranslateService) {}

@@ -1,7 +1,7 @@
 export enum EcosystemCategory {
   wallet = 'wallet',
   dapp = 'dapp',
-  libraries = 'libraries'
+  library = 'library'
 }
 
 export enum SocialType {

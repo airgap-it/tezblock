@@ -97,6 +97,14 @@
     "total-number": "Total Number of Bakers",
     "top25": "Top 25 Bakers by Staking Balance"
   },
+  "ecosystem-dapps": {
+    "title": "dApps",
+    "tzbutton": {
+      "title": "tzbutton",
+      "description": "tzbutton is a social experiment on the Tezos blockchain. Each button click requires 0.2 tez, the countdown is reset and the address will become the leader. Winner can withdraw the whole amount of tez in the pot.",
+      "features": "Simple interface, Beacon-compatible"
+    }
+  },
   "resources-wallets": {
     "wallets": "Wallets",
     "introduction_1": "A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list updated and",

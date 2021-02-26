@@ -13,11 +13,12 @@ import { HealthComponent } from './pages/health/health.component'
 import { ListComponent } from './pages/list/list.component'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
-import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { WalletsComponent } from './pages/ecosystem/wallets/wallets.component'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
+import { DappsComponent } from './pages/ecosystem/dapps/dapps.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -36,7 +37,8 @@ const routes: Routes = [
   { path: 'connected-nodes', component: NodesOnMapComponent },
   { path: 'resources/glossary', component: GlossaryComponent },
   { path: 'ecosystem', component: EcosystemComponent },
-  { path: 'ecosystem/wallets', component: ResourcesWalletsComponent }
+  { path: 'ecosystem/wallets', component: WalletsComponent },
+  { path: 'ecosystem/dapps', component: DappsComponent }
 ]
 
 @NgModule({

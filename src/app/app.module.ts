@@ -86,7 +86,7 @@ import { ListComponent } from './pages/list/list.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
-import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { WalletsComponent } from './pages/ecosystem/wallets/wallets.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -106,6 +106,7 @@ import { AssetsValueComponent } from './components/assets-value/assets-value.com
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
+import { DappsComponent } from './pages/ecosystem/dapps/dapps.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -201,7 +202,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     LoadingSkeletonComponent,
     TelegramModalComponent,
     BakerTableComponent,
-    ResourcesWalletsComponent,
+    WalletsComponent,
     ExtendTableCellComponent,
     EcosystemItemComponent,
     ModalCellComponent,
@@ -228,7 +229,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ProgressbarComponent,
     NodesOnMapComponent,
     BasicCellComponent,
-    EcosystemComponent
+    EcosystemComponent,
+    DappsComponent
   ],
 
   providers: [
