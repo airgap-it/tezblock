@@ -106,7 +106,8 @@ import { AssetsValueComponent } from './components/assets-value/assets-value.com
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
 import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
-import { DappsComponent } from './pages/ecosystem/dapps/dapps.component'
+import { DappsComponent } from './pages/ecosystem/dapps/dapps.component';
+import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -230,7 +231,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     NodesOnMapComponent,
     BasicCellComponent,
     EcosystemComponent,
-    DappsComponent
+    DappsComponent,
+    LibrariesComponent
   ],
 
   providers: [

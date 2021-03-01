@@ -1,19 +1,16 @@
 <div class="container py-5">
-  <h1 hidden="true">
-    list of wallets that support Tezos protocol for transactions, delegations or other operations along with a short description with links
-    to all relevant pages and download links
-  </h1>
   <div class="row pb-4">
     <div class="col-12 col-md-6">
       <h5 class="mb-4">
         {{ 'ecosystem-dapps.title' | translate }}
       </h5>
-      <p>
-        {{ 'resources-wallets.introduction_1' | translate }}
-        <a href="https://docs.google.com/forms/d/e/1FAIpQLScQBHm9-qIVRVrva3aVkDXb6Zza755BwY6TV8eOBGwkiRW-Fw/viewform" target="_blank">
-          {{ 'resources-wallets.let-us-know_link' | translate }}
+      <p [innerHtml]="'ecosystem-dapps.description' | translate"></p>
+      <p class="pt-3">
+        {{ 'ecosystem-dapps.link.text' | translate }}
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfUCvRK8U_0sJSkTXJmbalAIW16DxGw9oRQMy1uw95CkKfiUA/viewform" target="_blank">
+          <br />
+          {{ 'ecosystem-dapps.link.description' | translate }}
         </a>
-        {{ 'resources-wallets.introduction_2' | translate }}
       </p>
     </div>
   </div>

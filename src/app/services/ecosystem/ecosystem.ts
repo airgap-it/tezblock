@@ -10,8 +10,8 @@ import { TranslateService } from '@ngx-translate/core'
 export class EcosystemService {
   ecosystem: EcosystemItem[] = [
     {
-      title: this.translateService.instant('resources-wallets.airgap.title'),
-      description: this.translateService.instant('resources-wallets.airgap.description'),
+      title: this.translateService.instant('ecosystem-wallets.airgap.title'),
+      description: this.translateService.instant('ecosystem-wallets.airgap.description'),
       logo: 'AirGap.svg',
       socials: [
         {
@@ -62,13 +62,13 @@ export class EcosystemService {
           url: 'https://github.com/airgap-it/airgap-wallet/releases'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.airgap.features')],
+      features: [this.translateService.instant('ecosystem-wallets.airgap.features')],
       downloadLink: 'https://airgap.it#download',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.atomic.title'),
-      description: this.translateService.instant('resources-wallets.atomic.description'),
+      title: this.translateService.instant('ecosystem-wallets.atomic.title'),
+      description: this.translateService.instant('ecosystem-wallets.atomic.description'),
       logo: 'atomic_wallet.png',
       socials: [
         {
@@ -119,13 +119,13 @@ export class EcosystemService {
           url: 'https://atomicwallet.io/downloads'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.atomic.features')],
+      features: [this.translateService.instant('ecosystem-wallets.atomic.features')],
       downloadLink: 'https://atomicwallet.io/downloads',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.atomex.title'),
-      description: this.translateService.instant('resources-wallets.atomex.description'),
+      title: this.translateService.instant('ecosystem-wallets.atomex.title'),
+      description: this.translateService.instant('ecosystem-wallets.atomex.description'),
       logo: 'atomex.png',
       socials: [
         {
@@ -181,13 +181,13 @@ export class EcosystemService {
           url: 'https://play.google.com/store/apps/details?id=com.atomex.android'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.atomex.features')],
+      features: [this.translateService.instant('ecosystem-wallets.atomex.features')],
       downloadLink: 'https://github.com/atomex-me/atomex.client.wpf/releases/download/v1.0.8/Atomex.Client.msi',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.galleon.title'),
-      description: this.translateService.instant('resources-wallets.galleon.description'),
+      title: this.translateService.instant('ecosystem-wallets.galleon.title'),
+      description: this.translateService.instant('ecosystem-wallets.galleon.description'),
       logo: 'galleon.png',
       socials: [
         {
@@ -220,13 +220,13 @@ export class EcosystemService {
           url: 'https://cryptonomic-wallet.nyc3.digitaloceanspaces.com/release_0.9.0b/galleon_0.9.0-b_amd64.deb'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.galleon.features')],
+      features: [this.translateService.instant('ecosystem-wallets.galleon.features')],
       downloadLink: 'https://cryptonomic.tech/galleon.html',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.kukai.title'),
-      description: this.translateService.instant('resources-wallets.kukai.description'),
+      title: this.translateService.instant('ecosystem-wallets.kukai.title'),
+      description: this.translateService.instant('ecosystem-wallets.kukai.description'),
       logo: 'kukai.svg',
       socials: [
         {
@@ -257,13 +257,13 @@ export class EcosystemService {
           url: 'https://kukai.app'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.kukai.features')],
+      features: [this.translateService.instant('ecosystem-wallets.kukai.features')],
       downloadLink: 'https://kukai.app',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.ledger.title'),
-      description: this.translateService.instant('resources-wallets.ledger.description'),
+      title: this.translateService.instant('ecosystem-wallets.ledger.title'),
+      description: this.translateService.instant('ecosystem-wallets.ledger.description'),
       logo: 'ledger.svg',
       socials: [
         {
@@ -306,13 +306,13 @@ export class EcosystemService {
           url: 'https://download-live.ledger.com/releases/latest/download/linux'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.ledger.features')],
+      features: [this.translateService.instant('ecosystem-wallets.ledger.features')],
       downloadLink: 'https://www.ledger.com/ledger-live',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.magma.title'),
-      description: this.translateService.instant('resources-wallets.magma.description'),
+      title: this.translateService.instant('ecosystem-wallets.magma.title'),
+      description: this.translateService.instant('ecosystem-wallets.magma.description'),
       logo: 'magma.svg',
       socials: [
         {
@@ -344,13 +344,13 @@ export class EcosystemService {
           url: 'https://play.google.com/store/apps/details?id=io.camlcase.smartwallet'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.magma.features')],
+      features: [this.translateService.instant('ecosystem-wallets.magma.features')],
       downloadLink: 'https://magmawallet.io/',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.simplestaking.title'),
-      description: this.translateService.instant('resources-wallets.simplestaking.description'),
+      title: this.translateService.instant('ecosystem-wallets.simplestaking.title'),
+      description: this.translateService.instant('ecosystem-wallets.simplestaking.description'),
       logo: 'simplestaking.png',
       socials: [
         {
@@ -387,13 +387,13 @@ export class EcosystemService {
           url: 'https://simplestaking.com'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.simplestaking.features')],
+      features: [this.translateService.instant('ecosystem-wallets.simplestaking.features')],
       downloadLink: 'https://simplestaking.com',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.spire.title'),
-      description: this.translateService.instant('resources-wallets.spire.description'),
+      title: this.translateService.instant('ecosystem-wallets.spire.title'),
+      description: this.translateService.instant('ecosystem-wallets.spire.description'),
       logo: 'spire.png',
       socials: [
         {
@@ -419,18 +419,18 @@ export class EcosystemService {
       ],
       platforms: [
         {
-          name: PlatformName.Web,
+          name: PlatformName.BrowserExtension,
           icon: 'globe',
           url: 'https://spirewallet.com/#download'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.spire.features')],
+      features: [this.translateService.instant('ecosystem-wallets.spire.features')],
       downloadLink: 'https://templewallet.com/download',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.temple.title'),
-      description: this.translateService.instant('resources-wallets.temple.description'),
+      title: this.translateService.instant('ecosystem-wallets.temple.title'),
+      description: this.translateService.instant('ecosystem-wallets.temple.description'),
       logo: 'temple.png',
       socials: [
         {
@@ -456,18 +456,18 @@ export class EcosystemService {
       ],
       platforms: [
         {
-          name: PlatformName.Web,
+          name: PlatformName.BrowserExtension,
           icon: 'globe',
           url: 'https://templewallet.com/download'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.temple.features')],
+      features: [this.translateService.instant('ecosystem-wallets.temple.features')],
       downloadLink: 'https://templewallet.com/download',
       category: EcosystemCategory.wallet
     },
     {
-      title: this.translateService.instant('resources-wallets.trust-wallet.title'),
-      description: this.translateService.instant('resources-wallets.trust-wallet.description'),
+      title: this.translateService.instant('ecosystem-wallets.trust-wallet.title'),
+      description: this.translateService.instant('ecosystem-wallets.trust-wallet.description'),
       logo: 'trust-wallet.svg',
       socials: [
         {
@@ -503,9 +503,80 @@ export class EcosystemService {
           url: 'https://play.google.com/store/apps/details?id=com.wallet.crypto.trustapp&referrer=utm_source%3Dwebsite'
         }
       ],
-      features: [this.translateService.instant('resources-wallets.trust-wallet.features')],
+      features: [this.translateService.instant('ecosystem-wallets.trust-wallet.features')],
       downloadLink: 'https://trustwallet.com/',
       category: EcosystemCategory.wallet
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.dexter.title'),
+      description: this.translateService.instant('ecosystem-dapps.dexter.description'),
+      logo: 'dexter.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://dexter.exchange/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/DexterExchange'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://dexter.exchange/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.dexter.features')],
+      downloadLink: 'https://dexter.exchange/',
+      category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.kolibri.title'),
+      description: this.translateService.instant('ecosystem-dapps.kolibri.description'),
+      logo: 'kolibri.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://kolibri.finance/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/HoverEng'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://kolibri.finance/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.kolibri.features')],
+      downloadLink: 'https://kolibri.finance/',
+      category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.openminter.title'),
+      description: this.translateService.instant('ecosystem-dapps.openminter.description'),
+      logo: 'openminter.svg',
+      socials: [
+        {
+          type: SocialType.github,
+          url: 'https://github.com/tqtezos/minter'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://github.com/tqtezos/minter'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.openminter.features')],
+      downloadLink: 'https://github.com/tqtezos/minter',
+      category: EcosystemCategory.dapp
     },
     {
       title: this.translateService.instant('ecosystem-dapps.tzbutton.title'),
@@ -543,6 +614,244 @@ export class EcosystemService {
       features: [this.translateService.instant('ecosystem-dapps.tzbutton.features')],
       downloadLink: 'https://tzbutton.io/',
       category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.tzcolors.title'),
+      description: this.translateService.instant('ecosystem-dapps.tzcolors.description'),
+      logo: 'tzcolors.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://tzcolors.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/AirGap_it'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/AirGap'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/airgap-it'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://github.com/tzbutton/tzbutton'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://tzcolors.io/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.tzcolors.features')],
+      downloadLink: 'https://tzcolors.io/',
+      category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.tezos-domains.title'),
+      description: this.translateService.instant('ecosystem-dapps.tezos-domains.description'),
+      logo: 'tezos-domains.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://tezos.domains/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/tezosdomains'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/tezos-name-service'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://gitlab.com/tezos-domains'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://tezos.domains/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.tezos-domains.features')],
+      downloadLink: 'https://tezos.domains/',
+      category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.tezex.title'),
+      description: this.translateService.instant('ecosystem-dapps.tezex.description'),
+      logo: 'tezex.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://tezex.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/tezosexchange'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/tezexofficial'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/tezosexchange'
+        }
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://tezex.io/'
+        }
+      ],
+      features: [this.translateService.instant('ecosystem-libraries.tezex.features')],
+      downloadLink: 'https://tezex.io/',
+      category: EcosystemCategory.dapp
+    },
+    {
+      title: this.translateService.instant('ecosystem-libraries.beacon.title'),
+      description: this.translateService.instant('ecosystem-libraries.beacon.description'),
+      logo: 'beacon.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://walletbeacon.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/AirGap_it'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/airgap-it'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://github.com/airgap-it/beacon-sdk'
+        }
+      ],
+      platforms: [],
+      features: [this.translateService.instant('ecosystem-libraries.beacon.features')],
+      downloadLink: 'https://walletbeacon.io/',
+      category: EcosystemCategory.library
+    },
+    {
+      title: this.translateService.instant('ecosystem-libraries.ligo.title'),
+      description: this.translateService.instant('ecosystem-libraries.ligo.description'),
+      logo: 'ligo.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://ligolang.org/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/ligolang'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/LigoLang'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://gitlab.com/ligolang/ligo'
+        }
+      ],
+      platforms: [],
+      features: [this.translateService.instant('ecosystem-libraries.ligo.features')],
+      downloadLink: 'https://ligolang.org/',
+      category: EcosystemCategory.library
+    },
+    {
+      title: this.translateService.instant('ecosystem-libraries.pytezos.title'),
+      description: this.translateService.instant('ecosystem-libraries.pytezos.description'),
+      logo: 'pytezos.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://pytezos.org/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/TezosBakingBad'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/baking_bad_chat'
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://baking-bad.org/blog/'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://github.com/baking-bad/pytezos'
+        }
+      ],
+      platforms: [],
+      features: [this.translateService.instant('ecosystem-libraries.pytezos.features')],
+      downloadLink: 'https://pytezos.org/',
+      category: EcosystemCategory.library
+    },
+    {
+      title: this.translateService.instant('ecosystem-libraries.smartpy.title'),
+      description: this.translateService.instant('ecosystem-libraries.smartpy.description'),
+      logo: 'smartpy.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://smartpy.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/SmartPy_io'
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/SmartPy_io'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://gitlab.com/SmartPy/smartpy'
+        }
+      ],
+      platforms: [],
+      features: [this.translateService.instant('ecosystem-libraries.smartpy.features')],
+      downloadLink: 'https://smartpy.io/',
+      category: EcosystemCategory.library
+    },
+    {
+      title: this.translateService.instant('ecosystem-libraries.taquito.title'),
+      description: this.translateService.instant('ecosystem-libraries.taquito.description'),
+      logo: 'taquito.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://tezostaquito.io/'
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/TezosTaquito'
+        },
+        {
+          type: SocialType.github,
+          url: 'https://github.com/ecadlabs/taquito'
+        }
+      ],
+      platforms: [],
+      features: [this.translateService.instant('ecosystem-libraries.taquito.features')],
+      downloadLink: 'https://tezostaquito.io/',
+      category: EcosystemCategory.library
     }
   ]
   constructor(private translateService: TranslateService) {}

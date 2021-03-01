@@ -15,6 +15,6 @@ export class EcosystemItemComponent implements OnInit {
   ngOnInit() {}
 
   getLogo(ecosystem: EcosystemItem): string {
-    return `assets/img/ecosystem/${ecosystem.category}s/${ecosystem.logo}`
+    return `assets/img/ecosystem/${ecosystem.category}/${ecosystem.logo}`
   }
 }

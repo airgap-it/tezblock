@@ -97,22 +97,92 @@
     "total-number": "Total Number of Bakers",
     "top25": "Top 25 Bakers by Staking Balance"
   },
+  "ecosystem-item": {
+    "features_label": "Features",
+    "open_label": "Open"
+  },
   "ecosystem-dapps": {
     "title": "dApps",
+    "description": "dApps in the Tezos ecosystem",
+    "link": {
+      "text": "Please help us to keep the list updated and if a dApp is missing.",
+      "description": "Add new dApp"
+    },
     "tzbutton": {
       "title": "tzbutton",
       "description": "tzbutton is a social experiment on the Tezos blockchain. Each button click requires 0.2 tez, the countdown is reset and the address will become the leader. Winner can withdraw the whole amount of tez in the pot.",
       "features": "Simple interface, Beacon-compatible"
+    },
+    "dexter": {
+      "title": "Dexter",
+      "description": "Dexter is a decentralized, non-custodial exchange on the Tezos blockchain that enables users to exchange their tez with other tokens built on the Tezos FA1.2 token standard.",
+      "features": "Pegged USD stablecoin"
+    },
+    "kolibri": {
+      "title": "Kolibri",
+      "description": "Kolibri, the algorithmic stablecoin pegged to the US dollar. Kolibri represents an independently useful asset which enables trustless stable value payments on the Tezos network.",
+      "features": "Decentralized exchange, FA1.2"
+    },
+    "openminter": {
+      "title": "OpenMinter",
+      "description": "OpenMinter is dApp framework for enabling the creation and collection of non-fungible tokens (NFTs) on Tezos. The dApp enables anyone to create an NFT by filling in just a few fields.",
+      "features": "Multimedia NFTs, FA2"
+    },
+    "tzcolors": {
+      "title": "tzcolors",
+      "description": "tzcolors is a Tezos Non-Fungible Token experiment. tzcolors has 1690 color artworks as NFTs. Users can participate in auctions and if their bid wins, they can put up their color artwork NFT up for auction again.",
+      "features": "NFTs, simple interface, Beacon-compatible"
+    },
+    "tezos-domains": {
+      "title": "Tezos Domains",
+      "description": "Tezos Domains is a distributed, open and extensible naming system using Tezos blockchain. The main function is to translate a meaningful and user-friendly alias to a Tezos address and vice versa.",
+      "features": "Human readable Tezos addresses"
+    },
+    "tezex": {
+      "title": "Tezex Bridge",
+      "description": "TEZEX Bridge is a fully-decentralized non-custodial exchange, enabling cross-chain swaps between Ethereum ERC-20 tokens and Tezos FA-standard tokens like FA 1.2 and FA 2.0.",
+      "features": "Cross-chain swaps between Ethereum and Tezos"
     }
   },
-  "resources-wallets": {
-    "wallets": "Wallets",
-    "introduction_1": "A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list updated and",
-    "introduction_2": "if a wallet is missing.",
-    "let-us-know_link": "let us know",
-    "wallet-item": {
-      "features": "Features",
-      "open_button": "Open"
+  "ecosystem-libraries": {
+    "title": "Libraries",
+    "description": "Libraries in the Tezos ecosystem",
+    "link": {
+      "text": "Please help us to keep the list updated and if a library is missing.",
+      "description": "Add new library"
+    },
+    "beacon": {
+      "title": "Beacon",
+      "description": "Beacon is the implementation of tzip-10 which describes an interaction standard between a wallet and a dApp. Connects Mobile, Browser Web, Desktop and Hardware wallets to dApps",
+      "features": "Wallet and dApp interaction"
+    },
+    "ligo": {
+      "title": "LIGO",
+      "description": "LIGO is a statically typed high-level smart-contract language that compiles down to Michelson. It seeks to be easy to use and safe.",
+      "features": "Smart Contract abstraction"
+    },
+    "pytezos": {
+      "title": "PyTezos",
+      "description": "PyTezos is a Python library for interacting with Tezos blockchain, testing smart contracts, and writing Michelson scripts.",
+      "features": "Smart Contract abstraction"
+    },
+    "smartpy": {
+      "title": "SmartPy",
+      "description": "SmartPy is an intuitive and powerful smart contract development platform for Tezos. It comes with various tools: a compiler that generates Michelson code, a simulation engine, a contract explorer.",
+      "features": "Smart Contract abstraction"
+    },
+    "taquito": {
+      "title": "Taquito",
+      "description": "Taquito is a TypeScript library suite for development on the Tezos blockchain. Taquito's Smart-Contract abstractions makes working with contracts feel like your working with plain old JavaScript objects.",
+      "features": "Smart Contract abstraction"
+    }
+  },
+  "ecosystem-wallets": {
+    "title": "Wallets",
+    "description": "Wallets in the Tezos ecosystem",
+    "link": {
+      "text": "Please help us to keep the list updated and if a wallet is missing.",
+      "description": "Add new wallet"
     },
     "airgap": {
       "title": "AirGap",

@@ -95,7 +95,7 @@
     "total-number": "Gesamtanzahl an Bakers",
     "top25": "Top 25 Bakers nach Staking Balance"
   },
-  "resources-wallets": {
+  "ecosystem-wallets": {
     "wallets": "Wallets",
     "introduction_1": "Eine Liste von Wallets, die das Tezos Protokoll unterstützen. Helft uns, die Liste aktuell zu halten und",
     "introduction_2": "falls eine Wallet fehlt.",

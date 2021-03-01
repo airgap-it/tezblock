@@ -17,8 +17,8 @@ import { WalletsComponent } from './pages/ecosystem/wallets/wallets.component'
 import { TokenContractOverviewComponent } from './pages/token-contract-overview/token-contract-overview.component'
 import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
-import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
 import { DappsComponent } from './pages/ecosystem/dapps/dapps.component'
+import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component'
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -36,9 +36,9 @@ const routes: Routes = [
   { path: 'health', component: HealthComponent },
   { path: 'connected-nodes', component: NodesOnMapComponent },
   { path: 'resources/glossary', component: GlossaryComponent },
-  { path: 'ecosystem', component: EcosystemComponent },
   { path: 'ecosystem/wallets', component: WalletsComponent },
-  { path: 'ecosystem/dapps', component: DappsComponent }
+  { path: 'ecosystem/dapps', component: DappsComponent },
+  { path: 'ecosystem/libraries', component: LibrariesComponent }
 ]
 
 @NgModule({
