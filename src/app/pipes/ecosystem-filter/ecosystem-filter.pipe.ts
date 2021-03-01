@@ -6,7 +6,7 @@ import { EcosystemItem } from '../../interfaces/Ecosystem'
   pure: false
 })
 export class EcosystemFilterPipe implements PipeTransform {
-  transform(ecosystem: any[], filter: EcosystemItem): any {
+  transform(ecosystem: EcosystemItem[], filter: { category: string }): any {
     if (!ecosystem || !filter) {
       return ecosystem
     }
