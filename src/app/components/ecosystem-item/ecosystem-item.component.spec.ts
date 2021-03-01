@@ -8,18 +8,20 @@ import { EcosystemCategory, EcosystemItem } from '@tezblock/interfaces/Ecosystem
 import { TranslateService, TranslateModule, TranslatePipe } from '@ngx-translate/core'
 import { TranslateServiceStub } from '@tezblock/services/translation/translate.service.stub'
 import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock'
+import { getPipeMock } from 'test-config/mocks/pipe.mock'
 
 describe('ResourcesWalletItemComponent', () => {
   let component: EcosystemItemComponent
   let fixture: ComponentFixture<EcosystemItemComponent>
   let mockedWallet: EcosystemItem
+  const iconPipeMock = getPipeMock()
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [FontAwesomeModule, TranslateModule.forRoot()],
-      declarations: [EcosystemItemComponent, TranslatePipe],
+      declarations: [EcosystemItemComponent, TranslatePipe, IconPipe],
       providers: [
-        IconPipe,
+        { provide: IconPipe, useValue: iconPipeMock },
         { provide: TranslateService, useClass: TranslateServiceStub },
         { provide: TranslatePipe, useClass: TranslatePipeMock }
       ],
@@ -40,7 +42,7 @@ describe('ResourcesWalletItemComponent', () => {
       downloadLink: 'fooDownloadLink',
       category: EcosystemCategory.wallet
     }
-  }))
+  })
 
   it('should create', () => {
     expect(component).toBeTruthy()
