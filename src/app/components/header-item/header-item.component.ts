@@ -28,7 +28,7 @@ export class HeaderItemComponent implements OnInit {
   activeLinkResources: boolean = false
 
   @Input()
-  activeEcosystem: boolean = false
+  activeLinkEcosystem: boolean = false
 
   @Input()
   activeLinkAssets: boolean = false
