@@ -103,9 +103,8 @@
   },
   "ecosystem-dapps": {
     "title": "dApps",
-    "description": "dApps in the Tezos ecosystem",
     "link": {
-      "text": "Please help us to keep the list updated and if a dApp is missing.",
+      "text": "Please help us to keep the list updated and submit details if a dApp is missing.",
       "description": "Add new dApp"
     },
     "tzbutton": {
@@ -146,9 +145,8 @@
   },
   "ecosystem-libraries": {
     "title": "Libraries",
-    "description": "Libraries in the Tezos ecosystem",
     "link": {
-      "text": "Please help us to keep the list updated and if a library is missing.",
+      "text": "Please help us to keep the list updated and submit details if a library is missing.",
       "description": "Add new library"
     },
     "beacon": {
@@ -179,9 +177,8 @@
   },
   "ecosystem-wallets": {
     "title": "Wallets",
-    "description": "Wallets in the Tezos ecosystem",
     "link": {
-      "text": "Please help us to keep the list updated and if a wallet is missing.",
+      "text": "Please help us to keep the list updated and submit details if a wallet is missing.",
       "description": "Add new wallet"
     },
     "airgap": {
