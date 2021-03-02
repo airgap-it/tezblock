@@ -588,18 +588,6 @@ export class EcosystemService {
           url: 'https://tzbutton.io/'
         },
         {
-          type: SocialType.twitter,
-          url: 'https://twitter.com/AirGap_it'
-        },
-        {
-          type: SocialType.telegram,
-          url: 'https://t.me/AirGap'
-        },
-        {
-          type: SocialType.medium,
-          url: 'https://medium.com/airgap-it'
-        },
-        {
           type: SocialType.github,
           url: 'https://github.com/tzbutton/tzbutton'
         }
@@ -626,19 +614,15 @@ export class EcosystemService {
         },
         {
           type: SocialType.twitter,
-          url: 'https://twitter.com/AirGap_it'
+          url: 'https://twitter.com/tzcolors'
         },
         {
           type: SocialType.telegram,
-          url: 'https://t.me/AirGap'
-        },
-        {
-          type: SocialType.medium,
-          url: 'https://medium.com/airgap-it'
+          url: 'https://t.me/tzcolors'
         },
         {
           type: SocialType.github,
-          url: 'https://github.com/tzbutton/tzbutton'
+          url: 'https://github.com/tzcolors/tzcolors'
         }
       ],
       platforms: [
