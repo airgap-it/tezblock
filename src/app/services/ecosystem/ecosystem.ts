@@ -483,10 +483,6 @@ export class EcosystemService {
           url: 'https://t.me/trust_announcements'
         },
         {
-          type: SocialType.medium,
-          url: 'https://medium.com/madfish-solutions'
-        },
-        {
           type: SocialType.github,
           url: 'https://github.com/trustwallet'
         }
