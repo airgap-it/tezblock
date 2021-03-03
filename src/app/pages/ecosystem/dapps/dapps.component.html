@@ -1,0 +1,21 @@
+<div class="container py-5">
+  <div class="row pb-4">
+    <div class="col-12 col-md-6">
+      <h5 class="mb-4">
+        {{ 'ecosystem-dapps.title' | translate }}
+      </h5>
+      <p class="pt-3">
+        {{ 'ecosystem-dapps.link.text' | translate }}
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfUCvRK8U_0sJSkTXJmbalAIW16DxGw9oRQMy1uw95CkKfiUA/viewform" target="_blank">
+          <br />
+          {{ 'ecosystem-dapps.link.description' | translate }}
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6 pb-4" *ngFor="let ecosystem of ecosystems$ | async | ecosystemFilter: categoryFilter">
+      <app-ecosystem-item [ecosystem]="ecosystem"></app-ecosystem-item>
+    </div>
+  </div>
+</div>

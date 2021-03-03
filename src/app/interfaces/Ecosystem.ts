@@ -1,3 +1,9 @@
+export enum EcosystemCategory {
+  wallet = 'wallet',
+  dapp = 'dapp',
+  library = 'library'
+}
+
 export enum SocialType {
   website = 'globe',
   twitter = 'twitter',
@@ -14,11 +20,12 @@ export interface Social {
 export enum PlatformName {
   iOS = 'iOS',
   Android = 'Android',
-  BrowserExtension = 'BrowserExtension',
+  BrowserExtension = 'Browser Extension',
   Linux = 'Linux',
-  LinuxDistribution = 'LinuxDistribution',
+  LinuxDistribution = 'Linux Distribution',
   macOS = 'macOS',
-  Windows = 'Windows'
+  Windows = 'Windows',
+  Web = 'Web'
 }
 
 export interface PlatformData {
@@ -27,7 +34,7 @@ export interface PlatformData {
   url: string
 }
 
-export interface Wallet {
+export interface EcosystemItem {
   title: string
   description: string
   logo: string
@@ -35,4 +42,5 @@ export interface Wallet {
   platforms: PlatformData[]
   features: string[]
   downloadLink: string
+  category: EcosystemCategory
 }

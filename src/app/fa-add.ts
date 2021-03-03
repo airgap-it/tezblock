@@ -38,7 +38,8 @@ import {
   faHandRock,
   faCheck,
   faTimes,
-  faCog
+  faCog,
+  faExternalLink
 } from '@fortawesome/free-solid-svg-icons'
 
 export const addFontAwesome = () => {
@@ -86,6 +87,7 @@ export const addFontAwesome = () => {
     faHandRock,
     faCheck,
     faTimes,
-    faCog
+    faCog,
+    faExternalLink
   )
 }

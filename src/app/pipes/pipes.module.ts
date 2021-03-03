@@ -11,6 +11,7 @@ import { ShortenStringPipe } from './shorten-string/shorten-string.pipe'
 import { WithoutBracesPipe } from './without-braces.pipe'
 import { FilterPipe } from './filter/filter.pipe'
 import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.pipe'
+import { EcosystemFilterPipe } from './ecosystem-filter/ecosystem-filter.pipe'
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     PercentagePipe,
     WithoutBracesPipe,
     FilterPipe,
-    DecimalsFormatterPipe
+    DecimalsFormatterPipe,
+    EcosystemFilterPipe
   ],
   providers: [
     ShortenStringPipe,
@@ -37,7 +39,8 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     PercentagePipe,
     WithoutBracesPipe,
     FilterPipe,
-    DecimalsFormatterPipe
+    DecimalsFormatterPipe,
+    EcosystemFilterPipe
   ],
   imports: [],
   exports: [
@@ -51,7 +54,8 @@ import { DecimalsFormatterPipe } from './decimals-formatter/decimals-formatter.p
     PercentagePipe,
     WithoutBracesPipe,
     FilterPipe,
-    DecimalsFormatterPipe
+    DecimalsFormatterPipe,
+    EcosystemFilterPipe
   ]
 })
 export class PipesModule {}
