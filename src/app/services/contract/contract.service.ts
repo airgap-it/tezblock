@@ -206,24 +206,24 @@ export class ContractService extends BaseService {
       switchMap((contractOperations) =>
         contractOperations.length > 0
           ? forkJoin(
-              contractOperations.map((contractOperation) =>
-                from(faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)).pipe(
-                  catchError(() => of({ entrypoint: 'default', value: null }))
-                )
-              )
-            ).pipe(
-              map((response) =>
-                contractOperations.map((contractOperation, index) => ({
-                  ...contractOperation,
-                  entrypoint:
-                    contractOperation.parameters_entrypoints === 'default'
-                      ? _get(response[index], 'entrypoint')
-                      : contractOperation.parameters_entrypoints,
-                  symbol: contract.symbol,
-                  decimals: contract.decimals
-                }))
+            contractOperations.map((contractOperation) =>
+              from(faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)).pipe(
+                catchError(() => of({ entrypoint: 'default', value: null }))
               )
             )
+          ).pipe(
+            map((response) =>
+              contractOperations.map((contractOperation, index) => ({
+                ...contractOperation,
+                entrypoint:
+                  contractOperation.parameters_entrypoints === 'default'
+                    ? _get(response[index], 'entrypoint')
+                    : contractOperation.parameters_entrypoints,
+                // symbol: contract.symbol,
+                decimals: contract.decimals
+              }))
+            )
+          )
           : of([])
       )
     )
