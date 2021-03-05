@@ -61,24 +61,24 @@ const networkCondition = (tezosNetwork: TezosNetwork) => (tokenContract: TokenCo
     return true
   }
 
-  return tokenContract.tezosNetwork.some(_tezosNetwork => _tezosNetwork === tezosNetwork)
+  return tokenContract.tezosNetwork.some((_tezosNetwork) => _tezosNetwork === tezosNetwork)
 }
 
 export const getTokenContractByAddress = (address: string, tezosNetwork: TezosNetwork): TokenContract =>
-  fpGet<TokenContract>(tokenContract => {
+  fpGet<TokenContract>((tokenContract) => {
     const isInNetwork = networkCondition(tezosNetwork)
 
     return isInNetwork(tokenContract)
       ? {
-        ...tokenContract,
-        id: address
-      }
+          ...tokenContract,
+          id: address
+        }
       : undefined
   })(tokenContracts[address])
 
 export const getTokenContracts = (tezosNetwork: TezosNetwork, limit?: number): Pageable<TokenContract> => {
   const data = Object.keys(tokenContracts)
-    .map(key => getTokenContractByAddress(key, tezosNetwork))
+    .map((key) => getTokenContractByAddress(key, tezosNetwork))
     .filter(negate(isNil))
     .slice(0, limit || Number.MAX_SAFE_INTEGER)
 
@@ -97,8 +97,8 @@ export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetw
   const tokenContractByAddress = getTokenContractByAddress(searchTerm, tezosNetwork)
 
   return getTokenContracts(tezosNetwork)
-    .data.filter(tokenContract => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
-    .map(tokenContract => ({
+    .data.filter((tokenContract) => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
+    .map((tokenContract) => ({
       id: tokenContract.id,
       label: tokenContract.name,
       type
@@ -106,12 +106,12 @@ export const searchTokenContracts = (searchTerm: string, tezosNetwork: TezosNetw
     .concat(
       tokenContractByAddress
         ? [
-          {
-            id: tokenContractByAddress.id,
-            label: tokenContractByAddress.name,
-            type
-          }
-        ]
+            {
+              id: tokenContractByAddress.id,
+              label: tokenContractByAddress.name,
+              type
+            }
+          ]
         : []
     )
 }
@@ -125,7 +125,7 @@ export const getTokenContractBy = (searchTerm: string, tezosNetwork: TezosNetwor
 
   return first(
     getTokenContracts(tezosNetwork)
-      .data.filter(tokenContract => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
+      .data.filter((tokenContract) => tokenContract.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1)
       .concat(tokenContractByAddress ? [tokenContractByAddress] : [])
   )
 }
@@ -135,7 +135,7 @@ export const getTokenContractBySymbol = (symbol: string, tezosNetwork: TezosNetw
     return undefined
   }
 
-  return getTokenContracts(tezosNetwork).data.find(tokenContract => tokenContract.symbol === symbol)
+  return getTokenContracts(tezosNetwork).data.find((tokenContract) => tokenContract.symbol === symbol)
 }
 
 export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, exchangeRates: ExchangeRates): CurrencyConverterPipeArgs => {
@@ -153,25 +153,33 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
   }
 }
 
-export const hasTokenHolders = (contract: TokenContract): boolean => ['STKR', 'tzBTC', 'USDtz', 'weCHF', 'ETHtz', 'wXTZ'].includes(contract.symbol)
+export const hasTokenHolders = (contract: TokenContract): boolean =>
+  ['STKR', 'tzBTC', 'USDtz', 'weCHF', 'ETHtz', 'wXTZ', 'kUSD'].includes(contract.symbol)
 
 export interface TokenHolder {
   address: string
   amount: string
 }
 
-const normalizeParameters = async (faProtocol: TezosFAProtocol, parameters: string, fallbackEntrypoint?: string): Promise<TezosTransactionParameters> => {
+const normalizeParameters = async (
+  faProtocol: TezosFAProtocol,
+  parameters: string,
+  fallbackEntrypoint?: string
+): Promise<TezosTransactionParameters> => {
   try {
     return await faProtocol.normalizeTransactionParameters(parameters, fallbackEntrypoint)
   } catch {
     return {
-      entrypoint: "default",
+      entrypoint: 'default',
       value: null
     }
   }
 }
 
-const transactionDetailsFromParameters = async (faProtocol: TezosFAProtocol, parameters: TezosTransactionParameters): Promise<Partial<IAirGapTransaction>[]> => {
+const transactionDetailsFromParameters = async (
+  faProtocol: TezosFAProtocol,
+  parameters: TezosTransactionParameters
+): Promise<Partial<IAirGapTransaction>[]> => {
   try {
     return faProtocol.transactionDetailsFromParameters(parameters)
   } catch {
@@ -195,13 +203,17 @@ export const fillTransferOperations = async (
 
     if (contract && transaction.kind === OperationTypes.Transaction && transaction.parameters_micheline) {
       const faProtocol = getFaProtocol(contract, chainNetworkService.getEnvironment(), chainNetworkService.getNetwork())
-      const normalizedParameters = await normalizeParameters(faProtocol, transaction.parameters_micheline, transaction.parameters_entrypoints)
+      const normalizedParameters = await normalizeParameters(
+        faProtocol,
+        transaction.parameters_micheline,
+        transaction.parameters_entrypoints
+      )
       if (normalizedParameters.entrypoint !== 'transfer') {
         result.push(onNoAssetValue(transaction))
         continue
       }
       const details = await transactionDetailsFromParameters(faProtocol, normalizedParameters)
-      const transactionDetails = details.map(detail => {
+      const transactionDetails = details.map((detail) => {
         if (detail === undefined) {
           return onNoAssetValue(transaction)
         }
@@ -219,7 +231,7 @@ export const fillTransferOperations = async (
       result.push(onNoAssetValue(transaction))
     }
   }
-  return result.filter(item => item !== undefined && item !== null)
+  return result.filter((item) => item !== undefined && item !== null)
 }
 
 // by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function

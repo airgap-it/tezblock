@@ -1,4 +1,26 @@
 {
+  "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV": {
+    "symbol": "kUSD",
+    "name": "Kolibri USD",
+    "website": "https://kolibri.finance/",
+    "description": "Kolibri USD is an algorithmic stablecoin pegged to the US dollar.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://kolibri.finance/"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/HoverEng"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/hover-labs"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 18
+  },
   "KT19at7rQUvyjxnZ2fBv7D9zc8rkyG7gAoU8": {
     "symbol": "ETHtz",
     "name": "ETH Tez",

@@ -132,7 +132,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     super()
 
     this.subscriptions.push(
-      this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe((paramMap) => {
         const address = paramMap.get('id')
 
         this.store$.dispatch(actions.reset())
@@ -144,23 +144,23 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
   }
 
   public ngOnInit() {
-    this.address$ = this.store$.select(state => state.contractDetails.address)
-    this.contract$ = this.store$.select(state => state.contractDetails.contract)
-    this.website$ = this.getSocial(social => social.type === SocialType.website)
-    this.twitter$ = this.getSocial(social => social.type === SocialType.twitter)
-    this.telegram$ = this.getSocial(social => social.type === SocialType.telegram)
-    this.medium$ = this.getSocial(social => social.type === SocialType.medium)
-    this.github$ = this.getSocial(social => social.type === SocialType.github)
-    this.copyToClipboardState$ = this.store$.select(state => state.contractDetails.copyToClipboardState)
+    this.address$ = this.store$.select((state) => state.contractDetails.address)
+    this.contract$ = this.store$.select((state) => state.contractDetails.contract)
+    this.website$ = this.getSocial((social) => social.type === SocialType.website)
+    this.twitter$ = this.getSocial((social) => social.type === SocialType.twitter)
+    this.telegram$ = this.getSocial((social) => social.type === SocialType.telegram)
+    this.medium$ = this.getSocial((social) => social.type === SocialType.medium)
+    this.github$ = this.getSocial((social) => social.type === SocialType.github)
+    this.copyToClipboardState$ = this.store$.select((state) => state.contractDetails.copyToClipboardState)
     this.hasAlias$ = this.store$
-      .select(state => state.contractDetails.address)
-      .pipe(map(address => address && !!this.aliasPipe.transform(address)))
+      .select((state) => state.contractDetails.address)
+      .pipe(map((address) => address && !!this.aliasPipe.transform(address)))
     this.transactions$ = combineLatest([
-      this.store$.select(state => state.contractDetails.currentTabKind),
+      this.store$.select((state) => state.contractDetails.currentTabKind),
       this.store$.select(fromRoot.contractDetails.transferOperations),
-      this.store$.select(state => state.contractDetails.otherOperations.data),
-      this.store$.select(state => state.contractDetails.tokenHolders),
-      this.store$.select(state => state.contractDetails.entrypoints)
+      this.store$.select((state) => state.contractDetails.otherOperations.data),
+      this.store$.select((state) => state.contractDetails.tokenHolders),
+      this.store$.select((state) => state.contractDetails.entrypoints)
     ]).pipe(
       map(([currentTabKind, transferOperations, otherOperations, tokenHolders, entrypoints]) => {
         if (currentTabKind === actions.OperationTab.transfers) {
@@ -180,32 +180,32 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       })
     )
     this.loading$ = combineLatest([
-      this.store$.select(state => state.contractDetails.transferOperations.loading),
-      this.store$.select(state => state.contractDetails.otherOperations.loading)
+      this.store$.select((state) => state.contractDetails.transferOperations.loading),
+      this.store$.select((state) => state.contractDetails.otherOperations.loading)
     ]).pipe(map(([transferOperationsLoading, otherOperationsLoading]) => transferOperationsLoading || otherOperationsLoading))
     this.orderBy$ = combineLatest([
-      this.store$.select(state => state.contractDetails.currentTabKind),
-      this.store$.select(state => state.contractDetails.transferOperations.orderBy),
-      this.store$.select(state => state.contractDetails.otherOperations.orderBy)
+      this.store$.select((state) => state.contractDetails.currentTabKind),
+      this.store$.select((state) => state.contractDetails.transferOperations.orderBy),
+      this.store$.select((state) => state.contractDetails.otherOperations.orderBy)
     ]).pipe(
       map(([currentTabKind, transferOrderBy, otherOrderBy]) =>
         currentTabKind === actions.OperationTab.transfers ? transferOrderBy : otherOrderBy
       )
     )
-    this.manager$ = this.store$.select(state => state.contractDetails.manager)
-    this.showFiatValue$ = this.contract$.pipe(map(contract => contract && isConvertableToUSD(contract.symbol)))
-    this.transactions24hCount$ = this.store$.select(state => state.contractDetails.transfer24hCount)
-    this.transactions24hVolume$ = this.store$.select(state => state.contractDetails.transfer24hVolume)
+    this.manager$ = this.store$.select((state) => state.contractDetails.manager)
+    this.showFiatValue$ = this.contract$.pipe(map((contract) => contract && isConvertableToUSD(contract.symbol)))
+    this.transactions24hCount$ = this.store$.select((state) => state.contractDetails.transfer24hCount)
+    this.transactions24hVolume$ = this.store$.select((state) => state.contractDetails.transfer24hVolume)
 
     this.subscriptions.push(
       combineLatest([
         this.address$,
         this.contract$,
         combineLatest([
-          this.store$.select(state => state.contractDetails.transferOperations.pagination.total),
-          this.store$.select(state => state.contractDetails.otherOperations.pagination.total),
-          this.store$.select(state => state.contractDetails.tokenHolders.pagination.total),
-          this.store$.select(state => state.contractDetails.entrypoints.pagination.total)
+          this.store$.select((state) => state.contractDetails.transferOperations.pagination.total),
+          this.store$.select((state) => state.contractDetails.otherOperations.pagination.total),
+          this.store$.select((state) => state.contractDetails.tokenHolders.pagination.total),
+          this.store$.select((state) => state.contractDetails.entrypoints.pagination.total)
         ]).pipe(
           map(([transferCount, otherCount, tokenHoldersCount, entrypointsCount]) => [
             { key: actions.OperationTab.transfers, count: transferCount },
@@ -220,7 +220,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
       this.contract$
         .pipe(
-          filter(contract => contract && ['tzBTC', 'BTC'].includes(contract.symbol)),
+          filter((contract) => contract && ['tzBTC', 'BTC'].includes(contract.symbol)),
           switchMap(() =>
             getRefresh([
               this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
@@ -231,7 +231,9 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
         .subscribe(() => this.store$.dispatch(appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })))
     )
 
-    this.contract$.pipe(filter(contract => contract !== undefined)).subscribe((contract) => this.store$.dispatch(actions.load24hTransferVolume({ contract })))
+    this.contract$
+      .pipe(filter((contract) => contract !== undefined))
+      .subscribe((contract) => this.store$.dispatch(actions.load24hTransferVolume({ contract })))
 
     this.titleService.setTitle(`${this.aliasService.getFormattedAddress(this.contractAddress)} Contract - tezblock`)
     this.metaTagService.updateTag({
@@ -280,10 +282,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
 
   private getSocial(condition: (social: Social) => boolean): Observable<string> {
     return this.store$
-      .select(state => state.contractDetails.contract)
+      .select((state) => state.contractDetails.contract)
       .pipe(
         filter(negate(isNil)),
-        map(contract => {
+        map((contract) => {
           const match = contract.socials.find(condition)
 
           return match ? match.url : null
