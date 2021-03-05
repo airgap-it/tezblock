@@ -43,7 +43,7 @@ import { LoadingSkeletonComponent } from './components/loading-skeleton/loading-
 import { OccurrenceStatisticsComponent } from './components/occurrence-statistics/occurrence-statistics.component'
 import { QrItemComponent } from './components/qr-item/qr-item.component'
 import { QrModalComponent } from './components/qr-modal/qr-modal.component'
-import { ResourcesWalletItemComponent } from './components/resources-wallet-item/resources-wallet-item.component'
+import { EcosystemItemComponent } from './components/ecosystem-item/ecosystem-item.component'
 import { SearchItemComponent } from './components/search-item/search-item.component'
 import { TabbedTableComponent } from './components/tabbed-table/tabbed-table.component'
 import { TelegramModalComponent } from './components/telegram-modal/telegram-modal.component'
@@ -86,7 +86,7 @@ import { ListComponent } from './pages/list/list.component'
 import { ProposalDetailEffects } from './pages/proposal-detail/effects'
 import { ProposalDetailComponent } from './pages/proposal-detail/proposal-detail.component'
 import { ProtocolConstantComponent } from './pages/protocol-constant/protocol-constant.component'
-import { ResourcesWalletsComponent } from './pages/resources-wallets/resources-wallets.component'
+import { WalletsComponent } from './pages/ecosystem/wallets/wallets.component'
 import { TransactionDetailEffects } from './pages/transaction-detail/effects'
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component'
 import { PipesModule } from './pipes/pipes.module'
@@ -105,6 +105,9 @@ import { ThemeService } from '@tezblock/services/theme/theme.service'
 import { AssetsValueComponent } from './components/assets-value/assets-value.component'
 import { ProgressbarComponent } from './components/progressbar/progressbar.component'
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component'
+import { EcosystemComponent } from './pages/ecosystem/ecosystem.component'
+import { DappsComponent } from './pages/ecosystem/dapps/dapps.component';
+import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component'
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json')
@@ -200,9 +203,9 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     LoadingSkeletonComponent,
     TelegramModalComponent,
     BakerTableComponent,
-    ResourcesWalletsComponent,
+    WalletsComponent,
     ExtendTableCellComponent,
-    ResourcesWalletItemComponent,
+    EcosystemItemComponent,
     ModalCellComponent,
     EndorsementDetailComponent,
     SearchItemComponent,
@@ -226,7 +229,10 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     AssetsValueComponent,
     ProgressbarComponent,
     NodesOnMapComponent,
-    BasicCellComponent
+    BasicCellComponent,
+    EcosystemComponent,
+    DappsComponent,
+    LibrariesComponent
   ],
 
   providers: [

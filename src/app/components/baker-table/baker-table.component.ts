@@ -4,7 +4,7 @@ import { combineLatest, Observable, EMPTY } from 'rxjs'
 import { filter, map, switchMap } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 import { Actions, ofType } from '@ngrx/effects'
-import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
+import { BeaconBaseMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { BaseComponent } from '@tezblock/components/base.component'
@@ -30,9 +30,9 @@ import { TezosNetwork, TezosPayoutInfo } from '@airgap/coinlib-core'
 
 // TODO: ask Pascal if this override payout logic is needed
 const subtractFeeFromPayout = (rewards: Reward[], bakerFee: number): Reward[] =>
-  rewards.map(reward => ({
+  rewards.map((reward) => ({
     ...reward,
-    payouts: reward.payouts.map(payout => {
+    payouts: reward.payouts.map((payout) => {
       const payoutValue = parseFloat(payout.payout)
       const payoutMinusFee = payoutValue > 0 && bakerFee ? payoutValue - payoutValue * (bakerFee / 100) : payoutValue
 
@@ -147,7 +147,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.store$.dispatch(actions.reset())
 
     this.subscriptions.push(
-      this.route.paramMap.subscribe(async paramMap => {
+      this.route.paramMap.subscribe(async (paramMap) => {
         const accountAddress = paramMap.get('id')
 
         this.store$.dispatch(actions.setAccountAddress({ accountAddress }))
@@ -160,22 +160,22 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
   ngOnInit() {
     this.rights$ = this.store$
-      .select(state => state.bakerTable.kind)
+      .select((state) => state.bakerTable.kind)
       .pipe(
-        switchMap(kind => {
+        switchMap((kind) => {
           if (kind === OperationTypes.BakingRights) {
-            return this.store$.select(state => state.bakerTable.bakingRights.data)
+            return this.store$.select((state) => state.bakerTable.bakingRights.data)
           }
 
           if (kind === OperationTypes.EndorsingRights) {
-            return this.store$.select(state => state.bakerTable.endorsingRights.data)
+            return this.store$.select((state) => state.bakerTable.endorsingRights.data)
           }
 
           return EMPTY
         })
       )
 
-    this.rewards$ = this.store$.select(state => state.bakerTable.rewards.data)
+    this.rewards$ = this.store$.select((state) => state.bakerTable.rewards.data)
     // combineLatest(
     //   this.store$.select(state => state.bakerTable.rewards.data),
     //   this.bakerFee$
@@ -183,36 +183,36 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     //   filter(([rewards, bakerFee]) => bakerFee !== undefined),
     //   map(([rewards, bakerFee]) => subtractFeeFromPayout(rewards, bakerFee))
     // )
-    this.bakerReward$ = this.store$.select(state => state.bakerTable.bakerReward)
-    this.isBakerRewardBusy$ = this.store$.select(state => state.bakerTable.busy.bakerReward)
+    this.bakerReward$ = this.store$.select((state) => state.bakerTable.bakerReward)
+    this.isBakerRewardBusy$ = this.store$.select((state) => state.bakerTable.busy.bakerReward)
     this.rightsLoading$ = combineLatest([
-      this.store$.select(state => state.bakerTable.bakingRights.loading),
-      this.store$.select(state => state.bakerTable.endorsingRights.loading)
+      this.store$.select((state) => state.bakerTable.bakingRights.loading),
+      this.store$.select((state) => state.bakerTable.endorsingRights.loading)
     ]).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
-    this.rewardsLoading$ = this.store$.select(state => state.bakerTable.rewards.loading)
-    this.accountLoading$ = this.store$.select(state => state.bakerTable.busy.activeDelegations)
-    this.activeDelegations$ = this.store$.select(state => state.bakerTable.activeDelegations)
-    this.efficiencyLast10Cycles$ = this.store$.select(state => state.bakerTable.efficiencyLast10Cycles)
-    this.efficiencyLast10CyclesLoading$ = this.store$.select(state => state.bakerTable.busy.efficiencyLast10Cycles)
-    this.upcomingRights$ = this.store$.select(state => state.bakerTable.upcomingRights)
-    this.upcomingRightsLoading$ = this.store$.select(state => state.bakerTable.busy.upcomingRights)
+    this.rewardsLoading$ = this.store$.select((state) => state.bakerTable.rewards.loading)
+    this.accountLoading$ = this.store$.select((state) => state.bakerTable.busy.activeDelegations)
+    this.activeDelegations$ = this.store$.select((state) => state.bakerTable.activeDelegations)
+    this.efficiencyLast10Cycles$ = this.store$.select((state) => state.bakerTable.efficiencyLast10Cycles)
+    this.efficiencyLast10CyclesLoading$ = this.store$.select((state) => state.bakerTable.busy.efficiencyLast10Cycles)
+    this.upcomingRights$ = this.store$.select((state) => state.bakerTable.upcomingRights)
+    this.upcomingRightsLoading$ = this.store$.select((state) => state.bakerTable.busy.upcomingRights)
     this.isRightsTabAvailable$ = this.store$
-      .select(state => state.bakerTable.upcomingRights)
+      .select((state) => state.bakerTable.upcomingRights)
       .pipe(
-        map(upcomingRights =>
+        map((upcomingRights) =>
           !upcomingRights
             ? true
             : this.selectedTab.kind === 'baking_rights'
-              ? upcomingRights.baking !== null
-              : upcomingRights.endorsing !== null
+            ? upcomingRights.baking !== null
+            : upcomingRights.endorsing !== null
         )
       )
-    this.votes$ = this.store$.select(state => state.bakerTable.votes.data)
-    this.votesLoading$ = this.store$.select(state => state.bakerTable.votes.loading)
+    this.votes$ = this.store$.select((state) => state.bakerTable.votes.data)
+    this.votesLoading$ = this.store$.select((state) => state.bakerTable.votes.loading)
     this.votesShowLoadMore$ = this.store$
-      .select(state => state.bakerTable.votes)
-      .pipe(map(votes => (votes.data || []).length !== votes.pagination.total))
-    this.fiatCurrencyInfo$ = this.store$.select(state => state.app.fiatCurrencyInfo)
+      .select((state) => state.bakerTable.votes)
+      .pipe(map((votes) => (votes.data || []).length !== votes.pagination.total))
+    this.fiatCurrencyInfo$ = this.store$.select((state) => state.app.fiatCurrencyInfo)
 
     this.setupExpandedRows()
     this.setupTables()
@@ -220,7 +220,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.route.paramMap
         .pipe(
-          filter(paramMap => !!paramMap.get('id')),
+          filter((paramMap) => !!paramMap.get('id')),
           switchMap(() =>
             getRefresh([
               this.actions$.pipe(ofType(actions.loadActiveDelegationsSucceeded)),
@@ -247,7 +247,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       */
       this.route.paramMap
         .pipe(
-          filter(paramMap => !!paramMap.get('id')),
+          filter((paramMap) => !!paramMap.get('id')),
           switchMap(() =>
             getRefresh([this.actions$.pipe(ofType(actions.loadRewardsSucceeded)), this.actions$.pipe(ofType(actions.loadRewardsFailed))])
           )
@@ -256,8 +256,8 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
 
       // using account-detail functionality
       this.store$
-        .select(state => state.accountDetails.counts)
-        .pipe(filter(counts => !!counts))
+        .select((state) => state.accountDetails.counts)
+        .pipe(filter((counts) => !!counts))
         .subscribe(this.updateVotesCount.bind(this))
     )
   }
@@ -303,19 +303,19 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       .then((response: OperationResponseOutput) => {
         // make any action ?
       })
-      .catch((operationError: BeaconErrorMessage) => {
+      .catch((operationError: BeaconBaseMessage) => {
         // make any action ?
       })
   }
 
   private updateSelectedTab(selectedTab: Tab) {
-    this.tabs.forEach(tab => (tab.active = tab === selectedTab))
+    this.tabs.forEach((tab) => (tab.active = tab === selectedTab))
     this.selectedTab = selectedTab
   }
 
   private setupTables() {
     this.bakingRightsColumns = columns[OperationTypes.BakingRights]({ showFiatValue: this.isMainnet }, this.translateService)
-    this.bakingRightsFields = this.bakingRightsColumns.map(column => column.field)
+    this.bakingRightsFields = this.bakingRightsColumns.map((column) => column.field)
 
     this.endorsingRightsColumns = columns[OperationTypes.EndorsingRights](
       {
@@ -323,10 +323,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
       },
       this.translateService
     )
-    this.endorsingRightsFields = this.endorsingRightsColumns.map(column => column.field)
+    this.endorsingRightsFields = this.endorsingRightsColumns.map((column) => column.field)
 
     this.rewardsColumns = columns[OperationTypes.Rewards]({ showFiatValue: this.isMainnet }, this.translateService)
-    this.rewardsFields = this.rewardsColumns.map(column => column.field)
+    this.rewardsFields = this.rewardsColumns.map((column) => column.field)
   }
 
   private setupExpandedRows() {
@@ -433,7 +433,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   }
 
   private updateVotesCount(counts: Count[]) {
-    const votesTab = this.tabs.find(tab => tab.kind === 'ballot')
+    const votesTab = this.tabs.find((tab) => tab.kind === 'ballot')
     const updatedTab = first(updateTabCounts([votesTab], counts))
 
     votesTab.count = updatedTab.count
@@ -442,7 +442,7 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
   private getRewardsInnerDataSource(cycle: number): DataSource<TezosPayoutInfo> {
     return {
       get: (pagination: Pagination, filter?: any) => {
-        const rewards = fromRoot.getState(this.store$).bakerTable.rewards.data.find(_reward => _reward.cycle === cycle)
+        const rewards = fromRoot.getState(this.store$).bakerTable.rewards.data.find((_reward) => _reward.cycle === cycle)
 
         return this.rewardService.getRewardsPayouts(rewards, pagination, filter)
       },
@@ -458,10 +458,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadEndorsingRightItems({ baker: this.address, cycle, endorsingRewardsDetails }))
 
         return this.store$
-          .select(state => state.bakerTable.endorsingRightItems)
+          .select((state) => state.bakerTable.endorsingRightItems)
           .pipe(
-            filter(response => response[cycle] !== undefined),
-            map(response => toPagable(response[cycle], pagination))
+            filter((response) => response[cycle] !== undefined),
+            map((response) => toPagable(response[cycle], pagination))
           )
       },
       isFilterable: false
@@ -476,10 +476,10 @@ export class BakerTableComponent extends BaseComponent implements OnInit {
         this.store$.dispatch(actions.loadBakingRightItems({ baker: this.address, cycle, bakingRewardsDetails }))
 
         return this.store$
-          .select(state => state.bakerTable.bakingRightItems)
+          .select((state) => state.bakerTable.bakingRightItems)
           .pipe(
-            filter(response => response[cycle] !== undefined),
-            map(response => toPagable(response[cycle], pagination))
+            filter((response) => response[cycle] !== undefined),
+            map((response) => toPagable(response[cycle], pagination))
           )
       },
       isFilterable: false

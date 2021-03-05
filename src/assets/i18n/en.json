@@ -25,17 +25,19 @@
     "contracts_button": "Contracts",
     "assets_button": "Assets",
     "resources_button": "Resources",
-    "wallets_button": "Wallets",
     "constants_button": "Constants",
     "tezblock-health_button": "tezblock Health",
-    "dapps_button": "Dapps",
-    "development_button": "Development",
     "glossary_button": "Glossary",
     "languages_label": "Languages",
     "theme_label": "Theme",
     "light-mode_label": "Light Mode",
     "dark-mode_label": "Dark Mode",
-    "connected-nodes": "Connected Nodes"
+    "connected-nodes": "Connected Nodes",
+    "ecosystem_button": "Ecosystem",
+    "ecosystem-wallets_button": "Wallets",
+    "ecosystem-dapps_button": "Dapps",
+    "ecosystem-libraries_button": "Libraries",
+    "ecosystem-block-explorers_button": "Block Explorers"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
@@ -95,64 +97,144 @@
     "total-number": "Total Number of Bakers",
     "top25": "Top 25 Bakers by Staking Balance"
   },
-  "resources-wallets": {
-    "wallets": "Wallets",
-    "introduction_1": "A list of wallets that support the Tezos protocol for transactions, delegations or other operations. Please help us to keep the list updated and",
-    "introduction_2": "if a wallet is missing.",
-    "let-us-know_link": "let us know",
-    "wallet-item": {
-      "features": "Features",
-      "download_button": "Download"
+  "ecosystem-item": {
+    "features_label": "Features",
+    "open_label": "Open"
+  },
+  "ecosystem-dapps": {
+    "title": "dApps",
+    "link": {
+      "text": "Please help us to keep the list updated and submit details if a dApp is missing.",
+      "description": "Add new dApp"
+    },
+    "tzbutton": {
+      "title": "tzbutton",
+      "description": "tzbutton is a social experiment on the Tezos blockchain. Each button click requires 0.2 tez, the countdown is reset and the address will become the leader. Winner can withdraw the whole amount of tez in the pot.",
+      "features": "Simple interface, Beacon-compatible"
+    },
+    "dexter": {
+      "title": "Dexter",
+      "description": "Dexter is a decentralized, non-custodial exchange on the Tezos blockchain that enables users to exchange their tez with other tokens built on the Tezos FA1.2 token standard.",
+      "features": "Pegged USD stablecoin"
+    },
+    "kolibri": {
+      "title": "Kolibri",
+      "description": "Kolibri, the algorithmic stablecoin pegged to the US dollar. Kolibri represents an independently useful asset which enables trustless stable value payments on the Tezos network.",
+      "features": "Decentralized exchange, FA1.2"
+    },
+    "openminter": {
+      "title": "OpenMinter",
+      "description": "OpenMinter is dApp framework for enabling the creation and collection of non-fungible tokens (NFTs) on Tezos. The dApp enables anyone to create an NFT by filling in just a few fields.",
+      "features": "Multimedia NFTs, FA2"
+    },
+    "tzcolors": {
+      "title": "tzcolors",
+      "description": "tzcolors is a Tezos Non-Fungible Token experiment. tzcolors has 1690 color artworks as NFTs. Users can participate in auctions and if their bid wins, they can put up their color artwork NFT up for auction again.",
+      "features": "NFTs, simple interface, Beacon-compatible"
+    },
+    "tezos-domains": {
+      "title": "Tezos Domains",
+      "description": "Tezos Domains is a distributed, open and extensible naming system using Tezos blockchain. The main function is to translate a meaningful and user-friendly alias to a Tezos address and vice versa.",
+      "features": "Human readable Tezos addresses"
+    },
+    "tezex": {
+      "title": "Tezex Bridge",
+      "description": "TEZEX Bridge is a fully-decentralized non-custodial exchange, enabling cross-chain swaps between Ethereum ERC-20 tokens and Tezos FA-standard tokens like FA 1.2 and FA 2.0.",
+      "features": "Cross-chain swaps between Ethereum and Tezos"
+    }
+  },
+  "ecosystem-libraries": {
+    "title": "Libraries",
+    "link": {
+      "text": "Please help us to keep the list updated and submit details if a library is missing.",
+      "description": "Add new library"
+    },
+    "beacon": {
+      "title": "Beacon",
+      "description": "Beacon is the implementation of tzip-10 which describes an interaction standard between a wallet and a dApp. Connects Mobile, Browser Web, Desktop and Hardware wallets to dApps",
+      "features": "Wallet and dApp interaction"
+    },
+    "ligo": {
+      "title": "LIGO",
+      "description": "LIGO is a statically typed high-level smart-contract language that compiles down to Michelson. It seeks to be easy to use and safe.",
+      "features": "Smart Contract abstraction"
+    },
+    "pytezos": {
+      "title": "PyTezos",
+      "description": "PyTezos is a Python library for interacting with Tezos blockchain, testing smart contracts, and writing Michelson scripts.",
+      "features": "Smart Contract abstraction"
+    },
+    "smartpy": {
+      "title": "SmartPy",
+      "description": "SmartPy is an intuitive and powerful smart contract development platform for Tezos. It comes with various tools: a compiler that generates Michelson code, a simulation engine, a contract explorer.",
+      "features": "Smart Contract abstraction"
+    },
+    "taquito": {
+      "title": "Taquito",
+      "description": "Taquito is a TypeScript library suite for development on the Tezos blockchain. Taquito's Smart-Contract abstractions makes working with contracts feel like your working with plain old JavaScript objects.",
+      "features": "Smart Contract abstraction"
+    }
+  },
+  "ecosystem-wallets": {
+    "title": "Wallets",
+    "link": {
+      "text": "Please help us to keep the list updated and submit details if a wallet is missing.",
+      "description": "Add new wallet"
     },
     "airgap": {
       "title": "AirGap",
-      "description": "With AirGap your old smartphone is your new ‘hardware wallet’. Securely store your XTZ with the unique two device approach where one device is completely offline, delegate your Tezzies from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
-      "features": "Offline device, Highest security, XTZ delegation, Coin agnostic, Secure storage, Social recovery, Hot wallet option"
+      "description": "AirGap makes self-custody simple and secure. Securely store your tez with the unique two device approach where one device is completely offline, delegate your Tez from cold storage and earn rewards. AirGap's focus is on accessible security, providing best in class security while maintaing a great user experience.",
+      "features": "Offline device, Highest security, Delegation, FA1.2, FA2, Secure storage, Social recovery"
     },
     "atomic": {
       "title": "Atomic Wallet",
       "description": "Atomic is a decentralized wallet that supports 300+ cryptocurrency assets. Strong encryption and custody-free solution guarantee their users the highest level of security. Atomic Wallet provides instant exchange and 'buy crypto with a credit card' feature.",
-      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, XTZ delegation"
+      "features": "Buy Cryptocurrency (Visa, Master card), Exchange option, tez delegation"
     },
     "atomex": {
       "title": "Atomex",
-      "description": "Multicurrency HD wallet with built-in hybrid atomic swap exchange.",
+      "description": "Multicurrency HD wallet with built-in hybrid atomic swap exchange. Combines advantages of centralized and decentralized exchanges. Cross-chain transactions are carried out using atomic swaps.",
       "features": "HD wallet, built-in hybrid atomic swap DEX"
-    },
-    "cortez": {
-      "title": "Cortez",
-      "description": "Mobile wallet developed by Nomadic Labs.",
-      "features": "Mobile"
     },
     "galleon": {
       "title": "Galleon",
       "description": "Galleon is a smart wallet for Tezos. Galleon is a deployment of Tezori, an open source wallet framework for Tezos, supporting both software and hardware wallets in eight languages on Mac, Windows and Linux.",
-      "features": "Ledger Support, Delegation"
+      "features": "Ledger Support, Delegation, FA1.2, FA2"
     },
     "kukai": {
       "title": "Kukai",
-      "description": "One of the first Tezos wallets with offline-signing, KT backward compatibility and ledger support. Kukai is available in 6 different languages thanks to the Tezos community efforts. The wallet has been audited by one of the leading security audit German firm. Kukai guarantees full anonymity as there is no tracking, cookies or analytics in their wallet.",
-      "features": "Ledger Support, Delegation, Offline-signing"
+      "description": "Kukai is a Tezos web wallet based on three principles: Security, Community and Reliability. Kukai supports HD wallets, Ledger connection and DirectAuth for one-Click login with your Google, Reddit or Twitter account.",
+      "features": "Direct Auth, Ledger Support, Delegation, FA1.2, FA2"
     },
-    "magnum": {
-      "title": "Magnum Wallet",
-      "description": "Magnum Wallet is a multicurrency non-custodial wallet service. Designed for those who wish to manage their crypto portfolio in a secure and convenient interface, it also lets the user earn rewards through staking or by claiming forks and bounty airdrops. As part of their “Multiply Your Funds” paradigm, the team is always on the lookout for new ways to benefit the users.",
-      "features": "Blockchain Agnostic, In-App Exchange, Hardware Wallets, Ultimate Security, Passive Income, Forks & Bounties"
+    "ledger": {
+      "title": "Ledger Live",
+      "description": "Connect to your Ledger Nano S and X with Ledger Live. Manage your tez on your Ledger hardware wallet, send and delegate them. Directly buy or exchange your tez in Ledger Live.",
+      "features": "Ledger Support, Delegation, Multiple Accounts, Exchange, Fiat on-ramp"
     },
-    "paytomat": {
-      "title": "paytomat",
-      "description": "paytomat is a non-custodial wallet that brings financial services that modern customers eager. From exchanging assets, to referral programs, to trading BEP-2 tokens or accessing dApps and games, paytomat supports over 14 cryptocurrencies and covers all of a user's wants and needs in one single app.",
-      "features": "reliable, decentralized, convenient"
+    "magma": {
+      "title": "Magma",
+      "description": "Magma is a A secure, self-custodial mobile wallet. Magma natively integrates Dexter, a decentralized Tezos exchange, to trade tokens built with the FA1.2 token standard. Stake your Tez. Earn rewards.",
+      "features": "Delegation, FA1.2, Dexter Integration, Fiat on-ramp"
     },
-    "simplestacking": {
-      "title": "simplestacking.com",
+    "simplestaking": {
+      "title": "simplestaking.com",
       "description": "Safe way to store & stake Tezos. Desktop & Web wallet with Trezor support.",
       "features": "Trezor T, multiple wallets, wallet balance history"
     },
-    "tezbox": {
-      "title": "TezBox",
-      "description": "TezBox was the earliest functional GUI wallet for Tezos. TezBox has grown to be one of the major community developed wallets and will continue to provide users and developers with an easy to use, powerful and secure wallet.",
-      "features": "Secure, Mobile, Developer Friendly, Open Source, Hardware Wallet Support"
+    "spire": {
+      "title": "Spire",
+      "description": "Spire is a light-weight Beacon enabled Browser Extension for simple interaction with Tezos dApps. Spire connects Desktop, Web, Mobile or Hardware Wallets like Ledger Nano and is the bridge between Beacon-compatible dApps.",
+      "features": "Web Extension, Multiple Accounts, Ledger, dApp Support"
+    },
+    "temple": {
+      "title": "Temple Wallet",
+      "description": "Cryptocurrency wallet for the Tezos blockchain as a Web Extension for your Browser. Temple wallet has support for multiple accounts, delegation, FA1.2 and FA2 assets and is able to interact directly with Beacon-compatible dApps.",
+      "features": "Web Extension, Delegation, Multiple Accounts, FA1.2, FA2, Ledger, dApp Support"
+    },
+    "trust-wallet": {
+      "title": "Trust Wallet",
+      "description": "Trust Wallet is mobile wallet where you can buy, store, exchange & earn Tezos. With Turst Wallet you can buy tez with a card, exchange instantly and delegate.",
+      "features": "Delegation, Multiple Accounts, Exchange, Fiat on-ramp"
     }
   },
   "protocol-constants": {

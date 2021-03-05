@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core'
 import {
+  ColorMode,
   DAppClient,
   NetworkType,
   OperationResponseOutput,
+  PartialTezosOperation,
   RequestPermissionInput,
   TezosDelegationOperation,
   TezosOperationType
@@ -26,10 +28,12 @@ const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   providedIn: 'root'
 })
 export class BeaconService {
-  constructor(private readonly chainNetworkService: ChainNetworkService) { }
+  private client: DAppClient
+  constructor(private readonly chainNetworkService: ChainNetworkService) {
+    this.client = this.getDAppClient()
+  }
 
   async delegate(address: string): Promise<OperationResponseOutput> {
-    const client = this.getDAppClient()
     const requestPermissions = async () => {
       const input: RequestPermissionInput = {
         network: {
@@ -37,11 +41,11 @@ export class BeaconService {
         }
       }
 
-      await client.requestPermissions(input)
+      await this.client.requestPermissions(input)
     }
 
     // Check if we have permissions stored locally already
-    const activeAccount = await client.getActiveAccount()
+    const activeAccount = await this.client.getActiveAccount()
 
     if (!activeAccount) {
       // If no active account is set, we have to ask for permissions.
@@ -49,12 +53,12 @@ export class BeaconService {
       await requestPermissions()
     }
 
-    const operation: Partial<TezosDelegationOperation> = {
+    const operation: PartialTezosOperation = {
       kind: TezosOperationType.DELEGATION,
       delegate: address
     }
 
-    return client.requestOperation({
+    return this.client.requestOperation({
       operationDetails: [operation]
     })
   }
@@ -62,5 +66,9 @@ export class BeaconService {
   // for testing (mainly)
   getDAppClient(): DAppClient {
     return new DAppClient({ name: 'tezblock' })
+  }
+
+  changeTheme(color: ColorMode) {
+    this.client.setColorMode(color)
   }
 }

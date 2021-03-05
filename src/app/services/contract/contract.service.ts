@@ -13,6 +13,7 @@ import moment from 'moment'
 import { WetziKoin } from '@tezblock/domain/airgap/wetzikoin'
 import { TezosBTC, TezosFA1Protocol, TezosStaker, TezosUSD, TezosWrapped } from '@airgap/coinlib-core'
 import { TezosETHtz } from '@airgap/coinlib-core/protocols/tezos/fa/TezosETHtz'
+import { TezosKolibriUSD } from '@airgap/coinlib-core/protocols/tezos/fa/TezosKolibriUSD'
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
@@ -106,6 +107,10 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
     return new TezosWrapped(options)
   }
 
+  if (contract.symbol === 'kUSD') {
+    return new TezosKolibriUSD(options)
+  }
+
   return undefined
 }
 
@@ -145,7 +150,7 @@ export class ContractService extends BaseService {
       map(
         pipe(
           first,
-          get(data => data.source)
+          get((data) => data.source)
         )
       )
     )
@@ -166,7 +171,7 @@ export class ContractService extends BaseService {
         map(
           pipe(
             first,
-            get<any>(item => parseInt(item.count_destination))
+            get<any>((item) => parseInt(item.count_destination))
           )
         )
       ),
@@ -183,7 +188,7 @@ export class ContractService extends BaseService {
         map(
           pipe(
             first,
-            get<any>(item => parseInt(item.count_destination))
+            get<any>((item) => parseInt(item.count_destination))
           )
         )
       )
@@ -198,23 +203,23 @@ export class ContractService extends BaseService {
       orderBy: [orderBy],
       limit
     }).pipe(
-      switchMap(contractOperations =>
+      switchMap((contractOperations) =>
         contractOperations.length > 0
           ? forkJoin(
-            contractOperations.map(contractOperation =>
-              from(
-                faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)
-              ).pipe(catchError(() => of({ entrypoint: 'default', value: null })))
+            contractOperations.map((contractOperation) =>
+              from(faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)).pipe(
+                catchError(() => of({ entrypoint: 'default', value: null }))
+              )
             )
           ).pipe(
-            map(response =>
+            map((response) =>
               contractOperations.map((contractOperation, index) => ({
                 ...contractOperation,
                 entrypoint:
                   contractOperation.parameters_entrypoints === 'default'
                     ? _get(response[index], 'entrypoint')
                     : contractOperation.parameters_entrypoints,
-                symbol: contract.symbol,
+                // symbol: contract.symbol,
                 decimals: contract.decimals
               }))
             )
@@ -231,8 +236,10 @@ export class ContractService extends BaseService {
       limit
     }).pipe(
       switchMap(
-        contractOperations =>
-          <Observable<ContractOperation[]>>from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+        (contractOperations) =>
+          <Observable<ContractOperation[]>>(
+            from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+          )
       )
     )
   }
@@ -246,9 +253,7 @@ export class ContractService extends BaseService {
         {
           field: 'parameters_entrypoints',
           operation: Operation.eq,
-          set: [
-            'transfer'
-          ],
+          set: ['transfer'],
           inverse: false
         },
         {
@@ -260,17 +265,13 @@ export class ContractService extends BaseService {
         {
           field: 'kind',
           operation: Operation.eq,
-          set: [
-            'transaction'
-          ],
+          set: ['transaction'],
           inverse: false
         },
         {
           field: 'destination',
           operation: Operation.eq,
-          set: [
-            contract.id
-          ],
+          set: [contract.id],
           inverse: false
         },
         {
@@ -282,16 +283,16 @@ export class ContractService extends BaseService {
         {
           field: 'timestamp',
           operation: Operation.gt,
-          set: [
-            cutoff.toDate().getTime()
-          ],
+          set: [cutoff.toDate().getTime()],
           inverse: false
         }
       ]
     }).pipe(
       switchMap(
-        contractOperations =>
-          <Observable<ContractOperation[]>>from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+        (contractOperations) =>
+          <Observable<ContractOperation[]>>(
+            from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+          )
       )
     )
   }
@@ -306,9 +307,11 @@ export class ContractService extends BaseService {
       return from(protocol.getTotalSupply())
     }
 
-    return from(new Promise<string>((resolve) => {
-      resolve(contract.totalSupply)
-    }))
+    return from(
+      new Promise<string>((resolve) => {
+        resolve(contract.totalSupply)
+      })
+    )
   }
 
   public loadEntrypoints(id: string): Observable<string[]> {

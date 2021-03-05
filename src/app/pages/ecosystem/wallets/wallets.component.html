@@ -1,0 +1,25 @@
+<div class="container py-5">
+  <h1 hidden="true">
+    list of wallets that support Tezos protocol for transactions, delegations or other operations along with a short description with links
+    to all relevant pages and download links
+  </h1>
+  <div class="row pb-4">
+    <div class="col-12 col-md-6">
+      <h5 class="mb-4">
+        {{ 'ecosystem-wallets.title' | translate }}
+      </h5>
+      <p class="pt-3">
+        {{ 'ecosystem-wallets.link.text' | translate }}
+        <a href="https://docs.google.com/forms/d/e/1FAIpQLSfUCvRK8U_0sJSkTXJmbalAIW16DxGw9oRQMy1uw95CkKfiUA/viewform" target="_blank">
+          <br />
+          {{ 'ecosystem-wallets.link.description' | translate }}
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6 pb-4" *ngFor="let ecosystem of ecosystems$ | async | ecosystemFilter: categoryFilter">
+      <app-ecosystem-item [ecosystem]="ecosystem"></app-ecosystem-item>
+    </div>
+  </div>
+</div>

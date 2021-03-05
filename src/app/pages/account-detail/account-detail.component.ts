@@ -12,7 +12,7 @@ import { Actions, ofType } from '@ngrx/effects'
 import { ChartOptions } from 'chart.js'
 import { FormControl } from '@angular/forms'
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead'
-import { BeaconErrorMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
+import { BeaconBaseMessage, OperationResponseOutput } from '@airgap/beacon-sdk'
 
 import { TelegramModalComponent } from '@tezblock/components/telegram-modal/telegram-modal.component'
 import { QrModalComponent } from '@tezblock/components/qr-modal/qr-modal.component'
@@ -300,7 +300,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             )
       )
     )
-
     this.isBusy$ = this.store$.select((state) => state.accountDetails.busy)
     this.remainingTime$ = this.store$.select(fromRoot.app.roundedRemainingTime)
     this.transactions$ = this.store$
@@ -666,7 +665,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       .then((response: OperationResponseOutput) => {
         this.store$.dispatch(actions.loadDelegation())
       })
-      .catch((operationError: BeaconErrorMessage) => {
+      .catch((operationError: BeaconBaseMessage) => {
         // make any action ?
       })
   }

@@ -28,6 +28,9 @@ export class HeaderItemComponent implements OnInit {
   activeLinkResources: boolean = false
 
   @Input()
+  activeLinkEcosystem: boolean = false
+
+  @Input()
   activeLinkAssets: boolean = false
 
   subscription: Subscription
@@ -51,7 +54,7 @@ export class HeaderItemComponent implements OnInit {
     public readonly themeService: ThemeService,
     public translate: TranslateService,
     private readonly languagesService: LanguagesService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
