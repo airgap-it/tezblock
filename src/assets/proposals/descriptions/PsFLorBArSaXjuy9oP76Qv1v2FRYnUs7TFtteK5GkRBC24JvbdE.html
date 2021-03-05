@@ -1,0 +1,72 @@
+<p>
+  We are offering the community two versions of the Florence proposal to choose between, one with Baking Accounts (as described below) and
+  one without; we’ll explain the rationale for this decision later in this blog post.
+</p>
+<h5>Features</h5>
+<p>
+  <strong>Increased Maximum Operation Size:</strong>
+  Previously, the maximum size of an operation was 16kB. In Florence, we propose to increase it to 32kB. Among other things, this has the
+  effect of slightly more than doubling the maximum size of a smart contract, which should be of interest to some developers with
+  particularly complicated applications.
+</p>
+
+<p>
+  <strong>Gas Optimizations:</strong>
+  We have again reduced gas consumption in smart contract execution by increasing the efficiency of gas computation inside the Michelson
+  interpreter. This allows for smart contracts with more complicated functionality to operate economically on the chain. We will continue to
+  work on further efficiency improvements in coming versions of the protocol.
+</p>
+
+<p>
+  <strong>Baking Accounts:</strong>
+  Previously, token holders delegated to a baker by specifying that baker’s public key hash. This meant that bakers could never change their
+  public keys, which was exceptionally inconvenient. The new “Baking Accounts” feature alleviates this issue. In Florence, a new account
+  type has been added to represent accounts managed by bakers. These accounts are Michelson smart contracts running a fixed multisig script.
+  This feature lets bakers renew and split their consensus keys without moving to a new address and asking their delegators to follow. In
+  addition to the usual internal operations, baking accounts can also emit baking operations such as proposing and voting for protocol
+  amendments.
+  <br />
+  (The rights granted to the baking key (baking, endorsing, voting, and spending the funds) remain unchanged. However, the system also
+  allows a baker to vote and access their funds using multisig authentication. Not using the baking key for such tasks reduces the risk of
+  it being exposed, and the baking key can also be rotated in a worst case scenario.)
+  <br />
+  Although we strongly believe that Baking Accounts are an important new addition to the Tezos protocol, and although we have made
+  considerable effort to make them backwards compatible with existing code, we recognize that client libraries, wallets, indexers, and other
+  software will require some work to fully support Baking Accounts. We are thus providing the community with the opportunity to decide for
+  itself during the Proposal Period whether or not to include this feature in the Florence update.
+</p>
+
+<p>
+  <strong>Depth First Execution Order:</strong>
+  Previously, intercontract calls were executed in a so-called “breadth first” ordering. This was believed to be the correct choice when the
+  Tezos protocol was initially designed, but it has turned out to significantly complicate the lives of smart contract developers. If
+  Florence is adopted, the calling convention will change to a “depth first” execution order. This will make it far easier to reason about
+  intercontract calls.
+</p>
+<p>
+  <strong>No More Test Chain:</strong>
+  Previously, during the voting process, a test chain would be spun up during the “testing period” which took place between the exploration
+  and promotion voting periods. The intent was that this test chain be used to assure that the new proposal worked correctly, but in
+  practice, the test chain has never been used in this manner, and has caused significant operational problems to node operators. The new
+  proposal eliminates the test chain activation; the testing period has been retained but is now named the “cooldown period”. Instead, we
+  will continue to test the protocol using test chains that operate outside of the mainnet voting process.
+</p>
+
+<h5 class="pb-3">More information</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://gitlab.com/tezos/tezos/-/tree/master/src/proto_009_PsFLorBA/lib_protocol">
+      Gitlab Repository with Baking Accounts
+    </a>
+  </li>
+  <li>
+    <a target="_blank" href="http://doc.tzalpha.net/protocols/009_florence.html">Changelog</a>
+  </li>
+</ul>
+
+<h5>Invoice</h5>
+<p>
+  This protocol amendment and the related updates to the Tezos shell were developed by programmers from Nomadic Labs, Metastate, DaiLambda,
+  Marigold, Tarides, and an external contributor, Keefer Taylor 16, to whom the proposals grant an invoice of ꜩ100 to thank him for his
+  merge request that increased the maximum operation size.
+</p>
