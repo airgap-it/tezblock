@@ -551,6 +551,7 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
                 const stakingBond: number = bakerInfos.staking_balance - bakerInfos.delegated_balance
 
                 return {
+                  fullBalance: bakerInfos.balance,
                   stakingBalance: bakerInfos.staking_balance,
                   numberOfRolls: Math.floor(bakerInfos.staking_balance / (8000 * 1000000)),
                   stakingCapacity,
