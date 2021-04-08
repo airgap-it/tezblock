@@ -66,11 +66,11 @@
                   {{ 'baker-table.baker-overview.full-balance' | translate }}
                 </h5>
                 <h3 class="d-inline-block">
-                  <amount-cell [data]="data?.stakingBond" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
+                  <amount-cell [data]="data?.fullBalance" [options]="{ showFiatValue: false, maxDigits: 10 }"></amount-cell>
                 </h3>
                 <ng-container
                   *appVar="
-                    data?.stakingBond | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
+                    data?.fullBalance | currencyConverter: { currInfo: fiatCurrencyInfo$ | async, protocolIdentifier: 'xtz' } as value
                   "
                 >
                   <h5 class="text-secondary ml-2 d-inline-block">
