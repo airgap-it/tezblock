@@ -42,11 +42,11 @@ export class ProposalService extends BaseService {
       return of([])
     }
 
-    kindList = kindList || transactions.map(transaction => transaction.kind).filter(distinctFilter)
+    kindList = kindList || transactions.map((transaction) => transaction.kind).filter(distinctFilter)
 
     if (kindList.includes('ballot') || kindList.includes('proposals')) {
       const votingPeriodPredicates: Predicate[] = transactions
-        .map(transaction => transaction.block_level)
+        .map((transaction) => transaction.block_level)
         .filter(distinctFilter)
         .map((block_level, index) => ({
           field: 'level',
@@ -58,11 +58,11 @@ export class ProposalService extends BaseService {
 
       return forkJoin(
         this.getVotingPeriod(votingPeriodPredicates),
-        forkJoin(transactions.map(transaction => this.getVotesForTransaction(transaction)))
+        forkJoin(transactions.map((transaction) => this.getVotesForTransaction(transaction)))
       ).pipe(
         map(([votingPeriods, votes]) =>
           transactions.map((transaction, index) => {
-            const votingPeriod = votingPeriods.find(vP => vP.level === transaction.block_level)
+            const votingPeriod = votingPeriods.find((vP) => vP.level === transaction.block_level)
 
             return {
               ...transaction,
@@ -86,7 +86,7 @@ export class ProposalService extends BaseService {
 
   getVotesForTransaction(transaction: Transaction): Observable<number> {
     return from(this.protocol.getTezosVotingInfo(transaction.block_hash)).pipe(
-      map(data => {
+      map((data) => {
         const votingInfo = data.find((element: VotingInfo) => element.pkh === transaction.source)
 
         return votingInfo ? votingInfo.rolls : null
@@ -99,16 +99,18 @@ export class ProposalService extends BaseService {
       // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
       this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
       this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
-      this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion)
+      this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion),
+      this.getMetaVotingPeriod(proposalHash, PeriodKind.Adoption)
     ).pipe(
-      map(metaVotingPeriodCounts => [
+      map((metaVotingPeriodCounts) => [
         {
           periodKind: PeriodKind.Proposal,
           value: metaVotingPeriodCounts[0] ? metaVotingPeriodCounts[0] - 1 : proposal.period
         },
         { periodKind: PeriodKind.Exploration, value: metaVotingPeriodCounts[0] },
         { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
-        { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] }
+        { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] },
+        { periodKind: PeriodKind.Adoption, value: metaVotingPeriodCounts[3] }
       ])
     )
   }
@@ -119,8 +121,8 @@ export class ProposalService extends BaseService {
     proposalHash: string,
     pagination: Pagination
   ): Observable<Transaction[]> {
-    const metaVotingPeriod = get<MetaVotingPeriod>(period => period.value)(
-      metaVotingPeriods.find(period => period.periodKind === periodKind)
+    const metaVotingPeriod = get<MetaVotingPeriod>((period) => period.value)(
+      metaVotingPeriods.find((period) => period.periodKind === periodKind)
     )
 
     return this.post<Transaction[]>('operations', {
@@ -180,15 +182,15 @@ export class ProposalService extends BaseService {
 
   getVotesTotal(proposalHash: string, metaVotingPeriods: MetaVotingPeriod[]): Observable<MetaVotingPeriod[]> {
     const _metaVotingPeriods = metaVotingPeriods.filter(
-      metaVotingPeriod => !!metaVotingPeriod.value && metaVotingPeriod.periodKind !== PeriodKind.Proposal
+      (metaVotingPeriod) => !!metaVotingPeriod.value && metaVotingPeriod.periodKind !== PeriodKind.Proposal
     )
 
     return forkJoin(
       [this.getProposalVotesCount(proposalHash)].concat(
-        _metaVotingPeriods.map(metaVotingPeriod => this.getMetaVotingPeriodCount(proposalHash, metaVotingPeriod.value))
+        _metaVotingPeriods.map((metaVotingPeriod) => this.getMetaVotingPeriodCount(proposalHash, metaVotingPeriod.value))
       )
     ).pipe(
-      map(counts =>
+      map((counts) =>
         [
           {
             ...metaVotingPeriods[0],
@@ -206,30 +208,32 @@ export class ProposalService extends BaseService {
   ): Observable<{ periodsTimespans: PeriodTimespan[]; blocksPerVotingPeriod: number }> {
     return forkJoin(
       forkJoin(
-        metaVotingPeriods.map(period =>
+        metaVotingPeriods.map((period) =>
           period.value <= currentVotingPeriod
             ? this.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'asc')).pipe(
-              map(first),
-              map(get(item => item.timestamp))
-            )
+                map(first),
+                map(get((item) => item.timestamp))
+              )
             : of(null)
         )
       ),
       forkJoin(
-        metaVotingPeriods.map(period =>
+        metaVotingPeriods.map((period) =>
           period.value < currentVotingPeriod
             ? this.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
-              map(first),
-              map(get(item => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
-            )
+                map(first),
+                map(get((item) => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
+              )
             : of(null)
         )
       )
     ).pipe(
-      map(response => ({
-        periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),
-        blocksPerVotingPeriod
-      }))
+      map((response) => {
+        return {
+          periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),
+          blocksPerVotingPeriod
+        }
+      })
     )
   }
 
@@ -242,25 +246,25 @@ export class ProposalService extends BaseService {
       .concat(
         arg.proposalHash
           ? [
-            {
-              field: 'proposal_hash',
-              operation: Operation.eq,
-              set: [arg.proposalHash],
-              inverse: false
-            }
-          ]
+              {
+                field: 'proposal_hash',
+                operation: Operation.eq,
+                set: [arg.proposalHash],
+                inverse: false
+              }
+            ]
           : []
       )
       .concat(
         arg.votingPeriod
           ? [
-            {
-              field: 'voting_period',
-              operation: Operation.eq,
-              set: [arg.votingPeriod],
-              inverse: false
-            }
-          ]
+              {
+                field: 'voting_period',
+                operation: Operation.eq,
+                set: [arg.votingPeriod],
+                inverse: false
+              }
+            ]
           : []
       )
 
@@ -333,7 +337,7 @@ export class ProposalService extends BaseService {
       map(
         pipe(
           first,
-          get<Block>(block => block.meta_voting_period)
+          get<Block>((block) => block.meta_voting_period)
         )
       )
     )
@@ -369,7 +373,7 @@ export class ProposalService extends BaseService {
       map(
         pipe(
           first,
-          get<any>(item => parseInt(item.count_proposal))
+          get<any>((item) => parseInt(item.count_proposal))
         )
       )
     )
@@ -402,7 +406,7 @@ export class ProposalService extends BaseService {
       map(
         pipe(
           first,
-          get<any>(item => parseInt(item.count_proposal))
+          get<any>((item) => parseInt(item.count_proposal))
         )
       )
     )

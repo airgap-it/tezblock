@@ -80,44 +80,47 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       name: 'description',
       content: `Tezos Proposal Hash ${this.proposalHash}. The name, period, discussion, features, documentation, exploration, testing and promotion of the proposal are detailed on tezblock.">`
     })
-    this.proposal$ = this.store$.select(state => state.proposalDetails.proposal)
-    this.votes$ = this.store$.select(state => state.proposalDetails.votes.data)
-    this.loading$ = this.store$.select(state => state.proposalDetails.votes.loading)
+    this.proposal$ = this.store$.select((state) => state.proposalDetails.proposal)
+    this.votes$ = this.store$.select((state) => state.proposalDetails.votes.data)
+    this.loading$ = this.store$.select((state) => state.proposalDetails.votes.loading)
     this.periodTimespan$ = combineLatest([
-      this.store$.select(state => state.proposalDetails.periodKind),
-      this.store$.select(state => state.proposalDetails.periodsTimespans)
+      this.store$.select((state) => state.proposalDetails.periodKind),
+      this.store$.select((state) => state.proposalDetails.periodsTimespans)
     ]).pipe(
       filter(([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans),
-      map(
-        ([periodKind, periodsTimespans]) =>
-          periodsTimespans[
-          [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion].indexOf(<PeriodKind>periodKind)
-          ]
-      )
+      map(([periodKind, periodsTimespans]) => {
+        return periodsTimespans[
+          [PeriodKind.Proposal, PeriodKind.Exploration, PeriodKind.Testing, PeriodKind.Promotion, PeriodKind.Adoption].indexOf(
+            <PeriodKind>periodKind
+          )
+        ]
+      })
     )
     this.noDataLabel$ = this.store$
-      .select(state => state.proposalDetails.periodKind)
+      .select((state) => state.proposalDetails.periodKind)
       .pipe(
-        withLatestFrom(this.store$.select(state => state.proposalDetails.proposal)),
+        withLatestFrom(this.store$.select((state) => state.proposalDetails.proposal)),
         filter(([periodKind, proposal]) => !!proposal),
         map(([periodKind, proposal]) =>
           periodKind === PeriodKind.Testing
             ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is investigated by the community.`
+            : periodKind === PeriodKind.Adoption
+            ? `${this.aliasPipe.transform(proposal.proposal, 'proposal')} upgrade is adapted.`
             : undefined
         )
       )
     this.periodKind$ = this.store$
-      .select(state => state.proposalDetails.periodKind)
+      .select((state) => state.proposalDetails.periodKind)
       .pipe(
         filter(negate(isNil)),
-        map(periodKind => $enum(PeriodKind).getKeyOrThrow(periodKind))
+        map((periodKind) => $enum(PeriodKind).getKeyOrThrow(periodKind))
       )
     this.yayRolls$ = this.store$.select(fromRoot.proposalDetails.yayRolls)
     this.nayRolls$ = this.store$.select(fromRoot.proposalDetails.nayRolls)
     this.passRolls$ = this.store$.select(fromRoot.proposalDetails.passRolls)
     this.yayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.yayRollsPercentage)
     this.nayRollsPercentage$ = this.store$.select(fromRoot.proposalDetails.nayRollsPercentage)
-    this.showRolls$ = combineLatest([this.store$.select(state => state.proposalDetails.periodKind), this.yayRolls$]).pipe(
+    this.showRolls$ = combineLatest([this.store$.select((state) => state.proposalDetails.periodKind), this.yayRolls$]).pipe(
       map(
         ([periodKind, yayRolls]) =>
           [<string>PeriodKind.Exploration, <string>PeriodKind.Promotion].indexOf(periodKind) !== -1 && yayRolls !== undefined
@@ -125,7 +128,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     )
 
     this.subscriptions.push(
-      this.activatedRoute.paramMap.subscribe(paramMap => {
+      this.activatedRoute.paramMap.subscribe((paramMap) => {
         const id = paramMap.get('id')
         const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
         this.setTabs(tabTitle)
@@ -135,23 +138,23 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
       this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
         ({ metaVotingPeriods }) =>
-        (this.tabs = updateTabCounts(
-          this.tabs,
-          metaVotingPeriods.map(metaVotingPeriod => ({
-            key: metaVotingPeriod.periodKind,
-            count: metaVotingPeriod.count
-          }))
-        ))
+          (this.tabs = updateTabCounts(
+            this.tabs,
+            metaVotingPeriods.map((metaVotingPeriod) => ({
+              key: metaVotingPeriod.periodKind,
+              count: metaVotingPeriod.count
+            }))
+          ))
       ),
 
       combineLatest(
-        this.activatedRoute.paramMap.pipe(filter(paramMap => !!paramMap.get('id'))),
-        this.store$.select(state => state.proposalDetails.proposal)
+        this.activatedRoute.paramMap.pipe(filter((paramMap) => !!paramMap.get('id'))),
+        this.store$.select((state) => state.proposalDetails.proposal)
       )
         .pipe(filter(([paramMap, proposal]) => !!proposal))
         .subscribe(() => {
           const tabTitle: string = this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined
-          const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find(tab => tab.title === tabTitle).kind : PeriodKind.Proposal
+          const periodKind: PeriodKind = tabTitle ? <PeriodKind>this.tabs.find((tab) => tab.title === tabTitle).kind : PeriodKind.Proposal
 
           this.store$.dispatch(actions.startLoadingVotes({ periodKind }))
         }),
@@ -159,16 +162,16 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       getRefresh([this.actions$.pipe(ofType(actions.loadVotesSucceeded)), this.actions$.pipe(ofType(actions.loadVotesFailed))])
         .pipe(
           withLatestFrom(
-            this.store$.select(state => state.proposalDetails.periodKind),
-            this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-            this.store$.select(state => state.app.currentVotingPeriod)
+            this.store$.select((state) => state.proposalDetails.periodKind),
+            this.store$.select((state) => state.proposalDetails.metaVotingPeriods),
+            this.store$.select((state) => state.app.currentVotingPeriod)
           ),
           filter(([refreshNo, periodKind, metaVotingPeriods, currentVotingPeriod]) => {
             if (!metaVotingPeriods || !currentVotingPeriod) {
               return false
             }
 
-            const currentPeriod = metaVotingPeriods.find(period => period.value === currentVotingPeriod)
+            const currentPeriod = metaVotingPeriods.find((period) => period.value === currentVotingPeriod)
 
             return currentPeriod && currentPeriod.periodKind === periodKind
           })
@@ -197,7 +200,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         kind: PeriodKind.Proposal,
         count: undefined,
         icon: this.iconPipe.transform('fileUpload'),
-        columns: columns(this.translateService).filter(column => column.field !== 'ballot'),
+        columns: columns(this.translateService).filter((column) => column.field !== 'ballot'),
         disabled: () => false
       },
       {
@@ -214,9 +217,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
             return true
           }
 
-          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Exploration)
+          const period = metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === PeriodKind.Exploration)
 
-          const result = !period || get<MetaVotingPeriod>(period => !period.value)(period)
+          const result = !period || get<MetaVotingPeriod>((period) => !period.value)(period)
           return result
         }
       },
@@ -235,9 +238,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
             return true
           }
 
-          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Testing)
+          const period = metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === PeriodKind.Testing)
 
-          return !period || get<MetaVotingPeriod>(period => !period.value)(period)
+          return !period || get<MetaVotingPeriod>((period) => !period.value)(period)
         }
       },
       {
@@ -254,9 +257,43 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
             return true
           }
 
-          const period = metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === PeriodKind.Promotion)
+          const period = metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === PeriodKind.Promotion)
 
-          return !period || get<MetaVotingPeriod>(period => !period.value)(period)
+          return !period || get<MetaVotingPeriod>((period) => !period.value)(period)
+        }
+      },
+      {
+        title: 'Adoption',
+        active: selectedTitle === 'Adoption',
+        kind: PeriodKind.Adoption,
+        count: undefined,
+        icon: this.iconPipe.transform('graduationCap'), //TODO change icon
+        columns: columns(this.translateService),
+        emptySign: '-',
+        disabled: () => {
+          const proposalsBeforeAdoptionPeriod = [
+            'PtdRxBHvc91c2ea2evV6wkoqnzW7TadTg9aqS9jAn2GbcPGtumD',
+            'PsBABY5HQTSkA4297zNHfsZNKtxULfL18y95qb3m53QJiXGmrbU',
+            'PsBABY5nk4JhdEv1N1pZbt6m6ccB9BfNqa23iKZcHBh23jmRS9f',
+            'PtCarthavAMoXqbjBPVgDCRd5LgT7qqKWUPXnYii3xCaHRBMfHH',
+            'PsCARTHAGazKbHtnKfLzQg3kms52kSRpgnDY982a9oYsSXRLQEb',
+            'PsDELPH1Kxsxt8f9eWbxQeRxkjfbxoqM52jvs5Y5fBxWWh4ifpo',
+            'PtEdoTezd3RHSC31mpxxo1npxFjoWWcFgQtxapi51Z8TLu6v6Uq'
+          ]
+          const viewedProposal = fromRoot.getState(this.store$).proposalDetails.id
+          if (proposalsBeforeAdoptionPeriod.includes(viewedProposal)) {
+            return true
+          }
+
+          const metaVotingPeriods = fromRoot.getState(this.store$).proposalDetails.metaVotingPeriods
+
+          if (!metaVotingPeriods) {
+            return true
+          }
+
+          const period = metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === PeriodKind.Adoption)
+
+          return !period || get<MetaVotingPeriod>((period) => !period.value)(period)
         }
       }
     ]
