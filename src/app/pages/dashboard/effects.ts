@@ -29,13 +29,13 @@ export class DashboarEffects {
           return of(actions.loadContractsSucceeded({ contracts: [] }))
         }
 
-        return forkJoin(contracts.data.map(contract => this.contractService.getTotalSupplyByContract(contract))).pipe(
-          map(totalSupplies =>
+        return forkJoin(contracts.data.map((contract) => this.contractService.getTotalSupplyByContract(contract))).pipe(
+          map((totalSupplies) =>
             actions.loadContractsSucceeded({
               contracts: totalSupplies.map((totalSupply, index) => ({ ...contracts.data[index], totalSupply }))
             })
           ),
-          catchError(error => of(actions.loadContractsFailed({ error })))
+          catchError((error) => of(actions.loadContractsFailed({ error })))
         )
       })
     )
@@ -47,8 +47,8 @@ export class DashboarEffects {
       switchMap(() => {
         return this.apiService.getProposals(1).pipe(
           map(first),
-          map(proposal => actions.loadLatestProposalSucceeded({ proposal })),
-          catchError(error => of(actions.loadLatestProposalFailed({ error })))
+          map((proposal) => actions.loadLatestProposalSucceeded({ proposal })),
+          catchError((error) => of(actions.loadLatestProposalFailed({ error })))
         )
       })
     )
@@ -58,21 +58,21 @@ export class DashboarEffects {
     this.actions$.pipe(
       ofType(actions.loadCurrentPeriodTimespan),
       withLatestFrom(
-        this.store$.select(state => state.app.currentVotingPeriod),
-        this.store$.select(state => state.app.blocksPerVotingPeriod)
+        this.store$.select((state) => state.app.currentVotingPeriod),
+        this.store$.select((state) => state.app.blocksPerVotingPeriod)
       ),
       switchMap(([action, currentVotingPeriod, blocksPerVotingPeriod]) =>
         this.baseService
           .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(currentVotingPeriod, 'asc'))
-          .pipe(map(first), map(get(item => item.timestamp)))
+          .pipe(map(first), map(get((item) => item.timestamp)))
           .pipe(
-            map(response =>
+            map((response) =>
               actions.loadCurrentPeriodTimespanSucceeded({
                 currentPeriodTimespan: { start: response, end: null },
                 blocksPerVotingPeriod
               })
             ),
-            catchError(error => of(actions.loadCurrentPeriodTimespanFailed({ error })))
+            catchError((error) => of(actions.loadCurrentPeriodTimespanFailed({ error })))
           )
       )
     )
@@ -83,8 +83,8 @@ export class DashboarEffects {
       ofType(actions.loadTransactions),
       switchMap(() => {
         return this.apiService.getLatestTransactions(5, ['transaction']).pipe(
-          map(transactions => actions.loadTransactionsSucceeded({ transactions })),
-          catchError(error => of(actions.loadTransactionsFailed({ error })))
+          map((transactions) => actions.loadTransactionsSucceeded({ transactions })),
+          catchError((error) => of(actions.loadTransactionsFailed({ error })))
         )
       })
     )
@@ -95,8 +95,8 @@ export class DashboarEffects {
       ofType(actions.loadBlocks),
       switchMap(() =>
         this.blockService.getLatestBlocks(5, ['volume', 'txcount']).pipe(
-          map(blocks => actions.loadBlocksSucceeded({ blocks })),
-          catchError(error => of(actions.loadBlocksFailed({ error })))
+          map((blocks) => actions.loadBlocksSucceeded({ blocks })),
+          catchError((error) => of(actions.loadBlocksFailed({ error })))
         )
       )
     )
@@ -107,8 +107,8 @@ export class DashboarEffects {
       ofType(actions.loadCryptoHistoricData),
       switchMap(({ periodIndex }) =>
         this.cryptoPricesService.getHistoricCryptoPrices(new Date(), 'USD', 'XTZ', periodIndex).pipe(
-          map(cryptoHistoricData => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
-          catchError(error => of(actions.loadCryptoHistoricDataFailed({ error })))
+          map((cryptoHistoricData) => actions.loadCryptoHistoricDataSucceeded({ cryptoHistoricData })),
+          catchError((error) => of(actions.loadCryptoHistoricDataFailed({ error })))
         )
       )
     )
@@ -117,11 +117,11 @@ export class DashboarEffects {
   loadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadDivisionOfVotes),
-      withLatestFrom(this.store$.select(state => state.app.currentVotingPeriod)),
+      withLatestFrom(this.store$.select((state) => state.app.currentVotingPeriod)),
       switchMap(([action, votingPeriod]) =>
         this.proposalService.getDivisionOfVotes({ votingPeriod }).pipe(
-          map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
-          catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
+          map((divisionOfVotes) => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
+          catchError((error) => of(actions.loadDivisionOfVotesFailed({ error })))
         )
       )
     )

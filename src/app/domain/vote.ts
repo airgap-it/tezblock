@@ -15,7 +15,8 @@ export enum PeriodKind {
   Proposal = 'proposal',
   Exploration = 'testing_vote',
   Testing = 'testing',
-  Promotion = 'promotion_vote'
+  Promotion = 'promotion_vote',
+  Adoption = 'adoption'
 }
 
 export interface MetaVotingPeriod {
@@ -37,18 +38,19 @@ export const fillMissingPeriodTimespans = (periodsTimespans: PeriodTimespan[], b
     if (index < 0) {
       return null
     }
-
     return array[index].end
       ? fromPeriod(array[index].end, originIndex - index + (isStart ? -1 : 0))
       : array[index].start
-      ? fromPeriod(array[index].end, originIndex - index + (isStart ? 0 : 1))
+      ? fromPeriod(array[index].start, originIndex - index + (isStart ? 0 : 1))
       : getFromPrevious(index - 1, array, isStart, originIndex)
   }
 
-  const getPeriod = (period: PeriodTimespan, index: number, array: PeriodTimespan[]): PeriodTimespan => ({
-    start: period.start || getFromPrevious(index - 1, array, true, index),
-    end: period.end || period.start ? fromPeriod(period.start, 1) : getFromPrevious(index - 1, array, false, index)
-  })
+  const getPeriod = (period: PeriodTimespan, index: number, array: PeriodTimespan[]): PeriodTimespan => {
+    return {
+      start: period.start || getFromPrevious(index - 1, array, true, index),
+      end: period.end || period.start ? fromPeriod(period.start, 1) : getFromPrevious(index - 1, array, false, index)
+    }
+  }
 
   return periodsTimespans.map(getPeriod)
 }
@@ -85,9 +87,19 @@ export interface DivisionOfVotes {
   max_level: number
 }
 
-export const _yayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_yay_rolls).reduce((a, b) => a + b, 0) : undefined)
-export const _nayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_nay_rolls).reduce((a, b) => a + b, 0) : undefined)
-export const _passRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => (divisionOfVotes ? divisionOfVotes.map(x => x.max_pass_rolls).reduce((a, b) => a + b, 0) : undefined)
-const allRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number => _yayRollsSelector(divisionOfVotes) + _nayRollsSelector(divisionOfVotes)
-export const _yayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_yayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0
-export const _nayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number => allRollsSelector(divisionOfVotes) > 0 ? Math.round((_nayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000)/100 : 0
+export const _yayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  divisionOfVotes ? divisionOfVotes.map((x) => x.max_yay_rolls).reduce((a, b) => a + b, 0) : undefined
+export const _nayRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  divisionOfVotes ? divisionOfVotes.map((x) => x.max_nay_rolls).reduce((a, b) => a + b, 0) : undefined
+export const _passRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  divisionOfVotes ? divisionOfVotes.map((x) => x.max_pass_rolls).reduce((a, b) => a + b, 0) : undefined
+const allRollsSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  _yayRollsSelector(divisionOfVotes) + _nayRollsSelector(divisionOfVotes)
+export const _yayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  allRollsSelector(divisionOfVotes) > 0
+    ? Math.round((_yayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000) / 100
+    : 0
+export const _nayRollsPercentageSelector = (divisionOfVotes: DivisionOfVotes[]): number =>
+  allRollsSelector(divisionOfVotes) > 0
+    ? Math.round((_nayRollsSelector(divisionOfVotes) / allRollsSelector(divisionOfVotes)) * 10000) / 100
+    : 0

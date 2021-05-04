@@ -24,15 +24,15 @@ const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: S
     return metaVotingPeriods
   }
 
-  return metaVotingPeriods.map(metaVotingPeriod => {
-    const match = state.metaVotingPeriods.find(_metaVotingPeriod => _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind)
+  return metaVotingPeriods.map((metaVotingPeriod) => {
+    const match = state.metaVotingPeriods.find((_metaVotingPeriod) => _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind)
 
     return { ...match, [property]: metaVotingPeriod[property] }
   })
 }
 
 export const isEmptyPeriodKind = (periodKind: string, metaVotingPeriods: MetaVotingPeriod[] = []): boolean =>
-  get<MetaVotingPeriod>(period => period.count)(metaVotingPeriods.find(period => period.periodKind === periodKind)) === 0
+  get<MetaVotingPeriod>((period) => period.count)(metaVotingPeriods.find((period) => period.periodKind === periodKind)) === 0
 
 export interface State {
   id: string
@@ -69,22 +69,23 @@ export const reducer = createReducer(
     proposal: proposal || null,
     loadingProposal: false
   })),
-  on(actions.loadProposalFailed, state => ({
+  on(actions.loadProposalFailed, (state) => ({
     ...state,
     proposal: null,
     loadingProposal: false
   })),
   on(actions.startLoadingVotes, (state, { periodKind }) => {
     const hasKindChanged = periodKind !== state.periodKind
-    
+
     return {
-    ...state,
-    periodKind,
-    votes: {
-      ...state.votes,
-      data: hasKindChanged ? undefined : state.votes.data
+      ...state,
+      periodKind,
+      votes: {
+        ...state.votes,
+        data: hasKindChanged ? undefined : state.votes.data
+      }
     }
-  }}),
+  }),
   on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
     ...state,
     metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'value')
@@ -93,7 +94,7 @@ export const reducer = createReducer(
     ...state,
     metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'count')
   })),
-  on(actions.loadMetaVotingPeriodsFailed, state => ({
+  on(actions.loadMetaVotingPeriodsFailed, (state) => ({
     ...state,
     votes: {
       ...state.votes,
@@ -116,14 +117,14 @@ export const reducer = createReducer(
       loading: false
     }
   })),
-  on(actions.loadVotesFailed, state => ({
+  on(actions.loadVotesFailed, (state) => ({
     ...state,
     votes: {
       ...state.votes,
       loading: false
     }
   })),
-  on(actions.increasePageSize, state => ({
+  on(actions.increasePageSize, (state) => ({
     ...state,
     votes: {
       ...state.votes,
@@ -148,7 +149,7 @@ export const reducer = createReducer(
     ...state,
     divisionOfVotes
   })),
-  on(actions.loadDivisionOfVotesFailed, state => ({
+  on(actions.loadDivisionOfVotesFailed, (state) => ({
     ...state,
     divisionOfVotes: null
   }))

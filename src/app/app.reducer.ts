@@ -91,7 +91,7 @@ export const reducer = createReducer(
     currentVotingeriodPosition,
     blocksPerVotingPeriod
   })),
-  on(actions.loadPeriodInfosFailed, state => ({
+  on(actions.loadPeriodInfosFailed, (state) => ({
     ...state,
     currentVotingPeriod: null,
     currentVotingeriodPosition: null,
@@ -112,7 +112,7 @@ export const reducer = createReducer(
     ...state,
     exchangeRates: updateExchangeRates(from, to, price, state.exchangeRates)
   })),
-  on(actions.loadProtocolVariables, state => ({
+  on(actions.loadProtocolVariables, (state) => ({
     ...state,
     busy: {
       ...state.busy,
@@ -127,7 +127,7 @@ export const reducer = createReducer(
       protocolVariables: false
     }
   })),
-  on(actions.loadProtocolVariablesFailed, state => ({
+  on(actions.loadProtocolVariablesFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
