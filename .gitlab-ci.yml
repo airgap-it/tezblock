@@ -105,7 +105,7 @@ publish-dev:
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
     - gcloud config set account $GCLOUD_ACCOUNT_DEV
     - gcloud config set project $GCLOUD_PROJECT_DEV
-    - gcloud config set compute/zone $GCLOUD_ZONE
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEV
     - gcloud auth configure-docker
   script:
     - docker tag $GOOGLE_TAG $GOOGLE_TAG_DEV
@@ -124,14 +124,14 @@ k8s-deploy-development:
   when: manual
   image: google/cloud-sdk
   before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - echo $GCLOUD_GOOGLE_KEY_DEV > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT_DEV
+    - gcloud config set project $GCLOUD_PROJECT_DEV
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEV
     - gcloud container clusters get-credentials papers-cluster-development
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG_DEV"|g" k8s/tezblock/common/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/development/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
