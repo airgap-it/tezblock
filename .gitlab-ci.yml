@@ -4,6 +4,8 @@ variables:
   GOOGLE_TAG: eu.gcr.io/papers-kubernetes/tezblock-frontend:$CI_COMMIT_SHA
   TEST_TAG: tezblock_frontend_test_$CI_COMMIT_SHA
   GOOGLE_TAG_LATEST: eu.gcr.io/papers-kubernetes/tezblock-frontend:latest
+  GOOGLE_TAG_DEV: eu.gcr.io/papers-dev-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:$CI_COMMIT_SHA
+  GOOGLE_TAG_LATEST_DEV: eu.gcr.io/papers-dev-kubernetes/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME:latest
 
 stages:
   - build
@@ -25,6 +27,9 @@ build_serve:
   when: manual
   script:
     - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg CARTHAGENET_RPC_URL --build-arg DELPHINET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg CARTHAGENET_CONSEIL_URL --build-arg DELPHINET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg CARTHAGENET_CONSEIL_API_KEY --build-arg DELPHINET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg CARTHAGENET_TARGET_URL --build-arg DELPHINET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
+  only:
+   - master
+   - develop
   tags:
     - docker
 
@@ -71,10 +76,10 @@ qa:
   tags:
     - docker
 
-publish:
+publish-prod:
   stage: publish
-  when: manual
   image: google/cloud-sdk
+  needs: ["build_serve"]
   before_script:
     - echo $GCLOUD_GOOGLE_KEY > key.json
     - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
@@ -88,24 +93,45 @@ publish:
     - docker push $GOOGLE_TAG_LATEST
   only:
     - master
-    - develop
-    - feat/delphinet
+  tags:
+    - docker
+
+publish-dev:
+  stage: publish
+  needs: ["build_serve"]
+  image: google/cloud-sdk
+  before_script:
+    - echo $GCLOUD_GOOGLE_KEY_DEV > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT_DEV
+    - gcloud config set project $GCLOUD_PROJECT_DEV
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEV
+    - gcloud auth configure-docker
+  script:
+    - docker tag $GOOGLE_TAG $GOOGLE_TAG_DEV
+    - docker tag $GOOGLE_TAG $GOOGLE_TAG_LATEST_DEV
+    - docker push $GOOGLE_TAG_DEV
+    - docker push $GOOGLE_TAG_LATEST_DEV
+  only:
+   - master
+   - develop
   tags:
     - docker
 
 k8s-deploy-development:
   stage: deploy
+  needs: ["publish-dev"]
   when: manual
   image: google/cloud-sdk
   before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set compute/zone $GCLOUD_ZONE_DEVELOPMENT
+    - echo $GCLOUD_GOOGLE_KEY_DEV > key.json
+    - gcloud auth activate-service-account $GCLOUD_ACCOUNT_DEV --key-file key.json
+    - gcloud config set account $GCLOUD_ACCOUNT_DEV
+    - gcloud config set project $GCLOUD_PROJECT_DEV
+    - gcloud config set compute/zone $GCLOUD_ZONE_DEV
     - gcloud container clusters get-credentials papers-cluster-development
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG_DEV"|g" k8s/tezblock/common/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/development/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
@@ -117,6 +143,7 @@ k8s-deploy-development:
 
 k8s-deploy-production:
   stage: deploy
+  needs: ["publish-prod"]
   when: manual
   image: google/cloud-sdk
   before_script:
@@ -133,25 +160,5 @@ k8s-deploy-production:
     - kubectl apply -f k8s/tezblock/common/ --recursive
   only:
     - master
-  tags:
-    - docker
-
-k8s-deploy-delphinet-prod:
-  stage: deploy
-  when: manual
-  image: google/cloud-sdk
-  before_script:
-    - echo $GCLOUD_GOOGLE_KEY > key.json
-    - gcloud auth activate-service-account $GCLOUD_ACCOUNT --key-file key.json
-    - gcloud config set project $GCLOUD_PROJECT
-    - gcloud config set account $GCLOUD_ACCOUNT
-    - gcloud config set compute/zone $GCLOUD_ZONE
-    - gcloud container clusters get-credentials papers-cluster-production
-  script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/delphinet/frontend/deployment.yaml
-    - kubectl apply -f k8s/tezblock/common/namespace.yaml
-    - kubectl apply -f k8s/tezblock/delphinet/ --recursive
-  only:
-    - feat/delphinet
   tags:
     - docker
