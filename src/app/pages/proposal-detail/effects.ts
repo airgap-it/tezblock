@@ -21,7 +21,7 @@ export class ProposalDetailEffects {
       ofType(actions.loadProposal),
       switchMap(({ id }) =>
         this.apiService.getProposal(id).pipe(
-          map(proposal => {
+          map((proposal) => {
             const match = proposals[id]
 
             return actions.loadProposalSucceeded({
@@ -31,7 +31,7 @@ export class ProposalDetailEffects {
               }
             })
           }),
-          catchError(error => of(actions.loadProposalFailed({ error })))
+          catchError((error) => of(actions.loadProposalFailed({ error })))
         )
       )
     )
@@ -55,27 +55,27 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriods),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.proposal)
+        this.store$.select((state) => state.proposalDetails.id),
+        this.store$.select((state) => state.proposalDetails.proposal)
       ),
-      switchMap(([action, proposalHash, proposal]) =>
-        this.proposalService.getMetaVotingPeriods(proposalHash, proposal).pipe(
-          map(metaVotingPeriods => actions.loadMetaVotingPeriodsSucceeded({ metaVotingPeriods })),
-          catchError(error => of(actions.loadMetaVotingPeriodsFailed({ error })))
+      switchMap(([action, proposalHash, proposal]) => {
+        return this.proposalService.getMetaVotingPeriods(proposalHash, proposal).pipe(
+          map((metaVotingPeriods) => actions.loadMetaVotingPeriodsSucceeded({ metaVotingPeriods })),
+          catchError((error) => of(actions.loadMetaVotingPeriodsFailed({ error })))
         )
-      )
+      })
     )
   )
 
   onMetaVotingPeriodLoadVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadMetaVotingPeriodsSucceeded),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
+      withLatestFrom(this.store$.select((state) => state.proposalDetails.periodKind)),
       filter(
         ([{ metaVotingPeriods }, periodKind]) =>
           periodKind === PeriodKind.Proposal ||
-          !!get<MetaVotingPeriod>(period => period.value)(
-            metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === periodKind)
+          !!get<MetaVotingPeriod>((period) => period.value)(
+            metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === periodKind)
           )
       ),
       map(([{ metaVotingPeriods }, periodKind]) => actions.loadVotes({ periodKind }))
@@ -86,15 +86,15 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-        this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.votes.pagination)
+        this.store$.select((state) => state.proposalDetails.metaVotingPeriods),
+        this.store$.select((state) => state.proposalDetails.id),
+        this.store$.select((state) => state.proposalDetails.votes.pagination)
       ),
       filter(([{ periodKind }]) => periodKind !== PeriodKind.Proposal),
       switchMap(([{ periodKind }, metaVotingPeriods, proposalHash, pagination]) => {
         return this.proposalService.getVotes(periodKind, metaVotingPeriods, proposalHash, pagination).pipe(
-          map(votes => actions.loadVotesSucceeded({ votes })),
-          catchError(error => of(actions.loadVotesFailed({ error })))
+          map((votes) => actions.loadVotesSucceeded({ votes })),
+          catchError((error) => of(actions.loadVotesFailed({ error })))
         )
       })
     )
@@ -104,16 +104,16 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadVotes),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.votes.pagination)
+        this.store$.select((state) => state.proposalDetails.id),
+        this.store$.select((state) => state.proposalDetails.votes.pagination)
       ),
       filter(([{ periodKind }, proposalHash, pagination]) => periodKind === PeriodKind.Proposal),
       switchMap(([{ periodKind }, proposalHash, pagination]) =>
         this.proposalService.getProposalVotes(proposalHash, pagination).pipe(
           switchMap((votes: Transaction[]) =>
             this.proposalService.addVoteData(votes).pipe(
-              map(votes => actions.loadVotesSucceeded({ votes })),
-              catchError(error => of(actions.loadVotesFailed({ error })))
+              map((votes) => actions.loadVotesSucceeded({ votes })),
+              catchError((error) => of(actions.loadVotesFailed({ error })))
             )
           )
         )
@@ -132,13 +132,13 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadVotesTotal),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.id),
-        this.store$.select(state => state.proposalDetails.metaVotingPeriods)
+        this.store$.select((state) => state.proposalDetails.id),
+        this.store$.select((state) => state.proposalDetails.metaVotingPeriods)
       ),
       switchMap(([action, proposalHash, metaVotingPeriods]) =>
         this.proposalService.getVotesTotal(proposalHash, metaVotingPeriods).pipe(
-          map(metaVotingPeriods => actions.loadVotesTotalSucceeded({ metaVotingPeriods })),
-          catchError(error => of(actions.loadVotesTotalFailed({ error })))
+          map((metaVotingPeriods) => actions.loadVotesTotalSucceeded({ metaVotingPeriods })),
+          catchError((error) => of(actions.loadVotesTotalFailed({ error })))
         )
       )
     )
@@ -147,7 +147,7 @@ export class ProposalDetailEffects {
   onPaging$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.increasePageSize),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.periodKind)),
+      withLatestFrom(this.store$.select((state) => state.proposalDetails.periodKind)),
       map(([action, periodKind]) => actions.loadVotes({ periodKind }))
     )
   )
@@ -164,32 +164,32 @@ export class ProposalDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadPeriodsTimespans),
       withLatestFrom(
-        this.store$.select(state => state.proposalDetails.metaVotingPeriods),
-        this.store$.select(state => state.app.currentVotingPeriod),
-        this.store$.select(state => state.app.blocksPerVotingPeriod)
+        this.store$.select((state) => state.proposalDetails.metaVotingPeriods),
+        this.store$.select((state) => state.app.currentVotingPeriod),
+        this.store$.select((state) => state.app.blocksPerVotingPeriod)
       ),
-      switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) =>
-        this.proposalService.getPeriodsTimespans(metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod).pipe(
+      switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) => {
+        return this.proposalService.getPeriodsTimespans(metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod).pipe(
           map(({ periodsTimespans, blocksPerVotingPeriod }) =>
             actions.loadPeriodsTimespansSucceeded({
               periodsTimespans,
               blocksPerVotingPeriod
             })
           ),
-          catchError(error => of(actions.loadPeriodsTimespansFailed({ error })))
+          catchError((error) => of(actions.loadPeriodsTimespansFailed({ error })))
         )
-      )
+      })
     )
   )
 
   loadProposalDescription$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadProposalDescription),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
+      withLatestFrom(this.store$.select((state) => state.proposalDetails.id)),
       switchMap(([action, id]) =>
         this.proposalService.getProposalDescription(id).pipe(
-          map(description => actions.loadProposalDescriptionSucceeded({ description })),
-          catchError(error => of(actions.loadProposalDescriptionFailed({ error })))
+          map((description) => actions.loadProposalDescriptionSucceeded({ description })),
+          catchError((error) => of(actions.loadProposalDescriptionFailed({ error })))
         )
       )
     )
@@ -198,10 +198,10 @@ export class ProposalDetailEffects {
   onLoadVotesLoadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadVotes),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.metaVotingPeriods)),
+      withLatestFrom(this.store$.select((state) => state.proposalDetails.metaVotingPeriods)),
       map(([{ periodKind }, metaVotingPeriods]) => {
-        const votingPeriod = get<MetaVotingPeriod>(metaVotingPeriod => metaVotingPeriod.value)(
-          metaVotingPeriods.find(metaVotingPeriod => metaVotingPeriod.periodKind === periodKind)
+        const votingPeriod = get<MetaVotingPeriod>((metaVotingPeriod) => metaVotingPeriod.value)(
+          metaVotingPeriods.find((metaVotingPeriod) => metaVotingPeriod.periodKind === periodKind)
         )
 
         return actions.loadDivisionOfVotes({ votingPeriod })
@@ -212,11 +212,11 @@ export class ProposalDetailEffects {
   loadDivisionOfVotes$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadDivisionOfVotes),
-      withLatestFrom(this.store$.select(state => state.proposalDetails.id)),
+      withLatestFrom(this.store$.select((state) => state.proposalDetails.id)),
       switchMap(([{ votingPeriod }, proposalHash]) =>
         this.proposalService.getDivisionOfVotes({ proposalHash, votingPeriod }).pipe(
-          map(divisionOfVotes => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
-          catchError(error => of(actions.loadDivisionOfVotesFailed({ error })))
+          map((divisionOfVotes) => actions.loadDivisionOfVotesSucceeded({ divisionOfVotes })),
+          catchError((error) => of(actions.loadDivisionOfVotesFailed({ error })))
         )
       )
     )

@@ -24,12 +24,12 @@ export class AppEffects {
   loadLatestBlock$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadLatestBlock),
-      withLatestFrom(this.store$.select(state => state.app.latestBlock)),
+      withLatestFrom(this.store$.select((state) => state.app.latestBlock)),
       filter(([action, latestBlock]) => !latestBlock || moment().diff(moment(latestBlock.timestamp), 'seconds') > 60),
       switchMap(() =>
         this.blockService.getLatest().pipe(
-          map(latestBlock => actions.loadLatestBlockSucceeded({ latestBlock })),
-          catchError(error => of(actions.loadLatestBlockFailed({ error })))
+          map((latestBlock) => actions.loadLatestBlockSucceeded({ latestBlock })),
+          catchError((error) => of(actions.loadLatestBlockFailed({ error })))
         )
       )
     )
@@ -38,7 +38,7 @@ export class AppEffects {
   onCurrentCycleLoadFirstBlockOfCycle$ = createEffect(() =>
     this.store$.select(fromRoot.app.currentCycle).pipe(
       filter(negate(isNil)),
-      map(cycle => actions.loadFirstBlockOfCycle({ cycle }))
+      map((cycle) => actions.loadFirstBlockOfCycle({ cycle }))
     )
   )
 
@@ -90,8 +90,8 @@ export class AppEffects {
           })
           .pipe(
             map(first),
-            map(firstBlockOfCycle => actions.loadFirstBlockOfCycleSucceeded({ firstBlockOfCycle })),
-            catchError(error => of(actions.loadFirstBlockOfCycleFailed({ error })))
+            map((firstBlockOfCycle) => actions.loadFirstBlockOfCycleSucceeded({ firstBlockOfCycle })),
+            catchError((error) => of(actions.loadFirstBlockOfCycleFailed({ error })))
           )
       )
     )
@@ -109,7 +109,7 @@ export class AppEffects {
       ofType(actions.loadPeriodInfos),
       switchMap(() =>
         this.proposalService.getPeriodInfos().pipe(
-          withLatestFrom(this.store$.select(state => state.app.protocolVariables)),
+          withLatestFrom(this.store$.select((state) => state.app.protocolVariables)),
           map(([{ meta_voting_period, meta_voting_period_position }, protocolVariables]) =>
             actions.loadPeriodInfosSucceeded({
               currentVotingPeriod: meta_voting_period,
@@ -117,7 +117,7 @@ export class AppEffects {
               blocksPerVotingPeriod: protocolVariables.blocks_per_voting_period
             })
           ),
-          catchError(error => of(actions.loadPeriodInfosFailed({ error })))
+          catchError((error) => of(actions.loadPeriodInfosFailed({ error })))
         )
       )
     )
@@ -127,12 +127,12 @@ export class AppEffects {
     this.actions$.pipe(
       ofType(actions.loadCryptoPriceFromCache),
       withLatestFrom(
-        this.store$.select(state => state.app.cryptoCurrencyInfo),
-        this.store$.select(state => state.app.fiatCurrencyInfo)
+        this.store$.select((state) => state.app.cryptoCurrencyInfo),
+        this.store$.select((state) => state.app.fiatCurrencyInfo)
       ),
       switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
         this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
-          map(currency => {
+          map((currency) => {
             const fiatCurrency = get(get(currency, Currency.XTZ), fiatCurrencyInfo.currency)
             const cryptoCurrency = get(get(currency, Currency.XTZ), cryptoCurrencyInfo.currency)
             const fiatPrice = new BigNumber(fiatCurrency)
@@ -140,7 +140,7 @@ export class AppEffects {
 
             return actions.loadCryptoPriceFromCacheSucceeded({ fiatPrice, cryptoPrice })
           }),
-          catchError(error => of(actions.loadCryptoPriceFromCacheFailed({ error })))
+          catchError((error) => of(actions.loadCryptoPriceFromCacheFailed({ error })))
         )
       )
     )
@@ -157,14 +157,14 @@ export class AppEffects {
     this.actions$.pipe(
       ofType(actions.loadCryptoPrice),
       withLatestFrom(
-        this.store$.select(state => state.app.cryptoCurrencyInfo),
-        this.store$.select(state => state.app.fiatCurrencyInfo)
+        this.store$.select((state) => state.app.cryptoCurrencyInfo),
+        this.store$.select((state) => state.app.fiatCurrencyInfo)
       ),
       switchMap(([action, cryptoCurrencyInfo, fiatCurrencyInfo]) =>
         this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
-          switchMap(exchangeRates =>
+          switchMap((exchangeRates) =>
             this.cryptoPricesService.getCryptoPrices('xtz', [fiatCurrencyInfo.currency, cryptoCurrencyInfo.currency]).pipe(
-              map(prices => {
+              map((prices) => {
                 const fiatCurrency =
                   get(prices, fiatCurrencyInfo.currency) || get(get(exchangeRates, Currency.XTZ), fiatCurrencyInfo.currency)
                 const cryptoCurrency =
@@ -174,7 +174,7 @@ export class AppEffects {
 
                 return actions.loadCryptoPriceSucceeded({ fiatPrice, cryptoPrice })
               }),
-              catchError(error => {
+              catchError((error) => {
                 const fiatCurrency = get(get(exchangeRates, Currency.XTZ), fiatCurrencyInfo.currency)
                 const cryptoCurrency = get(get(exchangeRates, Currency.XTZ), cryptoCurrencyInfo.currency)
                 const fiatPrice = new BigNumber(fiatCurrency)
@@ -192,16 +192,16 @@ export class AppEffects {
   loadExchangeRate$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadExchangeRate),
-      switchMap(action =>
+      switchMap((action) =>
         this.cacheService.get<ExchangeRates>(CacheKeys.exchangeRates).pipe(
-          switchMap(exchangeRates =>
+          switchMap((exchangeRates) =>
             this.cryptoPricesService.getCryptoPrices(action.from, [action.to]).pipe(
-              map(prices => {
+              map((prices) => {
                 const price = get(prices, action.to) || get(get(exchangeRates, action.from), action.to)
 
                 return actions.loadExchangeRateSucceeded({ from: action.from, to: action.to, price })
               }),
-              catchError(error => {
+              catchError((error) => {
                 const price = get(get(exchangeRates, action.from), action.to)
 
                 return price
@@ -220,8 +220,8 @@ export class AppEffects {
       ofType(actions.loadProtocolVariables),
       switchMap(() =>
         this.protocolVariablesService.getProtocolVariables().pipe(
-          map(protocolVariables => actions.loadProtocolVariablesSucceeded({ protocolVariables })),
-          catchError(error => of(actions.loadProtocolVariablesFailed({ error })))
+          map((protocolVariables) => actions.loadProtocolVariablesSucceeded({ protocolVariables })),
+          catchError((error) => of(actions.loadProtocolVariablesFailed({ error })))
         )
       )
     )
