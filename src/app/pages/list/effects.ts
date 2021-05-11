@@ -453,7 +453,7 @@ export class ListEffects {
       ),
       switchMap(([action, pagination, orderBy]) => {
         return this.apiService
-          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, [OperationTypes.Endorsement], orderBy)
+          .getLatestTransactions(pagination.selectedSize * pagination.currentPage, ['endorsement', 'endorsement_with_slot'], orderBy)
           .pipe(
             map((endorsements: Transaction[]) => listActions.loadEndorsementsSucceeded({ endorsements })),
             catchError(error => of(listActions.loadEndorsementsFailed({ error })))
