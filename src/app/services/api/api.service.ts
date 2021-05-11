@@ -240,8 +240,8 @@ export class ApiService {
           },
           {
             field: 'kind',
-            operation: 'eq',
-            set: ['endorsement']
+            operation: 'in',
+            set: ['endorsement', 'endorsement_with_slot']
           }
         ],
         limit
@@ -285,34 +285,52 @@ export class ApiService {
     limit: number,
     orderBy = sort('block_level', 'desc')
   ): Observable<Transaction[]> {
+    const predicates = [
+      {
+        field: 'operation_group_hash',
+        operation: 'isnull',
+        inverse: true
+      },
+      {
+        field,
+        operation: 'eq',
+        set: [value]
+      }
+    ]
+    if (kind === 'endorsement') {
+      predicates.push({
+        field: 'kind',
+        operation: 'in',
+        set: ['endorsement', 'endorsement_with_slot']
+      })
+    } else {
+      predicates.push({
+        field: 'kind',
+        operation: 'eq',
+        set: [kind]
+      })
+    }
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
         {
-          predicates: [
-            {
-              field: 'operation_group_hash',
-              operation: 'isnull',
-              inverse: true
-            },
-            {
-              field,
-              operation: 'eq',
-              set: [value]
-            },
-            {
-              field: 'kind',
-              operation: 'eq',
-              set: [kind]
-            }
-          ],
+          predicates,
           orderBy: [orderBy],
           limit
         },
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit)),
+        map((transactions: Transaction[]) => transactions.slice(0, limit).map(transaction => {
+          if (transaction.kind === 'endorsement_with_slot') {
+            return {
+              ...transaction,
+              kind: 'endorsement'
+            }
+          }
+
+          return transaction
+        })),
         switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
@@ -397,7 +415,7 @@ export class ApiService {
           results.map(item => {
             return {
               id: item.operation_group_hash,
-              type: item.kind === OperationTypes.Endorsement ? OperationTypes.Endorsement : OperationTypes.Transaction
+              type: (item.kind === 'endorsement' || item.kind === 'endorsement_with_slot') ? OperationTypes.Endorsement : OperationTypes.Transaction
             }
           })
         )
@@ -548,7 +566,12 @@ export class ApiService {
 
     return this.http
       .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
-      .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field }))))
+      .pipe(map(operationCounts => operationCounts.map(operationCount => {
+        if (operationCount.kind === 'endorsement_with_slot') {
+          return { ...operationCount, kind: 'endorsement', field }
+        }
+        return { ...operationCount, field }
+      })))
   }
 
   getTokenTransferCount(address: string, supportedTokens: TokenContract[]): Observable<OperationCount[]> {
@@ -868,8 +891,8 @@ export class ApiService {
             },
             {
               field: 'kind',
-              operation: 'eq',
-              set: ['endorsement']
+              operation: 'in',
+              set: ['endorsement', 'endorsement_with_slot']
             }
           ],
           orderBy: [sort('block_level', 'desc')],
