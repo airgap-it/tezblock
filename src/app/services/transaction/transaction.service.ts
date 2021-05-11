@@ -48,6 +48,8 @@ export class TransactionService {
         proposal: transaction.proposal ? transaction.proposal.slice(1, transaction.proposal.length - 1) : transaction.proposal
       }))
     const predicates: Predicate[] = []
+    const kindValues = kind === 'endorsement' ? ['endorsement', 'endorsement_with_slot'] : [kind]
+    const comparisonOperation = kind === 'endorsement' ? Operation.in : Operation.eq
 
     predicates.push(
       ...[].concat(
@@ -67,7 +69,7 @@ export class TransactionService {
             }
             return predicates
           }
-          return andGroup([{ field, set: [address] }, { field: 'kind', set: [kind] }, idNotNullPredicate], `A${index}`)
+          return andGroup([{ field, set: [address] }, { field: 'kind', set: kindValues }, idNotNullPredicate], `A${index}`, comparisonOperation)
         })
       )
     )

@@ -177,7 +177,16 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(transactions => transactions.slice(0, limit)),
+        map(transactions => transactions.slice(0, limit).map(transaction => {
+          if (transaction.kind === 'endorsement_with_slot') {
+            return {
+              ...transaction,
+              kind: 'endorsement'
+            }
+          }
+
+          return transaction
+        })),
         switchMap(transactions => {
           const originatedAccounts = transactions
             .filter(transaction => transaction.kind === 'origination')
@@ -220,7 +229,16 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map(transactions => transactions.slice(0, limit)),
+        map(transactions => transactions.slice(0, limit).map(transaction => {
+          if (transaction.kind === 'endorsement_with_slot') {
+            return {
+              ...transaction,
+              kind: 'endorsement'
+            }
+          }
+
+          return transaction
+        })),
         switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.proposalService.addVoteData(transactions))
@@ -386,7 +404,16 @@ export class ApiService {
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit)),
+        map((transactions: Transaction[]) => transactions.slice(0, limit).map(transaction => {
+          if (transaction.kind === 'endorsement_with_slot') {
+            return {
+              ...transaction,
+              kind: 'endorsement'
+            }
+          }
+
+          return transaction
+        })),
         switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
         switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
       )
