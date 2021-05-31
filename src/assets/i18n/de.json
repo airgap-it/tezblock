@@ -179,8 +179,8 @@
     "latest-block-seen": "Letzter Block"
   },
   "block-detail": {
-    "invalid-block_title": "Invalides Blocklevel",
-    "invalid-block_text": "Dieses Blocklevel ist nicht valid.",
+    "invalid-block_title": "Unbekannets Blocklevel",
+    "invalid-block_text": "Dieses Blocklevel ist nicht unbekannt.",
     "block-details": "Block Details",
     "block-height": "Block Height",
     "block-height_tooltip": "Die Block Height, welche die Länge der Blockchain angibt, erhöht sich durch die Addition eines neuen Blocks.",
@@ -211,8 +211,8 @@
     "less": "Weniger"
   },
   "transaction-detail": {
-    "invalid-operation-hash_title": "Invalider Operationhash",
-    "invalid-operation-hash_text": "Dieses Hash ist momentan invalid. Es ist möglicherweise noch nicht Teil der Blockchain.",
+    "invalid-operation-hash_title": "Unbekannets Operationhash",
+    "invalid-operation-hash_text": "Dieses Hash ist momentan unbekannt. Es ist möglicherweise noch nicht Teil der Blockchain.",
     "invalid-operation-hash_update": "Diese Seite wird kontinuierlich aktualisiert, um den aktuellen Status zu erhalten.",
     "transaction-details": "Transaktionsdetails",
     "transaction-hash": "Transaktionshash",
@@ -255,8 +255,8 @@
     "baker-split": "Baker Split",
     "baker-split_tooltip": "Der Baker Split ist ein prozentualer Anteil, welcher dem Baker zusteht als Reward für das Betreiben seiner Infrastruktur. Dieser Split wird vom Baker festgelegt, geschieht off-chain und könnte auch 0% betragen.",
     "last30d": "letzte 30 Tage",
-    "invalid-address": "Invalide Adresse",
-    "invalid-address_text": "Diese Adresse ist momentan invalid. Sie ist möglicherweise noch nicht Teil der Blockchain.",
+    "invalid-address": "Unbekannte Adresse",
+    "invalid-address_text": "Diese Adresse ist momentan unnbekannt. Sie ist möglicherweise noch nicht Teil der Blockchain.",
     "delegate-to": "Delegieren nach",
     "delegate-now": "Jetzt delegieren",
     "or": "oder",
@@ -277,7 +277,7 @@
     "transactions": "Transaktionen",
     "last24h": "letzte 24 Stunden",
     "volume": "Volumen",
-    "invalid-address": "Invalide Adresse",
+    "invalid-address": "Unbekannete Adresse",
     "invalid-address_text": "Diese Adresse ist momentan nicht sichtbar auf der Blockchain."
   },
   "proposal-detail": {
@@ -297,8 +297,8 @@
     "the-current": "Die aktuelle",
     "period-ends": "Periode endet am",
     "period-will-start": "Periode wird beginnen am",
-    "invalid-proposal-hash": "Invalides Proposal Hash",
-    "invalid-proposal-text": "Dieses Operationshash ist invalid."
+    "invalid-proposal-hash": "Unbekannets Proposal Hash",
+    "invalid-proposal-text": "Dieses Operationshash ist unbekannt."
   },
   "token-contract-overview": {
     "asset-smart-contracts": "Asset Smart Contracts"

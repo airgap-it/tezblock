@@ -261,8 +261,8 @@
     "latest-block-seen": "Latest Block Seen"
   },
   "block-detail": {
-    "invalid-block_title": "Invalid Block Level",
-    "invalid-block_text": "This block level is not valid.",
+    "invalid-block_title": "Unknown Block Level",
+    "invalid-block_text": "This block level is unknown.",
     "block-details": "Block Details",
     "block-height": "Block Height",
     "block-height_tooltip": "The block height, which indicates the length of the blockchain, increases after the addition of the new block.",
@@ -293,8 +293,8 @@
     "less": "Less"
   },
   "transaction-detail": {
-    "invalid-operation-hash_title": "Invalid Operation Hash",
-    "invalid-operation-hash_text": "This hash is currently invalid, it might not yet have been included in the blockchain.",
+    "invalid-operation-hash_title": "Unknown Operation Hash",
+    "invalid-operation-hash_text": "This hash is currently unknown, it might not yet have been included in the blockchain.",
     "invalid-operation-hash_update": "This page continuously updates to get the latest state.",
     "transaction-details": "Transaction Details",
     "transaction-hash": "Transaction Hash",
@@ -341,7 +341,7 @@
     "baker-split": "Baker Split",
     "baker-split_tooltip": "The baker split is a percentage taken by the baker as a reward for running his infrastrucutre. This split is decided by the baker, happens offchain and could also be 0%.",
     "last30d": "last 30 days",
-    "invalid-address": "Invalid Address",
+    "invalid-address": "Unknown Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
   "contract-detail": {
@@ -359,7 +359,7 @@
     "transactions": "Transactions",
     "last24h": "last 24 hours",
     "volume": "Volume",
-    "invalid-address": "Invalid Address",
+    "invalid-address": "Unknown Address",
     "invalid-address_text": "This address is currently not visible on the blockchain."
   },
   "proposal-detail": {
@@ -379,8 +379,8 @@
     "the-current": "The current",
     "period-ends": "period ends on",
     "period-will-start": "period will start on",
-    "invalid-proposal-hash": "Invalid Proposal Hash",
-    "invalid-proposal-text": "This operation hash is invalid."
+    "invalid-proposal-hash": "Unknown Proposal Hash",
+    "invalid-proposal-text": "This operation hash is unknown."
   },
   "token-contract-overview": {
     "asset-smart-contracts": "Asset Smart Contracts"
