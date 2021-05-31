@@ -1,0 +1,46 @@
+<p>
+  Granada contains several major improvements to the protocol, as well as numerous bug fixes and minor improvements. Below we discuss some
+  of the most interesting and important changes:
+</p>
+<h5>Features</h5>
+<p>
+  <strong>Emmy*:</strong>
+  The current Tezos consensus algorithm is Emmy+ and we propose to replace it with Emmy*. As described
+  <a href="https://blog.nomadic-labs.com/faster-finality-with-emmy.html" target="_blank">this blog post</a>
+  , if Granada is adopted, Emmy* will generally halve the time between blocks, from 60 seconds to 30 seconds, and allow transactions to
+  achieve significantly faster finality than under the current consensus algorithm. (We expect several significant further improvements to
+  our consensus algorithm and reductions in block times in coming proposals.)
+</p>
+
+<p>
+  <strong>Liquidity Baking:</strong>
+  The availability of low-slippage exchange of tez into other currencies and vice-versa is key to allow the widespread use of Tezos.
+  <a href="https://gitlab.com/tzip/tzip/-/blob/master/drafts/current/draft-liquidity_baking.md" target="_blank">Liquidity Baking</a>
+  addresses this directly by piggybacking off the liquidity and global availability of Bitcoin, and incentivizing large amounts of
+  decentralized liquidity provision between tez and wrapped bitcoins.
+</p>
+
+<p>
+  <strong>Gas improvements:</strong>
+  A number of substantial improvements to performance have been made, which in turn result in dramatic reductions in gas consumption. We
+  have generally observed a decrease of a factor of three to six in the gas consumed in the execution of already deployed contracts. For
+  some contracts, the improvement has been almost a factor of eight. This reduction in gas consumption, the latest in a series we began with
+  Delphi, will enable developers to deploy richer, more complicated, and more interesting applications on Tezos at reasonable real-world
+  cost.
+</p>
+
+<p>
+  Granada contains numerous other bug fixes and small improvements, and
+  <a href="https://tezos.gitlab.io/protocols/010_granada.html" target="_blank">encourage you to look at the changelog</a>
+  for a full description of the contents of the proposal.
+</p>
+
+<h5 class="pb-3">More information</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://gitlab.com/tezos/tezos/-/tree/master/src/proto_010_PtGRANAD">Gitlab Repository</a>
+  </li>
+  <li>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/010_granada.html">Changelog</a>
+  </li>
+</ul>
