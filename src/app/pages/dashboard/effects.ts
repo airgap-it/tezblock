@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { Actions, createEffect, ofType } from '@ngrx/effects'
 import { of, forkJoin } from 'rxjs'
-import { map, catchError, switchMap, withLatestFrom } from 'rxjs/operators'
+import { map, catchError, switchMap, withLatestFrom, filter } from 'rxjs/operators'
 import { Store } from '@ngrx/store'
 
 import * as actions from './actions'
@@ -59,9 +59,12 @@ export class DashboarEffects {
       ofType(actions.loadCurrentPeriodTimespan),
       withLatestFrom(
         this.store$.select((state) => state.app.currentVotingPeriod),
-        this.store$.select((state) => state.app.blocksPerVotingPeriod)
+        this.store$.select((state) => state.app.blocksPerVotingPeriod),
+        this.store$.select((state) => state.app.protocolVariables?.minimal_block_delay)
       ),
-      switchMap(([action, currentVotingPeriod, blocksPerVotingPeriod]) =>
+      filter(([, , , timeBetweenBlocks]) => timeBetweenBlocks !== undefined),
+      map(([, currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks]) => ({ currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks: Number(timeBetweenBlocks) })),
+      switchMap(({ currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks }) =>
         this.baseService
           .post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(currentVotingPeriod, 'asc'))
           .pipe(map(first), map(get((item) => item.timestamp)))
@@ -69,7 +72,8 @@ export class DashboarEffects {
             map((response) =>
               actions.loadCurrentPeriodTimespanSucceeded({
                 currentPeriodTimespan: { start: response, end: null },
-                blocksPerVotingPeriod
+                blocksPerVotingPeriod,
+                timeBetweenBlocks
               })
             ),
             catchError((error) => of(actions.loadCurrentPeriodTimespanFailed({ error })))

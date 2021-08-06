@@ -6,7 +6,6 @@ import {
   OperationResponseOutput,
   PartialTezosOperation,
   RequestPermissionInput,
-  TezosDelegationOperation,
   TezosOperationType
 } from '@airgap/beacon-sdk'
 
@@ -17,8 +16,6 @@ const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   switch (tezosNetwork) {
     case TezosNetwork.MAINNET:
       return NetworkType.MAINNET
-    case TezosNetwork.DELPHINET:
-      return NetworkType.CUSTOM
     default:
       return NetworkType.CUSTOM
   }

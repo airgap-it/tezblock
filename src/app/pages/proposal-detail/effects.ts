@@ -166,14 +166,18 @@ export class ProposalDetailEffects {
       withLatestFrom(
         this.store$.select((state) => state.proposalDetails.metaVotingPeriods),
         this.store$.select((state) => state.app.currentVotingPeriod),
-        this.store$.select((state) => state.app.blocksPerVotingPeriod)
+        this.store$.select((state) => state.app.blocksPerVotingPeriod),
+        this.store$.select((state) => state.app.protocolVariables?.minimal_block_delay)
       ),
-      switchMap(([action, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod]) => {
-        return this.proposalService.getPeriodsTimespans(metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod).pipe(
+      filter(([, , , timeBetweenBlocks]) => timeBetweenBlocks !== undefined),
+      map(([, metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks]) => ({ metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks: Number(timeBetweenBlocks) })),
+      switchMap(({ metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks }) => {
+        return this.proposalService.getPeriodsTimespans(metaVotingPeriods, currentVotingPeriod, blocksPerVotingPeriod, timeBetweenBlocks).pipe(
           map(({ periodsTimespans, blocksPerVotingPeriod }) =>
             actions.loadPeriodsTimespansSucceeded({
               periodsTimespans,
-              blocksPerVotingPeriod
+              blocksPerVotingPeriod,
+              timeBetweenBlocks
             })
           ),
           catchError((error) => of(actions.loadPeriodsTimespansFailed({ error })))

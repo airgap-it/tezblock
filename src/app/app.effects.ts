@@ -42,7 +42,7 @@ export class AppEffects {
     )
   )
 
-  onCurrentCycleChaneResetCache$ = createEffect(
+  onCurrentCycleChangeResetCache$ = createEffect(
     () =>
       combineLatest([
         this.store$.select(fromRoot.app.currentCycle),
@@ -58,7 +58,7 @@ export class AppEffects {
     { dispatch: false }
   )
 
-  onCurrentCycleChaneLoadProtocolVariables$ = createEffect(() =>
+  onCurrentCycleChangeLoadProtocolVariables$ = createEffect(() =>
     this.store$.select(fromRoot.app.currentCycle).pipe(
       filter(negate(isNil)),
       map(() => actions.loadProtocolVariables())

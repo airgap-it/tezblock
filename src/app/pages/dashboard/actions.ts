@@ -23,7 +23,7 @@ export const loadLatestProposalFailed = createAction(`[${featureName}] Load Late
 export const loadCurrentPeriodTimespan = createAction(`[${featureName}] Load CurrenyPeriodTimespan`)
 export const loadCurrentPeriodTimespanSucceeded = createAction(
   `[${featureName}] Load CurrenyPeriodTimespan Succeeded`,
-  props<{ currentPeriodTimespan: PeriodTimespan; blocksPerVotingPeriod: number }>()
+  props<{ currentPeriodTimespan: PeriodTimespan; blocksPerVotingPeriod: number, timeBetweenBlocks: number }>()
 )
 export const loadCurrentPeriodTimespanFailed = createAction(`[${featureName}] Load CurrenyPeriodTimespan Failed`, props<{ error: any }>())
 
