@@ -33,8 +33,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@airgap/beacon-sdk": "^2.2.1",
-    "@airgap/coinlib-core": "^0.10.6",
+    "@airgap/beacon-sdk": "^2.3.1",
+    "@airgap/coinlib-core": "^0.11.7",
     "@angular/animations": "^10.0.8",
     "@angular/cdk": "^10.1.2",
     "@angular/common": "^10.0.8",

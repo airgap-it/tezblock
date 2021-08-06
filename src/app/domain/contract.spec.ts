@@ -10,7 +10,7 @@ const tzBTCaddress = 'KT1PWx2mnDueood7fEmfbBDKx1D9BAnnXitn'
 describe('contract', () => {
   describe('getTokenContractByAddress', () => {
     it('when contract does not exist in given network then returns undefined', () => {
-      expect(getTokenContractByAddress(tzBTCaddress, TezosNetwork.DELPHINET)).toBe(undefined)
+      expect(getTokenContractByAddress(tzBTCaddress, TezosNetwork.GRANADANET)).toBe(undefined)
     })
 
     it('when contract exist in given network then returns that contract', () => {
@@ -24,7 +24,7 @@ describe('contract', () => {
 
   describe('searchTokenContracts', () => {
     it('when contract by part name does not exist in given network then returns empty array', () => {
-      expect(searchTokenContracts('btc', TezosNetwork.DELPHINET)).toEqual([])
+      expect(searchTokenContracts('btc', TezosNetwork.GRANADANET)).toEqual([])
     })
 
     it('when contract by part name exist in given network then returns array with option for that contract', () => {

@@ -9,12 +9,6 @@ import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.ser
 import { ExchangeRates } from '@tezblock/services/cache/cache.service'
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
 
-export const meanBlockTime = 60.032 // seconds, not as per https://medium.com/cryptium/tempus-fugit-understanding-cycles-snapshots-locking-and-unlocking-periods-in-the-tezos-protocol-78b27bd6d62d
-export const numberOfBlocksToSeconds = (numberOfBlocks: number): number => meanBlockTime * numberOfBlocks
-
-export const meanBlockTimeFromPeriod = 60.846710205078125 // Pascal's suspicious calculation from period length
-export const numberOfBlocksToSecondsFromPeriod = (numberOfBlocks: number): number => meanBlockTimeFromPeriod * numberOfBlocks
-
 const updateExchangeRates = (from: string, to: string, price: number, exchangeRates: ExchangeRates): ExchangeRates => {
   return {
     ...exchangeRates,
@@ -136,18 +130,18 @@ export const reducer = createReducer(
   }))
 )
 
-const getRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number): string => {
+const getRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number, timeBetweenBlocks: number): string => {
   const remainingBlocks = cycleEndingBlockLevel - currentBlockLevel
-  const totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
+  const totalSeconds = remainingBlocks * timeBetweenBlocks
   const duration = moment.duration(totalSeconds * 1000)
 
   return duration.days() >= 1
     ? `~${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`
     : `~${duration.hours()}h ${duration.minutes()}m`
 }
-const getRoundedRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number): string => {
+const getRoundedRemainingTime = (currentBlockLevel: number, cycleEndingBlockLevel: number, timeBetweenBlocks: number): string => {
   const remainingBlocks = cycleEndingBlockLevel - currentBlockLevel
-  const totalSeconds = numberOfBlocksToSeconds(remainingBlocks)
+  const totalSeconds = remainingBlocks * timeBetweenBlocks
   const duration = moment.duration(totalSeconds * 1000)
   const days = duration.hours() > 0 || duration.minutes() > 0 ? duration.days() + 1 : duration.days()
 
@@ -159,16 +153,16 @@ export const currentBlockLevelSelector = (state: State): number => (state.latest
 export const cycleStartingBlockLevelSelector = (state: State): number =>
   state.firstBlockOfCurrentCycle ? state.firstBlockOfCurrentCycle.level : undefined
 export const cycleEndingBlockLevelSelector = (state: State): number =>
-  state.firstBlockOfCurrentCycle ? state.firstBlockOfCurrentCycle.level + 4095 : undefined
+  state.firstBlockOfCurrentCycle ? state.firstBlockOfCurrentCycle.level + (state.protocolVariables.blocks_per_cycle - 1) : undefined
 export const cycleProgressSelector = (state: State): number =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
-    ? Math.round(((state.latestBlock.level - state.firstBlockOfCurrentCycle.level) / 4096) * 100)
+    ? Math.round(((state.latestBlock.level - state.firstBlockOfCurrentCycle.level) / state.protocolVariables.blocks_per_cycle) * 100)
     : undefined
 export const remainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
-    ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
+    ? getRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state), Number(state.protocolVariables.minimal_block_delay))
     : undefined
 export const roundedRemainingTimeSelector = (state: State): string =>
   state.firstBlockOfCurrentCycle && state.latestBlock.level
-    ? getRoundedRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state))
+    ? getRoundedRemainingTime(currentBlockLevelSelector(state), cycleEndingBlockLevelSelector(state), Number(state.protocolVariables.minimal_block_delay))
     : undefined

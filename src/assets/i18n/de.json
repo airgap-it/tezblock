@@ -179,8 +179,8 @@
     "latest-block-seen": "Letzter Block"
   },
   "block-detail": {
-    "invalid-block_title": "Unbekannets Blocklevel",
-    "invalid-block_text": "Dieses Blocklevel ist nicht unbekannt.",
+    "invalid-block_title": "Unbekannter Block Level",
+    "invalid-block_text": "Dieser Block Level ist unbekannt.",
     "block-details": "Block Details",
     "block-height": "Block Height",
     "block-height_tooltip": "Die Block Height, welche die Länge der Blockchain angibt, erhöht sich durch die Addition eines neuen Blocks.",
@@ -211,8 +211,8 @@
     "less": "Weniger"
   },
   "transaction-detail": {
-    "invalid-operation-hash_title": "Unbekannets Operationhash",
-    "invalid-operation-hash_text": "Dieses Hash ist momentan unbekannt. Es ist möglicherweise noch nicht Teil der Blockchain.",
+    "invalid-operation-hash_title": "Unbekannter Hash",
+    "invalid-operation-hash_text": "Dieser Hash ist momentan unbekannt. Er ist möglicherweise noch nicht Teil der Blockchain.",
     "invalid-operation-hash_update": "Diese Seite wird kontinuierlich aktualisiert, um den aktuellen Status zu erhalten.",
     "transaction-details": "Transaktionsdetails",
     "transaction-hash": "Transaktionshash",
@@ -277,7 +277,7 @@
     "transactions": "Transaktionen",
     "last24h": "letzte 24 Stunden",
     "volume": "Volumen",
-    "invalid-address": "Unbekannete Adresse",
+    "invalid-address": "Unbekannte Adresse",
     "invalid-address_text": "Diese Adresse ist momentan nicht sichtbar auf der Blockchain."
   },
   "proposal-detail": {
@@ -297,8 +297,8 @@
     "the-current": "Die aktuelle",
     "period-ends": "Periode endet am",
     "period-will-start": "Periode wird beginnen am",
-    "invalid-proposal-hash": "Unbekannets Proposal Hash",
-    "invalid-proposal-text": "Dieses Operationshash ist unbekannt."
+    "invalid-proposal-hash": "Unbekanneter Hash",
+    "invalid-proposal-text": "Dieser Hash ist unbekannt."
   },
   "token-contract-overview": {
     "asset-smart-contracts": "Asset Smart Contracts"

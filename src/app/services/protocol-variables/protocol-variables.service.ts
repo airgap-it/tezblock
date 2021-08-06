@@ -38,6 +38,7 @@ export interface ProtocolConstantResponse {
   min_proposal_quorum: number
   initial_endorsers: number
   delay_per_missing_endorsement: string
+  minimal_block_delay: number
 }
 
 @Injectable({

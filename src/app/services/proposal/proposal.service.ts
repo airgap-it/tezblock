@@ -19,7 +19,6 @@ import {
 } from '@tezblock/domain/vote'
 import { ProposalDto } from '@tezblock/interfaces/proposal'
 import { Pagination } from '@tezblock/domain/table'
-import { meanBlockTimeFromPeriod } from '@tezblock/app.reducer'
 import { getTezosProtocol } from '@tezblock/domain/airgap'
 import { TezosProtocol } from '@airgap/coinlib-core'
 
@@ -202,11 +201,12 @@ export class ProposalService extends BaseService {
   }
 
   getPeriodsTimespans(
-    metaVotingPeriods,
-    currentVotingPeriod,
-    blocksPerVotingPeriod
+    metaVotingPeriods: MetaVotingPeriod[],
+    currentVotingPeriod: number,
+    blocksPerVotingPeriod: number,
+    timeBetweenBlocks: number,
   ): Observable<{ periodsTimespans: PeriodTimespan[]; blocksPerVotingPeriod: number }> {
-    return forkJoin(
+    return forkJoin([
       forkJoin(
         metaVotingPeriods.map((period) =>
           period.value <= currentVotingPeriod
@@ -222,12 +222,12 @@ export class ProposalService extends BaseService {
           period.value < currentVotingPeriod
             ? this.post<{ timestamp: number }[]>('blocks', getPeriodTimespanQuery(period.value, 'desc')).pipe(
                 map(first),
-                map(get((item) => (item.timestamp ? item.timestamp + meanBlockTimeFromPeriod /* seconds */ * 1000 : item.timestamp)))
+                map(get((item) => (item.timestamp ? item.timestamp + timeBetweenBlocks /* seconds */ * 1000 : item.timestamp)))
               )
             : of(null)
         )
       )
-    ).pipe(
+    ]).pipe(
       map((response) => {
         return {
           periodsTimespans: response[0].map((start, index) => <PeriodTimespan>{ start, end: response[1][index] }),

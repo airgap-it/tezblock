@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment'
 export class ChainNetworkService implements OnInit {
   private chainName: TezosNetwork
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET
-  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.DELPHINET]
+  private readonly supportedChains = [TezosNetwork.MAINNET]
 
   constructor() {
     const origin = new URL(location.href).origin
@@ -16,8 +16,6 @@ export class ChainNetworkService implements OnInit {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET
         break
-      case environment.delphinet.targetUrl:
-        this.chainName = TezosNetwork.DELPHINET
         break
       default:
         this.chainName = this.defaultChain
@@ -29,8 +27,6 @@ export class ChainNetworkService implements OnInit {
     switch (chainName) {
       case TezosNetwork.MAINNET:
         return environment.mainnet
-      case TezosNetwork.DELPHINET:
-        return environment.delphinet
       default:
         return environment.mainnet
     }

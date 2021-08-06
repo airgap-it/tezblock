@@ -36,7 +36,7 @@ export const loadVotesTotalFailed = createAction(`[${featureName}] Load Votes To
 export const loadPeriodsTimespans = createAction(`[${featureName}] Load Periods Timespans`)
 export const loadPeriodsTimespansSucceeded = createAction(
   `[${featureName}] Load Periods Timespans Succeeded`,
-  props<{ periodsTimespans: PeriodTimespan[]; blocksPerVotingPeriod: number }>()
+  props<{ periodsTimespans: PeriodTimespan[]; blocksPerVotingPeriod: number, timeBetweenBlocks: number }>()
 )
 export const loadPeriodsTimespansFailed = createAction(`[${featureName}] Load Periods Timespans Failed`, props<{ error: any }>())
 
