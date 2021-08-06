@@ -109,9 +109,9 @@ export const reducer = createReducer(
       currentPeriodTimespan: true
     }
   })),
-  on(actions.loadCurrentPeriodTimespanSucceeded, (state, { currentPeriodTimespan, blocksPerVotingPeriod }) => ({
+  on(actions.loadCurrentPeriodTimespanSucceeded, (state, { currentPeriodTimespan, blocksPerVotingPeriod, timeBetweenBlocks }) => ({
     ...state,
-    currentPeriodTimespan: first(fillMissingPeriodTimespans([currentPeriodTimespan], blocksPerVotingPeriod)),
+    currentPeriodTimespan: first(fillMissingPeriodTimespans([currentPeriodTimespan], blocksPerVotingPeriod, timeBetweenBlocks)),
     busy: {
       ...state.busy,
       currentPeriodTimespan: false

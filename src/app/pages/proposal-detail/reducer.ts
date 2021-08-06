@@ -134,9 +134,9 @@ export const reducer = createReducer(
       }
     }
   })),
-  on(actions.loadPeriodsTimespansSucceeded, (state, { periodsTimespans, blocksPerVotingPeriod }) => ({
+  on(actions.loadPeriodsTimespansSucceeded, (state, { periodsTimespans, blocksPerVotingPeriod, timeBetweenBlocks }) => ({
     ...state,
-    periodsTimespans: fillMissingPeriodTimespans(periodsTimespans, blocksPerVotingPeriod)
+    periodsTimespans: fillMissingPeriodTimespans(periodsTimespans, blocksPerVotingPeriod, timeBetweenBlocks)
   })),
   on(actions.loadProposalDescriptionSucceeded, (state, { description }) => ({
     ...state,

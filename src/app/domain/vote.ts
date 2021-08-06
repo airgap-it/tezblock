@@ -1,4 +1,3 @@
-import { numberOfBlocksToSecondsFromPeriod } from '@tezblock/app.reducer'
 import { Operation, Direction, Body } from '@tezblock/services/base.service'
 
 export interface VotingInfo {
@@ -30,9 +29,9 @@ export interface PeriodTimespan {
   end: number
 }
 
-export const fillMissingPeriodTimespans = (periodsTimespans: PeriodTimespan[], blocksPerVotingPeriod: number) => {
+export const fillMissingPeriodTimespans = (periodsTimespans: PeriodTimespan[], blocksPerVotingPeriod: number, timeBetweenBlocks: number) => {
   const fromPeriod = (value: number, periodsBetween: number): number =>
-    value + numberOfBlocksToSecondsFromPeriod(blocksPerVotingPeriod) * 1000 * periodsBetween
+    value + (blocksPerVotingPeriod * timeBetweenBlocks) * 1000 * periodsBetween
 
   const getFromPrevious = (index: number, array: PeriodTimespan[], isStart: boolean, originIndex: number): number => {
     if (index < 0) {

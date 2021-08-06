@@ -30,7 +30,7 @@ describe('CacheService', () => {
 
   describe('update', () => {
     it('when network is not Mainnet then does not run executeUpdate or update updateQueue', () => {
-      chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.DELPHINET)
+      chainNetworkServiceMock.getNetwork.and.returnValue(TezosNetwork.GRANADANET)
       spyOn(service, 'executeUpdate')
 
       service.update(CacheKeys.fromCurrentCycle, () => null)
