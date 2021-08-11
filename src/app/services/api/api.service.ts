@@ -68,8 +68,7 @@ export interface Balance {
   asof: number
 }
 
-const cycleToLevel = (cycle: number, blocksPerCycle: number): number => cycle * blocksPerCycle
-export const addCycleFromLevel = (blocksPerCycle: number) => right => ({ ...right, level: right.block_level, cycle: Math.floor(right.block_level / blocksPerCycle) })
+export const addCycleFromLevel = (protocol: TezosProtocol) => right => ({ ...right, level: right.block_level, cycle: protocol.blockLevelToCycle(right.block_level) })
 
 function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
   return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
@@ -701,7 +700,7 @@ export class ApiService {
       .pipe(map(first))
   }
 
-  private getBakingRights(address: string, blocksPerCycle: number, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
+  private getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
     const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
@@ -730,7 +729,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(map((rights: BakingRights[]) => rights.map(addCycleFromLevel(blocksPerCycle))))
+      .pipe(map((rights: BakingRights[]) => rights.map(addCycleFromLevel(this.protocol))))
   }
 
   getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
@@ -776,10 +775,9 @@ export class ApiService {
       .select(state => state.app.protocolVariables)
       .pipe(
         filter(negate(isNil)),
-        map((protocolVariables: ProtocolConstantResponse) => protocolVariables.blocks_per_cycle),
-        switchMap(blocks_per_cycle => {
-          const minLevel = cycleToLevel(cycle, blocks_per_cycle)
-          const maxLevel = cycleToLevel(cycle + 1, blocks_per_cycle)
+        switchMap(() => {
+          const minLevel = this.protocol.cycleToBlockLevel(cycle)
+          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1)
           const predicates = [
             {
               field: 'block_level',
@@ -793,8 +791,8 @@ export class ApiService {
             }
           ]
 
-          return this.getBakingRights(address, blocks_per_cycle, null, predicates).pipe(
-            map((rights: BakingRights[]) => rights.map(addCycleFromLevel(blocks_per_cycle))),
+          return this.getBakingRights(address, null, predicates).pipe(
+            map((rights: BakingRights[]) => rights.map(addCycleFromLevel(this.protocol))),
             map((rights: BakingRights[]) => rights.map(setRewardsDepositsAndFees))
           )
         })
@@ -803,7 +801,6 @@ export class ApiService {
 
   private getEndorsingRights(
     address: string,
-    blocksPerCycle: number,
     limit?: number,
     predicates?: Predicate[]
   ): Observable<EndorsingRights[]> {
@@ -831,7 +828,7 @@ export class ApiService {
         },
         this.options
       )
-      .pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(blocksPerCycle))))
+      .pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(this.protocol))))
   }
 
   getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
@@ -875,10 +872,9 @@ export class ApiService {
       .select(state => state.app.protocolVariables)
       .pipe(
         filter(negate(isNil)),
-        map((protocolVariables: ProtocolConstantResponse) => protocolVariables.blocks_per_cycle),
-        switchMap(blocks_per_cycle => {
-          const minLevel = cycleToLevel(cycle, blocks_per_cycle)
-          const maxLevel = cycleToLevel(cycle + 1, blocks_per_cycle)
+        switchMap(() => {
+          const minLevel = this.protocol.cycleToBlockLevel(cycle)
+          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1)
           const predicates = [
             {
               field: 'block_level',
@@ -892,8 +888,8 @@ export class ApiService {
             }
           ]
 
-          return this.getEndorsingRights(address, blocks_per_cycle, 30000, predicates).pipe(
-            map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(blocks_per_cycle))),
+          return this.getEndorsingRights(address, 30000, predicates).pipe(
+            map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(this.protocol))),
             map((rights: EndorsingRights[]) => rights.map(setRewardsAndDeposits))
           )
         })

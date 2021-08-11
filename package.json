@@ -8,7 +8,7 @@
     "start": "ng serve",
     "build": "npm run set-env && ng build && npm run reset-env",
     "test": "ng test",
-    "test-ci": "npm run set-env && ng test --code-coverage --watch=false && npm run reset-env",
+    "test-ci": "npm run set-env && node --max_old_space_size=8192 ./node_modules/@angular/cli/bin/ng test --code-coverage --watch=false && npm run reset-env",
     "lint": "ng lint --format stylish",
     "lint-ci": "ng lint --format json > ./lintReport.json || true",
     "lint-fix": "ng lint --fix",
@@ -34,7 +34,7 @@
   "license": "MIT",
   "dependencies": {
     "@airgap/beacon-sdk": "^2.3.1",
-    "@airgap/coinlib-core": "^0.11.7",
+    "@airgap/coinlib-core": "^0.11.8",
     "@angular/animations": "^10.0.8",
     "@angular/cdk": "^10.1.2",
     "@angular/common": "^10.0.8",
