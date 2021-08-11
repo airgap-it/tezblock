@@ -210,7 +210,7 @@ export class AccountDetailEffects {
     )
   )
 
-  cachBakingBadRatings$ = createEffect(
+  cacheBakingBadRatings$ = createEffect(
     () =>
       this.actions$.pipe(
         ofType(actions.loadBakingBadRatingsSucceeded),

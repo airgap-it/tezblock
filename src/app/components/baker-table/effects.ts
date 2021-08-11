@@ -35,7 +35,7 @@ export class BakerTableEffects {
         this.store$.select(state => state.bakerTable.accountAddress),
         this.store$.select(state => state.bakerTable.bakingRights.pagination)
       ),
-      switchMap(([action, accountAddress, pagination]) =>
+      switchMap(([, accountAddress, pagination]) =>
         this.apiService.getAggregatedBakingRights(accountAddress, pagination.selectedSize * pagination.currentPage).pipe(
           map(bakingRights => actions.loadBakingRightsSucceeded({ bakingRights })),
           catchError(error => of(actions.loadBakingRightsFailed({ error })))

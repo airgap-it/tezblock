@@ -352,17 +352,17 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.numberOfContractAssets$ = this.contractAssets$.pipe(
       map((contractAssets: ContractAsset[]) => uniqBy(contractAssets, (contractAsset) => contractAsset.contract.name).length)
     )
-    this.areBusyRightsPerBlockLevel$ = combineLatest(
+    this.areBusyRightsPerBlockLevel$ = combineLatest([
       this.store$.select((state) => state.bakerTable.bakingRights.loading),
       this.store$.select((state) => state.bakerTable.endorsingRights.loading)
-    ).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
-    this.rightsPerBlockLevel$ = combineLatest(
+    ]).pipe(map(([bakingRightsLoading, endorsingRightsLoading]) => bakingRightsLoading || endorsingRightsLoading))
+    this.rightsPerBlockLevel$ = combineLatest([
       this.store$.select((state) => state.app.latestBlock),
       this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
       this.store$.select((state) => state.app.protocolVariables),
       this.store$.select((state) => state.bakerTable.bakingRights.data),
       this.store$.select((state) => state.bakerTable.endorsingRights.data)
-    ).pipe(
+    ]).pipe(
       filter(
         ([latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights]) =>
           latestBlock && firstBlockOfCurrentCycle && protocolVariables && bakingRights !== undefined && endorsingRights !== undefined
@@ -392,10 +392,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         })
       })
     )
-    this.rightsPerBlockLevelBusy$ = combineLatest(
+    this.rightsPerBlockLevelBusy$ = combineLatest([
       this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
       this.store$.select((state) => state.app.protocolVariables)
-    ).pipe(
+    ]).pipe(
       filter(([firstBlockOfCurrentCycle, protocolVariables]) => !!firstBlockOfCurrentCycle && !!protocolVariables),
       map(([firstBlockOfCurrentCycle, protocolVariables]) => {
         const step = 6
