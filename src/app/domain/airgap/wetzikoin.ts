@@ -13,7 +13,7 @@ export class WetziKoin extends TezosFA2Protocol {
         super(options)
     }
 
-    public async fetchTokenHolders(_tokenIDs: number[] = []): Promise<{ address: string; amount: string, tokenID: number }[]> {
+    public async fetchTokenHolders(): Promise<{ address: string; amount: string }[]> {
         const tokenID = this.options.config.tokenID ?? 0
         const values = await this.contract.bigMapValues({
             bigMapFilter: [
@@ -53,8 +53,7 @@ export class WetziKoin extends TezosFA2Protocol {
 
             return {
                 address: TezosUtils.parseAddress(address),
-                amount: value.value,
-                tokenID
+                amount: value.value
             }
         })
     }

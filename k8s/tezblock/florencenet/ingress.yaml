@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: tezblock-delphinet-frontend
+  name: tezblock-florencenet-frontend
   namespace: tezblock
   annotations:
     kubernetes.io/ingress.class: 'nginx'
@@ -9,19 +9,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - tezblock-delphinet.prod.gke.papers.tech
-        - delphinet.tezblock.io
-      secretName: tezblock-delphinet-prod-tls  
+        - tezblock-florencenet.prod.gke.papers.tech
+        - florencenet.tezblock.io
+      secretName: tezblock-florencenet-prod-tls
   rules:
-    - host: tezblock-delphinet.prod.gke.papers.tech
+    - host: tezblock-florencenet.prod.gke.papers.tech
       http:
         paths:
           - backend:
-              serviceName: tezblock-delphinet-frontend
+              serviceName: tezblock-florencenet-frontend
               servicePort: 80
-    - host: delphinet.tezblock.io
+    - host: florencenet.tezblock.io
       http:
         paths:
           - backend:
-              serviceName: tezblock-delphinet-frontend
+              serviceName: tezblock-florencenet-frontend
               servicePort: 80

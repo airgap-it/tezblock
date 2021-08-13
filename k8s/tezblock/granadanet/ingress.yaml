@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: tezblock-carthagenet-frontend
+  name: tezblock-granadanet-frontend
   namespace: tezblock
   annotations:
     kubernetes.io/ingress.class: 'nginx'
@@ -9,19 +9,19 @@ metadata:
 spec:
   tls:
     - hosts:
-        - tezblock-carthagenet.prod.gke.papers.tech
-        - carthagenet.tezblock.io
-      secretName: tezblock-carthagenet-prod-tls  
+        - tezblock-granadanet.prod.gke.papers.tech
+        - granadanet.tezblock.io
+      secretName: tezblock-granadanet-prod-tls
   rules:
-    - host: tezblock-carthagenet.prod.gke.papers.tech
+    - host: tezblock-granadanet.prod.gke.papers.tech
       http:
         paths:
           - backend:
-              serviceName: tezblock-carthagenet-frontend
+              serviceName: tezblock-granadanet-frontend
               servicePort: 80
-    - host: carthagenet.tezblock.io
+    - host: granadanet.tezblock.io
       http:
         paths:
           - backend:
-              serviceName: tezblock-carthagenet-frontend
+              serviceName: tezblock-granadanet-frontend
               servicePort: 80

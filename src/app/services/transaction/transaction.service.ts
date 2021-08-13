@@ -8,6 +8,7 @@ import { andGroup, Operation, Predicate, OrderBy, likeGroup } from '@tezblock/se
 import { ProposalService } from '@tezblock/services/proposal/proposal.service'
 import { AccountService } from '@tezblock/services/account/account.service'
 import { TokenContract } from '@tezblock/domain/contract'
+import { TezosUtils } from '@airgap/coinlib-core'
 
 const kindToFieldsMap = {
   transaction: ['source', 'destination', 'parameters_micheline'],
@@ -55,16 +56,23 @@ export class TransactionService {
       ...[].concat(
         ...fields.map((field, index) => {
           if (field === 'parameters_micheline') {
-            const predicates = likeGroup([
+            let predicates = likeGroup([
               { field, set: [address] },
               { field: 'kind', operation: Operation.eq, set: [kind] },
             ],
               `D${index}`
             )
+            predicates = predicates.concat(likeGroup([
+              { field, set: [TezosUtils.encodeAddress(address).toString('hex')] },
+              { field: 'kind', operation: Operation.eq, set: [kind] },
+            ], 
+              `DB${index}`)
+            )
             if (supportedTokens) {
               const contractAddresses = supportedTokens.map(contract => contract.id).filter(address => address !== undefined)
               if (contractAddresses.length > 0) {
                 predicates.push({ field: 'destination', operation: Operation.in, set: contractAddresses, group: `D${index}` })
+                predicates.push({ field: 'destination', operation: Operation.in, set: contractAddresses, group: `DB${index}` })
               }
             }
             return predicates
