@@ -21,6 +21,10 @@ export const convertSymbol = (symbol: string): ProtocolSymbols => {
         return SubProtocolSymbols.XTZ_BTC
       case 'usdtz':
         return SubProtocolSymbols.XTZ_USD
+      case 'you':
+        return SubProtocolSymbols.XTZ_YOU
+      case 'uusd':
+        return SubProtocolSymbols.XTZ_UUSD
       default:
         return symbol
     }
@@ -71,7 +75,7 @@ export const getTezosFA2ProtocolOptions = (
   contract: TokenContract,
   environmentUrls: EnvironmentUrls,
   tezosNetwork: TezosNetwork
-): TezosFAProtocolOptions => {
+): TezosFA2ProtocolOptions => {
   const feeDefaults = {
     low: '0',
     medium: '0',
@@ -85,7 +89,11 @@ export const getTezosFA2ProtocolOptions = (
     contract.id,
     feeDefaults,
     contract.decimals ?? 0,
-    contract.tokenID ?? 0
+    contract.tokenID ?? 0,
+    undefined,
+    undefined,
+    undefined,
+    contract.ledgerBigMapID
   )
 
   return new TezosFA2ProtocolOptions(getTezosProtocolNetwork(environmentUrls, tezosNetwork), config)

@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment'
 export class ChainNetworkService implements OnInit {
   private chainName: TezosNetwork
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET
-  private readonly supportedChains = [TezosNetwork.MAINNET]
+  private readonly supportedChains = [TezosNetwork.MAINNET, TezosNetwork.FLORENCENET, TezosNetwork.GRANADANET]
 
   constructor() {
     const origin = new URL(location.href).origin
@@ -16,6 +16,11 @@ export class ChainNetworkService implements OnInit {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET
         break
+      case environment.florencenet.targetUrl:
+        this.chainName = TezosNetwork.FLORENCENET
+        break
+      case environment.granadanet.targetUrl:
+        this.chainName = TezosNetwork.GRANADANET
         break
       default:
         this.chainName = this.defaultChain
@@ -24,12 +29,7 @@ export class ChainNetworkService implements OnInit {
   }
 
   public getEnvironment(chainName: TezosNetwork = this.chainName) {
-    switch (chainName) {
-      case TezosNetwork.MAINNET:
-        return environment.mainnet
-      default:
-        return environment.mainnet
-    }
+    return environment[chainName] ?? environment.mainnet
   }
 
   public getEnvironmentVariable(): string {
