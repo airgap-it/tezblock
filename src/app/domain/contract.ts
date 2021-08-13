@@ -43,7 +43,8 @@ export interface TokenContract {
   totalSupply?: string
   decimals?: number
   type?: string
-  tokenID?: number
+  tokenID?: number,
+  ledgerBigMapID?: number,
 }
 
 export interface ContractOperation extends Transaction {
@@ -154,7 +155,7 @@ export const getCurrencyConverterPipeArgs = (contract: { symbol: string }, excha
 }
 
 export const hasTokenHolders = (contract: TokenContract): boolean =>
-  ['STKR', 'tzBTC', 'USDtz', 'weCHF', 'ETHtz', 'wXTZ', 'kUSD'].includes(contract.symbol)
+  ['STKR', 'tzBTC', 'USDtz', 'weCHF', 'ETHtz', 'wXTZ', 'kUSD', 'YOU', 'uUSD'].includes(contract.symbol)
 
 export interface TokenHolder {
   address: string

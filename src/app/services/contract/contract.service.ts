@@ -8,10 +8,10 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
 import { first, get } from '@tezblock/services/fp'
 import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
-import { getFaProtocol, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
+import { getFaProtocol, getTezosFA2ProtocolOptions, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
 import moment from 'moment'
 import { WetziKoin } from '@tezblock/domain/airgap/wetzikoin'
-import { TezosBTC, TezosFA1Protocol, TezosStaker, TezosUSD, TezosWrapped } from '@airgap/coinlib-core'
+import { TezosBTC, TezosFA1Protocol, TezosFA2Protocol, TezosFA2ProtocolOptions, TezosStaker, TezosUSD, TezosUUSD, TezosWrapped, TezosYOU } from '@airgap/coinlib-core'
 import { TezosETHtz } from '@airgap/coinlib-core/protocols/tezos/fa/TezosETHtz'
 import { TezosKolibriUSD } from '@airgap/coinlib-core/protocols/tezos/fa/TezosKolibriUSD'
 
@@ -81,6 +81,12 @@ export interface ContractProtocol {
 export const getContractProtocol = (contract: TokenContract, chainNetworkService: ChainNetworkService): ContractProtocol => {
   const environmentUrls = chainNetworkService.getEnvironment()
   const tezosNetwork = chainNetworkService.getNetwork()
+
+  if (contract.type === 'fa2') {
+    const options = getTezosFA2ProtocolOptions(contract, environmentUrls, tezosNetwork)
+    return new TezosFA2Protocol(options)
+  }
+
   const options = getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork)
 
   if (contract.symbol === 'STKR') {
@@ -93,10 +99,6 @@ export const getContractProtocol = (contract: TokenContract, chainNetworkService
 
   if (contract.symbol === 'USDtz') {
     return new TezosUSD(options)
-  }
-
-  if (contract.symbol === 'weCHF') {
-    return new WetziKoin(options)
   }
 
   if (contract.symbol === 'ETHtz') {
@@ -302,16 +304,18 @@ export class ContractService extends BaseService {
   }
 
   public getTotalSupplyByContract(contract: TokenContract): Observable<string> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
-    if (protocol instanceof TezosFA1Protocol) {
-      return from(protocol.getTotalSupply())
+    if (contract.totalSupply !== undefined) {
+      return from(
+        new Promise<string>((resolve) => {
+          resolve(contract.totalSupply)
+        })
+      )
     }
-
-    return from(
-      new Promise<string>((resolve) => {
-        resolve(contract.totalSupply)
-      })
-    )
+    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
+    if (contract.type === 'fa2') {
+      return from((protocol as TezosFA2Protocol).getTotalSupply())  
+    }
+    return from((protocol as TezosFA1Protocol).getTotalSupply())
   }
 
   public loadEntrypoints(id: string): Observable<string[]> {

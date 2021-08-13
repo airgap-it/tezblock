@@ -1,4 +1,62 @@
 {
+  "KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL": {
+    "symbol": "YOU",
+    "name": "youves YOU Governance",
+    "website": "https://youves.com/",
+    "description": "Your tool on Tezos for asset creation and management.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://youves.com/"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/@youves"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/youves_com"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/youves-com"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 12,
+    "type": "fa2",
+    "tokenID": 0,
+    "ledgerBigMapID": 7715
+  },
+  "KT1XRPEPXbZK25r3Htzp2o1x7xdMMmfocKNW": {
+    "symbol": "uUSD",
+    "name": "youves uUSD",
+    "website": "https://youves.com/",
+    "description": "Your tool on Tezos for asset creation and management.",
+    "socials": [
+      {
+        "type": "website",
+        "url": "https://youves.com/"
+      },
+      {
+        "type": "medium",
+        "url": "https://medium.com/@youves"
+      },
+      {
+        "type": "twitter",
+        "url": "https://twitter.com/youves_com"
+      },
+      {
+        "type": "github",
+        "url": "https://github.com/youves-com"
+      }
+    ],
+    "tezosNetwork": ["mainnet"],
+    "decimals": 12,
+    "type": "fa2",
+    "tokenID": 0,
+    "ledgerBigMapID": 7706
+  },
   "KT1K9gCRgaLRFKTErYt1wVxA3Frb9FjasjTV": {
     "symbol": "kUSD",
     "name": "Kolibri USD",
@@ -146,6 +204,7 @@
     "decimals": 2,
     "type": "fa2",
     "tokenID": 0,
+    "ledgerBigMapID": 105,
     "totalSupply": "25160000"
   }
 }

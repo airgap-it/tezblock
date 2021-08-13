@@ -1,9 +1,14 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tezblock-babylonnet-frontend
+  name: tezblock-granadanet-frontend
   namespace: tezblock
+  labels:
+    app: tezblock-granadanet-frontend
 spec:
+  selector:
+    matchLabels:
+      app: tezblock-granadanet-frontend
   replicas: 1
   revisionHistoryLimit: 3
   strategy:
@@ -13,15 +18,15 @@ spec:
   template:
     metadata:
       labels:
-        app: tezblock-babylonnet-frontend
+        app: tezblock-granadanet-frontend
     spec:
       containers:
-        - name: tezblock-babylonnet-frontend
+        - name: tezblock-granadanet-frontend
           image: _TO_BE_REPLACED_BY_IMAGE_TAG_
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: tezblock-babylonnet-frontend-config-map
+                name: tezblock-granadanet-frontend-config-map
           ports:
             - containerPort: 80
           readinessProbe:
