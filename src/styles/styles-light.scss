@@ -99,5 +99,9 @@
     }
   }
 
+  .badge-outline-pill {
+    border: 1px solid map_get($theme-colors, 'primary-dark');
+  }
+
   @import '../../node_modules/bootstrap/scss/bootstrap';
 }
