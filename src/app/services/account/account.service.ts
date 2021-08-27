@@ -11,9 +11,10 @@ import { first, get } from '@tezblock/services/fp'
 import { SearchOptionData } from '@tezblock/services/search/model'
 import { OperationTypes } from '@tezblock/domain/operations'
 import { getAccountByIdBody, Account, accounts, jsonAccounts, JsonAccountData } from '@tezblock/domain/account'
+import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core'
 
 export const getAddressesFilteredBy = (phrase: string) =>
-  Object.keys(jsonAccounts).filter(address => {
+  Object.keys(jsonAccounts).filter((address) => {
     if (!phrase) {
       return true
     }
@@ -21,13 +22,12 @@ export const getAddressesFilteredBy = (phrase: string) =>
     return address.toLowerCase().includes(phrase.toLowerCase())
   })
 
-export const getAddressByAlias = (alias: string) => Object.keys(jsonAccounts).find(address => accounts[address].alias === alias)
+export const getAddressByAlias = (alias: string) => Object.keys(jsonAccounts).find((address) => accounts[address].alias === alias)
 
 export const getBakers = (): JsonAccountData[] =>
-  accounts
-    .filter(
-      account => !account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)
-    )
+  accounts.filter(
+    (account) => !account.accountType || get<string>((accountType) => !['account', 'contract'].includes(accountType))(account.accountType)
+  )
 
 export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean =>
   jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
@@ -57,9 +57,9 @@ export class AccountService extends BaseService {
       ],
       limit: 1
     }).pipe(
-      switchMap(accounts => {
+      switchMap((accounts) => {
         return this.isBaker(accounts[0].account_id).pipe(
-          map(bakingStatus => {
+          map((bakingStatus) => {
             return { ...accounts[0], is_baker: bakingStatus } // CONSEIL currently does not reliably provide the correct value for is_baker
           })
         )
@@ -100,7 +100,7 @@ export class AccountService extends BaseService {
         if (address.startsWith('tz')) {
           // since babylon, also tz addresses themselves can be delegated
 
-          const originatedContracts = transactions.map(transaction => transaction.originated_contracts)
+          const originatedContracts = transactions.map((transaction) => transaction.originated_contracts)
 
           return forkJoin([this.getAccountById(address), this.getAccountsByIds(originatedContracts)]).pipe(
             map(([account, relatedAccounts]) => {
@@ -110,14 +110,14 @@ export class AccountService extends BaseService {
                 delegated:
                   delegatedAccounts.length > 0
                     ? delegatedAccounts
-                    : relatedAccounts.filter(relatedAccount => relatedAccount.delegate_value),
+                    : relatedAccounts.filter((relatedAccount) => relatedAccount.delegate_value),
                 related: relatedAccounts
               }
             })
           )
         }
 
-        const managerPubKeys = transactions.map(transaction => transaction.manager_pubkey)
+        const managerPubKeys = transactions.map((transaction) => transaction.manager_pubkey)
 
         return forkJoin([this.getAccountById(address), this.getAccountsByIds(managerPubKeys)]).pipe(
           map(([account, relatedAccounts]) => {
@@ -155,7 +155,7 @@ export class AccountService extends BaseService {
       orderBy: [sort('block_level', 'desc')],
       limit: 1
     }).pipe(
-      map(transactions => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
+      map((transactions) => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
       catchError(() => of('Not Available'))
     )
   }
@@ -163,11 +163,11 @@ export class AccountService extends BaseService {
   getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOptionData[]> {
     const bakers: SearchOptionData[] = accounts
       .filter(
-        account =>
-          (!account.accountType || get<string>(accountType => !['account', 'contract'].includes(accountType))(account.accountType)) &&
-          get<string>(alias => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
+        (account) =>
+          (!account.accountType || get<string>((accountType) => !['account', 'contract'].includes(accountType))(account.accountType)) &&
+          get<string>((alias) => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
       )
-      .map(account => ({ id: account.address, label: account.alias, type: OperationTypes.Baker }))
+      .map((account) => ({ id: account.address, label: account.alias, type: OperationTypes.Baker }))
 
     if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>('accounts', {
@@ -182,15 +182,14 @@ export class AccountService extends BaseService {
         ],
         limit: 5
       }).pipe(
-        map(_accounts =>
+        map((_accounts) =>
           _accounts
-            .filter(account => {
-              const isContract = accounts
-                .some(_account => _account.address === account.account_id && _account.accountType === 'contract')
+            .filter((account) => {
+              const isContract = accounts.some((_account) => _account.address === account.account_id && _account.accountType === 'contract')
 
               return !isContract
             })
-            .map(account => {
+            .map((account) => {
               return { id: account.account_id, type: OperationTypes.Account }
             })
         )

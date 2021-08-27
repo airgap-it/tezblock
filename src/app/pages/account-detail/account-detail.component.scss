@@ -15,10 +15,10 @@ $blue: #2e5bff;
   .address--item__container {
     overflow: hidden;
     word-break: break-word;
-    address-item a {
+    address-item.address--item a {
       text-align: left;
       white-space: normal;
-      font-size: 13px;
+      font-size: 0.75rem !important;
     }
   }
 

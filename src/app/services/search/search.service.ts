@@ -11,6 +11,7 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { OperationTypes } from '@tezblock/domain/operations'
 import { CacheKeys, CacheService } from '@tezblock/services/cache/cache.service'
 import { SearchOptionData } from './model'
+import { AliasService } from '../alias/alias.service'
 
 const guessType = (token: string): OperationTypes => {
   if (token?.startsWith('o')) {
@@ -32,16 +33,20 @@ export class SearchService {
     private readonly accountService: AccountService,
     private readonly apiService: ApiService,
     private readonly cacheService: CacheService,
+    private readonly aliasService: AliasService,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly router: Router
-  ) { }
+  ) {}
 
   getSearchSources(token: string): Observable<SearchOptionData[]>[] {
-    const matchByAccountIds = ['tz', 'KT', 'SG'].some(prefix => token?.startsWith(prefix))
+    const matchByAccountIds = ['tz', 'KT'].some((prefix) => token?.startsWith(prefix))
+
     const result = [
       of(searchTokenContracts(token, this.chainNetworkService.getNetwork())),
       this.accountService.getAccountsStartingWith(token, matchByAccountIds)
     ]
+
+    result.push(this.aliasService.tezosDomainsNameToAddress(token))
 
     if (token?.startsWith('o')) {
       result.push(this.apiService.getTransactionHashesStartingWith(token))
@@ -55,7 +60,7 @@ export class SearchService {
       result.push(
         this.apiService
           .getBlockByLevel(token)
-          .pipe(map(block => (block ? [{ id: block.level.toString(), type: OperationTypes.Block }] : [])))
+          .pipe(map((block) => (block ? [{ id: block.level.toString(), type: OperationTypes.Block }] : [])))
       )
     }
 
@@ -87,7 +92,7 @@ export class SearchService {
   }
 
   getPreviousSearches(): Observable<SearchOptionData[]> {
-    return this.cacheService.get<SearchOptionData[]>(CacheKeys.previousSearches).pipe(map(value => value || []))
+    return this.cacheService.get<SearchOptionData[]>(CacheKeys.previousSearches).pipe(map((value) => value || []))
   }
 
   updatePreviousSearches(option: SearchOptionData) {
@@ -96,7 +101,7 @@ export class SearchService {
     const _option = <SearchOptionData>pick(option, ['id', 'type'].concat(label))
 
     this.cacheService.update(CacheKeys.previousSearches, (previousOptions: SearchOptionData[]) =>
-      ((previousOptions || []).some(previousOption => previousOption.id === _option.id) ? [] : [_option])
+      ((previousOptions || []).some((previousOption) => previousOption.id === _option.id) ? [] : [_option])
         .concat(previousOptions || [])
         .slice(0, 5)
     )
