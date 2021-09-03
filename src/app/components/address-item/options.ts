@@ -3,6 +3,7 @@ export interface Options {
   isText?: boolean
   showFiatValue?: boolean
   showFullAddress?: boolean
+  showTezosDomain?: boolean
   showAlliasOrFullAddress?: boolean
   forceIdenticon?: boolean
   hideIdenticon?: boolean

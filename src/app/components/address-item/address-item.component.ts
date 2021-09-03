@@ -1,11 +1,10 @@
 import { Component, Input, ChangeDetectionStrategy, OnInit } from '@angular/core'
-
 import { getTokenContractByAddress, TokenContract } from '@tezblock/domain/contract'
-import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe'
-import { ShortenStringPipe } from '@tezblock/pipes/shorten-string/shorten-string.pipe'
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
 import { AliasService } from '@tezblock/services/alias/alias.service'
 import { Options } from './options'
+import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core'
+import { AccountService } from '@tezblock/services/account/account.service'
 
 @Component({
   selector: 'address-item',
@@ -33,6 +32,9 @@ export class AddressItemComponent implements OnInit {
       this._options = value
       if (this.address) {
         this.formattedAddress = this.getFormattedAddress()
+        if (this._options.showTezosDomain) {
+          this.tezosDomainName = this.getTezosDomainsName()
+        }
       }
     }
   }
@@ -59,6 +61,7 @@ export class AddressItemComponent implements OnInit {
   }
 
   formattedAddress: string
+  tezosDomainName: Promise<string>
 
   private contract: TokenContract
 
@@ -66,16 +69,15 @@ export class AddressItemComponent implements OnInit {
     return this.options && this.options.pageId ? this.options.pageId !== this.address : true
   }
 
-  constructor(
-    private readonly aliasPipe: AliasPipe,
-    private readonly chainNetworkService: ChainNetworkService,
-    private readonly shortenStringPipe: ShortenStringPipe,
-    private readonly aliasService: AliasService
-  ) {}
+  constructor(private readonly chainNetworkService: ChainNetworkService, private readonly aliasService: AliasService) {}
 
   ngOnInit() {}
 
   private getFormattedAddress() {
     return this.aliasService.getFormattedAddress(this.address, this.options)
+  }
+
+  private async getTezosDomainsName(): Promise<string> {
+    return this.aliasService.tezosDomainsAddressToName(this.address)
   }
 }

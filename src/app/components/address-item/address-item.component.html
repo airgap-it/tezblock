@@ -1,15 +1,22 @@
 <div [ngSwitch]="options?.isText" class="media d-flex align-items-center">
   <ng-container *ngSwitchCase="true">{{ address }}</ng-container>
   <ng-container *ngSwitchDefault>
-    <identicon *ngIf="!options?.hideIdenticon" class="mr-2" [address]="address" [forceIdenticon]="options?.forceIdenticon"></identicon>
+    <div [ngSwitch]="options?.showTezosDomain" class="media d-flex align-items-center">
+      <ng-container *ngSwitchCase="true">
+        <span class="badge badge-pill badge-outline-pill">{{ tezosDomainName | async }}</span>
+      </ng-container>
 
-    <div class="media-body" [ngSwitch]="clickableButton">
-      <a *ngSwitchCase="false" class="btn p-0" role="button">
-        {{ formattedAddress }}
-      </a>
-      <a *ngSwitchDefault [routerLink]="[path, address]" class="btn btn-link p-0" role="button">
-        {{ formattedAddress }}
-      </a>
+      <ng-container *ngSwitchDefault>
+        <identicon *ngIf="!options?.hideIdenticon" class="mr-2" [address]="address" [forceIdenticon]="options?.forceIdenticon"></identicon>
+        <div class="media-body" [ngSwitch]="clickableButton">
+          <a *ngSwitchCase="false" class="btn p-0" role="button">
+            {{ formattedAddress }}
+          </a>
+          <a *ngSwitchDefault [routerLink]="[path, address]" class="btn btn-link p-0" role="button">
+            {{ formattedAddress }}
+          </a>
+        </div>
+      </ng-container>
     </div>
   </ng-container>
 </div>
