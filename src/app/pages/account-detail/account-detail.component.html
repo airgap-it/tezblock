@@ -27,7 +27,7 @@
                 </div>
                 <div class="col-md-10 pl-sm-0 pr-0 address--item__container">
                   <address-item
-                    class="d-inline-flex"
+                    class="d-inline-flex address--item"
                     [address]="account.account_id"
                     [options]="{ showFullAddress: true, forceIdenticon: true, hideIdenticon: !hasLogo }"
                     [clickableButton]="false"
@@ -50,10 +50,13 @@
                   <div>
                     <address-item
                       *ngIf="hasAlias"
-                      class="d-inline-flex"
+                      class="d-inline-flex mr-1"
                       [address]="account.account_id"
                       [options]="{ hideIdenticon: true }"
                     ></address-item>
+                    <div class="d-inline-block">
+                      <address-item [address]="account.account_id" [options]="{ showTezosDomain: true }"></address-item>
+                    </div>
                     <span *ngIf="isExchange" class="badge badge-pill badge-primary-light ml-1">
                       {{ 'account-detail.exchange' | translate }}
                     </span>
@@ -391,9 +394,7 @@
                             <div>Baking Rights: {{ context?.bakes || '-' }}</div>
                             <div>Endorsing Rights: {{ context?.endorsements || '-' }}</div>
                           </ng-container>
-                          <ng-container *ngSwitchCase="false">
-                            No rights
-                          </ng-container>
+                          <ng-container *ngSwitchCase="false">No rights</ng-container>
                         </ng-container>
                       </div>
                     </ng-template>

@@ -124,5 +124,9 @@
     }
   }
 
+  .badge-outline-pill {
+    border: 1px solid map_get($theme-colors, 'primary-light');
+  }
+
   @import '../../node_modules/bootstrap/scss/bootstrap';
 }
