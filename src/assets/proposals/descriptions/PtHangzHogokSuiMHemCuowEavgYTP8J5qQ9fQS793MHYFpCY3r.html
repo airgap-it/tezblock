@@ -1,0 +1,53 @@
+<p>
+  The last upgrade of the Tezos protocol, Granada, activated on August 6th, 2021. We are now glad to announce a new protocol proposal, Hangzhou, the result of a collaborative work from various teams.</p>
+
+<p>(As usual, Hangzhou’s “true name” is its hash, which is PtHangzHogokSuiMHemCuowEavgYTP8J5qQ9fQS793MHYFpCY3r).</p>
+
+<p>Hangzhou is the capital of East China's Zhejiang province, with a population of more than 10 millions. Founded in the 7th century, it is a city with a rich history ; more recently, it has become a dynamic economic zone, and is considered a major technological and innovation hub.</p>
+
+<p>The Hangzhou proposal features several major improvements to the protocol, as well as numerous minor improvements. Below, we present some of the most interesting and important changes:</p>
+</p>
+<h5>Features</h5>
+<p>A selection of features, more details can be found in the changelog.</p>
+<p>
+  <strong>Timelock:</strong>
+    Timelock encryption makes it possible for smart contract authors to include strong countermeasures against Block Producer Extractable Value (referred to as "MEV" on proof-of-work chains).
+</p>
+
+<p>
+  <strong>Views:</strong>
+  Views are a new kind of entrypoints for smart contracts, which make internal state information more easily accessible to other smart contracts.
+</p>
+
+<p>
+  <strong>Cache:</strong>
+  Caching provides faster access to regularly accessed data and lowers the associated gas cost. It does so by splitting state storage between a "hot" storage, kept in RAM, and a "cold" storage, kept on disk. Caching directly increases the throughput of Tezos and can be built upon to further improve the performance of various parts of the protocol.
+</p>
+
+<p>
+  <strong>Global Table of Constants:</strong>
+  The global table of constants can be used by smart contract developers to register Michelson expressions as "constants" and reference them in contracts. This allows developers to create larger and more complex contracts than they otherwise could. It will also serve as the foundation for smart contracts libraries in Tezos.
+</p>
+
+<p>
+  <strong>Context Flattening:</strong>
+  Context flattening is a rewriting of the protocol's database internals. It optimizes storage use, and will also enable future optimisations in order to speed up the processing of blocks and operations.
+</p>
+<p>
+  <strong>Liquidity baking:</strong>
+  Hangzhou includes a small increase to the liquidity baking sunset level. Without this, the subsidy would halt during the lifespan of this protocol.
+</p>
+
+<p>
+  We invite you to look at the changelog for a full description of the contents of the proposal. Furthermore, we strongly encourage you to test your own Tezos-based applications to check for compatibility problems with Hangzhou. Hangzhou, and the configuration for its test network Hangzhounet, are included in version 11.0 of the Tezos node.
+</p>
+
+<h5 class="pb-3">More information</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://gitlab.com/tezos/tezos/-/tree/master/src/proto_011_PtHangzH">Gitlab Repository</a>
+  </li>
+  <li>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/011_hangzhou.html">Changelog</a>
+  </li>
+</ul>
