@@ -71,13 +71,13 @@ Edit the `src/environments/environment.ts` and `src/environments/environment.pro
 - `MAINNET_CONSEIL_API_KEY` API key for the Conseil service
 - `MAINNET_TARGET_URL` Value can be set to the URL tezblock will be accessible from. Only needed if switching between the different network deployments is desired, otherwise this can be ignored
 
-If support for multiple networks is needed, similarly edit the `DEPLHINET_` and `EDONET_` values, or ignore them otherwise.
+If support for test networks is needed, edit the testnet specific values, or ignore them otherwise.
 
 From the root of the tezblock folder, execute the following command to build tezblock:
 
-    npm install
-    npm run build
+    yarn install
+    yarn build
 
 To start tezblock on http://localhost:4200, execute:
 
-    npm run start
+    yarn start
