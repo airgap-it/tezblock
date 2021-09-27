@@ -1,17 +1,19 @@
-import { TezosRewards } from "@airgap/coinlib-core/protocols/tezos/TezosProtocol"
+import { TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol';
 
 export interface Payout {
-  delegator: string
-  share: string
-  payout: string
+  delegator: string;
+  share: string;
+  payout: string;
 }
 
 export interface Reward extends TezosRewards {
-  payouts: Payout[]
+  payouts: Payout[];
 }
 
-export const getRewardAmountMinusFee = (rewardAmont: number, tezosBakerFee: number): number =>
-  rewardAmont - rewardAmont * (tezosBakerFee / 100)
+export const getRewardAmountMinusFee = (
+  rewardAmont: number,
+  tezosBakerFee: number
+): number => rewardAmont - rewardAmont * (tezosBakerFee / 100);
 
 /*
     next 5 cycles: Upcoming
@@ -21,16 +23,16 @@ export const getRewardAmountMinusFee = (rewardAmont: number, tezosBakerFee: numb
 */
 export const getRightStatus = (currentCycle: number, cycle: number): string => {
   if (cycle > currentCycle) {
-    return 'Upcoming'
+    return 'Upcoming';
   }
 
   if (cycle === currentCycle) {
-    return 'Active'
+    return 'Active';
   }
 
   if (cycle < currentCycle - 5) {
-    return 'Unfrozen'
+    return 'Unfrozen';
   }
 
-  return 'Frozen'
-}
+  return 'Frozen';
+};

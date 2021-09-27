@@ -2,14 +2,21 @@
   <h5 class="modal-title pull-left">
     {{ 'telegram-modal-component.title' | translate }}
   </h5>
-  <button type="button" class="close pull-right" aria-label="Close" (click)="bsModalRef.hide()">
+  <button
+    type="button"
+    class="close pull-right"
+    aria-label="Close"
+    (click)="bsModalRef.hide()"
+  >
     <span aria-hidden="true">&times;</span>
   </button>
 </div>
 
 <div class="modal-body">
   {{ 'telegram-modal-component.text_1' | translate }}
-  <a href="https://tzsnt.fr/" target="_blank">{{ 'telegram-modal-component.telegram_link' | translate }}</a>
+  <a href="https://tzsnt.fr/" target="_blank">{{
+    'telegram-modal-component.telegram_link' | translate
+  }}</a>
   {{ 'telegram-modal-component.text_2' | translate }}
   <br />
   <br />
@@ -31,8 +38,14 @@
   </div>
   <form [formGroup]="form">
     <div class="form-group">
-      <input formControlName="botName" class="form-control" placeholder="{{ 'telegram-modal-component.placeholder' | translate }}" />
-      <div *ngIf="botNameInvalid" class="text-danger">{{ 'telegram-modal-component.name-too-long' | translate }}</div>
+      <input
+        formControlName="botName"
+        class="form-control"
+        placeholder="{{ 'telegram-modal-component.placeholder' | translate }}"
+      />
+      <div *ngIf="botNameInvalid" class="text-danger">
+        {{ 'telegram-modal-component.name-too-long' | translate }}
+      </div>
     </div>
 
     <button

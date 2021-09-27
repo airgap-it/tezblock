@@ -1,19 +1,19 @@
-import { TestBed } from '@angular/core/testing'
-import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { TestBed } from '@angular/core/testing';
+import { UnitHelper } from '../../../../test-config/unit-test-helper';
 
-import { CryptoPricesService } from './crypto-prices.service'
+import { CryptoPricesService } from './crypto-prices.service';
 
 xdescribe('CryptoPricesService', () => {
-  let unitHelper: UnitHelper
+  let unitHelper: UnitHelper;
   beforeEach(() => {
-    unitHelper = new UnitHelper()
+    unitHelper = new UnitHelper();
 
     TestBed.configureTestingModule(unitHelper.testBed({ providers: [] }))
       .compileComponents()
-      .catch(console.error)
-  })
+      .catch(console.error);
+  });
   it('should be created', () => {
-    const service: CryptoPricesService = TestBed.inject(CryptoPricesService)
-    expect(service).toBeTruthy()
-  })
-})
+    const service: CryptoPricesService = TestBed.inject(CryptoPricesService);
+    expect(service).toBeTruthy();
+  });
+});

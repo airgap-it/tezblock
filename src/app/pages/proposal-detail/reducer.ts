@@ -1,10 +1,10 @@
-import { createReducer, on } from '@ngrx/store'
-import * as _ from 'lodash'
+import { createReducer, on } from '@ngrx/store';
+import * as _ from 'lodash';
 
-import * as actions from './actions'
-import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { getInitialTableState, TableState } from '@tezblock/domain/table'
+import * as actions from './actions';
+import { ProposalDto } from '@tezblock/interfaces/proposal';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { getInitialTableState, TableState } from '@tezblock/domain/table';
 import {
   MetaVotingPeriod,
   PeriodTimespan,
@@ -14,35 +14,47 @@ import {
   _nayRollsSelector,
   _passRollsSelector,
   _yayRollsPercentageSelector,
-  _nayRollsPercentageSelector
-} from '@tezblock/domain/vote'
-import { squareBrackets } from '@tezblock/domain/pattern'
-import { get } from '@tezblock/services/fp'
+  _nayRollsPercentageSelector,
+} from '@tezblock/domain/vote';
+import { squareBrackets } from '@tezblock/domain/pattern';
+import { get } from '@tezblock/services/fp';
 
-const updateMetaVotingPeriods = (metaVotingPeriods: MetaVotingPeriod[], state: State, property: string): MetaVotingPeriod[] => {
+const updateMetaVotingPeriods = (
+  metaVotingPeriods: MetaVotingPeriod[],
+  state: State,
+  property: string
+): MetaVotingPeriod[] => {
   if (!state.metaVotingPeriods) {
-    return metaVotingPeriods
+    return metaVotingPeriods;
   }
 
   return metaVotingPeriods.map((metaVotingPeriod) => {
-    const match = state.metaVotingPeriods.find((_metaVotingPeriod) => _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind)
+    const match = state.metaVotingPeriods.find(
+      (_metaVotingPeriod) =>
+        _metaVotingPeriod.periodKind === metaVotingPeriod.periodKind
+    );
 
-    return { ...match, [property]: metaVotingPeriod[property] }
-  })
-}
+    return { ...match, [property]: metaVotingPeriod[property] };
+  });
+};
 
-export const isEmptyPeriodKind = (periodKind: string, metaVotingPeriods: MetaVotingPeriod[] = []): boolean =>
-  get<MetaVotingPeriod>((period) => period.count)(metaVotingPeriods.find((period) => period.periodKind === periodKind)) === 0
+export const isEmptyPeriodKind = (
+  periodKind: string,
+  metaVotingPeriods: MetaVotingPeriod[] = []
+): boolean =>
+  get<MetaVotingPeriod>((period) => period.count)(
+    metaVotingPeriods.find((period) => period.periodKind === periodKind)
+  ) === 0;
 
 export interface State {
-  id: string
-  proposal: ProposalDto
-  loadingProposal: boolean
-  periodKind: string
-  metaVotingPeriods: MetaVotingPeriod[]
-  periodsTimespans: PeriodTimespan[]
-  votes: TableState<Transaction>
-  divisionOfVotes: DivisionOfVotes[]
+  id: string;
+  proposal: ProposalDto;
+  loadingProposal: boolean;
+  periodKind: string;
+  metaVotingPeriods: MetaVotingPeriod[];
+  periodsTimespans: PeriodTimespan[];
+  votes: TableState<Transaction>;
+  divisionOfVotes: DivisionOfVotes[];
 }
 
 export const initialState: State = {
@@ -53,8 +65,8 @@ export const initialState: State = {
   metaVotingPeriods: undefined,
   periodsTimespans: undefined,
   votes: getInitialTableState(),
-  divisionOfVotes: undefined
-}
+  divisionOfVotes: undefined,
+};
 
 export const reducer = createReducer(
   initialState,
@@ -62,67 +74,78 @@ export const reducer = createReducer(
   on(actions.loadProposal, (state, { id }) => ({
     ...state,
     id,
-    loading: true
+    loading: true,
   })),
   on(actions.loadProposalSucceeded, (state, { proposal }) => ({
     ...state,
     proposal: proposal || null,
-    loadingProposal: false
+    loadingProposal: false,
   })),
   on(actions.loadProposalFailed, (state) => ({
     ...state,
     proposal: null,
-    loadingProposal: false
+    loadingProposal: false,
   })),
   on(actions.startLoadingVotes, (state, { periodKind }) => {
-    const hasKindChanged = periodKind !== state.periodKind
+    const hasKindChanged = periodKind !== state.periodKind;
 
     return {
       ...state,
       periodKind,
       votes: {
         ...state.votes,
-        data: hasKindChanged ? undefined : state.votes.data
-      }
-    }
+        data: hasKindChanged ? undefined : state.votes.data,
+      },
+    };
   }),
-  on(actions.loadMetaVotingPeriodsSucceeded, (state, { metaVotingPeriods }) => ({
-    ...state,
-    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'value')
-  })),
+  on(
+    actions.loadMetaVotingPeriodsSucceeded,
+    (state, { metaVotingPeriods }) => ({
+      ...state,
+      metaVotingPeriods: updateMetaVotingPeriods(
+        metaVotingPeriods,
+        state,
+        'value'
+      ),
+    })
+  ),
   on(actions.loadVotesTotalSucceeded, (state, { metaVotingPeriods }) => ({
     ...state,
-    metaVotingPeriods: updateMetaVotingPeriods(metaVotingPeriods, state, 'count')
+    metaVotingPeriods: updateMetaVotingPeriods(
+      metaVotingPeriods,
+      state,
+      'count'
+    ),
   })),
   on(actions.loadMetaVotingPeriodsFailed, (state) => ({
     ...state,
     votes: {
       ...state.votes,
-      loading: false
-    }
+      loading: false,
+    },
   })),
   on(actions.loadVotes, (state, { periodKind }) => ({
     ...state,
     periodKind,
     votes: {
       ...state.votes,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadVotesSucceeded, (state, { votes }) => ({
     ...state,
     votes: {
       ...state.votes,
       data: votes,
-      loading: false
-    }
+      loading: false,
+    },
   })),
   on(actions.loadVotesFailed, (state) => ({
     ...state,
     votes: {
       ...state.votes,
-      loading: false
-    }
+      loading: false,
+    },
   })),
   on(actions.increasePageSize, (state) => ({
     ...state,
@@ -130,33 +153,48 @@ export const reducer = createReducer(
       ...state.votes,
       pagination: {
         ...state.votes.pagination,
-        currentPage: state.votes.pagination.currentPage + 1
-      }
-    }
+        currentPage: state.votes.pagination.currentPage + 1,
+      },
+    },
   })),
-  on(actions.loadPeriodsTimespansSucceeded, (state, { periodsTimespans, blocksPerVotingPeriod, timeBetweenBlocks }) => ({
-    ...state,
-    periodsTimespans: fillMissingPeriodTimespans(periodsTimespans, blocksPerVotingPeriod, timeBetweenBlocks)
-  })),
+  on(
+    actions.loadPeriodsTimespansSucceeded,
+    (
+      state,
+      { periodsTimespans, blocksPerVotingPeriod, timeBetweenBlocks }
+    ) => ({
+      ...state,
+      periodsTimespans: fillMissingPeriodTimespans(
+        periodsTimespans,
+        blocksPerVotingPeriod,
+        timeBetweenBlocks
+      ),
+    })
+  ),
   on(actions.loadProposalDescriptionSucceeded, (state, { description }) => ({
     ...state,
     proposal: {
       ...state.proposal,
-      description
-    }
+      description,
+    },
   })),
   on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
     ...state,
-    divisionOfVotes
+    divisionOfVotes,
   })),
   on(actions.loadDivisionOfVotesFailed, (state) => ({
     ...state,
-    divisionOfVotes: null
+    divisionOfVotes: null,
   }))
-)
+);
 
-export const yayRollsSelector = (state: State): number => _yayRollsSelector(state.divisionOfVotes)
-export const nayRollsSelector = (state: State): number => _nayRollsSelector(state.divisionOfVotes)
-export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
-export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
-export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)
+export const yayRollsSelector = (state: State): number =>
+  _yayRollsSelector(state.divisionOfVotes);
+export const nayRollsSelector = (state: State): number =>
+  _nayRollsSelector(state.divisionOfVotes);
+export const passRollsSelector = (state: State): number =>
+  _passRollsSelector(state.divisionOfVotes);
+export const yayRollsPercentageSelector = (state: State): number =>
+  _yayRollsPercentageSelector(state.divisionOfVotes);
+export const nayRollsPercentageSelector = (state: State): number =>
+  _nayRollsPercentageSelector(state.divisionOfVotes);

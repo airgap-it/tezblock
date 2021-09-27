@@ -1,6 +1,7 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getRewardServiceMock = () => jasmine.createSpyObj('RewardService', {
+export const getRewardServiceMock = () =>
+  jasmine.createSpyObj('RewardService', {
     getLastCycles: EMPTY,
     getRewards: EMPTY,
     getRewardsPayouts: EMPTY,
@@ -8,5 +9,5 @@ export const getRewardServiceMock = () => jasmine.createSpyObj('RewardService', 
     calculateRewards: EMPTY.toPromise(),
     getRewardsForAddressInCycle: EMPTY,
     getDoubleBakingEvidenceData: EMPTY,
-    getDoubleEndorsingEvidenceData: EMPTY
-})
+    getDoubleEndorsingEvidenceData: EMPTY,
+  });

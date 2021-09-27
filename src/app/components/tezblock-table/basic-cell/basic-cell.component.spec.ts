@@ -1,21 +1,21 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing'
+import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BasicCellComponent } from './basic-cell.component'
+import { BasicCellComponent } from './basic-cell.component';
 
 describe('BasicCellComponent', () => {
-  let component: BasicCellComponent
-  let fixture: ComponentFixture<BasicCellComponent>
+  let component: BasicCellComponent;
+  let fixture: ComponentFixture<BasicCellComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [BasicCellComponent]
-    })
+      declarations: [BasicCellComponent],
+    });
 
-    fixture = TestBed.createComponent(BasicCellComponent)
-    component = fixture.componentInstance
-  }))
+    fixture = TestBed.createComponent(BasicCellComponent);
+    component = fixture.componentInstance;
+  }));
 
   it('should create', () => {
-    expect(component).toBeTruthy()
-  })
-})
+    expect(component).toBeTruthy();
+  });
+});

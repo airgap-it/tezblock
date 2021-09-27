@@ -1,12 +1,20 @@
-<ng-container *ngIf="class === 'p'; then ptemplate; else thtemplate"></ng-container>
+<ng-container
+  *ngIf="class === 'p'; then ptemplate; else thtemplate"
+></ng-container>
 <ng-template #ptemplate>
-  <p class="loading--paragraph--skeleton" [ngStyle]="{ width: loadingWidth }"></p>
+  <p
+    class="loading--paragraph--skeleton"
+    [ngStyle]="{ width: loadingWidth }"
+  ></p>
 </ng-template>
 <ng-template #thtemplate>
   <ng-container *ngIf="class === 'ph'">
-    <p class="loading--table--skeleton " [ngStyle]="{ width: loadingWidth }"></p>
+    <p class="loading--table--skeleton" [ngStyle]="{ width: loadingWidth }"></p>
   </ng-container>
   <ng-container *ngIf="class === 'th'">
-    <th class="loading--table--skeleton " [ngStyle]="{ width: loadingWidth }"></th>
+    <th
+      class="loading--table--skeleton"
+      [ngStyle]="{ width: loadingWidth }"
+    ></th>
   </ng-container>
 </ng-template>

@@ -1,87 +1,98 @@
-import { Component, Input, OnInit } from '@angular/core'
-import { createIcon } from '@download/blockies'
-import { BigNumber } from 'bignumber.js'
-import { toDataUrl } from 'myetherwallet-blockies'
+import { Component, Input, OnInit } from '@angular/core';
+import { createIcon } from '@download/blockies';
+import { BigNumber } from 'bignumber.js';
+import { toDataUrl } from 'myetherwallet-blockies';
 
-import { jsonAccounts } from '@tezblock/domain/account'
+import { jsonAccounts } from '@tezblock/domain/account';
 
 @Component({
   selector: 'identicon',
   templateUrl: 'identicon.html',
-  styleUrls: ['./identicon.scss']
+  styleUrls: ['./identicon.scss'],
 })
 export class IdenticonComponent implements OnInit {
-  hasBakerIcon: boolean = false
-  bakerIconUrl: string = ''
+  hasBakerIcon: boolean = false;
+  bakerIconUrl: string = '';
 
-  identicon: string = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7' // transparent
+  identicon: string =
+    'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // transparent
 
   @Input()
-  sizeLarge: boolean = false
+  sizeLarge: boolean = false;
 
   @Input()
   set forceIdenticon(value: boolean) {
     if (value !== this._forceIdenticon) {
-      this._forceIdenticon = value
-      this.setIdenticon()
+      this._forceIdenticon = value;
+      this.setIdenticon();
     }
   }
   get forceIdenticon(): boolean {
-    return this._forceIdenticon
+    return this._forceIdenticon;
   }
-  private _forceIdenticon: boolean = false
+  private _forceIdenticon: boolean = false;
 
   @Input()
   set address(value: string) {
     if (value !== this._address) {
-      this._address = value
-      this.setIdenticon()
+      this._address = value;
+      this.setIdenticon();
     }
   }
   get address(): string {
-    return this._address
+    return this._address;
   }
-  private _address: string
+  private _address: string;
 
   ngOnInit() {}
 
   private b582int(val: string): string {
-    let rv = new BigNumber(0)
-    const alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
+    let rv = new BigNumber(0);
+    const alpha = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
     for (let i = 0; i < val.length; i++) {
-      rv = rv.plus(new BigNumber(alpha.indexOf(val[val.length - 1 - i])).multipliedBy(new BigNumber(alpha.length).exponentiatedBy(i)))
+      rv = rv.plus(
+        new BigNumber(alpha.indexOf(val[val.length - 1 - i])).multipliedBy(
+          new BigNumber(alpha.length).exponentiatedBy(i)
+        )
+      );
     }
 
-    return rv.toString(16)
+    return rv.toString(16);
   }
 
   private setIdenticon() {
-    const address = this.address
+    const address = this.address;
 
     if (!address) {
-      return
+      return;
     }
 
     const getIdenticon = (): string => {
-      const displayLogo: boolean = jsonAccounts.hasOwnProperty(address) && jsonAccounts[address].hasLogo && !this.forceIdenticon
+      const displayLogo: boolean =
+        jsonAccounts.hasOwnProperty(address) &&
+        jsonAccounts[address].hasLogo &&
+        !this.forceIdenticon;
 
       if (displayLogo) {
-        const logoReference = jsonAccounts[address].logoReference || address
+        const logoReference = jsonAccounts[address].logoReference || address;
 
-        return `submodules/tezos_assets/imgs/${logoReference}.png`
+        return `submodules/tezos_assets/imgs/${logoReference}.png`;
       }
 
       if (address.startsWith('ak_')) {
-        return createIcon({ seed: address }).toDataURL()
+        return createIcon({ seed: address }).toDataURL();
       }
 
       if (address.startsWith('tz') || address.startsWith('kt')) {
-        return createIcon({ seed: `0${this.b582int(address)}`, spotcolor: '#000' }).toDataURL()
+        return createIcon({
+          seed: `0${this.b582int(address)}`,
+          spotcolor: '#000',
+        }).toDataURL();
       }
 
-      return toDataUrl(address)
-    }
+      return toDataUrl(address);
+    };
 
-    this.identicon = getIdenticon()
+    this.identicon = getIdenticon();
   }
 }

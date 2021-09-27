@@ -2,8 +2,8 @@
   <div class="mb-5 pt-5">
     <div class="container p-0">
       <h1 hidden="true">
-        proposal detail page with information about hash, name, period, discussion, features, documentation, exploration, testing and
-        promotion
+        proposal detail page with information about hash, name, period,
+        discussion, features, documentation, exploration, testing and promotion
       </h1>
       <div class="card h-100 pt-3">
         <div class="card-body p-4">
@@ -12,7 +12,9 @@
           </h5>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-hash' | translate }}</p>
+              <p class="text-secondary mb-0">
+                {{ 'proposal-detail.proposal-hash' | translate }}
+              </p>
             </div>
             <div class="col-md-9">
               <p class="mb-0">
@@ -20,17 +22,27 @@
                 <a
                   (click)="copyToClipboard()"
                   value="click to copy"
-                  class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+                  class="
+                    btn btn-sm btn-icon btn-light
+                    rounded-circle
+                    ml-1
+                    d-sm-inline-block
+                  "
                   tooltip="Copy to clipboard"
                 >
-                  <fa-icon [icon]="'copy' | iconPipe" class="text-secondary"></fa-icon>
+                  <fa-icon
+                    [icon]="'copy' | iconPipe"
+                    class="text-secondary"
+                  ></fa-icon>
                 </a>
               </p>
             </div>
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-name' | translate }}</p>
+              <p class="text-secondary mb-0">
+                {{ 'proposal-detail.proposal-name' | translate }}
+              </p>
             </div>
             <div class="col-md-9">
               {{ proposal.proposal | alias: 'proposal' }}
@@ -38,7 +50,9 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">{{ 'proposal-detail.period' | translate }}</p>
+              <p class="text-secondary mb-0">
+                {{ 'proposal-detail.period' | translate }}
+              </p>
             </div>
             <div class="col-md-9">
               {{ proposal.period }}
@@ -46,13 +60,20 @@
           </div>
           <div *ngIf="proposal.discussionLink" class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">{{ 'proposal-detail.proposal-discussion' | translate }}</p>
+              <p class="text-secondary mb-0">
+                {{ 'proposal-detail.proposal-discussion' | translate }}
+              </p>
             </div>
             <div class="col-md-9">
               <div class="d-block">
                 <div>
                   <img src="/assets/img/tezos-agora.svg" width="16px" />
-                  <a role="button" class="btn btn-link py-0 text-capitalize" [href]="proposal.discussionLink" target="_blank">
+                  <a
+                    role="button"
+                    class="btn btn-link py-0 text-capitalize"
+                    [href]="proposal.discussionLink"
+                    target="_blank"
+                  >
                     {{ 'proposal-detail.discussion-on-tezos' | translate }}
                   </a>
                 </div>
@@ -61,7 +82,9 @@
           </div>
           <div class="row mb-3">
             <div class="col-md-3">
-              <p class="text-secondary mb-0">{{ 'proposal-detail.more-info' | translate }}</p>
+              <p class="text-secondary mb-0">
+                {{ 'proposal-detail.more-info' | translate }}
+              </p>
             </div>
             <div class="col-md-9">
               <div class="d-block">
@@ -91,10 +114,17 @@
                 [ngClass]="{ 'btn--rotated': !isCollapsed }"
               >
                 <span>
-                  {{ isCollapsed ? ('proposal-detail.more-proposal' | translate) : ('proposal-detail.less-proposal' | translate) }}
+                  {{
+                    isCollapsed
+                      ? ('proposal-detail.more-proposal' | translate)
+                      : ('proposal-detail.less-proposal' | translate)
+                  }}
                 </span>
                 {{ 'proposal-detail.details' | translate }}
-                <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
+                <fa-icon
+                  [icon]="'longArrowAltDown' | iconPipe"
+                  class="ml-1"
+                ></fa-icon>
               </button>
               <div
                 [innerHtml]="proposal.description | safeHtml"
@@ -113,7 +143,16 @@
   <div class="container p-0 mb-5">
     <div class="card h-100">
       <div class="card pt-3">
-        <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
+        <div
+          class="
+            card-header
+            d-flex
+            justify-content-between
+            align-items-center
+            px-3
+            py-0
+          "
+        >
           <tabbed-table
             [tabs]="tabs"
             [page]="'proposal'"
@@ -128,21 +167,30 @@
               <div class="row pl-0 pl-md-3 pt-3">
                 <div class="col-12 col-md-3">
                   <p>
-                    <fa-icon [icon]="'thumbsUp' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    <fa-icon
+                      [icon]="'thumbsUp' | iconPipe"
+                      class="text-primary fa-2x mr-3"
+                    ></fa-icon>
                     <strong>{{ yayRollsPercentage$ | async }}%</strong>
                     ({{ yayRolls$ | async }}) In Favor
                   </p>
                 </div>
                 <div class="col-12 col-md-3">
                   <p>
-                    <fa-icon [icon]="'thumbsDown' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    <fa-icon
+                      [icon]="'thumbsDown' | iconPipe"
+                      class="text-primary fa-2x mr-3"
+                    ></fa-icon>
                     <strong>{{ nayRollsPercentage$ | async }}%</strong>
                     ({{ nayRolls$ | async }}) Against
                   </p>
                 </div>
                 <div class="col-12 col-md-3">
                   <p>
-                    <fa-icon [icon]="'handRock' | iconPipe" class="text-primary fa-2x mr-3"></fa-icon>
+                    <fa-icon
+                      [icon]="'handRock' | iconPipe"
+                      class="text-primary fa-2x mr-3"
+                    ></fa-icon>
                     {{ passRolls$ | async }}
                     Pass
                   </p>
@@ -150,27 +198,41 @@
               </div>
             </ng-container>
             <ng-container *ngIf="periodTimespan$ | async as periodTimespan">
-              <ng-container *ngIf="periodTimespan.end < now && !!periodTimespan.start">
+              <ng-container
+                *ngIf="periodTimespan.end < now && !!periodTimespan.start"
+              >
                 <div class="pl-0 pl-md-3 py-3">
                   <strong>
-                    {{ periodKind$ | async }} {{ 'proposal-detail.period-has-ended' | translate }}
-                    {{ periodTimespan.start | amDateFormat: 'LL' }} {{ 'proposal-detail.and' | translate }}
+                    {{ periodKind$ | async }}
+                    {{ 'proposal-detail.period-has-ended' | translate }}
+                    {{ periodTimespan.start | amDateFormat: 'LL' }}
+                    {{ 'proposal-detail.and' | translate }}
                     {{ periodTimespan.end | amDateFormat: 'LL' }}
                   </strong>
                 </div>
               </ng-container>
-              <ng-container *ngIf="periodTimespan.start < now && periodTimespan.end > now && !!periodTimespan.end">
+              <ng-container
+                *ngIf="
+                  periodTimespan.start < now &&
+                  periodTimespan.end > now &&
+                  !!periodTimespan.end
+                "
+              >
                 <div class="pl-0 pl-md-3 py-3">
                   <strong>
-                    {{ 'proposal-detail.the-current' | translate }} {{ periodKind$ | async }}
+                    {{ 'proposal-detail.the-current' | translate }}
+                    {{ periodKind$ | async }}
                     {{ 'proposal-detail.period-ends' | translate }}
                     {{ periodTimespan.end | amDateFormat: 'LL' }}
                   </strong>
                 </div>
               </ng-container>
-              <ng-container *ngIf="periodTimespan.start > now && !!periodTimespan.start">
+              <ng-container
+                *ngIf="periodTimespan.start > now && !!periodTimespan.start"
+              >
                 <div class="pl-0 pl-md-3 py-3">
-                  {{ periodKind$ | async }} {{ 'proposal-detail.period-will-start' | translate }}
+                  {{ periodKind$ | async }}
+                  {{ 'proposal-detail.period-will-start' | translate }}
                   {{ periodTimespan.start | amDateFormat: 'LL' }}
                 </div>
               </ng-container>

@@ -2,8 +2,13 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-5 col-sm-3 order-0 p-0">
-        <div class="d-block ">
-          <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(block.level)">
+        <div class="d-block">
+          <button
+            type="button"
+            class="btn btn-link p-0"
+            ng-href="#here"
+            (click)="inspectDetail(block.level)"
+          >
             {{ block.level }}
           </button>
           <p class="m-0 small text-secondary">
@@ -14,11 +19,29 @@
       <div class="col-4 col-sm-2 p-0 order-1 order-sm-1">
         <p class="m-0">{{ block.txcount }} txns</p>
       </div>
-      <div class="col-12 col-sm-5 p-0 pt-2 pt-sm-0 d-flex align-items-center order-3 order-sm-2">
-        <address-item [address]="block.baker" ng-href="#here" (click)="inspectDetail(block.baker)"></address-item>
+      <div
+        class="
+          col-12 col-sm-5
+          p-0
+          pt-2 pt-sm-0
+          d-flex
+          align-items-center
+          order-3 order-sm-2
+        "
+      >
+        <address-item
+          [address]="block.baker"
+          ng-href="#here"
+          (click)="inspectDetail(block.baker)"
+        ></address-item>
       </div>
-      <div class="col-3 col-sm-2 p-0 d-flex align-items-center order-2 order-sm-3">
-        <amount-cell [data]="block.volume" [options]="{ showFiatValue: false, maxDigits: 4 }"></amount-cell>
+      <div
+        class="col-3 col-sm-2 p-0 d-flex align-items-center order-2 order-sm-3"
+      >
+        <amount-cell
+          [data]="block.volume"
+          [options]="{ showFiatValue: false, maxDigits: 4 }"
+        ></amount-cell>
       </div>
     </div>
     <hr />

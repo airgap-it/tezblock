@@ -18,8 +18,8 @@ const palette = [
   '#ff5722',
   '#795548',
   '#9e9e9e',
-  '#607d8b'
-]
+  '#607d8b',
+];
 
 const countryCodes = [
   'AF',
@@ -232,8 +232,8 @@ const countryCodes = [
   'MQ',
   'GP',
   'CW',
-  'IC'
-]
+  'IC',
+];
 
 const predefinedCountryColors = {
   AU: '#ffeb3b',
@@ -241,10 +241,15 @@ const predefinedCountryColors = {
   RU: '#ff1744',
   US: '#304ffe',
   NL: '#ff3d00',
-  BR: '#00c853'
-}
+  BR: '#00c853',
+};
 
 export const getCountryColors = (): { [key: string]: string } =>
   countryCodes
-    .map((code, index) => ({ [code]: predefinedCountryColors[code] || palette[index % palette.length] }))
-    .reduce((accumulator, currentItem) => ({ ...accumulator, ...currentItem }), {})
+    .map((code, index) => ({
+      [code]: predefinedCountryColors[code] || palette[index % palette.length],
+    }))
+    .reduce(
+      (accumulator, currentItem) => ({ ...accumulator, ...currentItem }),
+      {}
+    );

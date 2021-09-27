@@ -1,25 +1,25 @@
-import { createReducer, on } from '@ngrx/store'
+import { createReducer, on } from '@ngrx/store';
 
-import * as actions from './actions'
-import { getInitialTableState, TableState } from '@tezblock/domain/table'
-import { TokenContract } from '@tezblock/domain/contract'
+import * as actions from './actions';
+import { getInitialTableState, TableState } from '@tezblock/domain/table';
+import { TokenContract } from '@tezblock/domain/contract';
 
 export interface State {
-  tokenContracts: TableState<TokenContract>
+  tokenContracts: TableState<TokenContract>;
 }
 
 export const initialState: State = {
-  tokenContracts: getInitialTableState()
-}
+  tokenContracts: getInitialTableState(),
+};
 
 export const reducer = createReducer(
   initialState,
-  on(actions.loadTokenContracts, state => ({
+  on(actions.loadTokenContracts, (state) => ({
     ...state,
     tokenContracts: {
       ...state.tokenContracts,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadTokenContractsSucceeded, (state, { tokenContracts }) => ({
     ...state,
@@ -28,28 +28,28 @@ export const reducer = createReducer(
       data: tokenContracts.data,
       pagination: {
         ...state.tokenContracts.pagination,
-        total: tokenContracts.total
+        total: tokenContracts.total,
       },
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadTokenContractsFailed, state => ({
+  on(actions.loadTokenContractsFailed, (state) => ({
     ...state,
     tokenContracts: {
       ...state.tokenContracts,
       data: null,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.increasePageOfTokenContracts, state => ({
+  on(actions.increasePageOfTokenContracts, (state) => ({
     ...state,
     tokenContracts: {
       ...state.tokenContracts,
       pagination: {
         ...state.tokenContracts.pagination,
-        currentPage: state.tokenContracts.pagination.currentPage + 1
-      }
-    }
+        currentPage: state.tokenContracts.pagination.currentPage + 1,
+      },
+    },
   })),
   on(actions.reset, () => initialState)
-)
+);

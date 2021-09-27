@@ -1,6 +1,7 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getProtocolVariablesServiceMock = () => jasmine.createSpyObj('ProtocolVariablesService', {
+export const getProtocolVariablesServiceMock = () =>
+  jasmine.createSpyObj('ProtocolVariablesService', {
     getProtocolVariables: EMPTY,
-    getBlocksPerVotingPeriod: EMPTY
-})
+    getBlocksPerVotingPeriod: EMPTY,
+  });

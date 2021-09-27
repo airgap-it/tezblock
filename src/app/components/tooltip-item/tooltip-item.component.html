@@ -1,4 +1,8 @@
 <span tooltip="{{ tooltip }}">
   {{ title }}
-  <fa-icon *ngIf="!hasNoIcon" [icon]="'infoCircle' | iconPipe" class="text-secondary"></fa-icon>
+  <fa-icon
+    *ngIf="!hasNoIcon"
+    [icon]="'infoCircle' | iconPipe"
+    class="text-secondary"
+  ></fa-icon>
 </span>

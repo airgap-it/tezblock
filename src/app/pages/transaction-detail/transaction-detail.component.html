@@ -1,7 +1,8 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
     <h1 hidden="true">
-      transaction detail page with information about hash, block level, timestamp, value, fees and and tranfers
+      transaction detail page with information about hash, block level,
+      timestamp, value, fees and and tranfers
     </h1>
     <ng-container *ngIf="latestTx$ | async">
       <div class="card h-100 pt-3 mb-">
@@ -17,7 +18,16 @@
 
       <div class="pt-5">
         <div class="card pt-3">
-          <div class="card-header d-flex justify-content-between align-items-center px-3 py-0">
+          <div
+            class="
+              card-header
+              d-flex
+              justify-content-between
+              align-items-center
+              px-3
+              py-0
+            "
+          >
             <tabbed-table
               [tabs]="tabs"
               [page]="'transaction'"
@@ -37,12 +47,17 @@
       <div class="card p-3">
         <h5 class="card-title mb-4 d-flex align-items-center">
           {{ 'transaction-detail.invalid-operation-hash_title' | translate }}
-          <div class="spinner-grow ml-2 spinner-grow-sm text-primary" role="status"></div>
+          <div
+            class="spinner-grow ml-2 spinner-grow-sm text-primary"
+            role="status"
+          ></div>
         </h5>
         <p>
           {{ 'transaction-detail.invalid-operation-hash_text' | translate }}
         </p>
-        <p>{{ 'transaction-detail.invalid-operation-hash_update' | translate }}</p>
+        <p>
+          {{ 'transaction-detail.invalid-operation-hash_update' | translate }}
+        </p>
       </div>
     </ng-container>
   </div>

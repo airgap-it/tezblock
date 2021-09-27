@@ -1,14 +1,20 @@
-import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { TranslateService } from '@ngx-translate/core'
+import {
+  Column,
+  Template,
+} from '@tezblock/components/tezblock-table/tezblock-table.component';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface Options {
-  pageId: string
-  showFiatValue: boolean
-  symbol: string
+  pageId: string;
+  showFiatValue: boolean;
+  symbol: string;
 }
 
 export const columns: {
-  [key: string]: (options?: Options, translateService?: TranslateService) => Column[]
+  [key: string]: (
+    options?: Options,
+    translateService?: TranslateService
+  ) => Column[];
 } = {
   transfers: (options: Options, translateService?: TranslateService) => [
     {
@@ -16,19 +22,25 @@ export const columns: {
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({
+        data: item.source,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
     },
     {
       field: '',
       width: '1',
-      template: Template.symbol
+      template: Template.symbol,
     },
     {
       name: translateService.instant('tezblock-table.transfers.to'),
       field: 'destination',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({
+        data: item.destination,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
     },
     {
       name: translateService.instant('tezblock-table.transfers.amount'),
@@ -38,36 +50,39 @@ export const columns: {
         data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol
-        }
+          symbol: options.symbol,
+        },
       }),
-      sortable: false
+      sortable: false,
     },
     {
       name: translateService.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
-      sortable: false
+      data: (item: any) => ({
+        data: item.fee,
+        options: { showFiatValue: false, digitsInfo: '1.2-8' },
+      }),
+      sortable: false,
     },
     {
       name: translateService.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
       data: (item: any) => ({ data: item.timestamp }),
-      sortable: true
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.block'),
       field: 'block_level',
       template: Template.block,
-      sortable: true
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.tx-hash'),
       field: 'operation_group_hash',
-      template: Template.hash
-    }
+      template: Template.hash,
+    },
   ],
   other: (options: Options, translateService?: TranslateService) => [
     {
@@ -75,19 +90,25 @@ export const columns: {
       field: 'source',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.source, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({
+        data: item.source,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
     },
     {
       field: '',
       width: '1',
-      template: Template.symbol
+      template: Template.symbol,
     },
     {
       name: translateService.instant('tezblock-table.transfers.to'),
       field: 'destination',
       width: '1',
       template: Template.address,
-      data: (item: any) => ({ data: item.destination, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({
+        data: item.destination,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
     },
     {
       name: translateService.instant('tezblock-table.transfers.amount'),
@@ -97,52 +118,58 @@ export const columns: {
         data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol
-        }
+          symbol: options.symbol,
+        },
       }),
-      sortable: true
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.fee'),
       field: 'fee',
       template: Template.amount,
-      data: (item: any) => ({ data: item.fee, options: { showFiatValue: false, digitsInfo: '1.2-8' } }),
-      sortable: true
+      data: (item: any) => ({
+        data: item.fee,
+        options: { showFiatValue: false, digitsInfo: '1.2-8' },
+      }),
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.age'),
       field: 'timestamp',
       template: Template.timestamp,
-      sortable: true
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.entrypoint'),
-      field: 'entrypoint'
+      field: 'entrypoint',
     },
     {
       name: translateService.instant('tezblock-table.transfers.block'),
       field: 'block_level',
       template: Template.block,
-      sortable: true
+      sortable: true,
     },
     {
       name: translateService.instant('tezblock-table.transfers.tx-hash'),
       field: 'operation_group_hash',
-      template: Template.hash
-    }
+      template: Template.hash,
+    },
   ],
   entrypoints: (options?: Options) => [
     {
       name: 'Entrypoint',
-      data: (item: string) => ({ data: item })
-    }
+      data: (item: string) => ({ data: item }),
+    },
   ],
   tokenHolders: (options: Options) => [
     {
       name: 'Account',
       field: 'address',
       template: Template.address,
-      data: (item: any) => ({ data: item.address, options: { showFullAddress: false, pageId: options.pageId } })
+      data: (item: any) => ({
+        data: item.address,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
     },
     {
       name: 'Token Balance',
@@ -152,9 +179,9 @@ export const columns: {
         data: item.amount,
         options: {
           showFiatValue: options.showFiatValue,
-          symbol: options.symbol
-        }
-      })
-    }
-  ]
-}
+          symbol: options.symbol,
+        },
+      }),
+    },
+  ],
+};

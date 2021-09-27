@@ -1,5 +1,12 @@
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { faGithub, faMedium, faTelegram, faTwitter, faAndroid, faApple } from '@fortawesome/free-brands-svg-icons'
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faGithub,
+  faMedium,
+  faTelegram,
+  faTwitter,
+  faAndroid,
+  faApple,
+} from '@fortawesome/free-brands-svg-icons';
 import {
   faBell,
   faBoxBallot,
@@ -41,8 +48,8 @@ import {
   faCheck,
   faTimes,
   faCog,
-  faExternalLink
-} from '@fortawesome/pro-light-svg-icons'
+  faExternalLink,
+} from '@fortawesome/pro-light-svg-icons';
 
 export const addFontAwesome = () => {
   library.add(
@@ -93,5 +100,5 @@ export const addFontAwesome = () => {
     faTimes,
     faCog,
     faExternalLink
-  )
-}
+  );
+};

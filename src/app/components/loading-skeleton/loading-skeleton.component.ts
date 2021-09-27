@@ -1,9 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core'
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'loading-skeleton',
   templateUrl: './loading-skeleton.component.html',
-  styleUrls: ['./loading-skeleton.component.scss']
+  styleUrls: ['./loading-skeleton.component.scss'],
 })
 export class LoadingSkeletonComponent implements OnInit {
   constructor() {}
@@ -11,8 +11,8 @@ export class LoadingSkeletonComponent implements OnInit {
   ngOnInit() {}
 
   @Input()
-  public class: string = 'p'
+  public class: string = 'p';
 
   @Input()
-  public loadingWidth = '100%'
+  public loadingWidth = '100%';
 }

@@ -1,50 +1,50 @@
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout'
-import { Component, Input, OnInit } from '@angular/core'
-import { Router } from '@angular/router'
-import { Store } from '@ngrx/store'
-import { TranslateService } from '@ngx-translate/core'
-import { Observable, Subscription } from 'rxjs'
-import { map } from 'rxjs/operators'
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { TranslateService } from '@ngx-translate/core';
+import { Observable, Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import * as fromRoot from '@tezblock/reducers'
-import { ThemeService } from '@tezblock/services/theme/theme.service'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { LanguagesService } from '@tezblock/services/translation/languages.service'
-import { TezosNetwork } from '@airgap/coinlib-core'
+import * as fromRoot from '@tezblock/reducers';
+import { ThemeService } from '@tezblock/services/theme/theme.service';
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
+import { LanguagesService } from '@tezblock/services/translation/languages.service';
+import { TezosNetwork } from '@airgap/coinlib-core';
 
 @Component({
   selector: 'header-item',
   templateUrl: './header-item.component.html',
-  styleUrls: ['./header-item.component.scss']
+  styleUrls: ['./header-item.component.scss'],
 })
 export class HeaderItemComponent implements OnInit {
   @Input()
-  isMinimized: boolean = false
+  isMinimized: boolean = false;
 
   @Input()
-  activeLinkBlockchain: boolean = false
+  activeLinkBlockchain: boolean = false;
 
   @Input()
-  activeLinkResources: boolean = false
+  activeLinkResources: boolean = false;
 
   @Input()
-  activeLinkEcosystem: boolean = false
+  activeLinkEcosystem: boolean = false;
 
   @Input()
-  activeLinkAssets: boolean = false
+  activeLinkAssets: boolean = false;
 
-  subscription: Subscription
+  subscription: Subscription;
 
-  currentCycle$: Observable<number>
-  cycleProgress$: Observable<number>
-  remainingTime$: Observable<string>
-  triggers: string = ''
-  title = 'tezblock'
-  triggers$: Observable<string>
-  isCollapsed = true
-  hideDropdown = true
-  selectedNetwork: TezosNetwork
-  networks = TezosNetwork
+  currentCycle$: Observable<number>;
+  cycleProgress$: Observable<number>;
+  remainingTime$: Observable<string>;
+  triggers: string = '';
+  title = 'tezblock';
+  triggers$: Observable<string>;
+  isCollapsed = true;
+  hideDropdown = true;
+  selectedNetwork: TezosNetwork;
+  networks = TezosNetwork;
 
   constructor(
     private readonly router: Router,
@@ -57,33 +57,33 @@ export class HeaderItemComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle)
-    this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress)
-    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime)
-    this.selectedNetwork = this.chainNetworkService.getNetwork()
+    this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle);
+    this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress);
+    this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime);
+    this.selectedNetwork = this.chainNetworkService.getNetwork();
     this.triggers$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
-      .pipe(map((breakpointState) => (breakpointState.matches ? '' : 'hover')))
+      .pipe(map((breakpointState) => (breakpointState.matches ? '' : 'hover')));
   }
 
   navigate(entity: string) {
-    this.router.navigate([`${entity}/list`])
+    this.router.navigate([`${entity}/list`]);
   }
   ngOnDestroy() {
     if (this.subscription) {
-      this.subscription.unsubscribe()
+      this.subscription.unsubscribe();
     }
   }
 
   changeNetwork(name: TezosNetwork) {
-    this.chainNetworkService.changeEnvironment(name)
+    this.chainNetworkService.changeEnvironment(name);
   }
 
   changeTheme() {
-    this.themeService.switch()
+    this.themeService.switch();
   }
 
   changeLanguage(language: string) {
-    this.languagesService.loadLanguages(language)
+    this.languagesService.loadLanguages(language);
   }
 }

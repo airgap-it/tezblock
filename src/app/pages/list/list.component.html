@@ -10,14 +10,18 @@
               <div class="col col-md-3 py-3">
                 <div class="row mb-3">
                   <div class="col">
-                    <h5 class="card-title__secondary mb-3 ">
+                    <h5 class="card-title__secondary mb-3">
                       {{ 'list.transactions.transactions' | translate }}
-                      <small>{{ 'list.transactions.last24h' | translate }}</small>
+                      <small>{{
+                        'list.transactions.last24h' | translate
+                      }}</small>
                     </h5>
                     <h3>
                       {{ transactionsCountLast24h$ | async }}
                       <loading-skeleton
-                        *ngIf="(transactionsCountLast24h$ | async) === undefined"
+                        *ngIf="
+                          (transactionsCountLast24h$ | async) === undefined
+                        "
                         [loadingWidth]="'150px'"
                       ></loading-skeleton>
                     </h3>
@@ -25,10 +29,12 @@
                 </div>
                 <div class="row">
                   <div class="col">
-                    <h5 class="card-title__secondary mb-3 ">
+                    <h5 class="card-title__secondary mb-3">
                       {{ 'list.transactions.transaction-volume' | translate }}
                       <br />
-                      <small>{{ 'list.transactions.last24h' | translate }}</small>
+                      <small>{{
+                        'list.transactions.last24h' | translate
+                      }}</small>
                     </h5>
                     <h3>
                       <amount-cell
@@ -36,13 +42,16 @@
                         [data]="transactionsTotalXTZ$ | async"
                         options="{ showFiatValue: false }"
                       ></amount-cell>
-                      <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
+                      <loading-skeleton
+                        *ngIf="!(transactionsChartDatasets$ | async)"
+                        [loadingWidth]="'150px'"
+                      ></loading-skeleton>
                     </h3>
                   </div>
                 </div>
               </div>
               <div class="col col-md-9 py-3 chart--container">
-                <h5 class="card-title__secondary mb-3 ">
+                <h5 class="card-title__secondary mb-3">
                   {{ 'list.transactions.transactions' | translate }}
                   <small>{{ 'list.transactions.last7d' | translate }}</small>
                 </h5>
@@ -52,9 +61,16 @@
                   [labels]="chartLabels"
                   [options]="transactionsChartOptions"
                   chartType="bar"
-                  [colorOptions]="{ gradientFrom: 'rgba(46,91,255,0.09)', borderWidth: 1, colors: [{ backgroundColor: '#2e5bff' }] }"
+                  [colorOptions]="{
+                    gradientFrom: 'rgba(46,91,255,0.09)',
+                    borderWidth: 1,
+                    colors: [{ backgroundColor: '#2e5bff' }]
+                  }"
                 ></chart-item>
-                <loading-skeleton *ngIf="!(transactionsChartDatasets$ | async)" [loadingWidth]="'150px'"></loading-skeleton>
+                <loading-skeleton
+                  *ngIf="!(transactionsChartDatasets$ | async)"
+                  [loadingWidth]="'150px'"
+                ></loading-skeleton>
               </div>
             </div>
           </ng-container>

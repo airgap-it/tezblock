@@ -1,4 +1,4 @@
 export interface TypeAheadObject {
-  name: string
-  type: string
+  name: string;
+  type: string;
 }

@@ -1,12 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core'
+import { Pipe, PipeTransform } from '@angular/core';
 
-import { withoutBraces } from '@tezblock/services/fp'
+import { withoutBraces } from '@tezblock/services/fp';
 
 @Pipe({
-  name: 'withoutBraces'
+  name: 'withoutBraces',
 })
 export class WithoutBracesPipe implements PipeTransform {
   public transform(value: string): string {
-    return withoutBraces(value)
+    return withoutBraces(value);
   }
 }

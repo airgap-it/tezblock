@@ -1,5 +1,6 @@
-import { of } from 'rxjs'
+import { of } from 'rxjs';
 
-export const getCopyServiceMock = () => jasmine.createSpyObj('CopyService', {
-    copyToClipboard: undefined
-})
+export const getCopyServiceMock = () =>
+  jasmine.createSpyObj('CopyService', {
+    copyToClipboard: undefined,
+  });

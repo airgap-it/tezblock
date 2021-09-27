@@ -3,27 +3,50 @@
     <div class="row">
       <div class="col-6 col-sm-3 pl-0 order-2 order-sm-0">
         <div class="d-block pt-2 pt-sm-0">
-          <button type="button" class="btn btn-link p-0" ng-href="#here" (click)="inspectDetail(transaction.operation_group_hash)">
+          <button
+            type="button"
+            class="btn btn-link p-0"
+            ng-href="#here"
+            (click)="inspectDetail(transaction.operation_group_hash)"
+          >
             {{ transaction.operation_group_hash | shortenString }}
           </button>
           <p class="m-0 small text-secondary">
-            <app-timestamp-cell [data]="transaction.timestamp"></app-timestamp-cell>
+            <app-timestamp-cell
+              [data]="transaction.timestamp"
+            ></app-timestamp-cell>
           </p>
         </div>
       </div>
       <div class="col-2 col-sm-1 d-flex align-items-center order-0 order-sm-2">
-        <fa-icon [icon]="'levelDownAlt' | iconPipe" class="ml-1 text-primary-light"></fa-icon>
+        <fa-icon
+          [icon]="'levelDownAlt' | iconPipe"
+          class="ml-1 text-primary-light"
+        ></fa-icon>
       </div>
       <div class="col-10 col-sm-5 pl-0 order-1 order-sm-3">
-        <div class="d-block ">
+        <div class="d-block">
           <div class="mb-1">
-            <address-item [address]="transaction.source" ng-href="#here" (click)="inspectDetail(transaction.source)"></address-item>
+            <address-item
+              [address]="transaction.source"
+              ng-href="#here"
+              (click)="inspectDetail(transaction.source)"
+            ></address-item>
           </div>
-          <address-item [address]="transaction.destination" ng-href="#here" (click)="inspectDetail(transaction.destination)"></address-item>
+          <address-item
+            [address]="transaction.destination"
+            ng-href="#here"
+            (click)="inspectDetail(transaction.destination)"
+          ></address-item>
         </div>
       </div>
-      <div class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4">
-        <amount-cell [data]="transaction.amount" [options]="{ showFiatValue: false, maxDigits: 4 }"></amount-cell>
+      <div
+        class="col-6 col-sm-3 pr-0 d-flex align-items-center order-3 order-sm-4"
+      >
+        <amount-cell
+          [data]="transaction.amount"
+          [options]="{ showFiatValue: false, maxDigits: 4 }"
+        ></amount-cell>
       </div>
     </div>
     <hr />

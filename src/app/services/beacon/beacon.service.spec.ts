@@ -1,32 +1,34 @@
-import { TestBed } from '@angular/core/testing'
-import { NetworkType } from '@airgap/beacon-sdk'
+import { TestBed } from '@angular/core/testing';
+import { NetworkType } from '@airgap/beacon-sdk';
 
-import { BeaconService } from './beacon.service'
-import { getDAppClientMock } from 'test-config/mocks/d-app-client.mock'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
+import { BeaconService } from './beacon.service';
+import { getDAppClientMock } from 'test-config/mocks/d-app-client.mock';
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock';
 
 describe('BeaconService', () => {
-  let service: BeaconService
-  const dAppClientMock = getDAppClientMock()
-  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  let service: BeaconService;
+  const dAppClientMock = getDAppClientMock();
+  const chainNetworkServiceMock = getChainNetworkServiceMock();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [{ provide: ChainNetworkService, useValue: chainNetworkServiceMock }]
-    })
+      providers: [
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+      ],
+    });
 
-    service = TestBed.inject(BeaconService)
-  })
+    service = TestBed.inject(BeaconService);
+  });
 
   it('should be created', () => {
-    expect(service).toBeTruthy()
-  })
+    expect(service).toBeTruthy();
+  });
 
   describe('delegate', () => {
     beforeEach(() => {
-      spyOn(service, 'getDAppClient').and.returnValue(dAppClientMock)
-    })
+      spyOn(service, 'getDAppClient').and.returnValue(dAppClientMock);
+    });
 
     // describe('when account in not active', () => {
     //   beforeEach(() => {
@@ -61,8 +63,8 @@ describe('BeaconService', () => {
     //     done()
     //   })
     // })
-  })
-})
+  });
+});
 
 // how to override es6 class import by mock ? ...
 // possible solution: https://www.npmjs.com/package/ts-mock-imports

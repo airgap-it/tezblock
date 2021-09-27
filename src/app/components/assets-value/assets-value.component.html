@@ -1,14 +1,19 @@
 <ng-template #value let-context>
-    ${{ context | async | number: getPrecision(context | async) | decimalsFormatter }}
+  ${{
+    context | async | number: getPrecision(context | async) | decimalsFormatter
+  }}
 </ng-template>
 <ng-template #noHeader>
-  <ng-container *ngTemplateOutlet="value; context: { $implicit: value$ }"></ng-container>
+  <ng-container
+    *ngTemplateOutlet="value; context: { $implicit: value$ }"
+  ></ng-container>
 </ng-template>
-
 
 <div class="pl-sm-0 d-flex align-items-center">
   <h5 *ngIf="useHeader; else noHeader" class="d-inline-block m-0">
-    <ng-container *ngTemplateOutlet="value; context: { $implicit: value$ }"></ng-container>
+    <ng-container
+      *ngTemplateOutlet="value; context: { $implicit: value$ }"
+    ></ng-container>
   </h5>
   <span
     class="badge badge-pill ml-2"

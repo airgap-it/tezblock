@@ -1,6 +1,7 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getProposalServiceMock = () => jasmine.createSpyObj('ProposalService', {
+export const getProposalServiceMock = () =>
+  jasmine.createSpyObj('ProposalService', {
     addVoteData: EMPTY,
     getVotingPeriod: EMPTY,
     getVotesForTransaction: EMPTY,
@@ -11,5 +12,5 @@ export const getProposalServiceMock = () => jasmine.createSpyObj('ProposalServic
     getPeriodsTimespans: EMPTY,
     getProposalDescription: EMPTY,
     getDivisionOfVotes: EMPTY,
-    getPeriodInfos: EMPTY
-})
+    getPeriodInfos: EMPTY,
+  });

@@ -1,5 +1,7 @@
 <ng-container *ngIf="headerTemplate">
-  <ng-container *ngTemplateOutlet="headerTemplate; context: { $implicit: headerContext }"></ng-container>
+  <ng-container
+    *ngTemplateOutlet="headerTemplate; context: { $implicit: headerContext }"
+  ></ng-container>
 </ng-container>
 
 <div *ngIf="dataSource.isFilterable" class="input-group input-group-main">
@@ -11,15 +13,24 @@
   />
   <div class="input-group-append">
     <button class="btn btn-primary" type="submit" (click)="filter()">
-      <fa-icon [icon]="'search' | iconPipe" class="text-white d-inline-block d-sm-none"></fa-icon>
+      <fa-icon
+        [icon]="'search' | iconPipe"
+        class="text-white d-inline-block d-sm-none"
+      ></fa-icon>
       <span class="d-none d-sm-inline-block">Filter</span>
     </button>
   </div>
 </div>
 <div class="table-responsive">
-  <tezblock-table [columns]="columns" [data]="data" [pagination]="false" [loading]="loading"></tezblock-table>
+  <tezblock-table
+    [columns]="columns"
+    [data]="data"
+    [pagination]="false"
+    [loading]="loading"
+  ></tezblock-table>
   <div class="w-100 p-0 d-flex justify-content-sm-end">
-    <pagination *ngIf="pagination$ | async as pagination"
+    <pagination
+      *ngIf="pagination$ | async as pagination"
       [totalItems]="pagination.total"
       (pageChanged)="pageChanged($event)"
       [boundaryLinks]="true"
