@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { ToastrModule, ToastrService } from 'ngx-toastr'
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 import { DownloadService } from './download.service';
 

@@ -1,8 +1,9 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getCryptoPricesServiceMock = () => jasmine.createSpyObj('CryptoPricesService', {
+export const getCryptoPricesServiceMock = () =>
+  jasmine.createSpyObj('CryptoPricesService', {
     getCryptoPrices: EMPTY,
     getHistoricCryptoPrices: EMPTY,
     getCurrencyConverterArgs: EMPTY,
-    getEfficiencyLast10Cycles: EMPTY
-})
+    getEfficiencyLast10Cycles: EMPTY,
+  });

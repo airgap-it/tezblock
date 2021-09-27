@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ContractService } from './contract.service';
-import { UnitHelper } from '../../../../test-config/unit-test-helper'
+import { UnitHelper } from '../../../../test-config/unit-test-helper';
 
 xdescribe('ContractService', () => {
   beforeEach(() => {
-    const unitHelper = new UnitHelper()
+    const unitHelper = new UnitHelper();
 
-    TestBed.configureTestingModule(unitHelper.testBed({}))
+    TestBed.configureTestingModule(unitHelper.testBed({}));
   });
 
   it('should be created', () => {

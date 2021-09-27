@@ -7,33 +7,41 @@ import { map } from 'rxjs/operators';
 import { OrderBy } from '../base.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class NodeService {
+  private nodes: Node[];
+  private baseUrl = '';
 
-  private nodes: Node[]
-  private baseUrl = 'https://services.tzkt.io/v1/nodes'
+  constructor(private readonly httpClient: HttpClient) {}
 
-  constructor(private readonly httpClient: HttpClient) { }
-
-  loadConnectedNodes(orderBy?: [TypedAction<string>, OrderBy]): Observable<Node[]> {
+  loadConnectedNodes(
+    orderBy?: [TypedAction<string>, OrderBy]
+  ): Observable<Node[]> {
     if (this.nodes && orderBy[1]) {
-      return of(this.sortedNodes(orderBy[1]))
+      return of(this.sortedNodes(orderBy[1]));
     }
-    return this.httpClient.get<Node[]>(`${this.baseUrl}/public`).pipe(map(nodes => this.nodes = nodes))
+    return this.httpClient
+      .get<Node[]>(`${this.baseUrl}/public`)
+      .pipe(map((nodes) => (this.nodes = nodes)));
   }
 
   loadConnectedNodesPerCountry(): Observable<Heatmap[]> {
-    return this.httpClient.get<Heatmap[]>(`${this.baseUrl}/stats`).pipe(map((stats: any) => stats.heatmap as Heatmap[]))
+    return this.httpClient
+      .get<Heatmap[]>(`${this.baseUrl}/stats`)
+      .pipe(map((stats: any) => stats.heatmap as Heatmap[]));
   }
 
   sortedNodes(orderBy: OrderBy) {
     if (!orderBy) {
-      return this.nodes
+      return this.nodes;
     }
-    return orderBy.direction === 'asc' ?
-      Array.from(this.nodes).sort((a, b) => (a[orderBy.field] > b[orderBy.field]) ? 1 : -1) :
-      Array.from(this.nodes).sort((a, b) => (a[orderBy.field] < b[orderBy.field]) ? 1 : -1)
+    return orderBy.direction === 'asc'
+      ? Array.from(this.nodes).sort((a, b) =>
+          a[orderBy.field] > b[orderBy.field] ? 1 : -1
+        )
+      : Array.from(this.nodes).sort((a, b) =>
+          a[orderBy.field] < b[orderBy.field] ? 1 : -1
+        );
   }
-
 }

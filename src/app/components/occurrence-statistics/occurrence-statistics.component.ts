@@ -1,7 +1,7 @@
-import { Component, Input, OnInit } from '@angular/core'
-import { ChartOptions } from 'chart.js'
+import { Component, Input, OnInit } from '@angular/core';
+import { ChartOptions } from 'chart.js';
 
-import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component'
+import { defaultOptions } from '@tezblock/components/chart-item/chart-item.component';
 
 const defaultChartOptions: ChartOptions = {
   ...defaultOptions,
@@ -11,38 +11,38 @@ const defaultChartOptions: ChartOptions = {
       {
         display: false,
         gridLines: {
-          display: false
+          display: false,
         },
         ticks: {
-          beginAtZero: true
-        }
-      }
-    ]
-  }
-}
+          beginAtZero: true,
+        },
+      },
+    ],
+  },
+};
 
 @Component({
   selector: 'app-occurrence-statistics',
   templateUrl: './occurrence-statistics.component.html',
-  styleUrls: ['./occurrence-statistics.component.scss']
+  styleUrls: ['./occurrence-statistics.component.scss'],
 })
 export class OccurrenceStatisticsComponent implements OnInit {
-  @Input() count: number
-  @Input() kind: string
-  @Input() chartDatasets: { data: number[]; label: string }[]
-  @Input() chartLabels: string[]
-  
+  @Input() count: number;
+  @Input() kind: string;
+  @Input() chartDatasets: { data: number[]; label: string }[];
+  @Input() chartLabels: string[];
+
   @Input()
   set chartOptions(value: ChartOptions) {
     if (value !== this._chartOptions) {
-      this._chartOptions = value
+      this._chartOptions = value;
     }
   }
   get chartOptions(): ChartOptions {
-    return this._chartOptions || defaultChartOptions
+    return this._chartOptions || defaultChartOptions;
   }
 
-  private _chartOptions: ChartOptions
+  private _chartOptions: ChartOptions;
 
   constructor() {}
 

@@ -2,7 +2,10 @@
   <ng-container *ngIf="amountPipedTrailingChars; else noDecimals">
     <span class="d-flex align-items-baseline">
       {{ amountPipedLeadingChars }}.
-      <span [ngStyle]="fontSmall ? { 'font-size': '90%' } : null" [ngClass]="{ 'text-muted': fontColor }">
+      <span
+        [ngStyle]="fontSmall ? { 'font-size': '90%' } : null"
+        [ngClass]="{ 'text-muted': fontColor }"
+      >
         {{ amountPipedTrailingChars }}
       </span>
     </span>
@@ -40,7 +43,10 @@
   </ng-container>
 </ng-container>
 <ng-template #noComparison>
-  <span *ngIf="options?.showFiatValue" class="badge badge-pill badge-primary-light ml-1">
+  <span
+    *ngIf="options?.showFiatValue"
+    class="badge badge-pill badge-primary-light ml-1"
+  >
     {{ 1 | currencySymbol: { currInfo: { symbol: '$' } } }}
     {{ currencyAmount$ | async | decimalsFormatter }}
   </span>

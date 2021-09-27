@@ -20,7 +20,10 @@
       <fa-icon
         [icon]="'search' | iconPipe"
         class="text-white"
-        [ngClass]="{ 'd-inline-block': !!buttonLabel, 'd-sm-none': !!buttonLabel }"
+        [ngClass]="{
+          'd-inline-block': !!buttonLabel,
+          'd-sm-none': !!buttonLabel
+        }"
       ></fa-icon>
       <ng-container *ngIf="buttonLabel">
         <span class="d-none d-sm-inline-block">{{ buttonLabel }}</span>

@@ -1,12 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core'
+import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'translate'
+  name: 'translate',
 })
 export class TranslatePipeMock implements PipeTransform {
-  public name = 'translate'
+  public name = 'translate';
 
   public transform(query: string, ...args: any[]): any {
-    return query
+    return query;
   }
 }

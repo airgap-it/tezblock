@@ -1,8 +1,6 @@
 <div class="mb-5 pt-5">
   <div class="container p-0">
-    <h1 hidden="true">
-      Top 25 Tezos bakers
-    </h1>
+    <h1 hidden="true">Top 25 Tezos bakers</h1>
     <div class="card h-100 pt-3">
       <div class="card-body p-4">
         <h5 class="card-title mb-3">
@@ -10,26 +8,31 @@
         </h5>
         <div class="row pb-3">
           <div class="col">
-            <ng-container *ngIf="totalActiveBakers$ | async as totalActiveBakers">
-              <h5 class="card-title__secondary mb-3 ">
+            <ng-container
+              *ngIf="totalActiveBakers$ | async as totalActiveBakers"
+            >
+              <h5 class="card-title__secondary mb-3">
                 {{ 'baker-overview.total-number' | translate }}
               </h5>
               <h3>
                 {{ totalActiveBakers }}
-                <loading-skeleton *ngIf="(totalActiveBakers$ | async) === undefined" [loadingWidth]="'150px'"></loading-skeleton>
+                <loading-skeleton
+                  *ngIf="(totalActiveBakers$ | async) === undefined"
+                  [loadingWidth]="'150px'"
+                ></loading-skeleton>
               </h3>
             </ng-container>
           </div>
         </div>
         <div class="row pb-5">
           <div class="col col-12">
-            <h5 class="card-title__secondary mb-3 ">
+            <h5 class="card-title__secondary mb-3">
               {{ 'baker-overview.top25' | translate }}
             </h5>
           </div>
           <div class="col col-12 d-flex justify-content-center">
             <ng-container *ngIf="top24ChartDatasets$ | async">
-              <div style="position: relative;">
+              <div style="position: relative">
                 <chart-item
                   [datasets]="top24ChartDatasets$ | async"
                   [labels]="top24ChartLabels$ | async"

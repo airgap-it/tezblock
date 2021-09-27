@@ -1,6 +1,12 @@
-import { Pipe, PipeTransform } from '@angular/core'
-import { findIconDefinition, IconDefinition, IconLookup, IconName, IconPrefix } from '@fortawesome/fontawesome-svg-core'
-import { environment } from 'src/environments/environment'
+import { Pipe, PipeTransform } from '@angular/core';
+import {
+  findIconDefinition,
+  IconDefinition,
+  IconLookup,
+  IconName,
+  IconPrefix,
+} from '@fortawesome/fontawesome-svg-core';
+import { environment } from 'src/environments/environment';
 
 export type IconRef =
   | 'bell'
@@ -49,34 +55,34 @@ export type IconRef =
   | 'check'
   | 'times'
   | 'cog'
-  | 'externalLink'
+  | 'externalLink';
 
 @Pipe({
-  name: 'iconPipe'
+  name: 'iconPipe',
 })
 export class IconPipe implements PipeTransform {
-  private readonly iconNameMap: Record<IconRef, IconLookup>
+  private readonly iconNameMap: Record<IconRef, IconLookup>;
 
   constructor() {
-    let prefix: IconPrefix = 'fal'
-    let handReceiving: IconName = 'hand-receiving'
-    let boxBallot: IconName = 'box-ballot'
-    let handHoldingSeedling: IconName = 'hand-holding-seedling'
-    let coin: IconName = 'coin'
-    let hatChef: IconName = 'hat-chef'
-    let infoCircle: IconName = 'info-circle'
-    let breadLoaf: IconName = 'bread-loaf'
-    let externalLink: IconName = 'link'
+    let prefix: IconPrefix = 'fal';
+    let handReceiving: IconName = 'hand-receiving';
+    let boxBallot: IconName = 'box-ballot';
+    let handHoldingSeedling: IconName = 'hand-holding-seedling';
+    let coin: IconName = 'coin';
+    let hatChef: IconName = 'hat-chef';
+    let infoCircle: IconName = 'info-circle';
+    let breadLoaf: IconName = 'bread-loaf';
+    let externalLink: IconName = 'link';
     if (!environment.proFontAwesomeAvailable) {
-      prefix = 'fas'
-      handReceiving = 'handshake'
-      boxBallot = 'vote-yea'
-      handHoldingSeedling = 'seedling'
-      coin = 'coins'
-      hatChef = 'list-alt'
-      infoCircle = 'info'
-      breadLoaf = 'bread-slice'
-      externalLink = "external-link"
+      prefix = 'fas';
+      handReceiving = 'handshake';
+      boxBallot = 'vote-yea';
+      handHoldingSeedling = 'seedling';
+      coin = 'coins';
+      hatChef = 'list-alt';
+      infoCircle = 'info';
+      breadLoaf = 'bread-slice';
+      externalLink = 'external-link';
     }
     this.iconNameMap = {
       bell: { prefix, iconName: 'bell' },
@@ -125,17 +131,17 @@ export class IconPipe implements PipeTransform {
       check: { prefix, iconName: 'check' },
       times: { prefix, iconName: 'times' },
       cog: { prefix, iconName: 'cog' },
-      externalLink: { prefix, iconName: externalLink }
-    }
+      externalLink: { prefix, iconName: externalLink },
+    };
   }
 
   public iconDefinition(name: IconRef): IconDefinition {
-    return findIconDefinition(this.iconNameMap[name])
+    return findIconDefinition(this.iconNameMap[name]);
   }
 
   public transform(value: IconRef): string[] {
-    const icon = this.iconNameMap[value]
+    const icon = this.iconNameMap[value];
 
-    return [icon.prefix, icon.iconName]
+    return [icon.prefix, icon.iconName];
   }
 }

@@ -1,143 +1,172 @@
-import { Component, EventEmitter, Input, OnInit, Output, ChangeDetectionStrategy } from '@angular/core'
-import { ActivatedRoute, Router } from '@angular/router'
-import { filter } from 'rxjs/operators'
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnInit,
+  Output,
+  ChangeDetectionStrategy,
+} from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
-import { BaseComponent } from '@tezblock/components/base.component'
-import { DownloadService } from '@tezblock/services/download/download.service'
-import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab'
-import { OrderBy } from '@tezblock/services/base.service'
-import { first, get } from '@tezblock/services/fp'
+import { BaseComponent } from '@tezblock/components/base.component';
+import { DownloadService } from '@tezblock/services/download/download.service';
+import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab';
+import { OrderBy } from '@tezblock/services/base.service';
+import { first, get } from '@tezblock/services/fp';
 
 @Component({
   selector: 'tabbed-table',
   templateUrl: './tabbed-table.component.html',
   styleUrls: ['./tabbed-table.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TabbedTableComponent extends BaseComponent implements OnInit {
   @Input()
-  page: string = 'account'
+  page: string = 'account';
 
   @Input()
   set tabs(value: Tab[]) {
     if (value !== null && value !== this._tabs) {
-      const tabQuery = this.activatedRoute.snapshot.queryParamMap.get('tab')
-      const tabFromQuery = get<string>(_tabQuery => value.find(tab => tab.title === _tabQuery && tab.count > 0))(tabQuery)
+      const tabQuery = this.activatedRoute.snapshot.queryParamMap.get('tab');
+      const tabFromQuery = get<string>((_tabQuery) =>
+        value.find((tab) => tab.title === _tabQuery && tab.count > 0)
+      )(tabQuery);
 
-      const selectedTab = value.find(tab => tab.active) || first(value)
+      const selectedTab = value.find((tab) => tab.active) || first(value);
 
-      this._tabs = value
+      this._tabs = value;
 
-      this.updateSelectedTab(selectedTab)
+      this.updateSelectedTab(selectedTab);
 
-      if ((this.selectedTab.disabled() && this._tabs.some(tab => tab.count > 0)) || tabFromQuery) {
-        this.setInitTabSelection()
+      if (
+        (this.selectedTab.disabled() &&
+          this._tabs.some((tab) => tab.count > 0)) ||
+        tabFromQuery
+      ) {
+        this.setInitTabSelection();
       }
     }
   }
 
   get tabs() {
-    return this._tabs || []
+    return this._tabs || [];
   }
 
   @Input()
-  data: any[]
+  data: any[];
 
   @Input()
-  loading: boolean
+  loading: boolean;
 
   @Input()
-  orderBy: OrderBy
+  orderBy: OrderBy;
 
   @Input()
-  downloadable: boolean
+  downloadable: boolean;
 
   @Input()
-  disableTabLogic: boolean
+  disableTabLogic: boolean;
 
   @Input()
-  noDataLabel: string
+  noDataLabel: string;
 
   @Output()
-  tabClicked: EventEmitter<KindType> = new EventEmitter()
+  tabClicked: EventEmitter<KindType> = new EventEmitter();
 
   @Output()
-  loadMore: EventEmitter<boolean> = new EventEmitter()
+  loadMore: EventEmitter<boolean> = new EventEmitter();
 
-  @Output() onSort: EventEmitter<OrderBy> = new EventEmitter()
+  @Output() onSort: EventEmitter<OrderBy> = new EventEmitter();
 
   get id(): string {
-    return this.activatedRoute.snapshot.paramMap.get('id')
+    return this.activatedRoute.snapshot.paramMap.get('id');
   }
 
-  selectedTab: Tab | undefined
+  selectedTab: Tab | undefined;
 
-  private _tabs: Tab[] | undefined
-  public enableDownload: boolean = false
+  private _tabs: Tab[] | undefined;
+  public enableDownload: boolean = false;
 
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
     private readonly downloadService: DownloadService
   ) {
-    super()
+    super();
   }
 
   ngOnInit() {
     this.subscriptions.push(
-      this.activatedRoute.queryParamMap.pipe(filter(queryParam => queryParam.has('tab'))).subscribe(queryParam => {
-        const selectedTab = this.tabs.find(compareTabWith(queryParam.get('tab')))
-        this.selectTab(selectedTab)
-      })
-    )
+      this.activatedRoute.queryParamMap
+        .pipe(filter((queryParam) => queryParam.has('tab')))
+        .subscribe((queryParam) => {
+          const selectedTab = this.tabs.find(
+            compareTabWith(queryParam.get('tab'))
+          );
+          this.selectTab(selectedTab);
+        })
+    );
   }
 
   // on page start (after first api request)
   setInitTabSelection() {
-    const hasData = (tab: Tab) => tab.count > 0
-    const tabNameFromQuery: string = this.activatedRoute.snapshot.queryParamMap.get('tab')
-    const tabFromQuery: Tab = this.tabs.filter(hasData).find(compareTabWith(tabNameFromQuery))
-    const firstTabWithData: Tab = this.tabs.find(hasData)
-    const firstActiveTab: Tab = this.tabs.find(tab => tab.active && (tab.count === undefined || tab.count > 0))
-    const selectedTab: Tab = tabFromQuery || firstActiveTab || firstTabWithData
+    const hasData = (tab: Tab) => tab.count > 0;
+    const tabNameFromQuery: string =
+      this.activatedRoute.snapshot.queryParamMap.get('tab');
+    const tabFromQuery: Tab = this.tabs
+      .filter(hasData)
+      .find(compareTabWith(tabNameFromQuery));
+    const firstTabWithData: Tab = this.tabs.find(hasData);
+    const firstActiveTab: Tab = this.tabs.find(
+      (tab) => tab.active && (tab.count === undefined || tab.count > 0)
+    );
+    const selectedTab: Tab = tabFromQuery || firstActiveTab || firstTabWithData;
     if (selectedTab) {
-      this.selectTab(selectedTab)
+      this.selectTab(selectedTab);
     }
   }
 
   onSelectTab(selectedTab: Tab) {
-    this.router.navigate([], { relativeTo: this.activatedRoute, queryParams: { tab: selectedTab.title } })
+    this.router.navigate([], {
+      relativeTo: this.activatedRoute,
+      queryParams: { tab: selectedTab.title },
+    });
   }
 
   onLoadMore() {
-    this.loadMore.emit(true)
+    this.loadMore.emit(true);
   }
 
   trackByFn(index: number, item: Tab): string {
-    return item ? item.title : null
+    return item ? item.title : null;
   }
 
   download() {
     if (this.downloadable) {
-      this.downloadService.download(this.page, this.selectedTab.count, this.selectedTab.kind)
+      this.downloadService.download(
+        this.page,
+        this.selectedTab.count,
+        this.selectedTab.kind
+      );
     }
   }
 
   sortTransactions(orderBy: OrderBy) {
-    this.onSort.emit(orderBy)
+    this.onSort.emit(orderBy);
   }
 
   private selectTab(selectedTab: Tab) {
     if (this.selectedTab && selectedTab.title === this.selectedTab.title) {
-      return
+      return;
     }
-    this.updateSelectedTab(selectedTab)
-    this.tabClicked.emit(selectedTab.kind)
+    this.updateSelectedTab(selectedTab);
+    this.tabClicked.emit(selectedTab.kind);
   }
 
   private updateSelectedTab(selectedTab: Tab) {
-    this.tabs.forEach(tab => (tab.active = tab === selectedTab))
-    this.selectedTab = selectedTab
+    this.tabs.forEach((tab) => (tab.active = tab === selectedTab));
+    this.selectedTab = selectedTab;
 
     // TODO: refactor
     this.enableDownload =
@@ -146,6 +175,6 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       selectedTab.kind === 'origination' ||
       selectedTab.kind === 'transfers' ||
       selectedTab.kind === 'token holders' ||
-      selectedTab.kind === 'other'
+      selectedTab.kind === 'other';
   }
 }

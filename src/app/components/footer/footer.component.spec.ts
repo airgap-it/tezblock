@@ -1,13 +1,13 @@
-import { FooterComponent } from './footer.component'
+import { FooterComponent } from './footer.component';
 
 describe('FooterComponent', () => {
-  let component: FooterComponent
+  let component: FooterComponent;
 
   beforeEach(() => {
-    component = new FooterComponent()
-  })
+    component = new FooterComponent();
+  });
 
   it('should create', () => {
-    expect(component).toBeTruthy()
-  })
-})
+    expect(component).toBeTruthy();
+  });
+});

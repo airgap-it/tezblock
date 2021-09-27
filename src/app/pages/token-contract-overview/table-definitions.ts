@@ -1,19 +1,25 @@
-import { TranslateService } from '@ngx-translate/core'
-import { Column, Template } from '@tezblock/components/tezblock-table/tezblock-table.component'
-import { isConvertableToUSD } from '@tezblock/domain/airgap'
-import { TokenContract } from '@tezblock/domain/contract'
+import { TranslateService } from '@ngx-translate/core';
+import {
+  Column,
+  Template,
+} from '@tezblock/components/tezblock-table/tezblock-table.component';
+import { isConvertableToUSD } from '@tezblock/domain/airgap';
+import { TokenContract } from '@tezblock/domain/contract';
 
 export const columns = (translate: TranslateService): Column[] => [
   {
     name: translate.instant('tezblock-table.token-contract.asset'),
     field: 'id',
-    template: Template.address
+    template: Template.address,
   },
   {
     name: translate.instant('tezblock-table.token-contract.contract-address'),
     field: 'id',
     template: Template.address,
-    data: (item: any) => ({ data: item.id, options: { showFullAddress: true, forceIdenticon: true } })
+    data: (item: any) => ({
+      data: item.id,
+      options: { showFullAddress: true, forceIdenticon: true },
+    }),
   },
   // {
   //   name: 'Symbol',
@@ -25,11 +31,14 @@ export const columns = (translate: TranslateService): Column[] => [
     template: Template.amount,
     data: (item: TokenContract) => ({
       data: item.totalSupply,
-      options: { symbol: item.symbol, showFiatValue: isConvertableToUSD(item.symbol) }
-    })
+      options: {
+        symbol: item.symbol,
+        showFiatValue: isConvertableToUSD(item.symbol),
+      },
+    }),
   },
   {
     name: translate.instant('tezblock-table.token-contract.description'),
-    field: 'description'
-  }
-]
+    field: 'description',
+  },
+];

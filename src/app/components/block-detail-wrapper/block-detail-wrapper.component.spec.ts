@@ -1,13 +1,13 @@
-import { BlockDetailWrapperComponent } from './block-detail-wrapper.component'
+import { BlockDetailWrapperComponent } from './block-detail-wrapper.component';
 
 describe('BlockDetailWrapperComponent', () => {
-  let component: BlockDetailWrapperComponent
+  let component: BlockDetailWrapperComponent;
 
   beforeEach(() => {
-    component = new BlockDetailWrapperComponent()
-  })
+    component = new BlockDetailWrapperComponent();
+  });
 
   it('should create', () => {
-    expect(component).toBeTruthy()
-  })
-})
+    expect(component).toBeTruthy();
+  });
+});

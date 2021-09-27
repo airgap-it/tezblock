@@ -1,7 +1,8 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getSearchServiceMock = () => jasmine.createSpyObj('SearchService', {
+export const getSearchServiceMock = () =>
+  jasmine.createSpyObj('SearchService', {
     processSearchSelection: EMPTY,
     getPreviousSearches: EMPTY,
-    updatePreviousSearches: undefined
-})
+    updatePreviousSearches: undefined,
+  });

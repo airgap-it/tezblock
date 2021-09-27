@@ -1,30 +1,44 @@
 <p>
-  Adds two major features: Sapling and BLS12-381 to enable privacy-preserving smart contracts and tickets for native permissions. Updates
-  amendment process by lowering period length to 5 cycles and adding a 5th Adoption Period. Also includes minor Michelson improvements.
-  <a href="https://tezos.gitlab.io/protocols/008_edo.html" target="_blank">Full changelog here</a>
+  Adds two major features: Sapling and BLS12-381 to enable privacy-preserving
+  smart contracts and tickets for native permissions. Updates amendment process
+  by lowering period length to 5 cycles and adding a 5th Adoption Period. Also
+  includes minor Michelson improvements.
+  <a href="https://tezos.gitlab.io/protocols/008_edo.html" target="_blank"
+    >Full changelog here</a
+  >
   .
 </p>
 <h5>Features</h5>
 
 <p>
-  The Edo proposal, a joint effort from Nomadic Labs, Marigold, and Metastate is a protocol upgrade proposal focused on implementing new
-  features such as Sapling and Tickets, and adding core functionality improvements to the Tezos protocol.
+  The Edo proposal, a joint effort from Nomadic Labs, Marigold, and Metastate is
+  a protocol upgrade proposal focused on implementing new features such as
+  Sapling and Tickets, and adding core functionality improvements to the Tezos
+  protocol.
 </p>
 <p>
-  <a href="https://blog.nomadic-labs.com/sapling-integration-in-tezos-tech-preview.html" target="_blank">Sapling</a>
-  , originally developed by the Electric Coin Company, will be integrated to enable privacy-preserving transactions on Tezos. With recent
-  improvements, the time needed for crafting and verifying transactions using Sapling have reached practical levels suitable for any
-  end-user. Coupled with this is the addition of Michelson opcodes for the pairing-friendly elliptic curve BLS12-381.
+  <a
+    href="https://blog.nomadic-labs.com/sapling-integration-in-tezos-tech-preview.html"
+    target="_blank"
+    >Sapling</a
+  >
+  , originally developed by the Electric Coin Company, will be integrated to
+  enable privacy-preserving transactions on Tezos. With recent improvements, the
+  time needed for crafting and verifying transactions using Sapling have reached
+  practical levels suitable for any end-user. Coupled with this is the addition
+  of Michelson opcodes for the pairing-friendly elliptic curve BLS12-381.
 </p>
 
 <p>
-  Tickets provide a mechanism for smart-contract to grant portable permissions to other smart-contracts, or to issue tokens. This enables
-  new kinds of composable contract architectures and aims to guard against common smart contract vulnerabilities.
+  Tickets provide a mechanism for smart-contract to grant portable permissions
+  to other smart-contracts, or to issue tokens. This enables new kinds of
+  composable contract architectures and aims to guard against common smart
+  contract vulnerabilities.
 </p>
 
 <p>
-  Edo also adds several new instructions to Michelson, including LEVEL, which has been widely requested by developers exploring Layer-2
-  scaling solutions.
+  Edo also adds several new instructions to Michelson, including LEVEL, which
+  has been widely requested by developers exploring Layer-2 scaling solutions.
 </p>
 
 <p>New instructions</p>
@@ -33,33 +47,47 @@
   <li>New hash functions: instructions KECCAK and SHA3</li>
   <li>Instruction LEVEL to query the level of the current block</li>
   <li>
-    Instructions VOTING_POWER (and resp. TOTAL_VOTING_POWER) to query the voting power of a particular delegate (resp. of all delegates)
+    Instructions VOTING_POWER (and resp. TOTAL_VOTING_POWER) to query the voting
+    power of a particular delegate (resp. of all delegates)
   </li>
-  <li>Instruction SELF_ADDRESS equivalent to SELF; ADDRESS but allowed in lambdas</li>
+  <li>
+    Instruction SELF_ADDRESS equivalent to SELF; ADDRESS but allowed in lambdas
+  </li>
 </ul>
 
 <h5>Amendment Process Updates</h5>
 
 <p>
-  A new fifth period called “Adoption” is a means to improve governance on Tezos by providing an additional window for bakers, indexers, and
-  end-users to upgrade their nodes once a protocol upgrade goes live. At the moment, protocol upgrades that pass go live one block after the
-  completion of voting has been perceived to provide an insufficient update window. This Adoption period aims to provide a more suitable
-  time window for these updates.
+  A new fifth period called “Adoption” is a means to improve governance on Tezos
+  by providing an additional window for bakers, indexers, and end-users to
+  upgrade their nodes once a protocol upgrade goes live. At the moment, protocol
+  upgrades that pass go live one block after the completion of voting has been
+  perceived to provide an insufficient update window. This Adoption period aims
+  to provide a more suitable time window for these updates.
 </p>
 <p>
-  Additionally, amendment period lengths will be reduced from 8 cycles to 5 cycles, making the total duration of the voting procedure 25
-  cycles (~2 months and 10 days).
+  Additionally, amendment period lengths will be reduced from 8 cycles to 5
+  cycles, making the total duration of the voting procedure 25 cycles (~2 months
+  and 10 days).
 </p>
 <h5 class="pb-3">Explanation Posts</h5>
 <ul>
   <li>
-    <a target="_blank" href="https://tezos.gitlab.io/protocols/008_edo.html">Edo official realease</a>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/008_edo.html"
+      >Edo official realease</a
+    >
   </li>
   <li>
-    <a target="_blank" href="https://tezos.gitlab.io/protocols/008_edo.html">Edo changelog</a>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/008_edo.html"
+      >Edo changelog</a
+    >
   </li>
   <li>
-    <a target="_blank" href="https://medium.com/@MetastateTeam/governance-improvements-725fba622615">Governance Updates</a>
+    <a
+      target="_blank"
+      href="https://medium.com/@MetastateTeam/governance-improvements-725fba622615"
+      >Governance Updates</a
+    >
     from Metastate
   </li>
 </ul>
