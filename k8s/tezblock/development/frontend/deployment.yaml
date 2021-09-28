@@ -27,8 +27,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: tezblock-frontend-config-map
-            # - secretRef:
-            #     name: tezblock-frontend-secret
           ports:
             - containerPort: 80
           readinessProbe:

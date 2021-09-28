@@ -1,18 +1,21 @@
-import { TestBed } from '@angular/core/testing'
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing'
-import { of } from 'rxjs'
+import { TestBed } from '@angular/core/testing';
+import {
+  HttpClientTestingModule,
+  HttpTestingController,
+} from '@angular/common/http/testing';
+import { of } from 'rxjs';
 
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock'
-import { ProposalService } from './proposal.service'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Operation } from '@tezblock/services/base.service'
-import { OperationTypes } from '@tezblock/domain/operations'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
+import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock';
+import { ProposalService } from './proposal.service';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { Operation } from '@tezblock/services/base.service';
+import { OperationTypes } from '@tezblock/domain/operations';
 
 describe('ProposalService', () => {
-  let service: ProposalService
-  let httpMock: HttpTestingController
-  const chainNetworkServiceMock = getChainNetworkServiceMock()
+  let service: ProposalService;
+  let httpMock: HttpTestingController;
+  const chainNetworkServiceMock = getChainNetworkServiceMock();
   const mockedTransactions: Transaction[] = [
     {
       timestamp: 1,
@@ -30,7 +33,7 @@ describe('ProposalService', () => {
       bakingRewards: '0',
       endorsingRewards: '0',
       fees: '0',
-      totalRewards: '0'
+      totalRewards: '0',
     },
     {
       timestamp: 2,
@@ -48,95 +51,118 @@ describe('ProposalService', () => {
       bakingRewards: '1',
       endorsingRewards: '1',
       fees: '1',
-      totalRewards: '1'
-    }
-  ]
+      totalRewards: '1',
+    },
+  ];
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        { provide: ChainNetworkService, useValue: chainNetworkServiceMock }
-      ]
-    })
+        { provide: ChainNetworkService, useValue: chainNetworkServiceMock },
+      ],
+    });
 
-    service = TestBed.inject(ProposalService)
-    httpMock = TestBed.inject(HttpTestingController)
-  })
+    service = TestBed.inject(ProposalService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
 
   it('should be created', () => {
-    expect(service).toBeTruthy()
-  })
+    expect(service).toBeTruthy();
+  });
 
   describe('addVoteData', () => {
     it('when kindList does not include "ballot" or "proposals" then no logic is used', () => {
-      spyOn(service, 'getVotingPeriod')
-      spyOn(service, 'getVotesForTransaction')
-      const _mockedTransactions = mockedTransactions.map(transaction => ({ ...transaction, kind: OperationTypes.Transaction }))
+      spyOn(service, 'getVotingPeriod');
+      spyOn(service, 'getVotesForTransaction');
+      const _mockedTransactions = mockedTransactions.map((transaction) => ({
+        ...transaction,
+        kind: OperationTypes.Transaction,
+      }));
 
-      service.addVoteData(_mockedTransactions, [OperationTypes.Transaction]).subscribe(transactions => {
-        expect(transactions).toEqual(_mockedTransactions)
-        expect(service.getVotingPeriod).not.toHaveBeenCalled()
-        expect(service.getVotesForTransaction).not.toHaveBeenCalled()
-      })
-    })
+      service
+        .addVoteData(_mockedTransactions, [OperationTypes.Transaction])
+        .subscribe((transactions) => {
+          expect(transactions).toEqual(_mockedTransactions);
+          expect(service.getVotingPeriod).not.toHaveBeenCalled();
+          expect(service.getVotesForTransaction).not.toHaveBeenCalled();
+        });
+    });
 
     describe('when kindList includes "ballot" or "proposals"', () => {
-      let _mockedTransactions
+      let _mockedTransactions;
 
       beforeEach(() => {
-        _mockedTransactions = mockedTransactions.map(transaction => ({ ...transaction, block_level: 2 }))
+        _mockedTransactions = mockedTransactions.map((transaction) => ({
+          ...transaction,
+          block_level: 2,
+        }));
         spyOn(service, 'getVotingPeriod').and.returnValue(
           of([
             {
               level: 2,
-              period_kind: 'mocked_period_kind'
-            }
+              period_kind: 'mocked_period_kind',
+            },
           ])
-        )
-      })
+        );
+      });
 
       it('then getVotingPeriod is called only for transactions with distinct block_level', () => {
-        spyOn(service, 'getVotesForTransaction').and.callFake(transaction => of(transaction.fee))
+        spyOn(service, 'getVotesForTransaction').and.callFake((transaction) =>
+          of(transaction.fee)
+        );
 
-        service.addVoteData(_mockedTransactions, [OperationTypes.Ballot]).subscribe(transactions => {
-          expect(transactions.length).toBe(2)
-          
-          expect(service.getVotingPeriod).toHaveBeenCalledWith([
-            {
-              field: 'level',
-              operation: Operation.eq,
-              set: ['2'],
-              inverse: false,
-              group: `A0`
-            }
-          ])  
-        })
-      })
+        service
+          .addVoteData(_mockedTransactions, [OperationTypes.Ballot])
+          .subscribe((transactions) => {
+            expect(transactions.length).toBe(2);
+
+            expect(service.getVotingPeriod).toHaveBeenCalledWith([
+              {
+                field: 'level',
+                operation: Operation.eq,
+                set: ['2'],
+                inverse: false,
+                group: `A0`,
+              },
+            ]);
+          });
+      });
 
       it('then sets voting_period and votes properties', () => {
-        const getVotesForTransactionSpy = spyOn(service, 'getVotesForTransaction').and.callFake(transaction => of(transaction.fee))
+        const getVotesForTransactionSpy = spyOn(
+          service,
+          'getVotesForTransaction'
+        ).and.callFake((transaction) => of(transaction.fee));
 
-        service.addVoteData(_mockedTransactions, [OperationTypes.Ballot]).subscribe(transactions => {
-          expect(transactions.length).toBe(2)
-          expect(transactions[0]).toEqual(
-            jasmine.objectContaining({
-              voting_period: 'mocked_period_kind',
-              votes: 0
-            })
-          )
-          expect(transactions[1]).toEqual(
-            jasmine.objectContaining({
-              voting_period: 'mocked_period_kind',
-              votes: 1
-            })
-          )
+        service
+          .addVoteData(_mockedTransactions, [OperationTypes.Ballot])
+          .subscribe((transactions) => {
+            expect(transactions.length).toBe(2);
+            expect(transactions[0]).toEqual(
+              jasmine.objectContaining({
+                voting_period: 'mocked_period_kind',
+                votes: 0,
+              })
+            );
+            expect(transactions[1]).toEqual(
+              jasmine.objectContaining({
+                voting_period: 'mocked_period_kind',
+                votes: 1,
+              })
+            );
 
-          expect(getVotesForTransactionSpy.calls.all().length).toEqual(_mockedTransactions.length)
-          expect(getVotesForTransactionSpy.calls.all()[0].args[0]).toEqual(_mockedTransactions[0])
-          expect(getVotesForTransactionSpy.calls.all()[1].args[0]).toEqual(_mockedTransactions[1])
-        })
-      })
-    })
-  })
-})
+            expect(getVotesForTransactionSpy.calls.all().length).toEqual(
+              _mockedTransactions.length
+            );
+            expect(getVotesForTransactionSpy.calls.all()[0].args[0]).toEqual(
+              _mockedTransactions[0]
+            );
+            expect(getVotesForTransactionSpy.calls.all()[1].args[0]).toEqual(
+              _mockedTransactions[1]
+            );
+          });
+      });
+    });
+  });
+});

@@ -17,7 +17,9 @@
           <h5 class="card-title mb-3 text-primary">
             {{ 'dashboard.explore' | translate }}
           </h5>
-          <app-search-item buttonLabel="{{ 'search-item.label' | translate }}"></app-search-item>
+          <app-search-item
+            buttonLabel="{{ 'search-item.label' | translate }}"
+          ></app-search-item>
         </div>
       </div>
     </div>
@@ -27,9 +29,13 @@
           <small class="text-muted">Sponsored</small>
           <p class="mb-3">Delegating crypto was never so easy!</p>
           <p class="m-0">
-            <a href="https://airgap.it?source=tezblock" target="_blank">AirGap</a>
-            the self-custody solution offers One-click delegation to the baker of your choice. The AirGap wallet was designed to store Tezos
-            in an easy and safe manner. AirGap is an OpenSource wallet made for the people!
+            <a href="https://airgap.it?source=tezblock" target="_blank"
+              >AirGap</a
+            >
+            the self-custody solution offers One-click delegation to the baker
+            of your choice. The AirGap wallet was designed to store Tezos in an
+            easy and safe manner. AirGap is an OpenSource wallet made for the
+            people!
           </p>
         </div>
       </div>
@@ -49,7 +55,10 @@
                 <div class="container p-0">
                   <div class="row mb-2">
                     <div class="col">
-                      <p class="m-0">{{ 'dashboard.cycle' | translate }} {{ currentCycle$ | async }}</p>
+                      <p class="m-0">
+                        {{ 'dashboard.cycle' | translate }}
+                        {{ currentCycle$ | async }}
+                      </p>
                     </div>
                     <div class="col">
                       <ng-container *ngIf="cycleStartingBlockLevel$">
@@ -61,7 +70,10 @@
                     </div>
                   </div>
                 </div>
-                <progressbar [value]="cycleProgress$ | async" style="height: 6px"></progressbar>
+                <progressbar
+                  [value]="cycleProgress$ | async"
+                  style="height: 6px"
+                ></progressbar>
                 <div class="mt-2 container">
                   <div class="row">
                     <div class="col p-0">
@@ -75,55 +87,86 @@
                   </div>
                 </div>
               </div>
-              <h5 class="card-title__secondary mb-3">
-                {{ 'dashboard.governance' | translate }}
-              </h5>
-              <p>
-                {{ currentPeriodKind$ | async }} {{ 'dashboard.period' | translate }}
-                {{ (currentPeriodTimespan$ | async)?.end | amDateFormat: 'LL' }}
-              </p>
-              <progressbar [value]="20 * (currentPeriodIndex$ | async)" style="height: 6px" class="my-2"></progressbar>
-              <div class="mt-2 container">
-                <div class="row">
-                  <div class="col-9 p-0">
-                    <app-hash-cell
-                      [data]="'PtHangzHogokSuiMHemCuowEavgYTP8J5qQ9fQS793MHYFpCY3r'"
-                      [options]="{ kind: 'proposal' }"
-                    ></app-hash-cell>
-                    <!-- TODO: need to be fixed
-                    <app-hash-cell
-                      *ngIf="proposalHash$ | async as proposalHash"
-                      [data]="proposalHash"
-                      [options]="{ kind: 'proposal' }"
-                    ></app-hash-cell>
-                    <ng-container *ngIf="(proposalHash$ | async) === null">
-                      <p class="text-secondary m-0">{{ 'dashboard.no-proposal' | translate }}</p>
-                    </ng-container>
-                     -->
-                  </div>
-                  <div class="col col-3 p-0">
-                    <div class="float-right">
-                      <p class="m-0">{{ currentPeriodIndex$ | async }} {{ 'dashboard.of' | translate }} 5</p>
+              <ng-container *ngIf="isMainnet()">
+                <h5 class="card-title__secondary mb-3">
+                  {{ 'dashboard.governance' | translate }}
+                </h5>
+                <p>
+                  {{ currentPeriodKind$ | async }}
+                  {{ 'dashboard.period' | translate }}
+                  {{
+                    (currentPeriodTimespan$ | async)?.end | amDateFormat: 'LL'
+                  }}
+                </p>
+                <progressbar
+                  [value]="20 * (currentPeriodIndex$ | async)"
+                  style="height: 6px"
+                  class="my-2"
+                ></progressbar>
+                <div class="mt-2 container">
+                  <div class="row">
+                    <div class="col-9 p-0">
+                      <app-hash-cell
+                        [data]="
+                          'PtHangzHogokSuiMHemCuowEavgYTP8J5qQ9fQS793MHYFpCY3r'
+                        "
+                        [options]="{ kind: 'proposal' }"
+                      ></app-hash-cell>
+                      <!-- TODO: need to be fixed
+                      <app-hash-cell
+                        *ngIf="proposalHash$ | async as proposalHash"
+                        [data]="proposalHash"
+                        [options]="{ kind: 'proposal' }"
+                      ></app-hash-cell>
+                      <ng-container *ngIf="(proposalHash$ | async) === null">
+                        <p class="text-secondary m-0">
+                          {{ 'dashboard.no-proposal' | translate }}
+                        </p>
+                      </ng-container>
+                       -->
+                    </div>
+                    <div class="col col-3 p-0">
+                      <div class="float-right">
+                        <p class="m-0">
+                          {{ currentPeriodIndex$ | async }}
+                          {{ 'dashboard.of' | translate }} 5
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div class="pt-3" *ngIf="showRolls$ | async">
-                <p class="pr-3 m-0 d-inline-block">
-                  <fa-icon [icon]="'thumbsUp' | iconPipe" class="text-primary mr-2"></fa-icon>
-                  <strong>{{ yayRollsPercentage$ | async }}%</strong>
-                  <span class="text-secondary ml-1">{{ yayRolls$ | async }}</span>
-                </p>
-                <p class="pr-3 m-0 d-inline-block">
-                  <fa-icon [icon]="'thumbsDown' | iconPipe" class="text-primary mr-2"></fa-icon>
-                  <strong>{{ nayRollsPercentage$ | async }}%</strong>
-                  <span class="text-secondary ml-1">{{ nayRolls$ | async }}</span>
-                </p>
-                <p class="m-0 d-inline-block">
-                  <fa-icon [icon]="'handRock' | iconPipe" class="text-primary mr-1"></fa-icon>
-                  <span class="text-secondary ml-1">{{ passRolls$ | async }}</span>
-                </p>
-              </div>
+                <div class="pt-3" *ngIf="showRolls$ | async">
+                  <p class="pr-3 m-0 d-inline-block">
+                    <fa-icon
+                      [icon]="'thumbsUp' | iconPipe"
+                      class="text-primary mr-2"
+                    ></fa-icon>
+                    <strong>{{ yayRollsPercentage$ | async }}%</strong>
+                    <span class="text-secondary ml-1">{{
+                      yayRolls$ | async
+                    }}</span>
+                  </p>
+                  <p class="pr-3 m-0 d-inline-block">
+                    <fa-icon
+                      [icon]="'thumbsDown' | iconPipe"
+                      class="text-primary mr-2"
+                    ></fa-icon>
+                    <strong>{{ nayRollsPercentage$ | async }}%</strong>
+                    <span class="text-secondary ml-1">{{
+                      nayRolls$ | async
+                    }}</span>
+                  </p>
+                  <p class="m-0 d-inline-block">
+                    <fa-icon
+                      [icon]="'handRock' | iconPipe"
+                      class="text-primary mr-1"
+                    ></fa-icon>
+                    <span class="text-secondary ml-1">{{
+                      passRolls$ | async
+                    }}</span>
+                  </p>
+                </div>
+              </ng-container>
             </div>
             <ng-container *ngIf="isMainnet()">
               <div class="col-md-6 col-lg-3 col-xl-3 p-sm-0 pl-md-4">
@@ -138,7 +181,10 @@
                 <h5 class="card-title__secondary mb-3">
                   {{ 'dashboard.market-cap' | translate }}
                 </h5>
-                <h3 *ngIf="fiatInfo$ | async as fiatInfo">{{ fiatInfo.symbol }}{{ fiatInfo.price.times('890141239').toFormat(0) }}</h3>
+                <h3 *ngIf="fiatInfo$ | async as fiatInfo">
+                  {{ fiatInfo.symbol
+                  }}{{ fiatInfo.price.times('890141239').toFormat(0) }}
+                </h3>
               </div>
               <div class="col-md-6 col-lg-4">
                 <h5 class="card-title__secondary mb-3">
@@ -146,7 +192,10 @@
                   <button
                     type="button"
                     class="btn btn-sm ml-2"
-                    [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 0, 'btn-outline-primary': (pricePeriod$ | async) !== 0 }"
+                    [ngClass]="{
+                      'btn-primary-light': (pricePeriod$ | async) === 0,
+                      'btn-outline-primary': (pricePeriod$ | async) !== 0
+                    }"
                     (click)="changePricePeriod(0)"
                   >
                     {{ 'dashboard.24h_button' | translate }}
@@ -154,7 +203,10 @@
                   <button
                     type="button"
                     class="btn btn-sm"
-                    [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 1, 'btn-outline-primary': (pricePeriod$ | async) !== 1 }"
+                    [ngClass]="{
+                      'btn-primary-light': (pricePeriod$ | async) === 1,
+                      'btn-outline-primary': (pricePeriod$ | async) !== 1
+                    }"
                     (click)="changePricePeriod(1)"
                   >
                     {{ 'dashboard.7d_button' | translate }}
@@ -162,7 +214,10 @@
                   <button
                     type="button"
                     class="btn btn-sm"
-                    [ngClass]="{ 'btn-primary-light': (pricePeriod$ | async) === 2, 'btn-outline-primary': (pricePeriod$ | async) !== 2 }"
+                    [ngClass]="{
+                      'btn-primary-light': (pricePeriod$ | async) === 2,
+                      'btn-outline-primary': (pricePeriod$ | async) !== 2
+                    }"
                     (click)="changePricePeriod(2)"
                   >
                     {{ 'dashboard.90d_button' | translate }}
@@ -170,16 +225,24 @@
                 </h5>
                 <ng-container *ngIf="fiatInfo$">
                   <ng-container *ngIf="cryptoInfo$">
-                    <h3 class="mb-0 mr-1 d-inline-block">{{ (fiatInfo$ | async).symbol }}{{ (fiatInfo$ | async).price }}</h3>
+                    <h3 class="mb-0 mr-1 d-inline-block">
+                      {{ (fiatInfo$ | async).symbol
+                      }}{{ (fiatInfo$ | async).price }}
+                    </h3>
                     <p class="text-secondary d-inline-block">
                       {{ 'dashboard.at' | translate }}
-                      {{ (cryptoInfo$ | async).price }} {{ (cryptoInfo$ | async).symbol }}
+                      {{ (cryptoInfo$ | async).price }}
+                      {{ (cryptoInfo$ | async).symbol }}
                       <ng-container *ngIf="percentage$ | async as percentage">
                         <ng-container *ngIf="percentage >= 0">
-                          <span class="text-primary ml-1">(+{{ percentage | number: '1.0-3' }} %)</span>
+                          <span class="text-primary ml-1"
+                            >(+{{ percentage | number: '1.0-3' }} %)</span
+                          >
                         </ng-container>
                         <ng-container *ngIf="percentage < 0">
-                          <span class="text-danger ml-1">({{ percentage | number: '1.0-3' }} %)</span>
+                          <span class="text-danger ml-1"
+                            >({{ percentage | number: '1.0-3' }} %)</span
+                          >
                         </ng-container>
                       </ng-container>
                     </p>
@@ -205,7 +268,11 @@
                 {{ 'dashboard.latest-blocks' | translate }}
               </h5>
               <block-item [blocks$]="blocks$"></block-item>
-              <button type="button" routerLink="/block/list" class="btn btn-primary-light btn-sm btn-block">
+              <button
+                type="button"
+                routerLink="/block/list"
+                class="btn btn-primary-light btn-sm btn-block"
+              >
                 {{ 'dashboard.all-blocks_button' | translate }}
               </button>
             </div>
@@ -218,7 +285,11 @@
                 {{ 'dashboard.latest-transactions' | translate }}
               </h5>
               <transaction-item [data]="transactions$"></transaction-item>
-              <button type="button" routerLink="/transaction/list" class="btn btn-primary-light btn-sm btn-block">
+              <button
+                type="button"
+                routerLink="/transaction/list"
+                class="btn btn-primary-light btn-sm btn-block"
+              >
                 {{ 'dashboard.all-transactions_button' | translate }}
               </button>
             </div>
@@ -234,8 +305,14 @@
               <h5 class="card-title__secondary mb-3">
                 {{ 'dashboard.latest-asset' | translate }}
               </h5>
-              <app-latest-contracts [contracts]="contracts$ | async"></app-latest-contracts>
-              <button type="button" [routerLink]="['/token-contract/list']" class="btn btn-primary-light btn-sm btn-block">
+              <app-latest-contracts
+                [contracts]="contracts$ | async"
+              ></app-latest-contracts>
+              <button
+                type="button"
+                [routerLink]="['/token-contract/list']"
+                class="btn btn-primary-light btn-sm btn-block"
+              >
                 {{ 'dashboard.all-assets_button' | translate }}
               </button>
             </div>
@@ -243,7 +320,9 @@
               <h5 class="card-title__secondary mb-3">
                 {{ 'dashboard.latest-transfers' | translate }}
               </h5>
-              <app-latest-contracts-transactions [contracts]="contracts$ | async"></app-latest-contracts-transactions>
+              <app-latest-contracts-transactions
+                [contracts]="contracts$ | async"
+              ></app-latest-contracts-transactions>
             </div>
           </div>
         </div>

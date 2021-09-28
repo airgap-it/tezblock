@@ -1,5 +1,6 @@
-import { EMPTY } from 'rxjs'
+import { EMPTY } from 'rxjs';
 
-export const getBeaconServiceMock = () => jasmine.createSpyObj('BeaconService', {
-    delegate: EMPTY.toPromise()
-})
+export const getBeaconServiceMock = () =>
+  jasmine.createSpyObj('BeaconService', {
+    delegate: EMPTY.toPromise(),
+  });

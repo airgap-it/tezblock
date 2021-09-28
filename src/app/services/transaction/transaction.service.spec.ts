@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 
 import { TransactionService } from './transaction.service';
-import { UnitHelper } from 'test-config/unit-test-helper'
+import { UnitHelper } from 'test-config/unit-test-helper';
 
 xdescribe('TransactionService', () => {
-  let unitHelper: UnitHelper
+  let unitHelper: UnitHelper;
   beforeEach(() => {
-    unitHelper = new UnitHelper()
+    unitHelper = new UnitHelper();
 
-    TestBed.configureTestingModule(unitHelper.testBed({ providers: [] }))
+    TestBed.configureTestingModule(unitHelper.testBed({ providers: [] }));
   });
 
   it('should be created', () => {

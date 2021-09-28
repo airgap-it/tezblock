@@ -1,100 +1,135 @@
-import { BigNumber } from 'bignumber.js'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
-import { Injectable } from '@angular/core'
-import * as _ from 'lodash'
-import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs'
-import { map, switchMap, filter, tap } from 'rxjs/operators'
-import { Store } from '@ngrx/store'
-import { isNil, negate, get as _get } from 'lodash'
+import { BigNumber } from 'bignumber.js';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import * as _ from 'lodash';
+import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs';
+import { map, switchMap, filter, tap } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+import { isNil, negate, get as _get } from 'lodash';
 
-import { AggregatedBakingRights, BakingRights, getEmptyAggregatedBakingRight, BakingRewardsDetail } from '@tezblock/interfaces/BakingRights'
+import {
+  AggregatedBakingRights,
+  BakingRights,
+  getEmptyAggregatedBakingRight,
+  BakingRewardsDetail,
+} from '@tezblock/interfaces/BakingRights';
 import {
   EndorsingRights,
   AggregatedEndorsingRights,
   getEmptyAggregatedEndorsingRight,
-  EndorsingRewardsDetail
-} from '@tezblock/interfaces/EndorsingRights'
-import { Account } from '@tezblock/domain/account'
-import { Block } from '@tezblock/interfaces/Block'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { ChainNetworkService } from '../chain-network/chain-network.service'
-import { distinctFilter, first, get, flatten } from '@tezblock/services/fp'
-import { RewardService } from '@tezblock/services/reward/reward.service'
-import { Predicate, Operation, Options } from '../base.service'
-import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls'
-import { ProposalDto } from '@tezblock/interfaces/proposal'
-import { TokenContract } from '@tezblock/domain/contract'
-import { sort } from '@tezblock/domain/table'
-import { RPCBlocksOpertions, RPCContent, OperationErrorsById, OperationError, OperationTypes } from '@tezblock/domain/operations'
-import { SearchOptionData } from '@tezblock/services/search/model'
-import { getFaProtocol, getTezosProtocol, xtzToMutezConvertionRatio } from '@tezblock/domain/airgap'
-import { CacheService, CacheKeys, ByAddressState, ByProposalState, ByCycle } from '@tezblock/services/cache/cache.service'
-import { squareBrackets } from '@tezblock/domain/pattern'
-import * as fromRoot from '@tezblock/reducers'
-import * as fromApp from '@tezblock/app.reducer'
-import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service'
-import { ProposalService } from '@tezblock/services/proposal/proposal.service'
-import { AccountService } from '@tezblock/services/account/account.service'
-import { getRightStatus } from '@tezblock/domain/reward'
-import { TezosProtocol, TezosTransactionCursor, TezosTransactionResult } from '@airgap/coinlib-core'
-import { TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol'
+  EndorsingRewardsDetail,
+} from '@tezblock/interfaces/EndorsingRights';
+import { Account } from '@tezblock/domain/account';
+import { Block } from '@tezblock/interfaces/Block';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { ChainNetworkService } from '../chain-network/chain-network.service';
+import { distinctFilter, first, get, flatten } from '@tezblock/services/fp';
+import { RewardService } from '@tezblock/services/reward/reward.service';
+import { Predicate, Operation, Options } from '../base.service';
+import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls';
+import { ProposalDto } from '@tezblock/interfaces/proposal';
+import { TokenContract } from '@tezblock/domain/contract';
+import { sort } from '@tezblock/domain/table';
+import {
+  RPCBlocksOpertions,
+  RPCContent,
+  OperationErrorsById,
+  OperationError,
+  OperationTypes,
+} from '@tezblock/domain/operations';
+import { SearchOptionData } from '@tezblock/services/search/model';
+import {
+  getFaProtocol,
+  getTezosProtocol,
+  xtzToMutezConvertionRatio,
+} from '@tezblock/domain/airgap';
+import {
+  CacheService,
+  CacheKeys,
+  ByAddressState,
+  ByProposalState,
+  ByCycle,
+} from '@tezblock/services/cache/cache.service';
+import { squareBrackets } from '@tezblock/domain/pattern';
+import * as fromRoot from '@tezblock/reducers';
+import * as fromApp from '@tezblock/app.reducer';
+import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service';
+import { ProposalService } from '@tezblock/services/proposal/proposal.service';
+import { AccountService } from '@tezblock/services/account/account.service';
+import { getRightStatus } from '@tezblock/domain/reward';
+import {
+  TezosProtocol,
+  TezosTransactionCursor,
+  TezosTransactionResult,
+} from '@airgap/coinlib-core';
+import { TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol';
 
 export interface OperationCount {
-  [key: string]: string
-  field: string
-  kind: string
+  [key: string]: string;
+  field: string;
+  kind: string;
 }
 
 export interface Baker {
-  pkh: string
-  block_level: number
-  delegated_balance: number
-  balance: number
-  deactivated: boolean
-  staking_balance: number
-  block_id: string
-  frozen_balance: number
-  grace_period: number
-  number_of_delegators?: number
+  pkh: string;
+  block_level: number;
+  delegated_balance: number;
+  balance: number;
+  deactivated: boolean;
+  staking_balance: number;
+  block_id: string;
+  frozen_balance: number;
+  grace_period: number;
+  number_of_delegators?: number;
 }
 
 export interface NumberOfDelegatorsByBakers {
-  delegate_value: string
-  number_of_delegators: number
+  delegate_value: string;
+  number_of_delegators: number;
 }
 
 export interface Balance {
-  balance: number
-  asof: number
+  balance: number;
+  asof: number;
 }
 
-export const addCycleFromLevel = (protocol: TezosProtocol) => right => ({ ...right, level: right.block_level, cycle: protocol.blockLevelToCycle(right.block_level) })
+export const addCycleFromLevel = (protocol: TezosProtocol) => (right) => ({
+  ...right,
+  level: right.block_level,
+  cycle: protocol.blockLevelToCycle(right.block_level),
+});
 
-function ensureCycle<T extends { cycle: number }>(cycle: number, factory: () => T) {
-  return (rights: T[]): T[] => (rights.some(right => right.cycle === cycle) ? rights : [{ ...factory(), cycle }].concat(rights))
+function ensureCycle<T extends { cycle: number }>(
+  cycle: number,
+  factory: () => T
+) {
+  return (rights: T[]): T[] =>
+    rights.some((right) => right.cycle === cycle)
+      ? rights
+      : [{ ...factory(), cycle }].concat(rights);
 }
 
 const getRightCycles = (currentCycle: number, limit: number): number[] =>
   _.range(0, limit)
-    .map(index => currentCycle + 3 - index)
-    .sort((a, b) => b - a)
+    .map((index) => currentCycle + 3 - index)
+    .sort((a, b) => b - a);
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
-  environmentUrls: EnvironmentUrls
-  environmentVariable: string
-  protocol: TezosProtocol
+  environmentUrls: EnvironmentUrls;
+  environmentVariable: string;
+  protocol: TezosProtocol;
 
-  private bakingRightsApiUrl: string
-  private endorsingRightsApiUrl: string
-  private blocksApiUrl: string
-  private transactionsApiUrl: string
-  private accountsApiUrl: string
-  private delegatesApiUrl: string
-  private accountHistoryApiUrl: string
-  private options: Options
+  private bakingRightsApiUrl: string;
+  private endorsingRightsApiUrl: string;
+  private blocksApiUrl: string;
+  private transactionsApiUrl: string;
+  private accountsApiUrl: string;
+  private delegatesApiUrl: string;
+  private accountHistoryApiUrl: string;
+  private options: Options;
 
   constructor(
     private readonly accountService: AccountService,
@@ -105,33 +140,33 @@ export class ApiService {
     private readonly rewardService: RewardService,
     private readonly store$: Store<fromRoot.State>
   ) {
-    const network = chainNetworkService.getNetwork()
+    const network = chainNetworkService.getNetwork();
 
-    this.environmentUrls = chainNetworkService.getEnvironment()
-    this.environmentVariable = chainNetworkService.getEnvironmentVariable()
-    this.protocol = getTezosProtocol(this.environmentUrls, network)
-    this.setProperties()
+    this.environmentUrls = chainNetworkService.getEnvironment();
+    this.environmentVariable = chainNetworkService.getEnvironmentVariable();
+    this.protocol = getTezosProtocol(this.environmentUrls, network);
+    this.setProperties();
   }
 
   // method created to ease testing
   private getUrl(domain: string): string {
-    return `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${domain}`
+    return `${this.environmentUrls.conseilUrl}/v2/data/tezos/${this.environmentVariable}/${domain}`;
   }
 
   private setProperties() {
     this.options = {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        apikey: this.environmentUrls.conseilApiKey
-      })
-    }
-    this.bakingRightsApiUrl = this.getUrl('baking_rights')
-    this.endorsingRightsApiUrl = this.getUrl('endorsing_rights')
-    this.blocksApiUrl = this.getUrl('blocks')
-    this.transactionsApiUrl = this.getUrl('operations')
-    this.accountsApiUrl = this.getUrl('accounts')
-    this.delegatesApiUrl = this.getUrl('bakers') /* delegates (previously) */
-    this.accountHistoryApiUrl = this.getUrl('accounts_history')
+        apikey: this.environmentUrls.conseilApiKey,
+      }),
+    };
+    this.bakingRightsApiUrl = this.getUrl('baking_rights');
+    this.endorsingRightsApiUrl = this.getUrl('endorsing_rights');
+    this.blocksApiUrl = this.getUrl('blocks');
+    this.transactionsApiUrl = this.getUrl('operations');
+    this.accountsApiUrl = this.getUrl('accounts');
+    this.delegatesApiUrl = this.getUrl('bakers'); /* delegates (previously) */
+    this.accountHistoryApiUrl = this.getUrl('accounts_history');
   }
 
   getCurrentCycleRange(currentCycle: number): Observable<Block[]> {
@@ -143,17 +178,21 @@ export class ApiService {
             field: 'meta_cycle',
             operation: 'eq',
             set: [currentCycle],
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
         orderBy: [sort('timestamp', 'asc')],
-        limit: 1
+        limit: 1,
       },
       this.options
-    )
+    );
   }
 
-  getLatestTransactions(limit: number, kindList: string[], orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
+  getLatestTransactions(
+    limit: number,
+    kindList: string[],
+    orderBy = sort('block_level', 'desc')
+  ): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -162,54 +201,70 @@ export class ApiService {
             {
               field: 'operation_group_hash',
               operation: 'isnull',
-              inverse: true
+              inverse: true,
             },
             {
               field: 'kind',
               operation: 'in',
-              set: kindList
-            }
+              set: kindList,
+            },
           ],
           orderBy: [orderBy],
-          limit
+          limit,
         },
         this.options
       )
       .pipe(
-        map(transactions => transactions.slice(0, limit).map(transaction => {
-          if (transaction.kind === 'endorsement_with_slot') {
-            return {
-              ...transaction,
-              kind: 'endorsement'
+        map((transactions) =>
+          transactions.slice(0, limit).map((transaction) => {
+            if (transaction.kind === 'endorsement_with_slot') {
+              return {
+                ...transaction,
+                kind: 'endorsement',
+              };
             }
-          }
 
-          return transaction
-        })),
-        switchMap(transactions => {
+            return transaction;
+          })
+        ),
+        switchMap((transactions) => {
           const originatedAccounts = transactions
-            .filter(transaction => transaction.kind === 'origination')
-            .map(transaction => transaction.originated_contracts)
+            .filter((transaction) => transaction.kind === 'origination')
+            .map((transaction) => transaction.originated_contracts);
 
           if (originatedAccounts.length > 0) {
-            return this.accountService.getAccountsByIds(originatedAccounts).pipe(
-              map(originators =>
-                transactions.map(transaction => {
-                  const match = originators.find(originator => originator.account_id === transaction.originated_contracts)
+            return this.accountService
+              .getAccountsByIds(originatedAccounts)
+              .pipe(
+                map((originators) =>
+                  transactions.map((transaction) => {
+                    const match = originators.find(
+                      (originator) =>
+                        originator.account_id ===
+                        transaction.originated_contracts
+                    );
 
-                  return match ? { ...transaction, originatedBalance: match.balance } : transaction
-                })
-              )
-            )
+                    return match
+                      ? { ...transaction, originatedBalance: match.balance }
+                      : transaction;
+                  })
+                )
+              );
           }
 
-          return of(transactions)
+          return of(transactions);
         }),
-        switchMap((transactions: Transaction[]) => this.proposalService.addVoteData(transactions, kindList))
-      )
+        switchMap((transactions: Transaction[]) =>
+          this.proposalService.addVoteData(transactions, kindList)
+        )
+      );
   }
 
-  getTransactionsById(id: string, limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
+  getTransactionsById(
+    id: string,
+    limit: number,
+    orderBy = sort('block_level', 'desc')
+  ): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
@@ -219,29 +274,37 @@ export class ApiService {
               field: 'operation_group_hash',
               operation: 'eq',
               set: [id],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
           orderBy: [orderBy],
-          limit
+          limit,
         },
         this.options
       )
       .pipe(
-        map(transactions => transactions.slice(0, limit).map(transaction => {
-          if (transaction.kind === 'endorsement_with_slot') {
-            return {
-              ...transaction,
-              kind: 'endorsement'
+        map((transactions) =>
+          transactions.slice(0, limit).map((transaction) => {
+            if (transaction.kind === 'endorsement_with_slot') {
+              return {
+                ...transaction,
+                kind: 'endorsement',
+              };
             }
-          }
 
-          return transaction
-        })),
-        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
-        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions)),
-        switchMap((transactions: Transaction[]) => this.proposalService.addVoteData(transactions))
-      )
+            return transaction;
+          })
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillDelegatedBalance(transactions)
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillOriginatedBalance(transactions)
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.proposalService.addVoteData(transactions)
+        )
+      );
   }
 
   getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
@@ -253,21 +316,24 @@ export class ApiService {
             field: 'operation_group_hash',
             operation: 'eq',
             set: [id],
-            inverse: false
+            inverse: false,
           },
           {
             field: 'kind',
             operation: 'in',
-            set: ['endorsement', 'endorsement_with_slot']
-          }
+            set: ['endorsement', 'endorsement_with_slot'],
+          },
         ],
-        limit
+        limit,
       },
       this.options
-    )
+    );
   }
 
-  getTransactionsByBlock(blockHash: string, limit: number): Observable<Transaction[]> {
+  getTransactionsByBlock(
+    blockHash: string,
+    limit: number
+  ): Observable<Transaction[]> {
     return this.http.post<Transaction[]>(
       this.transactionsApiUrl,
       {
@@ -275,24 +341,24 @@ export class ApiService {
           {
             field: 'operation_group_hash',
             operation: 'isnull',
-            inverse: true
+            inverse: true,
           },
           {
             field: 'block_hash',
             operation: 'eq',
-            set: [blockHash]
+            set: [blockHash],
           },
           {
             field: 'kind',
             operation: 'eq',
-            set: ['transaction']
-          }
+            set: ['transaction'],
+          },
         ],
         orderBy: [sort('block_level', 'desc')],
-        limit
+        limit,
       },
       this.options
-    )
+    );
   }
 
   getTransactionsByField(
@@ -306,26 +372,26 @@ export class ApiService {
       {
         field: 'operation_group_hash',
         operation: 'isnull',
-        inverse: true
+        inverse: true,
       },
       {
         field,
         operation: 'eq',
-        set: [value]
-      }
-    ]
+        set: [value],
+      },
+    ];
     if (kind === 'endorsement') {
       predicates.push({
         field: 'kind',
         operation: 'in',
-        set: ['endorsement', 'endorsement_with_slot']
-      })
+        set: ['endorsement', 'endorsement_with_slot'],
+      });
     } else {
       predicates.push({
         field: 'kind',
         operation: 'eq',
-        set: [kind]
-      })
+        set: [kind],
+      });
     }
     return this.http
       .post<Transaction[]>(
@@ -333,89 +399,120 @@ export class ApiService {
         {
           predicates,
           orderBy: [orderBy],
-          limit
+          limit,
         },
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit).map(transaction => {
-          if (transaction.kind === 'endorsement_with_slot') {
-            return {
-              ...transaction,
-              kind: 'endorsement'
+        map((transactions: Transaction[]) =>
+          transactions.slice(0, limit).map((transaction) => {
+            if (transaction.kind === 'endorsement_with_slot') {
+              return {
+                ...transaction,
+                kind: 'endorsement',
+              };
             }
-          }
 
-          return transaction
-        })),
-        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
-        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
-      )
+            return transaction;
+          })
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillDelegatedBalance(transactions)
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillOriginatedBalance(transactions)
+        )
+      );
   }
 
-  private fillDelegatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
-    const sources = transactions.filter(transaction => transaction.kind === 'delegation').map(transaction => transaction.source)
+  private fillDelegatedBalance(
+    transactions: Transaction[]
+  ): Observable<Transaction[]> {
+    const sources = transactions
+      .filter((transaction) => transaction.kind === 'delegation')
+      .map((transaction) => transaction.source);
 
     if (sources.length > 0) {
       return this.accountService.getAccountsByIds(sources).pipe(
         map((accounts: Account[]) =>
-          transactions.map(transaction => {
-            const match = accounts.find(account => account.account_id === transaction.source)
+          transactions.map((transaction) => {
+            const match = accounts.find(
+              (account) => account.account_id === transaction.source
+            );
 
-            return match ? { ...transaction, delegatedBalance: match.balance } : transaction
+            return match
+              ? { ...transaction, delegatedBalance: match.balance }
+              : transaction;
           })
         )
-      )
+      );
     }
 
-    return of(transactions)
+    return of(transactions);
   }
 
-  private fillOriginatedBalance(transactions: Transaction[]): Observable<Transaction[]> {
+  private fillOriginatedBalance(
+    transactions: Transaction[]
+  ): Observable<Transaction[]> {
     const originatedAccounts = transactions
-      .filter(transaction => transaction.kind === 'origination')
-      .map(transaction => transaction.originated_contracts)
+      .filter((transaction) => transaction.kind === 'origination')
+      .map((transaction) => transaction.originated_contracts);
 
     if (originatedAccounts.length > 0) {
       return this.accountService.getAccountsByIds(originatedAccounts).pipe(
         map((accounts: Account[]) =>
-          transactions.map(transaction => {
-            const match = accounts.find(account => account.account_id === transaction.originated_contracts)
+          transactions.map((transaction) => {
+            const match = accounts.find(
+              (account) =>
+                account.account_id === transaction.originated_contracts
+            );
 
-            return match ? { ...transaction, originatedBalance: match.balance } : transaction
+            return match
+              ? { ...transaction, originatedBalance: match.balance }
+              : transaction;
           })
         )
-      )
+      );
     }
 
-    return of(transactions)
+    return of(transactions);
   }
 
-  getTransactionsByPredicates(predicates: Predicate[], limit: number, orderBy = sort('block_level', 'desc')): Observable<Transaction[]> {
+  getTransactionsByPredicates(
+    predicates: Predicate[],
+    limit: number,
+    orderBy = sort('block_level', 'desc')
+  ): Observable<Transaction[]> {
     return this.http
       .post<Transaction[]>(
         this.transactionsApiUrl,
         {
           predicates: [...predicates],
           orderBy: [orderBy],
-          limit
+          limit,
         },
         this.options
       )
       .pipe(
-        map((transactions: Transaction[]) => transactions.slice(0, limit).map(transaction => {
-          if (transaction.kind === 'endorsement_with_slot') {
-            return {
-              ...transaction,
-              kind: 'endorsement'
+        map((transactions: Transaction[]) =>
+          transactions.slice(0, limit).map((transaction) => {
+            if (transaction.kind === 'endorsement_with_slot') {
+              return {
+                ...transaction,
+                kind: 'endorsement',
+              };
             }
-          }
 
-          return transaction
-        })),
-        switchMap((transactions: Transaction[]) => this.fillDelegatedBalance(transactions)),
-        switchMap((transactions: Transaction[]) => this.fillOriginatedBalance(transactions))
-      )
+            return transaction;
+          })
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillDelegatedBalance(transactions)
+        ),
+        switchMap((transactions: Transaction[]) =>
+          this.fillOriginatedBalance(transactions)
+        )
+      );
   }
 
   getTransactionHashesStartingWith(id: string): Observable<SearchOptionData[]> {
@@ -429,23 +526,27 @@ export class ApiService {
               field: 'operation_group_hash',
               operation: 'startsWith',
               set: [id],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
-          limit: 5
+          limit: 5,
         },
         this.options
       )
       .pipe(
-        map(results =>
-          results.map(item => {
+        map((results) =>
+          results.map((item) => {
             return {
               id: item.operation_group_hash,
-              type: (item.kind === 'endorsement' || item.kind === 'endorsement_with_slot') ? OperationTypes.Endorsement : OperationTypes.Transaction
-            }
+              type:
+                item.kind === 'endorsement' ||
+                item.kind === 'endorsement_with_slot'
+                  ? OperationTypes.Endorsement
+                  : OperationTypes.Transaction,
+            };
           })
         )
-      )
+      );
   }
 
   getBlockHashesStartingWith(id: string): Observable<SearchOptionData[]> {
@@ -459,44 +560,44 @@ export class ApiService {
               field: 'hash',
               operation: 'startsWith',
               set: [id],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
-          limit: 5
+          limit: 5,
         },
         this.options
       )
       .pipe(
-        map(results =>
-          results.map(item => {
-            return { id: item.level.toString(), type: OperationTypes.Block }
+        map((results) =>
+          results.map((item) => {
+            return { id: item.level.toString(), type: OperationTypes.Block };
           })
         )
-      )
+      );
   }
 
   getLatestBlocks(
     limit: number,
     orderBy = {
       field: 'timestamp',
-      direction: 'desc'
+      direction: 'desc',
     }
   ): Observable<Block[]> {
     return this.http.post<Block[]>(
       this.blocksApiUrl,
       {
         orderBy: [orderBy],
-        limit
+        limit,
       },
       this.options
-    )
+    );
   }
 
   getLatestBlocksWithData(
     limit: number,
     orderBy = {
       field: 'timestamp',
-      direction: 'desc'
+      direction: 'desc',
     }
   ): Observable<Block[]> {
     return this.http
@@ -504,74 +605,109 @@ export class ApiService {
         this.blocksApiUrl,
         {
           orderBy: [orderBy],
-          limit
+          limit,
         },
         this.options
       )
       .pipe(
-        switchMap(blocks => {
-          const blockRange = blocks.map(blocksList => blocksList.level)
-          const amountObservable$ = this.getAdditionalBlockField(blockRange, 'amount', 'sum', limit)
-          const feeObservable$ = this.getAdditionalBlockField(blockRange, 'fee', 'sum', limit)
-          const operationGroupObservable$ = this.getAdditionalBlockField(blockRange, 'operation_group_hash', 'count', limit)
+        switchMap((blocks) => {
+          const blockRange = blocks.map((blocksList) => blocksList.level);
+          const amountObservable$ = this.getAdditionalBlockField(
+            blockRange,
+            'amount',
+            'sum',
+            limit
+          );
+          const feeObservable$ = this.getAdditionalBlockField(
+            blockRange,
+            'fee',
+            'sum',
+            limit
+          );
+          const operationGroupObservable$ = this.getAdditionalBlockField(
+            blockRange,
+            'operation_group_hash',
+            'count',
+            limit
+          );
 
-          return combineLatest([amountObservable$, feeObservable$, operationGroupObservable$]).pipe(
+          return combineLatest([
+            amountObservable$,
+            feeObservable$,
+            operationGroupObservable$,
+          ]).pipe(
             map(([amount, fee, operationGroup]) =>
-              blocks.map(block => {
-                const blockAmount: any = amount.find((amount: any) => amount.block_level === block.level)
-                const blockFee: any = fee.find((fee: any) => fee.block_level === block.level)
-                const blockOperations: any = operationGroup.find((operation: any) => operation.block_level === block.level)
+              blocks.map((block) => {
+                const blockAmount: any = amount.find(
+                  (amount: any) => amount.block_level === block.level
+                );
+                const blockFee: any = fee.find(
+                  (fee: any) => fee.block_level === block.level
+                );
+                const blockOperations: any = operationGroup.find(
+                  (operation: any) => operation.block_level === block.level
+                );
 
                 return {
                   ...block,
                   volume: blockAmount ? blockAmount.sum_amount : 0,
                   fee: blockFee ? blockFee.sum_fee : 0,
-                  txcount: blockOperations ? blockOperations.count_operation_group_hash : '0'
-                }
+                  txcount: blockOperations
+                    ? blockOperations.count_operation_group_hash
+                    : '0',
+                };
               })
             )
-          )
+          );
         })
-      )
+      );
   }
 
-  getAdditionalBlockField<T>(blockRange: number[], field: string, operation: string, limit?: number): Observable<T[]> {
+  getAdditionalBlockField<T>(
+    blockRange: number[],
+    field: string,
+    operation: string,
+    limit?: number
+  ): Observable<T[]> {
     const body = {
       fields: [field, 'block_level'],
       predicates: [
         {
           field,
           operation: 'isnull',
-          inverse: true
+          inverse: true,
         },
         {
           field: 'block_level',
           operation: 'in',
-          set: blockRange
-        }
+          set: blockRange,
+        },
       ].concat(
         field === 'operation_group_hash'
           ? <any>{
-            field: 'kind',
-            operation: 'in',
-            set: ['transaction']
-          }
+              field: 'kind',
+              operation: 'in',
+              set: ['transaction'],
+            }
           : []
       ),
       orderBy: [sort('block_level', 'desc')],
       aggregation: [
         {
           field,
-          function: operation
-        }
+          function: operation,
+        },
       ],
-      limit
-    }
+      limit,
+    };
 
-    return this.http.post<T[]>(this.transactionsApiUrl, body, this.options)
+    return this.http.post<T[]>(this.transactionsApiUrl, body, this.options);
   }
 
-  getOperationCount(field: string, value: string): Observable<OperationCount[]> {
+  getOperationCount(
+    field: string,
+    value: string
+  ): Observable<OperationCount[]> {
     const body = {
       fields: [field, 'kind'],
       predicates: [
@@ -579,66 +715,80 @@ export class ApiService {
           field,
           operation: 'eq',
           set: [value],
-          inverse: false
-        }
+          inverse: false,
+        },
       ],
       aggregation: [
         {
           field,
-          function: 'count'
-        }
-      ]
-    }
+          function: 'count',
+        },
+      ],
+    };
 
     return this.http
       .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
-      .pipe(map(operationCounts => operationCounts.map(operationCount => {
-        if (operationCount.kind === 'endorsement_with_slot') {
-          return { ...operationCount, kind: 'endorsement', field }
-        }
-        return { ...operationCount, field }
-      })))
+      .pipe(
+        map((operationCounts) =>
+          operationCounts.map((operationCount) => {
+            if (operationCount.kind === 'endorsement_with_slot') {
+              return { ...operationCount, kind: 'endorsement', field };
+            }
+            return { ...operationCount, field };
+          })
+        )
+      );
   }
 
-  getTokenTransferCount(address: string, supportedTokens: TokenContract[]): Observable<OperationCount[]> {
+  getTokenTransferCount(
+    address: string,
+    supportedTokens: TokenContract[]
+  ): Observable<OperationCount[]> {
     const body = {
       fields: ['source', 'kind'],
       predicates: [
         {
-          field: "operation_group_hash",
-          operation: "isnull",
-          inverse: true
+          field: 'operation_group_hash',
+          operation: 'isnull',
+          inverse: true,
         },
         {
-          field: "kind",
-          operation: "eq",
+          field: 'kind',
+          operation: 'eq',
           set: ['transaction'],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'parameters_micheline',
           operation: 'like',
           set: [address],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'destination',
           operation: 'in',
-          set: supportedTokens.map(contract => contract.id),
-          inverse: false
-        }
+          set: supportedTokens.map((contract) => contract.id),
+          inverse: false,
+        },
       ],
       aggregation: [
         {
           field: 'source',
-          function: 'count'
-        }
-      ]
-    }
+          function: 'count',
+        },
+      ],
+    };
 
     return this.http
       .post<OperationCount[]>(this.transactionsApiUrl, body, this.options)
-      .pipe(map(operationCounts => operationCounts.map(operationCount => ({ ...operationCount, field: 'source' }))))
+      .pipe(
+        map((operationCounts) =>
+          operationCounts.map((operationCount) => ({
+            ...operationCount,
+            field: 'source',
+          }))
+        )
+      );
   }
 
   getBlockByLevel(level: string): Observable<Block> {
@@ -651,18 +801,18 @@ export class ApiService {
               field: 'level',
               operation: 'eq',
               set: [level],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
-          limit: 1
+          limit: 1,
         },
         this.options
       )
-      .pipe(map(first))
+      .pipe(map(first));
   }
 
   getBlocksOfIds(blockIds: number[]): Observable<Block[]> {
-    const limit = blockIds.length
+    const limit = blockIds.length;
     return this.http.post<Block[]>(
       this.blocksApiUrl,
       {
@@ -671,13 +821,13 @@ export class ApiService {
             field: 'level',
             operation: 'in',
             set: blockIds,
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
-        limit: limit
+        limit: limit,
       },
       this.options
-    )
+    );
   }
 
   getBlockByHash(hash: string): Observable<Block> {
@@ -690,29 +840,33 @@ export class ApiService {
               field: 'hash',
               operation: 'eq',
               set: [hash],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
-          limit: 1
+          limit: 1,
         },
         this.options
       )
-      .pipe(map(first))
+      .pipe(map(first));
   }
 
-  private getBakingRights(address: string, limit?: number, predicates?: Predicate[]): Observable<BakingRights[]> {
+  private getBakingRights(
+    address: string,
+    limit?: number,
+    predicates?: Predicate[]
+  ): Observable<BakingRights[]> {
     const _predicates = (<Predicate[]>[
       {
         field: 'delegate',
         operation: 'eq',
-        set: [address]
+        set: [address],
       },
       {
         field: 'priority',
         operation: 'eq',
-        set: ['0']
-      }
-    ]).concat(predicates || [])
+        set: ['0'],
+      },
+    ]).concat(predicates || []);
 
     return this.http
       .post<BakingRights[]>(
@@ -722,23 +876,30 @@ export class ApiService {
           orderBy: [
             {
               field: 'block_level',
-              direction: 'desc'
-            }
+              direction: 'desc',
+            },
           ],
-          limit: limit
+          limit: limit,
         },
         this.options
       )
-      .pipe(map((rights: BakingRights[]) => rights.map(addCycleFromLevel(this.protocol))))
+      .pipe(
+        map((rights: BakingRights[]) =>
+          rights.map(addCycleFromLevel(this.protocol))
+        )
+      );
   }
 
-  getAggregatedBakingRights(address: string, limit: number): Observable<AggregatedBakingRights[]> {
+  getAggregatedBakingRights(
+    address: string,
+    limit: number
+  ): Observable<AggregatedBakingRights[]> {
     return this.rewardService.getCurrentCycle().pipe(
-      switchMap(currentCycle => {
-        const cycles = getRightCycles(currentCycle, limit)
+      switchMap((currentCycle) => {
+        const cycles = getRightCycles(currentCycle, limit);
 
         return forkJoin(
-          cycles.map(cycle =>
+          cycles.map((cycle) =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
                 cycle,
@@ -747,56 +908,72 @@ export class ApiService {
                 deposits: reward.bakingDeposits,
                 fees: new BigNumber(reward.fees).toNumber(),
                 bakingRewardsDetails: reward.bakingRewardsDetails,
-                rightStatus: getRightStatus(currentCycle, cycle)
+                rightStatus: getRightStatus(currentCycle, cycle),
               }))
             )
           )
         ).pipe(
-          map((aggregatedRights: AggregatedBakingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map((aggregatedRights: AggregatedBakingRights[]) =>
+            aggregatedRights.sort((a, b) => b.cycle - a.cycle)
+          ),
           map(ensureCycle(first(cycles), getEmptyAggregatedBakingRight))
-        )
+        );
       })
-    )
+    );
   }
 
-  getBakingRightsItems(address: string, cycle: number, bakingRewardsDetails: BakingRewardsDetail[]): Observable<BakingRights[]> {
+  getBakingRightsItems(
+    address: string,
+    cycle: number,
+    bakingRewardsDetails: BakingRewardsDetail[]
+  ): Observable<BakingRights[]> {
     const rewardByLevel = bakingRewardsDetails.reduce(
-      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
+      (accumulator, currentValue) => (
+        (accumulator[currentValue.level] = currentValue), accumulator
+      ),
       {}
-    )
+    );
     const setRewardsDepositsAndFees = (right: BakingRights): BakingRights => ({
       ...right,
-      rewards: rewardByLevel[right.level] ? rewardByLevel[right.level].amount : '0',
-      deposit: rewardByLevel[right.level] ? rewardByLevel[right.level].deposit : '0',
-      fees: rewardByLevel[right.level] ? rewardByLevel[right.level].fees : '0'
-    })
+      rewards: rewardByLevel[right.level]
+        ? rewardByLevel[right.level].amount
+        : '0',
+      deposit: rewardByLevel[right.level]
+        ? rewardByLevel[right.level].deposit
+        : '0',
+      fees: rewardByLevel[right.level] ? rewardByLevel[right.level].fees : '0',
+    });
 
     return this.store$
-      .select(state => state.app.protocolVariables)
+      .select((state) => state.app.protocolVariables)
       .pipe(
         filter(negate(isNil)),
         switchMap(() => {
-          const minLevel = this.protocol.cycleToBlockLevel(cycle)
-          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1)
+          const minLevel = this.protocol.cycleToBlockLevel(cycle);
+          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1);
           const predicates = [
             {
               field: 'block_level',
               operation: Operation.gt,
-              set: [minLevel]
+              set: [minLevel],
             },
             {
               field: 'block_level',
               operation: Operation.lt,
-              set: [maxLevel]
-            }
-          ]
+              set: [maxLevel],
+            },
+          ];
 
           return this.getBakingRights(address, null, predicates).pipe(
-            map((rights: BakingRights[]) => rights.map(addCycleFromLevel(this.protocol))),
-            map((rights: BakingRights[]) => rights.map(setRewardsDepositsAndFees))
-          )
+            map((rights: BakingRights[]) =>
+              rights.map(addCycleFromLevel(this.protocol))
+            ),
+            map((rights: BakingRights[]) =>
+              rights.map(setRewardsDepositsAndFees)
+            )
+          );
         })
-      )
+      );
   }
 
   private getEndorsingRights(
@@ -808,9 +985,9 @@ export class ApiService {
       {
         field: 'delegate',
         operation: Operation.eq,
-        set: [address]
-      }
-    ]).concat(predicates || [])
+        set: [address],
+      },
+    ]).concat(predicates || []);
 
     return this.http
       .post<EndorsingRights[]>(
@@ -821,23 +998,30 @@ export class ApiService {
           orderBy: [
             {
               field: 'block_level',
-              direction: 'desc'
-            }
+              direction: 'desc',
+            },
           ],
-          limit: limit
+          limit: limit,
         },
         this.options
       )
-      .pipe(map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(this.protocol))))
+      .pipe(
+        map((rights: EndorsingRights[]) =>
+          rights.map(addCycleFromLevel(this.protocol))
+        )
+      );
   }
 
-  getAggregatedEndorsingRights(address: string, limit: number): Observable<AggregatedEndorsingRights[]> {
+  getAggregatedEndorsingRights(
+    address: string,
+    limit: number
+  ): Observable<AggregatedEndorsingRights[]> {
     return this.rewardService.getCurrentCycle().pipe(
-      switchMap(currentCycle => {
-        const cycles = getRightCycles(currentCycle, limit)
+      switchMap((currentCycle) => {
+        const cycles = getRightCycles(currentCycle, limit);
 
         return forkJoin(
-          cycles.map(cycle =>
+          cycles.map((cycle) =>
             from(this.rewardService.calculateRewards(address, cycle)).pipe(
               map((reward: TezosRewards) => ({
                 cycle,
@@ -845,55 +1029,73 @@ export class ApiService {
                 deposits: reward.endorsingDeposits,
                 endorsementsCount: reward.endorsingRewardsDetails.length,
                 endorsingRewardsDetails: reward.endorsingRewardsDetails,
-                rightStatus: getRightStatus(currentCycle, cycle)
+                rightStatus: getRightStatus(currentCycle, cycle),
               }))
             )
           )
         ).pipe(
-          map((aggregatedRights: AggregatedEndorsingRights[]) => aggregatedRights.sort((a, b) => b.cycle - a.cycle)),
+          map((aggregatedRights: AggregatedEndorsingRights[]) =>
+            aggregatedRights.sort((a, b) => b.cycle - a.cycle)
+          ),
           map(ensureCycle(first(cycles), getEmptyAggregatedEndorsingRight))
-        )
+        );
       })
-    )
+    );
   }
 
-  getEndorsingRightItems(address: string, cycle: number, endorsingRewardsDetails: EndorsingRewardsDetail[]): Observable<EndorsingRights[]> {
+  getEndorsingRightItems(
+    address: string,
+    cycle: number,
+    endorsingRewardsDetails: EndorsingRewardsDetail[]
+  ): Observable<EndorsingRights[]> {
     const rewardByLevel = endorsingRewardsDetails.reduce(
-      (accumulator, currentValue) => ((accumulator[currentValue.level] = currentValue), accumulator),
+      (accumulator, currentValue) => (
+        (accumulator[currentValue.level] = currentValue), accumulator
+      ),
       {}
-    )
-    const setRewardsAndDeposits = (right: EndorsingRights): EndorsingRights => ({
+    );
+    const setRewardsAndDeposits = (
+      right: EndorsingRights
+    ): EndorsingRights => ({
       ...right,
-      rewards: rewardByLevel[right.level] ? rewardByLevel[right.level].amount : '0',
-      deposit: rewardByLevel[right.level] ? rewardByLevel[right.level].deposit : '0'
-    })
+      rewards: rewardByLevel[right.level]
+        ? rewardByLevel[right.level].amount
+        : '0',
+      deposit: rewardByLevel[right.level]
+        ? rewardByLevel[right.level].deposit
+        : '0',
+    });
 
     return this.store$
-      .select(state => state.app.protocolVariables)
+      .select((state) => state.app.protocolVariables)
       .pipe(
         filter(negate(isNil)),
         switchMap(() => {
-          const minLevel = this.protocol.cycleToBlockLevel(cycle)
-          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1)
+          const minLevel = this.protocol.cycleToBlockLevel(cycle);
+          const maxLevel = this.protocol.cycleToBlockLevel(cycle + 1);
           const predicates = [
             {
               field: 'block_level',
               operation: Operation.gt,
-              set: [minLevel]
+              set: [minLevel],
             },
             {
               field: 'block_level',
               operation: Operation.lt,
-              set: [maxLevel]
-            }
-          ]
+              set: [maxLevel],
+            },
+          ];
 
           return this.getEndorsingRights(address, 30000, predicates).pipe(
-            map((rights: EndorsingRights[]) => rights.map(addCycleFromLevel(this.protocol))),
-            map((rights: EndorsingRights[]) => rights.map(setRewardsAndDeposits))
-          )
+            map((rights: EndorsingRights[]) =>
+              rights.map(addCycleFromLevel(this.protocol))
+            ),
+            map((rights: EndorsingRights[]) =>
+              rights.map(setRewardsAndDeposits)
+            )
+          );
         })
-      )
+      );
   }
 
   getEndorsedSlotsCount(blockHash: string): Observable<number> {
@@ -905,35 +1107,46 @@ export class ApiService {
             {
               field: 'operation_group_hash',
               operation: 'isnull',
-              inverse: true
+              inverse: true,
             },
             {
               field: 'block_hash',
               operation: 'eq',
-              set: [blockHash]
+              set: [blockHash],
             },
             {
               field: 'kind',
               operation: 'in',
-              set: ['endorsement', 'endorsement_with_slot']
-            }
+              set: ['endorsement', 'endorsement_with_slot'],
+            },
           ],
           orderBy: [sort('block_level', 'desc')],
-          limit: 32
+          limit: 32,
         },
         this.options
       )
-      .pipe(map((transactions: Transaction[]) => _.flatten(transactions.map(transaction => JSON.parse(transaction.slots))).length))
+      .pipe(
+        map(
+          (transactions: Transaction[]) =>
+            _.flatten(
+              transactions.map((transaction) => JSON.parse(transaction.slots))
+            ).length
+        )
+      );
   }
 
   getFrozenBalance(address: string): Observable<number> {
     return this.cacheService.get<ByAddressState>(CacheKeys.byAddress).pipe(
-      switchMap(byAddressCache => {
-        const currentCycle = fromApp.currentCycleSelector(fromRoot.getState(this.store$).app)
-        const frozenBalance = (<any>_get(byAddressCache, `${address}.frozenBalance`)) as ByCycle<number>
+      switchMap((byAddressCache) => {
+        const currentCycle = fromApp.currentCycleSelector(
+          fromRoot.getState(this.store$).app
+        );
+        const frozenBalance = (<any>(
+          _get(byAddressCache, `${address}.frozenBalance`)
+        )) as ByCycle<number>;
 
         if (frozenBalance && frozenBalance.cycle === currentCycle) {
-          return of(frozenBalance.value)
+          return of(frozenBalance.value);
         }
 
         return this.http
@@ -946,9 +1159,9 @@ export class ApiService {
                   field: 'pkh',
                   operation: 'eq',
                   set: [address],
-                  inverse: false
-                }
-              ]
+                  inverse: false,
+                },
+              ],
             },
             this.options
           )
@@ -956,21 +1169,27 @@ export class ApiService {
             map(
               pipe<any[], any, number>(
                 first,
-                get(_first => _first.frozen_balance)
+                get((_first) => _first.frozen_balance)
               )
             ),
-            tap(frozenBalance => {
-              this.cacheService.update<ByAddressState>(CacheKeys.byAddress, byAddressCache => ({
-                ...byAddressCache,
-                [address]: {
-                  ..._get(byAddressCache, address),
-                  frozenBalance: { value: frozenBalance, cycle: currentCycle }
-                }
-              }))
+            tap((frozenBalance) => {
+              this.cacheService.update<ByAddressState>(
+                CacheKeys.byAddress,
+                (byAddressCache) => ({
+                  ...byAddressCache,
+                  [address]: {
+                    ..._get(byAddressCache, address),
+                    frozenBalance: {
+                      value: frozenBalance,
+                      cycle: currentCycle,
+                    },
+                  },
+                })
+              );
             })
-          )
+          );
       })
-    )
+    );
   }
 
   getDelegatedAccountsList(tzAddress: string): Observable<any[]> {
@@ -983,22 +1202,25 @@ export class ApiService {
             field: 'delegate_value',
             operation: 'eq',
             set: [tzAddress],
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
         orderBy: [{ field: 'count_account_id', direction: 'desc' }],
         aggregation: [
           {
             field: 'account_id',
-            function: 'count'
-          }
-        ]
+            function: 'count',
+          },
+        ],
       },
       this.options
-    )
+    );
   }
 
-  getActiveBakers(limit: number, orderBy = { field: 'staking_balance', direction: 'desc' }): Observable<Baker[]> {
+  getActiveBakers(
+    limit: number,
+    orderBy = { field: 'staking_balance', direction: 'desc' }
+  ): Observable<Baker[]> {
     return this.http.post<Baker[]>(
       this.delegatesApiUrl,
       {
@@ -1008,14 +1230,14 @@ export class ApiService {
             field: 'staking_balance',
             operation: 'gt',
             set: ['8000000000'],
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
         orderBy: [orderBy],
-        limit
+        limit,
       },
       this.options
-    )
+    );
   }
 
   getTotalBakersAtTheLatestBlock(): Observable<number> {
@@ -1029,23 +1251,31 @@ export class ApiService {
               field: 'staking_balance',
               operation: 'gt',
               set: ['8000000000'],
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
           orderBy: [{ field: 'count_pkh', direction: 'desc' }],
           aggregation: [
             {
               field: 'pkh',
-              function: 'count'
-            }
-          ]
+              function: 'count',
+            },
+          ],
         },
         this.options
       )
-      .pipe(map(response => (Array.isArray(response) && response.length > 0 ? response[0].count_pkh : null)))
+      .pipe(
+        map((response) =>
+          Array.isArray(response) && response.length > 0
+            ? response[0].count_pkh
+            : null
+        )
+      );
   }
 
-  getNumberOfDelegatorsByBakers(delegates: string[]): Observable<NumberOfDelegatorsByBakers[]> {
+  getNumberOfDelegatorsByBakers(
+    delegates: string[]
+  ): Observable<NumberOfDelegatorsByBakers[]> {
     return this.http
       .post<any[]>(
         this.accountsApiUrl,
@@ -1056,35 +1286,37 @@ export class ApiService {
               field: 'delegate_value',
               operation: 'in',
               set: delegates,
-              inverse: false
-            }
+              inverse: false,
+            },
           ],
           aggregation: [
             {
               field: 'account_id',
-              function: 'count'
-            }
-          ]
+              function: 'count',
+            },
+          ],
         },
         this.options
       )
       .pipe(
-        map(response =>
-          delegates.map(delegate => ({
+        map((response) =>
+          delegates.map((delegate) => ({
             delegate_value: delegate,
-            number_of_delegators: response.filter(tesponseItem => tesponseItem.delegate_value === delegate).length
+            number_of_delegators: response.filter(
+              (tesponseItem) => tesponseItem.delegate_value === delegate
+            ).length,
           }))
         )
-      )
+      );
   }
 
   getProposal(hash: string): Observable<ProposalDto> {
     return this.cacheService.get<ByProposalState>(CacheKeys.byProposal).pipe(
-      switchMap(byProposalState => {
-        const period: any = _get(byProposalState, hash)
+      switchMap((byProposalState) => {
+        const period: any = _get(byProposalState, hash);
 
         if (period) {
-          return of({ proposal: hash, period })
+          return of({ proposal: hash, period });
         }
 
         return this.http
@@ -1097,75 +1329,112 @@ export class ApiService {
                   field: 'kind',
                   operation: 'eq',
                   set: ['proposals'],
-                  inverse: false
+                  inverse: false,
                 },
-                { field: 'proposal', operation: 'like', set: [hash], inverse: false }
+                {
+                  field: 'proposal',
+                  operation: 'like',
+                  set: [hash],
+                  inverse: false,
+                },
               ],
               orderBy: [
                 {
                   field: 'block_level',
-                  direction: 'asc'
-                }
+                  direction: 'asc',
+                },
               ],
-              limit: 1
+              limit: 1,
             },
             this.options
           )
           .pipe(
             map(first),
-            map(item => ({ ...item, proposal: item.proposal.replace(squareBrackets, '') })),
-            tap(proposal =>
-              this.cacheService.update<ByProposalState>(CacheKeys.byProposal, byProposalState => ({
-                ...byProposalState,
-                [hash]: proposal.period
-              }))
+            map((item) => ({
+              ...item,
+              proposal: item.proposal.replace(squareBrackets, ''),
+            })),
+            tap((proposal) =>
+              this.cacheService.update<ByProposalState>(
+                CacheKeys.byProposal,
+                (byProposalState) => ({
+                  ...byProposalState,
+                  [hash]: proposal.period,
+                })
+              )
             )
-          )
+          );
       })
-    )
+    );
   }
 
-  getProposals(limit: number, orderBy = { field: 'period', direction: 'desc' }): Observable<ProposalDto[]> {
+  getProposals(
+    limit: number,
+    orderBy = { field: 'period', direction: 'desc' }
+  ): Observable<ProposalDto[]> {
     return this.http
       .post<ProposalDto[]>(
         this.transactionsApiUrl,
         {
           fields: ['proposal', 'period'],
-          predicates: [{ field: 'kind', operation: 'eq', set: ['proposals'], inverse: false }],
+          predicates: [
+            {
+              field: 'kind',
+              operation: 'eq',
+              set: ['proposals'],
+              inverse: false,
+            },
+          ],
           orderBy: [orderBy],
           aggregation: [{ field: 'operation_group_hash', function: 'count' }],
-          limit
+          limit,
         },
         this.options
       )
-      .pipe(map(proposals => proposals.filter(proposal => proposal.proposal.indexOf(',') === -1)))
+      .pipe(
+        map((proposals) =>
+          proposals.filter((proposal) => proposal.proposal.indexOf(',') === -1)
+        )
+      );
   }
 
-  getTransferOperationsForContract(contract: TokenContract, cursor?: TezosTransactionCursor): Observable<TezosTransactionResult> {
-    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
+  getTransferOperationsForContract(
+    contract: TokenContract,
+    cursor?: TezosTransactionCursor
+  ): Observable<TezosTransactionResult> {
+    const protocol = getFaProtocol(
+      contract,
+      this.chainNetworkService.getEnvironment(),
+      this.chainNetworkService.getNetwork()
+    );
 
-    return from(protocol.getTransactions(10, cursor))
+    return from(protocol.getTransactions(10, cursor));
   }
 
   getBalanceForLast30Days(accountId: string): Observable<Balance[]> {
-    const today = new Date()
-    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
-    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds)
+    const today = new Date();
+    const thirtyDaysInMilliseconds =
+      1000 * 60 * 60 * 24 * 29; /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(today.getTime() - thirtyDaysInMilliseconds);
 
-    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
+    const isLastItemOfTheMonth = (
+      value: Balance,
+      index: number,
+      array: Balance[]
+    ) => {
       if (index === 0) {
-        return true
+        return true;
       }
 
-      const current = new Date(value.asof)
-      const previous = new Date(array[index - 1].asof)
+      const current = new Date(value.asof);
+      const previous = new Date(array[index - 1].asof);
 
       if (current.getDay() !== previous.getDay()) {
-        return true
+        return true;
       }
 
-      return false
-    }
+      return false;
+    };
 
     return this.http
       .post<Balance[]>(
@@ -1173,67 +1442,92 @@ export class ApiService {
         {
           fields: ['balance', 'asof'],
           predicates: [
-            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
-            { field: 'asof', operation: 'between', set: [thirtyDaysAgo.getTime(), today.getTime()], inverse: false }
+            {
+              field: 'account_id',
+              operation: 'eq',
+              set: [accountId],
+              inverse: false,
+            },
+            {
+              field: 'asof',
+              operation: 'between',
+              set: [thirtyDaysAgo.getTime(), today.getTime()],
+              inverse: false,
+            },
           ],
           orderBy: [{ field: 'asof', direction: 'desc' }],
-          limit: 50000
+          limit: 50000,
         },
         this.options
       )
       .pipe(
-        map(balances => balances.filter(isLastItemOfTheMonth)),
-        map(balances =>
-          balances.map(balance => ({
+        map((balances) => balances.filter(isLastItemOfTheMonth)),
+        map((balances) =>
+          balances.map((balance) => ({
             ...balance,
-            balance: balance.balance / xtzToMutezConvertionRatio
+            balance: balance.balance / xtzToMutezConvertionRatio,
           }))
         ),
-        map(balances => balances.sort((a, b) => a.asof - b.asof)),
-        map(balances => {
+        map((balances) => balances.sort((a, b) => a.asof - b.asof)),
+        map((balances) => {
           const dateArray: {
-            balance: number
-            asof: number
-          }[] = []
+            balance: number;
+            asof: number;
+          }[] = [];
 
-          let previousBalance: number
+          let previousBalance: number;
           for (let day = 29; day >= 0; day--) {
-            const priorDate = new Date(new Date().setDate(new Date().getDate() - day))
+            const priorDate = new Date(
+              new Date().setDate(new Date().getDate() - day)
+            );
 
-            const foundBalance = balances.find(balance => new Date(balance.asof).getDate() === priorDate.getDate())
+            const foundBalance = balances.find(
+              (balance) =>
+                new Date(balance.asof).getDate() === priorDate.getDate()
+            );
 
             if (foundBalance) {
               dateArray.push({
                 balance: foundBalance.balance,
-                asof: new Date().setDate(new Date().getDate() - day)
-              })
-              previousBalance = foundBalance.balance
+                asof: new Date().setDate(new Date().getDate() - day),
+              });
+              previousBalance = foundBalance.balance;
             } else {
               dateArray.push({
                 balance: previousBalance ? previousBalance : null,
-                asof: new Date().setDate(new Date().getDate() - day)
-              })
+                asof: new Date().setDate(new Date().getDate() - day),
+              });
             }
           }
-          return dateArray
+          return dateArray;
         })
-      )
+      );
   }
 
-  getEarlierBalance(accountId: string, temporaryBalances: Balance[]): Observable<Balance[]> {
-    const thirtyDaysInMilliseconds = 1000 * 60 * 60 * 24 * 29 /*30 => predicated condition return 31 days */
-    const thirtyDaysAgo = new Date(new Date().getTime() - thirtyDaysInMilliseconds)
+  getEarlierBalance(
+    accountId: string,
+    temporaryBalances: Balance[]
+  ): Observable<Balance[]> {
+    const thirtyDaysInMilliseconds =
+      1000 * 60 * 60 * 24 * 29; /*30 => predicated condition return 31 days */
+    const thirtyDaysAgo = new Date(
+      new Date().getTime() - thirtyDaysInMilliseconds
+    );
 
-    const isLastItemOfTheMonth = (value: Balance, index: number, array: Balance[]) => {
+    const isLastItemOfTheMonth = (
+      value: Balance,
+      index: number,
+      array: Balance[]
+    ) => {
       if (index === 0) {
-        return true
+        return true;
       }
 
-      const current = new Date(value.asof)
-      const previous = new Date(array[index - 1].asof)
+      const current = new Date(value.asof);
+      const previous = new Date(array[index - 1].asof);
 
-      return current.getDay() !== previous.getDay()
-    }
+      return current.getDay() !== previous.getDay();
+    };
 
     return this.http
       .post<Balance[]>(
@@ -1241,85 +1535,125 @@ export class ApiService {
         {
           fields: ['balance', 'asof'],
           predicates: [
-            { field: 'account_id', operation: 'eq', set: [accountId], inverse: false },
-            { field: 'asof', operation: 'before', set: [thirtyDaysAgo.getTime()], inverse: false }
+            {
+              field: 'account_id',
+              operation: 'eq',
+              set: [accountId],
+              inverse: false,
+            },
+            {
+              field: 'asof',
+              operation: 'before',
+              set: [thirtyDaysAgo.getTime()],
+              inverse: false,
+            },
           ],
           orderBy: [{ field: 'asof', direction: 'desc' }],
-          limit: 1
+          limit: 1,
         },
         this.options
       )
       .pipe(
-        map(balances => balances.filter(isLastItemOfTheMonth)),
-        map(balances =>
-          balances.map(balance => ({
+        map((balances) => balances.filter(isLastItemOfTheMonth)),
+        map((balances) =>
+          balances.map((balance) => ({
             ...balance,
-            balance: balance.balance / xtzToMutezConvertionRatio
+            balance: balance.balance / xtzToMutezConvertionRatio,
           }))
         ),
-        map(balances => {
-          const copiedBalances = JSON.parse(JSON.stringify(temporaryBalances))
+        map((balances) => {
+          const copiedBalances = JSON.parse(JSON.stringify(temporaryBalances));
           if (balances.length === 0) {
-            copiedBalances[0].balance = 0
+            copiedBalances[0].balance = 0;
           } else {
-            copiedBalances[0] = balances[0]
+            copiedBalances[0] = balances[0];
           }
 
-          let previousBalance = copiedBalances[0].balance
+          let previousBalance = copiedBalances[0].balance;
           for (let index = 0; index <= 29; index++) {
-            if (!copiedBalances[index].balance && (previousBalance || previousBalance === 0)) {
-              copiedBalances[index].balance = previousBalance
+            if (
+              !copiedBalances[index].balance &&
+              (previousBalance || previousBalance === 0)
+            ) {
+              copiedBalances[index].balance = previousBalance;
             } else if (copiedBalances[index].balance) {
-              previousBalance = copiedBalances[index].balance
+              previousBalance = copiedBalances[index].balance;
             }
           }
 
-          return copiedBalances
+          return copiedBalances;
         })
-      )
+      );
   }
 
-  getErrorsForOperations(operations: Transaction[]): Observable<OperationErrorsById[]> {
-    const distinctBlockLevels = operations.filter(operation => operation.status !== 'applied').map(operation => operation.block_level).filter(distinctFilter)
+  getErrorsForOperations(
+    operations: Transaction[]
+  ): Observable<OperationErrorsById[]> {
+    const distinctBlockLevels = operations
+      .filter((operation) => operation.status !== 'applied')
+      .map((operation) => operation.block_level)
+      .filter(distinctFilter);
     const contentWithError = (content: RPCContent): boolean =>
       _.get(content, 'metadata.operation_result.errors') ||
-      get<{ result: { errors?: OperationError[] } }[]>(internal_operation_results =>
-        internal_operation_results.some(internal_operation_result => !!internal_operation_result.result.errors)
-      )(_.get(content, 'metadata.internal_operation_results'))
+      get<{ result: { errors?: OperationError[] } }[]>(
+        (internal_operation_results) =>
+          internal_operation_results.some(
+            (internal_operation_result) =>
+              !!internal_operation_result.result.errors
+          )
+      )(_.get(content, 'metadata.internal_operation_results'));
     const hasError = (rpcBlocksOpertions: RPCBlocksOpertions): boolean =>
-      rpcBlocksOpertions.contents && rpcBlocksOpertions.contents.some(contentWithError)
+      rpcBlocksOpertions.contents &&
+      rpcBlocksOpertions.contents.some(contentWithError);
     const contentToErrors = (content: RPCContent): OperationError[] =>
       content.metadata
         ? (_.get(content, 'metadata.operation_result.errors') || []).concat(
-          content.metadata.internal_operation_results
-            ? flatten(
-              content.metadata.internal_operation_results
-                .filter(internal_operation_result => !!internal_operation_result.result.errors)
-                .map(internal_operation_result => internal_operation_result.result.errors)
-            )
-            : []
-        )
-        : []
+            content.metadata.internal_operation_results
+              ? flatten(
+                  content.metadata.internal_operation_results
+                    .filter(
+                      (internal_operation_result) =>
+                        !!internal_operation_result.result.errors
+                    )
+                    .map(
+                      (internal_operation_result) =>
+                        internal_operation_result.result.errors
+                    )
+                )
+              : []
+          )
+        : [];
 
     return forkJoin(
-      distinctBlockLevels.map(blockLevel =>
-        this.http.get<any[]>(`${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}/operations`)
+      distinctBlockLevels.map((blockLevel) =>
+        this.http.get<any[]>(
+          `${this.environmentUrls.rpcUrl}/chains/main/blocks/${blockLevel}/operations`
+        )
       )
     ).pipe(
       map<any[][][], any[][]>(flatten), //forkJoin
       map(flatten), //http.get
       map((rpcBlocksOpertions: RPCBlocksOpertions[]) =>
-        operations.map(operation => {
+        operations.map((operation) => {
           const match = rpcBlocksOpertions.filter(
-            rpcBlocksOpertion => rpcBlocksOpertion.hash === operation.operation_group_hash && hasError(rpcBlocksOpertion)
-          )
+            (rpcBlocksOpertion) =>
+              rpcBlocksOpertion.hash === operation.operation_group_hash &&
+              hasError(rpcBlocksOpertion)
+          );
 
           return {
             id: operation.operation_group_hash,
-            errors: match.length > 0 ? flatten(match.map(item => flatten(item.contents.map(contentToErrors)))) : null
-          }
+            errors:
+              match.length > 0
+                ? flatten(
+                    match.map((item) =>
+                      flatten(item.contents.map(contentToErrors))
+                    )
+                  )
+                : null,
+          };
         })
       )
-    )
+    );
   }
 }

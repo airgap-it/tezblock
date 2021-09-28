@@ -6,13 +6,25 @@
     (selectTab)="onSelectTab(tab)"
   >
     <ng-template tabHeading>
-      <button type="button" class="btn p-0 mr-1" [ngClass]="tab.active ? 'btn-link' : ''">
+      <button
+        type="button"
+        class="btn p-0 mr-1"
+        [ngClass]="tab.active ? 'btn-link' : ''"
+      >
         <span class="d-none d-sm-inline-block">
           {{ tab.title | translate }}
         </span>
-        <fa-icon *ngIf="tab.icon" [icon]="tab.icon" size="lg" class="d-sm-none "></fa-icon>
+        <fa-icon
+          *ngIf="tab.icon"
+          [icon]="tab.icon"
+          size="lg"
+          class="d-sm-none"
+        ></fa-icon>
       </button>
-      <span class="badge badge-pill d-none d-sm-inline-block" [ngClass]="tab.active ? 'badge-primary' : 'badge-primary-light'">
+      <span
+        class="badge badge-pill d-none d-sm-inline-block"
+        [ngClass]="tab.active ? 'badge-primary' : 'badge-primary-light'"
+      >
         {{ tab.count || tab.emptySign || 0 }}
       </span>
     </ng-template>

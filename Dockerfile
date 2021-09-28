@@ -1,4 +1,4 @@
-FROM node:14.5.0 as angular-build
+FROM node:15 as angular-build
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
@@ -23,28 +23,24 @@ WORKDIR /app
 # install dependencies
 ADD .npmrc /app/.npmrc
 ADD package.json /app/package.json
-ADD package-lock.json /app/package-lock.json
+ADD yarn.lock /app/yarn.lock
 COPY ./scripts /app/scripts
 
 ARG FONTAWESOME_NPM_AUTH_TOKEN
 
 ARG MAINNET_RPC_URL 
-ARG CARTHAGENET_RPC_URL
-ARG DELPHINET_RPC_URL 
+ARG GRANADANET_RPC_URL
 ARG MAINNET_CONSEIL_URL 
-ARG CARTHAGENET_CONSEIL_URL
-ARG DELPHINET_CONSEIL_URL 
+ARG GRANADANET_CONSEIL_URL
 ARG MAINNET_CONSEIL_API_KEY 
-ARG CARTHAGENET_CONSEIL_API_KEY
-ARG DELPHINET_CONSEIL_API_KEY 
+ARG GRANADANET_CONSEIL_API_KEY
 ARG MAINNET_TARGET_URL
-ARG CARTHAGENET_TARGET_URL
-ARG DELPHINET_TARGET_URL
+ARG GRANADANET_TARGET_URL
 ARG GA_KEY
 
-RUN npm config set unsafe-perm true
-RUN npm run set-env
-RUN npm ci
+RUN yarn config set unsafe-perm true
+RUN yarn set-env
+RUN yarn install --frozen-lockfile
 
 ENV NODE_ENV production
 

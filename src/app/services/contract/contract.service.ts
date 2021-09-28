@@ -1,127 +1,166 @@
-import { Injectable } from '@angular/core'
-import { HttpClient } from '@angular/common/http'
-import { forkJoin, from, Observable, pipe, of } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
-import { get as _get } from 'lodash'
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin, from, Observable, pipe, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
+import { get as _get } from 'lodash';
 
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { BaseService, Operation, Predicate, OrderBy, ENVIRONMENT_URL } from '@tezblock/services/base.service'
-import { first, get } from '@tezblock/services/fp'
-import { ContractOperation, fillTransferOperations, TokenContract, TokenHolder } from '@tezblock/domain/contract'
-import { getFaProtocol, getTezosFA2ProtocolOptions, getTezosFAProtocolOptions } from '@tezblock/domain/airgap'
-import moment from 'moment'
-import { WetziKoin } from '@tezblock/domain/airgap/wetzikoin'
-import { TezosBTC, TezosFA1Protocol, TezosFA2Protocol, TezosFA2ProtocolOptions, TezosStaker, TezosUSD, TezosUUSD, TezosWrapped, TezosYOU } from '@airgap/coinlib-core'
-import { TezosETHtz } from '@airgap/coinlib-core/protocols/tezos/fa/TezosETHtz'
-import { TezosKolibriUSD } from '@airgap/coinlib-core/protocols/tezos/fa/TezosKolibriUSD'
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
+import {
+  BaseService,
+  Operation,
+  Predicate,
+  OrderBy,
+  ENVIRONMENT_URL,
+} from '@tezblock/services/base.service';
+import { first, get } from '@tezblock/services/fp';
+import {
+  ContractOperation,
+  fillTransferOperations,
+  TokenContract,
+  TokenHolder,
+} from '@tezblock/domain/contract';
+import {
+  getFaProtocol,
+  getTezosFA2ProtocolOptions,
+  getTezosFAProtocolOptions,
+} from '@tezblock/domain/airgap';
+import moment from 'moment';
+import { WetziKoin } from '@tezblock/domain/airgap/wetzikoin';
+import {
+  TezosBTC,
+  TezosFA1Protocol,
+  TezosFA2Protocol,
+  TezosFA2ProtocolOptions,
+  TezosStaker,
+  TezosUSD,
+  TezosUUSD,
+  TezosWrapped,
+  TezosYOU,
+} from '@airgap/coinlib-core';
+import { TezosETHtz } from '@airgap/coinlib-core/protocols/tezos/fa/TezosETHtz';
+import { TezosKolibriUSD } from '@airgap/coinlib-core/protocols/tezos/fa/TezosKolibriUSD';
 
 const transferPredicates = (contractHash: string): Predicate[] => [
   {
     field: 'parameters_entrypoints',
     operation: Operation.eq,
     set: ['transfer'],
-    inverse: false
+    inverse: false,
   },
   {
     field: 'parameters',
     operation: Operation.isnull,
     set: [],
-    inverse: true
+    inverse: true,
   },
   {
     field: 'kind',
     operation: Operation.eq,
     set: ['transaction'],
-    inverse: false
+    inverse: false,
   },
   {
     field: 'destination',
     operation: Operation.eq,
     set: [contractHash],
-    inverse: false
-  }
-]
+    inverse: false,
+  },
+];
 
 const otherPredicates = (contractHash: string): Predicate[] => [
   {
     field: 'parameters_entrypoints',
     operation: Operation.eq,
     set: ['transfer'],
-    inverse: true
+    inverse: true,
   },
   {
     field: 'parameters',
     operation: Operation.isnull,
     set: [''],
-    inverse: true
+    inverse: true,
   },
   {
     field: 'kind',
     operation: Operation.eq,
     set: ['transaction'],
-    inverse: false
+    inverse: false,
   },
   {
     field: 'destination',
     operation: Operation.eq,
     set: [contractHash],
-    inverse: false
-  }
-]
+    inverse: false,
+  },
+];
 
 export interface ContractOperationsCount {
-  transferTotal: number
-  otherTotal
+  transferTotal: number;
+  otherTotal;
 }
 
 export interface ContractProtocol {
-  fetchTokenHolders(): Promise<TokenHolder[]>
+  fetchTokenHolders(): Promise<TokenHolder[]>;
 }
 
-export const getContractProtocol = (contract: TokenContract, chainNetworkService: ChainNetworkService): ContractProtocol => {
-  const environmentUrls = chainNetworkService.getEnvironment()
-  const tezosNetwork = chainNetworkService.getNetwork()
+export const getContractProtocol = (
+  contract: TokenContract,
+  chainNetworkService: ChainNetworkService
+): ContractProtocol => {
+  const environmentUrls = chainNetworkService.getEnvironment();
+  const tezosNetwork = chainNetworkService.getNetwork();
 
   if (contract.type === 'fa2') {
-    const options = getTezosFA2ProtocolOptions(contract, environmentUrls, tezosNetwork)
-    return new TezosFA2Protocol(options)
+    const options = getTezosFA2ProtocolOptions(
+      contract,
+      environmentUrls,
+      tezosNetwork
+    );
+    return new TezosFA2Protocol(options);
   }
 
-  const options = getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork)
+  const options = getTezosFAProtocolOptions(
+    contract,
+    environmentUrls,
+    tezosNetwork
+  );
 
   if (contract.symbol === 'STKR') {
-    return new TezosStaker(options)
+    return new TezosStaker(options);
   }
 
   if (contract.symbol === 'tzBTC') {
-    return new TezosBTC(options)
+    return new TezosBTC(options);
   }
 
   if (contract.symbol === 'USDtz') {
-    return new TezosUSD(options)
+    return new TezosUSD(options);
   }
 
   if (contract.symbol === 'ETHtz') {
-    return new TezosETHtz(options)
+    return new TezosETHtz(options);
   }
 
   if (contract.symbol === 'wXTZ') {
-    return new TezosWrapped(options)
+    return new TezosWrapped(options);
   }
 
   if (contract.symbol === 'kUSD') {
-    return new TezosKolibriUSD(options)
+    return new TezosKolibriUSD(options);
   }
 
-  return undefined
-}
+  return undefined;
+};
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContractService extends BaseService {
-  constructor(readonly chainNetworkService: ChainNetworkService, readonly httpClient: HttpClient) {
-    super(chainNetworkService, httpClient)
+  constructor(
+    readonly chainNetworkService: ChainNetworkService,
+    readonly httpClient: HttpClient
+  ) {
+    super(chainNetworkService, httpClient);
   }
 
   public loadManagerAddress(address: string): Observable<string> {
@@ -132,22 +171,22 @@ export class ContractService extends BaseService {
           field: 'kind',
           operation: Operation.eq,
           set: ['origination'],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'originated_contracts',
           operation: Operation.eq,
           set: [address],
-          inverse: false
-        }
+          inverse: false,
+        },
       ],
       orderBy: [
         {
           field: 'block_level',
-          direction: 'desc'
-        }
+          direction: 'desc',
+        },
       ],
-      limit: 1
+      limit: 1,
     }).pipe(
       map(
         pipe(
@@ -155,10 +194,12 @@ export class ContractService extends BaseService {
           get((data) => data.source)
         )
       )
-    )
+    );
   }
 
-  public loadOperationsCount(contractHash: string): Observable<ContractOperationsCount> {
+  public loadOperationsCount(
+    contractHash: string
+  ): Observable<ContractOperationsCount> {
     return forkJoin([
       this.post<any[]>('operations', {
         fields: ['destination'],
@@ -166,9 +207,9 @@ export class ContractService extends BaseService {
         aggregation: [
           {
             field: 'destination',
-            function: 'count'
-          }
-        ]
+            function: 'count',
+          },
+        ],
       }).pipe(
         map(
           pipe(
@@ -183,9 +224,9 @@ export class ContractService extends BaseService {
         aggregation: [
           {
             field: 'destination',
-            function: 'count'
-          }
-        ]
+            function: 'count',
+          },
+        ],
       }).pipe(
         map(
           pipe(
@@ -193,136 +234,188 @@ export class ContractService extends BaseService {
             get<any>((item) => parseInt(item.count_destination))
           )
         )
-      )
-    ]).pipe(map(([transferTotal, otherTotal]) => ({ transferTotal, otherTotal })))
+      ),
+    ]).pipe(
+      map(([transferTotal, otherTotal]) => ({ transferTotal, otherTotal }))
+    );
   }
 
-  public loadOtherOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
-    const faProtocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
+  public loadOtherOperations(
+    contract: TokenContract,
+    orderBy: OrderBy,
+    limit: number
+  ): Observable<ContractOperation[]> {
+    const faProtocol = getFaProtocol(
+      contract,
+      this.chainNetworkService.getEnvironment(),
+      this.chainNetworkService.getNetwork()
+    );
 
     return this.post<ContractOperation[]>('operations', {
       predicates: otherPredicates(contract.id),
       orderBy: [orderBy],
-      limit
+      limit,
     }).pipe(
       switchMap((contractOperations) =>
         contractOperations.length > 0
           ? forkJoin(
-            contractOperations.map((contractOperation) =>
-              from(faProtocol.normalizeTransactionParameters(contractOperation.parameters_micheline)).pipe(
-                catchError(() => of({ entrypoint: 'default', value: null }))
+              contractOperations.map((contractOperation) =>
+                from(
+                  faProtocol.normalizeTransactionParameters(
+                    contractOperation.parameters_micheline
+                  )
+                ).pipe(
+                  catchError(() => of({ entrypoint: 'default', value: null }))
+                )
+              )
+            ).pipe(
+              map((response) =>
+                contractOperations.map((contractOperation, index) => ({
+                  ...contractOperation,
+                  entrypoint:
+                    contractOperation.parameters_entrypoints === 'default'
+                      ? _get(response[index], 'entrypoint')
+                      : contractOperation.parameters_entrypoints,
+                  // symbol: contract.symbol,
+                  decimals: contract.decimals,
+                }))
               )
             )
-          ).pipe(
-            map((response) =>
-              contractOperations.map((contractOperation, index) => ({
-                ...contractOperation,
-                entrypoint:
-                  contractOperation.parameters_entrypoints === 'default'
-                    ? _get(response[index], 'entrypoint')
-                    : contractOperation.parameters_entrypoints,
-                // symbol: contract.symbol,
-                decimals: contract.decimals
-              }))
-            )
-          )
           : of([])
       )
-    )
+    );
   }
 
-  public loadTransferOperations(contract: TokenContract, orderBy: OrderBy, limit: number): Observable<ContractOperation[]> {
+  public loadTransferOperations(
+    contract: TokenContract,
+    orderBy: OrderBy,
+    limit: number
+  ): Observable<ContractOperation[]> {
     return this.post<ContractOperation[]>('operations', {
       predicates: transferPredicates(contract.id),
       orderBy: [orderBy],
-      limit
+      limit,
     }).pipe(
       switchMap(
         (contractOperations) =>
           <Observable<ContractOperation[]>>(
-            from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+            from(
+              fillTransferOperations(
+                contractOperations,
+                this.chainNetworkService,
+                () => undefined,
+                contract
+              )
+            )
           )
       )
-    )
+    );
   }
 
-  public load24hTransferOperations(contract: TokenContract): Observable<ContractOperation[]> {
-    const cutoff = moment().subtract(24, 'hours')
+  public load24hTransferOperations(
+    contract: TokenContract
+  ): Observable<ContractOperation[]> {
+    const cutoff = moment().subtract(24, 'hours');
 
     return this.post<ContractOperation[]>('operations', {
-      fields: ['timestamp', 'parameters_entrypoints', 'parameters_micheline', 'parameters', 'kind'],
+      fields: [
+        'timestamp',
+        'parameters_entrypoints',
+        'parameters_micheline',
+        'parameters',
+        'kind',
+      ],
       predicates: [
         {
           field: 'parameters_entrypoints',
           operation: Operation.eq,
           set: ['transfer'],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'parameters',
           operation: Operation.isnull,
           set: [],
-          inverse: true
+          inverse: true,
         },
         {
           field: 'kind',
           operation: Operation.eq,
           set: ['transaction'],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'destination',
           operation: Operation.eq,
           set: [contract.id],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'status',
           operation: Operation.eq,
           set: ['applied'],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'timestamp',
           operation: Operation.gt,
           set: [cutoff.toDate().getTime()],
-          inverse: false
-        }
-      ]
+          inverse: false,
+        },
+      ],
     }).pipe(
       switchMap(
         (contractOperations) =>
           <Observable<ContractOperation[]>>(
-            from(fillTransferOperations(contractOperations, this.chainNetworkService, () => undefined, contract))
+            from(
+              fillTransferOperations(
+                contractOperations,
+                this.chainNetworkService,
+                () => undefined,
+                contract
+              )
+            )
           )
       )
-    )
+    );
   }
 
   public loadTokenHolders(contract: TokenContract): Observable<TokenHolder[]> {
-    return from(getContractProtocol(contract, this.chainNetworkService).fetchTokenHolders())
+    return from(
+      getContractProtocol(
+        contract,
+        this.chainNetworkService
+      ).fetchTokenHolders()
+    );
   }
 
   public getTotalSupplyByContract(contract: TokenContract): Observable<string> {
     if (contract.totalSupply !== undefined) {
       return from(
         new Promise<string>((resolve) => {
-          resolve(contract.totalSupply)
+          resolve(contract.totalSupply);
         })
-      )
+      );
     }
-    const protocol = getFaProtocol(contract, this.chainNetworkService.getEnvironment(), this.chainNetworkService.getNetwork())
+    const protocol = getFaProtocol(
+      contract,
+      this.chainNetworkService.getEnvironment(),
+      this.chainNetworkService.getNetwork()
+    );
     if (contract.type === 'fa2') {
-      return from((protocol as TezosFA2Protocol).getTotalSupply())  
+      return from((protocol as TezosFA2Protocol).getTotalSupply());
     }
-    return from((protocol as TezosFA1Protocol).getTotalSupply())
+    return from((protocol as TezosFA1Protocol).getTotalSupply());
   }
 
   public loadEntrypoints(id: string): Observable<string[]> {
-    return this.get(`${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`, true).pipe(
+    return this.get(
+      `${ENVIRONMENT_URL.rpcUrl}/chains/main/blocks/head/context/contracts/${id}/entrypoints`,
+      true
+    ).pipe(
       map((response: any) => {
-        return Object.keys(response.entrypoints)
+        return Object.keys(response.entrypoints);
       })
-    )
+    );
   }
 }

@@ -1,1 +1,1 @@
-export * from './airgap'
+export * from './airgap';

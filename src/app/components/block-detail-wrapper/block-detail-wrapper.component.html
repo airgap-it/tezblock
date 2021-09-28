@@ -1,5 +1,5 @@
 <div class="card-body p-4">
-  <h1 class="card-title mb-4 ">
+  <h1 class="card-title mb-4">
     {{ 'block-detail.block-details' | translate }}
   </h1>
   <div class="row mb-3">
@@ -12,28 +12,48 @@
       </p>
     </div>
 
-    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+    <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
       {{ wrapperBlock.level }}
       <ng-container *ngIf="confirmations">
         <span *ngIf="confirmations >= 1" class="text-secondary ml-1">
-          {{ confirmations }} {{ 'block-detail.block-confirmations' | translate }}
+          {{ confirmations }}
+          {{ 'block-detail.block-confirmations' | translate }}
         </span>
       </ng-container>
-      <button class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block" (click)="changeBlockLevel(-1)">
-        <fa-icon [icon]="'chevronLeft' | iconPipe" class="text-secondary"></fa-icon>
+      <button
+        class="
+          btn btn-sm btn-icon btn-light
+          rounded-circle
+          ml-1
+          d-sm-inline-block
+        "
+        (click)="changeBlockLevel(-1)"
+      >
+        <fa-icon
+          [icon]="'chevronLeft' | iconPipe"
+          class="text-secondary"
+        ></fa-icon>
       </button>
       <ng-container *ngIf="latestBlock">
         <button
           *ngIf="latestBlock.level > wrapperBlock.level"
-          class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+          class="
+            btn btn-sm btn-icon btn-light
+            rounded-circle
+            ml-1
+            d-sm-inline-block
+          "
           (click)="changeBlockLevel(1)"
         >
-          <fa-icon [icon]="'chevronRight' | iconPipe" class="text-secondary"></fa-icon>
+          <fa-icon
+            [icon]="'chevronRight' | iconPipe"
+            class="text-secondary"
+          ></fa-icon>
         </button>
       </ng-container>
     </div>
     <ng-template #loadingTemplate>
-      <div class=" col-md-9">
+      <div class="col-md-9">
         <loading-skeleton [loadingWidth]="'360px'"></loading-skeleton>
       </div>
     </ng-template>
@@ -41,10 +61,13 @@
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
-        <tooltip-item [title]="'block-detail.baker' | translate" [tooltip]="'block-detail.baker_tooltip' | translate"></tooltip-item>
+        <tooltip-item
+          [title]="'block-detail.baker' | translate"
+          [tooltip]="'block-detail.baker_tooltip' | translate"
+        ></tooltip-item>
       </p>
     </div>
-    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+    <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
       <address-item [address]="wrapperBlock.baker"></address-item>
     </div>
   </div>
@@ -57,22 +80,30 @@
         ></tooltip-item>
       </p>
     </div>
-    <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+    <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
       <p class="mb-0">
         {{ wrapperBlock.timestamp | amTimeAgo }}
-        <span class="text-secondary">({{ wrapperBlock.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span>
+        <span class="text-secondary"
+          >({{ wrapperBlock.timestamp | date: 'MMMM-d-y HH:mm:ss' }})</span
+        >
       </p>
     </div>
   </div>
   <div class="row mb-3">
     <div class="col-md-3">
       <p class="text-secondary mb-0">
-        <tooltip-item [title]="'block-detail.value' | translate" [tooltip]="'block-detail.value_tooltip' | translate"></tooltip-item>
+        <tooltip-item
+          [title]="'block-detail.value' | translate"
+          [tooltip]="'block-detail.value_tooltip' | translate"
+        ></tooltip-item>
       </p>
     </div>
     <ng-container *ngIf="amountFromBlockVolume; else loadingTemplate">
-      <div class=" col-md-9">
-        <amount-cell [data]="amountFromBlockVolume.data" [options]="amountFromBlockVolume.options"></amount-cell>
+      <div class="col-md-9">
+        <amount-cell
+          [data]="amountFromBlockVolume.data"
+          [options]="amountFromBlockVolume.options"
+        ></amount-cell>
       </div>
     </ng-container>
   </div>
@@ -94,12 +125,15 @@
       </p>
     </div>
     <ng-container *ngIf="amountFromBlockFee; else loadingTemplate">
-      <div class=" col-md-9">
-        <amount-cell [data]="amountFromBlockFee.data" [options]="amountFromBlockFee.options"></amount-cell>
+      <div class="col-md-9">
+        <amount-cell
+          [data]="amountFromBlockFee.data"
+          [options]="amountFromBlockFee.options"
+        ></amount-cell>
       </div>
     </ng-container>
     <ng-template #hideValue>
-      <div class=" col-md-9">
+      <div class="col-md-9">
         <span>0</span>
       </div>
     </ng-template>
@@ -112,7 +146,11 @@
     aria-controls="collapseBasic"
     [ngClass]="{ 'btn--rotated': !isCollapsed }"
   >
-    <span>{{ isCollapsed ? ('block-detail.more' | translate) : ('block-detail.less' | translate) }}</span>
+    <span>{{
+      isCollapsed
+        ? ('block-detail.more' | translate)
+        : ('block-detail.less' | translate)
+    }}</span>
     {{ 'block-detail.details' | translate }}
     <fa-icon [icon]="'longArrowAltDown' | iconPipe" class="ml-1"></fa-icon>
   </button>
@@ -126,9 +164,11 @@
           ></tooltip-item>
         </p>
       </div>
-      <ng-container *ngIf="blockLoading; then loadingTemplate; else loaded"></ng-container>
+      <ng-container
+        *ngIf="blockLoading; then loadingTemplate; else loaded"
+      ></ng-container>
       <ng-template #loaded>
-        <div class=" col-md-9">
+        <div class="col-md-9">
           <p class="mb-0">{{ endorsements }}</p>
         </div>
       </ng-template>
@@ -136,10 +176,13 @@
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
-          <tooltip-item [title]="'block-detail.cycle' | translate" [tooltip]="'block-detail.cycle_tooltip' | translate"></tooltip-item>
+          <tooltip-item
+            [title]="'block-detail.cycle' | translate"
+            [tooltip]="'block-detail.cycle_tooltip' | translate"
+          ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.meta_cycle }}</p>
       </div>
     </div>
@@ -152,33 +195,43 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
-        <p class="mb-0">{{ wrapperBlock.meta_cycle_position }} {{ 'block-detail.of' | translate }} 8191</p>
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+        <p class="mb-0">
+          {{ wrapperBlock.meta_cycle_position }}
+          {{ 'block-detail.of' | translate }} 8191
+        </p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">{{ 'block-detail.block-hash' | translate }}</p>
+        <p class="text-secondary mb-0">
+          {{ 'block-detail.block-hash' | translate }}
+        </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.hash }}</p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
-        <p class="text-secondary mb-0">{{ 'block-detail.signature' | translate }}</p>
+        <p class="text-secondary mb-0">
+          {{ 'block-detail.signature' | translate }}
+        </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.signature }}</p>
       </div>
     </div>
     <div class="row mb-3">
       <div class="col-md-3">
         <p class="text-secondary mb-0">
-          <tooltip-item [title]="'block-detail.fitness' | translate" [tooltip]="'block-detail.fitness_tooltip' | translate"></tooltip-item>
+          <tooltip-item
+            [title]="'block-detail.fitness' | translate"
+            [tooltip]="'block-detail.fitness_tooltip' | translate"
+          ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.fitness }}</p>
       </div>
     </div>
@@ -191,7 +244,7 @@
           ></tooltip-item>
         </p>
       </div>
-      <div class=" col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
+      <div class="col-md-9" *ngIf="wrapperBlock; else loadingTemplate">
         <p class="mb-0">{{ wrapperBlock.protocol }}</p>
       </div>
     </div>

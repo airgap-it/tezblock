@@ -1,36 +1,46 @@
-import { createReducer, on } from '@ngrx/store'
+import { createReducer, on } from '@ngrx/store';
 
-import * as actions from './actions'
-import { AggregatedBakingRights, BakingRights } from '@tezblock/interfaces/BakingRights'
-import { AggregatedEndorsingRights, EndorsingRights } from '@tezblock/interfaces/EndorsingRights'
-import { OperationTypes } from '@tezblock/domain/operations'
-import { TableState, getInitialTableState, tryUpdateTotal } from '@tezblock/domain/table'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service'
-import { TezosPayoutInfo } from '@airgap/coinlib-core'
+import * as actions from './actions';
+import {
+  AggregatedBakingRights,
+  BakingRights,
+} from '@tezblock/interfaces/BakingRights';
+import {
+  AggregatedEndorsingRights,
+  EndorsingRights,
+} from '@tezblock/interfaces/EndorsingRights';
+import { OperationTypes } from '@tezblock/domain/operations';
+import {
+  TableState,
+  getInitialTableState,
+  tryUpdateTotal,
+} from '@tezblock/domain/table';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { ExtendedTezosRewards } from '@tezblock/services/reward/reward.service';
+import { TezosPayoutInfo } from '@airgap/coinlib-core';
 
 interface Busy {
-  efficiencyLast10Cycles: boolean
-  upcomingRights: boolean
-  activeDelegations: boolean
-  bakerReward: { [key: string]: boolean }
+  efficiencyLast10Cycles: boolean;
+  upcomingRights: boolean;
+  activeDelegations: boolean;
+  bakerReward: { [key: string]: boolean };
 }
 
 export interface State {
-  accountAddress: string
-  currentCycle: number
-  bakingRights: TableState<AggregatedBakingRights>
-  endorsingRights: TableState<AggregatedEndorsingRights>
-  kind: string
-  efficiencyLast10Cycles: number
-  busy: Busy
-  upcomingRights: actions.UpcomingRights
-  activeDelegations: number
-  rewards: TableState<ExtendedTezosRewards>
-  bakerReward: { [key: string]: TezosPayoutInfo }
-  votes: TableState<Transaction>
-  endorsingRightItems: { [key: string]: EndorsingRights[] }
-  bakingRightItems: { [key: string]: BakingRights[] }
+  accountAddress: string;
+  currentCycle: number;
+  bakingRights: TableState<AggregatedBakingRights>;
+  endorsingRights: TableState<AggregatedEndorsingRights>;
+  kind: string;
+  efficiencyLast10Cycles: number;
+  busy: Busy;
+  upcomingRights: actions.UpcomingRights;
+  activeDelegations: number;
+  rewards: TableState<ExtendedTezosRewards>;
+  bakerReward: { [key: string]: TezosPayoutInfo };
+  votes: TableState<Transaction>;
+  endorsingRightItems: { [key: string]: EndorsingRights[] };
+  bakingRightItems: { [key: string]: BakingRights[] };
 }
 
 export const initialState: State = {
@@ -44,7 +54,7 @@ export const initialState: State = {
     efficiencyLast10Cycles: false,
     upcomingRights: false,
     activeDelegations: false,
-    bakerReward: {}
+    bakerReward: {},
   },
   upcomingRights: undefined,
   activeDelegations: undefined,
@@ -52,196 +62,205 @@ export const initialState: State = {
   bakerReward: {},
   votes: getInitialTableState(),
   endorsingRightItems: {},
-  bakingRightItems: {}
-}
+  bakingRightItems: {},
+};
 
 export const reducer = createReducer(
   initialState,
   on(actions.setAccountAddress, (state, { accountAddress }) => ({
     ...state,
-    accountAddress
+    accountAddress,
   })),
-  on(actions.loadCurrentCycleThenRightsSucceeded, (state, { currentCycle }) => ({
-    ...state,
-    currentCycle
-  })),
-  on(actions.loadBakingRights, state => ({
+  on(
+    actions.loadCurrentCycleThenRightsSucceeded,
+    (state, { currentCycle }) => ({
+      ...state,
+      currentCycle,
+    })
+  ),
+  on(actions.loadBakingRights, (state) => ({
     ...state,
     bakingRights: {
       ...state.bakingRights,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadBakingRightsSucceeded, (state, { bakingRights }) => ({
     ...state,
     bakingRights: {
       ...state.bakingRights,
       data: bakingRights,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadBakingRightsFailed, state => ({
+  on(actions.loadBakingRightsFailed, (state) => ({
     ...state,
     bakingRights: {
       ...state.bakingRights,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadEndorsingRights, state => ({
+  on(actions.loadEndorsingRights, (state) => ({
     ...state,
     endorsingRights: {
       ...state.endorsingRights,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadEndorsingRightsSucceeded, (state, { endorsingRights }) => ({
     ...state,
     endorsingRights: {
       ...state.endorsingRights,
       data: endorsingRights,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadEndorsingRightsFailed, state => ({
+  on(actions.loadEndorsingRightsFailed, (state) => ({
     ...state,
     endorsingRights: {
       ...state.endorsingRights,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.increaseRightsPageSize, state => ({
+  on(actions.increaseRightsPageSize, (state) => ({
     ...state,
     endorsingRights:
       state.kind === OperationTypes.EndorsingRights
         ? {
-          ...state.endorsingRights,
-          pagination: {
-            ...state.endorsingRights.pagination,
-            currentPage: state.endorsingRights.pagination.currentPage + 1
+            ...state.endorsingRights,
+            pagination: {
+              ...state.endorsingRights.pagination,
+              currentPage: state.endorsingRights.pagination.currentPage + 1,
+            },
           }
-        }
         : state.endorsingRights,
     bakingRights:
       state.kind === OperationTypes.BakingRights
         ? {
-          ...state.bakingRights,
-          pagination: {
-            ...state.bakingRights.pagination,
-            currentPage: state.bakingRights.pagination.currentPage + 1
+            ...state.bakingRights,
+            pagination: {
+              ...state.bakingRights.pagination,
+              currentPage: state.bakingRights.pagination.currentPage + 1,
+            },
           }
-        }
-        : state.bakingRights
+        : state.bakingRights,
   })),
   on(actions.kindChanged, (state, { kind }) => ({
     ...state,
-    kind
+    kind,
   })),
 
-  on(actions.loadEfficiencyLast10Cycles, state => ({
+  on(actions.loadEfficiencyLast10Cycles, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      efficiencyLast10Cycles: true
-    }
+      efficiencyLast10Cycles: true,
+    },
   })),
-  on(actions.loadEfficiencyLast10CyclesSucceeded, (state, { efficiencyLast10Cycles }) => ({
-    ...state,
-    efficiencyLast10Cycles,
-    busy: {
-      ...state.busy,
-      efficiencyLast10Cycles: false
-    }
-  })),
-  on(actions.loadEfficiencyLast10CyclesFailed, state => ({
+  on(
+    actions.loadEfficiencyLast10CyclesSucceeded,
+    (state, { efficiencyLast10Cycles }) => ({
+      ...state,
+      efficiencyLast10Cycles,
+      busy: {
+        ...state.busy,
+        efficiencyLast10Cycles: false,
+      },
+    })
+  ),
+  on(actions.loadEfficiencyLast10CyclesFailed, (state) => ({
     ...state,
     efficiencyLast10Cycles: null,
     busy: {
       ...state.busy,
-      efficiencyLast10Cycles: false
-    }
+      efficiencyLast10Cycles: false,
+    },
   })),
-  on(actions.loadUpcomingRights, state => ({
+  on(actions.loadUpcomingRights, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      upcomingRights: true
-    }
+      upcomingRights: true,
+    },
   })),
   on(actions.loadUpcomingRightsSucceeded, (state, { upcomingRights }) => ({
     ...state,
     upcomingRights,
     busy: {
       ...state.busy,
-      upcomingRights: false
-    }
+      upcomingRights: false,
+    },
   })),
-  on(actions.loadUpcomingRightsFailed, state => ({
+  on(actions.loadUpcomingRightsFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      upcomingRights: false
-    }
+      upcomingRights: false,
+    },
   })),
-  on(actions.loadActiveDelegations, state => ({
+  on(actions.loadActiveDelegations, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      activeDelegations: true
-    }
+      activeDelegations: true,
+    },
   })),
-  on(actions.loadActiveDelegationsSucceeded, (state, { activeDelegations }) => ({
+  on(
+    actions.loadActiveDelegationsSucceeded,
+    (state, { activeDelegations }) => ({
+      ...state,
+      activeDelegations,
+      busy: {
+        ...state.busy,
+        activeDelegations: false,
+      },
+    })
+  ),
+  on(actions.loadActiveDelegationsFailed, (state) => ({
     ...state,
-    activeDelegations,
     busy: {
       ...state.busy,
-      activeDelegations: false
-    }
+      activeDelegations: false,
+    },
   })),
-  on(actions.loadActiveDelegationsFailed, state => ({
-    ...state,
-    busy: {
-      ...state.busy,
-      activeDelegations: false
-    }
-  })),
-  on(actions.loadRewards, state => ({
+  on(actions.loadRewards, (state) => ({
     ...state,
     rewards: {
       ...state.rewards,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadRewardsSucceeded, (state, { rewards }) => ({
     ...state,
     rewards: {
       ...state.rewards,
       data: rewards,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadRewardsFailed, state => ({
+  on(actions.loadRewardsFailed, (state) => ({
     ...state,
     rewards: {
       ...state.rewards,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.increaseRewardsPageSize, state => ({
+  on(actions.increaseRewardsPageSize, (state) => ({
     ...state,
     rewards: {
       ...state.rewards,
       pagination: {
         ...state.rewards.pagination,
-        currentPage: state.rewards.pagination.currentPage + 1
-      }
-    }
+        currentPage: state.rewards.pagination.currentPage + 1,
+      },
+    },
   })),
-  on(actions.loadVotes, state => ({
+  on(actions.loadVotes, (state) => ({
     ...state,
     votes: {
       ...state.votes,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadVotesSucceeded, (state, { data }) => ({
     ...state,
@@ -249,25 +268,25 @@ export const reducer = createReducer(
       ...state.votes,
       data,
       pagination: tryUpdateTotal(state.votes, data),
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadVotesFailed, state => ({
+  on(actions.loadVotesFailed, (state) => ({
     ...state,
     votes: {
       ...state.votes,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.increaseVotesPageSize, state => ({
+  on(actions.increaseVotesPageSize, (state) => ({
     ...state,
     votes: {
       ...state.votes,
       pagination: {
         ...state.votes.pagination,
-        currentPage: state.votes.pagination.currentPage + 1
-      }
-    }
+        currentPage: state.votes.pagination.currentPage + 1,
+      },
+    },
   })),
   on(actions.loadBakerReward, (state, { baker, cycle }) => ({
     ...state,
@@ -275,67 +294,76 @@ export const reducer = createReducer(
       ...state.busy,
       bakerReward: {
         ...state.busy.bakerReward,
-        [cycle]: true
-      }
-    }
+        [cycle]: true,
+      },
+    },
   })),
   on(actions.loadBakerRewardSucceeded, (state, { cycle, bakerReward }) => ({
     ...state,
     bakerReward: {
       ...state.bakerReward,
-      [cycle]: bakerReward
+      [cycle]: bakerReward,
     },
     busy: {
       ...state.busy,
       bakerReward: {
         ...state.busy.bakerReward,
-        [cycle]: false
-      }
-    }
+        [cycle]: false,
+      },
+    },
   })),
   on(actions.loadBakerRewardFailed, (state, { cycle }) => ({
     ...state,
     bakerReward: {
       ...state.bakerReward,
-      [cycle]: null
+      [cycle]: null,
     },
     busy: {
       ...state.busy,
       bakerReward: {
         ...state.busy.bakerReward,
-        [cycle]: false
-      }
-    }
+        [cycle]: false,
+      },
+    },
   })),
-  on(actions.loadEndorsingRightItemsSucceeded, (state, { cycle, endorsingRightItems }) => ({
-    ...state,
-    endorsingRightItems: {
-      ...state.endorsingRightItems,
-      [cycle]: endorsingRightItems
-    }
-  })),
+  on(
+    actions.loadEndorsingRightItemsSucceeded,
+    (state, { cycle, endorsingRightItems }) => ({
+      ...state,
+      endorsingRightItems: {
+        ...state.endorsingRightItems,
+        [cycle]: endorsingRightItems,
+      },
+    })
+  ),
   on(actions.loadBakerRewardFailed, (state, { cycle }) => ({
     ...state,
     endorsingRightItems: {
       ...state.endorsingRightItems,
-      [cycle]: null
-    }
+      [cycle]: null,
+    },
   })),
-  on(actions.loadBakingRightItemsSucceeded, (state, { cycle, bakingRightItems }) => ({
-    ...state,
-    bakingRightItems: {
-      ...state.bakingRightItems,
-      [cycle]: bakingRightItems
-    }
-  })),
+  on(
+    actions.loadBakingRightItemsSucceeded,
+    (state, { cycle, bakingRightItems }) => ({
+      ...state,
+      bakingRightItems: {
+        ...state.bakingRightItems,
+        [cycle]: bakingRightItems,
+      },
+    })
+  ),
   on(actions.loadBakingRightItemsFailed, (state, { cycle }) => ({
     ...state,
     bakingRightItems: {
       ...state.bakingRightItems,
-      [cycle]: null
-    }
+      [cycle]: null,
+    },
   })),
   on(actions.reset, () => initialState)
-)
+);
 
-export const bakerRewardSelector = (cycle: number) => (state: State): TezosPayoutInfo => state.bakerReward[cycle]
+export const bakerRewardSelector =
+  (cycle: number) =>
+  (state: State): TezosPayoutInfo =>
+    state.bakerReward[cycle];

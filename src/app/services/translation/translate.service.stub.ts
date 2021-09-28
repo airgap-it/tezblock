@@ -1,38 +1,38 @@
-import { EventEmitter, Injectable } from '@angular/core'
-import { Observable, of } from 'rxjs'
+import { EventEmitter, Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class TranslateServiceStub {
   public get<T>(key: T): Observable<T> {
-    return of(key)
+    return of(key);
   }
 
   public getBrowserLang() {
-    return 'en'
+    return 'en';
   }
 
   public setDefaultLang(language) {}
 
   public get currentLang() {
-    return 'en'
+    return 'en';
   }
 
   public instant(key) {
-    return 'value'
+    return 'value';
   }
 
   public use(lang) {}
 
-  public onLangChange = new EventEmitter<any>()
-  public onTranslationChange = new EventEmitter<any>()
-  public onDefaultLangChange = new EventEmitter<any>()
+  public onLangChange = new EventEmitter<any>();
+  public onTranslationChange = new EventEmitter<any>();
+  public onDefaultLangChange = new EventEmitter<any>();
   public addLangs(langs: string[]) {
-    return
+    return;
   }
   public getLangs() {
-    return ['en-us']
+    return ['en-us'];
   }
   public getBrowserCultureLang() {
-    return ''
+    return '';
   }
 }

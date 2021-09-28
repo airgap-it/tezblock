@@ -1,8 +1,8 @@
-import { createReducer, on } from '@ngrx/store'
+import { createReducer, on } from '@ngrx/store';
 
-import * as actions from './actions'
-import { TokenContract } from '@tezblock/domain/contract'
-import { ProposalDto } from '@tezblock/interfaces/proposal'
+import * as actions from './actions';
+import { TokenContract } from '@tezblock/domain/contract';
+import { ProposalDto } from '@tezblock/interfaces/proposal';
 import {
   PeriodTimespan,
   fillMissingPeriodTimespans,
@@ -11,31 +11,31 @@ import {
   _nayRollsSelector,
   _passRollsSelector,
   _yayRollsPercentageSelector,
-  _nayRollsPercentageSelector
-} from '@tezblock/domain/vote'
-import { first } from '@tezblock/services/fp'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Block } from '@tezblock/interfaces/Block'
-import { State as appState } from '@tezblock/reducers/index'
-import { MarketDataSample } from '@tezblock/services/crypto-prices/crypto-prices.service'
+  _nayRollsPercentageSelector,
+} from '@tezblock/domain/vote';
+import { first } from '@tezblock/services/fp';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { Block } from '@tezblock/interfaces/Block';
+import { State as appState } from '@tezblock/reducers/index';
+import { MarketDataSample } from '@tezblock/services/crypto-prices/crypto-prices.service';
 
 interface Busy {
-  blocks: boolean
-  contracts: boolean
-  proposal: boolean
-  currentPeriodTimespan: boolean
-  transactions: boolean
+  blocks: boolean;
+  contracts: boolean;
+  proposal: boolean;
+  currentPeriodTimespan: boolean;
+  transactions: boolean;
 }
 
 export interface State {
-  blocks: Block[]
-  contracts: TokenContract[]
-  proposal: ProposalDto
-  transactions: Transaction[]
-  currentPeriodTimespan: PeriodTimespan
-  cryptoHistoricData: MarketDataSample[]
-  divisionOfVotes: DivisionOfVotes[]
-  busy: Busy
+  blocks: Block[];
+  contracts: TokenContract[];
+  proposal: ProposalDto;
+  transactions: Transaction[];
+  currentPeriodTimespan: PeriodTimespan;
+  cryptoHistoricData: MarketDataSample[];
+  divisionOfVotes: DivisionOfVotes[];
+  busy: Busy;
 }
 
 export const initialState: State = {
@@ -51,9 +51,9 @@ export const initialState: State = {
     contracts: false,
     proposal: false,
     currentPeriodTimespan: false,
-    transactions: false
-  }
-}
+    transactions: false,
+  },
+};
 
 export const reducer = createReducer(
   initialState,
@@ -62,149 +62,173 @@ export const reducer = createReducer(
     ...state,
     busy: {
       ...state.busy,
-      contracts: true
-    }
+      contracts: true,
+    },
   })),
   on(actions.loadContractsSucceeded, (state, { contracts }) => ({
     ...state,
     contracts,
     busy: {
       ...state.busy,
-      contracts: false
-    }
+      contracts: false,
+    },
   })),
   on(actions.loadContractsFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      contracts: false
-    }
+      contracts: false,
+    },
   })),
   on(actions.loadLatestProposal, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      proposal: true
-    }
+      proposal: true,
+    },
   })),
   on(actions.loadLatestProposalSucceeded, (state, { proposal }) => ({
     ...state,
     proposal,
     busy: {
       ...state.busy,
-      proposal: false
-    }
+      proposal: false,
+    },
   })),
   on(actions.loadLatestProposalFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      proposal: false
-    }
+      proposal: false,
+    },
   })),
   on(actions.loadCurrentPeriodTimespan, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      currentPeriodTimespan: true
-    }
+      currentPeriodTimespan: true,
+    },
   })),
-  on(actions.loadCurrentPeriodTimespanSucceeded, (state, { currentPeriodTimespan, blocksPerVotingPeriod, timeBetweenBlocks }) => ({
-    ...state,
-    currentPeriodTimespan: first(fillMissingPeriodTimespans([currentPeriodTimespan], blocksPerVotingPeriod, timeBetweenBlocks)),
-    busy: {
-      ...state.busy,
-      currentPeriodTimespan: false
-    }
-  })),
+  on(
+    actions.loadCurrentPeriodTimespanSucceeded,
+    (
+      state,
+      { currentPeriodTimespan, blocksPerVotingPeriod, timeBetweenBlocks }
+    ) => ({
+      ...state,
+      currentPeriodTimespan: first(
+        fillMissingPeriodTimespans(
+          [currentPeriodTimespan],
+          blocksPerVotingPeriod,
+          timeBetweenBlocks
+        )
+      ),
+      busy: {
+        ...state.busy,
+        currentPeriodTimespan: false,
+      },
+    })
+  ),
   on(actions.loadCurrentPeriodTimespanFailed, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      currentPeriodTimespan: false
-    }
+      currentPeriodTimespan: false,
+    },
   })),
   on(actions.loadTransactions, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      transactions: true
-    }
+      transactions: true,
+    },
   })),
   on(actions.loadTransactionsSucceeded, (state, { transactions }) => ({
     ...state,
     transactions,
     busy: {
       ...state.busy,
-      transactions: false
-    }
+      transactions: false,
+    },
   })),
   on(actions.loadTransactionsFailed, (state) => ({
     ...state,
     transactions: null,
     busy: {
       ...state.busy,
-      transactions: false
-    }
+      transactions: false,
+    },
   })),
   on(actions.loadBlocks, (state) => ({
     ...state,
     busy: {
       ...state.busy,
-      blocks: true
-    }
+      blocks: true,
+    },
   })),
   on(actions.loadBlocksSucceeded, (state, { blocks }) => ({
     ...state,
     blocks,
     busy: {
       ...state.busy,
-      blocks: false
-    }
+      blocks: false,
+    },
   })),
   on(actions.loadBlocksFailed, (state) => ({
     ...state,
     blocks: null,
     busy: {
       ...state.busy,
-      blocks: false
-    }
+      blocks: false,
+    },
   })),
-  on(actions.loadCryptoHistoricDataSucceeded, (state, { cryptoHistoricData }) => ({
-    ...state,
-    cryptoHistoricData
-  })),
+  on(
+    actions.loadCryptoHistoricDataSucceeded,
+    (state, { cryptoHistoricData }) => ({
+      ...state,
+      cryptoHistoricData,
+    })
+  ),
   on(actions.loadDivisionOfVotesSucceeded, (state, { divisionOfVotes }) => ({
     ...state,
-    divisionOfVotes
+    divisionOfVotes,
   })),
   on(actions.loadDivisionOfVotesFailed, (state) => ({
     ...state,
-    divisionOfVotes: null
+    divisionOfVotes: null,
   })),
   on(actions.reset, () => initialState)
-)
+);
 
-export const yayRollsSelector = (state: State): number => _yayRollsSelector(state.divisionOfVotes)
-export const nayRollsSelector = (state: State): number => _nayRollsSelector(state.divisionOfVotes)
-export const passRollsSelector = (state: State): number => _passRollsSelector(state.divisionOfVotes)
-export const yayRollsPercentageSelector = (state: State): number => _yayRollsPercentageSelector(state.divisionOfVotes)
-export const nayRollsPercentageSelector = (state: State): number => _nayRollsPercentageSelector(state.divisionOfVotes)
+export const yayRollsSelector = (state: State): number =>
+  _yayRollsSelector(state.divisionOfVotes);
+export const nayRollsSelector = (state: State): number =>
+  _nayRollsSelector(state.divisionOfVotes);
+export const passRollsSelector = (state: State): number =>
+  _passRollsSelector(state.divisionOfVotes);
+export const yayRollsPercentageSelector = (state: State): number =>
+  _yayRollsPercentageSelector(state.divisionOfVotes);
+export const nayRollsPercentageSelector = (state: State): number =>
+  _nayRollsPercentageSelector(state.divisionOfVotes);
 export const currencyGrowthPercentageSelector = (state: appState): number => {
-  const startingPrice = state.dashboard.cryptoHistoricData
-  const priceNow = state.app.fiatCurrencyInfo.price
+  const startingPrice = state.dashboard.cryptoHistoricData;
+  const priceNow = state.app.fiatCurrencyInfo.price;
 
   if (!startingPrice || startingPrice.length === 0) {
-    return 0
+    return 0;
   }
 
   if (!startingPrice[0].open) {
-    return 0
+    return 0;
   }
 
   if (!priceNow) {
-    return 0
+    return 0;
   }
 
-  return priceNow.minus(startingPrice[0].open).multipliedBy(100).dividedBy(startingPrice[0].open).toNumber()
-}
+  return priceNow
+    .minus(startingPrice[0].open)
+    .multipliedBy(100)
+    .dividedBy(startingPrice[0].open)
+    .toNumber();
+};

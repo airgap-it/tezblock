@@ -2,14 +2,20 @@
   <div class="row">
     <div class="col">
       <h5 class="mb-4">
-        {{ 'glossary-additional-terms.glossary' | translate }} </h5>
+        {{ 'glossary-additional-terms.glossary' | translate }}
+      </h5>
       <p>
         {{ 'glossary-additional-terms.introduction' | translate }}
       </p>
       <div class="row">
         <div class="col-md-6">
-          <input [(ngModel)]="searchText" placeholder="{{ 'glossary-additional-terms.search_placeholder' | translate }}"
-            class="form-control" />
+          <input
+            [(ngModel)]="searchText"
+            placeholder="{{
+              'glossary-additional-terms.search_placeholder' | translate
+            }}"
+            class="form-control"
+          />
         </div>
       </div>
     </div>
@@ -20,11 +26,15 @@
     <div class="card h-100 pt-3 mb-">
       <div class="card-body p-4">
         <dl>
-          <ng-container *ngFor="let definition of definitions | filter: searchText">
+          <ng-container
+            *ngFor="let definition of definitions | filter: searchText"
+          >
             <dt>
-              {{ definition.name }}</dt>
+              {{ definition.name }}
+            </dt>
             <dd class="pb-3">
-              {{ definition.field }}</dd>
+              {{ definition.field }}
+            </dd>
           </ng-container>
         </dl>
       </div>

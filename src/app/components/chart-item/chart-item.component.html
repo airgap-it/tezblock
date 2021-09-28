@@ -1,4 +1,8 @@
-<div class="chart" [style.height.px]="size?.height" [style.width.px]="size?.width">
+<div
+  class="chart"
+  [style.height.px]="size?.height"
+  [style.width.px]="size?.width"
+>
   <canvas
     baseChart
     width="700"
@@ -9,7 +13,6 @@
     [colors]="colors"
     [options]="options"
     [legend]="false"
-    
   ></canvas>
   <!-- // wrong results with binding .. : /
     [width]="size.width"

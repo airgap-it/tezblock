@@ -1,4 +1,4 @@
 export const getChartDataServiceMock = () =>
   jasmine.createSpyObj('ChartDataService', {
-    fetchHourlyMarketPrices: Promise.resolve(undefined)
-  })
+    fetchHourlyMarketPrices: Promise.resolve(undefined),
+  });

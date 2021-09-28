@@ -1,4 +1,8 @@
-import { FeeDefaults, ProtocolSymbols, TezosFA2ProtocolConfig } from "@airgap/coinlib-core";
+import {
+  FeeDefaults,
+  ProtocolSymbols,
+  TezosFA2ProtocolConfig,
+} from '@airgap/coinlib-core';
 
 export class WetziKoinProtocolConfig extends TezosFA2ProtocolConfig {
   constructor(
@@ -10,7 +14,7 @@ export class WetziKoinProtocolConfig extends TezosFA2ProtocolConfig {
     feeDefaults: FeeDefaults = {
       low: '0.100',
       medium: '0.300',
-      high: '0.500'
+      high: '0.500',
     },
     decimals: number = 2,
     tokenID: number = 0,
@@ -28,6 +32,6 @@ export class WetziKoinProtocolConfig extends TezosFA2ProtocolConfig {
       tokenID,
       tokenMetadataBigMapID,
       tokenMetadataBigMapName
-    )
+    );
   }
 }

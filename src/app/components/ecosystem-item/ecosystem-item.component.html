@@ -9,11 +9,19 @@
           <strong>{{ ecosystem.title }}</strong>
           <a
             *ngFor="let social of ecosystem.socials"
-            class="btn btn-sm btn-icon btn-light rounded-circle ml-1 d-sm-inline-block"
+            class="
+              btn btn-sm btn-icon btn-light
+              rounded-circle
+              ml-1
+              d-sm-inline-block
+            "
             [href]="social.url"
             target="_blank"
           >
-            <fa-icon [icon]="social.type | iconPipe" class="text-secondary"></fa-icon>
+            <fa-icon
+              [icon]="social.type | iconPipe"
+              class="text-secondary"
+            ></fa-icon>
           </a>
         </h4>
 
@@ -47,7 +55,12 @@
       </div>
     </div>
     <div class="mt-auto">
-      <a role="button" class="btn btn-primary" [href]="ecosystem.downloadLink" target="_blank">
+      <a
+        role="button"
+        class="btn btn-primary"
+        [href]="ecosystem.downloadLink"
+        target="_blank"
+      >
         {{ 'ecosystem-item.open_label' | translate }}
         <fa-icon [icon]="'externalLink' | iconPipe" class="ml-1"></fa-icon>
       </a>

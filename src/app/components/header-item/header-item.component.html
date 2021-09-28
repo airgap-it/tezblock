@@ -6,10 +6,18 @@
           <div class="d-flex align-items-end">
             <a class="navbar-brand mr-0 p-0" routerLink="/">
               <ng-container *ngIf="themeService.isLightMode()">
-                <img src="/assets/img/tezblock_logo.svg" width="160px" height="auto" />
+                <img
+                  src="/assets/img/tezblock_logo.svg"
+                  width="160px"
+                  height="auto"
+                />
               </ng-container>
               <ng-container *ngIf="themeService.isDarkMode()">
-                <img src="/assets/img/tezblock_logo-dark.svg" width="160px" height="auto" />
+                <img
+                  src="/assets/img/tezblock_logo-dark.svg"
+                  width="160px"
+                  height="auto"
+                />
               </ng-container>
             </a>
             <a href="https://airgap.it" target="_blank" class="text-dark">
@@ -21,14 +29,17 @@
 
           <div class="pt-2 d-none d-sm-block" *ngIf="!isMinimized">
             <span class="badge badge-pill badge-light">
-              {{ 'header-item.cycle' | translate }} {{ currentCycle$ | async }}: {{ cycleProgress$ | async }}% {{ remainingTime$ | async }}
+              {{ 'header-item.cycle' | translate }} {{ currentCycle$ | async }}:
+              {{ cycleProgress$ | async }}% {{ remainingTime$ | async }}
             </span>
           </div>
         </div>
         <button
           class="hamburger hamburger--spring navbar-toggler p-0"
           type="button"
-          (click)="isCollapsed = !isCollapsed; dp1.hide(); dp2.hide(); dp3.hide()"
+          (click)="
+            isCollapsed = !isCollapsed; dp1.hide(); dp2.hide(); dp3.hide()
+          "
           [attr.aria-expanded]="!isCollapsed"
           aria-controls="collapseBasic"
           [class.is-active]="!isCollapsed"
@@ -38,7 +49,9 @@
           </span>
         </button>
         <div class="pt-3 w-100 d-block d-sm-none">
-          <app-search-item (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"></app-search-item>
+          <app-search-item
+            (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"
+          ></app-search-item>
         </div>
         <div
           class="collapse navbar-collapse"
@@ -49,17 +62,30 @@
         >
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
-              <app-search-item (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"></app-search-item>
+              <app-search-item
+                (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"
+              ></app-search-item>
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
               <li class="nav-item">
-                <button type="button" class="btn" routerLinkActive="btn-link" [routerLinkActiveOptions]="{ exact: true }" routerLink="/">
+                <button
+                  type="button"
+                  class="btn"
+                  routerLinkActive="btn-link"
+                  [routerLinkActiveOptions]="{ exact: true }"
+                  routerLink="/"
+                >
                   {{ 'header-item.overview_button' | translate }}
                 </button>
               </li>
 
               <div class="nav-item dropdown mega-dropdown">
-                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp1="bs-dropdown">
+                <span
+                  class="d-block"
+                  dropdown
+                  [triggers]="triggers$ | async"
+                  #dp1="bs-dropdown"
+                >
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -74,63 +100,113 @@
                   >
                     {{ 'header-item.blockchain_button' | translate }}
                   </a>
-                  <ul class="dropdown-menu mega-dropdown-menu pb-4" *dropdownMenu role="menu" id="blockchain" (mouseleave)="dp1.hide()">
+                  <ul
+                    class="dropdown-menu mega-dropdown-menu pb-4"
+                    *dropdownMenu
+                    role="menu"
+                    id="blockchain"
+                    (mouseleave)="dp1.hide()"
+                  >
                     <li class="row">
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
                           {{ 'header-item.operations_button' | translate }}
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/transaction/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/transaction/list"
+                          >
                             {{ 'header-item.transactions_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/activation/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/activation/list"
+                          >
                             {{ 'header-item.activations_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/origination/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/origination/list"
+                          >
                             {{ 'header-item.originations_button' | translate }}
                           </a>
                         </li>
                       </ul>
                       <ul class="col-xs-12 col-sm-3">
                         <li class="mega-dropdown-menu__header">
-                          {{ 'header-item.network-validation_button' | translate }}
+                          {{
+                            'header-item.network-validation_button' | translate
+                          }}
                         </li>
 
                         <li>
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/baker/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/baker/list"
+                          >
                             {{ 'header-item.bakers_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/block/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/block/list"
+                          >
                             {{ 'header-item.blocks_button' | translate }}
                           </a>
                         </li>
 
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/endorsement/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/endorsement/list"
+                          >
                             {{ 'header-item.endorsements_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/delegation/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/delegation/list"
+                          >
                             {{ 'header-item.delegations_button' | translate }}
                           </a>
                         </li>
                         <hr />
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/double-baking/list">
-                            {{ 'header-item.double-baking-evidence_button' | translate }}
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/double-baking/list"
+                          >
+                            {{
+                              'header-item.double-baking-evidence_button'
+                                | translate
+                            }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/double-endorsement/list">
-                            {{ 'header-item.double-endorsement-evidence_button' | translate }}
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/double-endorsement/list"
+                          >
+                            {{
+                              'header-item.double-endorsement-evidence_button'
+                                | translate
+                            }}
                           </a>
                         </li>
                       </ul>
@@ -139,12 +215,20 @@
                           {{ 'header-item.governance_button' | translate }}
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/vote/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/vote/list"
+                          >
                             {{ 'header-item.votes_button' | translate }}
                           </a>
                         </li>
                         <li>
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/proposal/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/proposal/list"
+                          >
                             {{ 'header-item.proposals_button' | translate }}
                           </a>
                         </li>
@@ -154,12 +238,20 @@
                           {{ 'header-item.accounts_button' | translate }}
                         </li>
                         <li>
-                          <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/account/list']">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            [routerLink]="['/account/list']"
+                          >
                             {{ 'header-item.top-accounts_button' | translate }}
                           </a>
                         </li>
                         <li role="menuitem">
-                          <a class="dropdown-item" routerLinkActive="active" routerLink="/contract/list">
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
+                            routerLink="/contract/list"
+                          >
                             {{ 'header-item.contracts_button' | translate }}
                           </a>
                         </li>
@@ -180,7 +272,12 @@
                 </button>
               </li>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp5="bs-dropdown">
+                <span
+                  class="d-block"
+                  dropdown
+                  [triggers]="triggers$ | async"
+                  #dp5="bs-dropdown"
+                >
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -195,19 +292,39 @@
                   >
                     {{ 'header-item.ecosystem_button' | translate }}
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" id="resources" (mouseleave)="dp5.hide()">
+                  <ul
+                    class="dropdown-menu"
+                    *dropdownMenu
+                    role="menu"
+                    id="resources"
+                    (mouseleave)="dp5.hide()"
+                  >
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/ecosystem/dapps">
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        routerLink="/ecosystem/dapps"
+                      >
                         {{ 'header-item.ecosystem-dapps_button' | translate }}
                       </a>
                     </li>
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/ecosystem/libraries">
-                        {{ 'header-item.ecosystem-libraries_button' | translate }}
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        routerLink="/ecosystem/libraries"
+                      >
+                        {{
+                          'header-item.ecosystem-libraries_button' | translate
+                        }}
                       </a>
                     </li>
                     <li role="menuitem">
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/ecosystem/wallets">
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        routerLink="/ecosystem/wallets"
+                      >
                         {{ 'header-item.ecosystem-wallets_button' | translate }}
                       </a>
                     </li>
@@ -215,7 +332,12 @@
                 </span>
               </li>
               <li class="nav-item dropdown">
-                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp2="bs-dropdown">
+                <span
+                  class="d-block"
+                  dropdown
+                  [triggers]="triggers$ | async"
+                  #dp2="bs-dropdown"
+                >
                   <a
                     class="btn dropdown-toggle"
                     href
@@ -230,25 +352,47 @@
                   >
                     {{ 'header-item.resources_button' | translate }}
                   </a>
-                  <ul class="dropdown-menu 1" *dropdownMenu role="menu" id="resources" (mouseleave)="dp2.hide()">
+                  <ul
+                    class="dropdown-menu 1"
+                    *dropdownMenu
+                    role="menu"
+                    id="resources"
+                    (mouseleave)="dp2.hide()"
+                  >
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/resources/glossary']">
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        [routerLink]="['/resources/glossary']"
+                      >
                         {{ 'header-item.glossary_button' | translate }}
                       </a>
                     </li>
-                    <li>
-                      <a class="dropdown-item" routerLinkActive="active" [routerLink]="['/connected-nodes']">
+                    <!-- <li>
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        [routerLink]="['/connected-nodes']"
+                      >
                         {{ 'header-item.connected-nodes' | translate }}
                       </a>
-                    </li>
+                    </li> -->
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/constants">
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        routerLink="/constants"
+                      >
                         {{ 'header-item.constants_button' | translate }}
                       </a>
                     </li>
 
                     <li>
-                      <a class="dropdown-item" routerLinkActive="active" routerLink="/health">
+                      <a
+                        class="dropdown-item"
+                        routerLinkActive="active"
+                        routerLink="/health"
+                      >
                         {{ 'header-item.tezblock-health_button' | translate }}
                       </a>
                     </li>
@@ -256,7 +400,12 @@
                 </span>
               </li>
               <li class="nav-item dropdown pl-2 pl-sm-0">
-                <span class="d-block" dropdown [triggers]="triggers$ | async" #dp3="bs-dropdown">
+                <span
+                  class="d-block"
+                  dropdown
+                  [triggers]="triggers$ | async"
+                  #dp3="bs-dropdown"
+                >
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -279,17 +428,34 @@
                     <li role="menuitem">
                       <a
                         class="dropdown-item"
-                        [ngClass]="selectedNetwork === networks.MAINNET ? 'active' : ''"
+                        [ngClass]="
+                          selectedNetwork === networks.MAINNET ? 'active' : ''
+                        "
                         (click)="changeNetwork(networks.MAINNET); dp3.hide()"
                       >
                         mainnet
+                      </a>
+                      <a
+                        class="dropdown-item"
+                        [ngClass]="
+                          selectedNetwork === networks.GRANADANET
+                            ? 'active'
+                            : ''
+                        "
+                        (click)="changeNetwork(networks.GRANADANET); dp3.hide()"
+                      >
+                        granadanet
                       </a>
                     </li>
                   </ul>
                 </span>
               </li>
               <li class="nav-item dropdown pl-2 pl-sm-0 ml-md-2 mt-2 mt-md-0">
-                <span class="d-block dropdown__settings" dropdown #dp4="bs-dropdown">
+                <span
+                  class="d-block dropdown__settings"
+                  dropdown
+                  #dp4="bs-dropdown"
+                >
                   <a
                     class="btn btn-sm btn-outline-dark dropdown-toggle"
                     href
@@ -302,34 +468,59 @@
                   >
                     <fa-icon [icon]="'cog' | iconPipe"></fa-icon>
                   </a>
-                  <ul class="dropdown-menu" *dropdownMenu role="menu" [ngClass]="{ 'display--none': !hideDropdown }">
+                  <ul
+                    class="dropdown-menu"
+                    *dropdownMenu
+                    role="menu"
+                    [ngClass]="{ 'display--none': !hideDropdown }"
+                  >
                     <div class="pb-2 px-4">
-                      <strong>{{ 'header-item.languages_label' | translate }}</strong>
+                      <strong>{{
+                        'header-item.languages_label' | translate
+                      }}</strong>
                     </div>
                     <li role="menuitem">
                       <a
                         class="dropdown-item"
-                        [ngClass]="'en' === translate.currentLang ? 'active' : ''"
+                        [ngClass]="
+                          'en' === translate.currentLang ? 'active' : ''
+                        "
                         (click)="changeLanguage('en'); dp4.hide()"
                       >
                         English
                       </a>
                       <a
                         class="dropdown-item"
-                        [ngClass]="'de' === translate.currentLang ? 'active' : ''"
+                        [ngClass]="
+                          'de' === translate.currentLang ? 'active' : ''
+                        "
                         (click)="changeLanguage('de'); dp4.hide()"
                       >
                         Deutsch
                       </a>
                     </li>
                     <div class="py-2 px-4">
-                      <strong>{{ 'header-item.theme_label' | translate }}</strong>
+                      <strong>{{
+                        'header-item.theme_label' | translate
+                      }}</strong>
                     </div>
                     <li class="nav-item">
-                      <a class="dropdown-item" (click)="changeTheme()" [ngClass]="true === themeService.isDarkMode() ? '' : 'active'">
+                      <a
+                        class="dropdown-item"
+                        (click)="changeTheme()"
+                        [ngClass]="
+                          true === themeService.isDarkMode() ? '' : 'active'
+                        "
+                      >
                         {{ 'header-item.light-mode_label' | translate }}
                       </a>
-                      <a class="dropdown-item" (click)="changeTheme()" [ngClass]="true === themeService.isLightMode() ? '' : 'active'">
+                      <a
+                        class="dropdown-item"
+                        (click)="changeTheme()"
+                        [ngClass]="
+                          true === themeService.isLightMode() ? '' : 'active'
+                        "
+                      >
                         {{ 'header-item.dark-mode_label' | translate }}
                       </a>
                     </li>

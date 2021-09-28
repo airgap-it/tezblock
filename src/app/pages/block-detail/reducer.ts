@@ -1,25 +1,28 @@
-import { createReducer, on } from '@ngrx/store'
+import { createReducer, on } from '@ngrx/store';
 
-import * as actions from './actions'
-import { Transaction } from '@tezblock/interfaces/Transaction'
-import { Block } from '@tezblock/interfaces/Block'
-import { Count } from '@tezblock/domain/tab'
-import { getTransactionsWithErrors, OperationTypes } from '@tezblock/domain/operations'
-import { getInitialTableState, TableState } from '@tezblock/domain/table'
+import * as actions from './actions';
+import { Transaction } from '@tezblock/interfaces/Transaction';
+import { Block } from '@tezblock/interfaces/Block';
+import { Count } from '@tezblock/domain/tab';
+import {
+  getTransactionsWithErrors,
+  OperationTypes,
+} from '@tezblock/domain/operations';
+import { getInitialTableState, TableState } from '@tezblock/domain/table';
 
 export interface Busy {
-  block: boolean
+  block: boolean;
 }
 
 export interface State {
-  id: string
-  block: Block
-  operations: TableState<Transaction>
-  transactions: TableState<Transaction>
-  counts: Count[]
-  transactionsLoadedByBlockHash: string
-  kind: string
-  busy: Busy
+  id: string;
+  block: Block;
+  operations: TableState<Transaction>;
+  transactions: TableState<Transaction>;
+  counts: Count[];
+  transactionsLoadedByBlockHash: string;
+  kind: string;
+  busy: Busy;
 }
 
 export const initialState: State = {
@@ -31,9 +34,9 @@ export const initialState: State = {
   transactionsLoadedByBlockHash: undefined,
   kind: OperationTypes.Transaction,
   busy: {
-    block: false
-  }
-}
+    block: false,
+  },
+};
 
 export const reducer = createReducer(
   initialState,
@@ -42,68 +45,69 @@ export const reducer = createReducer(
     id,
     busy: {
       ...state.busy,
-      block: true
-    }
+      block: true,
+    },
   })),
   on(actions.loadBlockSucceeded, (state, { block }) => ({
     ...state,
     block: block || null,
     busy: {
       ...state.busy,
-      block: false
-    }
+      block: false,
+    },
   })),
-  on(actions.loadBlockFailed, state => ({
+  on(actions.loadBlockFailed, (state) => ({
     ...state,
     block: null,
     busy: {
       ...state.busy,
-      block: false
-    }
+      block: false,
+    },
   })),
   on(actions.loadOperationsByKind, (state, { blockHash, kind }) => {
-    const hasKindChanged = kind !== state.kind
+    const hasKindChanged = kind !== state.kind;
 
     return {
-    ...state,
-    blockHash,
-    kind,
-    transactionsLoadedByBlockHash: blockHash,
-    operations: {
-      ...state.operations,
-      data: hasKindChanged ? undefined : state.operations.data,
-      loading: true
-    }
-  }}),
+      ...state,
+      blockHash,
+      kind,
+      transactionsLoadedByBlockHash: blockHash,
+      operations: {
+        ...state.operations,
+        data: hasKindChanged ? undefined : state.operations.data,
+        loading: true,
+      },
+    };
+  }),
   on(actions.loadOperationsByKindSucceeded, (state, { data }) => ({
     ...state,
     operations: {
       ...state.operations,
       data,
-      loading: false
+      loading: false,
     },
     transactions:
       state.kind === OperationTypes.Transaction
         ? {
             ...state.transactions,
             data,
-            loading: false
+            loading: false,
           }
-        : state.transactions
+        : state.transactions,
   })),
-  on(actions.loadOperationsByKindFailed, state => ({
+  on(actions.loadOperationsByKindFailed, (state) => ({
     ...state,
     operations: {
       ...state.operations,
-      loading: false
+      loading: false,
     },
     transactions:
       state.kind === OperationTypes.Transaction
         ? {
             ...state.transactions,
-            loading: false
+            loading: false,
           }
-        : state.transactions
+        : state.transactions,
   })),
   on(actions.loadTransactions, (state, { blockHash }) => ({
     ...state,
@@ -114,49 +118,55 @@ export const reducer = createReducer(
     // this data(transactions) serves block-details table and assets-value
     operations: {
       ...state.operations,
-      loading: true
+      loading: true,
     },
     transactions: {
       ...state.transactions,
-      loading: true
-    }
+      loading: true,
+    },
   })),
   on(actions.loadTransactionsSucceeded, (state, { data }) => ({
     ...state,
     transactions: {
       ...state.transactions,
       data,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.loadTransactionsFailed, state => ({
+  on(actions.loadTransactionsFailed, (state) => ({
     ...state,
     transactions: {
       ...state.transactions,
-      loading: false
-    }
+      loading: false,
+    },
   })),
-  on(actions.increasePageSize, state => ({
+  on(actions.increasePageSize, (state) => ({
     ...state,
     operations: {
       ...state.operations,
       pagination: {
         ...state.operations.pagination,
-        currentPage: state.operations.pagination.currentPage + 1
-      }
-    }
+        currentPage: state.operations.pagination.currentPage + 1,
+      },
+    },
   })),
   on(actions.loadOperationsCountsSucceeded, (state, { counts }) => ({
     ...state,
-    counts
+    counts,
   })),
   on(actions.sortOperationsByKind, (state, { orderBy }) => ({
     ...state,
-    orderBy
+    orderBy,
   })),
   on(actions.reset, () => initialState),
-  on(actions.loadTransactionsErrorsSucceeded, (state, { operationErrorsById }) => ({
-    ...state,
-    operations: getTransactionsWithErrors(operationErrorsById, state.operations)
-  }))
-)
+  on(
+    actions.loadTransactionsErrorsSucceeded,
+    (state, { operationErrorsById }) => ({
+      ...state,
+      operations: getTransactionsWithErrors(
+        operationErrorsById,
+        state.operations
+      ),
+    })
+  )
+);

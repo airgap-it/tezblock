@@ -1,16 +1,19 @@
 <div class="pt-5">
   <div class="container p-0">
     <h1 hidden="true">
-      constants page with information about periods, rewards and limits of tezos blockchain
+      constants page with information about periods, rewards and limits of tezos
+      blockchain
     </h1>
-    <div class="card h-100 pt-3 ">
+    <div class="card h-100 pt-3">
       <div class="card-body p-4">
-        <h5 class="card-title mb-4 ">
+        <h5 class="card-title mb-4">
           {{ 'protocol-constants.periods' | translate }}
         </h5>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.blocks-per-cycle' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.blocks-per-cycle' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.blocks_per_cycle }}
@@ -18,7 +21,9 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.blocks-per-commitment' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.blocks-per-commitment' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.blocks_per_commitment }}
@@ -26,7 +31,9 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.blocks-per-roll-snapshot' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.blocks-per-roll-snapshot' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.blocks_per_roll_snapshot }}
@@ -34,7 +41,9 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.time-between-blocks' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.time-between-blocks' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.time_between_blocks }}
@@ -46,14 +55,16 @@
 </div>
 <div class="pt-5">
   <div class="container p-0">
-    <div class="card h-100 pt-3 ">
+    <div class="card h-100 pt-3">
       <div class="card-body p-4">
-        <h5 class="card-title mb-4 ">
+        <h5 class="card-title mb-4">
           {{ 'protocol-constants.rewards' | translate }}
         </h5>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.block-security-deposit' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.block-security-deposit' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             <amount-cell
@@ -64,11 +75,17 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.endorsement-security-deposit' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{
+                'protocol-constants.endorsement-security-deposit' | translate
+              }}
+            </p>
           </div>
           <div class="col-md-9">
             <amount-cell
-              [data]="(protocolVariables$ | async)?.endorsement_security_deposit"
+              [data]="
+                (protocolVariables$ | async)?.endorsement_security_deposit
+              "
               [options]="{ showFiatValue: false, maxDigits: 10 }"
             ></amount-cell>
           </div>
@@ -79,14 +96,18 @@
 </div>
 <div class="mb-5 pt-5">
   <div class="container p-0">
-    <div class="card h-100 pt-3 ">
+    <div class="card h-100 pt-3">
       <div class="card-body p-4">
-        <h5 class="card-title mb-4 ">
+        <h5 class="card-title mb-4">
           {{ 'protocol-constants.limits' | translate }}
         </h5>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.maximum-revelations-per-block' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{
+                'protocol-constants.maximum-revelations-per-block' | translate
+              }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.max_revelations_per_block }}
@@ -94,7 +115,11 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.maximum-operation-data-length' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{
+                'protocol-constants.maximum-operation-data-length' | translate
+              }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.max_revelations_per_block }}
@@ -102,7 +127,11 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.hard-gas-limit-per-operation' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{
+                'protocol-constants.hard-gas-limit-per-operation' | translate
+              }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.hard_gas_limit_per_operation }}
@@ -110,7 +139,9 @@
         </div>
         <div class="row mb-3">
           <div class="col-md-3">
-            <p class="text-secondary mb-0">{{ 'protocol-constants.hard-gas-limit-per-block' | translate }}</p>
+            <p class="text-secondary mb-0">
+              {{ 'protocol-constants.hard-gas-limit-per-block' | translate }}
+            </p>
           </div>
           <div class="col-md-9">
             {{ (protocolVariables$ | async)?.hard_gas_limit_per_block }}

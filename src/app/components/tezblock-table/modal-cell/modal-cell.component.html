@@ -1,14 +1,24 @@
 <span *ngIf="!data" class="text-secondary">
   {{ 'modal-component.none' | translate }}
 </span>
-<button *ngIf="data" (click)="openModal(template)" type="button" class="btn btn-link p-0">
+<button
+  *ngIf="data"
+  (click)="openModal(template)"
+  type="button"
+  class="btn btn-link p-0"
+>
   {{ 'modal-component.show_button' | translate }}
 </button>
 
 <ng-template #template>
   <div class="modal-header">
     <h5 class="modal-title pull-left">Parameters</h5>
-    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+    <button
+      type="button"
+      class="close pull-right"
+      aria-label="Close"
+      (click)="modalRef.hide()"
+    >
       <span aria-hidden="true">&times;</span>
     </button>
   </div>

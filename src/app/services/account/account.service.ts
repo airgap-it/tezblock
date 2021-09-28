@@ -1,48 +1,66 @@
-import { Injectable } from '@angular/core'
-import { forkJoin, Observable, of } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
-import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core';
+import { forkJoin, Observable, of } from 'rxjs';
+import { map, switchMap, catchError } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
 
-import { Transaction } from 'src/app/interfaces/Transaction'
-import { BaseService, Operation } from '@tezblock/services/base.service'
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service'
-import { sort } from '@tezblock/domain/table'
-import { first, get } from '@tezblock/services/fp'
-import { SearchOptionData } from '@tezblock/services/search/model'
-import { OperationTypes } from '@tezblock/domain/operations'
-import { getAccountByIdBody, Account, accounts, jsonAccounts, JsonAccountData } from '@tezblock/domain/account'
-import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core'
+import { Transaction } from 'src/app/interfaces/Transaction';
+import { BaseService, Operation } from '@tezblock/services/base.service';
+import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
+import { sort } from '@tezblock/domain/table';
+import { first, get } from '@tezblock/services/fp';
+import { SearchOptionData } from '@tezblock/services/search/model';
+import { OperationTypes } from '@tezblock/domain/operations';
+import {
+  getAccountByIdBody,
+  Account,
+  accounts,
+  jsonAccounts,
+  JsonAccountData,
+} from '@tezblock/domain/account';
+import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core';
 
 export const getAddressesFilteredBy = (phrase: string) =>
   Object.keys(jsonAccounts).filter((address) => {
     if (!phrase) {
-      return true
+      return true;
     }
 
-    return address.toLowerCase().includes(phrase.toLowerCase())
-  })
+    return address.toLowerCase().includes(phrase.toLowerCase());
+  });
 
-export const getAddressByAlias = (alias: string) => Object.keys(jsonAccounts).find((address) => accounts[address].alias === alias)
+export const getAddressByAlias = (alias: string) =>
+  Object.keys(jsonAccounts).find(
+    (address) => accounts[address].alias === alias
+  );
 
 export const getBakers = (): JsonAccountData[] =>
   accounts.filter(
-    (account) => !account.accountType || get<string>((accountType) => !['account', 'contract'].includes(accountType))(account.accountType)
-  )
+    (account) =>
+      !account.accountType ||
+      get<string>(
+        (accountType) => !['account', 'contract'].includes(accountType)
+      )(account.accountType)
+  );
 
 export const doesAcceptsDelegations = (jsonAccount: JsonAccountData): boolean =>
-  jsonAccount.hasOwnProperty('acceptsDelegations') ? jsonAccount.acceptsDelegations : true
+  jsonAccount.hasOwnProperty('acceptsDelegations')
+    ? jsonAccount.acceptsDelegations
+    : true;
 
 export interface GetDelegatedAccountsResponseDto {
-  delegated: Account[]
-  related: Account[]
+  delegated: Account[];
+  related: Account[];
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AccountService extends BaseService {
-  constructor(readonly chainNetworkService: ChainNetworkService, readonly httpClient: HttpClient) {
-    super(chainNetworkService, httpClient)
+  constructor(
+    readonly chainNetworkService: ChainNetworkService,
+    readonly httpClient: HttpClient
+  ) {
+    super(chainNetworkService, httpClient);
   }
 
   getAccountById(id: string): Observable<Account> {
@@ -52,19 +70,19 @@ export class AccountService extends BaseService {
           field: 'account_id',
           operation: Operation.eq,
           set: [id],
-          inverse: false
-        }
+          inverse: false,
+        },
       ],
-      limit: 1
+      limit: 1,
     }).pipe(
       switchMap((accounts) => {
         return this.isBaker(accounts[0].account_id).pipe(
           map((bakingStatus) => {
-            return { ...accounts[0], is_baker: bakingStatus } // CONSEIL currently does not reliably provide the correct value for is_baker
+            return { ...accounts[0], is_baker: bakingStatus }; // CONSEIL currently does not reliably provide the correct value for is_baker
           })
-        )
+        );
       })
-    )
+    );
   }
 
   getAccountsByIds(ids: string[]): Observable<Account[]> {
@@ -74,63 +92,78 @@ export class AccountService extends BaseService {
           field: 'account_id',
           operation: Operation.in,
           set: ids,
-          inverse: false
-        }
-      ]
-    })
+          inverse: false,
+        },
+      ],
+    });
   }
 
-  getDelegatedAccounts(address: string): Observable<GetDelegatedAccountsResponseDto> {
+  getDelegatedAccounts(
+    address: string
+  ): Observable<GetDelegatedAccountsResponseDto> {
     return this._getDelegatedAccounts(address, 10).pipe(
       switchMap((transactions: Transaction[]) => {
         if (transactions.length === 0) {
           // there exists the possibility that we're dealing with a kt address which might be delegated, but does not have delegated accounts itself
           return this.getAccountById(address).pipe(
             map((account: Account) => {
-              const delegated = account && account.delegate_value ? [account] : []
+              const delegated =
+                account && account.delegate_value ? [account] : [];
 
               return {
                 delegated,
-                related: []
-              }
+                related: [],
+              };
             })
-          )
+          );
         }
 
         if (address.startsWith('tz')) {
           // since babylon, also tz addresses themselves can be delegated
 
-          const originatedContracts = transactions.map((transaction) => transaction.originated_contracts)
+          const originatedContracts = transactions.map(
+            (transaction) => transaction.originated_contracts
+          );
 
-          return forkJoin([this.getAccountById(address), this.getAccountsByIds(originatedContracts)]).pipe(
+          return forkJoin([
+            this.getAccountById(address),
+            this.getAccountsByIds(originatedContracts),
+          ]).pipe(
             map(([account, relatedAccounts]) => {
-              const delegatedAccounts = account.delegate_value ? [account] : []
+              const delegatedAccounts = account.delegate_value ? [account] : [];
 
               return {
                 delegated:
                   delegatedAccounts.length > 0
                     ? delegatedAccounts
-                    : relatedAccounts.filter((relatedAccount) => relatedAccount.delegate_value),
-                related: relatedAccounts
-              }
+                    : relatedAccounts.filter(
+                        (relatedAccount) => relatedAccount.delegate_value
+                      ),
+                related: relatedAccounts,
+              };
             })
-          )
+          );
         }
 
-        const managerPubKeys = transactions.map((transaction) => transaction.manager_pubkey)
+        const managerPubKeys = transactions.map(
+          (transaction) => transaction.manager_pubkey
+        );
 
-        return forkJoin([this.getAccountById(address), this.getAccountsByIds(managerPubKeys)]).pipe(
+        return forkJoin([
+          this.getAccountById(address),
+          this.getAccountsByIds(managerPubKeys),
+        ]).pipe(
           map(([account, relatedAccounts]) => {
-            const delegated = account.delegate_value ? [account] : []
+            const delegated = account.delegate_value ? [account] : [];
 
             return {
               delegated,
-              related: relatedAccounts
-            }
+              related: relatedAccounts,
+            };
           })
-        )
+        );
       })
-    )
+    );
   }
 
   getAccountStatus(address: string): Observable<string> {
@@ -139,35 +172,49 @@ export class AccountService extends BaseService {
         {
           field: 'operation_group_hash',
           operation: Operation.isnull,
-          inverse: true
+          inverse: true,
         },
         {
           field: 'kind',
           operation: Operation.eq,
-          set: ['reveal']
+          set: ['reveal'],
         },
         {
           field: 'source',
           operation: Operation.eq,
-          set: [address]
-        }
+          set: [address],
+        },
       ],
       orderBy: [sort('block_level', 'desc')],
-      limit: 1
+      limit: 1,
     }).pipe(
-      map((transactions) => (transactions.length > 0 ? 'Revealed' : 'Not Revealed')),
+      map((transactions) =>
+        transactions.length > 0 ? 'Revealed' : 'Not Revealed'
+      ),
       catchError(() => of('Not Available'))
-    )
+    );
   }
 
-  getAccountsStartingWith(id: string, matchByAccountIds = true): Observable<SearchOptionData[]> {
+  getAccountsStartingWith(
+    id: string,
+    matchByAccountIds = true
+  ): Observable<SearchOptionData[]> {
     const bakers: SearchOptionData[] = accounts
       .filter(
         (account) =>
-          (!account.accountType || get<string>((accountType) => !['account', 'contract'].includes(accountType))(account.accountType)) &&
-          get<string>((alias) => alias.toLowerCase().startsWith(id.toLowerCase()))(account.alias)
+          (!account.accountType ||
+            get<string>(
+              (accountType) => !['account', 'contract'].includes(accountType)
+            )(account.accountType)) &&
+          get<string>((alias) =>
+            alias.toLowerCase().startsWith(id.toLowerCase())
+          )(account.alias)
       )
-      .map((account) => ({ id: account.address, label: account.alias, type: OperationTypes.Baker }))
+      .map((account) => ({
+        id: account.address,
+        label: account.alias,
+        type: OperationTypes.Baker,
+      }));
 
     if (bakers.length === 0 && matchByAccountIds) {
       return this.post<Account[]>('accounts', {
@@ -177,29 +224,36 @@ export class AccountService extends BaseService {
             field: 'account_id',
             operation: Operation.startsWith,
             set: [id],
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
-        limit: 5
+        limit: 5,
       }).pipe(
         map((_accounts) =>
           _accounts
             .filter((account) => {
-              const isContract = accounts.some((_account) => _account.address === account.account_id && _account.accountType === 'contract')
+              const isContract = accounts.some(
+                (_account) =>
+                  _account.address === account.account_id &&
+                  _account.accountType === 'contract'
+              );
 
-              return !isContract
+              return !isContract;
             })
             .map((account) => {
-              return { id: account.account_id, type: OperationTypes.Account }
+              return { id: account.account_id, type: OperationTypes.Account };
             })
         )
-      )
+      );
     }
 
-    return of(bakers)
+    return of(bakers);
   }
 
-  private _getDelegatedAccounts(address: string, limit: number): Observable<Transaction[]> {
+  private _getDelegatedAccounts(
+    address: string,
+    limit: number
+  ): Observable<Transaction[]> {
     if (address.startsWith('tz')) {
       return this.post<Transaction[]>('operations', {
         predicates: [
@@ -207,29 +261,29 @@ export class AccountService extends BaseService {
             field: 'manager_pubkey',
             operation: Operation.eq,
             set: [address],
-            inverse: false
+            inverse: false,
           },
           {
             field: 'originated_contracts',
             operation: Operation.isnull,
             set: [''],
-            inverse: true
+            inverse: true,
           },
           {
             field: 'status',
             operation: Operation.eq,
             set: ['applied'],
-            inverse: false
-          }
+            inverse: false,
+          },
         ],
         orderBy: [
           {
             field: 'balance',
-            direction: 'desc'
-          }
+            direction: 'desc',
+          },
         ],
-        limit
-      })
+        limit,
+      });
     }
 
     return this.post<Transaction[]>('operations', {
@@ -238,28 +292,28 @@ export class AccountService extends BaseService {
           field: 'originated_contracts',
           operation: Operation.eq,
           set: [address],
-          inverse: false
+          inverse: false,
         },
         {
           field: 'manager_pubkey',
           operation: Operation.isnull,
           set: [''],
-          inverse: true
+          inverse: true,
         },
         {
           field: 'status',
           operation: Operation.eq,
           set: ['applied'],
-          inverse: false
-        }
+          inverse: false,
+        },
       ],
       orderBy: [
         {
           field: 'balance',
-          direction: 'desc'
-        }
+          direction: 'desc',
+        },
       ],
-      limit
-    })
+      limit,
+    });
   }
 }

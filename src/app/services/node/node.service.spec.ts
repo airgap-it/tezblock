@@ -9,12 +9,10 @@ describe('NodeService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientTestingModule
-      ],
+      imports: [HttpClientTestingModule],
     });
     service = TestBed.inject(NodeService);
-    TestBed.inject(HttpClient)
+    TestBed.inject(HttpClient);
   });
 
   it('should be created', () => {
