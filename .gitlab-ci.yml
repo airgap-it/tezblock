@@ -129,7 +129,7 @@ k8s-deploy-development:
     - gcloud config set compute/zone $GCLOUD_ZONE_DEV
     - gcloud container clusters get-credentials papers-cluster-development
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG_DEV"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG_DEV"|g" k8s/tezblock/development/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/development/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
@@ -151,7 +151,7 @@ k8s-deploy-production:
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/production/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/production/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
@@ -173,7 +173,7 @@ k8s-deploy-granadanet:
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/common/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/granadanet/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
     - kubectl apply -f k8s/tezblock/granadanet/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
