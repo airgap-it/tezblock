@@ -55,7 +55,8 @@ export type IconRef =
   | 'check'
   | 'times'
   | 'cog'
-  | 'externalLink';
+  | 'externalLink'
+  | 'discord';
 
 @Pipe({
   name: 'iconPipe',
@@ -132,6 +133,7 @@ export class IconPipe implements PipeTransform {
       times: { prefix, iconName: 'times' },
       cog: { prefix, iconName: 'cog' },
       externalLink: { prefix, iconName: externalLink },
+      discord: { prefix: 'fab', iconName: 'discord' },
     };
   }
 

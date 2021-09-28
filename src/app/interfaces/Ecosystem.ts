@@ -10,6 +10,7 @@ export enum SocialType {
   telegram = 'telegram',
   medium = 'medium',
   github = 'github',
+  discord = 'discord',
 }
 
 export interface Social {
