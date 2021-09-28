@@ -112,11 +112,6 @@
       "description": "tzbutton is a social experiment on the Tezos blockchain. Each button click requires 0.2 tez, the countdown is reset and the address will become the leader. Winner can withdraw the whole amount of tez in the pot.",
       "features": "Simple interface, Beacon-compatible"
     },
-    "dexter": {
-      "title": "Dexter",
-      "description": "Dexter is a decentralized, non-custodial exchange on the Tezos blockchain that enables users to exchange their tez with other tokens built on the Tezos FA1.2 token standard.",
-      "features": "Pegged USD stablecoin"
-    },
     "kolibri": {
       "title": "Kolibri",
       "description": "Kolibri, the algorithmic stablecoin pegged to the US dollar. Kolibri represents an independently useful asset which enables trustless stable value payments on the Tezos network.",
@@ -141,6 +136,26 @@
       "title": "Tezex Bridge",
       "description": "TEZEX Bridge is a fully-decentralized non-custodial exchange, enabling cross-chain swaps between Ethereum ERC-20 tokens and Tezos FA-standard tokens like FA 1.2 and FA 2.0.",
       "features": "Cross-chain swaps between Ethereum and Tezos"
+    },
+    "plenty": {
+      "title": "Plenty",
+      "description": "Plenty is expanding DeFi use cases on Tezos towards a full scale decentralized financial ecosystem. Empowering traders, liquidity providers & developers to participate in an open financial marketplace.",
+      "features": "Decentralized Token Exchange, Yield Farming"
+    },
+    "youves": {
+      "title": "youves",
+      "description": "Youves is a decentralised, non-custodial and self-governed platform for the creation and management of synthetic assets. Mint and Save assets, Stake YOU.",
+      "features": "Synthetic Assets, Collateralized Lending, uUSD"
+    },
+    "objkt": {
+      "title": "objkt.com",
+      "description": "objkt.com is the first FA2 marketplace that aggregates tokens across contracts and provides a cohesive user interface to interact with and trade multimedia NFTs.",
+      "features": "NFT, marketplace"
+    },
+    "hen": {
+      "title": "Hic et nunc",
+      "description": "The H=N platform combines the cost-effective utility working artists need and the eco-friendly characteristics they care about.",
+      "features": "NFT, NFT Creation, marketplace"
     }
   },
   "ecosystem-libraries": {
