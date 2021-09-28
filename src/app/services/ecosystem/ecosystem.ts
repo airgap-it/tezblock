@@ -562,35 +562,6 @@ export class EcosystemService {
       category: EcosystemCategory.wallet,
     },
     {
-      title: this.translateService.instant('ecosystem-dapps.dexter.title'),
-      description: this.translateService.instant(
-        'ecosystem-dapps.dexter.description'
-      ),
-      logo: 'dexter.png',
-      socials: [
-        {
-          type: SocialType.website,
-          url: 'https://dexter.exchange/',
-        },
-        {
-          type: SocialType.twitter,
-          url: 'https://twitter.com/DexterExchange',
-        },
-      ],
-      platforms: [
-        {
-          name: PlatformName.Web,
-          icon: 'globe',
-          url: 'https://dexter.exchange/',
-        },
-      ],
-      features: [
-        this.translateService.instant('ecosystem-dapps.dexter.features'),
-      ],
-      downloadLink: 'https://dexter.exchange/',
-      category: EcosystemCategory.dapp,
-    },
-    {
       title: this.translateService.instant('ecosystem-dapps.kolibri.title'),
       description: this.translateService.instant(
         'ecosystem-dapps.kolibri.description'
@@ -781,7 +752,7 @@ export class EcosystemService {
         },
       ],
       features: [
-        this.translateService.instant('ecosystem-libraries.tezex.features'),
+        this.translateService.instant('ecosystem-dapps.tezex.features'),
       ],
       downloadLink: 'https://tezex.io/',
       category: EcosystemCategory.dapp,
@@ -940,6 +911,140 @@ export class EcosystemService {
       ],
       downloadLink: 'https://tezostaquito.io/',
       category: EcosystemCategory.library,
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.plenty.title'),
+      description: this.translateService.instant(
+        'ecosystem-dapps.plenty.description'
+      ),
+      logo: 'plenty.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://www.plentydefi.com/',
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/PlentyDeFi',
+        },
+        {
+          type: SocialType.telegram,
+          url: 'https://t.me/PlentyDeFi',
+        },
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://www.plentydefi.com/',
+        },
+      ],
+      features: [
+        this.translateService.instant('ecosystem-dapps.plenty.features'),
+      ],
+      downloadLink: 'https://www.plentydefi.com/',
+      category: EcosystemCategory.dapp,
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.youves.title'),
+      description: this.translateService.instant(
+        'ecosystem-dapps.youves.description'
+      ),
+      logo: 'youves.svg',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://youves.com/',
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/youves_com',
+        },
+        {
+          type: SocialType.discord,
+          url: 'https://discord.gg/2TGyP8UEJF',
+        },
+        {
+          type: SocialType.medium,
+          url: 'https://medium.com/@youves',
+        },
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://youves.com/',
+        },
+      ],
+      features: [
+        this.translateService.instant('ecosystem-dapps.youves.features'),
+      ],
+      downloadLink: 'https://youves.com/',
+      category: EcosystemCategory.dapp,
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.objkt.title'),
+      description: this.translateService.instant(
+        'ecosystem-dapps.objkt.description'
+      ),
+      logo: 'objkt.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://objkt.com/',
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/objktcom',
+        },
+        {
+          type: SocialType.discord,
+          url: 'https://discord.gg/m7YFqPvmj6',
+        },
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://objkt.com/',
+        },
+      ],
+      features: [
+        this.translateService.instant('ecosystem-dapps.objkt.features'),
+      ],
+      downloadLink: 'https://objkt.com/',
+      category: EcosystemCategory.dapp,
+    },
+    {
+      title: this.translateService.instant('ecosystem-dapps.hen.title'),
+      description: this.translateService.instant(
+        'ecosystem-dapps.hen.description'
+      ),
+      logo: 'hen.png',
+      socials: [
+        {
+          type: SocialType.website,
+          url: 'https://www.hicetnunc.xyz/',
+        },
+        {
+          type: SocialType.twitter,
+          url: 'https://twitter.com/hicetnunc2000',
+        },
+        {
+          type: SocialType.discord,
+          url: 'https://discord.gg/Yx6UN5SkCd',
+        },
+      ],
+      platforms: [
+        {
+          name: PlatformName.Web,
+          icon: 'globe',
+          url: 'https://www.hicetnunc.xyz/',
+        },
+      ],
+      features: [this.translateService.instant('ecosystem-dapps.hen.features')],
+      downloadLink: 'https://www.hicetnunc.xyz/',
+      category: EcosystemCategory.dapp,
     },
   ];
   constructor(private translateService: TranslateService) {}
