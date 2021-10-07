@@ -12,7 +12,7 @@ export interface VotingPeriod {
 
 export enum PeriodKind {
   Proposal = 'proposal',
-  Exploration = 'testing_vote',
+  Exploration = 'exploration',
   Testing = 'testing',
   Promotion = 'promotion_vote',
   Adoption = 'adoption',
