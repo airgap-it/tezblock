@@ -1,4 +1,5 @@
 import { Operation, Direction, Body } from '@tezblock/services/base.service';
+import { $ } from 'protractor';
 
 export interface VotingInfo {
   pkh: string;
@@ -13,13 +14,16 @@ export interface VotingPeriod {
 export enum PeriodKind {
   Proposal = 'proposal',
   Exploration = 'exploration',
-  Testing = 'testing',
-  Promotion = 'promotion_vote',
+  Cooldown = 'cooldown',
+  Promotion = 'promotion',
   Adoption = 'adoption',
 }
-
+export enum LegacyPeriodKind {
+  Testing = 'testing',
+  PromotionVote = 'promotion_vote',
+}
 export interface MetaVotingPeriod {
-  periodKind: PeriodKind;
+  periodKind: PeriodKind | LegacyPeriodKind;
   value?: number;
   count?: number;
 }
