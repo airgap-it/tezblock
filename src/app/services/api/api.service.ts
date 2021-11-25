@@ -2,10 +2,10 @@ import { BigNumber } from 'bignumber.js';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { Observable, of, pipe, from, forkJoin, combineLatest } from 'rxjs';
-import { map, switchMap, filter, tap } from 'rxjs/operators';
+import { EMPTY, of, pipe, from, forkJoin, combineLatest } from 'rxjs';
+import { map, switchMap, filter, tap, expand, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { isNil, negate, get as _get } from 'lodash';
+import { isNil, negate, get as _get, flatMap } from 'lodash';
 
 import {
   AggregatedBakingRights,
@@ -27,7 +27,7 @@ import { distinctFilter, first, get, flatten } from '@tezblock/services/fp';
 import { RewardService } from '@tezblock/services/reward/reward.service';
 import { Predicate, Operation, Options } from '../base.service';
 import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls';
-import { ProposalDto } from '@tezblock/interfaces/proposal';
+import { ProposalDto, RawProposalDto } from '@tezblock/interfaces/proposal';
 import { TokenContract } from '@tezblock/domain/contract';
 import { sort } from '@tezblock/domain/table';
 import {
@@ -63,6 +63,7 @@ import {
   TezosTransactionResult,
 } from '@airgap/coinlib-core';
 import { TezosRewards } from '@airgap/coinlib-core/protocols/tezos/TezosProtocol';
+import { Observable, throwError, timer } from 'rxjs';
 
 export interface OperationCount {
   [key: string]: string;
@@ -126,6 +127,7 @@ export class ApiService {
   private endorsingRightsApiUrl: string;
   private blocksApiUrl: string;
   private transactionsApiUrl: string;
+  private governanceApiUrl: string;
   private accountsApiUrl: string;
   private delegatesApiUrl: string;
   private accountHistoryApiUrl: string;
@@ -164,6 +166,7 @@ export class ApiService {
     this.endorsingRightsApiUrl = this.getUrl('endorsing_rights');
     this.blocksApiUrl = this.getUrl('blocks');
     this.transactionsApiUrl = this.getUrl('operations');
+    this.governanceApiUrl = this.getUrl('governance');
     this.accountsApiUrl = this.getUrl('accounts');
     this.delegatesApiUrl = this.getUrl('bakers'); /* delegates (previously) */
     this.accountHistoryApiUrl = this.getUrl('accounts_history');
@@ -1370,31 +1373,51 @@ export class ApiService {
 
   getProposals(
     limit: number,
-    orderBy = { field: 'period', direction: 'desc' }
+    _orderBy = { field: 'voting_period', direction: 'desc' }
   ): Observable<ProposalDto[]> {
     return this.http
-      .post<ProposalDto[]>(
-        this.transactionsApiUrl,
+      .post<RawProposalDto[]>(
+        this.governanceApiUrl,
         {
-          fields: ['proposal', 'period'],
+          fields: ['voting_period', 'proposal_hash'],
           predicates: [
             {
-              field: 'kind',
+              field: 'voting_period_kind',
               operation: 'eq',
-              set: ['proposals'],
+              set: ['proposal'],
               inverse: false,
             },
           ],
-          orderBy: [orderBy],
-          aggregation: [{ field: 'operation_group_hash', function: 'count' }],
-          limit,
+          orderBy: [{ field: 'voting_period', direction: 'desc' }],
+          aggregation: [
+            {
+              field: 'block_hash',
+              function: 'count',
+            },
+          ],
         },
         this.options
       )
       .pipe(
-        map((proposals) =>
-          proposals.filter((proposal) => proposal.proposal.indexOf(',') === -1)
-        )
+        map((rawProposals) => {
+          rawProposals = rawProposals.reverse();
+          const uniqueProposalHashes = Array.from(
+            new Set(rawProposals.map((proposal) => proposal.proposal_hash))
+          );
+          const proposals = rawProposals.map((rawProposal) => {
+            return {
+              proposal: rawProposal.proposal_hash,
+              period: rawProposal.voting_period,
+            };
+          });
+
+          return uniqueProposalHashes
+            .map((hash) =>
+              proposals.find((proposal) => proposal.proposal === hash)
+            )
+            .reverse()
+            .slice(0, limit);
+        })
       );
   }
 

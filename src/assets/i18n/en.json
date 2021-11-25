@@ -526,6 +526,7 @@
       "proposal": "Proposal",
       "exploration": "Exploration",
       "testing": "Testing",
+      "cooldown": "Cooldown",
       "promotion": "Promotion"
     }
   },
