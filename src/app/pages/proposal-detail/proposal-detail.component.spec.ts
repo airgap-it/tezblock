@@ -119,7 +119,7 @@ describe('ProposalDetailComponent', () => {
           ...initialState,
           proposalDetails: {
             ...initialState.proposalDetails,
-            periodKind: PeriodKind.Testing,
+            periodKind: PeriodKind.Cooldown,
           },
         });
 
@@ -157,7 +157,7 @@ describe('ProposalDetailComponent', () => {
           ...initialState,
           proposalDetails: {
             ...initialState.proposalDetails,
-            periodKind: PeriodKind.Testing,
+            periodKind: PeriodKind.Cooldown,
             proposal: {
               proposal: 'foo',
             },
@@ -184,7 +184,7 @@ describe('ProposalDetailComponent', () => {
           ...initialState,
           proposalDetails: {
             ...initialState.proposalDetails,
-            periodKind: PeriodKind.Testing,
+            periodKind: PeriodKind.Cooldown,
           },
         });
 

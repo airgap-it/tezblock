@@ -229,7 +229,7 @@ describe('DashboardComponent', () => {
         app: {
           ...initialState.app,
           latestBlock: {
-            period_kind: PeriodKind.Testing,
+            period_kind: PeriodKind.Cooldown,
           },
         },
       });

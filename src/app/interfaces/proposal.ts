@@ -14,6 +14,11 @@ export interface ProposalDto {
   description?: string;
 }
 
+export interface RawProposalDto {
+  proposal_hash: string;
+  voting_period: number;
+}
+
 export const toAlias = (name: string): string => {
   const match = proposals[name];
 

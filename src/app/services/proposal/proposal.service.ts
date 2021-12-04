@@ -125,9 +125,9 @@ export class ProposalService extends BaseService {
     proposal: ProposalDto
   ): Observable<MetaVotingPeriod[]> {
     return forkJoin(
-      // this.getMetaVotingPeriod(proposalHash, PeriodKind.Proposal),
+      // this.getMetaVotingPeriod(proposalHash, LegacyPeriodKind.Proposal),
       this.getMetaVotingPeriod(proposalHash, PeriodKind.Exploration),
-      this.getMetaVotingPeriod(proposalHash, PeriodKind.Testing),
+      this.getMetaVotingPeriod(proposalHash, PeriodKind.Cooldown),
       this.getMetaVotingPeriod(proposalHash, PeriodKind.Promotion),
       this.getMetaVotingPeriod(proposalHash, PeriodKind.Adoption)
     ).pipe(
@@ -142,13 +142,21 @@ export class ProposalService extends BaseService {
           periodKind: PeriodKind.Exploration,
           value: metaVotingPeriodCounts[0],
         },
-        { periodKind: PeriodKind.Testing, value: metaVotingPeriodCounts[1] },
-        { periodKind: PeriodKind.Promotion, value: metaVotingPeriodCounts[2] },
-        { periodKind: PeriodKind.Adoption, value: metaVotingPeriodCounts[3] },
+        {
+          periodKind: PeriodKind.Cooldown,
+          value: metaVotingPeriodCounts[1],
+        },
+        {
+          periodKind: PeriodKind.Promotion,
+          value: metaVotingPeriodCounts[2],
+        },
+        {
+          periodKind: PeriodKind.Adoption,
+          value: metaVotingPeriodCounts[3],
+        },
       ])
     );
   }
-
   getVotes(
     periodKind: string,
     metaVotingPeriods: MetaVotingPeriod[],

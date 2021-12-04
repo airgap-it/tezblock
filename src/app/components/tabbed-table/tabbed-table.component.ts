@@ -161,7 +161,7 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
       return;
     }
     this.updateSelectedTab(selectedTab);
-    this.tabClicked.emit(selectedTab.kind);
+    this.tabClicked.emit(selectedTab?.kind);
   }
 
   private updateSelectedTab(selectedTab: Tab) {
@@ -170,11 +170,11 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
     // TODO: refactor
     this.enableDownload =
-      selectedTab.kind === 'transaction' ||
-      selectedTab.kind === 'delegation' ||
-      selectedTab.kind === 'origination' ||
-      selectedTab.kind === 'transfers' ||
-      selectedTab.kind === 'token holders' ||
-      selectedTab.kind === 'other';
+      selectedTab?.kind === 'transaction' ||
+      selectedTab?.kind === 'delegation' ||
+      selectedTab?.kind === 'origination' ||
+      selectedTab?.kind === 'transfers' ||
+      selectedTab?.kind === 'token holders' ||
+      selectedTab?.kind === 'other';
   }
 }

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { Observable, combineLatest } from 'rxjs';
-import { filter, map, withLatestFrom } from 'rxjs/operators';
+import { filter, map, take, withLatestFrom } from 'rxjs/operators';
 import { Actions, ofType } from '@ngrx/effects';
 import { isNil, negate } from 'lodash';
 import { $enum } from 'ts-enum-util';
@@ -16,9 +16,10 @@ import { ProposalDto } from '@tezblock/interfaces/proposal';
 import { Tab, updateTabCounts } from '@tezblock/domain/tab';
 import { columns } from './table-definitions';
 import {
-  PeriodKind,
+  LegacyPeriodKind,
   PeriodTimespan,
   MetaVotingPeriod,
+  PeriodKind,
 } from '@tezblock/domain/vote';
 import { Transaction } from '@tezblock/interfaces/Transaction';
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe';
@@ -30,6 +31,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { AliasService } from '@tezblock/services/alias/alias.service';
 import { TezosNetwork } from '@airgap/coinlib-core';
+import { capitalize } from 'lodash';
 
 @Component({
   selector: 'app-proposal-detail',
@@ -52,6 +54,9 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
   yayRollsPercentage$: Observable<number>;
   nayRollsPercentage$: Observable<number>;
   showRolls$: Observable<boolean>;
+  thirdPeriod = LegacyPeriodKind.Testing || PeriodKind.Cooldown;
+  fourthPeriod = LegacyPeriodKind.PromotionVote || PeriodKind.Promotion;
+  tabTitle: string;
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET;
@@ -105,17 +110,29 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         ([periodKind, periodsTimespans]) => !!periodKind && !!periodsTimespans
       ),
       map(([periodKind, periodsTimespans]) => {
+        const thirdPeriodStart = periodsTimespans[2]?.start;
+        this.thirdPeriod =
+          thirdPeriodStart >= 1620696786000 // adopted at block #1'466'369.
+            ? PeriodKind.Cooldown
+            : LegacyPeriodKind.Testing;
+
+        const fourthPeriodStart = periodsTimespans[3]?.start;
+        this.fourthPeriod =
+          fourthPeriodStart >= 1618127760000 // adopted after block #1'425'670
+            ? PeriodKind.Promotion
+            : LegacyPeriodKind.PromotionVote;
         return periodsTimespans[
           [
             PeriodKind.Proposal,
             PeriodKind.Exploration,
-            PeriodKind.Testing,
+            PeriodKind.Cooldown,
             PeriodKind.Promotion,
             PeriodKind.Adoption,
           ].indexOf(<PeriodKind>periodKind)
         ];
       })
     );
+
     this.noDataLabel$ = this.store$
       .select((state) => state.proposalDetails.periodKind)
       .pipe(
@@ -124,7 +141,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
         ),
         filter(([periodKind, proposal]) => !!proposal),
         map(([periodKind, proposal]) =>
-          periodKind === PeriodKind.Testing
+          periodKind === PeriodKind.Cooldown
             ? `${this.aliasPipe.transform(
                 proposal.proposal,
                 'proposal'
@@ -133,7 +150,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
             ? `${this.aliasPipe.transform(
                 proposal.proposal,
                 'proposal'
-              )} upgrade is adapted.`
+              )} upgrade is adopted.`
             : undefined
         )
       );
@@ -168,38 +185,44 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe((paramMap) => {
         const id = paramMap.get('id');
-        const tabTitle: string =
+        this.tabTitle =
           this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined;
-        this.setTabs(tabTitle);
-
         this.store$.dispatch(actions.loadProposal({ id }));
       }),
 
-      this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)).subscribe(
-        ({ metaVotingPeriods }) =>
-          (this.tabs = updateTabCounts(
+      this.actions$
+        .pipe(ofType(actions.loadPeriodsTimespansSucceeded))
+        .subscribe(() => {}),
+
+      combineLatest([
+        this.actions$.pipe(ofType(actions.loadVotesTotalSucceeded)),
+        this.actions$.pipe(ofType(actions.loadPeriodsTimespansSucceeded)),
+      ])
+        .pipe(take(1))
+        .subscribe(([{ metaVotingPeriods }]) => {
+          this.setTabs(this.tabTitle);
+          this.tabs = updateTabCounts(
             this.tabs,
             metaVotingPeriods.map((metaVotingPeriod) => ({
               key: metaVotingPeriod.periodKind,
               count: metaVotingPeriod.count,
             }))
-          ))
-      ),
+          );
+        }),
 
-      combineLatest(
+      combineLatest([
         this.activatedRoute.paramMap.pipe(
           filter((paramMap) => !!paramMap.get('id'))
         ),
-        this.store$.select((state) => state.proposalDetails.proposal)
-      )
-        .pipe(filter(([paramMap, proposal]) => !!proposal))
+        this.store$.select((state) => state.proposalDetails.proposal),
+      ])
+        .pipe(filter(([_paramMap, proposal]) => !!proposal))
         .subscribe(() => {
           const tabTitle: string =
             this.activatedRoute.snapshot.queryParamMap.get('tab') || undefined;
           const periodKind: PeriodKind = tabTitle
-            ? <PeriodKind>this.tabs.find((tab) => tab.title === tabTitle).kind
+            ? <PeriodKind>this.tabs?.find((tab) => tab.title === tabTitle).kind
             : PeriodKind.Proposal;
-
           this.store$.dispatch(actions.startLoadingVotes({ periodKind }));
         }),
 
@@ -298,10 +321,10 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
       },
       {
         title: this.translateService.instant(
-          'tabbed-table.proposal-detail.testing'
+          `tabbed-table.proposal-detail.${this.thirdPeriod}`
         ),
-        active: selectedTitle === 'Testing',
-        kind: PeriodKind.Testing,
+        active: selectedTitle === capitalize(this.thirdPeriod),
+        kind: this.thirdPeriod,
         count: undefined,
         icon: this.iconPipe.transform('hammer'),
         columns: columns(this.translateService),
@@ -316,7 +339,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
           const period = metaVotingPeriods.find(
             (metaVotingPeriod) =>
-              metaVotingPeriod.periodKind === PeriodKind.Testing
+              metaVotingPeriod.periodKind === this.thirdPeriod
           );
 
           return (
@@ -329,7 +352,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
           'tabbed-table.proposal-detail.promotion'
         ),
         active: selectedTitle === 'Promotion',
-        kind: PeriodKind.Promotion,
+        kind: this.fourthPeriod,
         count: undefined,
         icon: this.iconPipe.transform('graduationCap'),
         columns: columns(this.translateService),
@@ -343,7 +366,7 @@ export class ProposalDetailComponent extends BaseComponent implements OnInit {
 
           const period = metaVotingPeriods.find(
             (metaVotingPeriod) =>
-              metaVotingPeriod.periodKind === PeriodKind.Promotion
+              metaVotingPeriod.periodKind === this.fourthPeriod
           );
 
           return (

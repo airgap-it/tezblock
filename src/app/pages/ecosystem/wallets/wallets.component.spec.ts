@@ -9,6 +9,7 @@ import { TranslateServiceStub } from '@tezblock/services/translation/translate.s
 import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe.mock';
 import { EcosystemFilterPipe } from '@tezblock/pipes/ecosystem-filter/ecosystem-filter.pipe';
 import { getPipeMock } from 'test-config/mocks/pipe.mock';
+import { EcosystemItemComponent } from '@tezblock/components/ecosystem-item/ecosystem-item.component';
 
 describe('ResourcesWalletsComponent', () => {
   let component: WalletsComponent;
@@ -31,6 +32,7 @@ describe('ResourcesWalletsComponent', () => {
         TranslatePipe,
         IconPipe,
         EcosystemFilterPipe,
+        EcosystemItemComponent,
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA],
     });
