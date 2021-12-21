@@ -113,6 +113,13 @@ import { ProgressbarComponent } from './components/progressbar/progressbar.compo
 import { BasicCellComponent } from './components/tezblock-table/basic-cell/basic-cell.component';
 import { DappsComponent } from './pages/ecosystem/dapps/dapps.component';
 import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component';
+import { LiquidityBakingComponent } from './pages/liquidity-baking/liquidity-baking.component';
+import { LiquidityBakingEffects } from './pages/liquidity-baking/effects';
+import { LiquidityInputComponent } from './components/liquidity-input/liquidity-input.component';
+import { SwapComponent } from './components/swap/swap.component';
+import { AddLiquidityComponent } from './components/add-liquidity/add-liquidity.component';
+import { RemoveLiquidityComponent } from './components/remove-liquidity/remove-liquidity.component';
+import { LoadingItemComponent } from './components/loading-item/loading-item.component';
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -163,6 +170,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
       ContractDetailEffects,
       BakersEffects,
       HealthEffects,
+      LiquidityBakingEffects,
       AccountsEffects,
       DashboarEffects,
       DashboardLatestContractsTransactionsEffects,
@@ -237,6 +245,12 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     BasicCellComponent,
     DappsComponent,
     LibrariesComponent,
+    LiquidityBakingComponent,
+    LiquidityInputComponent,
+    SwapComponent,
+    AddLiquidityComponent,
+    RemoveLiquidityComponent,
+    LoadingItemComponent,
   ],
 
   providers: [

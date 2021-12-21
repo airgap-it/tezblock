@@ -1,0 +1,64 @@
+<div class="pt-3">
+  <app-liquidity-input
+    [tab]="'SWAP'"
+    [currency]="fromCurrency"
+    [balance]="availableBalanceFrom$ | async"
+    [amountControl]="fromAmount"
+    [loadValuesBusy]="loadValuesBusy$ | async"
+  ></app-liquidity-input>
+</div>
+<div class="py-3 d-flex justify-content-center">
+  <button
+    type="button"
+    class="btn btn-light exchange--icon"
+    (click)="swapDirection()"
+  >
+    <fa-icon
+      [icon]="'longArrowAltDown' | iconPipe"
+      class="text-primary"
+    ></fa-icon>
+  </button>
+</div>
+<div class="pb-5">
+  <app-liquidity-input
+    [tab]="'SWAP'"
+    [currency]="toCurrency"
+    [balance]="availableBalanceTo$ | async"
+    [amountControl]="toAmount"
+    [toggleMaxDisabled]="true"
+    [allowAmountGreaterThanBalance]="true"
+  ></app-liquidity-input>
+</div>
+
+<button
+  type="button"
+  class="btn btn-primary-light btn-block"
+  (click)="connectWallet()"
+  *ngIf="!(connectedWallet$ | async)"
+>
+  Connect Wallet
+</button>
+<button
+  type="button"
+  class="btn btn-primary-light btn-block"
+  (click)="swap()"
+  *ngIf="connectedWallet$ | async"
+  [disabled]="
+    fromAmount.invalid ||
+    fromAmount.value > (availableBalanceFrom$ | async)?.toNumber() ||
+    !(connectedWallet$ | async) ||
+    !minimumReceived$ ||
+    (busy$ | async) ||
+    (loadValuesBusy$ | async)
+  "
+>
+  <ng-container *ngIf="busy$ | async; then loading"></ng-container>
+
+  Swap
+</button>
+
+<ng-template #loading>
+  <div class="d-block">
+    <loading-item></loading-item>
+  </div>
+</ng-template>

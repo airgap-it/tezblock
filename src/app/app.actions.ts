@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 
 import { Block } from '@tezblock/interfaces/Block';
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service';
+import { AccountInfo } from '@airgap/beacon-sdk';
 
 const featureName = 'App';
 
@@ -99,5 +100,49 @@ export const loadProtocolVariablesSucceeded = createAction(
 );
 export const loadProtocolVariablesFailed = createAction(
   `[${featureName}] Load Protocol Variables Failed`,
+  props<{ error: any }>()
+);
+
+export const setupBeacon = createAction(`[${featureName}] Setup Beacon`);
+export const setupBeaconSucceeded = createAction(
+  `[${featureName}] Setup Beacon Succeeded`
+);
+export const setupBeaconFailed = createAction(
+  `[${featureName}] Setup Beacon Failed`,
+  props<{ error: any }>()
+);
+
+export const connectWallet = createAction(
+  `[${featureName}] Connect Wallet with Beacon`
+);
+export const connectWalletSucceeded = createAction(
+  `[${featureName}] Connect Wallet with Beacon Succeeded`,
+  props<{ accountInfo: AccountInfo }>()
+);
+export const connectWalletFailed = createAction(
+  `[${featureName}] Connect Wallet with Beacon Failed`,
+  props<{ error: any }>()
+);
+
+export const disconnectWallet = createAction(
+  `[${featureName}] Disconnect Wallet`
+);
+export const disconnectWalletSucceeded = createAction(
+  `[${featureName}] Disconnect Wallet Succeeded`
+);
+export const disconnectWalletFailed = createAction(
+  `[${featureName}] Disconnect Wallet Failed`,
+  props<{ error: any }>()
+);
+
+export const fetchConnectedWalletBalance = createAction(
+  `[${featureName}] Fetch Connected Wallet Balance`
+);
+export const fetchConnectedWalletBalanceSucceeded = createAction(
+  `[${featureName}] Fetch Connected Wallet Balance Succeeded`,
+  props<{ balance: BigNumber }>()
+);
+export const fetchConnectedWalletBalanceFailed = createAction(
+  `[${featureName}] Fetch Connected Wallet Balance Failed`,
   props<{ error: any }>()
 );

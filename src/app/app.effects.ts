@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of, combineLatest } from 'rxjs';
+import { of, combineLatest, from } from 'rxjs';
 import {
   catchError,
   map,
@@ -30,6 +30,8 @@ import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-pri
 import { Currency } from '@tezblock/domain/airgap';
 import { ProtocolVariablesService } from '@tezblock/services/protocol-variables/protocol-variables.service';
 import { ProposalService } from '@tezblock/services/proposal/proposal.service';
+import { BeaconService } from './services/beacon/beacon.service';
+import { ApiService } from './services/api/api.service';
 
 @Injectable()
 export class AppEffects {
@@ -318,11 +320,91 @@ export class AppEffects {
     )
   );
 
+  // tslint:disable: member-ordering
+  setupBeacon$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.setupBeacon),
+      switchMap(() =>
+        from(this.beaconService.setupBeaconWallet()).pipe(
+          map((accountInfo) => {
+            if (accountInfo !== undefined) {
+              return actions.connectWalletSucceeded({ accountInfo });
+            } else {
+              return actions.setupBeaconSucceeded();
+            }
+          }),
+          catchError((error) => of(actions.connectWalletFailed({ error })))
+        )
+      )
+    )
+  );
+
+  connectWallet$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.connectWallet),
+      switchMap(() =>
+        from(this.beaconService.connectWallet()).pipe(
+          map((accountInfo) => {
+            if (accountInfo) {
+              return actions.connectWalletSucceeded({ accountInfo });
+            } else {
+              return actions.connectWalletFailed({
+                error: 'wallet connection could not be established',
+              });
+            }
+          }),
+          catchError((error) => of(actions.connectWalletFailed({ error })))
+        )
+      )
+    )
+  );
+
+  disconnectWallet$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.disconnectWallet),
+      switchMap(() =>
+        this.beaconService
+          .reset()
+          .then(() => {
+            return actions.disconnectWalletSucceeded();
+          })
+          .catch((error) => actions.disconnectWalletFailed({ error }))
+      )
+    )
+  );
+
+  fetchConnectedWalletBalance$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.fetchConnectedWalletBalance),
+      withLatestFrom(this.store$.select((state) => state.app.connectedWallet)),
+      switchMap(([_, connectedWallet]) => {
+        return from(this.apiService.getBalance(connectedWallet?.address)).pipe(
+          map((balance) => {
+            if (balance) {
+              return actions.fetchConnectedWalletBalanceSucceeded({
+                balance: new BigNumber(balance),
+              });
+            } else {
+              return actions.fetchConnectedWalletBalanceFailed({
+                error: 'wallet balance could not be fetched',
+              });
+            }
+          }),
+          catchError((error) =>
+            of(actions.fetchConnectedWalletBalanceFailed({ error }))
+          )
+        );
+      })
+    )
+  );
+
   constructor(
     private readonly actions$: Actions,
     private readonly baseService: BaseService,
     private readonly blockService: BlockService,
+    private readonly apiService: ApiService,
     private readonly cacheService: CacheService,
+    private readonly beaconService: BeaconService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly protocolVariablesService: ProtocolVariablesService,
     private readonly proposalService: ProposalService,

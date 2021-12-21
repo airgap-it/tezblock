@@ -22,6 +22,7 @@ import * as fromBakerTable from '../components/baker-table/reducer';
 import * as fromContractDetails from '../pages/contract-detail/reducer';
 import * as fromBakers from '../pages/baker-overview/reducer';
 import * as fromHealth from '../pages/health/reducer';
+import * as fromLiquidityBaking from '../pages/liquidity-baking/reducer';
 import * as fromApp from '../app.reducer';
 import * as fromDashboard from '../pages/dashboard/reducer';
 import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer';
@@ -44,6 +45,7 @@ export interface State {
   contractDetails: fromContractDetails.State;
   list: fromList.State;
   health: fromHealth.State;
+  liquidityBaking: fromLiquidityBaking.State;
   connectedNodes: fromConnectedNodes.State;
 }
 
@@ -72,6 +74,7 @@ export const ROOT_REDUCERS = new InjectionToken<
     contractDetails: fromContractDetails.reducer,
     list: fromList.reducer,
     health: fromHealth.reducer,
+    liquidityBaking: fromLiquidityBaking.reducer,
     connectedNodes: fromConnectedNodes.reducer,
   }),
 });
@@ -110,6 +113,7 @@ export const selectProposalDetails = (state: State) => state.proposalDetails;
 export const selectDashboard = (state: State) => state.dashboard;
 export const selectContractDetails = (state: State) => state.contractDetails;
 export const selectConnectedNodes = (state: State) => state.connectedNodes;
+export const selectLiquidityBaking = (state: State) => state.connectedNodes;
 
 export const dashboard = {
   currencyGrowthPercentage: createSelector(

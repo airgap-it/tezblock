@@ -7,57 +7,57 @@
 
   /* custom tezblock colors */
   $theme-colors: (
-    "primary": #6183ff,
-    "primary-light": $primary-light-color,
-    "primary-dark": $primary-dark-color,
-    "secondary": #7c99d6,
-    "light": #f4f6fc,
-    "dark": #6683c3,
+    'primary': #6183ff,
+    'primary-light': $primary-light-color,
+    'primary-dark': $primary-dark-color,
+    'secondary': #7c99d6,
+    'light': #f4f6fc,
+    'dark': #6683c3,
   );
 
   /* Sass overwrites */
   $body-bg: $content-background-color-dark;
-  $body-color: map_get($theme-colors, "light");
+  $body-color: map_get($theme-colors, 'light');
   $card-cap-bg: $content-background-color;
   $card-border-color: none;
   $card-bg: $content-background-color;
   $dropdown-border-color: rgba(46, 91, 255, 0.08);
-  $link-color: map_get($theme-colors, "primary");
-  $navbar-light-active-color: map_get($theme-colors, "primary");
+  $link-color: map_get($theme-colors, 'primary');
+  $navbar-light-active-color: map_get($theme-colors, 'primary');
   $table-hover-bg: rgba(46, 91, 255, 0.04);
   $table-border-color: $content-background-color-dark;
-  $dropdown-link-hover-color: map_get($theme-colors, "primary");
-  $nav-tabs-link-active-color: map_get($theme-colors, "primary");
+  $dropdown-link-hover-color: map_get($theme-colors, 'primary');
+  $nav-tabs-link-active-color: map_get($theme-colors, 'primary');
   $nav-tabs-link-active-bg: #35425e;
   $navbar-light-toggler-border-color: transparent;
-  $tooltip-bg: map_get($theme-colors, "secondary");
+  $tooltip-bg: map_get($theme-colors, 'secondary');
   $modal-content-bg: $content-background-color;
   $modal-header-border-color: transparent;
   $dropdown-link-hover-bg: #fff;
   $dropdown-bg: $content-background-color;
-  $dropdown-link-color: map_get($theme-colors, "primary");
-  $dropdown-header-color: map_get($theme-colors, "dark");
+  $dropdown-link-color: map_get($theme-colors, 'primary');
+  $dropdown-header-color: map_get($theme-colors, 'dark');
   $modal-content-border-color: rgba(46, 91, 255, 0.08);
-  $ngx-json-viewer-background: map_get($theme-colors, "light");
-  $link-hover-color: map_get($theme-colors, "light");
+  $ngx-json-viewer-background: map_get($theme-colors, 'light');
+  $link-hover-color: map_get($theme-colors, 'light');
   $input-bg: $content-background-color;
-  $input-border-color: map_get($theme-colors, "dark");
-  $input-color: map_get($theme-colors, "light");
-  $input-placeholder-color: map_get($theme-colors, "dark");
+  $input-border-color: map_get($theme-colors, 'dark');
+  $input-color: map_get($theme-colors, 'light');
+  $input-placeholder-color: map_get($theme-colors, 'dark');
 
-  $headings-color: map_get($theme-colors, "secondary");
+  $headings-color: map_get($theme-colors, 'secondary');
   $text-muted: #7c99d6;
 
   .card {
     .card-title__secondary {
-      color: map_get($theme-colors, "dark") !important;
+      color: map_get($theme-colors, 'dark') !important;
     }
   }
 
   h1,
   h3,
   h5 {
-    color: map_get($theme-colors, "light") !important;
+    color: map_get($theme-colors, 'light') !important;
   }
 
   .table-danger,
@@ -73,7 +73,7 @@
   }
   header-item {
     .badge-light {
-      background-color: map_get($theme-colors, "primary") !important;
+      background-color: map_get($theme-colors, 'primary') !important;
     }
   }
   .search--container {
@@ -98,33 +98,33 @@
       div {
         background-color: $content-background-color-dark;
         &.active {
-          background-color: darken(map_get($theme-colors, "light"), 10%);
+          background-color: darken(map_get($theme-colors, 'light'), 10%);
         }
 
         &.super-active {
-          background-color: darken(map_get($theme-colors, "light"), 20%);
+          background-color: darken(map_get($theme-colors, 'light'), 20%);
         }
 
         &.now {
-          background-color: map_get($theme-colors, "primary");
+          background-color: map_get($theme-colors, 'primary');
         }
 
         &.past {
           background-color: lighten(
-            map_get($theme-colors, "primary-light"),
+            map_get($theme-colors, 'primary-light'),
             10%
           );
 
           &.active {
             background-color: darken(
-              map_get($theme-colors, "primary-light"),
+              map_get($theme-colors, 'primary-light'),
               10%
             );
           }
 
           &.super-active {
             background-color: darken(
-              map_get($theme-colors, "primary-light"),
+              map_get($theme-colors, 'primary-light'),
               20%
             );
           }
@@ -134,8 +134,19 @@
   }
 
   .badge-outline-pill {
-    border: 1px solid map_get($theme-colors, "primary-light");
+    border: 1px solid map_get($theme-colors, 'primary-light');
   }
 
-  @import "../../node_modules/bootstrap/scss/bootstrap";
+  .step--container {
+    background-color: map_get($theme-colors, 'light');
+    color: map_get($theme-colors, 'dark');
+  }
+
+  .symbol--container {
+    img {
+      border: 2px solid $content-background-color;
+    }
+  }
+
+  @import '../../node_modules/bootstrap/scss/bootstrap';
 }

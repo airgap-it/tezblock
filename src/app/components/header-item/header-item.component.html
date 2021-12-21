@@ -37,9 +37,7 @@
         <button
           class="hamburger hamburger--spring navbar-toggler p-0"
           type="button"
-          (click)="
-            isCollapsed = !isCollapsed; dp1.hide(); dp2.hide(); dp3.hide()
-          "
+          (click)="isCollapsed = !isCollapsed; dp1.hide(); dp3.hide()"
           [attr.aria-expanded]="!isCollapsed"
           aria-controls="collapseBasic"
           [class.is-active]="!isCollapsed"
@@ -50,7 +48,7 @@
         </button>
         <div class="pt-3 w-100 d-block d-sm-none">
           <app-search-item
-            (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"
+            (onSearch)="dp1.hide(); dp3.hide()"
           ></app-search-item>
         </div>
         <div
@@ -63,7 +61,7 @@
           <div class="d-block ml-auto mt-2 mt-lg-0">
             <div class="pb-2 d-none d-sm-block" *ngIf="!isMinimized">
               <app-search-item
-                (onSearch)="dp1.hide(); dp2.hide(); dp3.hide()"
+                (onSearch)="dp1.hide(); dp3.hide()"
               ></app-search-item>
             </div>
             <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
@@ -96,7 +94,7 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkBlockchain }"
                     aria-controls="blockchain"
-                    (mouseover)="dp2.hide(); dp3.hide(); dp5.hide()"
+                    (mouseover)="dp3.hide(); dp5.hide()"
                   >
                     {{ 'header-item.blockchain_button' | translate }}
                   </a>
@@ -271,6 +269,17 @@
                   {{ 'header-item.assets_button' | translate }}
                 </button>
               </li>
+              <li class="nav-item">
+                <button
+                  type="button"
+                  class="btn"
+                  routerLinkActive="btn-link"
+                  [ngClass]="{ 'btn-link': activeLinkSwap }"
+                  [routerLink]="['/swap']"
+                >
+                  {{ 'header-item.swap_button' | translate }}
+                </button>
+              </li>
               <li class="nav-item dropdown">
                 <span
                   class="d-block"
@@ -288,7 +297,7 @@
                     routerLinkActive="btn-link"
                     [ngClass]="{ 'btn-link': activeLinkEcosystem }"
                     aria-controls="resources"
-                    (mouseover)="dp1.hide(); dp3.hide(); dp2.hide()"
+                    (mouseover)="dp1.hide(); dp3.hide()"
                   >
                     {{ 'header-item.ecosystem_button' | translate }}
                   </a>
@@ -328,60 +337,26 @@
                         {{ 'header-item.ecosystem-wallets_button' | translate }}
                       </a>
                     </li>
-                  </ul>
-                </span>
-              </li>
-              <li class="nav-item dropdown">
-                <span
-                  class="d-block"
-                  dropdown
-                  [triggers]="triggers$ | async"
-                  #dp2="bs-dropdown"
-                >
-                  <a
-                    class="btn dropdown-toggle"
-                    href
-                    role="button"
-                    dropdownToggle
-                    (click)="(false)"
-                    id="button-basic"
-                    routerLinkActive="btn-link"
-                    [ngClass]="{ 'btn-link': activeLinkResources }"
-                    aria-controls="resources"
-                    (mouseover)="dp1.hide(); dp3.hide(); dp5.hide()"
-                  >
-                    {{ 'header-item.resources_button' | translate }}
-                  </a>
-                  <ul
-                    class="dropdown-menu 1"
-                    *dropdownMenu
-                    role="menu"
-                    id="resources"
-                    (mouseleave)="dp2.hide()"
-                  >
+                    <div class="py-2 px-4">
+                      <strong>{{
+                        'header-item.resources_label' | translate
+                      }}</strong>
+                    </div>
                     <li>
                       <a
                         class="dropdown-item"
                         routerLinkActive="active"
-                        [routerLink]="['/resources/glossary']"
+                        [routerLink]="['/ecosystem/resources/glossary']"
                       >
                         {{ 'header-item.glossary_button' | translate }}
                       </a>
                     </li>
-                    <!-- <li>
-                      <a
-                        class="dropdown-item"
-                        routerLinkActive="active"
-                        [routerLink]="['/connected-nodes']"
-                      >
-                        {{ 'header-item.connected-nodes' | translate }}
-                      </a>
-                    </li> -->
+
                     <li>
                       <a
                         class="dropdown-item"
                         routerLinkActive="active"
-                        routerLink="/constants"
+                        routerLink="/ecosystem/constants"
                       >
                         {{ 'header-item.constants_button' | translate }}
                       </a>
@@ -391,7 +366,7 @@
                       <a
                         class="dropdown-item"
                         routerLinkActive="active"
-                        routerLink="/health"
+                        routerLink="/ecosystem/health"
                       >
                         {{ 'header-item.tezblock-health_button' | translate }}
                       </a>
@@ -399,6 +374,7 @@
                   </ul>
                 </span>
               </li>
+
               <li class="nav-item dropdown pl-2 pl-sm-0">
                 <span
                   class="d-block"
@@ -414,7 +390,7 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (mouseover)="dp1.hide(); dp2.hide()"
+                    (mouseover)="dp1.hide()"
                   >
                     {{ selectedNetwork }}
                   </a>
@@ -450,6 +426,7 @@
                   </ul>
                 </span>
               </li>
+
               <li class="nav-item dropdown pl-2 pl-sm-0 ml-md-2 mt-2 mt-md-0">
                 <span
                   class="d-block dropdown__settings"
@@ -464,7 +441,7 @@
                     (click)="(false)"
                     id="button-basic"
                     routerLinkActive="btn-link"
-                    (mouseover)="dp1.hide(); dp2.hide()"
+                    (mouseover)="dp1.hide()"
                   >
                     <fa-icon [icon]="'cog' | iconPipe"></fa-icon>
                   </a>
@@ -522,6 +499,29 @@
                         "
                       >
                         {{ 'header-item.dark-mode_label' | translate }}
+                      </a>
+                    </li>
+
+                    <div class="py-2 px-4">
+                      <strong> Wallet </strong>
+                    </div>
+                    <li class="nav-item">
+                      <div *ngIf="connectedWallet$ | async">
+                        <span class="dropdown-item">
+                          {{
+                            (connectedWallet$ | async).address | shortenString
+                          }}
+                        </span>
+                        <a class="dropdown-item" (click)="disconnectWallet()">
+                          {{ 'header-item.disconnect_wallet' | translate }}
+                        </a>
+                      </div>
+                      <a
+                        class="dropdown-item"
+                        (click)="connectWallet()"
+                        *ngIf="!(connectedWallet$ | async)"
+                      >
+                        {{ 'header-item.connect_wallet' | translate }}
                       </a>
                     </li>
                   </ul>
