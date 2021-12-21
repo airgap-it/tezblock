@@ -98,6 +98,8 @@ export class ChartItemComponent implements AfterViewInit {
 
   @Input() labels: string[];
 
+  @Input() height: number = 200;
+
   @Input()
   set options(value: ChartOptions) {
     if (value !== this._options) {

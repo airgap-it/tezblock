@@ -7,17 +7,15 @@ import { Transaction } from 'src/app/interfaces/Transaction';
 import { BaseService, Operation } from '@tezblock/services/base.service';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { sort } from '@tezblock/domain/table';
-import { first, get } from '@tezblock/services/fp';
+import { get } from '@tezblock/services/fp';
 import { SearchOptionData } from '@tezblock/services/search/model';
 import { OperationTypes } from '@tezblock/domain/operations';
 import {
-  getAccountByIdBody,
   Account,
   accounts,
   jsonAccounts,
   JsonAccountData,
 } from '@tezblock/domain/account';
-import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core';
 
 export const getAddressesFilteredBy = (phrase: string) =>
   Object.keys(jsonAccounts).filter((address) => {

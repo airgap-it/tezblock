@@ -5,11 +5,11 @@
 
   /* custom tezblock colors */
   $theme-colors: (
-    "primary": #2e5bff,
-    "primary-light": $primary-light-color,
-    "primary-dark": $primary-dark-color,
-    "secondary": #8798ad,
-    "light": #f4f6fc,
+    'primary': #2e5bff,
+    'primary-light': $primary-light-color,
+    'primary-dark': $primary-dark-color,
+    'secondary': #8798ad,
+    'light': #f4f6fc,
   );
 
   /* Sass overwrites */
@@ -17,20 +17,21 @@
   $card-cap-bg: #fff;
   $card-border-color: rgba(46, 91, 255, 0.08);
   $dropdown-border-color: rgba(46, 91, 255, 0.08);
-  $link-color: map_get($theme-colors, "primary");
-  $navbar-light-active-color: map_get($theme-colors, "primary");
+  $link-color: map_get($theme-colors, 'primary');
+  $navbar-light-active-color: map_get($theme-colors, 'primary');
   $table-hover-bg: rgba(46, 91, 255, 0.04);
-  $font-family-sans-serif: "Manrope", sans-serif;
-  $dropdown-link-hover-color: map_get($theme-colors, "primary");
-  $nav-tabs-link-active-color: map_get($theme-colors, "primary");
+  $font-family-sans-serif: 'Manrope', sans-serif;
+  $dropdown-link-hover-color: map_get($theme-colors, 'primary');
+  $nav-tabs-link-active-color: map_get($theme-colors, 'primary');
   $nav-tabs-link-active-bg: #fff;
   $navbar-light-toggler-border-color: transparent;
-  $tooltip-bg: map_get($theme-colors, "secondary");
+  $tooltip-bg: map_get($theme-colors, 'secondary');
   $modal-header-border-color: transparent;
   $dropdown-link-hover-bg: #fff;
   $modal-content-border-color: rgba(46, 91, 255, 0.08);
+  $input-color: #000;
 
-  $ngx-json-viewer-background: map_get($theme-colors, "light");
+  $ngx-json-viewer-background: map_get($theme-colors, 'light');
 
   .card,
   .dropdown-menu {
@@ -39,7 +40,7 @@
 
   .card {
     .card-title__secondary {
-      color: map_get($theme-colors, "secondary");
+      color: map_get($theme-colors, 'secondary');
     }
   }
 
@@ -75,32 +76,32 @@
   app-account-detail {
     .rights-chart {
       div {
-        background-color: map_get($theme-colors, "light");
+        background-color: map_get($theme-colors, 'light');
         &.active {
-          background-color: darken(map_get($theme-colors, "light"), 10%);
+          background-color: darken(map_get($theme-colors, 'light'), 10%);
         }
 
         &.super-active {
-          background-color: darken(map_get($theme-colors, "light"), 20%);
+          background-color: darken(map_get($theme-colors, 'light'), 20%);
         }
 
         &.now {
-          background-color: map_get($theme-colors, "primary");
+          background-color: map_get($theme-colors, 'primary');
         }
 
         &.past {
-          background-color: map_get($theme-colors, "primary-light");
+          background-color: map_get($theme-colors, 'primary-light');
 
           &.active {
             background-color: darken(
-              map_get($theme-colors, "primary-light"),
+              map_get($theme-colors, 'primary-light'),
               10%
             );
           }
 
           &.super-active {
             background-color: darken(
-              map_get($theme-colors, "primary-light"),
+              map_get($theme-colors, 'primary-light'),
               20%
             );
           }
@@ -110,8 +111,19 @@
   }
 
   .badge-outline-pill {
-    border: 1px solid map_get($theme-colors, "primary-dark");
+    border: 1px solid map_get($theme-colors, 'primary-dark');
   }
 
-  @import "../../node_modules/bootstrap/scss/bootstrap";
+  .step--container {
+    background-color: map_get($theme-colors, 'primary-light');
+    color: map_get($theme-colors, 'light');
+  }
+
+  .symbol--container {
+    img {
+      border: 2px solid white;
+    }
+  }
+
+  @import '../../node_modules/bootstrap/scss/bootstrap';
 }

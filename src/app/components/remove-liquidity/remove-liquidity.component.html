@@ -1,0 +1,71 @@
+<div class="pb-5">
+  <app-liquidity-input
+    [tab]="'REMOVE_LIQUIDITY'"
+    [currency]="fromCurrency"
+    [balance]="availableLiquidity$ | async"
+    [amountControl]="amountControl"
+    [displayLiquidityToken]="true"
+    [loadValuesBusy]="loadValuesBusy$ | async"
+  ></app-liquidity-input>
+
+  <div class="card" *ngIf="xtzOut && tokensOut">
+    <div class="card-body">
+      <p>You Receive</p>
+
+      <div class="small d-flex align-items-center">
+        <div class="d-flex align-items-center">
+          <identicon
+            [imgUrl]="toCurrency.imgUrl"
+            [forceIdenticon]="false"
+            class="mr-1"
+          ></identicon>
+          {{ xtzOut?.toNumber() }} {{ toCurrency.symbol }}
+        </div>
+        <fa-icon
+          [icon]="'plus' | iconPipe"
+          class="text-primary px-1 mx-1"
+        ></fa-icon>
+        <div class="d-flex align-items-center">
+          <identicon
+            [imgUrl]="fromCurrency.imgUrl"
+            [forceIdenticon]="false"
+            class="mr-1"
+          ></identicon>
+          {{ tokensOut?.toNumber() }}
+          {{ fromCurrency.symbol }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button
+  type="button"
+  class="btn btn-primary-light btn-block"
+  (click)="connectWallet()"
+  *ngIf="!(connectedWallet$ | async)"
+>
+  Connect Wallet
+</button>
+
+<button
+  type="button"
+  class="btn btn-primary-light btn-block"
+  *ngIf="connectedWallet$ | async"
+  [disabled]="
+    amountControl.invalid ||
+    amountControl.value > (availableLiquidity$ | async)?.toNumber() ||
+    (busy$ | async)
+  "
+  (click)="removeLiquidity()"
+>
+  <ng-container *ngIf="busy$ | async; then loading"></ng-container>
+
+  Remove Liquidity
+</button>
+
+<ng-template #loading>
+  <div class="d-inline-block">
+    <loading-item></loading-item>
+  </div>
+</ng-template>

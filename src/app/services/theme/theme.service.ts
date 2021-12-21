@@ -60,7 +60,7 @@ export class ThemeService {
     return this.getTheme() === Theme.light;
   }
 
-  setTheme(): Promise<any> {
+  setTheme(): Promise<void> {
     return new Promise((resolve) => {
       this.cacheService.get<string>(CacheKeys.theme).subscribe(
         (theme) => {

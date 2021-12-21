@@ -189,7 +189,7 @@ export class ProposalDetailEffects {
       ofType(actions.loadMetaVotingPeriodsSucceeded),
       combineLatest(
         this.actions$.pipe(ofType(appActions.loadPeriodInfosSucceeded))
-      ), // TODO JGD
+      ),
       map(() => actions.loadPeriodsTimespans())
     )
   );

@@ -1,19 +1,19 @@
 /* Manrope font imports*/
 @font-face {
-  font-family: "Manrope";
-  src: url(../assets/fonts/Manrope/manrope-regular.woff) format("truetype");
+  font-family: 'Manrope';
+  src: url(../assets/fonts/Manrope/manrope-regular.woff) format('truetype');
   font-weight: 400;
 }
 
 @font-face {
-  font-family: "Manrope";
-  src: url(../assets/fonts/Manrope/manrope-light.woff) format("truetype");
+  font-family: 'Manrope';
+  src: url(../assets/fonts/Manrope/manrope-light.woff) format('truetype');
   font-weight: 200;
 }
 
 @font-face {
-  font-family: "Manrope";
-  src: url(../assets/fonts/Manrope/manrope-bold.woff) format("truetype");
+  font-family: 'Manrope';
+  src: url(../assets/fonts/Manrope/manrope-bold.woff) format('truetype');
   font-weight: 600;
 }
 
@@ -22,7 +22,7 @@ th {
 }
 
 /* Sass overwrites */
-$font-family-base: "Manrope";
+$font-family-base: 'Manrope';
 $card-border-radius: 0;
 $alert-border-radius: 0;
 $dropdown-border-radius: 0;
@@ -66,7 +66,7 @@ tabset {
 
 /* font family & weight of secondary colored text */
 .text-secondary {
-  font-family: "Manrope", sans-serif;
+  font-family: 'Manrope', sans-serif;
   font-weight: 200;
 }
 
@@ -161,6 +161,29 @@ transaction-item div:nth-of-type(5) hr {
   border-top: 1px solid transparent;
 }
 
+.step--container {
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  h6 {
+    margin: 0 !important;
+    font-weight: bold !important;
+  }
+}
+
+.custom-switch {
+  padding-left: 0 !important;
+}
+.exchange--icon:hover {
+  svg {
+    transform: rotate(180deg);
+    transition: transform 0.5s ease;
+  }
+}
+
 /* Global Styles */
-@import "./styles-dark.scss";
-@import "./styles-light.scss";
+@import './styles-dark.scss';
+@import './styles-light.scss';

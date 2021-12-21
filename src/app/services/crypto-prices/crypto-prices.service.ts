@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import BigNumber from 'bignumber.js';
 import * as cryptocompare from 'cryptocompare';
 import { Observable, from, of } from 'rxjs';
-import { filter, map, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { isNil, negate } from 'lodash';
 
@@ -10,11 +10,24 @@ import {
   CacheService,
   CacheKeys,
   ExchangeRates,
+  ByHistoricPriceState,
 } from '@tezblock/services/cache/cache.service';
 import * as fromRoot from '@tezblock/reducers';
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe';
 import { getCurrencyConverterPipeArgs } from '@tezblock/domain/contract';
 import { isConvertableToUSD } from '@tezblock/domain/airgap';
+import { HttpClient } from '@angular/common/http';
+import { get as _get } from 'lodash';
+
+export interface CurrentPrice {
+  usd: number;
+}
+export interface MarketData {
+  current_price: CurrentPrice;
+}
+export interface CoinGeckoResponse {
+  market_data: MarketData;
+}
 
 export interface MarketDataSample {
   time: number;
@@ -24,6 +37,11 @@ export interface MarketDataSample {
   open: number;
   volumefrom: number;
   volumeto: number;
+}
+
+export interface CryptoPriceApiResponse {
+  time: number;
+  price: number;
 }
 
 export enum PricePeriod {
@@ -42,7 +60,10 @@ export interface CurrencyInfo {
   providedIn: 'root',
 })
 export class CryptoPricesService {
+  private readonly baseURL: string = 'https://api.coingecko.com/api/v3/coins/';
+
   constructor(
+    private readonly http: HttpClient,
     private readonly cacheService: CacheService,
     private readonly store$: Store<fromRoot.State>
   ) {}
@@ -135,6 +156,45 @@ export class CryptoPricesService {
         map((exchangeRates) =>
           getCurrencyConverterPipeArgs({ symbol }, exchangeRates)
         )
+      );
+  }
+
+  fetchChartData(
+    from: string,
+    to: string
+  ): Observable<CryptoPriceApiResponse[]> {
+    const symbolMapping = {
+      XTZ: 'tezos',
+      tzBTC: 'tzbtc',
+    };
+    const fromIdentifier = symbolMapping[from];
+    const toIdentifier = symbolMapping[to];
+
+    return this.http
+      .get<any[]>(
+        `${this.baseURL}${fromIdentifier}/market_chart?vs_currency=usd&days=7`
+      )
+      .pipe(
+        switchMap((fromData: any) => {
+          const fromPrices = fromData.prices;
+          return this.http
+            .get<any[]>(
+              `${this.baseURL}${toIdentifier}/market_chart?vs_currency=usd&days=7`
+            )
+            .pipe(
+              map((toData: any) => {
+                const toPrices = toData.prices;
+                return toPrices
+                  .slice(0, fromPrices.length)
+                  .map((tuple, i) => [
+                    tuple[0],
+                    new BigNumber(toPrices[i][1])
+                      .div(fromPrices[i][1])
+                      .toNumber(),
+                  ]);
+              })
+            );
+        })
       );
   }
 }
