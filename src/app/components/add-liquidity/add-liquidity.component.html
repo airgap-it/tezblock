@@ -1,0 +1,176 @@
+<app-liquidity-input
+  [tab]="'ADD_LIQUIDITY'"
+  [currency]="fromCurrency"
+  [balance]="availableBalanceFrom$ | async"
+  [amountControl]="formGroup.controls['amountControl']"
+  [loadValuesBusy]="loadValuesBusy$ | async"
+></app-liquidity-input>
+
+<div class="card">
+  <div class="card-body">
+    <div class="custom-control custom-switch custom-switch-md">
+      <input
+        checked="true"
+        type="checkbox"
+        (click)="toggleManualMode()"
+        class="custom-control-input"
+        id="customSwitch1"
+      />
+
+      <label class="custom-control-label w-100 pt-1 pb-0" for="customSwitch1"
+        >Provide Only XTZ</label
+      >
+    </div>
+    <ng-container *ngIf="!addLiquidityManually">
+      <p class="text-muted m-0 pt-4">
+        You can add liquidity with only XTZ. A swap of half the XTZ to tzBTC
+        will be done first.
+      </p>
+    </ng-container>
+  </div>
+  <ng-container *ngIf="!addLiquidityManually && minimumReceived$ | async">
+    <hr class="mt-0" />
+    <div class="card-body pt-0">
+      <div class="d-flex pb-3">
+        <div class="step--container">
+          <h6>1</h6>
+        </div>
+        <p class="pl-3 m-0">Swap</p>
+      </div>
+      <div class="small d-flex align-items-center">
+        <div class="d-flex align-items-center">
+          <identicon
+            [imgUrl]="fromCurrency.imgUrl"
+            [forceIdenticon]="false"
+            class="mr-1"
+          ></identicon>
+          {{ xtzAmount }} {{ fromCurrency.symbol }}
+        </div>
+        <fa-icon
+          [icon]="'exchangeAlt' | iconPipe"
+          class="text-primary px-1 mx-1"
+        ></fa-icon>
+        <div class="d-flex align-items-center">
+          <identicon
+            [imgUrl]="toCurrency.imgUrl"
+            [forceIdenticon]="false"
+            class="mr-1"
+          ></identicon>
+          {{ minimumReceived$ | async }} {{ toCurrency.symbol }}
+        </div>
+      </div>
+      <div class="pt-3">
+        <div class="d-flex justify-content-between text-muted small">
+          <div>Minimum Received</div>
+          <div>{{ minimumReceived$ | async }} {{ toCurrency.symbol }}</div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+<div class="card" *ngIf="!addLiquidityManually && minimumReceived$ | async">
+  <div class="card-body">
+    <div class="d-flex pb-3">
+      <div class="step--container">
+        <h6>2</h6>
+      </div>
+      <p class="pl-3 m-0">Add Liquidity</p>
+    </div>
+    <div class="small d-flex align-items-center">
+      <div class="d-flex align-items-center">
+        <identicon
+          [imgUrl]="fromCurrency.imgUrl"
+          [forceIdenticon]="false"
+          class="mr-1"
+        ></identicon>
+        {{ xtzAmount }} {{ fromCurrency.symbol }}
+      </div>
+      <fa-icon
+        [icon]="'plus' | iconPipe"
+        class="text-primary px-1 mx-1"
+      ></fa-icon>
+      <div class="d-flex align-items-center">
+        <identicon
+          [imgUrl]="toCurrency.imgUrl"
+          [forceIdenticon]="false"
+          class="mr-1"
+        ></identicon>
+        {{ minimumReceived$ | async }}
+        {{ toCurrency.symbol }}
+      </div>
+    </div>
+    <div class="pt-3">
+      <div class="d-flex justify-content-between text-muted small">
+        <div>Liquidity Tokens Created</div>
+        <div>
+          {{ estimatedLiquidityCreated?.toNumber() }}
+          {{ fromCurrency.symbol }}/{{ toCurrency.symbol }} LP
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-container *ngIf="addLiquidityManually">
+  <div class="py-3 d-flex justify-content-center">
+    <fa-icon [icon]="'plus' | iconPipe" class="text-primary"></fa-icon>
+  </div>
+
+  <app-liquidity-input
+    [tab]="'ADD_LIQUIDITY'"
+    [currency]="toCurrency"
+    [balance]="availableBalanceTo$ | async"
+    [amountControl]="formGroup.controls['liquidityControl']"
+    [toggleMaxDisabled]="true"
+  ></app-liquidity-input>
+</ng-container>
+
+<div
+  class="card"
+  *ngIf="
+    formGroup.controls['liquidityControl'].touched &&
+    formGroup.controls['liquidityControl'].invalid
+  "
+>
+  <div class="card-body">
+    <div class="text-danger">
+      You don't have sufficient {{ toCurrency.symbol }} funds
+    </div>
+  </div>
+</div>
+
+<div class="pt-5">
+  <button
+    type="button"
+    class="btn btn-primary-light btn-block"
+    (click)="connectWallet()"
+    *ngIf="!(connectedWallet$ | async)"
+  >
+    Connect Wallet
+  </button>
+  <button
+    *ngIf="connectedWallet$ | async"
+    type="button"
+    class="btn btn-primary-light btn-block"
+    [disabled]="
+      (formGroup.controls['liquidityControl'].touched
+        ? formGroup.invalid
+        : formGroup.controls['amountControl'].invalid) ||
+      formGroup.controls['amountControl'].value >
+        (availableBalanceFrom$ | async)?.toNumber() ||
+      (busy$ | async) ||
+      (loadValuesBusy$ | async)
+    "
+    (click)="addLiquidity()"
+  >
+    <ng-container *ngIf="busy$ | async; then loading"></ng-container>
+
+    Add Liquidity
+  </button>
+</div>
+
+<ng-template #loading>
+  <div class="d-inline-block">
+    <loading-item></loading-item>
+  </div>
+</ng-template>

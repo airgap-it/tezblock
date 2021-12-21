@@ -5,12 +5,14 @@ import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-
+import * as actions from '../../app.actions';
 import * as fromRoot from '@tezblock/reducers';
 import { ThemeService } from '@tezblock/services/theme/theme.service';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { LanguagesService } from '@tezblock/services/translation/languages.service';
 import { TezosNetwork } from '@airgap/coinlib-core';
+import { AccountInfo } from '@airgap/beacon-sdk';
+import { getConnectedWallet } from '@tezblock/app.selectors';
 
 @Component({
   selector: 'header-item',
@@ -25,7 +27,7 @@ export class HeaderItemComponent implements OnInit {
   activeLinkBlockchain: boolean = false;
 
   @Input()
-  activeLinkResources: boolean = false;
+  activeLinkSwap: boolean = false;
 
   @Input()
   activeLinkEcosystem: boolean = false;
@@ -45,6 +47,7 @@ export class HeaderItemComponent implements OnInit {
   hideDropdown = true;
   selectedNetwork: TezosNetwork;
   networks = TezosNetwork;
+  connectedWallet$: Observable<AccountInfo | undefined>;
 
   constructor(
     private readonly router: Router,
@@ -64,6 +67,8 @@ export class HeaderItemComponent implements OnInit {
     this.triggers$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .pipe(map((breakpointState) => (breakpointState.matches ? '' : 'hover')));
+
+    this.connectedWallet$ = this.store$.select(getConnectedWallet);
   }
 
   navigate(entity: string) {
@@ -85,5 +90,13 @@ export class HeaderItemComponent implements OnInit {
 
   changeLanguage(language: string) {
     this.languagesService.loadLanguages(language);
+  }
+
+  disconnectWallet() {
+    this.store$.dispatch(actions.disconnectWallet());
+  }
+
+  connectWallet() {
+    this.store$.dispatch(actions.connectWallet());
   }
 }

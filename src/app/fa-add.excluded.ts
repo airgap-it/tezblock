@@ -49,6 +49,7 @@ import {
   faTimes,
   faCog,
   faExternalLink,
+  faPlus,
 } from '@fortawesome/pro-light-svg-icons';
 
 export const addFontAwesome = () => {
@@ -99,6 +100,7 @@ export const addFontAwesome = () => {
     faCheck,
     faTimes,
     faCog,
-    faExternalLink
+    faExternalLink,
+    faPlus
   );
 };

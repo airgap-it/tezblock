@@ -310,6 +310,12 @@ export class ApiService {
       );
   }
 
+  getContractBalance(address: string): Observable<string> {
+    return this.http.get<string>(
+      `${this.environmentUrls.rpcUrl}/chains/main/blocks/head/context/contracts/${address}/balance`
+    );
+  }
+
   getEndorsementsById(id: string, limit: number): Observable<Transaction[]> {
     return this.http.post<Transaction[]>(
       this.transactionsApiUrl,
@@ -1134,6 +1140,29 @@ export class ApiService {
             _.flatten(
               transactions.map((transaction) => JSON.parse(transaction.slots))
             ).length
+        )
+      );
+  }
+
+  getBalance(address: string): Observable<string> {
+    return this.http
+      .post<Transaction[]>(
+        this.accountsApiUrl,
+        {
+          predicates: [
+            {
+              field: 'account_id',
+              operation: 'eq',
+              set: [address],
+            },
+          ],
+          limit: 1,
+        },
+        this.options
+      )
+      .pipe(
+        map((account: any[]) =>
+          new BigNumber(account[0].balance).shiftedBy(-6).toString()
         )
       );
   }

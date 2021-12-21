@@ -19,6 +19,7 @@ import { NodesOnMapComponent } from './pages/nodes-on-map/nodes-on-map.component
 import { TransactionDetailComponent } from './pages/transaction-detail/transaction-detail.component';
 import { DappsComponent } from './pages/ecosystem/dapps/dapps.component';
 import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component';
+import { LiquidityBakingComponent } from './pages/liquidity-baking/liquidity-baking.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -30,12 +31,13 @@ const routes: Routes = [
   { path: 'account/:id', component: AccountDetailComponent },
   { path: 'transaction/:id', component: TransactionDetailComponent },
   { path: 'endorsement/:id', component: EndorsementDetailComponent },
-  { path: 'constants', component: ProtocolConstantComponent },
+  { path: 'ecosystem/constants', component: ProtocolConstantComponent },
   { path: 'proposal/:id', component: ProposalDetailComponent },
   { path: 'contract/:id', component: ContractDetailComponent },
-  { path: 'health', component: HealthComponent },
+  { path: 'ecosystem/health', component: HealthComponent },
+  { path: 'swap', component: LiquidityBakingComponent },
   { path: 'connected-nodes', component: NodesOnMapComponent },
-  { path: 'resources/glossary', component: GlossaryComponent },
+  { path: 'ecosystem/resources/glossary', component: GlossaryComponent },
   { path: 'ecosystem/wallets', component: WalletsComponent },
   { path: 'ecosystem/dapps', component: DappsComponent },
   { path: 'ecosystem/libraries', component: LibrariesComponent },

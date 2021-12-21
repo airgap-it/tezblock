@@ -8,6 +8,7 @@ import { Block } from '@tezblock/interfaces/Block';
 import { CurrencyInfo } from '@tezblock/services/crypto-prices/crypto-prices.service';
 import { ExchangeRates } from '@tezblock/services/cache/cache.service';
 import { ProtocolConstantResponse } from '@tezblock/services/protocol-variables/protocol-variables.service';
+import { AccountInfo } from '@airgap/beacon-sdk';
 
 const updateExchangeRates = (
   from: string,
@@ -44,6 +45,8 @@ export interface State {
 
   // XTZ -> USD
   fiatCurrencyInfo: CurrencyInfo;
+  connectedWallet: AccountInfo | undefined;
+  connectedWalletBalance: BigNumber;
 }
 
 export const initialState: State = {
@@ -68,6 +71,8 @@ export const initialState: State = {
     currency: 'USD',
     price: new BigNumber(0),
   },
+  connectedWallet: undefined,
+  connectedWalletBalance: new BigNumber(0),
 };
 
 export const reducer = createReducer(
@@ -144,6 +149,19 @@ export const reducer = createReducer(
       ...state.busy,
       protocolVariables: false,
     },
+  })),
+
+  on(actions.connectWalletSucceeded, (state, { accountInfo }) => ({
+    ...state,
+    connectedWallet: accountInfo,
+  })),
+  on(actions.disconnectWalletSucceeded, (state, {}) => ({
+    ...state,
+    connectedWallet: undefined,
+  })),
+  on(actions.fetchConnectedWalletBalanceSucceeded, (state, { balance }) => ({
+    ...state,
+    connectedWalletBalance: balance,
   }))
 );
 

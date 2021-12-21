@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import {
+  AccountInfo,
   ColorMode,
   DAppClient,
   NetworkType,
@@ -34,6 +35,47 @@ export class BeaconService {
     this.client = this.getDAppClient();
   }
 
+  async setupBeaconWallet(): Promise<AccountInfo | undefined> {
+    try {
+      return await this.getActiveAccount();
+    } catch (error) {
+      return undefined;
+    }
+  }
+  async getActiveAccount(): Promise<AccountInfo> {
+    return this.client.getActiveAccount();
+  }
+
+  async connectWallet(): Promise<AccountInfo | undefined> {
+    const requestPermissions = async () => {
+      const input: RequestPermissionInput = {
+        network: {
+          type: tezosNetworkToNetworkType(
+            this.chainNetworkService.getNetwork()
+          ),
+        },
+      };
+
+      await this.client.requestPermissions(input);
+      return this.getActiveAccount();
+    };
+
+    // Check if we have permissions stored locally already
+    const activeAccount = await this.getActiveAccount();
+
+    if (!activeAccount) {
+      // If no active account is set, we have to ask for permissions.
+      // After this call, the SDK saves the permissions locally
+      const permissions = await requestPermissions();
+      return permissions;
+    }
+    return activeAccount;
+  }
+
+  async reset(): Promise<void> {
+    await this.client.removeAllAccounts();
+  }
+
   async delegate(address: string): Promise<OperationResponseOutput> {
     const requestPermissions = async () => {
       const input: RequestPermissionInput = {
@@ -48,7 +90,7 @@ export class BeaconService {
     };
 
     // Check if we have permissions stored locally already
-    const activeAccount = await this.client.getActiveAccount();
+    const activeAccount = await this.getActiveAccount();
 
     if (!activeAccount) {
       // If no active account is set, we have to ask for permissions.
@@ -63,6 +105,35 @@ export class BeaconService {
 
     return this.client.requestOperation({
       operationDetails: [operation],
+    });
+  }
+
+  async operationRequest(
+    operation: PartialTezosOperation[]
+  ): Promise<OperationResponseOutput> {
+    const requestPermissions = async () => {
+      const input: RequestPermissionInput = {
+        network: {
+          type: tezosNetworkToNetworkType(
+            this.chainNetworkService.getNetwork()
+          ),
+        },
+      };
+
+      await this.client.requestPermissions(input);
+    };
+
+    // Check if we have permissions stored locally already
+    const activeAccount = await this.getActiveAccount();
+
+    if (!activeAccount) {
+      // If no active account is set, we have to ask for permissions.
+      // After this call, the SDK saves the permissions locally
+      await requestPermissions();
+    }
+
+    return this.client.requestOperation({
+      operationDetails: operation,
     });
   }
 

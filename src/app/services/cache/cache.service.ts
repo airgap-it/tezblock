@@ -18,8 +18,10 @@ export enum CacheKeys {
   exchangeRates = 'exchangeRates',
   byAddress = 'byAddress',
   byProposal = 'byProposal',
+  byHistoricPrice = 'byHistoricPrice',
   theme = 'theme',
   previousSearches = 'previousSearches',
+  historicAmountToggle = 'historicAmountToggle',
   language = 'language',
 }
 
@@ -68,11 +70,16 @@ export interface ByProposalState {
   [proposal: string]: number /* period */;
 }
 
+export interface ByHistoricPriceState {
+  [date: string]: number /* period */;
+}
+
 export interface Cache {
   [CacheKeys.fromCurrentCycle]: CurrentCycleState;
   [CacheKeys.exchangeRates]: ExchangeRates;
   [CacheKeys.byAddress]: ByAddressState;
   [CacheKeys.theme]: string;
+  [CacheKeys.byHistoricPrice]: ByHistoricPriceState;
 
   // probably in future this entry will replace byPeriod which will contain this data
   [CacheKeys.byProposal]: ByProposalState;

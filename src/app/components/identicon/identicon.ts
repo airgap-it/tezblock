@@ -33,6 +33,11 @@ export class IdenticonComponent implements OnInit {
   private _forceIdenticon: boolean = false;
 
   @Input()
+  set imgUrl(value: string) {
+    this.identicon = value;
+  }
+
+  @Input()
   set address(value: string) {
     if (value !== this._address) {
       this._address = value;
@@ -68,6 +73,9 @@ export class IdenticonComponent implements OnInit {
     }
 
     const getIdenticon = (): string => {
+      if (address === 'TEZOS') {
+        return 'assets/img/symbols/tez.svg';
+      }
       const displayLogo: boolean =
         jsonAccounts.hasOwnProperty(address) &&
         jsonAccounts[address].hasLogo &&
@@ -75,7 +83,6 @@ export class IdenticonComponent implements OnInit {
 
       if (displayLogo) {
         const logoReference = jsonAccounts[address].logoReference || address;
-
         return `submodules/tezos_assets/imgs/${logoReference}.png`;
       }
 

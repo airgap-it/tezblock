@@ -1,0 +1,218 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <h1 hidden="true">Swap</h1>
+    <div class="row pb-4">
+      <div class="col-12 col-md-6">
+        <h5 class="mb-4">Swap</h5>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 mb-4 mb-lg-0">
+        <div class="card">
+          <div class="card-body p-3">
+            <tabset>
+              <tab id="SWAP" (selectTab)="selectTab($event)">
+                <ng-template tabHeading>
+                  <button
+                    type="button"
+                    class="btn p-0 mr-1"
+                    [ngClass]="mainTab === 'SWAP' ? 'btn-link' : ''"
+                  >
+                    <span class="d-sm-inline-block">Swap</span>
+                  </button>
+                </ng-template>
+
+                <app-swap
+                  [connectedWallet$]="connectedWallet$"
+                  [fromCurrency]="fromCurrency"
+                  [toCurrency]="toCurrency"
+                  [availableBalanceFrom$]="availableBalanceFrom$"
+                  [availableBalanceTo$]="availableBalanceTo$"
+                  (onSwapDirection)="swapDirection()"
+                  (onMinimumReceived)="setMinimumReceived$($event)"
+                ></app-swap>
+              </tab>
+
+              <tab id="LIQUIDITY" (selectTab)="selectTab($event)">
+                <ng-template tabHeading>
+                  <button
+                    type="button"
+                    class="btn p-0 mr-1"
+                    [ngClass]="mainTab === 'LIQUIDITY' ? 'btn-link' : ''"
+                  >
+                    <span class="d-sm-inline-block">Liquidity</span>
+                  </button>
+                </ng-template>
+                <tabset>
+                  <tab
+                    id="ADD_LIQUIDITY"
+                    (selectTab)="selectTab($event, false)"
+                  >
+                    <ng-template tabHeading>
+                      <button
+                        type="button"
+                        class="btn p-0 mr-1"
+                        [ngClass]="
+                          nestedTab === 'ADD_LIQUIDITY' ? 'btn-link' : ''
+                        "
+                      >
+                        <span class="d-sm-inline-block">Add Liquidity</span>
+                      </button>
+                    </ng-template>
+
+                    <app-add-liquidity
+                      [connectedWallet$]="connectedWallet$"
+                      [fromCurrency]="tezCurrency"
+                      [toCurrency]="tokenCurrency"
+                      [availableBalanceFrom$]="tezBalance$"
+                      [availableBalanceTo$]="tokenBalance$"
+                    ></app-add-liquidity>
+                  </tab>
+                  <tab
+                    id="REMOVE_LIQUIDITY"
+                    (selectTab)="selectTab($event, false)"
+                  >
+                    <ng-template tabHeading>
+                      <button
+                        type="button"
+                        class="btn p-0 mr-1"
+                        [ngClass]="
+                          nestedTab === 'REMOVE_LIQUIDITY' ? 'btn-link' : ''
+                        "
+                      >
+                        <span class="d-sm-inline-block">Remove Liquidity</span>
+                      </button>
+                    </ng-template>
+                    <app-remove-liquidity
+                      [fromCurrency]="tokenCurrency"
+                      [toCurrency]="tezCurrency"
+                      [connectedWallet$]="connectedWallet$"
+                    ></app-remove-liquidity>
+                  </tab>
+                </tabset>
+              </tab>
+            </tabset>
+          </div>
+        </div>
+        <div *ngIf="mainTab === 'SWAP'">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>Minimum received</div>
+                <div *ngIf="minimumReceived$ | async">
+                  {{ minimumReceived$ | async }} {{ toCurrency.symbol }}
+                </div>
+                <div *ngIf="!(minimumReceived$ | async)">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="card">
+          <div class="card-body">
+            <div class="pb-3 d-flex align-items-center symbol--container">
+              <div class="row px-2">
+                <img [src]="fromCurrency.imgUrl" />
+                <img [src]="toCurrency.imgUrl" />
+                <span class="ml-4">
+                  <h5 class="m-0">
+                    {{ fromCurrency.symbol }}/{{ toCurrency.symbol }}
+                  </h5>
+                  <p class="m-0 text-muted">
+                    {{ marketPrice$ | async }} {{ fromCurrency.symbol }}
+                  </p>
+                </span>
+              </div>
+            </div>
+            <chart-item
+              *ngIf="priceChartDatasets$ | async"
+              [datasets]="priceChartDatasets$ | async"
+              [labels]="priceChartLabels$ | async"
+              [options]="chartOptions"
+              [height]="278"
+            ></chart-item>
+          </div>
+        </div>
+        <div class="pb-3">
+          <div class="card">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-12 col-md-4 pb-3 pb-md-0">
+                  <h5 class="card-title__secondary">Total Value Locked</h5>
+
+                  <h5
+                    *appVar="
+                      totalValueLocked
+                        | async
+                        | currencyConverter
+                          : {
+                              currInfo: currencyInfo,
+                              protocolIdentifier: 'xtz'
+                            } as value
+                    "
+                    class="mb-0"
+                  >
+                    {{ 1 | currencySymbol: { currInfo: currencyInfo }
+                    }}{{ value | number: getPrecision(value) }}
+                  </h5>
+                </div>
+                <div class="col-12 col-md-8">
+                  <h5 class="card-title__secondary">Annual Percentage Yield</h5>
+                  <h5 class="mb-0">
+                    {{ estimatedApy | async }}
+                  </h5>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="col-lg-9 px-0"
+          *ngIf="nestedTab === 'ADD_LIQUIDITY' && mainTab === 'LIQUIDITY'"
+        >
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Why should I add XTZ/tzBTC Liquidity?</h5>
+              <p class="card-text text-muted">
+                By providing liquidity to the XTZ/tzBTC liqiduity pool, you will
+                receive rewards of an estimated annual percentage yield of
+                {{ estimatedApy | async }} in XTZ.<br />
+                More stats can be found on
+                <a href="https://liquidity-baking.com/" target="_blank"
+                  >liquidity-baking.com</a
+                >.
+              </p>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">
+                Where do the rewards come from for the Liqudity Baking?
+              </h5>
+              <p class="card-text text-muted">
+                The protocol has a built-in incentive mechanism and distributes
+                2.5 XTZ for every block to the XTZ/tzBTC liquidity providers.
+                <br />
+                More details can be found in the
+                <a
+                  href="https://tezos.gitlab.io/alpha/liquidity_baking.html"
+                  target="_blank"
+                  >Liquidity Baking documentation</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #loading>
+    <div class="col-md-9">
+      <loading-skeleton [loadingWidth]="'360px'"></loading-skeleton>
+    </div>
+  </ng-template>
+</div>

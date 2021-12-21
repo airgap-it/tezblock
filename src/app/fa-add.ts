@@ -9,12 +9,12 @@ import {
 } from '@fortawesome/free-brands-svg-icons';
 import {
   faBell,
-  faVoteYea,
+  faBoxBallot,
   faCopy,
   faExchangeAlt,
   faEye,
-  faSeedling,
-  faHandshake,
+  faHandHoldingSeedling,
+  faHandReceiving,
   faLevelDownAlt,
   faLevelUpAlt,
   faLink,
@@ -27,8 +27,10 @@ import {
   faLaptop,
   faCaretUp,
   faCaretDown,
-  faBreadSlice,
+  faBreadLoaf,
+  faCoin,
   faCoins,
+  faHatChef,
   faListAlt,
   faInfoCircle,
   faDownload,
@@ -46,7 +48,9 @@ import {
   faCheck,
   faTimes,
   faCog,
-} from '@fortawesome/free-solid-svg-icons';
+  faExternalLink,
+  faPlus,
+} from '@fortawesome/pro-light-svg-icons';
 
 export const addFontAwesome = () => {
   library.add(
@@ -59,11 +63,11 @@ export const addFontAwesome = () => {
     faQrcode,
     faSearch,
     faExchangeAlt,
-    faHandshake,
+    faHandReceiving,
     faLink,
     faStamp,
-    faVoteYea,
-    faSeedling,
+    faBoxBallot,
+    faHandHoldingSeedling,
     faEye,
     faGithub,
     faMedium,
@@ -75,8 +79,10 @@ export const addFontAwesome = () => {
     faGlobe,
     faCaretUp,
     faCaretDown,
-    faBreadSlice,
+    faBreadLoaf,
+    faCoin,
     faCoins,
+    faHatChef,
     faListAlt,
     faInfoCircle,
     faDownload,
@@ -93,6 +99,8 @@ export const addFontAwesome = () => {
     faHandRock,
     faCheck,
     faTimes,
-    faCog
+    faCog,
+    faExternalLink,
+    faPlus
   );
 };

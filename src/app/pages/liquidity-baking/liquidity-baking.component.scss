@@ -1,0 +1,16 @@
+.tiny {
+  font-size: xx-small;
+}
+.symbol--container {
+  img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    z-index: 1;
+    &:nth-child(2) {
+      position: relative;
+      z-index: 0;
+      margin-left: -10px;
+    }
+  }
+}

@@ -1,0 +1,96 @@
+<p>
+  Ithaca contains two major updates to the protocol, as well as numerous minor
+  improvements. Below we discuss some of the most interesting and important
+  changes.
+</p>
+
+<p>
+  (As is usual, Ithaca’s “true name” is its hash, which is
+  PsiThaCaT47Zboaw71QWScM8sXeMM7bbQFncK9FLqYc6EKdpjVP).
+</p>
+
+<h5>Tenderbake</h5>
+<p>
+  Tenderbake is a major update to the Tezos consensus algorithm. Like
+  Tendermint, Tenderbake brings fast deterministic finality to the Tezos
+  protocol.
+</p>
+<p>Tenderbake comes with a set of important changes:</p>
+<ul>
+  <li>
+    The protocol moves away from a roll-based model to an optimized stake-based
+    model to allocate rewards: bakers will receive rewards depending on their
+    current stake instead of the number of rolls they own.
+  </li>
+  <li>
+    A reduction in the minimal number of tokens required to be selected as a
+    validator would be implemented: from 8,000 tez to 6,000 tez. This minimal
+    stake of 6,000 tez remains necessary for performance reasons.
+  </li>
+  <li>
+    The baking and endorsement rewards mechanism has been reworked (c.f. rewards
+    documentation). In particular, baking rewards will be credited
+    instantaneously, and not frozen for 5 cycles as is the case with Emmy*.
+    Furthermore, there will no longer be a variance for endorsement rewards. The
+    total sum of endorsement rewards for a cycle will be fully distributed at
+    the end of the same cycle, provided delegates have at least 2/3 of their
+    endorsement slots included in blocks.
+  </li>
+  <li>
+    A new security deposit mechanism is introduced: delegates are required to
+    freeze, at minimum, 10% of their stake in advance in order to obtain baking
+    and endorsement rights. A new operation Set_deposit_limit is also introduced
+    to manually manage this limit.
+  </li>
+  <li>
+    The number of endorsement slots per block has been bumped from 256 to 7,000:
+    this means that a delegate with the minimum amount of tokens will
+    participate every 10 blocks on average. The node’s storage layer and
+    prevalidator have been optimized to handle the charge, with the precheck
+    feature also contributing to the increase in performance. The number of
+    endorsement operations, which will continue to endorse multiple slots, will
+    be proportional to the number of validators in the network, i.e. around 500.
+  </li>
+  <li>
+    Since Tenderbake is modeled after classical BFT consensus algorithms, it
+    favors safety over liveness and requires active participation of validators
+    holding 2/3 of the stake in order for the chain to progress.
+  </li>
+</ul>
+<p>
+  This consensus algorithm also offers the possibility to easily reduce the
+  minimal time between blocks, which may be proposed in future Tezos protocol
+  amendments.
+</p>
+
+<h5>Precheck of operations</h5>
+<p>
+  The new version of the protocol will enable the prechecking of operations.
+  This is not a feature of the Ithaca protocol proposal per se, but it rather
+  consists of a new set of functions which are exposed by the economic protocol,
+  and which can be used by any Tezos shell (e.g., Octez and TezEdge) to avoid
+  fully executing manager operations before gossiping them through the network.
+</p>
+<p>
+  The feature serves mainly one purpose: increasing the number of operations
+  gossiped over the Tezos network. It is a prequel to further optimizations that
+  should increase the transaction throughput over the Tezos network.
+</p>
+
+<h5>Liquidity Baking</h5>
+<p>
+  Ithaca includes an increase to the liquidity baking sunset level of 819,200
+  blocks, or twenty voting periods, roughly an additional ten months. This
+  bigger increase will avoid needing to worry about the sunset level for the
+  next few protocol amendments. Also, to balance this increase, the threshold
+  for activating the escape hatch is lowered from 50% to 33%.
+</p>
+
+<h5 class="pb-3">More information</h5>
+<ul>
+  <li>
+    <a target="_blank" href="https://tezos.gitlab.io/protocols/012_ithaca.html"
+      >Changelog</a
+    >
+  </li>
+</ul>

@@ -1,0 +1,73 @@
+<div class="row" *ngIf="currency">
+  <div class="col-4 pr-0">
+    <div class="card h-100">
+      <div class="card-body pl-3">
+        <div class="h-100 d-flex align-items-center">
+          <identicon
+            [imgUrl]="currency.imgUrl"
+            [forceIdenticon]="false"
+          ></identicon>
+          <span class="pl-2">
+            {{ currency.symbol }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-8 pl-0" *ngIf="amountControl">
+    <div class="card h-100">
+      <div class="card-body py-0 px-2">
+        <div class="row h-100 align-items-center">
+          <div class="col-8 pr-0">
+            <input
+              [formControl]="amountControl"
+              type="text"
+              class="form-control border-0 p-0"
+              placeholder="0.0"
+              aria-label="Amount"
+              [ngClass]="{
+                'is-invalid':
+                  (amountControl.errors &&
+                    (amountControl.touched || amountControl.dirty)) ||
+                  (amountControl.value > balance?.toNumber() &&
+                    !allowAmountGreaterThanBalance)
+              }"
+            />
+
+            <div class="tiny">
+              Balance: {{ balance }}
+              {{
+                displayLiquidityToken
+                  ? currency.liquidityTokenSymbol
+                  : currency.symbol
+              }}
+            </div>
+          </div>
+          <div
+            class="col-4 p-0 pr-3 d-flex justify-content-end"
+            *ngIf="!toggleMaxDisabled"
+          >
+            <button
+              type="button"
+              class="btn btn-primary btn-sm"
+              (click)="setMaxValue()"
+              [ngClass]="'btn-light'"
+              *ngIf="!loadValuesBusy"
+              [disabled]="balance?.lte(0)"
+            >
+              MAX
+            </button>
+
+            <ng-container *ngIf="loadValuesBusy; then loading"></ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div>
+    <loading-item></loading-item>
+  </div>
+</ng-template>
