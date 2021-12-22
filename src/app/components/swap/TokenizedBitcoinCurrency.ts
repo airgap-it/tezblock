@@ -215,7 +215,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       liquidityBakingCalculations.xtzToTokenTokenOutput(
         mutezAmount,
         this.xtzPool,
-        this.lqtTotal
+        this.tokenPool
       );
 
     let xtzToTokenParams = this.liquidityBakingContract.methods

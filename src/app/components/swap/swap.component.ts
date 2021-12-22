@@ -121,7 +121,9 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
 
             const percentage = new BigNumber(100).minus(slippage).div(100);
 
-            const result = value.times(percentage);
+            const result = new BigNumber(
+              value.times(percentage).toFixed(this.toCurrency?.decimals)
+            );
 
             this.minimumReceived$ = of(result);
             this.updateMinimumReceived();
