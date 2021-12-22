@@ -88,7 +88,7 @@ describe('SwapComponent', () => {
           const formControlAmountSlippageAdjusted = new BigNumber(
             new BigNumber(component.toAmount.value)
               .times(percentage)
-              .shiftedBy(component.toCurrency.decimals)
+              .toFixed(component.toCurrency.decimals)
           );
           expect(formControlAmountSlippageAdjusted.toNumber()).toBe(
             currency.expectedXtzToTokenValues[idx]
@@ -125,8 +125,11 @@ describe('SwapComponent', () => {
           );
 
           const formControlAmountSlippageAdjusted = new BigNumber(
-            component.toAmount.value
-          ).times(percentage);
+            new BigNumber(component.toAmount.value)
+              .times(percentage)
+              .toFixed(component.toCurrency.decimals)
+          );
+
           expect(formControlAmountSlippageAdjusted.toNumber()).toBe(
             currency.expectedTokenToXtzValues[idx]
           );
