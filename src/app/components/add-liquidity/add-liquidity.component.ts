@@ -10,7 +10,7 @@ import {
   Validators,
 } from '@angular/forms';
 import BigNumber from 'bignumber.js';
-import { debounceTime, first, map, takeUntil } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { BeaconService } from '@tezblock/services/beacon/beacon.service';
 import { LiquidityBaseComponent } from '../liquidity-base/liquidity-base.component';
 
@@ -60,7 +60,6 @@ export class AddLiquidityComponent
     const lastChanged = this.formGroup.controls[
       'amountControl'
     ].valueChanges.pipe(
-      debounceTime(300),
       map((amountInTez) => ({
         addLiquidityManually: false,
         amountInTez,
@@ -71,6 +70,7 @@ export class AddLiquidityComponent
       lastChanged,
       this.selectedSlippage$,
       this.connectedWallet$,
+      this.availableBalanceTo$,
       this.manualToggle$,
     ])
       .pipe(takeUntil(this.ngDestroyed$))
@@ -79,10 +79,9 @@ export class AddLiquidityComponent
           lastChanged,
           slippage,
           connectedWallet,
+          availableBalanceTo,
           _manualToggle,
         ]): Promise<void> => {
-          this.loadValuesBusy$.next(true);
-
           this.address = connectedWallet?.address;
           if (this.addLiquidityManually) {
             const rawValue =
@@ -92,15 +91,20 @@ export class AddLiquidityComponent
                   .integerValue()
               );
 
-            this.availableBalanceTo$.pipe(first()).subscribe((balance) => {
-              this.minimumReceived$ = of(rawValue);
-              this.loadValuesBusy$.next(false);
-              const value = rawValue.gt(balance) ? NaN : rawValue.toNumber();
-              this.formGroup.controls['liquidityControl'].setValue(value, {
-                emitEvent: false,
-              });
-              this.formGroup.controls['liquidityControl'].markAsTouched();
+            this.minimumReceived$ = of(rawValue);
+            this.loadValuesBusy$.next(false);
+
+            const value = rawValue.gt(availableBalanceTo)
+              ? 'Insufficient'
+              : lastChanged.amountInTez === '' ||
+                lastChanged.amountInTez === '0'
+              ? 0
+              : rawValue.toNumber();
+
+            this.formGroup.controls['liquidityControl'].setValue(value, {
+              emitEvent: false,
             });
+            this.formGroup.controls['liquidityControl'].markAsTouched();
           } else {
             this.xtzAmount = new BigNumber(lastChanged.amountInTez)
               .div(2)

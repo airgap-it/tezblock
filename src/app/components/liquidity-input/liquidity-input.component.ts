@@ -47,7 +47,6 @@ export class LiquidityInputComponent {
     const maxFeeValue = this.MAX_FEE_MUTEZ.shiftedBy(
       -1 * this.currency.decimals
     );
-    this.loadValuesBusy = true;
 
     if (this.balance.gt(maxFeeValue) || this.currency.symbol !== Currency.XTZ) {
       this.amountControl.markAsTouched();

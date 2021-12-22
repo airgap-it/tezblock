@@ -3,7 +3,6 @@
   [currency]="fromCurrency"
   [balance]="availableBalanceFrom$ | async"
   [amountControl]="formGroup.controls['amountControl']"
-  [loadValuesBusy]="loadValuesBusy$ | async"
 ></app-liquidity-input>
 
 <div class="card">
@@ -125,20 +124,6 @@
   ></app-liquidity-input>
 </ng-container>
 
-<div
-  class="card"
-  *ngIf="
-    formGroup.controls['liquidityControl'].touched &&
-    formGroup.controls['liquidityControl'].invalid
-  "
->
-  <div class="card-body">
-    <div class="text-danger">
-      You don't have sufficient {{ toCurrency.symbol }} funds
-    </div>
-  </div>
-</div>
-
 <div class="pt-5">
   <button
     type="button"
@@ -158,8 +143,7 @@
         : formGroup.controls['amountControl'].invalid) ||
       formGroup.controls['amountControl'].value >
         (availableBalanceFrom$ | async)?.toNumber() ||
-      (busy$ | async) ||
-      (loadValuesBusy$ | async)
+      (busy$ | async)
     "
     (click)="addLiquidity()"
   >
