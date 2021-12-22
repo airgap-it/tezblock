@@ -111,7 +111,6 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
   }
 
   async getExpectedMinimumReceivedTez(tokenAmount: number): Promise<BigNumber> {
-    console.log('getExpectedMinimumReceivedTez', tokenAmount);
     await this.initContracts();
     return new BigNumber(this.tokenToXtzXtzOutput(tokenAmount));
   }
