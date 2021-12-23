@@ -86,10 +86,10 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
       .subscribe(
         async ([lastChanged, slippage, connectedWallet]): Promise<void> => {
           this.loadValuesBusy$.next(true);
+
           this.address = connectedWallet?.address;
           if (!lastChanged.amount || !slippage) {
-            this.minimumReceived$ = of(undefined);
-            this.updateMinimumReceived();
+            this.updateMinimumReceived(undefined);
 
             this.loadValuesBusy$.next(false);
             if (lastChanged.direction === SwapDirection.FROM) {
@@ -127,8 +127,7 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
             }
 
             if (!value) {
-              this.minimumReceived$ = of(undefined);
-              this.updateMinimumReceived();
+              this.updateMinimumReceived(undefined);
 
               this.toAmount.setValue(0, {
                 emitEvent: false,
@@ -142,9 +141,7 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
               value.times(percentage).toFixed(this.toCurrency?.decimals)
             );
 
-            this.minimumReceived$ = of(result);
-            this.updateMinimumReceived();
-
+            this.updateMinimumReceived(result);
             this.loadValuesBusy$.next(false);
 
             this.toAmount.setValue(result.toNumber(), {
@@ -167,9 +164,7 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
             }
 
             if (!value) {
-              this.minimumReceived$ = of(undefined);
-              this.updateMinimumReceived();
-
+              this.updateMinimumReceived(undefined);
               this.loadValuesBusy$.next(false);
               this.fromAmount.setValue(0, {
                 emitEvent: false,
@@ -177,16 +172,10 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
               return;
             }
 
-            this.minimumReceived$ = of(
-              new BigNumber((lastChanged.amount, this.toDecimals))
-            );
-            this.updateMinimumReceived();
+            this.updateMinimumReceived(new BigNumber(lastChanged.amount));
             this.loadValuesBusy$.next(false);
-
             const percentage = new BigNumber(100).minus(slippage).div(100);
-
             const result = value.times(percentage);
-
             this.fromAmount.setValue(result.toNumber(), {
               emitEvent: false,
             });
@@ -245,7 +234,8 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
     });
   }
 
-  updateMinimumReceived() {
+  updateMinimumReceived(value: BigNumber | undefined) {
+    this.minimumReceived$.next(value);
     this.onMinimumReceived.next(this.minimumReceived$);
   }
 

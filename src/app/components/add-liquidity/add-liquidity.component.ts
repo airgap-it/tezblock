@@ -1,5 +1,5 @@
 import { Component, OnChanges, SimpleChanges } from '@angular/core';
-import { combineLatest, of, ReplaySubject } from 'rxjs';
+import { combineLatest, ReplaySubject } from 'rxjs';
 import { formControlOptions, tezToMutez } from '../swap/swap-utils';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '@tezblock/reducers';
@@ -91,7 +91,7 @@ export class AddLiquidityComponent
                   .integerValue()
               );
 
-            this.minimumReceived$ = of(rawValue);
+            this.minimumReceived$.next(rawValue);
             this.loadValuesBusy$.next(false);
 
             const value = rawValue.gt(availableBalanceTo)
@@ -100,7 +100,6 @@ export class AddLiquidityComponent
                 lastChanged.amountInTez === '0'
               ? 0
               : rawValue.toNumber();
-
             this.formGroup.controls['liquidityControl'].setValue(value, {
               emitEvent: false,
             });
@@ -122,7 +121,7 @@ export class AddLiquidityComponent
               ? undefined
               : value.times(percentage);
 
-            this.minimumReceived$ = of(minimumReceived);
+            this.minimumReceived$.next(minimumReceived);
             this.loadValuesBusy$.next(false);
 
             this.estimatedLiquidityCreated =
