@@ -30,7 +30,8 @@ export abstract class LiquidityBaseComponent {
   public loadValuesBusy$: BehaviorSubject<boolean> =
     new BehaviorSubject<boolean>(false);
   public selectedSlippage$: ReplaySubject<number> = new ReplaySubject(1);
-  public minimumReceived$: Observable<BigNumber | undefined> = new Observable();
+  public minimumReceived$: BehaviorSubject<BigNumber | undefined> =
+    new BehaviorSubject(undefined);
 
   protected readonly ngDestroyed$: Subject<void> = new Subject();
 

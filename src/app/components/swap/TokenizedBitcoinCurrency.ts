@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { getConnectedWallet } from '@tezblock/app.selectors';
 import { TezosBTC } from '@airgap/coinlib-core';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
-import { map, mergeMap, switchMap } from 'rxjs/operators';
+import { map, mergeMap, retry, switchMap } from 'rxjs/operators';
 import * as liquidityBakingCalculations from '../../services/liquidity-baking/liquidity-baking-calculations';
 import { AbstractCurrency, tezToMutez } from './swap-utils';
 import { PartialTezosOperation } from '@airgap/beacon-sdk';
@@ -47,6 +47,14 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
   ) {}
 
   async initContracts() {
+    if (
+      this.tezosToolKit &&
+      this.liquidityBakingContract &&
+      this.liquidityTokenContract &&
+      this.tokenContract
+    ) {
+      return;
+    }
     try {
       const environment = this.chainNetworkService.getEnvironment();
       this.tezosToolKit = new TezosToolkit(environment.rpcUrl);
@@ -54,14 +62,12 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       this.liquidityBakingContract = await this.tezosToolKit.contract.at(
         this.liquidityBakingContractAddress
       );
-
       this.liquidityTokenContract = await this.tezosToolKit.contract.at(
         this.liquidityTokenContractAddress
       );
       this.liquidityBakingContract = await this.tezosToolKit.contract.at(
         this.liquidityBakingContractAddress
       );
-
       this.tokenContract = await this.tezosToolKit.contract.at(
         this.tokenContractAddress
       );

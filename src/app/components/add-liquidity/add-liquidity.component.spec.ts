@@ -18,6 +18,7 @@ import { SimpleChange } from '@angular/core';
 import BigNumber from 'bignumber.js';
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe';
 import { getPipeMock } from 'test-config/mocks/pipe.mock';
+import { last } from 'rxjs/operators';
 
 describe('AddLiquidityComponent', () => {
   let component: AddLiquidityComponent;
@@ -56,6 +57,8 @@ describe('AddLiquidityComponent', () => {
     component.connectedWallet$ = of({
       address: 'tz1Mj7RzPmMAqDUNFBn5t5VbXmWW4cSUAdtT',
     } as AccountInfo);
+
+    component.availableBalanceTo$ = of(new BigNumber(1000000));
   }
 
   it('should create', () => {
@@ -95,11 +98,13 @@ describe('AddLiquidityComponent', () => {
           expect(component.estimatedLiquidityCreated.toNumber()).toBe(
             currency.expectedLiquidityCreatedValues[idx]
           );
-          component.minimumReceived$.subscribe((minimumReceived) => {
-            expect(minimumReceived.toNumber()).toBe(
-              currency.expectedMinimumReceivedValues[idx]
-            );
-          });
+          component.minimumReceived$
+            .pipe(last())
+            .subscribe((minimumReceived) => {
+              expect(minimumReceived.toNumber()).toBe(
+                currency.expectedMinimumReceivedValues[idx]
+              );
+            });
         });
       });
     }));
@@ -126,12 +131,21 @@ describe('AddLiquidityComponent', () => {
       fixture.detectChanges();
       const toCurrencies = [new MockTokenizedBitcoinCurrency()];
       toCurrencies.forEach((currency) => {
-        testManualLiquidityProvision([NaN, NaN, NaN, NaN, NaN], currency);
+        testManualLiquidityProvision(
+          [
+            'Insufficient',
+            'Insufficient',
+            'Insufficient',
+            'Insufficient',
+            'Insufficient',
+          ],
+          currency
+        );
       });
     }));
 
     function testManualLiquidityProvision(
-      expectedValues: number[],
+      expectedValues: number[] | string[],
       currency: any
     ) {
       currency.tezAmounts.forEach((tezAmount, idx) => {
