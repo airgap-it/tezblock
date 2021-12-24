@@ -1,9 +1,11 @@
 import { AccountInfo } from '@airgap/beacon-sdk';
 import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
+import { getSelectedSlippage } from '@tezblock/app.selectors';
 import * as fromRoot from '@tezblock/reducers';
 import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import * as actions from '../../app.actions';
 import { AbstractCurrency } from '../swap/swap-utils';
 
@@ -37,8 +39,21 @@ export abstract class LiquidityBaseComponent {
 
   constructor(protected readonly store$: Store<fromRoot.State>) {}
 
+  async ngOnInit() {
+    this.store$
+      .select(getSelectedSlippage)
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((slippage) => {
+        this.selectedSlippage$.next(slippage);
+      });
+  }
+
   connectWallet() {
     this.store$.dispatch(actions.connectWallet());
+  }
+
+  setSlippage(slippage: number) {
+    this.store$.dispatch(actions.setSlippage({ slippage }));
   }
 
   public ngOnDestroy(): void {

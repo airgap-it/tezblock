@@ -31,12 +31,13 @@ export interface AbstractCurrency {
   addLiquidity(
     mutezAmount: number,
     address: string,
-    minLqtMinted: number
+    minLqtMinted: number,
+    expectedTokenAmount: number
   ): Promise<PartialTezosOperation[]>;
 
   addLiquidityManually(
-    mutezAmount: number,
     address: string,
+    minLqtMinted: number,
     maxTokenDeposited: number
   ): Promise<PartialTezosOperation[]>;
 

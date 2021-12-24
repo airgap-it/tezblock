@@ -103,4 +103,5 @@ export const addFontAwesome = () => {
     faExternalLink,
     faPlus
   );
+  library.add(faGithub, faMedium, faTelegram, faTwitter, faApple, faAndroid);
 };

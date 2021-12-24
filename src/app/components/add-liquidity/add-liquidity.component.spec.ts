@@ -101,9 +101,11 @@ describe('AddLiquidityComponent', () => {
           component.minimumReceived$
             .pipe(last())
             .subscribe((minimumReceived) => {
-              expect(minimumReceived.toNumber()).toBe(
-                currency.expectedMinimumReceivedValues[idx]
-              );
+              expect(
+                new BigNumber(
+                  minimumReceived.toFixed(component.toCurrency.decimals)
+                ).toNumber()
+              ).toBe(currency.expectedMinimumReceivedValues[idx]);
             });
         });
       });
@@ -131,16 +133,7 @@ describe('AddLiquidityComponent', () => {
       fixture.detectChanges();
       const toCurrencies = [new MockTokenizedBitcoinCurrency()];
       toCurrencies.forEach((currency) => {
-        testManualLiquidityProvision(
-          [
-            'Insufficient',
-            'Insufficient',
-            'Insufficient',
-            'Insufficient',
-            'Insufficient',
-          ],
-          currency
-        );
+        testManualLiquidityProvision([NaN, NaN, NaN, NaN, NaN], currency);
       });
     }));
 
@@ -168,9 +161,21 @@ describe('AddLiquidityComponent', () => {
           ),
         });
         tick(1000);
-        expect(component.formGroup.controls.liquidityControl.value).toEqual(
-          expectedValues[idx]
-        );
+
+        component.selectedSlippage$.subscribe((slippage) => {
+          const percentage = new BigNumber(100).div(
+            new BigNumber(100).minus(slippage)
+          );
+
+          const formControlAmountSlippageAdjusted = new BigNumber(
+            new BigNumber(component.formGroup.controls.liquidityControl.value)
+              .times(percentage)
+              .toFixed(component.toCurrency.decimals)
+          );
+          expect(formControlAmountSlippageAdjusted.toNumber()).toEqual(
+            expectedValues[idx] as any
+          );
+        });
       });
     }
   });

@@ -1,17 +1,18 @@
 import {
   Component,
   EventEmitter,
+  Input,
   OnChanges,
   Output,
   SimpleChanges,
 } from '@angular/core';
 import { Store } from '@ngrx/store';
 import BigNumber from 'bignumber.js';
-import { BehaviorSubject, combineLatest, Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { formControlOptions } from './swap-utils';
 import * as fromRoot from '@tezblock/reducers';
 import { FormControl } from '@angular/forms';
-import { takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { BeaconService } from '@tezblock/services/beacon/beacon.service';
 import { LiquidityBaseComponent } from '../liquidity-base/liquidity-base.component';
 
@@ -34,8 +35,12 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
   onSwapDirection: EventEmitter<void> = new EventEmitter();
 
   @Output()
-  onMinimumReceived: EventEmitter<Observable<BigNumber | undefined>> =
-    new EventEmitter();
+  onMinimumReceived: EventEmitter<BigNumber | undefined> = new EventEmitter();
+
+  @Input()
+  set slippage(value: number) {
+    this.selectedSlippage$.next(value);
+  }
 
   public fromTez: boolean = true;
   public fromAmount: FormControl;
@@ -53,7 +58,6 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
     super(store$);
     this.fromAmount = new FormControl(null, formControlOptions);
     this.toAmount = new FormControl(null, formControlOptions);
-    this.selectedSlippage$.next(this.slippages[0]);
     this.toAmount.valueChanges
       .pipe(takeUntil(this.ngDestroyed$))
       .subscribe((amount) => {
@@ -187,32 +191,32 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
   async swap() {
     this.busy$.next(true);
     const fromAmount = new BigNumber(this.fromAmount.value);
-    this.minimumReceived$
-      .pipe(takeUntil(this.ngDestroyed$))
-      .subscribe(async (minimumReceived) => {
-        if (fromAmount && minimumReceived) {
-          const currency = this.fromTez ? this.toCurrency : this.fromCurrency;
-          const minReceived = Math.floor(minimumReceived.toNumber());
-          if (currency) {
-            if (this.fromTez) {
-              await currency
-                .fromTez(this.address, fromAmount, minReceived)
-                .then((operation) => {
-                  this.beaconService.operationRequest(operation);
-                })
-                .catch(() => this.busy$.next(false));
-            } else {
-              await currency
-                .toTez(this.address, fromAmount, minReceived)
-                .then((operation) => {
-                  this.beaconService.operationRequest(operation);
-                })
-                .catch(() => this.busy$.next(false));
-            }
+    this.minimumReceived$.pipe(take(1)).subscribe(async (minimumReceived) => {
+      if (fromAmount && minimumReceived) {
+        const currency = this.fromTez ? this.toCurrency : this.fromCurrency;
+        const minReceived = Math.floor(
+          minimumReceived.shiftedBy(this.toCurrency.decimals).toNumber()
+        );
+        if (currency) {
+          if (this.fromTez) {
+            await currency
+              .fromTez(this.address, fromAmount, minReceived)
+              .then((operation) => {
+                this.beaconService.operationRequest(operation);
+              })
+              .catch(() => this.busy$.next(false));
+          } else {
+            await currency
+              .toTez(this.address, fromAmount, minReceived)
+              .then((operation) => {
+                this.beaconService.operationRequest(operation);
+              })
+              .catch(() => this.busy$.next(false));
           }
         }
-        this.busy$.next(false);
-      });
+      }
+      this.busy$.next(false);
+    });
   }
 
   swapDirection() {
@@ -236,7 +240,7 @@ export class SwapComponent extends LiquidityBaseComponent implements OnChanges {
 
   updateMinimumReceived(value: BigNumber | undefined) {
     this.minimumReceived$.next(value);
-    this.onMinimumReceived.next(this.minimumReceived$);
+    this.onMinimumReceived.next(value);
   }
 
   public ngOnDestroy(): void {
