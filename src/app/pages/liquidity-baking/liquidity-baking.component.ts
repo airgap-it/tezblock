@@ -8,7 +8,6 @@ import { map } from 'rxjs/operators';
 import { Title, Meta } from '@angular/platform-browser';
 import {
   CryptoPriceApiResponse,
-  CryptoPricesService,
   PricePeriod,
 } from '@tezblock/services/crypto-prices/crypto-prices.service';
 import { TabDirective } from 'ngx-bootstrap/tabs';
@@ -24,6 +23,7 @@ import { defaultOptions } from '@tezblock/components/chart-item/chart-item.compo
 import { ChartOptions } from 'chart.js';
 import { ApiService } from '@tezblock/services/api/api.service';
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component';
+import { LiquidityBaseComponent } from '@tezblock/components/liquidity-base/liquidity-base.component';
 
 const liquidityChartOptions = (currency: AbstractCurrency): ChartOptions => {
   return {
@@ -68,7 +68,10 @@ export enum NestedTab {
   templateUrl: './liquidity-baking.component.html',
   styleUrls: ['./liquidity-baking.component.scss'],
 })
-export class LiquidityBakingComponent implements OnInit {
+export class LiquidityBakingComponent
+  extends LiquidityBaseComponent
+  implements OnInit
+{
   private _tabs: Tab[] | undefined = [];
   selectedTab: Tab | undefined = undefined;
 
@@ -87,12 +90,12 @@ export class LiquidityBakingComponent implements OnInit {
   public totalValueLocked: Observable<string>;
   public estimatedApy: Observable<string>;
 
+  public slippage: number = this.slippages[0];
   public chartOptions;
   public mainTab: MainTab = MainTab.SWAP;
   public nestedTab: NestedTab = NestedTab.ADD_LIQUIDITY;
   public accountInfo: string | undefined;
   public marketPrice$: Observable<string> | undefined;
-  public minimumReceived$: Observable<BigNumber | undefined>;
   public fromCurrency: AbstractCurrency | undefined;
   public toCurrency: AbstractCurrency | undefined;
   public tezCurrency: AbstractCurrency | undefined;
@@ -112,12 +115,13 @@ export class LiquidityBakingComponent implements OnInit {
   }
 
   constructor(
-    private readonly store$: Store<fromRoot.State>,
+    protected readonly store$: Store<fromRoot.State>,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly apiService: ApiService,
     private titleService: Title,
     private metaTagService: Meta
   ) {
+    super(store$);
     this.store$.dispatch(appActions.setupBeacon());
     this.fromCurrency = new TezosCurrency(this.store$);
     this.tezCurrency = this.fromCurrency;
@@ -217,7 +221,11 @@ export class LiquidityBakingComponent implements OnInit {
     this.selectedTab = selectedTab;
   }
 
-  public setMinimumReceived$(value: Observable<BigNumber | undefined>) {
-    this.minimumReceived$ = value;
+  updateSlippage(slippage: number) {
+    this.slippage = slippage;
+  }
+
+  setMinimumReceived$(value: BigNumber | undefined) {
+    this.minimumReceived$.next(value);
   }
 }

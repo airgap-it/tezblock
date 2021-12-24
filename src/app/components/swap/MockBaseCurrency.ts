@@ -53,8 +53,8 @@ export abstract class MockBaseCurrency implements AbstractCurrency {
   }
 
   addLiquidityManually(
-    _mutezAmount: number,
     _address: string,
+    _minLqtMinted: number,
     _maxTokenDeposited: number
   ): Promise<PartialTezosOperation[]> {
     throw new Error('Not implemented');

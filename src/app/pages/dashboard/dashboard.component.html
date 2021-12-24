@@ -194,7 +194,7 @@
                   <h5 class="card-title__secondary mb-3">
                     {{ 'dashboard.circulating-supply' | translate }}
                   </h5>
-                  <h3>890,141,239 ꜩ</h3>
+                  <h3>900,212,611 ꜩ</h3>
                   <!--TODO-->
                 </div>
 
@@ -203,7 +203,7 @@
                 </h5>
                 <h3 *ngIf="fiatInfo$ | async as fiatInfo">
                   {{ fiatInfo.symbol
-                  }}{{ fiatInfo.price.times('890141239').toFormat(0) }}
+                  }}{{ fiatInfo.price.times('900212611 ').toFormat(0) }}
                 </h3>
               </div>
               <div class="col-md-6 col-lg-4">

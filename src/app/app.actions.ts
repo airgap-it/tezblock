@@ -146,3 +146,8 @@ export const fetchConnectedWalletBalanceFailed = createAction(
   `[${featureName}] Fetch Connected Wallet Balance Failed`,
   props<{ error: any }>()
 );
+
+export const setSlippage = createAction(
+  `[${featureName}] Set Slippage`,
+  props<{ slippage: number }>()
+);

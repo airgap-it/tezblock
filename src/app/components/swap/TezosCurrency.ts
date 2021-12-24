@@ -52,14 +52,15 @@ export class TezosCurrency implements AbstractCurrency {
   addLiquidity(
     _mutezAmount: number,
     _address: string,
-    _minLqtMinted: number
+    _minLqtMinted: number,
+    _expectedTokenAmount: number
   ): Promise<PartialTezosOperation[]> {
     throw new Error('Not implemented');
   }
 
   addLiquidityManually(
-    _mutezAmount: number,
     _address: string,
+    _minLqtMinted: number,
     _maxTokenDeposited: number
   ): Promise<PartialTezosOperation[]> {
     throw new Error('Not implemented');

@@ -120,6 +120,7 @@ import { SwapComponent } from './components/swap/swap.component';
 import { AddLiquidityComponent } from './components/add-liquidity/add-liquidity.component';
 import { RemoveLiquidityComponent } from './components/remove-liquidity/remove-liquidity.component';
 import { LoadingItemComponent } from './components/loading-item/loading-item.component';
+import { SlippageComponent } from './components/slippage/slippage.component';
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -251,6 +252,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     AddLiquidityComponent,
     RemoveLiquidityComponent,
     LoadingItemComponent,
+    SlippageComponent,
   ],
 
   providers: [
