@@ -18,6 +18,7 @@ import { SimpleChange } from '@angular/core';
 import BigNumber from 'bignumber.js';
 import { IconPipe } from '@tezblock/pipes/icon/icon.pipe';
 import { getPipeMock } from 'test-config/mocks/pipe.mock';
+import { last } from 'rxjs/operators';
 
 describe('AddLiquidityComponent', () => {
   let component: AddLiquidityComponent;
@@ -56,6 +57,8 @@ describe('AddLiquidityComponent', () => {
     component.connectedWallet$ = of({
       address: 'tz1Mj7RzPmMAqDUNFBn5t5VbXmWW4cSUAdtT',
     } as AccountInfo);
+
+    component.availableBalanceTo$ = of(new BigNumber(1000000));
   }
 
   it('should create', () => {
@@ -95,11 +98,15 @@ describe('AddLiquidityComponent', () => {
           expect(component.estimatedLiquidityCreated.toNumber()).toBe(
             currency.expectedLiquidityCreatedValues[idx]
           );
-          component.minimumReceived$.subscribe((minimumReceived) => {
-            expect(minimumReceived.toNumber()).toBe(
-              currency.expectedMinimumReceivedValues[idx]
-            );
-          });
+          component.minimumReceived$
+            .pipe(last())
+            .subscribe((minimumReceived) => {
+              expect(
+                new BigNumber(
+                  minimumReceived.toFixed(component.toCurrency.decimals)
+                ).toNumber()
+              ).toBe(currency.expectedMinimumReceivedValues[idx]);
+            });
         });
       });
     }));
@@ -131,7 +138,7 @@ describe('AddLiquidityComponent', () => {
     }));
 
     function testManualLiquidityProvision(
-      expectedValues: number[],
+      expectedValues: number[] | string[],
       currency: any
     ) {
       currency.tezAmounts.forEach((tezAmount, idx) => {
@@ -154,9 +161,21 @@ describe('AddLiquidityComponent', () => {
           ),
         });
         tick(1000);
-        expect(component.formGroup.controls.liquidityControl.value).toEqual(
-          expectedValues[idx]
-        );
+
+        component.selectedSlippage$.subscribe((slippage) => {
+          const percentage = new BigNumber(100).div(
+            new BigNumber(100).minus(slippage)
+          );
+
+          const formControlAmountSlippageAdjusted = new BigNumber(
+            new BigNumber(component.formGroup.controls.liquidityControl.value)
+              .times(percentage)
+              .toFixed(component.toCurrency.decimals)
+          );
+          expect(formControlAmountSlippageAdjusted.toNumber()).toEqual(
+            expectedValues[idx] as any
+          );
+        });
       });
     }
   });

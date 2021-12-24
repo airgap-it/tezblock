@@ -9,3 +9,8 @@ export const getConnectedWalletBalance = createSelector(
   selectApp,
   (state) => state.connectedWalletBalance
 );
+
+export const getSelectedSlippage = createSelector(
+  selectApp,
+  (state) => state.selectedSlippage
+);

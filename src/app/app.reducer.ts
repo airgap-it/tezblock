@@ -47,6 +47,7 @@ export interface State {
   fiatCurrencyInfo: CurrencyInfo;
   connectedWallet: AccountInfo | undefined;
   connectedWalletBalance: BigNumber;
+  selectedSlippage: number;
 }
 
 export const initialState: State = {
@@ -73,6 +74,7 @@ export const initialState: State = {
   },
   connectedWallet: undefined,
   connectedWalletBalance: new BigNumber(0),
+  selectedSlippage: 0.5,
 };
 
 export const reducer = createReducer(
@@ -162,6 +164,10 @@ export const reducer = createReducer(
   on(actions.fetchConnectedWalletBalanceSucceeded, (state, { balance }) => ({
     ...state,
     connectedWalletBalance: balance,
+  })),
+  on(actions.setSlippage, (state, { slippage }) => ({
+    ...state,
+    selectedSlippage: slippage,
   }))
 );
 

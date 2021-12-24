@@ -1,5 +1,5 @@
 import { Component, OnChanges, SimpleChanges } from '@angular/core';
-import { combineLatest, of, ReplaySubject } from 'rxjs';
+import { combineLatest, ReplaySubject } from 'rxjs';
 import { formControlOptions, tezToMutez } from '../swap/swap-utils';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '@tezblock/reducers';
@@ -10,7 +10,7 @@ import {
   Validators,
 } from '@angular/forms';
 import BigNumber from 'bignumber.js';
-import { debounceTime, first, map, takeUntil } from 'rxjs/operators';
+import { map, take, takeUntil } from 'rxjs/operators';
 import { BeaconService } from '@tezblock/services/beacon/beacon.service';
 import { LiquidityBaseComponent } from '../liquidity-base/liquidity-base.component';
 
@@ -39,7 +39,6 @@ export class AddLiquidityComponent
   ) {
     super(store$);
     this.manualToggle$.next();
-    this.selectedSlippage$.next(this.slippages[0]);
     this.formGroup = this.formBuilder.group({
       amountControl: [null, formControlOptions],
       liquidityControl: [
@@ -60,7 +59,6 @@ export class AddLiquidityComponent
     const lastChanged = this.formGroup.controls[
       'amountControl'
     ].valueChanges.pipe(
-      debounceTime(300),
       map((amountInTez) => ({
         addLiquidityManually: false,
         amountInTez,
@@ -71,6 +69,7 @@ export class AddLiquidityComponent
       lastChanged,
       this.selectedSlippage$,
       this.connectedWallet$,
+      this.availableBalanceTo$,
       this.manualToggle$,
     ])
       .pipe(takeUntil(this.ngDestroyed$))
@@ -79,12 +78,18 @@ export class AddLiquidityComponent
           lastChanged,
           slippage,
           connectedWallet,
+          availableBalanceTo,
           _manualToggle,
         ]): Promise<void> => {
           this.loadValuesBusy$.next(true);
+          const percentage = this.addLiquidityManually
+            ? new BigNumber(1)
+            : new BigNumber(100).minus(slippage).div(100);
 
           this.address = connectedWallet?.address;
           if (this.addLiquidityManually) {
+            this.xtzAmount = new BigNumber(lastChanged.amountInTez).toNumber();
+
             const rawValue =
               await this.toCurrency?.getExpectedMinimumReceivedToken(
                 new BigNumber(lastChanged.amountInTez)
@@ -92,15 +97,21 @@ export class AddLiquidityComponent
                   .integerValue()
               );
 
-            this.availableBalanceTo$.pipe(first()).subscribe((balance) => {
-              this.minimumReceived$ = of(rawValue);
-              this.loadValuesBusy$.next(false);
-              const value = rawValue.gt(balance) ? NaN : rawValue.toNumber();
-              this.formGroup.controls['liquidityControl'].setValue(value, {
-                emitEvent: false,
-              });
-              this.formGroup.controls['liquidityControl'].markAsTouched();
+            this.minimumReceived$.next(rawValue);
+            this.loadValuesBusy$.next(false);
+
+            const value = rawValue.gt(availableBalanceTo)
+              ? 'Insufficient'
+              : lastChanged.amountInTez === '' ||
+                lastChanged.amountInTez === '0'
+              ? 0
+              : new BigNumber(
+                  rawValue.times(percentage).toFixed(this.toCurrency?.decimals)
+                ).toNumber();
+            this.formGroup.controls['liquidityControl'].setValue(value, {
+              emitEvent: false,
             });
+            this.formGroup.controls['liquidityControl'].markAsTouched();
           } else {
             this.xtzAmount = new BigNumber(lastChanged.amountInTez)
               .div(2)
@@ -113,65 +124,68 @@ export class AddLiquidityComponent
                   .integerValue()
               );
 
-            const percentage = new BigNumber(100).minus(slippage).div(100);
             const minimumReceived = isNaN(value.times(percentage).toNumber())
               ? undefined
-              : value.times(percentage);
+              : new BigNumber(
+                  value.times(percentage).toFixed(this.toCurrency?.decimals)
+                );
 
-            this.minimumReceived$ = of(minimumReceived);
+            this.minimumReceived$.next(minimumReceived);
             this.loadValuesBusy$.next(false);
-
-            this.estimatedLiquidityCreated =
-              await this.toCurrency.estimateLiquidityCreated(
-                new BigNumber(tezToMutez(this.xtzAmount, this.fromDecimals))
-              );
           }
+
+          this.estimatedLiquidityCreated =
+            await this.toCurrency.estimateLiquidityCreated(
+              new BigNumber(
+                tezToMutez(
+                  new BigNumber(this.xtzAmount).times(percentage), // TODO JGD set to 0.995?
+                  this.fromDecimals
+                )
+              )
+            );
         }
       );
   }
 
-  async toggleAddLiquidityManually() {
-    this.addLiquidityManually = !this.addLiquidityManually;
-    this.manualToggle$.next();
-    this.formGroup.controls['liquidityControl'].markAsUntouched();
-  }
-
   async addLiquidity() {
     this.busy$.next(true);
-    if (this.addLiquidityManually) {
-      await this.toCurrency
-        .addLiquidityManually(
-          tezToMutez(
-            this.formGroup.controls['amountControl'].value,
-            this.fromDecimals
-          ),
-          this.address,
-          tezToMutez(
-            this.formGroup.controls['liquidityControl'].value,
-            this.toDecimals
+    this.minimumReceived$.pipe(take(1)).subscribe(async (minimumReceived) => {
+      const minReceived = Math.floor(
+        minimumReceived.shiftedBy(this.toCurrency.decimals).toNumber()
+      );
+      if (this.addLiquidityManually) {
+        await this.toCurrency
+          .addLiquidityManually(
+            this.address,
+            this.estimatedLiquidityCreated.toNumber(),
+            minReceived
           )
-        )
-        .then((operation) => this.beaconService.operationRequest(operation))
-        .catch(() => this.busy$.next(false));
-    } else {
-      if (this.xtzAmount && this.estimatedLiquidityCreated) {
-        if (this.toCurrency) {
-          await this.toCurrency
-            .addLiquidity(
-              tezToMutez(this.xtzAmount, this.fromDecimals),
-              this.address,
-              this.estimatedLiquidityCreated.toNumber()
-            )
-            .then((operation) => this.beaconService.operationRequest(operation))
-            .catch(() => this.busy$.next(false));
+          .then((operation) => this.beaconService.operationRequest(operation))
+          .catch(() => this.busy$.next(false));
+      } else {
+        if (this.xtzAmount && this.estimatedLiquidityCreated) {
+          if (this.toCurrency) {
+            await this.toCurrency
+              .addLiquidity(
+                tezToMutez(this.xtzAmount, this.fromDecimals),
+                this.address,
+                this.estimatedLiquidityCreated.toNumber(),
+                minReceived
+              )
+              .then((operation) =>
+                this.beaconService.operationRequest(operation)
+              )
+              .catch(() => this.busy$.next(false));
+          }
         }
       }
-      this.busy$.next(false);
-    }
+    });
   }
 
   toggleManualMode() {
     this.addLiquidityManually = !this.addLiquidityManually;
+    this.manualToggle$.next();
+    this.formGroup.controls['liquidityControl'].markAsUntouched();
   }
 
   public ngOnDestroy(): void {

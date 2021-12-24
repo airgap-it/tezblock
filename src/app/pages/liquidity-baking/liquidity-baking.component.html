@@ -23,6 +23,7 @@
                 </ng-template>
 
                 <app-swap
+                  [slippage]="slippage"
                   [connectedWallet$]="connectedWallet$"
                   [fromCurrency]="fromCurrency"
                   [toCurrency]="toCurrency"
@@ -94,16 +95,28 @@
             </tabset>
           </div>
         </div>
-        <div *ngIf="mainTab === 'SWAP'">
+        <div
+          *ngIf="
+            mainTab === 'SWAP' ||
+            (nestedTab === 'ADD_LIQUIDITY' && mainTab === 'LIQUIDITY')
+          "
+        >
           <div class="card">
             <div class="card-body">
-              <div class="d-flex justify-content-between">
+              <div
+                class="d-flex justify-content-between pb-3"
+                *ngIf="mainTab === 'SWAP'"
+              >
                 <div>Minimum received</div>
                 <div *ngIf="minimumReceived$ | async">
                   {{ minimumReceived$ | async }} {{ toCurrency.symbol }}
                 </div>
                 <div *ngIf="!(minimumReceived$ | async)">-</div>
               </div>
+
+              <app-slippage
+                [connectedWallet$]="connectedWallet$"
+              ></app-slippage>
             </div>
           </div>
         </div>

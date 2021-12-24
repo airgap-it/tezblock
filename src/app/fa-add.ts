@@ -101,6 +101,7 @@ export const addFontAwesome = () => {
     faTimes,
     faCog,
     faExternalLink,
-    faPlus
+    faPlus,
+    faAndroid
   );
 };
