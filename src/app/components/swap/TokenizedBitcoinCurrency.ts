@@ -129,40 +129,56 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     );
   }
 
+  async estimatePriceImpact(mutezAmount: BigNumber): Promise<BigNumber> {
+    await this.initContracts();
+    return new BigNumber(
+      this.xtzToTokenPriceImpact(mutezAmount.toNumber())
+    ).times(100);
+  }
+
   async addLiquidity(
-    mutezAmount: number,
     address: string,
-    minLqtMinted: number,
-    maxTokenDeposited: number
+    mutezAmount: number,
+    maxTokenDeposited: number,
+    minLqtMinted: number
   ): Promise<PartialTezosOperation[]> {
     await this.initContracts();
     return this.generateAddLiquidityOperation(
-      mutezAmount,
       address,
-      minLqtMinted,
-      maxTokenDeposited
+      mutezAmount,
+      maxTokenDeposited,
+      minLqtMinted
     );
   }
 
   async addLiquidityManually(
     address: string,
-    minLqtMinted: number,
-    tokenAmount: number
+    mutezAmount: number,
+    maxTokenDeposited: number,
+    minLqtMinted: number
   ): Promise<PartialTezosOperation[]> {
     await this.initContracts();
     return this.generateAddLiquidityManuallyOperation(
       address,
-      minLqtMinted,
-      tokenAmount
+      mutezAmount,
+      maxTokenDeposited,
+      minLqtMinted
     );
   }
 
   async removeLiquidity(
+    address: string,
+    tezAmount: number,
     liquidityAmount: number,
-    address: string
+    minTokensWithdrawn: number
   ): Promise<PartialTezosOperation[]> {
     await this.initContracts();
-    return this.generateRemoveLiquidityOperation(liquidityAmount, address);
+    return this.generateRemoveLiquidityOperation(
+      address,
+      tezAmount,
+      liquidityAmount,
+      minTokensWithdrawn
+    );
   }
 
   async toTez(
@@ -240,21 +256,14 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
 
   generateAddLiquidityManuallyOperation(
     address: string,
-    minLqtMinted: number,
-    maxTokenDeposited: number
+    mutezAmount: number,
+    maxTokenDeposited: number,
+    minLqtMinted: number
   ) {
     const deadline = new BigNumber(Date.now())
       .dividedToIntegerBy(1000)
       .plus(60 * 60)
       .toString();
-
-    const addLiquidityXtzIn = new BigNumber(
-      liquidityBakingCalculations.addLiquidityXtzIn(
-        maxTokenDeposited,
-        this.xtzPool,
-        this.tokenPool
-      )
-    ).toString();
 
     let approveZeroParams = this.tokenContract.methods
       .approve(this.liquidityBakingContractAddress, 0)
@@ -287,7 +296,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     const addLiquidityRequest = {
       kind: 'transaction',
       source: address,
-      amount: new BigNumber(addLiquidityXtzIn).toString(),
+      amount: new BigNumber(mutezAmount).toString(),
       destination: this.liquidityBakingContractAddress,
       parameters: addLiquidityParams.parameter,
     } as PartialTezosOperation;
@@ -300,23 +309,17 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
   }
 
   generateAddLiquidityOperation(
-    xtzAmountToBeSwapped: number,
     address: string,
-    minLqtMinted: number,
-    maxTokenDeposited: number
+    mutezAmount: number,
+    maxTokenDeposited: number,
+    minLqtMinted: number
   ) {
     const deadline = new BigNumber(Date.now())
       .dividedToIntegerBy(1000)
       .plus(60 * 60)
       .toString();
 
-    const addLiquidityXtzIn = new BigNumber(
-      liquidityBakingCalculations.addLiquidityXtzIn(
-        maxTokenDeposited,
-        this.xtzPool,
-        this.tokenPool
-      )
-    ).toString();
+    const additionalSlippage = new BigNumber(100).minus(0.05).div(100);
 
     let xtzToTokenParams = this.liquidityBakingContract.methods
       .xtzToToken(address, 0, deadline)
@@ -327,17 +330,27 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       .toTransferParams();
 
     let addLiquidityParams = this.liquidityBakingContract.methods
-      .addLiquidity(address, minLqtMinted, maxTokenDeposited, deadline)
+      .addLiquidity(
+        address,
+        new BigNumber(minLqtMinted)
+          .times(additionalSlippage)
+          .integerValue()
+          .toNumber(),
+        new BigNumber(maxTokenDeposited)
+          .times(additionalSlippage)
+          .integerValue()
+          .toNumber(),
+        deadline
+      )
       .toTransferParams();
 
     const xtzToTokenRequest = {
       kind: 'transaction',
       source: address,
-      amount: new BigNumber(xtzAmountToBeSwapped).toString(),
+      amount: new BigNumber(mutezAmount).toString(),
       destination: this.liquidityBakingContractAddress,
       parameters: xtzToTokenParams.parameter,
     } as PartialTezosOperation;
-
     const approveRequest = {
       kind: 'transaction',
       source: address,
@@ -349,36 +362,33 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     const addLiquidityRequest = {
       kind: 'transaction',
       source: address,
-      amount: new BigNumber(addLiquidityXtzIn).toString(),
+      amount: new BigNumber(mutezAmount)
+        .times(additionalSlippage)
+        .integerValue()
+        .toString(),
       destination: this.liquidityBakingContractAddress,
       parameters: addLiquidityParams.parameter,
     } as PartialTezosOperation;
-    return [xtzToTokenRequest, approveRequest, addLiquidityRequest];
+
+    return [xtzToTokenRequest, approveRequest, addLiquidityRequest] as any;
   }
 
-  generateRemoveLiquidityOperation(liquidityAmount: number, address: string) {
+  generateRemoveLiquidityOperation(
+    address: string,
+    tezAmount: number,
+    liquidityAmount: number,
+    minTokensWithdrawn: number
+  ) {
     const deadline = new BigNumber(Date.now())
       .dividedToIntegerBy(1000)
       .plus(60 * 60)
       .toString();
 
-    const minXtzWithdrawn = liquidityBakingCalculations.removeLiquidityXtzOut(
-      liquidityAmount,
-      this.lqtTotal,
-      this.xtzPool
-    );
-    const minTokensWithdrawn =
-      liquidityBakingCalculations.removeLiquidityTokenOut(
-        liquidityAmount,
-        this.lqtTotal,
-        this.tokenPool
-      );
-
     let removeLiquidityParams = this.liquidityBakingContract.methods
       .removeLiquidity(
         address,
         liquidityAmount,
-        minXtzWithdrawn,
+        tezAmount,
         minTokensWithdrawn,
         deadline
       )
@@ -397,6 +407,14 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
 
   xtzToTokenTokenOutput(mutezAmount: number) {
     return liquidityBakingCalculations.xtzToTokenTokenOutput(
+      mutezAmount,
+      this.xtzPool,
+      this.tokenPool
+    );
+  }
+
+  xtzToTokenPriceImpact(mutezAmount: number) {
+    return liquidityBakingCalculations.xtzToTokenPriceImpact(
       mutezAmount,
       this.xtzPool,
       this.tokenPool
@@ -460,11 +478,13 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     );
   }
 
-  estimateXtzIn(tokenAmount: number) {
-    return liquidityBakingCalculations.addLiquidityXtzIn(
-      tokenAmount,
-      this.xtzPool,
-      this.tokenPool
+  async getExpectedTokenIn(mutezAmount: BigNumber): Promise<BigNumber> {
+    return new BigNumber(
+      liquidityBakingCalculations.addLiquidityTokenIn(
+        mutezAmount.toNumber(),
+        this.xtzPool,
+        this.tokenPool
+      )
     );
   }
 

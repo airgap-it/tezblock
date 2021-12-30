@@ -4,9 +4,9 @@ import { FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { BeaconService } from '@tezblock/services/beacon/beacon.service';
 import BigNumber from 'bignumber.js';
-import { from, Observable } from 'rxjs';
+import { combineLatest, from, Observable } from 'rxjs';
 import { debounceTime, map, switchMap, takeUntil } from 'rxjs/operators';
-import { formControlOptions } from '../swap/swap-utils';
+import { formControlOptions, tezToMutez } from '../swap/swap-utils';
 import { LiquidityBaseComponent } from '../liquidity-base/liquidity-base.component';
 
 @Component({
@@ -19,8 +19,8 @@ export class RemoveLiquidityComponent
   implements OnChanges
 {
   public lqtBurned: number = 0;
-  public xtzOut: BigNumber;
-  public tokensOut: BigNumber;
+  public minXtzWithdrawn: BigNumber;
+  public minTokensWithdrawn: BigNumber;
   public amountControl: FormControl;
   public availableLiquidity$: Observable<BigNumber | undefined>;
 
@@ -58,30 +58,49 @@ export class RemoveLiquidityComponent
       })
     );
 
-    lastChanged
+    lastChanged;
+    combineLatest([lastChanged, this.selectedSlippage$])
       .pipe(takeUntil(this.ngDestroyed$))
-      .subscribe(async (lastChanged): Promise<void> => {
+      .subscribe(async ([lastChanged, slippage]): Promise<void> => {
+        const percentage = new BigNumber(100).minus(slippage).div(100);
+
         this.loadValuesBusy$.next(true);
         this.lqtBurned = lastChanged.lqtBurned;
-        this.xtzOut = new BigNumber(
-          await this.fromCurrency?.getLiquidityBurnXtzOut(lastChanged.lqtBurned)
-        ).shiftedBy(-1 * this.toDecimals);
-
-        this.tokensOut = new BigNumber(
-          await this.fromCurrency?.getLiquidityBurnTokensOut(
-            lastChanged.lqtBurned
+        this.minXtzWithdrawn = new BigNumber(
+          new BigNumber(
+            await this.fromCurrency?.getLiquidityBurnXtzOut(
+              lastChanged.lqtBurned
+            )
           )
-        ).shiftedBy(-1 * this.fromDecimals);
+            .times(percentage)
+            .shiftedBy(-1 * this.toDecimals)
+            .toFixed(this.toDecimals)
+        );
+        this.minTokensWithdrawn = new BigNumber(
+          new BigNumber(
+            await this.fromCurrency?.getLiquidityBurnTokensOut(
+              lastChanged.lqtBurned
+            )
+          )
+            .times(percentage)
+            .shiftedBy(-1 * this.fromDecimals)
+            .toFixed(this.fromDecimals)
+        );
         this.loadValuesBusy$.next(false);
       });
   }
 
   async removeLiquidity() {
     this.busy$.next(true);
-    if (this.xtzOut && this.tokensOut && this.address) {
+    if (this.minXtzWithdrawn && this.minTokensWithdrawn && this.address) {
       if (this.toCurrency) {
         await this.fromCurrency
-          .removeLiquidity(this.lqtBurned, this.address)
+          .removeLiquidity(
+            this.address,
+            tezToMutez(this.minXtzWithdrawn, this.toDecimals),
+            this.lqtBurned,
+            tezToMutez(this.minTokensWithdrawn, this.fromDecimals)
+          )
           .then((operation) => this.beaconService.operationRequest(operation))
           .catch(() => this.busy$.next(false));
       }

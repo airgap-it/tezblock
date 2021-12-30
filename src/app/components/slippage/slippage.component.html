@@ -1,12 +1,24 @@
 <div class="d-flex justify-content-between align-items-center">
-  <div>Slippage Tolerance</div>
+  <div *ngIf="(selectedSlippage$ | async) <= slippages[slippages.length - 1]">
+    Slippage Tolerance
+  </div>
+  <div
+    *ngIf="(selectedSlippage$ | async) > slippages[slippages.length - 1]"
+    class="text-danger"
+  >
+    Slippage set to {{ selectedSlippage$ | async }}%
+  </div>
+
   <div class="btn-group btn-group-sm d-block" role="group">
     <ng-container *ngFor="let slippage of slippages">
       <button
         (click)="setSlippage(slippage)"
         type="button"
         class="btn"
-        [disabled]="!(connectedWallet$ | async)"
+        [disabled]="
+          !(connectedWallet$ | async) ||
+          (selectedSlippage$ | async) > slippages[slippages.length - 1]
+        "
         [ngClass]="
           slippage === (selectedSlippage$ | async)
             ? 'btn-dark'

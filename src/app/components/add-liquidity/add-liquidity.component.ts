@@ -23,9 +23,11 @@ export class AddLiquidityComponent
   extends LiquidityBaseComponent
   implements OnChanges
 {
-  public xtzAmount: number = 0;
-  public estimatedLiquidityCreated: BigNumber;
+  public xtzAmount: string = '0';
+  public minLqtMinted: BigNumber;
+  public maxTokenDeposited: string;
   public addLiquidityManually: boolean = false;
+  public maxSlippageExceeded: boolean = false;
   public availableBalance: BigNumber;
   public amountControl: FormControl;
   public liquidityAmountControl: FormControl;
@@ -82,67 +84,93 @@ export class AddLiquidityComponent
           _manualToggle,
         ]): Promise<void> => {
           this.loadValuesBusy$.next(true);
-          const percentage = this.addLiquidityManually
-            ? new BigNumber(1)
-            : new BigNumber(100).minus(slippage).div(100);
+          const percentage = new BigNumber(100).minus(slippage).div(100);
 
           this.address = connectedWallet?.address;
+
+          this.maxTokenDeposited = new BigNumber(
+            await this.toCurrency?.getExpectedTokenIn(
+              new BigNumber(lastChanged.amountInTez)
+                .shiftedBy(this.fromDecimals)
+                .integerValue()
+            )
+          )
+            .div(percentage)
+            .shiftedBy(-1 * this.toDecimals)
+            .toString();
+
           if (this.addLiquidityManually) {
-            this.xtzAmount = new BigNumber(lastChanged.amountInTez).toNumber();
+            this.xtzAmount = new BigNumber(lastChanged.amountInTez).toString();
 
-            const rawValue =
-              await this.toCurrency?.getExpectedMinimumReceivedToken(
-                new BigNumber(lastChanged.amountInTez)
-                  .shiftedBy(this.fromDecimals)
-                  .integerValue()
-              );
-
-            this.minimumReceived$.next(rawValue);
             this.loadValuesBusy$.next(false);
 
-            const value = rawValue.gt(availableBalanceTo)
+            const formControlMaxTokenDeposited = new BigNumber(
+              this.maxTokenDeposited
+            ).gt(availableBalanceTo)
               ? 'Insufficient'
               : lastChanged.amountInTez === '' ||
                 lastChanged.amountInTez === '0'
               ? 0
               : new BigNumber(
-                  rawValue.times(percentage).toFixed(this.toCurrency?.decimals)
-                ).toNumber();
-            this.formGroup.controls['liquidityControl'].setValue(value, {
-              emitEvent: false,
-            });
+                  new BigNumber(this.maxTokenDeposited).toFixed(
+                    this.toCurrency?.decimals
+                  )
+                ).toString();
+
+            this.formGroup.controls['liquidityControl'].setValue(
+              formControlMaxTokenDeposited,
+              {
+                emitEvent: false,
+              }
+            );
             this.formGroup.controls['liquidityControl'].markAsTouched();
           } else {
             this.xtzAmount = new BigNumber(lastChanged.amountInTez)
               .div(2)
-              .toNumber();
+              .toString();
 
-            const value =
-              await this.toCurrency?.getExpectedMinimumReceivedToken(
-                new BigNumber(this.xtzAmount)
-                  .shiftedBy(this.fromDecimals)
-                  .integerValue()
-              );
+            const priceImpact = await this.toCurrency?.estimatePriceImpact(
+              new BigNumber(lastChanged.amountInTez)
+                .shiftedBy(this.fromDecimals)
+                .div(2)
+            );
 
-            const minimumReceived = isNaN(value.times(percentage).toNumber())
+            let newSlippage = this.slippages.find((slippage) =>
+              priceImpact.lt(slippage)
+            );
+            if (newSlippage === undefined) {
+              newSlippage = priceImpact
+                .integerValue(BigNumber.ROUND_UP)
+                .toNumber();
+            }
+            isNaN(newSlippage) ? null : this.setSlippage(newSlippage);
+
+            this.maxTokenDeposited = isNaN(
+              new BigNumber(this.maxTokenDeposited)
+                .times(percentage)
+                .div(2)
+                .toNumber()
+            )
               ? undefined
               : new BigNumber(
-                  value.times(percentage).toFixed(this.toCurrency?.decimals)
-                );
+                  new BigNumber(this.maxTokenDeposited)
+                    .div(2)
+                    .toFixed(this.toCurrency?.decimals)
+                ).toString();
 
-            this.minimumReceived$.next(minimumReceived);
             this.loadValuesBusy$.next(false);
           }
 
-          this.estimatedLiquidityCreated =
+          this.minimumReceived$.next(new BigNumber(this.maxTokenDeposited));
+          this.minLqtMinted = new BigNumber(
             await this.toCurrency.estimateLiquidityCreated(
               new BigNumber(
-                tezToMutez(
-                  new BigNumber(this.xtzAmount).times(percentage), // TODO JGD set to 0.995?
-                  this.fromDecimals
-                )
+                tezToMutez(new BigNumber(this.xtzAmount), this.fromDecimals)
               )
-            );
+            )
+          )
+            .times(percentage)
+            .integerValue(BigNumber.ROUND_DOWN);
         }
       );
   }
@@ -150,31 +178,36 @@ export class AddLiquidityComponent
   async addLiquidity() {
     this.busy$.next(true);
     this.minimumReceived$.pipe(take(1)).subscribe(async (minimumReceived) => {
-      const minReceived = Math.floor(
+      const maxTokenDeposited = Math.floor(
         minimumReceived.shiftedBy(this.toCurrency.decimals).toNumber()
       );
       if (this.addLiquidityManually) {
         await this.toCurrency
           .addLiquidityManually(
             this.address,
-            this.estimatedLiquidityCreated.toNumber(),
-            minReceived
+            tezToMutez(this.xtzAmount, this.fromDecimals),
+            maxTokenDeposited,
+            this.minLqtMinted.toNumber()
           )
-          .then((operation) => this.beaconService.operationRequest(operation))
+          .then((operation) => {
+            this.beaconService.operationRequest(operation);
+            this.busy$.next(false);
+          })
           .catch(() => this.busy$.next(false));
       } else {
-        if (this.xtzAmount && this.estimatedLiquidityCreated) {
+        if (this.xtzAmount && this.minLqtMinted) {
           if (this.toCurrency) {
             await this.toCurrency
               .addLiquidity(
-                tezToMutez(this.xtzAmount, this.fromDecimals),
                 this.address,
-                this.estimatedLiquidityCreated.toNumber(),
-                minReceived
+                tezToMutez(this.xtzAmount, this.fromDecimals),
+                maxTokenDeposited,
+                this.minLqtMinted.toNumber()
               )
-              .then((operation) =>
-                this.beaconService.operationRequest(operation)
-              )
+              .then((operation) => {
+                this.beaconService.operationRequest(operation);
+                this.busy$.next(false);
+              })
               .catch(() => this.busy$.next(false));
           }
         }

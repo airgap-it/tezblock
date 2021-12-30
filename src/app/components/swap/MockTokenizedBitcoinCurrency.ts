@@ -16,12 +16,22 @@ export class MockTokenizedBitcoinCurrency extends MockBaseCurrency {
   public expectedMinimumReceivedValues = [
     4.3e-7, 0.00000435, 0.0000435, 0.00043508, 0.00435079,
   ];
-  public expectedLiquidityCreatedValues = [0, 4, 45, 457, 4574];
-  public expectedXtzOutValues = [NaN, NaN, 0.010875, 0.108753, 1.08753];
-  public expectedTokensOutValues = [NaN, NaN, 9.5e-7, 0.00000953, 0.0000953];
+  public expectedLiquidityCreatedValues = [0, 3, 44, 456, 4574];
+  public expectedXtzOutValues = [NaN, NaN, 0.010821, 0.108209, 1.082092];
+  public expectedTokensOutValues = [NaN, NaN, 9.5e-7, 0.00000948, 0.00009482];
 
   constructor() {
     super();
+  }
+
+  async getExpectedTokenIn(mutezAmount: BigNumber): Promise<BigNumber> {
+    return new BigNumber(
+      liquidityBakingCalculations.addLiquidityTokenIn(
+        mutezAmount.toNumber(),
+        this.xtzPool,
+        this.tokenPool
+      )
+    );
   }
 
   async getExpectedMinimumReceivedToken(
@@ -29,6 +39,20 @@ export class MockTokenizedBitcoinCurrency extends MockBaseCurrency {
   ): Promise<BigNumber> {
     const num = this.xtzToTokenTokenOutput(mutezAmount.toNumber());
     return new BigNumber(num).shiftedBy(-1 * this.decimals);
+  }
+
+  async estimatePriceImpact(mutezAmount: BigNumber): Promise<BigNumber> {
+    return new BigNumber(
+      this.xtzToTokenPriceImpact(mutezAmount.toNumber())
+    ).times(100);
+  }
+
+  xtzToTokenPriceImpact(mutezAmount: number) {
+    return liquidityBakingCalculations.xtzToTokenPriceImpact(
+      mutezAmount,
+      this.xtzPool,
+      this.tokenPool
+    );
   }
 
   xtzToTokenTokenOutput(mutezAmount: number) {
