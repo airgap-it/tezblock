@@ -29,21 +29,24 @@ export interface AbstractCurrency {
   ): Promise<PartialTezosOperation[]>;
 
   addLiquidity(
-    mutezAmount: number,
     address: string,
-    minLqtMinted: number,
-    expectedTokenAmount: number
+    mutezAmount: number,
+    maxTokenDeposited: number,
+    minLqtMinted: number
   ): Promise<PartialTezosOperation[]>;
 
   addLiquidityManually(
     address: string,
+    mutezAmount: number,
     minLqtMinted: number,
     maxTokenDeposited: number
   ): Promise<PartialTezosOperation[]>;
 
   removeLiquidity(
+    address: string,
+    tezAmount: number,
     liquidityAmount: number,
-    address: string
+    minTokensWithdrawn: number
   ): Promise<PartialTezosOperation[]>;
 
   getAvailableLiquidityBalance(address: string): Promise<BigNumber>;
@@ -51,17 +54,18 @@ export interface AbstractCurrency {
   getLiquidityBurnTokensOut(lqtBurned: number): Promise<BigNumber>;
   estimateLiquidityCreated(mutezAmount: BigNumber): Promise<BigNumber>;
   getExpectedMinimumReceivedToken(mutezAmount: BigNumber): Promise<BigNumber>;
+  getExpectedTokenIn(mutezAmount: BigNumber): Promise<BigNumber>;
   getExpectedMinimumReceivedTez(
     tokenAmount: number,
     tokenCurrency?: AbstractCurrency
   ): Promise<BigNumber>;
-
   getTotalValueLocked(): Observable<string>;
   estimateApy(): Observable<string>;
+  estimatePriceImpact(mutezAmount: BigNumber): Promise<BigNumber>;
 }
 
 export const tezToMutez = (
-  tez: BigNumber | number | undefined,
+  tez: BigNumber | number | string | undefined,
   decimals: number | undefined,
   round: boolean = true
 ): number => {

@@ -75,10 +75,10 @@ describe('RemoveLiquidityComponent', () => {
         });
         fixture.detectChanges();
         tick(1000);
-        expect(component.xtzOut.toNumber()).toEqual(
+        expect(component.minXtzWithdrawn.toNumber()).toEqual(
           currency.expectedXtzOutValues[idx]
         );
-        expect(component.tokensOut.toNumber()).toEqual(
+        expect(component.minTokensWithdrawn.toNumber()).toEqual(
           currency.expectedTokensOutValues[idx]
         );
       });

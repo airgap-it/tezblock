@@ -95,7 +95,7 @@ describe('AddLiquidityComponent', () => {
           fixture.detectChanges();
           tick(1000);
 
-          expect(component.estimatedLiquidityCreated.toNumber()).toBe(
+          expect(component.minLqtMinted.toNumber()).toBe(
             currency.expectedLiquidityCreatedValues[idx]
           );
           component.minimumReceived$

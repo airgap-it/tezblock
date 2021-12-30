@@ -8,7 +8,7 @@
     [loadValuesBusy]="loadValuesBusy$ | async"
   ></app-liquidity-input>
 
-  <div class="card" *ngIf="xtzOut && tokensOut">
+  <div class="card" *ngIf="minXtzWithdrawn && minTokensWithdrawn">
     <div class="card-body">
       <p>You Receive</p>
 
@@ -19,7 +19,7 @@
             [forceIdenticon]="false"
             class="mr-1"
           ></identicon>
-          {{ xtzOut?.toNumber() }} {{ toCurrency.symbol }}
+          {{ minXtzWithdrawn?.toNumber() }} {{ toCurrency.symbol }}
         </div>
         <fa-icon
           [icon]="'plus' | iconPipe"
@@ -31,7 +31,7 @@
             [forceIdenticon]="false"
             class="mr-1"
           ></identicon>
-          {{ tokensOut?.toNumber() }}
+          {{ minTokensWithdrawn?.toNumber() }}
           {{ fromCurrency.symbol }}
         </div>
       </div>
