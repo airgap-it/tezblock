@@ -50,16 +50,17 @@ export class TezosCurrency implements AbstractCurrency {
   }
 
   addLiquidity(
-    _mutezAmount: number,
     _address: string,
-    _minLqtMinted: number,
-    _expectedTokenAmount: number
+    _mutezAmount: number,
+    _maxTokenDeposited: number,
+    _minLqtMinted: number
   ): Promise<PartialTezosOperation[]> {
     throw new Error('Not implemented');
   }
 
   addLiquidityManually(
     _address: string,
+    _mutezAmount: number,
     _minLqtMinted: number,
     _maxTokenDeposited: number
   ): Promise<PartialTezosOperation[]> {
@@ -67,8 +68,9 @@ export class TezosCurrency implements AbstractCurrency {
   }
 
   removeLiquidity(
+    _address: string,
     _liquidityAmount: number,
-    _address: string
+    _minTokensWithdrawn: number
   ): Promise<PartialTezosOperation[]> {
     throw new Error('Not implemented');
   }
@@ -86,6 +88,14 @@ export class TezosCurrency implements AbstractCurrency {
   }
 
   getExpectedMinimumReceivedToken(_mutezAmount: BigNumber): Promise<BigNumber> {
+    throw new Error('Not implemented');
+  }
+
+  getExpectedTokenIn(_mutezAmount: BigNumber): Promise<BigNumber> {
+    throw new Error('Not implemented');
+  }
+
+  estimatePriceImpact(_mutezAmount: BigNumber): Promise<BigNumber> {
     throw new Error('Not implemented');
   }
 
