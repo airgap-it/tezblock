@@ -184,6 +184,13 @@ transaction-item div:nth-of-type(5) hr {
   }
 }
 
+app-liquidity-baking {
+  .nav-link {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
 /* Global Styles */
 @import './styles-dark.scss';
 @import './styles-light.scss';
