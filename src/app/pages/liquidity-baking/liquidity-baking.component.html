@@ -3,7 +3,7 @@
     <h1 hidden="true">Swap</h1>
     <div class="row pb-4">
       <div class="col-12 col-md-6">
-        <h5 class="mb-4">Swap</h5>
+        <h5 class="mb-4">Swap & Liqudity</h5>
       </div>
     </div>
     <div class="row">
@@ -15,8 +15,12 @@
                 <ng-template tabHeading>
                   <button
                     type="button"
-                    class="btn p-0 mr-1"
-                    [ngClass]="mainTab === 'SWAP' ? 'btn-link' : ''"
+                    class="btn mr-2"
+                    [ngClass]="
+                      mainTab === 'SWAP'
+                        ? 'btn-primary-light'
+                        : 'btn-outline-primary'
+                    "
                   >
                     <span class="d-sm-inline-block">Swap</span>
                   </button>
@@ -38,8 +42,12 @@
                 <ng-template tabHeading>
                   <button
                     type="button"
-                    class="btn p-0 mr-1"
-                    [ngClass]="mainTab === 'LIQUIDITY' ? 'btn-link' : ''"
+                    class="btn mr-1"
+                    [ngClass]="
+                      mainTab === 'LIQUIDITY'
+                        ? 'btn-primary-light'
+                        : 'btn-outline-primary'
+                    "
                   >
                     <span class="d-sm-inline-block">Liquidity</span>
                   </button>
@@ -52,22 +60,26 @@
                     <ng-template tabHeading>
                       <button
                         type="button"
-                        class="btn p-0 mr-1"
+                        class="btn btn-sm mr-2"
                         [ngClass]="
-                          nestedTab === 'ADD_LIQUIDITY' ? 'btn-link' : ''
+                          nestedTab === 'ADD_LIQUIDITY'
+                            ? 'btn-primary-light'
+                            : 'btn-outline-primary'
                         "
                       >
                         <span class="d-sm-inline-block">Add Liquidity</span>
                       </button>
                     </ng-template>
 
-                    <app-add-liquidity
-                      [connectedWallet$]="connectedWallet$"
-                      [fromCurrency]="tezCurrency"
-                      [toCurrency]="tokenCurrency"
-                      [availableBalanceFrom$]="tezBalance$"
-                      [availableBalanceTo$]="tokenBalance$"
-                    ></app-add-liquidity>
+                    <div class="pt-3">
+                      <app-add-liquidity
+                        [connectedWallet$]="connectedWallet$"
+                        [fromCurrency]="tezCurrency"
+                        [toCurrency]="tokenCurrency"
+                        [availableBalanceFrom$]="tezBalance$"
+                        [availableBalanceTo$]="tokenBalance$"
+                      ></app-add-liquidity>
+                    </div>
                   </tab>
                   <tab
                     id="REMOVE_LIQUIDITY"
@@ -76,19 +88,23 @@
                     <ng-template tabHeading>
                       <button
                         type="button"
-                        class="btn p-0 mr-1"
+                        class="btn btn-sm mr-1"
                         [ngClass]="
-                          nestedTab === 'REMOVE_LIQUIDITY' ? 'btn-link' : ''
+                          nestedTab === 'REMOVE_LIQUIDITY'
+                            ? 'btn-primary-light'
+                            : 'btn-outline-primary'
                         "
                       >
                         <span class="d-sm-inline-block">Remove Liquidity</span>
                       </button>
                     </ng-template>
-                    <app-remove-liquidity
-                      [fromCurrency]="tokenCurrency"
-                      [toCurrency]="tezCurrency"
-                      [connectedWallet$]="connectedWallet$"
-                    ></app-remove-liquidity>
+                    <div class="pt-3">
+                      <app-remove-liquidity
+                        [fromCurrency]="tokenCurrency"
+                        [toCurrency]="tezCurrency"
+                        [connectedWallet$]="connectedWallet$"
+                      ></app-remove-liquidity>
+                    </div>
                   </tab>
                 </tabset>
               </tab>
@@ -100,6 +116,7 @@
             mainTab === 'SWAP' ||
             (nestedTab === 'ADD_LIQUIDITY' && mainTab === 'LIQUIDITY')
           "
+          class="pt-3"
         >
           <div class="card">
             <div class="card-body">
