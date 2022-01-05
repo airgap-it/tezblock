@@ -74,6 +74,8 @@ export class LiquidityBakingComponent
 {
   private _tabs: Tab[] | undefined = [];
   selectedTab: Tab | undefined = undefined;
+  public priceSymbol: string;
+  public priceReferenceSymbol: string;
 
   public connectedWallet$: Observable<AccountInfo | undefined>;
 
@@ -132,6 +134,8 @@ export class LiquidityBakingComponent
       this.apiService
     );
     this.tokenCurrency = this.toCurrency;
+    this.priceSymbol = this.toCurrency.symbol;
+    this.priceReferenceSymbol = this.toCurrency.referenceSymbol;
   }
 
   async ngOnInit() {
