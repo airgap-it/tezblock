@@ -60,7 +60,7 @@ export interface CurrencyInfo {
   providedIn: 'root',
 })
 export class CryptoPricesService {
-  private readonly baseURL: string = 'https://api.coingecko.com/api/v3/coins/';
+  private readonly baseURL: string = 'https://api.coingecko.com/api/v3';
 
   constructor(
     private readonly http: HttpClient,
@@ -172,14 +172,14 @@ export class CryptoPricesService {
 
     return this.http
       .get<any[]>(
-        `${this.baseURL}${fromIdentifier}/market_chart?vs_currency=usd&days=7`
+        `${this.baseURL}/coins/${fromIdentifier}/market_chart?vs_currency=usd&days=7`
       )
       .pipe(
         switchMap((fromData: any) => {
           const fromPrices = fromData.prices;
           return this.http
             .get<any[]>(
-              `${this.baseURL}${toIdentifier}/market_chart?vs_currency=usd&days=7`
+              `${this.baseURL}/coins/${toIdentifier}/market_chart?vs_currency=usd&days=7`
             )
             .pipe(
               map((toData: any) => {
@@ -192,6 +192,43 @@ export class CryptoPricesService {
                       .div(fromPrices[i][1])
                       .toNumber(),
                   ]);
+              })
+            );
+        })
+      );
+  }
+
+  calculatePriceDelta(
+    symbol: string,
+    referenceSymbol: string
+  ): Observable<string> {
+    const symbolMapping = {
+      BTC: 'bitcoin',
+      XTZ: 'tezos',
+      tzBTC: 'tzbtc',
+    };
+    const identifier = symbolMapping[symbol];
+    const referenceIdentifier = symbolMapping[referenceSymbol];
+    return this.http
+      .get<any[]>(
+        `${this.baseURL}/simple/price?ids=${identifier}&vs_currencies=usd`
+      )
+      .pipe(
+        switchMap((data: any) => {
+          const price = data[identifier]['usd'];
+          return this.http
+            .get<any[]>(
+              `${this.baseURL}/simple/price?ids=${referenceIdentifier}&vs_currencies=usd`
+            )
+            .pipe(
+              map((referenceData: any) => {
+                const referencePrice =
+                  referenceData[referenceIdentifier]['usd'];
+                return `${new BigNumber(price)
+                  .minus(referencePrice)
+                  .dividedBy(referencePrice)
+                  .times(100)
+                  .toFixed(2)}%`;
               })
             );
         })

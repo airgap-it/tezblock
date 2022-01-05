@@ -10,6 +10,7 @@ export const formControlOptions = [
 ];
 export interface AbstractCurrency {
   symbol: string;
+  referenceSymbol: string;
   chartSymbol: string;
   liquidityTokenSymbol: string | undefined;
   decimals: number;

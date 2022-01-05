@@ -19,6 +19,7 @@ import { ApiService } from '@tezblock/services/api/api.service';
 
 export class TokenizedBitcoinCurrency implements AbstractCurrency {
   public symbol = 'tzBTC';
+  public referenceSymbol = 'BTC';
   public chartSymbol = this.symbol;
   public liquidityTokenSymbol = 'LB Token';
 

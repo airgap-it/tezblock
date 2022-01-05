@@ -16,4 +16,17 @@ export const loadChartDataFailed = createAction(
   props<{ error: any }>()
 );
 
+export const calculatePriceDelta = createAction(
+  `[${featureName}] Calculate Price Delta`,
+  props<{ symbol: string; referenceSymbol: string }>()
+);
+export const calculatePriceDeltaSucceeded = createAction(
+  `[${featureName}] Calculate Price Delta Succeeded`,
+  props<{ priceDelta: string }>()
+);
+export const calculatePriceDeltaFailed = createAction(
+  `[${featureName}] Calculate Price Delta Failed`,
+  props<{ error: any }>()
+);
+
 export const reset = createAction(`[${featureName}] Reset`);
