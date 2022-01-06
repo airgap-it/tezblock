@@ -8,6 +8,7 @@ import { AccountInfo } from '@airgap/beacon-sdk';
 export interface State {
   chartData: CryptoPriceApiResponse[];
   contractAssets: ContractAsset[];
+  priceDelta: string;
   connectedWallet: AccountInfo | undefined;
 }
 
@@ -15,6 +16,7 @@ export const initialState: State = {
   chartData: [],
   contractAssets: [],
   connectedWallet: undefined,
+  priceDelta: '',
 };
 
 export const reducer = createReducer(
@@ -22,5 +24,9 @@ export const reducer = createReducer(
   on(actions.loadChartDataSucceeded, (state, { chartData }) => ({
     ...state,
     chartData,
+  })),
+  on(actions.calculatePriceDeltaSucceeded, (state, { priceDelta }) => ({
+    ...state,
+    priceDelta,
   }))
 );

@@ -169,12 +169,12 @@
           <div class="card">
             <div class="card-body">
               <div class="row">
-                <div class="col-12 col-md-4 pb-3 pb-md-0">
+                <div class="col-4 col-md-4 pb-3 pb-md-0">
                   <h5 class="card-title__secondary">Total Value Locked</h5>
 
                   <h5
                     *appVar="
-                      totalValueLocked
+                      totalValueLocked$
                         | async
                         | currencyConverter
                           : {
@@ -188,10 +188,19 @@
                     }}{{ value | number: getPrecision(value) }}
                   </h5>
                 </div>
-                <div class="col-12 col-md-8">
+                <div class="col-4 col-md-4">
                   <h5 class="card-title__secondary">Annual Percentage Yield</h5>
                   <h5 class="mb-0">
-                    {{ estimatedApy | async }}
+                    {{ estimatedApy$ | async }}
+                  </h5>
+                </div>
+                <div class="col-4 col-md-4">
+                  <h5 class="card-title__secondary">
+                    {{ priceSymbol }}/{{ priceReferenceSymbol }}
+                    Price Difference
+                  </h5>
+                  <h5 class="mb-0">
+                    {{ priceDelta$ | async }}
                   </h5>
                 </div>
               </div>
@@ -209,7 +218,7 @@
               <p class="card-text text-muted">
                 By providing liquidity to the XTZ/tzBTC liqiduity pool, you will
                 receive rewards of an estimated annual percentage yield of
-                {{ estimatedApy | async }} in XTZ.<br />
+                {{ estimatedApy$ | async }} in XTZ.<br />
                 More stats can be found on
                 <a href="https://liquidity-baking.com/" target="_blank"
                   >liquidity-baking.com</a

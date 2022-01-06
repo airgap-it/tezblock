@@ -5,6 +5,7 @@ import { PartialTezosOperation } from '@airgap/beacon-sdk';
 
 export abstract class MockBaseCurrency implements AbstractCurrency {
   public symbol = 'symbol';
+  public referenceSymbol = 'referenceSymbol';
   public chartSymbol = this.symbol;
   public liquidityTokenSymbol = 'liquidityTokenSymbol';
   public decimals = 8;

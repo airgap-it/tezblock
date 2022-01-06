@@ -14,6 +14,7 @@ import { Currency } from '@tezblock/domain/airgap';
 
 export class TezosCurrency implements AbstractCurrency {
   public symbol = Currency.XTZ;
+  public referenceSymbol: '';
   public chartSymbol = 'ꜩ';
   public liquidityTokenSymbol = undefined;
   public decimals = 6;

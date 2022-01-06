@@ -74,6 +74,8 @@ export class LiquidityBakingComponent
 {
   private _tabs: Tab[] | undefined = [];
   selectedTab: Tab | undefined = undefined;
+  public priceSymbol: string;
+  public priceReferenceSymbol: string;
 
   public connectedWallet$: Observable<AccountInfo | undefined>;
 
@@ -86,9 +88,10 @@ export class LiquidityBakingComponent
   public priceChartDatasets$: Observable<{ data: number[]; label: string }[]>;
 
   public chartData$: Observable<CryptoPriceApiResponse[]>;
+  public priceDelta$: Observable<string>;
   public pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day);
-  public totalValueLocked: Observable<string>;
-  public estimatedApy: Observable<string>;
+  public totalValueLocked$: Observable<string>;
+  public estimatedApy$: Observable<string>;
 
   public slippage: number = this.slippages[0];
   public chartOptions;
@@ -131,11 +134,13 @@ export class LiquidityBakingComponent
       this.apiService
     );
     this.tokenCurrency = this.toCurrency;
+    this.priceSymbol = this.toCurrency.symbol;
+    this.priceReferenceSymbol = this.toCurrency.referenceSymbol;
   }
 
   async ngOnInit() {
-    this.totalValueLocked = this.tokenCurrency.getTotalValueLocked();
-    this.estimatedApy = this.tokenCurrency.estimateApy();
+    this.totalValueLocked$ = this.tokenCurrency.getTotalValueLocked();
+    this.estimatedApy$ = this.tokenCurrency.estimateApy();
     if (!this.selectedTab) {
       this.updateSelectedTab(this.tabs[0]);
     }
@@ -147,7 +152,11 @@ export class LiquidityBakingComponent
     this.tezBalance$ = this.availableBalanceFrom$;
     this.tokenBalance$ = this.availableBalanceTo$;
 
+    this.priceDelta$ = this.store$.select(
+      (state) => state.liquidityBaking.priceDelta
+    );
     this.loadChartData();
+    this.calculatePriceDelta();
 
     this.chartData$ = this.store$.select(
       (state) => state.liquidityBaking.chartData
@@ -155,7 +164,7 @@ export class LiquidityBakingComponent
 
     this.priceChartDatasets$ = this.chartData$.pipe(
       map((data) => [
-        { data: data.map((dataItem) => dataItem[1]), label: 'Price' },
+        { data: data?.map((dataItem) => dataItem[1]), label: 'Price' },
       ])
     );
 
@@ -174,7 +183,7 @@ export class LiquidityBakingComponent
 
     this.priceChartLabels$ = this.chartData$.pipe(
       map((data) =>
-        data.map((dataItem) => new Date(dataItem[0]).toLocaleDateString())
+        data?.map((dataItem) => new Date(dataItem[0]).toLocaleDateString())
       )
     );
 
@@ -187,11 +196,19 @@ export class LiquidityBakingComponent
 
   loadChartData() {
     this.chartOptions = liquidityChartOptions(this.fromCurrency);
-
     this.store$.dispatch(
       actions.loadChartData({
         from: this.fromCurrency.symbol,
         to: this.toCurrency.symbol,
+      })
+    );
+  }
+
+  calculatePriceDelta() {
+    this.store$.dispatch(
+      actions.calculatePriceDelta({
+        symbol: this.toCurrency.symbol,
+        referenceSymbol: this.toCurrency.referenceSymbol,
       })
     );
   }
