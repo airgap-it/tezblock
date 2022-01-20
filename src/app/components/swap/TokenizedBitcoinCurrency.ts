@@ -320,7 +320,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       .plus(60 * 60)
       .toString();
 
-    const additionalSlippage = new BigNumber(100).minus(0.05).div(100);
+    const additionalSlippage = new BigNumber(100).minus(0.5).div(100);
 
     let xtzToTokenParams = this.liquidityBakingContract.methods
       .xtzToToken(address, 0, deadline)
@@ -371,7 +371,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       parameters: addLiquidityParams.parameter,
     } as PartialTezosOperation;
 
-    return [xtzToTokenRequest, approveRequest, addLiquidityRequest] as any;
+    return [xtzToTokenRequest, approveRequest, addLiquidityRequest];
   }
 
   generateRemoveLiquidityOperation(
