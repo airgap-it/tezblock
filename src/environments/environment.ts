@@ -12,17 +12,11 @@ export const environment = {
     conseilApiKey: 'MAINNET_CONSEIL_API_KEY',
     targetUrl: 'MAINNET_TARGET_URL',
   },
-  [TezosNetwork.FLORENCENET]: {
-    rpcUrl: 'FLORENCENET_RPC_URL',
-    conseilUrl: 'FLORENCENET_CONSEIL_URL',
-    conseilApiKey: 'FLORENCENET_CONSEIL_API_KEY',
-    targetUrl: 'FLORENCENET_TARGET_URL',
-  },
-  [TezosNetwork.GRANADANET]: {
-    rpcUrl: 'GRANADANET_RPC_URL',
-    conseilUrl: 'GRANADANET_CONSEIL_URL',
-    conseilApiKey: 'GRANADANET_CONSEIL_API_KEY',
-    targetUrl: 'GRANADANET_TARGET_URL',
+  [TezosNetwork.HANGZHOUNET]: {
+    rpcUrl: 'HANGZHOUNET_RPC_URL',
+    conseilUrl: 'HANGZHOUNET_CONSEIL_URL',
+    conseilApiKey: 'HANGZHOUNET_CONSEIL_API_KEY',
+    targetUrl: 'HANGZHOUNET_TARGET_URL',
   },
   googleAnalyticsKey: undefined,
   proFontAwesomeAvailable: false,
