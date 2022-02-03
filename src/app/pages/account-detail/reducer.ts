@@ -19,6 +19,7 @@ import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap';
 
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table';
 import { TezosPayoutInfo } from '@airgap/coinlib-core';
+import { CollectibleCursor } from '@tezblock/services/collectibles/collectibles.types';
 
 const ensure30Days = (balance: Balance[]): Balance[] => {
   const toDay = (index: number): number =>
@@ -106,6 +107,7 @@ export interface State {
   temporaryBalance: Balance[];
   bakerReward: TezosPayoutInfo;
   contractAssets: TableState<ContractAsset>;
+  collectibles: TableState<CollectibleCursor>;
 }
 
 export const initialState: State = {
@@ -127,6 +129,7 @@ export const initialState: State = {
   temporaryBalance: undefined,
   bakerReward: undefined,
   contractAssets: getInitialTableState(undefined, Number.MAX_SAFE_INTEGER),
+  collectibles: getInitialTableState(undefined, Number.MAX_SAFE_INTEGER),
 };
 
 export const reducer = createReducer(
@@ -254,6 +257,7 @@ export const reducer = createReducer(
     ...state,
     counts: (counts || []).concat([
       { key: 'assets', count: state.contractAssets.pagination.total },
+      { key: 'collectibles', count: state.collectibles.pagination.total },
     ]),
   })),
   on(
@@ -296,10 +300,50 @@ export const reducer = createReducer(
       loading: true,
     },
   })),
+  on(actions.loadCollectiblesSucceeded, (state, { data }) => ({
+    ...state,
+    collectibles: {
+      ...state.collectibles,
+      data,
+      pagination: {
+        ...state.collectibles.pagination,
+        currentPage: data.collectibles.length,
+      },
+      loading: false,
+    },
+  })),
+
+  on(actions.loadCollectiblesCountSucceeded, (state, { data }) => ({
+    ...state,
+    counts: (state.counts || [])
+      .filter((count) => {
+        return count.key !== 'collectibles';
+      })
+      .concat([{ key: 'collectibles', count: data }]),
+    collectibles: {
+      ...state.collectibles,
+      pagination: {
+        ...state.collectibles.pagination,
+        total: data,
+      },
+      loading: false,
+    },
+  })),
+
+  on(actions.loadCollectiblesFailed, (state) => ({
+    ...state,
+    collectibles: {
+      ...state.collectibles,
+      data: null,
+      loading: false,
+    },
+  })),
   on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
     ...state,
     counts: (state.counts || [])
-      .filter((count) => count.key !== 'assets')
+      .filter((count) => {
+        return count.key !== 'assets';
+      })
       .concat([{ key: 'assets', count: data.length }]),
     contractAssets: {
       ...state.contractAssets,
@@ -319,6 +363,7 @@ export const reducer = createReducer(
       loading: false,
     },
   })),
+
   on(actions.setKind, (state, { kind }) => ({
     ...state,
     kind,

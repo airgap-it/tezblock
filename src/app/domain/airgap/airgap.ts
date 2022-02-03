@@ -9,7 +9,7 @@ import {
   NetworkType,
   ProtocolSymbols,
   SubProtocolSymbols,
-  TezosFA12Protocol,
+  TezosFA1p2Protocol,
   TezosFA2Protocol,
   TezosFA2ProtocolConfig,
   TezosFA2ProtocolOptions,
@@ -94,10 +94,10 @@ export const getTezosFAProtocolOptions = (
     high: '0',
   };
   const config = new TezosFAProtocolConfig(
+    contract.contractAddress,
+    'xtz-fa2' as SubProtocolSymbols,
     contract.symbol,
     contract.name,
-    contract.symbol,
-    'xtz-fa' as SubProtocolSymbols,
     contract.id,
     feeDefaults,
     contract.decimals
@@ -120,18 +120,17 @@ export const getTezosFA2ProtocolOptions = (
     high: '0',
   };
   const config = new TezosFA2ProtocolConfig(
+    contract.contractAddress,
+    'xtz-fa2' as SubProtocolSymbols,
     contract.symbol,
     contract.name,
-    contract.symbol,
-    'xtz-fa2' as SubProtocolSymbols,
     contract.id,
     feeDefaults,
     contract.decimals ?? 0,
     contract.tokenID ?? 0,
     undefined,
-    undefined,
-    undefined,
-    contract.ledgerBigMapID
+    contract.ledgerBigMapID,
+    undefined
   );
 
   return new TezosFA2ProtocolOptions(
@@ -155,7 +154,7 @@ export const getFaProtocol = (
         ? new TezosFA2Protocol(
             getTezosFA2ProtocolOptions(contract, environmentUrls, tezosNetwork)
           )
-        : new TezosFA12Protocol(
+        : new TezosFA1p2Protocol(
             getTezosFAProtocolOptions(contract, environmentUrls, tezosNetwork)
           );
     faProtocolCache.set(contract.id, result);

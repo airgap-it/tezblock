@@ -75,6 +75,30 @@ export const loadDelegatedAccountsFailed = createAction(
   props<{ error: any }>()
 );
 
+export const loadCollectibles = createAction(
+  `[${featureName}] Load Collectibles`
+);
+export const loadCollectiblesSucceeded = createAction(
+  `[${featureName}] Load Collectibles Succeeded`,
+  props<{ data: any }>()
+);
+export const loadCollectiblesFailed = createAction(
+  `[${featureName}] Load Collectibles Failed`,
+  props<{ error: any }>()
+);
+
+export const loadCollectiblesCount = createAction(
+  `[${featureName}] Load Collectibles Count`
+);
+export const loadCollectiblesCountSucceeded = createAction(
+  `[${featureName}] Load Collectibles Count Succeeded`,
+  props<{ data: number }>()
+);
+export const loadCollectiblesCountFailed = createAction(
+  `[${featureName}] Load Collectibles Count Failed`,
+  props<{ error: any }>()
+);
+
 export const loadBalanceForLast30Days = createAction(
   `[${featureName}] Load Balance For Last 30 Days`,
   props<{ address: string }>()

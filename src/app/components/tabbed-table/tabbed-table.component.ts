@@ -8,7 +8,6 @@ import {
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-
 import { BaseComponent } from '@tezblock/components/base.component';
 import { DownloadService } from '@tezblock/services/download/download.service';
 import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab';

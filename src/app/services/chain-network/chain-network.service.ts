@@ -1,4 +1,11 @@
-import { TezosNetwork } from '@airgap/coinlib-core';
+import {
+  TezosNetwork,
+  NetworkType,
+  TezblockBlockExplorer,
+  TezosProtocolNetwork,
+  TezosProtocolNetworkExtras,
+  ProtocolNetwork,
+} from '@airgap/coinlib-core';
 import { Injectable, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 

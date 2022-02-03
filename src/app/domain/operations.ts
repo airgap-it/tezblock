@@ -26,6 +26,7 @@ export enum OperationTypes {
   Contract = 'contract',
   Account = 'account',
   Baker = 'baker',
+  Collectibles = 'collectibles',
 }
 
 export interface OperationError {

@@ -49,6 +49,7 @@ const proposalsToBallot = (
     ...operationCount,
     kind: operationCount.kind === 'proposals' ? 'ballot' : operationCount.kind,
   }));
+
 const sumCounts = (aggreagted: { [key: string]: OperationCount[] }): Count[] =>
   Object.keys(aggreagted).map((key) => ({
     key,
@@ -65,9 +66,10 @@ export const aggregateOperationCounts = pipe(
   sumCounts
 );
 
-export const updateTabCounts = (tabs: Tab[], counts: Count[]): Tab[] =>
-  tabs.map((tab) => {
+export const updateTabCounts = (tabs: Tab[], counts: Count[]): Tab[] => {
+  return tabs.map((tab) => {
     const match = counts.find((count) => isTabKindEqualTo(count.key)(tab));
 
     return { ...tab, count: match ? match.count : 0 };
   });
+};
