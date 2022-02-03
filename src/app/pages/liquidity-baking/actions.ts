@@ -18,7 +18,7 @@ export const loadChartDataFailed = createAction(
 
 export const calculatePriceDelta = createAction(
   `[${featureName}] Calculate Price Delta`,
-  props<{ symbol: string; referenceSymbol: string }>()
+  props<{ referenceSymbol: string; marketRate: number }>()
 );
 export const calculatePriceDeltaSucceeded = createAction(
   `[${featureName}] Calculate Price Delta Succeeded`,
