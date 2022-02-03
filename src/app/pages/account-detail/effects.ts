@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { from, of, forkJoin, Observable } from 'rxjs';
+import { from, of, forkJoin } from 'rxjs';
 import {
   map,
   catchError,
@@ -37,6 +37,10 @@ import { ChainNetworkService } from '@tezblock/services/chain-network/chain-netw
 import { ContractService } from '@tezblock/services/contract/contract.service';
 import { BakingRatingResponse } from './model';
 import { OperationTypes } from '@tezblock/domain/operations';
+import {
+  CollectiblesService,
+  DEFAULT_COLLECTIBLES_LIMIT,
+} from '@tezblock/services/collectibles/collectibles.service';
 
 @Injectable()
 export class AccountDetailEffects {
@@ -78,6 +82,62 @@ export class AccountDetailEffects {
     )
   );
 
+  onLoadAccountLoadCollectibles$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccountSucceeded),
+      map(() => actions.loadCollectibles())
+    )
+  );
+
+  loadCollectibles = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCollectibles),
+      withLatestFrom(
+        this.store$.select(
+          (state) => state.accountDetails.collectibles.pagination
+        ),
+        this.store$.select((state) => state.accountDetails.address)
+      ),
+      switchMap(([_action, pagination, address]) =>
+        from(
+          this.collectiblesService.getCollectibles(
+            address,
+            pagination.total
+              ? pagination.currentPage + DEFAULT_COLLECTIBLES_LIMIT
+              : DEFAULT_COLLECTIBLES_LIMIT
+          )
+        ).pipe(
+          map((data) => actions.loadCollectiblesSucceeded({ data })),
+          catchError((error) => of(actions.loadCollectiblesFailed({ error })))
+        )
+      )
+    )
+  );
+
+  onLoadAccountLoadCollectiblesCount$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadAccountSucceeded),
+      map(() => actions.loadCollectiblesCount())
+    )
+  );
+
+  loadCollectiblesCount = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.loadCollectiblesCount),
+      withLatestFrom(
+        this.store$.select((state) => state.accountDetails.address)
+      ),
+      switchMap(([_action, address]) =>
+        from(this.collectiblesService.getCollectiblesCount(address)).pipe(
+          map((data) => actions.loadCollectiblesCountSucceeded({ data })),
+          catchError((error) =>
+            of(actions.loadCollectiblesCountFailed({ error }))
+          )
+        )
+      )
+    )
+  );
+
   getRewardAmount$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadRewardAmont),
@@ -97,7 +157,7 @@ export class AccountDetailEffects {
   getTransactions$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTransactionsByKind),
-      filter(({ kind }) => kind !== 'assets'),
+      filter(({ kind }) => kind !== 'assets' && kind !== 'collectibles'),
       withLatestFrom(
         this.store$.select(
           (state) => state.accountDetails.transactions.pagination
@@ -457,6 +517,7 @@ export class AccountDetailEffects {
 
   constructor(
     private readonly accountService: AccountService,
+    private readonly collectiblesService: CollectiblesService,
     private readonly actions$: Actions,
     private readonly apiService: ApiService,
     private readonly bakingService: BakingService,

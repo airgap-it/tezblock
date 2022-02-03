@@ -22,16 +22,14 @@ export class WetziKoinProtocolConfig extends TezosFA2ProtocolConfig {
     tokenMetadataBigMapName: string = 'tokens'
   ) {
     super(
+      contractAddress,
+      identifier,
       symbol,
       name,
       marketSymbol,
-      identifier,
-      contractAddress,
       feeDefaults,
       decimals,
-      tokenID,
-      tokenMetadataBigMapID,
-      tokenMetadataBigMapName
+      tokenMetadataBigMapID
     );
   }
 }

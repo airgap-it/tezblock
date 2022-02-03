@@ -1,0 +1,40 @@
+<div>
+  <div class="row collectibles--list pt-3">
+    <div class="col-12 col-md-3 py-3" *ngFor="let item of data?.collectibles">
+      <div class="card" (click)="showCollectiblesModal(item)">
+        <img
+          #img
+          [src]="item.thumbnail"
+          (error)="
+            img.src =
+              img.src === item.thumbnail
+                ? item.displayImg
+                : './../../../assets/img/collectible-placeholder.png'
+          "
+          class="card__img"
+        />
+
+        <div class="card-body">
+          <h5 class="card-title mb-0">{{ item.name }}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="text-muted py-3">
+    <small
+      >Powered by
+      <a href="https://objkt.com" target="_blank">objkt.com</a></small
+    >
+  </p>
+</div>
+
+<div class="py-3">
+  <button
+    type="button"
+    class="btn btn-sm btn-primary-light w-100"
+    (click)="loadMore()"
+    *ngIf="data?.hasNext"
+  >
+    {{ 'tezblock-table.load-more_button' | translate }}
+  </button>
+</div>
