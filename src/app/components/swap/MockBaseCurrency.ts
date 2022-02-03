@@ -101,4 +101,8 @@ export abstract class MockBaseCurrency implements AbstractCurrency {
   estimateApy(): Observable<string> {
     throw new Error('Not implemented');
   }
+
+  async marketRate(): Promise<number> {
+    return 5.5;
+  }
 }

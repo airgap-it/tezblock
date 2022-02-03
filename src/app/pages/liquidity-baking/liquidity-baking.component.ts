@@ -205,12 +205,14 @@ export class LiquidityBakingComponent
   }
 
   calculatePriceDelta() {
-    this.store$.dispatch(
-      actions.calculatePriceDelta({
-        symbol: this.toCurrency.symbol,
-        referenceSymbol: this.toCurrency.referenceSymbol,
-      })
-    );
+    this.toCurrency.marketRate().then((marketRate) => {
+      this.store$.dispatch(
+        actions.calculatePriceDelta({
+          referenceSymbol: this.toCurrency.referenceSymbol,
+          marketRate,
+        })
+      );
+    });
   }
 
   selectTab(tab: TabDirective, mainTab: boolean = true) {

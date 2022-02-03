@@ -63,6 +63,7 @@ export interface AbstractCurrency {
   getTotalValueLocked(): Observable<string>;
   estimateApy(): Observable<string>;
   estimatePriceImpact(mutezAmount: BigNumber): Promise<BigNumber>;
+  marketRate(): Promise<number>;
 }
 
 export const tezToMutez = (

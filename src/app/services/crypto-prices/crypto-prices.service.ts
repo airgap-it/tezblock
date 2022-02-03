@@ -10,7 +10,6 @@ import {
   CacheService,
   CacheKeys,
   ExchangeRates,
-  ByHistoricPriceState,
 } from '@tezblock/services/cache/cache.service';
 import * as fromRoot from '@tezblock/reducers';
 import { CurrencyConverterPipeArgs } from '@tezblock/pipes/currency-converter/currency-converter.pipe';
@@ -198,40 +197,18 @@ export class CryptoPricesService {
       );
   }
 
-  calculatePriceDelta(
-    symbol: string,
-    referenceSymbol: string
-  ): Observable<string> {
-    const symbolMapping = {
-      BTC: 'bitcoin',
-      XTZ: 'tezos',
-      tzBTC: 'tzbtc',
-    };
-    const identifier = symbolMapping[symbol];
-    const referenceIdentifier = symbolMapping[referenceSymbol];
+  static symbolMapping = {
+    BTC: 'bitcoin',
+    XTZ: 'tezos',
+    tzBTC: 'tzbtc',
+  };
+
+  public getPrice(symbol: string): Observable<number> {
+    const identifier = CryptoPricesService.symbolMapping[symbol];
     return this.http
-      .get<any[]>(
+      .get<any>(
         `${this.baseURL}/simple/price?ids=${identifier}&vs_currencies=usd`
       )
-      .pipe(
-        switchMap((data: any) => {
-          const price = data[identifier]['usd'];
-          return this.http
-            .get<any[]>(
-              `${this.baseURL}/simple/price?ids=${referenceIdentifier}&vs_currencies=usd`
-            )
-            .pipe(
-              map((referenceData: any) => {
-                const referencePrice =
-                  referenceData[referenceIdentifier]['usd'];
-                return `${new BigNumber(price)
-                  .minus(referencePrice)
-                  .dividedBy(referencePrice)
-                  .times(100)
-                  .toFixed(2)}%`;
-              })
-            );
-        })
-      );
+      .pipe(map((data) => data[identifier]['usd']));
   }
 }

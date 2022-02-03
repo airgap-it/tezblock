@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
 import { map, catchError, mergeMap } from 'rxjs/operators';
 import * as actions from './actions';
 import { CryptoPricesService } from '@tezblock/services/crypto-prices/crypto-prices.service';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class LiquidityBakingEffects {
@@ -22,17 +23,27 @@ export class LiquidityBakingEffects {
   calculatePriceDelta$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.calculatePriceDelta),
-      mergeMap(({ symbol, referenceSymbol }) =>
-        this.cryptoPricesService
-          .calculatePriceDelta(symbol, referenceSymbol)
-          .pipe(
-            map((priceDelta) =>
-              actions.calculatePriceDeltaSucceeded({ priceDelta })
-            ),
-            catchError((error) =>
-              of(actions.calculatePriceDeltaFailed({ error }))
-            )
+      mergeMap(({ referenceSymbol, marketRate }) =>
+        forkJoin([
+          this.cryptoPricesService.getPrice(referenceSymbol),
+          this.cryptoPricesService.getPrice('XTZ'),
+        ]).pipe(
+          map(([referencePrice, xtzPrice]) => {
+            const price = new BigNumber(xtzPrice).times(marketRate);
+            const refPrice = new BigNumber(referencePrice);
+            return `${price
+              .minus(refPrice)
+              .dividedBy(refPrice)
+              .times(100)
+              .toFixed(2)}%`;
+          }),
+          map((priceDelta) =>
+            actions.calculatePriceDeltaSucceeded({ priceDelta })
+          ),
+          catchError((error) =>
+            of(actions.calculatePriceDeltaFailed({ error }))
           )
+        )
       )
     )
   );

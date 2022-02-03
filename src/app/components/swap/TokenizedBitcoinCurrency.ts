@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { getConnectedWallet } from '@tezblock/app.selectors';
 import { TezosBTC } from '@airgap/coinlib-core';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
-import { map, mergeMap, retry, switchMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import * as liquidityBakingCalculations from '../../services/liquidity-baking/liquidity-baking-calculations';
 import { AbstractCurrency, tezToMutez } from './swap-utils';
 import { PartialTezosOperation } from '@airgap/beacon-sdk';
@@ -522,5 +522,13 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
             .toFixed(2)}%`;
         })
       );
+  }
+
+  async marketRate(): Promise<number> {
+    await this.initContracts();
+    return liquidityBakingCalculations.tokenToXtzMarketRate(
+      this.xtzPool,
+      this.tokenPool
+    );
   }
 }
