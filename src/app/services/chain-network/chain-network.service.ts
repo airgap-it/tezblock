@@ -1,11 +1,4 @@
-import {
-  TezosNetwork,
-  NetworkType,
-  TezblockBlockExplorer,
-  TezosProtocolNetwork,
-  TezosProtocolNetworkExtras,
-  ProtocolNetwork,
-} from '@airgap/coinlib-core';
+import { TezosNetwork } from '@airgap/coinlib-core';
 import { Injectable, OnInit } from '@angular/core';
 import { environment } from 'src/environments/environment';
 
@@ -17,7 +10,7 @@ export class ChainNetworkService implements OnInit {
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET;
   private readonly supportedChains = [
     TezosNetwork.MAINNET,
-    TezosNetwork.GRANADANET,
+    TezosNetwork.HANGZHOUNET,
   ];
 
   constructor() {
@@ -26,8 +19,8 @@ export class ChainNetworkService implements OnInit {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET;
         break;
-      case environment.granadanet.targetUrl:
-        this.chainName = TezosNetwork.GRANADANET;
+      case environment.hangzhounet.targetUrl:
+        this.chainName = TezosNetwork.HANGZHOUNET;
         break;
       default:
         const originComponents = origin.split('.');
@@ -54,8 +47,7 @@ export class ChainNetworkService implements OnInit {
   }
 
   public getEnvironmentVariable(): string {
-    // return this.chainName;
-    return 'mainnet';
+    return this.chainName;
   }
 
   public getNetwork(): TezosNetwork {

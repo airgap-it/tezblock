@@ -17,10 +17,8 @@ const tezosNetworkToNetworkType = (tezosNetwork: TezosNetwork): NetworkType => {
   switch (tezosNetwork) {
     case TezosNetwork.MAINNET:
       return NetworkType.MAINNET;
-    case TezosNetwork.FLORENCENET:
-      return NetworkType.FLORENCENET;
-    case TezosNetwork.GRANADANET:
-      return NetworkType.GRANADANET;
+    case TezosNetwork.HANGZHOUNET:
+      return NetworkType.HANGZHOUNET;
     default:
       return NetworkType.CUSTOM;
   }

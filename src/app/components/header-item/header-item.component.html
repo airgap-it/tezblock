@@ -414,13 +414,15 @@
                       <a
                         class="dropdown-item"
                         [ngClass]="
-                          selectedNetwork === networks.GRANADANET
+                          selectedNetwork === networks.HANGZHOUNET
                             ? 'active'
                             : ''
                         "
-                        (click)="changeNetwork(networks.GRANADANET); dp3.hide()"
+                        (click)="
+                          changeNetwork(networks.HANGZHOUNET); dp3.hide()
+                        "
                       >
-                        granadanet
+                        hangzhounet
                       </a>
                     </li>
                   </ul>

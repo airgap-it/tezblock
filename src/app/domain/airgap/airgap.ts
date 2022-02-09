@@ -69,7 +69,7 @@ const getTezosProtocolNetwork = (
   tezosNetwork: TezosNetwork
 ): TezosProtocolNetwork =>
   new TezosProtocolNetwork(
-    tezosNetwork == TezosNetwork.MAINNET ? 'Mainnet' : 'Granadanet',
+    tezosNetwork == TezosNetwork.MAINNET ? 'Mainnet' : 'Hangzhounet',
     tezosNetwork == TezosNetwork.MAINNET
       ? NetworkType.MAINNET
       : NetworkType.TESTNET,

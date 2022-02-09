@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tezblock-granadanet-frontend
+  name: tezblock-hangzhounet-frontend
   namespace: tezblock
   labels:
-    app: tezblock-granadanet-frontend
+    app: tezblock-hangzhounet-frontend
 spec:
   selector:
     matchLabels:
-      app: tezblock-granadanet-frontend
+      app: tezblock-hangzhounet-frontend
   replicas: 1
   revisionHistoryLimit: 3
   strategy:
@@ -18,15 +18,15 @@ spec:
   template:
     metadata:
       labels:
-        app: tezblock-granadanet-frontend
+        app: tezblock-hangzhounet-frontend
     spec:
       containers:
-        - name: tezblock-granadanet-frontend
+        - name: tezblock-hangzhounet-frontend
           image: _TO_BE_REPLACED_BY_IMAGE_TAG_
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: tezblock-granadanet-frontend-config-map
+                name: tezblock-hangzhounet-frontend-config-map
           ports:
             - containerPort: 80
           readinessProbe:
