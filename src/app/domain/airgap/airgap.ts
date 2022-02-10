@@ -98,7 +98,7 @@ export const getTezosFAProtocolOptions = (
     'xtz-fa2' as SubProtocolSymbols,
     contract.symbol,
     contract.name,
-    contract.id,
+    contract.symbol,
     feeDefaults,
     contract.decimals
   );
@@ -124,7 +124,7 @@ export const getTezosFA2ProtocolOptions = (
     'xtz-fa2' as SubProtocolSymbols,
     contract.symbol,
     contract.name,
-    contract.id,
+    contract.symbol,
     feeDefaults,
     contract.decimals ?? 0,
     contract.tokenID ?? 0,
