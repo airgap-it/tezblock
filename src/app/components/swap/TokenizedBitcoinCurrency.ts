@@ -5,7 +5,7 @@ import { Store } from '@ngrx/store';
 import { getConnectedWallet } from '@tezblock/app.selectors';
 import { TezosBTC } from '@airgap/coinlib-core';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
-import { map, mergeMap, retry, switchMap } from 'rxjs/operators';
+import { map, mergeMap, switchMap } from 'rxjs/operators';
 import * as liquidityBakingCalculations from '../../services/liquidity-baking/liquidity-baking-calculations';
 import { AbstractCurrency, tezToMutez } from './swap-utils';
 import { PartialTezosOperation } from '@airgap/beacon-sdk';
@@ -14,6 +14,10 @@ import {
   ContractProvider,
   TezosToolkit,
 } from '@taquito/taquito';
+import {
+  MichelsonV1ExpressionBase,
+  MichelsonV1ExpressionExtended,
+} from '@taquito/rpc';
 import * as cryptocompare from 'cryptocompare';
 import { ApiService } from '@tezblock/services/api/api.service';
 
@@ -74,13 +78,27 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       );
 
       this.tokenPool = new BigNumber(
-        this.liquidityBakingContract.script.storage[0].int
+        (<MichelsonV1ExpressionBase>(
+          (<MichelsonV1ExpressionExtended>(
+            this.liquidityBakingContract.script.storage
+          )).args[0]
+        )).int
       ).toNumber();
+
       this.xtzPool = new BigNumber(
-        this.liquidityBakingContract.script.storage[1].int
+        (<MichelsonV1ExpressionBase>(
+          (<MichelsonV1ExpressionExtended>(
+            this.liquidityBakingContract.script.storage
+          )).args[1]
+        )).int
       ).toNumber();
+
       this.lqtTotal = new BigNumber(
-        this.liquidityBakingContract.script.storage[2].int
+        (<MichelsonV1ExpressionBase>(
+          (<MichelsonV1ExpressionExtended>(
+            this.liquidityBakingContract.script.storage
+          )).args[2]
+        )).int
       ).toNumber();
     } catch (error) {
       throw error;
@@ -522,5 +540,13 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
             .toFixed(2)}%`;
         })
       );
+  }
+
+  async marketRate(): Promise<number> {
+    await this.initContracts();
+    return liquidityBakingCalculations.tokenToXtzMarketRate(
+      this.xtzPool,
+      this.tokenPool
+    );
   }
 }

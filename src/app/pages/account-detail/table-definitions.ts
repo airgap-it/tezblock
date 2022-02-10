@@ -303,4 +303,29 @@ export const columns: {
       }),
     },
   ],
+  [OperationTypes.Collectibles]: (
+    options: any,
+    translateService: TranslateService
+  ) => [
+    {
+      name: translateService.instant('tezblock-table.contract.asset'),
+      template: Template.address,
+      data: (item: ContractAsset) => ({
+        data: item.contract.id,
+        options: { showFullAddress: false, pageId: options.pageId },
+      }),
+    },
+    {
+      name: translateService.instant('tezblock-table.contract.balance'),
+      field: 'amount',
+      template: Template.amount,
+      data: (item: ContractAsset) => ({
+        data: item.amount,
+        options: {
+          showFiatValue: isConvertableToUSD(item.contract.symbol),
+          symbol: item.contract.symbol,
+        },
+      }),
+    },
+  ],
 };

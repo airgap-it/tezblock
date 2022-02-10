@@ -18,14 +18,14 @@ stages:
 build:
   stage: build
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg GRANADANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg GRANADANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg GRANADANET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg GRANADANET_TARGET_URL --build-arg GA_KEY --target angular-build -t $TEST_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg HANGZHOUNET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg HANGZHOUNET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg HANGZHOUNET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg HANGZHOUNET_TARGET_URL --build-arg GA_KEY --target angular-build -t $TEST_TAG .
   tags:
     - docker
 
 build_serve:
   stage: build_serve
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg GRANADANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg GRANADANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg GRANADANET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg GRANADANET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg HANGZHOUNET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg HANGZHOUNET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg HANGZHOUNET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg HANGZHOUNET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
   only:
     - master
     - develop
@@ -36,8 +36,8 @@ test:
   allow_failure: false
   stage: test
   script:
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e GRANADANET_RPC_URL -e MAINNET_CONSEIL_URL -e GRANADANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e GRANADANET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e GRANADANET_TARGET_URL -e GA_KEY --name unit-$CI_COMMIT_SHA $TEST_TAG yarn test-ci
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e GRANADANET_RPC_URL -e MAINNET_CONSEIL_URL -e GRANADANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e GRANADANET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e GRANADANET_TARGET_URL -e GA_KEY --name lint-$CI_COMMIT_SHA $TEST_TAG yarn lint-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e HANGZHOUNET_RPC_URL -e MAINNET_CONSEIL_URL -e HANGZHOUNET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e HANGZHOUNET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e HANGZHOUNET_TARGET_URL -e GA_KEY --name unit-$CI_COMMIT_SHA $TEST_TAG yarn test-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e HANGZHOUNET_RPC_URL -e MAINNET_CONSEIL_URL -e HANGZHOUNET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e HANGZHOUNET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e HANGZHOUNET_TARGET_URL -e GA_KEY --name lint-$CI_COMMIT_SHA $TEST_TAG yarn lint-ci
     - docker cp unit-$CI_COMMIT_SHA:/app/coverage/tezblock/lcov.info lcov.info
     - docker cp lint-$CI_COMMIT_SHA:/app/lintReport.json lintReport.json
   after_script:
@@ -54,7 +54,7 @@ test:
 #   allow_failure: false
 #   stage: qa
 #   script:
-#     - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e GRANADANET_RPC_URL -e MAINNET_CONSEIL_URL -e GRANADANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e GRANADANET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e GRANADANET_TARGET_URL -e GA_KEY --name qa-$CI_PIPELINE_ID $TEST_TAG yarn sonar-scanner -- -X
+#     - docker create -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e HANGZHOUNET_RPC_URL -e MAINNET_CONSEIL_URL -e HANGZHOUNET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e HANGZHOUNET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e HANGZHOUNET_TARGET_URL -e GA_KEY --name qa-$CI_PIPELINE_ID $TEST_TAG yarn sonar-scanner -- -X
 #       -Dsonar.typescript.lcov.reportPaths=lcov.info
 #       -Dsonar.typescript.tslint.reportPaths=lintReport.json
 #       -Dsonar.test.inclusions=**/*.spec.ts
@@ -160,7 +160,7 @@ k8s-deploy-production:
   tags:
     - docker
 
-k8s-deploy-granadanet:
+k8s-deploy-hangzhounet:
   stage: deploy
   needs: ['publish-prod']
   when: manual
@@ -173,9 +173,9 @@ k8s-deploy-granadanet:
     - gcloud config set compute/zone $GCLOUD_ZONE
     - gcloud container clusters get-credentials papers-cluster-production
   script:
-    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/granadanet/frontend/deployment.yaml
+    - sed -i "s|_TO_BE_REPLACED_BY_IMAGE_TAG_|"$GOOGLE_TAG"|g" k8s/tezblock/hangzhounet/frontend/deployment.yaml
     - kubectl apply -f k8s/tezblock/common/namespace.yaml
-    - kubectl apply -f k8s/tezblock/granadanet/ --recursive
+    - kubectl apply -f k8s/tezblock/hangzhounet/ --recursive
     - kubectl apply -f k8s/tezblock/common/ --recursive
   only:
     - master

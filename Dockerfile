@@ -1,4 +1,4 @@
-FROM node:15 as angular-build
+FROM node:16.13.0 as angular-build
 
 # See https://crbug.com/795759
 RUN apt-get update && apt-get install -yq libgconf-2-4 bzip2 build-essential
@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y wget --no-install-recommends \
 	&& wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
 	&& sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
 	&& apt-get update \
-	&& apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+	&& apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst \
 	--no-install-recommends --allow-unauthenticated \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& apt-get purge --auto-remove -y curl \
@@ -29,13 +29,13 @@ COPY ./scripts /app/scripts
 ARG FONTAWESOME_NPM_AUTH_TOKEN
 
 ARG MAINNET_RPC_URL 
-ARG GRANADANET_RPC_URL
+ARG HANGZHOUNET_RPC_URL
 ARG MAINNET_CONSEIL_URL 
-ARG GRANADANET_CONSEIL_URL
+ARG HANGZHOUNET_CONSEIL_URL
 ARG MAINNET_CONSEIL_API_KEY 
-ARG GRANADANET_CONSEIL_API_KEY
+ARG HANGZHOUNET_CONSEIL_API_KEY
 ARG MAINNET_TARGET_URL
-ARG GRANADANET_TARGET_URL
+ARG HANGZHOUNET_TARGET_URL
 ARG GA_KEY
 
 RUN yarn config set unsafe-perm true

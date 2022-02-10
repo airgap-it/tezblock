@@ -33,7 +33,6 @@ export class DashboarEffects {
           this.chainNetworkService.getNetwork(),
           6
         );
-
         if (!contracts || contracts.total === 0) {
           return of(actions.loadContractsSucceeded({ contracts: [] }));
         }

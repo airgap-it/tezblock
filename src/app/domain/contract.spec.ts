@@ -16,7 +16,7 @@ describe('contract', () => {
   describe('getTokenContractByAddress', () => {
     it('when contract does not exist in given network then returns undefined', () => {
       expect(
-        getTokenContractByAddress(tzBTCaddress, TezosNetwork.GRANADANET)
+        getTokenContractByAddress(tzBTCaddress, TezosNetwork.HANGZHOUNET)
       ).toBe(undefined);
     });
 
@@ -33,7 +33,7 @@ describe('contract', () => {
 
   describe('searchTokenContracts', () => {
     it('when contract by part name does not exist in given network then returns empty array', () => {
-      expect(searchTokenContracts('btc', TezosNetwork.GRANADANET)).toEqual([]);
+      expect(searchTokenContracts('btc', TezosNetwork.HANGZHOUNET)).toEqual([]);
     });
 
     it('when contract by part name exist in given network then returns array with option for that contract', () => {

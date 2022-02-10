@@ -52,5 +52,12 @@
     (onSort)="sortTransactions($event)"
     [orderBy]="orderBy"
     [noDataLabel]="noDataLabel"
+    *ngIf="selectedTab.kind !== 'collectibles'"
   ></tezblock-table>
+
+  <app-collectibles-list
+    *ngIf="selectedTab.kind === 'collectibles'"
+    [data]="data"
+  >
+  </app-collectibles-list>
 </tabset>

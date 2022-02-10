@@ -37,6 +37,7 @@ export interface Social {
 }
 
 export interface TokenContract {
+  contractAddress?: string;
   id?: string;
   symbol: string;
   name: string;
@@ -79,11 +80,11 @@ export const getTokenContractByAddress = (
 ): TokenContract =>
   fpGet<TokenContract>((tokenContract) => {
     const isInNetwork = networkCondition(tezosNetwork);
-
     return isInNetwork(tokenContract)
       ? {
           ...tokenContract,
           id: address,
+          contractAddress: address,
         }
       : undefined;
   })(tokenContracts[address]);

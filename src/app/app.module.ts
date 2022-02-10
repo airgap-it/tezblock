@@ -121,6 +121,9 @@ import { AddLiquidityComponent } from './components/add-liquidity/add-liquidity.
 import { RemoveLiquidityComponent } from './components/remove-liquidity/remove-liquidity.component';
 import { LoadingItemComponent } from './components/loading-item/loading-item.component';
 import { SlippageComponent } from './components/slippage/slippage.component';
+import { CollectiblesModalItemComponent } from './components/collectibles-modal-item/collectibles-modal-item.component';
+import { CollectiblesService } from './services/collectibles/collectibles.service';
+import { CollectiblesListComponent } from './components/collectibles-list/collectibles-list.component';
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -253,6 +256,8 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     RemoveLiquidityComponent,
     LoadingItemComponent,
     SlippageComponent,
+    CollectiblesModalItemComponent,
+    CollectiblesListComponent,
   ],
 
   providers: [
@@ -262,6 +267,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     BsModalService,
     ChainNetworkService,
     AnalyticsService,
+    CollectiblesService,
     {
       provide: APP_INITIALIZER,
       useFactory: (themeService: ThemeService) => () => themeService.setTheme(),

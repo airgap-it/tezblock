@@ -40,7 +40,7 @@
     "ecosystem-block-explorers_button": "Block Explorers",
     "connect_wallet": "Connect Wallet",
     "disconnect_wallet": "Disconnect Wallet",
-    "swap_button": "Swap & Liqudity"
+    "swap_button": "Swap & Liquidity"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",

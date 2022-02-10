@@ -370,15 +370,24 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     this.transactions$ = this.store$
       .select((state) => state.accountDetails.kind)
       .pipe(
-        switchMap((kind) =>
-          kind !== 'assets'
-            ? this.store$.select(
-                (state) => state.accountDetails.transactions.data
-              )
-            : this.store$.select(
+        switchMap((kind) => {
+          switch (kind) {
+            case 'assets':
+              return this.store$.select(
                 (state) => state.accountDetails.contractAssets.data
-              )
-        )
+              );
+            case 'collectibles':
+              return this.store$.select(
+                (state) => state.accountDetails.collectibles.data
+              );
+
+            default:
+              return this.store$.select(
+                (state) => state.accountDetails.transactions.data
+              );
+              break;
+          }
+        })
       );
 
     this.areTransactionsLoading$ = this.store$
@@ -836,7 +845,6 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
     });
     modalRef.content.closeBtnName = 'Close';
   }
-
   showMoreItems() {
     this.paginationLimit = this.paginationLimit + 50; // TODO: set dynamic number
   }
@@ -1005,6 +1013,20 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
         count: undefined,
         icon: this.iconPipe.transform('coins'),
         columns: columns[OperationTypes.Contract](
+          { pageId, showFiatValue: this.isMainnet },
+          this.translateService
+        ),
+        disabled: function () {
+          return !this.count;
+        },
+      },
+      {
+        title: 'Collectibles',
+        active: false,
+        kind: 'collectibles',
+        count: undefined,
+        icon: this.iconPipe.transform('coins'),
+        columns: columns[OperationTypes.Collectibles](
           { pageId, showFiatValue: this.isMainnet },
           this.translateService
         ),

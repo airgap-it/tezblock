@@ -118,4 +118,8 @@ export class TezosCurrency implements AbstractCurrency {
   estimateApy(): Observable<string> {
     throw new Error('Not implemented');
   }
+
+  marketRate(): Promise<number> {
+    throw new Error('Not implemented');
+  }
 }

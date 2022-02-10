@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { provideMockStore } from '@ngrx/store/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
@@ -27,35 +27,37 @@ describe('LiquidityBakingComponent', () => {
   const pipeMock = getPipeMock();
   const apiServiceMock = getApiServiceMock();
 
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
-      imports: [ReactiveFormsModule, TabsModule],
-      declarations: [
-        LiquidityBakingComponent,
-        AddLiquidityComponent,
-        RemoveLiquidityComponent,
-        LiquidityInputComponent,
-        IdenticonComponent,
-        SwapComponent,
-        TranslatePipe,
-        IconPipe,
-        CurrencyConverterPipe,
-      ],
-      providers: [
-        TabsetConfig,
-        provideMockStore({ initialState }),
-        { provide: IconPipe, useValue: pipeMock },
-        { provide: CurrencyConverterPipe, useValue: pipeMock },
-        { provide: ApiService, useValue: apiServiceMock },
-        { provide: TranslateService, useClass: TranslateServiceStub },
-        { provide: TranslatePipe, useClass: TranslatePipeMock },
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [ReactiveFormsModule, TabsModule],
+        declarations: [
+          LiquidityBakingComponent,
+          AddLiquidityComponent,
+          RemoveLiquidityComponent,
+          LiquidityInputComponent,
+          IdenticonComponent,
+          SwapComponent,
+          TranslatePipe,
+          IconPipe,
+          CurrencyConverterPipe,
+        ],
+        providers: [
+          TabsetConfig,
+          provideMockStore({ initialState }),
+          { provide: IconPipe, useValue: pipeMock },
+          { provide: CurrencyConverterPipe, useValue: pipeMock },
+          { provide: ApiService, useValue: apiServiceMock },
+          { provide: TranslateService, useClass: TranslateServiceStub },
+          { provide: TranslatePipe, useClass: TranslatePipeMock },
+        ],
+        schemas: [CUSTOM_ELEMENTS_SCHEMA],
+      });
 
-    fixture = TestBed.createComponent(LiquidityBakingComponent);
-    component = fixture.componentInstance;
-  }));
+      fixture = TestBed.createComponent(LiquidityBakingComponent);
+      component = fixture.componentInstance;
+    })
+  );
 
   it('should create', () => {
     expect(component).toBeTruthy();
