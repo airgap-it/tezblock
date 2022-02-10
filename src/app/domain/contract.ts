@@ -84,6 +84,7 @@ export const getTokenContractByAddress = (
       ? {
           ...tokenContract,
           id: address,
+          contractAddress: address,
         }
       : undefined;
   })(tokenContracts[address]);
@@ -117,7 +118,6 @@ export const searchTokenContracts = (
     tezosNetwork
   );
 
-  console.log('tokenContractByAddress', tokenContractByAddress);
   return getTokenContracts(tezosNetwork)
     .data.filter(
       (tokenContract) =>
