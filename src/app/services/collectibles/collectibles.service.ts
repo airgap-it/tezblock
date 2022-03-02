@@ -1,14 +1,11 @@
 import { ProtocolSymbols, TezosProtocol } from '@airgap/coinlib-core';
-import { TezosContractRemoteDataFactory } from '@airgap/coinlib-core/protocols/tezos/contract/remote-data/TezosContractRemoteDataFactory';
-import { TezosFATokenMetadata } from '@airgap/coinlib-core/protocols/tezos/types/fa/TezosFATokenMetadata';
 import { Injectable } from '@angular/core';
 import { gql, request } from 'graphql-request';
-import { ChainNetworkService } from '../chain-network/chain-network.service';
 import { CollectibleCursor } from './collectibles.types';
 
 import { TezosCollectible } from './tezos/explorer/TezosCollectibleExplorer';
 
-const OBJKT_API_URL = 'https://data.objkt.com/v1/graphql';
+const OBJKT_API_URL = 'https://data.objkt.com/v2/graphql';
 const OBJKT_PAGE_URL = 'https://objkt.com';
 const OBJKT_ASSETS_URL = 'https://assets.objkt.com/file/assets-001';
 export const DEFAULT_COLLECTIBLES_LIMIT = 12;
@@ -17,14 +14,9 @@ export const DEFAULT_COLLECTIBLES_LIMIT = 12;
   providedIn: 'root',
 })
 export class CollectiblesService {
-  private readonly remoteDataFactory: TezosContractRemoteDataFactory =
-    new TezosContractRemoteDataFactory();
   private readonly collectibles: Map<string, TezosCollectible> = new Map();
-  private readonly tokenMetadata: Map<string, TezosFATokenMetadata> = new Map();
 
-  public constructor(
-    private readonly chainNetworkService: ChainNetworkService
-  ) {}
+  public constructor() {}
 
   public async getCollectibles(
     address: string,
@@ -72,27 +64,31 @@ export class CollectiblesService {
     const query = gql`
       {
         token_holder(limit: ${limit}, offset: ${offset}, where: {
-          holder_id: {
+          holder_address: {
             _eq: "${address}"
           },
           token: {
-            id: {
+            token_id: {
               _nlike: ""
             },
-            fa2_id: {
+            fa_contract: {
               _nlike: ""
             }
           },
           quantity: {
             _gt: 0
           }
+          
+        },
+        order_by: {
+          token_pk: desc
         }) {
           token {
-            id
+            token_id
             metadata
             description
-            title
-            fa2 {
+            name
+            fa {
               contract
               name
             }
@@ -109,13 +105,13 @@ export class CollectiblesService {
     protocol: TezosProtocol,
     tokenHolder: TokenHolder
   ): Promise<TezosCollectible | undefined> {
-    const id = tokenHolder.token?.id;
+    const id = tokenHolder.token?.token_id;
     const amount = tokenHolder.quantity;
     const metadataUri = tokenHolder.token?.metadata;
-    const contractAddress = tokenHolder.token?.fa2?.contract;
-    const contractName = tokenHolder.token?.fa2?.name;
+    const contractAddress = tokenHolder.token?.fa?.contract;
+    const contractName = tokenHolder.token?.fa?.name;
     const description = tokenHolder.token?.description;
-    const title = tokenHolder.token?.title;
+    const name = tokenHolder.token?.name ?? description;
 
     if (!id || !contractAddress) {
       return undefined;
@@ -131,7 +127,7 @@ export class CollectiblesService {
         name: contractName,
       },
       description,
-      name: title,
+      name,
       displayImg: this.getAssetUrl(contractAddress, id, 'display'),
       amount: amount.toString(),
       address: { type: 'contract', value: contractAddress },
@@ -198,11 +194,11 @@ export function faProtocolSymbol(
 }
 
 interface Token {
-  id?: string;
+  token_id?: string;
   metadata?: string;
   description?: string;
-  title?: string;
-  fa2?: FA2;
+  name?: string;
+  fa?: FA;
 }
 
 interface TokenHolder {
@@ -210,7 +206,7 @@ interface TokenHolder {
   quantity?: number;
 }
 
-interface FA2 {
+interface FA {
   contract?: string;
   name?: string;
 }
