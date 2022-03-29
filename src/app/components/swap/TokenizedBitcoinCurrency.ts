@@ -20,6 +20,7 @@ import {
 } from '@taquito/rpc';
 import * as cryptocompare from 'cryptocompare';
 import { ApiService } from '@tezblock/services/api/api.service';
+import { TezosOperationType } from '@airgap/coinlib-core/protocols/tezos/types/TezosOperationType';
 
 export class TokenizedBitcoinCurrency implements AbstractCurrency {
   public symbol = 'tzBTC';
@@ -70,9 +71,6 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       this.liquidityTokenContract = await this.tezosToolKit.contract.at(
         this.liquidityTokenContractAddress
       );
-      this.liquidityBakingContract = await this.tezosToolKit.contract.at(
-        this.liquidityBakingContractAddress
-      );
       this.tokenContract = await this.tezosToolKit.contract.at(
         this.tokenContractAddress
       );
@@ -81,7 +79,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
         (<MichelsonV1ExpressionBase>(
           (<MichelsonV1ExpressionExtended>(
             this.liquidityBakingContract.script.storage
-          )).args[0]
+          ))[0]
         )).int
       ).toNumber();
 
@@ -89,7 +87,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
         (<MichelsonV1ExpressionBase>(
           (<MichelsonV1ExpressionExtended>(
             this.liquidityBakingContract.script.storage
-          )).args[1]
+          ))[1]
         )).int
       ).toNumber();
 
@@ -97,7 +95,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
         (<MichelsonV1ExpressionBase>(
           (<MichelsonV1ExpressionExtended>(
             this.liquidityBakingContract.script.storage
-          )).args[2]
+          ))[2]
         )).int
       ).toNumber();
     } catch (error) {
@@ -217,27 +215,12 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     tokenAmount: number,
     minReceived: number
   ): PartialTezosOperation[] {
-    const deadline = new BigNumber(Date.now())
-      .dividedToIntegerBy(1000)
-      .plus(60 * 60)
-      .toString();
-
-    let approveParams = this.tokenContract.methods
-      .approve(this.liquidityBakingContractAddress, tokenAmount)
-      .toTransferParams();
-
     let tokenToXtzParams = this.liquidityBakingContract.methods
-      .tokenToXtz(address, tokenAmount, minReceived, deadline)
+      .tokenToXtz(address, tokenAmount, minReceived, this.deadline())
       .toTransferParams();
 
     return [
-      {
-        kind: 'transaction',
-        source: address,
-        amount: '0',
-        destination: this.tokenContractAddress,
-        parameters: approveParams.parameter,
-      },
+      this.approveRequest(address, tokenAmount),
       {
         kind: 'transaction',
         source: address,
@@ -253,13 +236,8 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     mutezAmount: number,
     expectedTokenAmount: number
   ): PartialTezosOperation[] {
-    const deadline = new BigNumber(Date.now())
-      .dividedToIntegerBy(1000)
-      .plus(60 * 60)
-      .toString();
-
     let xtzToTokenParams = this.liquidityBakingContract.methods
-      .xtzToToken(address, expectedTokenAmount, deadline)
+      .xtzToToken(address, expectedTokenAmount, this.deadline())
       .toTransferParams();
 
     return [
@@ -279,38 +257,9 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     maxTokenDeposited: number,
     minLqtMinted: number
   ) {
-    const deadline = new BigNumber(Date.now())
-      .dividedToIntegerBy(1000)
-      .plus(60 * 60)
-      .toString();
-
-    let approveZeroParams = this.tokenContract.methods
-      .approve(this.liquidityBakingContractAddress, 0)
-      .toTransferParams();
-
-    let approveParams = this.tokenContract.methods
-      .approve(this.liquidityBakingContractAddress, maxTokenDeposited)
-      .toTransferParams();
-
     let addLiquidityParams = this.liquidityBakingContract.methods
-      .addLiquidity(address, minLqtMinted, maxTokenDeposited, deadline)
+      .addLiquidity(address, minLqtMinted, maxTokenDeposited, this.deadline())
       .toTransferParams();
-
-    const approveZeroRequest = {
-      kind: 'transaction',
-      source: address,
-      amount: '0',
-      destination: this.tokenContractAddress,
-      parameters: approveZeroParams.parameter,
-    } as PartialTezosOperation;
-
-    const approveRequest = {
-      kind: 'transaction',
-      source: address,
-      amount: '0',
-      destination: this.tokenContractAddress,
-      parameters: approveParams.parameter,
-    } as PartialTezosOperation;
 
     const addLiquidityRequest = {
       kind: 'transaction',
@@ -320,10 +269,10 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       parameters: addLiquidityParams.parameter,
     } as PartialTezosOperation;
     return [
-      approveZeroRequest,
-      approveRequest,
+      this.approveRequest(address, 0),
+      this.approveRequest(address, maxTokenDeposited),
       addLiquidityRequest,
-      approveZeroRequest,
+      this.approveRequest(address, 0),
     ];
   }
 
@@ -333,19 +282,10 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     maxTokenDeposited: number,
     minLqtMinted: number
   ) {
-    const deadline = new BigNumber(Date.now())
-      .dividedToIntegerBy(1000)
-      .plus(60 * 60)
-      .toString();
-
     const additionalSlippage = new BigNumber(100).minus(0.5).div(100);
 
     let xtzToTokenParams = this.liquidityBakingContract.methods
-      .xtzToToken(address, 0, deadline)
-      .toTransferParams();
-
-    let approveParams = this.tokenContract.methods
-      .approve(this.liquidityBakingContractAddress, maxTokenDeposited)
+      .xtzToToken(address, 0, this.deadline())
       .toTransferParams();
 
     let addLiquidityParams = this.liquidityBakingContract.methods
@@ -359,7 +299,7 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
           .times(additionalSlippage)
           .integerValue()
           .toNumber(),
-        deadline
+        this.deadline()
       )
       .toTransferParams();
 
@@ -369,13 +309,6 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       amount: new BigNumber(mutezAmount).toString(),
       destination: this.liquidityBakingContractAddress,
       parameters: xtzToTokenParams.parameter,
-    } as PartialTezosOperation;
-    const approveRequest = {
-      kind: 'transaction',
-      source: address,
-      amount: '0',
-      destination: this.tokenContractAddress,
-      parameters: approveParams.parameter,
     } as PartialTezosOperation;
 
     const addLiquidityRequest = {
@@ -389,7 +322,13 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       parameters: addLiquidityParams.parameter,
     } as PartialTezosOperation;
 
-    return [xtzToTokenRequest, approveRequest, addLiquidityRequest];
+    return [
+      xtzToTokenRequest,
+      this.approveRequest(address, 0),
+      this.approveRequest(address, maxTokenDeposited),
+      addLiquidityRequest,
+      this.approveRequest(address, 0),
+    ];
   }
 
   generateRemoveLiquidityOperation(
@@ -398,18 +337,13 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     liquidityAmount: number,
     minTokensWithdrawn: number
   ) {
-    const deadline = new BigNumber(Date.now())
-      .dividedToIntegerBy(1000)
-      .plus(60 * 60)
-      .toString();
-
     let removeLiquidityParams = this.liquidityBakingContract.methods
       .removeLiquidity(
         address,
         liquidityAmount,
         tezAmount,
         minTokensWithdrawn,
-        deadline
+        this.deadline()
       )
       .toTransferParams();
 
@@ -548,5 +482,29 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
       this.xtzPool,
       this.tokenPool
     );
+  }
+
+  private approveRequest(
+    address: string,
+    tokenAmount: number
+  ): PartialTezosOperation {
+    const approveParams = this.tokenContract.methods
+      .approve(this.liquidityBakingContractAddress, tokenAmount)
+      .toTransferParams();
+
+    return {
+      kind: TezosOperationType.TRANSACTION,
+      source: address,
+      amount: '0',
+      destination: this.tokenContractAddress,
+      parameters: approveParams.parameter,
+    } as PartialTezosOperation;
+  }
+
+  private deadline() {
+    return new BigNumber(Date.now())
+      .dividedToIntegerBy(1000)
+      .plus(60 * 60)
+      .toString();
   }
 }
