@@ -532,58 +532,58 @@ describe('AccountDetailComponent', () => {
     //   })
     // })
 
-    describe('rightsPerBlockLevel$', () => {
-      it('when any of: latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights is empty then does not trigger', () => {
-        testScheduler.run(({ expectObservable }) => {
-          expectObservable(component.rightsPerBlockLevel$).toBe('---');
-        });
-      });
+    // describe('rightsPerBlockLevel$', () => {
+    //   it('when any of: latestBlock, firstBlockOfCurrentCycle, protocolVariables, bakingRights, endorsingRights is empty then does not trigger', () => {
+    //     testScheduler.run(({ expectObservable }) => {
+    //       expectObservable(component.rightsPerBlockLevel$).toBe('---');
+    //     });
+    //   });
 
-      it('creates ranges by 6 levels but not exceedes last level of cycle', () => {
-        storeMock.setState({
-          ...initialState,
-          app: {
-            ...initialState.app,
-            latestBlock: { level: 3 },
-            firstBlockOfCurrentCycle: { level: 1, meta_cycle: 6 },
-            protocolVariables: { blocks_per_cycle: 8 },
-          },
-          bakerTable: {
-            ...initialState.bakerTable,
-            bakingRights: {
-              data: [{ cycle: 6, bakingRewardsDetails: [{ level: 5 }] }],
-            },
-            endorsingRights: { data: [{ cycle: 7 }] },
-          },
-        });
+    //   it('creates ranges by 6 levels but not exceedes last level of cycle', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       app: {
+    //         ...initialState.app,
+    //         latestBlock: { level: 3 },
+    //         firstBlockOfCurrentCycle: { level: 1, meta_cycle: 6 },
+    //         protocolVariables: { blocks_per_cycle: 8 },
+    //       },
+    //       bakerTable: {
+    //         ...initialState.bakerTable,
+    //         bakingRights: {
+    //           data: [{ cycle: 6, bakingRewardsDetails: [{ level: 5 }] }],
+    //         },
+    //         endorsingRights: { data: [{ cycle: 7 }] },
+    //       },
+    //     });
 
-        testScheduler.run(({ expectObservable }) => {
-          const expected = 'a';
-          const expectedValues = {
-            a: [
-              {
-                isInFuture: 0,
-                from: 1,
-                to: 6,
-                endorsements: undefined,
-                bakes: 1,
-              },
-              {
-                isInFuture: 1,
-                from: 7,
-                to: 8,
-                endorsements: undefined,
-                bakes: 0,
-              },
-            ],
-          };
+    //     testScheduler.run(({ expectObservable }) => {
+    //       const expected = 'a';
+    //       const expectedValues = {
+    //         a: [
+    //           {
+    //             isInFuture: 0,
+    //             from: 1,
+    //             to: 6,
+    //             endorsements: undefined,
+    //             bakes: 1,
+    //           },
+    //           {
+    //             isInFuture: 1,
+    //             from: 7,
+    //             to: 8,
+    //             endorsements: undefined,
+    //             bakes: 0,
+    //           },
+    //         ],
+    //       };
 
-          expectObservable(component.rightsPerBlockLevel$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
-    });
+    //       expectObservable(component.rightsPerBlockLevel$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
+    // });
   });
 });

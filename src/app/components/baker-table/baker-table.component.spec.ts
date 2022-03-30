@@ -96,301 +96,301 @@ describe('BakerTableComponent', () => {
       component.ngOnInit();
     });
 
-    describe('isRightsTabAvailable$', () => {
-      it('when upcomingRights is not truthy then returns true', () => {
-        testScheduler.run((helpers) => {
-          const { expectObservable } = helpers;
-          const expected = 'a';
-          const expectedValues = { a: true };
+    // describe('isRightsTabAvailable$', () => {
+    //   it('when upcomingRights is not truthy then returns true', () => {
+    //     testScheduler.run((helpers) => {
+    //       const { expectObservable } = helpers;
+    //       const expected = 'a';
+    //       const expectedValues = { a: true };
 
-          expectObservable(component.isRightsTabAvailable$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
+    //       expectObservable(component.isRightsTabAvailable$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
 
-      it('when selectedTab.kind is "baking_rights" and upcomingRights.baking is truthy then returns true', () => {
-        storeMock.setState({
-          ...initialState,
-          bakerTable: {
-            ...initialState.bakerTable,
-            upcomingRights: {
-              baking: 'foo',
-            },
-          },
-        });
+    //   it('when selectedTab.kind is "baking_rights" and upcomingRights.baking is truthy then returns true', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       bakerTable: {
+    //         ...initialState.bakerTable,
+    //         upcomingRights: {
+    //           baking: 'foo',
+    //         },
+    //       },
+    //     });
 
-        component.selectedTab = {
-          kind: OperationTypes.BakingRights,
-          title: null,
-          active: true,
-          count: 1,
-          disabled: () => false,
-        };
+    //     component.selectedTab = {
+    //       kind: OperationTypes.BakingRights,
+    //       title: null,
+    //       active: true,
+    //       count: 1,
+    //       disabled: () => false,
+    //     };
 
-        testScheduler.run((helpers) => {
-          const { expectObservable } = helpers;
-          const expected = 'a';
-          const expectedValues = { a: true };
+    //     testScheduler.run((helpers) => {
+    //       const { expectObservable } = helpers;
+    //       const expected = 'a';
+    //       const expectedValues = { a: true };
 
-          expectObservable(component.isRightsTabAvailable$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
+    //       expectObservable(component.isRightsTabAvailable$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
 
-      it('when selectedTab.kind is "baking_rights" and upcomingRights.baking is not truthy then returns false', () => {
-        storeMock.setState({
-          ...initialState,
-          bakerTable: {
-            ...initialState.bakerTable,
-            upcomingRights: {
-              baking: null,
-            },
-          },
-        });
+    //   it('when selectedTab.kind is "baking_rights" and upcomingRights.baking is not truthy then returns false', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       bakerTable: {
+    //         ...initialState.bakerTable,
+    //         upcomingRights: {
+    //           baking: null,
+    //         },
+    //       },
+    //     });
 
-        component.selectedTab = {
-          kind: OperationTypes.BakingRights,
-          title: null,
-          active: true,
-          count: 1,
-          disabled: () => false,
-        };
+    //     component.selectedTab = {
+    //       kind: OperationTypes.BakingRights,
+    //       title: null,
+    //       active: true,
+    //       count: 1,
+    //       disabled: () => false,
+    //     };
 
-        testScheduler.run((helpers) => {
-          const { expectObservable } = helpers;
-          const expected = 'a';
-          const expectedValues = { a: false };
+    //     testScheduler.run((helpers) => {
+    //       const { expectObservable } = helpers;
+    //       const expected = 'a';
+    //       const expectedValues = { a: false };
 
-          expectObservable(component.isRightsTabAvailable$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
+    //       expectObservable(component.isRightsTabAvailable$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
 
-      it('when selectedTab.kind is NOT "baking_rights" and upcomingRights.endorsing is truthy then returns true', () => {
-        storeMock.setState({
-          ...initialState,
-          bakerTable: {
-            ...initialState.bakerTable,
-            upcomingRights: {
-              endorsing: 'foo',
-            },
-          },
-        });
+    //   it('when selectedTab.kind is NOT "baking_rights" and upcomingRights.endorsing is truthy then returns true', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       bakerTable: {
+    //         ...initialState.bakerTable,
+    //         upcomingRights: {
+    //           endorsing: 'foo',
+    //         },
+    //       },
+    //     });
 
-        component.selectedTab = {
-          kind: OperationTypes.EndorsingRights,
-          title: null,
-          active: true,
-          count: 1,
-          disabled: () => false,
-        };
+    //     component.selectedTab = {
+    //       kind: OperationTypes.EndorsingRights,
+    //       title: null,
+    //       active: true,
+    //       count: 1,
+    //       disabled: () => false,
+    //     };
 
-        testScheduler.run((helpers) => {
-          const { expectObservable } = helpers;
-          const expected = 'a';
-          const expectedValues = { a: true };
+    //     testScheduler.run((helpers) => {
+    //       const { expectObservable } = helpers;
+    //       const expected = 'a';
+    //       const expectedValues = { a: true };
 
-          expectObservable(component.isRightsTabAvailable$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
+    //       expectObservable(component.isRightsTabAvailable$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
 
-      it('when selectedTab.kind is NOT "baking_rights" and upcomingRights.endorsing is NOT truthy then returns false', () => {
-        storeMock.setState({
-          ...initialState,
-          bakerTable: {
-            ...initialState.bakerTable,
-            upcomingRights: {
-              endorsing: null,
-            },
-          },
-        });
+    //   it('when selectedTab.kind is NOT "baking_rights" and upcomingRights.endorsing is NOT truthy then returns false', () => {
+    //     storeMock.setState({
+    //       ...initialState,
+    //       bakerTable: {
+    //         ...initialState.bakerTable,
+    //         upcomingRights: {
+    //           endorsing: null,
+    //         },
+    //       },
+    //     });
 
-        component.selectedTab = {
-          kind: OperationTypes.EndorsingRights,
-          title: null,
-          active: true,
-          count: 1,
-          disabled: () => false,
-        };
+    //     component.selectedTab = {
+    //       kind: OperationTypes.EndorsingRights,
+    //       title: null,
+    //       active: true,
+    //       count: 1,
+    //       disabled: () => false,
+    //     };
 
-        testScheduler.run((helpers) => {
-          const { expectObservable } = helpers;
-          const expected = 'a';
-          const expectedValues = { a: false };
+    //     testScheduler.run((helpers) => {
+    //       const { expectObservable } = helpers;
+    //       const expected = 'a';
+    //       const expectedValues = { a: false };
 
-          expectObservable(component.isRightsTabAvailable$).toBe(
-            expected,
-            expectedValues
-          );
-        });
-      });
-    });
+    //       expectObservable(component.isRightsTabAvailable$).toBe(
+    //         expected,
+    //         expectedValues
+    //       );
+    //     });
+    //   });
+    // });
   });
 
-  describe('getRewardsInnerDataSource', () => {
-    it('returns data from rewardService.getRewardsPayouts using rewards  filtered by cycle', () => {
-      const reward1 = { cycle: 1, data: 'foo1' };
-      const reward2 = { cycle: 2, data: 'foo2' };
+  // describe('getRewardsInnerDataSource', () => {
+  //   it('returns data from rewardService.getRewardsPayouts using rewards  filtered by cycle', () => {
+  //     const reward1 = { cycle: 1, data: 'foo1' };
+  //     const reward2 = { cycle: 2, data: 'foo2' };
 
-      storeMock.setState({
-        ...initialState,
-        bakerTable: {
-          ...initialState.bakerTable,
-          rewards: {
-            data: [reward1, reward2],
-          },
-        },
-      });
+  //     storeMock.setState({
+  //       ...initialState,
+  //       bakerTable: {
+  //         ...initialState.bakerTable,
+  //         rewards: {
+  //           data: [reward1, reward2],
+  //         },
+  //       },
+  //     });
 
-      const dataSource: DataSource<any> = (<any>(
-        component
-      )).getRewardsInnerDataSource(2);
-      dataSource.get(null);
+  //     const dataSource: DataSource<any> = (<any>(
+  //       component
+  //     )).getRewardsInnerDataSource(2);
+  //     dataSource.get(null);
 
-      expect(rewardServiceMock.getRewardsPayouts).toHaveBeenCalledWith(
-        reward2,
-        null,
-        undefined
-      );
-    });
-  });
+  //     expect(rewardServiceMock.getRewardsPayouts).toHaveBeenCalledWith(
+  //       reward2,
+  //       null,
+  //       undefined
+  //     );
+  //   });
+  // });
 
-  describe('getEndorsingRightsInnerDataSource', () => {
-    const endorsingRights = { cycle: 3, endorsingRewardsDetails: [] };
+  // describe('getEndorsingRightsInnerDataSource', () => {
+  //   const endorsingRights = { cycle: 3, endorsingRewardsDetails: [] };
 
-    it('dispatches loadEndorsingRightItems  action', () => {
-      const dataSource: DataSource<any> = (<any>(
-        component
-      )).getEndorsingRightsInnerDataSource(endorsingRights);
+  //   it('dispatches loadEndorsingRightItems  action', () => {
+  //     const dataSource: DataSource<any> = (<any>(
+  //       component
+  //     )).getEndorsingRightsInnerDataSource(endorsingRights);
 
-      component.address = 'fakeAddress';
-      spyOn(storeMock, 'dispatch');
-      dataSource.get(null);
+  //     component.address = 'fakeAddress';
+  //     spyOn(storeMock, 'dispatch');
+  //     dataSource.get(null);
 
-      expect(storeMock.dispatch).toHaveBeenCalledWith(
-        actions.loadEndorsingRightItems({
-          baker: 'fakeAddress',
-          cycle: 3,
-          endorsingRewardsDetails: [],
-        })
-      );
-    });
+  //     expect(storeMock.dispatch).toHaveBeenCalledWith(
+  //       actions.loadEndorsingRightItems({
+  //         baker: 'fakeAddress',
+  //         cycle: 3,
+  //         endorsingRewardsDetails: [],
+  //       })
+  //     );
+  //   });
 
-    it('returns pagable response using endorsingRightItems from ngrx store', () => {
-      const fakeEndorsingRightItems = [
-        'foo1',
-        'foo2',
-        'foo3',
-        'foo4',
-        'foo5',
-        'foo6',
-        'foo7',
-        'foo8',
-        'foo9',
-      ];
+  //   it('returns pagable response using endorsingRightItems from ngrx store', () => {
+  //     const fakeEndorsingRightItems = [
+  //       'foo1',
+  //       'foo2',
+  //       'foo3',
+  //       'foo4',
+  //       'foo5',
+  //       'foo6',
+  //       'foo7',
+  //       'foo8',
+  //       'foo9',
+  //     ];
 
-      storeMock.setState({
-        ...initialState,
-        bakerTable: {
-          ...initialState.bakerTable,
-          endorsingRightItems: {
-            '3': fakeEndorsingRightItems,
-          },
-        },
-      });
+  //     storeMock.setState({
+  //       ...initialState,
+  //       bakerTable: {
+  //         ...initialState.bakerTable,
+  //         endorsingRightItems: {
+  //           '3': fakeEndorsingRightItems,
+  //         },
+  //       },
+  //     });
 
-      const dataSource: DataSource<any> = (<any>(
-        component
-      )).getEndorsingRightsInnerDataSource(endorsingRights);
+  //     const dataSource: DataSource<any> = (<any>(
+  //       component
+  //     )).getEndorsingRightsInnerDataSource(endorsingRights);
 
-      const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 });
+  //     const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 });
 
-      testScheduler.run((helpers) => {
-        const { expectObservable } = helpers;
-        const expected = 'a';
-        const expectedValues = {
-          a: {
-            data: ['foo4', 'foo5', 'foo6'],
-            total: fakeEndorsingRightItems.length,
-          },
-        };
+  //     testScheduler.run((helpers) => {
+  //       const { expectObservable } = helpers;
+  //       const expected = 'a';
+  //       const expectedValues = {
+  //         a: {
+  //           data: ['foo4', 'foo5', 'foo6'],
+  //           total: fakeEndorsingRightItems.length,
+  //         },
+  //       };
 
-        expectObservable(data$).toBe(expected, expectedValues);
-      });
-    });
-  });
+  //       expectObservable(data$).toBe(expected, expectedValues);
+  //     });
+  //   });
+  // });
 
-  describe('getBakingRightsInnerDataSource', () => {
-    const bakingRights = { cycle: 3, bakingRewardsDetails: [] };
+  // describe('getBakingRightsInnerDataSource', () => {
+  //   const bakingRights = { cycle: 3, bakingRewardsDetails: [] };
 
-    it('dispatches loadBakingRightItems  action', () => {
-      const dataSource: DataSource<any> = (<any>(
-        component
-      )).getBakingRightsInnerDataSource(bakingRights);
+  //   it('dispatches loadBakingRightItems  action', () => {
+  //     const dataSource: DataSource<any> = (<any>(
+  //       component
+  //     )).getBakingRightsInnerDataSource(bakingRights);
 
-      component.address = 'fakeAddress';
-      spyOn(storeMock, 'dispatch');
-      dataSource.get(null);
+  //     component.address = 'fakeAddress';
+  //     spyOn(storeMock, 'dispatch');
+  //     dataSource.get(null);
 
-      expect(storeMock.dispatch).toHaveBeenCalledWith(
-        actions.loadBakingRightItems({
-          baker: 'fakeAddress',
-          cycle: 3,
-          bakingRewardsDetails: [],
-        })
-      );
-    });
+  //     expect(storeMock.dispatch).toHaveBeenCalledWith(
+  //       actions.loadBakingRightItems({
+  //         baker: 'fakeAddress',
+  //         cycle: 3,
+  //         bakingRewardsDetails: [],
+  //       })
+  //     );
+  //   });
 
-    it('returns pagable response using bakingRightItems from ngrx store', () => {
-      const fakeBakingRightItems = [
-        'foo1',
-        'foo2',
-        'foo3',
-        'foo4',
-        'foo5',
-        'foo6',
-        'foo7',
-        'foo8',
-        'foo9',
-      ];
+  //   it('returns pagable response using bakingRightItems from ngrx store', () => {
+  //     const fakeBakingRightItems = [
+  //       'foo1',
+  //       'foo2',
+  //       'foo3',
+  //       'foo4',
+  //       'foo5',
+  //       'foo6',
+  //       'foo7',
+  //       'foo8',
+  //       'foo9',
+  //     ];
 
-      storeMock.setState({
-        ...initialState,
-        bakerTable: {
-          ...initialState.bakerTable,
-          bakingRightItems: {
-            '3': fakeBakingRightItems,
-          },
-        },
-      });
+  //     storeMock.setState({
+  //       ...initialState,
+  //       bakerTable: {
+  //         ...initialState.bakerTable,
+  //         bakingRightItems: {
+  //           '3': fakeBakingRightItems,
+  //         },
+  //       },
+  //     });
 
-      const dataSource: DataSource<any> = (<any>(
-        component
-      )).getBakingRightsInnerDataSource(bakingRights);
+  //     const dataSource: DataSource<any> = (<any>(
+  //       component
+  //     )).getBakingRightsInnerDataSource(bakingRights);
 
-      const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 });
+  //     const data$ = dataSource.get({ currentPage: 2, selectedSize: 3 });
 
-      testScheduler.run((helpers) => {
-        const { expectObservable } = helpers;
-        const expected = 'a';
-        const expectedValues = {
-          a: {
-            data: ['foo4', 'foo5', 'foo6'],
-            total: fakeBakingRightItems.length,
-          },
-        };
+  //     testScheduler.run((helpers) => {
+  //       const { expectObservable } = helpers;
+  //       const expected = 'a';
+  //       const expectedValues = {
+  //         a: {
+  //           data: ['foo4', 'foo5', 'foo6'],
+  //           total: fakeBakingRightItems.length,
+  //         },
+  //       };
 
-        expectObservable(data$).toBe(expected, expectedValues);
-      });
-    });
-  });
+  //       expectObservable(data$).toBe(expected, expectedValues);
+  //     });
+  //   });
+  // });
 });

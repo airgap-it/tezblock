@@ -321,7 +321,7 @@
                 </h5>
               </div>
 
-              <div class="mb-4">
+              <!-- <div class="mb-4">
                 <h5 class="card-title__secondary mb-3">
                   {{ 'baker-table.baker-overview.number-of-rolls' | translate }}
                 </h5>
@@ -335,9 +335,9 @@
                     }}</span>
                   </ng-template>
                 </h5>
-              </div>
+              </div> -->
 
-              <div>
+              <!-- <div>
                 <h5 class="card-title__secondary mb-3">
                   {{
                     'baker-table.baker-overview.next-baking-right' | translate
@@ -366,7 +366,7 @@
                     'baker-table.baker-overview.not-available' | translate
                   }}</ng-template>
                 </ng-template>
-              </div>
+              </div> -->
             </div>
             <div class="col-md-6 col-lg-4">
               <div class="mb-3">
@@ -463,7 +463,7 @@
                 </div>
               </div>
 
-              <div>
+              <!-- <div>
                 <h5 class="card-title__secondary mb-3">
                   {{
                     'baker-table.baker-overview.next-endorsing-right'
@@ -496,14 +496,14 @@
                     'baker-table.baker-overview.not-available' | translate
                   }}</ng-template>
                 </ng-template>
-              </div>
+              </div> -->
             </div>
           </div>
         </div>
       </div>
     </ng-container>
 
-    <ng-container
+    <!-- <ng-container
       *ngIf="tab.kind === 'baking_rights' || tab.kind === 'endorsing_rights'"
     >
       <tezblock-table
@@ -520,9 +520,9 @@
           {{ 'baker-table.baker-overview.not-available' | translate }}
         </div>
       </ng-template>
-    </ng-container>
+    </ng-container> -->
 
-    <ng-container *ngIf="tab.kind === 'rewards'">
+    <!-- <ng-container *ngIf="tab.kind === 'rewards'">
       <tezblock-table
         [columns]="rewardsColumns"
         [data]="rewards$ | async"
@@ -532,7 +532,7 @@
         (onLoadMore)="loadMoreRewards()"
         (rowExpanded)="onRowExpanded($event)"
       ></tezblock-table>
-    </ng-container>
+    </ng-container> -->
 
     <ng-container *ngIf="tab.kind === 'ballot'">
       <tezblock-table
