@@ -177,10 +177,10 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
   delegationControl: FormControl;
   delegationControlDataSource$: BehaviorSubject<string[]>;
   selectedDelegation: string;
-  rightsPerBlockLevel$: Observable<RightsPerBlockLevel[]>;
-  rightsPerBlockLevelBusy$: Observable<RightsPerBlockLevel[]>;
-  rightsPerBlockLevelTooltipContext: RightsPerBlockLevel;
-  areBusyRightsPerBlockLevel$: Observable<boolean>;
+  // rightsPerBlockLevel$: Observable<RightsPerBlockLevel[]>;
+  // rightsPerBlockLevelBusy$: Observable<RightsPerBlockLevel[]>;
+  // rightsPerBlockLevelTooltipContext: RightsPerBlockLevel;
+  // areBusyRightsPerBlockLevel$: Observable<boolean>;
 
   get isMainnet(): boolean {
     return this.chainNetworkService.getNetwork() === TezosNetwork.MAINNET;
@@ -453,120 +453,120 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
             .length
       )
     );
-    this.areBusyRightsPerBlockLevel$ = combineLatest([
-      this.store$.select((state) => state.bakerTable.bakingRights.loading),
-      this.store$.select((state) => state.bakerTable.endorsingRights.loading),
-    ]).pipe(
-      map(
-        ([bakingRightsLoading, endorsingRightsLoading]) =>
-          bakingRightsLoading || endorsingRightsLoading
-      )
-    );
-    this.rightsPerBlockLevel$ = combineLatest([
-      this.store$.select((state) => state.app.latestBlock),
-      this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
-      this.store$.select((state) => state.app.protocolVariables),
-      this.store$.select((state) => state.bakerTable.bakingRights.data),
-      this.store$.select((state) => state.bakerTable.endorsingRights.data),
-    ]).pipe(
-      filter(
-        ([
-          latestBlock,
-          firstBlockOfCurrentCycle,
-          protocolVariables,
-          bakingRights,
-          endorsingRights,
-        ]) =>
-          latestBlock &&
-          firstBlockOfCurrentCycle &&
-          protocolVariables &&
-          bakingRights !== undefined &&
-          endorsingRights !== undefined
-      ),
-      map(
-        ([
-          latestBlock,
-          firstBlockOfCurrentCycle,
-          protocolVariables,
-          bakingRights,
-          endorsingRights,
-        ]) => {
-          /*
-          looks like bakingRewardsDetails/endorsingRewardsDetails property contains data for unique level(s)
-          so grouping no needed
-        */
-          const step = 6;
-          const bakingRightsFromCurrentCycle = bakingRights.find(
-            (right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle
-          );
-          const endorsingRightsFromCurrentCycle = endorsingRights.find(
-            (right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle
-          );
-          const lastBlockLevelInCycle =
-            firstBlockOfCurrentCycle.level +
-            protocolVariables.blocks_per_cycle -
-            1;
-          const isInLevelRange =
-            (level: number) =>
-            (entity: { level: number }): boolean =>
-              entity.level >= level && entity.level <= level + step - 1;
+    // this.areBusyRightsPerBlockLevel$ = combineLatest([
+    //   this.store$.select((state) => state.bakerTable.bakingRights.loading),
+    //   this.store$.select((state) => state.bakerTable.endorsingRights.loading),
+    // ]).pipe(
+    //   map(
+    //     ([bakingRightsLoading, endorsingRightsLoading]) =>
+    //       bakingRightsLoading || endorsingRightsLoading
+    //   )
+    // );
+    // this.rightsPerBlockLevel$ = combineLatest([
+    //   this.store$.select((state) => state.app.latestBlock),
+    //   this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
+    //   this.store$.select((state) => state.app.protocolVariables),
+    //   this.store$.select((state) => state.bakerTable.bakingRights.data),
+    //   this.store$.select((state) => state.bakerTable.endorsingRights.data),
+    // ]).pipe(
+    //   filter(
+    //     ([
+    //       latestBlock,
+    //       firstBlockOfCurrentCycle,
+    //       protocolVariables,
+    //       bakingRights,
+    //       endorsingRights,
+    //     ]) =>
+    //       latestBlock &&
+    //       firstBlockOfCurrentCycle &&
+    //       protocolVariables &&
+    //       bakingRights !== undefined &&
+    //       endorsingRights !== undefined
+    //   ),
+    //   map(
+    //     ([
+    //       latestBlock,
+    //       firstBlockOfCurrentCycle,
+    //       protocolVariables,
+    //       bakingRights,
+    //       endorsingRights,
+    //     ]) => {
+    //       /*
+    //       looks like bakingRewardsDetails/endorsingRewardsDetails property contains data for unique level(s)
+    //       so grouping no needed
+    //     */
+    //       const step = 6;
+    //       const bakingRightsFromCurrentCycle = bakingRights.find(
+    //         (right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle
+    //       );
+    //       const endorsingRightsFromCurrentCycle = endorsingRights.find(
+    //         (right) => right.cycle === firstBlockOfCurrentCycle.meta_cycle
+    //       );
+    //       const lastBlockLevelInCycle =
+    //         firstBlockOfCurrentCycle.level +
+    //         protocolVariables.blocks_per_cycle -
+    //         1;
+    //       const isInLevelRange =
+    //         (level: number) =>
+    //         (entity: { level: number }): boolean =>
+    //           entity.level >= level && entity.level <= level + step - 1;
 
-          return range(
-            firstBlockOfCurrentCycle.level,
-            lastBlockLevelInCycle + 1 /* range doesn't include end */,
-            step
-          ).map((level) => {
-            const to = Math.min(level + step - 1, lastBlockLevelInCycle);
+    //       return range(
+    //         firstBlockOfCurrentCycle.level,
+    //         lastBlockLevelInCycle + 1 /* range doesn't include end */,
+    //         step
+    //       ).map((level) => {
+    //         const to = Math.min(level + step - 1, lastBlockLevelInCycle);
 
-            return {
-              isInFuture:
-                to < latestBlock.level ? -1 : level > latestBlock.level ? 1 : 0,
-              from: level,
-              to,
-              endorsements:
-                endorsingRightsFromCurrentCycle?.endorsingRewardsDetails.filter(
-                  isInLevelRange(level)
-                ).length,
-              bakes: bakingRightsFromCurrentCycle?.bakingRewardsDetails.filter(
-                isInLevelRange(level)
-              ).length,
-            };
-          });
-        }
-      )
-    );
-    this.rightsPerBlockLevelBusy$ = combineLatest([
-      this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
-      this.store$.select((state) => state.app.protocolVariables),
-    ]).pipe(
-      filter(
-        ([firstBlockOfCurrentCycle, protocolVariables]) =>
-          !!firstBlockOfCurrentCycle && !!protocolVariables
-      ),
-      map(([firstBlockOfCurrentCycle, protocolVariables]) => {
-        const step = 6;
-        const lastBlockLevelInCycle =
-          firstBlockOfCurrentCycle.level +
-          protocolVariables.blocks_per_cycle -
-          1;
+    //         return {
+    //           isInFuture:
+    //             to < latestBlock.level ? -1 : level > latestBlock.level ? 1 : 0,
+    //           from: level,
+    //           to,
+    //           endorsements:
+    //             endorsingRightsFromCurrentCycle?.endorsingRewardsDetails.filter(
+    //               isInLevelRange(level)
+    //             ).length,
+    //           bakes: bakingRightsFromCurrentCycle?.bakingRewardsDetails.filter(
+    //             isInLevelRange(level)
+    //           ).length,
+    //         };
+    //       });
+    //     }
+    //   )
+    // );
+    // this.rightsPerBlockLevelBusy$ = combineLatest([
+    //   this.store$.select((state) => state.app.firstBlockOfCurrentCycle),
+    //   this.store$.select((state) => state.app.protocolVariables),
+    // ]).pipe(
+    //   filter(
+    //     ([firstBlockOfCurrentCycle, protocolVariables]) =>
+    //       !!firstBlockOfCurrentCycle && !!protocolVariables
+    //   ),
+    //   map(([firstBlockOfCurrentCycle, protocolVariables]) => {
+    //     const step = 6;
+    //     const lastBlockLevelInCycle =
+    //       firstBlockOfCurrentCycle.level +
+    //       protocolVariables.blocks_per_cycle -
+    //       1;
 
-        return range(
-          firstBlockOfCurrentCycle.level,
-          lastBlockLevelInCycle + 1 /* range doesn't include end */,
-          step
-        ).map((level) => {
-          const to = Math.min(level + step - 1, lastBlockLevelInCycle);
+    //     return range(
+    //       firstBlockOfCurrentCycle.level,
+    //       lastBlockLevelInCycle + 1 /* range doesn't include end */,
+    //       step
+    //     ).map((level) => {
+    //       const to = Math.min(level + step - 1, lastBlockLevelInCycle);
 
-          return {
-            isInFuture: undefined,
-            from: level,
-            to,
-            endorsements: undefined,
-            bakes: undefined,
-          };
-        });
-      })
-    );
+    //       return {
+    //         isInFuture: undefined,
+    //         from: level,
+    //         to,
+    //         endorsements: undefined,
+    //         bakes: undefined,
+    //       };
+    //     });
+    //   })
+    // );
 
     this.subscriptions.push(
       this.activatedRoute.paramMap.subscribe((paramMap) => {
@@ -738,29 +738,36 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           switchMap((stakingCapacity) =>
             this.bakingService.getBakerInfos(address).pipe(
               map((bakerInfos) => {
+                console.log(`BAKER INFO: ${bakerInfos}`);
                 if (!bakerInfos) {
                   return null;
                 }
 
-                const stakingBalance: number = bakerInfos.staking_balance;
+                const stakingBalance: number = Number(
+                  bakerInfos.staking_balance
+                );
                 const stakingProgress: number = Math.min(
                   100,
                   (1 - (stakingCapacity - stakingBalance) / stakingCapacity) *
                     100
                 );
                 const stakingBond: number =
-                  bakerInfos.staking_balance - bakerInfos.delegated_balance;
+                  stakingBalance - Number(bakerInfos.delegated_balance);
 
                 return {
-                  fullBalance: bakerInfos.balance,
-                  stakingBalance: bakerInfos.staking_balance,
+                  fullBalance: Number(
+                    bakerInfos.full_balance ?? bakerInfos.balance
+                  ),
+                  stakingBalance: stakingBalance,
                   numberOfRolls: Math.floor(
                     bakerInfos.staking_balance / (8000 * 1000000)
                   ),
                   stakingCapacity,
                   stakingProgress,
                   stakingBond,
-                  frozenBalance: bakerInfos.frozen_balance,
+                  frozenBalance: Number(
+                    bakerInfos.frozen_deposits ?? bakerInfos.frozen_balance
+                  ),
                 };
               })
             )
@@ -896,13 +903,13 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
       });
   }
 
-  setTooltip(item: RightsPerBlockLevel) {
-    this.rightsPerBlockLevelTooltipContext = item;
-  }
+  // setTooltip(item: RightsPerBlockLevel) {
+  //   this.rightsPerBlockLevelTooltipContext = item;
+  // }
 
-  areRightsForBlockRange(item: RightsPerBlockLevel): boolean {
-    return item?.bakes > 0 || item?.endorsements > 0;
-  }
+  // areRightsForBlockRange(item: RightsPerBlockLevel): boolean {
+  //   return item?.bakes > 0 || item?.endorsements > 0;
+  // }
 
   private setupDelegation() {
     const sortBakersAlphabeticaly = (
@@ -1049,40 +1056,40 @@ export class AccountDetailComponent extends BaseComponent implements OnInit {
           return !this.count;
         },
       },
-      {
-        title: this.translateService.instant(
-          'baker-table.baking-rights.baking-rights'
-        ),
-        active: false,
-        kind: 'baking_rights',
-        count: undefined,
-        icon: this.iconPipe.transform('breadLoaf'),
-        disabled: function () {
-          return !this.count;
-        },
-      },
-      {
-        title: this.translateService.instant(
-          'baker-table.endorsing-rights.endorsing-rights'
-        ),
-        active: false,
-        kind: 'endorsing_rights',
-        count: undefined,
-        icon: this.iconPipe.transform('stamp'),
-        disabled: function () {
-          return !this.count;
-        },
-      },
-      {
-        title: this.translateService.instant('baker-table.rewards.rewards'),
-        active: false,
-        kind: 'rewards',
-        count: undefined,
-        icon: this.iconPipe.transform('coin'),
-        disabled: function () {
-          return !this.count;
-        },
-      },
+      // {
+      //   title: this.translateService.instant(
+      //     'baker-table.baking-rights.baking-rights'
+      //   ),
+      //   active: false,
+      //   kind: 'baking_rights',
+      //   count: undefined,
+      //   icon: this.iconPipe.transform('breadLoaf'),
+      //   disabled: function () {
+      //     return !this.count;
+      //   },
+      // },
+      // {
+      //   title: this.translateService.instant(
+      //     'baker-table.endorsing-rights.endorsing-rights'
+      //   ),
+      //   active: false,
+      //   kind: 'endorsing_rights',
+      //   count: undefined,
+      //   icon: this.iconPipe.transform('stamp'),
+      //   disabled: function () {
+      //     return !this.count;
+      //   },
+      // },
+      // {
+      //   title: this.translateService.instant('baker-table.rewards.rewards'),
+      //   active: false,
+      //   kind: 'rewards',
+      //   count: undefined,
+      //   icon: this.iconPipe.transform('coin'),
+      //   disabled: function () {
+      //     return !this.count;
+      //   },
+      // },
       {
         title: this.translateService.instant('baker-table.votes'),
         active: false,

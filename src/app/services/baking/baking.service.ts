@@ -67,16 +67,10 @@ export class BakingService extends BaseService {
   }
 
   getBakerInfos(tzAddress: string): Observable<any> {
-    return this.post<any[]>('bakers' /* delegates (previously) */, {
-      predicates: [
-        {
-          field: 'pkh',
-          operation: Operation.eq,
-          set: [tzAddress],
-          inverse: false,
-        },
-      ],
-    }).pipe(map(first));
+    return this.get<any[]>(
+      `{rpcUrl}/chains/main/blocks/head/context/delegates/${tzAddress}` /* delegates (previously) */,
+      true
+    );
   }
 
   getStakingCapacityFromTezosProtocol(tzAddress: string): Observable<number> {

@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tezblock-hangzhounet-frontend
+  name: tezblock-ithacanet-frontend
   namespace: tezblock
   labels:
-    app: tezblock-hangzhounet-frontend
+    app: tezblock-ithacanet-frontend
 spec:
   selector:
     matchLabels:
-      app: tezblock-hangzhounet-frontend
+      app: tezblock-ithacanet-frontend
   replicas: 1
   revisionHistoryLimit: 3
   strategy:
@@ -18,15 +18,15 @@ spec:
   template:
     metadata:
       labels:
-        app: tezblock-hangzhounet-frontend
+        app: tezblock-ithacanet-frontend
     spec:
       containers:
-        - name: tezblock-hangzhounet-frontend
+        - name: tezblock-ithacanet-frontend
           image: _TO_BE_REPLACED_BY_IMAGE_TAG_
           imagePullPolicy: IfNotPresent
           envFrom:
             - configMapRef:
-                name: tezblock-hangzhounet-frontend-config-map
+                name: tezblock-ithacanet-frontend-config-map
           ports:
             - containerPort: 80
           readinessProbe:

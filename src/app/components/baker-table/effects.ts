@@ -109,18 +109,18 @@ export class BakerTableEffects {
     )
   );
 
-  onCurrentCycleLoadRights$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(
-        actions.loadCurrentCycleThenRightsSucceeded,
-        actions.loadCurrentCycleThenRightsFailed
-      ),
-      switchMap(() => [
-        actions.loadBakingRights(),
-        actions.loadEndorsingRights(),
-      ])
-    )
-  );
+  // onCurrentCycleLoadRights$ = createEffect(() =>
+  //   this.actions$.pipe(
+  //     ofType(
+  //       actions.loadCurrentCycleThenRightsSucceeded,
+  //       actions.loadCurrentCycleThenRightsFailed
+  //     ),
+  //     switchMap(() => [
+  //       actions.loadBakingRights(),
+  //       actions.loadEndorsingRights(),
+  //     ])
+  //   )
+  // );
 
   loadEfficiencyLast10Cycles$ = createEffect(() =>
     this.actions$.pipe(
