@@ -10,7 +10,7 @@ export class ChainNetworkService implements OnInit {
   private defaultChain: TezosNetwork = TezosNetwork.MAINNET;
   private readonly supportedChains = [
     TezosNetwork.MAINNET,
-    TezosNetwork.HANGZHOUNET,
+    TezosNetwork.ITHACANET,
   ];
 
   constructor() {
@@ -19,8 +19,8 @@ export class ChainNetworkService implements OnInit {
       case environment.mainnet.targetUrl:
         this.chainName = TezosNetwork.MAINNET;
         break;
-      case environment.hangzhounet.targetUrl:
-        this.chainName = TezosNetwork.HANGZHOUNET;
+      case environment.ithacanet.targetUrl:
+        this.chainName = TezosNetwork.ITHACANET;
         break;
       default:
         const originComponents = origin.split('.');

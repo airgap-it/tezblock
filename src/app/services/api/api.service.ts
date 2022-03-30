@@ -2,10 +2,10 @@ import { BigNumber } from 'bignumber.js';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
-import { EMPTY, of, pipe, from, forkJoin, combineLatest } from 'rxjs';
-import { map, switchMap, filter, tap, expand, take } from 'rxjs/operators';
+import { of, pipe, from, forkJoin, combineLatest } from 'rxjs';
+import { map, switchMap, filter, tap } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { isNil, negate, get as _get, flatMap } from 'lodash';
+import { isNil, negate, get as _get } from 'lodash';
 
 import {
   AggregatedBakingRights,

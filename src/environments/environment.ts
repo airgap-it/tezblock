@@ -12,11 +12,11 @@ export const environment = {
     conseilApiKey: 'MAINNET_CONSEIL_API_KEY',
     targetUrl: 'MAINNET_TARGET_URL',
   },
-  [TezosNetwork.HANGZHOUNET]: {
-    rpcUrl: 'HANGZHOUNET_RPC_URL',
-    conseilUrl: 'HANGZHOUNET_CONSEIL_URL',
-    conseilApiKey: 'HANGZHOUNET_CONSEIL_API_KEY',
-    targetUrl: 'HANGZHOUNET_TARGET_URL',
+  [TezosNetwork.ITHACANET]: {
+    rpcUrl: 'ITHACANET_RPC_URL',
+    conseilUrl: 'ITHACANET_CONSEIL_URL',
+    conseilApiKey: 'ITHACANET_CONSEIL_API_KEY',
+    targetUrl: 'ITHACANET_TARGET_URL',
   },
   googleAnalyticsKey: undefined,
   proFontAwesomeAvailable: false,
