@@ -11,8 +11,8 @@ export class LiquidityBakingEffects {
   loadChartData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadChartData),
-      mergeMap(({ from, to }) =>
-        this.cryptoPricesService.fetchChartData(from, to).pipe(
+      mergeMap(({ from }) =>
+        this.cryptoPricesService.fetchLiquidityBakingChartData(from).pipe(
           map((chartData) => actions.loadChartDataSucceeded({ chartData })),
           catchError((error) => of(actions.loadChartDataFailed({ error })))
         )

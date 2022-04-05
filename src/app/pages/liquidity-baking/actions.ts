@@ -5,7 +5,7 @@ const featureName = 'Liquidity Baking';
 
 export const loadChartData = createAction(
   `[${featureName}] Load Chart Data`,
-  props<{ from: string; to: string }>()
+  props<{ from: string }>()
 );
 export const loadChartDataSucceeded = createAction(
   `[${featureName}] Load Chart Data Succeeded`,

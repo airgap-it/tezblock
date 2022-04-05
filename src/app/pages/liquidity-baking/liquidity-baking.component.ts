@@ -199,7 +199,6 @@ export class LiquidityBakingComponent
     this.store$.dispatch(
       actions.loadChartData({
         from: this.fromCurrency.symbol,
-        to: this.toCurrency.symbol,
       })
     );
   }

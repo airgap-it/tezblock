@@ -158,43 +158,51 @@ export class CryptoPricesService {
       );
   }
 
-  fetchChartData(
-    from: string,
-    to: string
+  fetchLiquidityBakingChartData(
+    from: string
   ): Observable<CryptoPriceApiResponse[]> {
     const symbolMapping = {
       XTZ: 'tezos',
       tzBTC: 'tzbtc',
     };
     const fromIdentifier = symbolMapping[from];
-    const toIdentifier = symbolMapping[to];
 
-    return this.http
-      .get<any[]>(
-        `${this.baseURL}/coins/${fromIdentifier}/market_chart?vs_currency=usd&days=7`
-      )
-      .pipe(
-        switchMap((fromData: any) => {
-          const fromPrices = fromData.prices;
-          return this.http
-            .get<any[]>(
-              `${this.baseURL}/coins/${toIdentifier}/market_chart?vs_currency=usd&days=7`
-            )
-            .pipe(
-              map((toData: any) => {
-                const toPrices = toData.prices;
-                return toPrices
-                  .slice(0, fromPrices.length)
-                  .map((tuple, i) => [
-                    tuple[0],
-                    new BigNumber(toPrices[i][1])
-                      .div(fromPrices[i][1])
-                      .toNumber(),
-                  ]);
-              })
-            );
-        })
-      );
+    const now = new Date(Date.now()).toISOString();
+    const ninetyDaysAgo = new Date(
+      Date.now() - 90 * 24 * 60 * 60 * 1000
+    ).toISOString();
+
+    const body = {
+      query:
+        'query ($v1:quotes_1d_bool_exp,$v2:[quotes_1d_order_by!]){quotes1d(where:$v1,order_by:$v2){...f1}},fragment f1 on quotes_1d{average,bucket}',
+      variables: {
+        v1: {
+          exchangeId: {
+            _eq: 'KT1TxqZ8QtKvLu3V3JH7Gx58n7Co8pgtpQU5',
+          },
+          bucket: {
+            _gt: ninetyDaysAgo,
+            _lt: now,
+          },
+        },
+        v2: {
+          bucket: 'asc',
+        },
+      },
+    };
+
+    return this.http.post<any>('https://dex.dipdup.net/v1/graphql', body).pipe(
+      map((response) => {
+        const quotes = response.data.quotes1d;
+
+        return fromIdentifier === symbolMapping.XTZ
+          ? quotes.map((quote) => [quote.bucket, quote.average])
+          : quotes.map((quote) => [
+              quote.bucket,
+              new BigNumber(1).dividedBy(quote.average),
+            ]);
+      })
+    );
   }
 
   static symbolMapping = {
