@@ -75,28 +75,21 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
         this.tokenContractAddress
       );
 
+      const storageArgs =
+        (<MichelsonV1ExpressionExtended>(
+          this.liquidityBakingContract.script.storage
+        )).args ?? this.liquidityBakingContract.script.storage;
+
       this.tokenPool = new BigNumber(
-        (<MichelsonV1ExpressionBase>(
-          (<MichelsonV1ExpressionExtended>(
-            this.liquidityBakingContract.script.storage
-          ))[0]
-        )).int
+        (<MichelsonV1ExpressionBase>storageArgs[0]).int
       ).toNumber();
 
       this.xtzPool = new BigNumber(
-        (<MichelsonV1ExpressionBase>(
-          (<MichelsonV1ExpressionExtended>(
-            this.liquidityBakingContract.script.storage
-          ))[1]
-        )).int
+        (<MichelsonV1ExpressionBase>storageArgs[1]).int
       ).toNumber();
 
       this.lqtTotal = new BigNumber(
-        (<MichelsonV1ExpressionBase>(
-          (<MichelsonV1ExpressionExtended>(
-            this.liquidityBakingContract.script.storage
-          ))[2]
-        )).int
+        (<MichelsonV1ExpressionBase>storageArgs[2]).int
       ).toNumber();
     } catch (error) {
       throw error;

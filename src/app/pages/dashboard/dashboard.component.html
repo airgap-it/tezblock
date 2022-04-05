@@ -127,13 +127,13 @@
                 <div class="mt-2 container">
                   <div class="row">
                     <div class="col-9 p-0">
-                      <app-hash-cell
+                      <!-- <app-hash-cell
                         [data]="
                           'PsiThaCaT47Zboaw71QWScM8sXeMM7bbQFncK9FLqYc6EKdpjVP'
                         "
                         [options]="{ kind: 'proposal' }"
-                      ></app-hash-cell>
-                      <!-- TODO: need to be fixed
+                      ></app-hash-cell> -->
+                      <!-- TODO: need to be fixed -->
                       <app-hash-cell
                         *ngIf="proposalHash$ | async as proposalHash"
                         [data]="proposalHash"
@@ -144,7 +144,7 @@
                           {{ 'dashboard.no-proposal' | translate }}
                         </p>
                       </ng-container>
-                    --></div>
+                    </div>
                     <div class="col col-3 p-0">
                       <div class="float-right">
                         <p class="m-0">
