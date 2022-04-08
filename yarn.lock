@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@airgap/beacon-sdk@2.3.10":
-  version "2.3.10"
-  resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.3.10.tgz#92cf94973889666011a3a54345d05b2b6159bccc"
-  integrity sha512-SfO+9nMZuETELzb6QWedp5Q0Egg1Id4ZM8+suVmnBUuySHGuJJ8TeWZWbSffJAJtavqpTPA6vM1i//Bj/nvW2Q==
+"@airgap/beacon-sdk@2.3.11":
+  version "2.3.11"
+  resolved "https://registry.yarnpkg.com/@airgap/beacon-sdk/-/beacon-sdk-2.3.11.tgz#00d1a1d0b7eabfbc1c769104e27bb8c7b8e9fdd4"
+  integrity sha512-9YeA/CLGO5dRbVfuPZx0Daj6bOWmnkVhMhHYRR1iV0fe7THq3GqiukYvFsBIxCi4vjgdMp/04occZxsHIyCvtw==
   dependencies:
     "@types/chrome" "0.0.115"
     "@types/libsodium-wrappers" "0.7.7"
@@ -15,10 +15,10 @@
     libsodium-wrappers "0.7.8"
     qrcode-generator "1.4.4"
 
-"@airgap/coinlib-core@0.13.0":
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/@airgap/coinlib-core/-/coinlib-core-0.13.0.tgz#0f45310fbd3b03386c4d439bb70db3118a728f01"
-  integrity sha512-MWrORGoqIhqwhrMfdfL/ynOHs5Hru6Zk0BLjIcQIPFOlKElzPFgX2VK9YxLfKh1bCgQ11atOOePwvbNLTwihug==
+"@airgap/coinlib-core@0.13.1":
+  version "0.13.1"
+  resolved "https://registry.yarnpkg.com/@airgap/coinlib-core/-/coinlib-core-0.13.1.tgz#ab40e79b2e6adc1a844ce4b7caccdd6003d5f88e"
+  integrity sha512-dEIHSgUlBYsiXZmcH6uqaQL8kz2NqcGV4pXs+PGz1emo4y+StzSY+IxHj2wyF3R3TkMh7Cf5HWUJDhIKjX32iA==
   dependencies:
     "@airgap/sapling-wasm" "0.0.5"
     "@ethereumjs/common" "2.6.0"
