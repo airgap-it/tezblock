@@ -50,10 +50,39 @@ export class CollectiblesService {
     };
   }
 
-  public async getCollectiblesCount(address: string): Promise<number> {
-    const { token_holder: noLimitTokenHolders } =
-      await this.fetchTokenHoldersForAddress(address, 1000000000, 0);
-    return noLimitTokenHolders.length;
+  public async getCollectiblesCount(
+    address: string,
+    offset: number = 0,
+    carry: number = 0,
+    tries: number = 0
+  ): Promise<number> {
+    const maxTries = 5;
+    const runQuery = async (address: string, offset: number): Promise<any> => {
+      // OBJKT API is limited to max 500 results
+      const query = gql`
+        {
+          token_holder(where: {holder_address: {_eq: ${address}}}, limit: 500, offset: ${offset}) { 
+            token {
+              token_id
+            }
+          }
+        }
+    `;
+      return request(OBJKT_API_URL, query);
+    };
+
+    const { token_holder: collectibles } = await runQuery(address, offset);
+
+    if (collectibles.length < 500 || tries === maxTries) {
+      return collectibles.length + carry;
+    }
+
+    return this.getCollectiblesCount(
+      address,
+      (offset += 500),
+      (carry += collectibles.length),
+      (tries += 1)
+    );
   }
 
   private async fetchTokenHoldersForAddress(
