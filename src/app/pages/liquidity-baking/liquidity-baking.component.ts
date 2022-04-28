@@ -13,7 +13,6 @@ import {
 import { TabDirective } from 'ngx-bootstrap/tabs';
 import { AbstractCurrency } from '@tezblock/components/swap/swap-utils';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
-import { AccountInfo } from '@airgap/beacon-sdk';
 import BigNumber from 'bignumber.js';
 import { getConnectedWallet } from '@tezblock/app.selectors';
 import { TezosCurrency } from '@tezblock/components/swap/TezosCurrency';
@@ -76,8 +75,6 @@ export class LiquidityBakingComponent
   selectedTab: Tab | undefined = undefined;
   public priceSymbol: string;
   public priceReferenceSymbol: string;
-
-  public connectedWallet$: Observable<AccountInfo | undefined>;
 
   public availableBalanceFrom$: Observable<BigNumber | undefined> =
     new Observable();
@@ -144,7 +141,7 @@ export class LiquidityBakingComponent
     if (!this.selectedTab) {
       this.updateSelectedTab(this.tabs[0]);
     }
-    this.connectedWallet$ = this.store$.select(getConnectedWallet);
+    super.ngOnInit();
 
     this.availableBalanceFrom$ = this.fromCurrency.getBalance();
     this.availableBalanceTo$ = this.toCurrency.getBalance();

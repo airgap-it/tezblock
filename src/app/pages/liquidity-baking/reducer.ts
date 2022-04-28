@@ -2,8 +2,8 @@ import { createReducer, on } from '@ngrx/store';
 
 import * as actions from './actions';
 import { CryptoPriceApiResponse } from '@tezblock/services/crypto-prices/crypto-prices.service';
-import { ContractAsset } from '../account-detail/model';
 import { AccountInfo } from '@airgap/beacon-sdk';
+import { ContractAsset } from '@tezblock/domain/contract';
 
 export interface State {
   chartData: CryptoPriceApiResponse[];

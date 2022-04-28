@@ -1,53 +1,52 @@
 import { createReducer, on } from '@ngrx/store';
-
 import * as actions from './actions';
 import { getInitialTableState, TableState } from '@tezblock/domain/table';
-import { TokenContract } from '@tezblock/domain/contract';
+import { TokenAsset } from '@tezblock/services/contract/contract.service';
 
 export interface State {
-  tokenContracts: TableState<TokenContract>;
+  tokenAssets: TableState<TokenAsset>;
 }
 
 export const initialState: State = {
-  tokenContracts: getInitialTableState(),
+  tokenAssets: getInitialTableState(),
 };
 
 export const reducer = createReducer(
   initialState,
-  on(actions.loadTokenContracts, (state) => ({
+  on(actions.loadTokenAssets, (state) => ({
     ...state,
-    tokenContracts: {
-      ...state.tokenContracts,
+    tokenAssets: {
+      ...state.tokenAssets,
       loading: true,
     },
   })),
-  on(actions.loadTokenContractsSucceeded, (state, { tokenContracts }) => ({
+  on(actions.loadTokenAssetsSucceeded, (state, { tokenAssets }) => ({
     ...state,
-    tokenContracts: {
-      ...state.tokenContracts,
-      data: tokenContracts.data,
+    tokenAssets: {
+      ...state.tokenAssets,
+      data: tokenAssets.data,
       pagination: {
-        ...state.tokenContracts.pagination,
-        total: tokenContracts.total,
+        ...state.tokenAssets.pagination,
+        total: tokenAssets.total,
       },
       loading: false,
     },
   })),
   on(actions.loadTokenContractsFailed, (state) => ({
     ...state,
-    tokenContracts: {
-      ...state.tokenContracts,
+    tokenAssets: {
+      ...state.tokenAssets,
       data: null,
       loading: false,
     },
   })),
   on(actions.increasePageOfTokenContracts, (state) => ({
     ...state,
-    tokenContracts: {
-      ...state.tokenContracts,
+    tokenAssets: {
+      ...state.tokenAssets,
       pagination: {
-        ...state.tokenContracts.pagination,
-        currentPage: state.tokenContracts.pagination.currentPage + 1,
+        ...state.tokenAssets.pagination,
+        currentPage: state.tokenAssets.pagination.currentPage + 1,
       },
     },
   })),

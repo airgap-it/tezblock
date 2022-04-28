@@ -6,7 +6,6 @@ import {
   NestedTab,
 } from '@tezblock/pages/liquidity-baking/liquidity-baking.component';
 import BigNumber from 'bignumber.js';
-import { Observable, Subscription } from 'rxjs';
 import { AbstractCurrency } from '../swap/swap-utils';
 
 @Component({

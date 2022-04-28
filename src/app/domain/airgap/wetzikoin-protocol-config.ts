@@ -6,9 +6,9 @@ import {
 
 export class WetziKoinProtocolConfig extends TezosFA2ProtocolConfig {
   constructor(
-    symbol: string = 'CHF',
-    name: string = 'WetziKoin',
-    marketSymbol: string = 'CHF',
+    symbol: string = 'ECOO',
+    name: string = 'Ecoo',
+    marketSymbol: string = 'ECOO',
     identifier: ProtocolSymbols = 'xtz-wtk' as ProtocolSymbols,
     contractAddress: string = 'KT1SovvF5KRQjBiVX8cHFmEoMc7H54ehxstV',
     feeDefaults: FeeDefaults = {

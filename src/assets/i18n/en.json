@@ -21,7 +21,7 @@
     "votes_button": "Votes",
     "proposals_button": "Proposals",
     "smart-contracts_button": "Smart Contracts",
-    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "asset-smart-contracts_button": "Assets",
     "contracts_button": "Contracts",
     "assets_button": "Assets",
     "resources_label": "Resources",
@@ -40,7 +40,8 @@
     "ecosystem-block-explorers_button": "Block Explorers",
     "connect_wallet": "Connect Wallet",
     "disconnect_wallet": "Disconnect Wallet",
-    "swap_button": "Swap & Liquidity"
+    "swap_button": "Swap",
+    "portfolio_button": "Portfolio"
   },
   "footer-item": {
     "tezblock": "tezblock is a block explorer for Tezos an open-source platform for assets and applications backed by a global community of validators, researchers, and builders.",
@@ -64,13 +65,15 @@
     "7d_button": "7 days",
     "90d_button": "90 days",
     "at": "at",
-    "latest-asset": "Latest Asset Contracts",
+    "latest-asset": "Assets",
     "all-assets_button": "All Assets",
     "latest-transfers": "Latest Transfers",
     "latest-blocks": "Latest Blocks",
     "all-blocks_button": "All Blocks",
     "latest-transactions": "Latest Transactions",
-    "all-transactions_button": "All Transactions"
+    "all-transactions_button": "All Transactions",
+    "connect-wallet_button": "Connect Wallet",
+    "view-portfolio_button": "View Portfolio"
   },
   "list": {
     "transactions": {
@@ -228,11 +231,6 @@
       "title": "Ledger Live",
       "description": "Connect to your Ledger Nano S and X with Ledger Live. Manage your tez on your Ledger hardware wallet, send and delegate them. Directly buy or exchange your tez in Ledger Live.",
       "features": "Ledger Support, Delegation, Multiple Accounts, Exchange, Fiat on-ramp"
-    },
-    "magma": {
-      "title": "Magma",
-      "description": "Magma is a A secure, self-custodial mobile wallet. Magma natively integrates Dexter, a decentralized Tezos exchange, to trade tokens built with the FA1.2 token standard. Stake your Tez. Earn rewards.",
-      "features": "Delegation, FA1.2, Dexter Integration, Fiat on-ramp"
     },
     "simplestaking": {
       "title": "simplestaking.com",
@@ -401,7 +399,10 @@
     "invalid-proposal-text": "This operation hash is unknown."
   },
   "token-contract-overview": {
-    "asset-smart-contracts": "Asset Smart Contracts"
+    "asset-smart-contracts": "Assets",
+    "asset": "Asset",
+    "supply": "Total Supply",
+    "transfers": "Transfers"
   },
   "modal-component": {
     "none": "None",
@@ -709,8 +710,14 @@
     "token-contract": {
       "asset": "Asset",
       "contract-address": "Contract Address",
-      "total-supply": "Total Supply",
-      "description": "Description"
+      "creator": "Creator",
+      "transactions": "Transactions"
+    },
+
+    "portfolio-assets": {
+      "asset": "Asset",
+      "balance": "Balance",
+      "value": "Value"
     },
     "baker-overview": {
       "baker": "Baker",

@@ -13,6 +13,9 @@ import { DownloadService } from '@tezblock/services/download/download.service';
 import { Tab, compareTabWith, KindType } from '@tezblock/domain/tab';
 import { OrderBy } from '@tezblock/services/base.service';
 import { first, get } from '@tezblock/services/fp';
+import * as fromRoot from '@tezblock/reducers';
+import { Store } from '@ngrx/store';
+import * as actions from '../../pages/account-detail/actions';
 
 @Component({
   selector: 'tabbed-table',
@@ -59,6 +62,9 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   loading: boolean;
 
   @Input()
+  forceTabPosition: boolean = false;
+
+  @Input()
   orderBy: OrderBy;
 
   @Input()
@@ -90,7 +96,8 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
-    private readonly downloadService: DownloadService
+    private readonly downloadService: DownloadService,
+    private readonly store$: Store<fromRoot.State>
   ) {
     super();
   }
@@ -113,16 +120,25 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
     const hasData = (tab: Tab) => tab.count > 0;
     const tabNameFromQuery: string =
       this.activatedRoute.snapshot.queryParamMap.get('tab');
+
     const tabFromQuery: Tab = this.tabs
       .filter(hasData)
       .find(compareTabWith(tabNameFromQuery));
+    if (tabFromQuery) {
+      this.selectTab(tabFromQuery);
+      return;
+    }
+
     const firstTabWithData: Tab = this.tabs.find(hasData);
+    if (firstTabWithData) {
+      this.selectTab(firstTabWithData);
+      return;
+    }
     const firstActiveTab: Tab = this.tabs.find(
       (tab) => tab.active && (tab.count === undefined || tab.count > 0)
     );
-    const selectedTab: Tab = tabFromQuery || firstActiveTab || firstTabWithData;
-    if (selectedTab) {
-      this.selectTab(selectedTab);
+    if (firstActiveTab) {
+      this.selectTab(firstActiveTab);
     }
   }
 
@@ -135,6 +151,10 @@ export class TabbedTableComponent extends BaseComponent implements OnInit {
 
   onLoadMore() {
     this.loadMore.emit(true);
+  }
+
+  onLoadMoreCollectibles() {
+    this.store$.dispatch(actions.loadCollectibles());
   }
 
   trackByFn(index: number, item: Tab): string {

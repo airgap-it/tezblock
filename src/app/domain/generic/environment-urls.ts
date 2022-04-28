@@ -3,4 +3,5 @@ export interface EnvironmentUrls {
   conseilUrl: string;
   conseilApiKey: string;
   targetUrl: string;
+  indexerUrl: string;
 }

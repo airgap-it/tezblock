@@ -5,8 +5,3 @@ export interface BakingRatingResponse {
   tezosBakerFee: number;
   stakingCapacity?: number;
 }
-
-export interface ContractAsset {
-  contract: TokenContract;
-  amount: number;
-}

@@ -15,6 +15,7 @@
         <identicon
           *ngIf="!options?.hideIdenticon"
           class="mr-2"
+          [useImgUrl]="options?.useImgUrl"
           [address]="address"
           [forceIdenticon]="options?.forceIdenticon"
         ></identicon>
@@ -24,7 +25,7 @@
           </a>
           <a
             *ngSwitchDefault
-            [routerLink]="[path, address]"
+            [routerLink]="[path]"
             class="btn btn-link p-0"
             role="button"
           >

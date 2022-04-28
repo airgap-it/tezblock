@@ -2,7 +2,6 @@ import { createReducer, on } from '@ngrx/store';
 import { pipe } from 'rxjs';
 import { range } from 'lodash';
 import moment from 'moment';
-
 import * as actions from './actions';
 import { Transaction } from '@tezblock/interfaces/Transaction';
 import { Account } from '@tezblock/domain/account';
@@ -14,9 +13,9 @@ import {
 } from '@tezblock/interfaces/BakingBadResponse';
 import { Count } from '@tezblock/domain/tab';
 import { getTransactionsWithErrors } from '@tezblock/domain/operations';
-import { BakingRatingResponse, ContractAsset } from './model';
+import { BakingRatingResponse } from './model';
 import { xtzToMutezConvertionRatio } from '@tezblock/domain/airgap';
-
+import { ContractAsset } from '@tezblock/domain/contract';
 import { getInitialTableState, sort, TableState } from '@tezblock/domain/table';
 import { TezosPayoutInfo } from '@airgap/coinlib-core';
 import { CollectibleCursor } from '@tezblock/services/collectibles/collectibles.types';
@@ -300,6 +299,7 @@ export const reducer = createReducer(
       loading: true,
     },
   })),
+
   on(actions.loadCollectiblesSucceeded, (state, { data }) => ({
     ...state,
     collectibles: {
@@ -338,6 +338,7 @@ export const reducer = createReducer(
       loading: false,
     },
   })),
+
   on(actions.loadContractAssetsSucceeded, (state, { data }) => ({
     ...state,
     counts: (state.counts || [])
@@ -355,6 +356,7 @@ export const reducer = createReducer(
       loading: false,
     },
   })),
+
   on(actions.loadContractAssetsFailed, (state) => ({
     ...state,
     contractAssets: {

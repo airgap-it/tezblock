@@ -16,18 +16,20 @@ export class DashboardLatestContractsTransactionsEffects {
       ofType(actions.loadTransferOperations),
       switchMap(({ contracts }) =>
         forkJoin(
-          contracts.map((contract) =>
-            this.contractService.loadTransferOperations(
+          contracts.map((contract) => {
+            return this.contractService.loadTransferOperations(
               contract,
               {
                 field: 'block_level',
                 direction: 'desc',
               },
               3
-            )
-          )
+            );
+          })
         ).pipe(
-          map((response) => flatten(response)),
+          map((response) => {
+            return flatten(response);
+          }),
           map((transferOperations) => {
             return actions.loadTransferOperationsSucceeded({
               transferOperations: transferOperations

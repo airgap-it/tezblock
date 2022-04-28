@@ -7,12 +7,13 @@ import BigNumber from 'bignumber.js';
 import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import * as actions from '../../app.actions';
+import { BeaconEnabledComponent } from '../beacon-enabled-component';
 import { AbstractCurrency } from '../swap/swap-utils';
 
 @Component({
   template: '',
 })
-export abstract class LiquidityBaseComponent {
+export abstract class LiquidityBaseComponent extends BeaconEnabledComponent {
   @Input()
   public connectedWallet$: Observable<AccountInfo | undefined>;
   @Input()
@@ -37,7 +38,9 @@ export abstract class LiquidityBaseComponent {
 
   protected readonly ngDestroyed$: Subject<void> = new Subject();
 
-  constructor(protected readonly store$: Store<fromRoot.State>) {}
+  constructor(protected readonly store$: Store<fromRoot.State>) {
+    super(store$);
+  }
 
   async ngOnInit() {
     this.store$
@@ -46,10 +49,6 @@ export abstract class LiquidityBaseComponent {
       .subscribe((slippage) => {
         this.selectedSlippage$.next(slippage);
       });
-  }
-
-  connectWallet() {
-    this.store$.dispatch(actions.connectWallet());
   }
 
   setSlippage(slippage: number) {

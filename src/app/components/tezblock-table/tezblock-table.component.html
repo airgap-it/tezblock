@@ -38,6 +38,12 @@
   <app-modal-cell [data]="context?.data"></app-modal-cell>
 </ng-template>
 
+<ng-template #swapOrTransferTemplate let-context>
+  <div class="btn-group btn-group-sm d-block" role="group">
+    <transfer-button [asset]="context?.data"></transfer-button>
+  </div>
+</ng-template>
+
 <div class="table-responsive mb-3">
   <table class="table table-hover">
     <ng-container

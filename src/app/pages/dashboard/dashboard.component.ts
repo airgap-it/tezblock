@@ -21,13 +21,17 @@ import { CurrencyInfo } from '../../services/crypto-prices/crypto-prices.service
 import * as actions from './actions';
 import { TezosNetwork } from '@airgap/coinlib-core';
 import { MarketDataSample } from '@tezblock/services/crypto-prices/crypto-prices.service';
+import { BeaconEnabledComponent } from '@tezblock/components/beacon-enabled-component';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent extends BaseComponent implements OnInit {
+export class DashboardComponent
+  extends BeaconEnabledComponent
+  implements OnInit
+{
   public blocks$: Observable<Block[]>;
   public transactions$: Observable<Transaction[]>;
   public currentCycle$: Observable<number>;
@@ -60,16 +64,18 @@ export class DashboardComponent extends BaseComponent implements OnInit {
   public showRolls$: Observable<boolean>;
 
   constructor(
+    protected readonly store$: Store<fromRoot.State>,
     private readonly actions$: Actions,
     private readonly chainNetworkService: ChainNetworkService,
-    private readonly store$: Store<fromRoot.State>,
     private readonly titleService: Title,
     private readonly metaTagService: Meta
   ) {
-    super();
+    super(store$);
   }
 
   public ngOnInit() {
+    super.ngOnInit();
+
     this.store$.dispatch(actions.loadContracts());
     this.store$.dispatch(actions.loadLatestProposal());
 

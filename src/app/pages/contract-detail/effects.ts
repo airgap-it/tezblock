@@ -22,12 +22,11 @@ import { TelegramModalComponent } from '@tezblock/components/telegram-modal/tele
 import { AliasPipe } from '@tezblock/pipes/alias/alias.pipe';
 import {
   getTokenContractByAddress,
-  hasTokenHolders,
+  TokenContract,
 } from '@tezblock/domain/contract';
 import { ApiService } from '@tezblock/services/api/api.service';
 import { ContractService } from '@tezblock/services/contract/contract.service';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
-import { maxLimit } from '@tezblock/services/base.service';
 
 @Injectable()
 export class ContractDetailEffects {
@@ -35,23 +34,30 @@ export class ContractDetailEffects {
     this.actions$.pipe(
       ofType(actions.loadContract),
       switchMap(({ address }) => {
-        const contract = getTokenContractByAddress(
+        let contract = getTokenContractByAddress(
           address,
           this.chainNetworkService.getNetwork()
         );
 
-        if (contract) {
-          return this.contractService.getTotalSupplyByContract(contract).pipe(
-            map((totalSupply) =>
-              actions.loadContractSucceeded({
-                contract: { ...contract, totalSupply },
-              })
-            ),
+        return this.contractService
+          .fetchContractDetails(address, contract)
+          .pipe(
+            switchMap((contract: TokenContract) => {
+              return this.contractService
+                .getTotalSupplyByContract(contract)
+                .pipe(
+                  map((totalSupply) =>
+                    actions.loadContractSucceeded({
+                      contract: { ...contract, totalSupply },
+                    })
+                  ),
+                  catchError((error) =>
+                    of(actions.loadContractFailed({ error }))
+                  )
+                );
+            }),
             catchError((error) => of(actions.loadContractFailed({ error })))
           );
-        }
-
-        return of(actions.loadContractFailed({ error: 'Not Found' }));
       })
     )
   );
@@ -358,7 +364,6 @@ export class ContractDetailEffects {
   loadTokenHolders$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadTokenHolders),
-      filter(({ contract }) => hasTokenHolders(contract)),
       switchMap(({ contract }) =>
         this.contractService.loadTokenHolders(contract).pipe(
           map((data) => actions.loadTokenHoldersSucceeded({ data })),

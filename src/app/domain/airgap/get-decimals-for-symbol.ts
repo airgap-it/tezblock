@@ -19,6 +19,6 @@ export const getDecimalsForSymbol = (
     case MainProtocolSymbols.BTC:
       return new BitcoinProtocol().decimals;
     default:
-      return getTokenContractBySymbol(symbol, network).decimals ?? 0;
+      return getTokenContractBySymbol(symbol, network)?.decimals ?? 0;
   }
 };

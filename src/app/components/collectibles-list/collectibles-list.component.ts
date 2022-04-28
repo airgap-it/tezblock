@@ -1,9 +1,6 @@
-import { Component, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { CollectiblesModalItemComponent } from '../collectibles-modal-item/collectibles-modal-item.component';
-import * as fromRoot from '@tezblock/reducers';
-import * as actions from '../../pages/account-detail/actions';
 import {
   Collectible,
   CollectibleCursor,
@@ -18,10 +15,10 @@ export class CollectiblesListComponent {
   @Input()
   data: CollectibleCursor;
 
-  constructor(
-    private readonly modalService: BsModalService,
-    private readonly store$: Store<fromRoot.State>
-  ) {}
+  @Output()
+  onLoadMore: EventEmitter<void> = new EventEmitter();
+
+  constructor(private readonly modalService: BsModalService) {}
 
   showCollectiblesModal(item: Collectible) {
     const modalRef = this.modalService.show(CollectiblesModalItemComponent, {
@@ -33,6 +30,6 @@ export class CollectiblesListComponent {
   }
 
   public loadMore() {
-    this.store$.dispatch(actions.loadCollectibles());
+    this.onLoadMore.next();
   }
 }

@@ -14,7 +14,6 @@ import * as actions from './actions';
 import { BaseService } from '@tezblock/services/base.service';
 import { ApiService } from '@tezblock/services/api/api.service';
 import * as fromRoot from '@tezblock/reducers';
-import { getTokenContracts } from '@tezblock/domain/contract';
 import { first, get } from '@tezblock/services/fp';
 import { getPeriodTimespanQuery } from '@tezblock/domain/vote';
 import { BlockService } from '@tezblock/services/blocks/blocks.service';
@@ -24,33 +23,24 @@ import { ContractService } from '@tezblock/services/contract/contract.service';
 import { ProposalService } from '@tezblock/services/proposal/proposal.service';
 
 @Injectable()
-export class DashboarEffects {
-  loadContracts$ = createEffect(() =>
+export class DashboardEffects {
+  public loadContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(actions.loadContracts),
-      switchMap(() => {
-        const contracts = getTokenContracts(
-          this.chainNetworkService.getNetwork(),
-          6
-        );
-        if (!contracts || contracts.total === 0) {
-          return of(actions.loadContractsSucceeded({ contracts: [] }));
-        }
-
-        return forkJoin(
-          contracts.data.map((contract) =>
-            this.contractService.getTotalSupplyByContract(contract)
-          )
-        ).pipe(
-          map((totalSupplies) =>
-            actions.loadContractsSucceeded({
-              contracts: totalSupplies.map((totalSupply, index) => ({
-                ...contracts.data[index],
-                totalSupply,
-              })),
-            })
-          ),
-          catchError((error) => of(actions.loadContractsFailed({ error })))
+      withLatestFrom(
+        this.store$.select(
+          (state) => state.tokenContractOverview.tokenAssets.pagination
+        )
+      ),
+      switchMap(([_action, _pagination]) => {
+        return this.contractService.fetchLatestContracts().pipe(
+          switchMap((assets) => {
+            return of(
+              actions.loadContractsSucceeded({
+                contracts: assets,
+              })
+            );
+          })
         );
       })
     )

@@ -40,6 +40,17 @@ export const accounts: JsonAccountData[] = Object.keys(data).map((address) => ({
   address,
 }));
 
+export const isCurated = (contractAddress: string): boolean => {
+  return jsonAccounts.hasOwnProperty(contractAddress);
+};
+
+export const getCuratedContractName = (contractAddress: string): string => {
+  if (jsonAccounts.hasOwnProperty(contractAddress)) {
+    return jsonAccounts[contractAddress].alias;
+  }
+  return undefined;
+};
+
 export const getAddressesFilteredBy = (phrase: string) =>
   Object.keys(accounts).filter((address) => {
     if (!phrase) {

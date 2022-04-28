@@ -1,0 +1,97 @@
+<ng-template #loading>
+  <loading-item></loading-item>
+</ng-template>
+<div class="modal-header">
+  <h4 class="modal-title pull-left">Transfer {{ symbol }}</h4>
+  <button
+    type="button"
+    class="close pull-right"
+    aria-label="Close"
+    (click)="bsModalRef.hide()"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="d-flex flex-column">
+    <div class="my-1">
+      <label>Receiving address</label>
+      <div class="input-group">
+        <input
+          [formControl]="addressControl"
+          type="text"
+          class="form-control"
+          placeholder="tz1..."
+          aria-label="Address"
+          [ngClass]="{
+            'is-invalid':
+              addressControl.errors &&
+              (addressControl.touched || addressControl.dirty)
+          }"
+        />
+        <div class="invalid-feedback px-3 py-2">
+          <strong>Invalid Address</strong>
+        </div>
+      </div>
+    </div>
+    <div class="my-5 transfer--input">
+      <label class="d-flex justify-content-between"
+        ><span>Amount to transfer</span>
+        <span
+          ><span class="text-muted mr-2">Available: </span>
+          <strong>
+            <amount-item
+              [amount$]="balance$"
+              [decimals]="decimals!"
+              [symbol]="symbol!"
+              [isBlock]="false"
+            ></amount-item
+          ></strong>
+          {{ symbol }}</span
+        >
+      </label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text">
+            <identicon
+              [useImgUrl]="thumbnailUri"
+              [address]="contractAddress"
+            ></identicon>
+          </span>
+        </div>
+        <input
+          *ngIf="balance$ | async as balance"
+          [formControl]="amountControl"
+          type="text"
+          class="form-control"
+          placeholder="0.0"
+          aria-label="Amount"
+          [ngClass]="{
+            'is-invalid':
+              amountControl.value > balance.shiftedBy(-1 * decimals) ||
+              (amountControl.errors &&
+                (amountControl.touched || amountControl.dirty))
+          }"
+        />
+        <span class="input-group-prepend">
+          <button type="button" class="btn btn-primary" (click)="setMaxValue()">
+            Max
+          </button>
+        </span>
+        <div class="invalid-feedback px-3 py-2">
+          <strong>Invalid Amount</strong>
+        </div>
+      </div>
+    </div>
+    <div class="mt-auto">
+      <button
+        type="button"
+        class="btn btn-primary btn-block"
+        (click)="transfer(); bsModalRef.hide()"
+        [disabled]="amountControl.invalid || addressControl.invalid"
+      >
+        Transfer
+      </button>
+    </div>
+  </div>
+</div>

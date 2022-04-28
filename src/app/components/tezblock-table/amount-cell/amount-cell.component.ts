@@ -20,6 +20,7 @@ export interface AmountOptions {
   showFiatValue?: boolean;
   symbol?: string;
   comparisonTimestamp?: number;
+  decimals?: number;
   maxDigits?: number;
   digitsInfo?: string;
   fontColor?: boolean;
@@ -151,20 +152,15 @@ export class AmountCellComponent implements OnInit {
       )
     );
 
-    this.options$
-      .pipe(
-        switchMap((options) =>
-          this.cryptoPricesService
-            .getCurrencyConverterArgs(
-              get<any>((_options) => _options.symbol)(options)
-            )
-            .pipe(map((value) => [options, value]))
-        )
+    this.options$.pipe(
+      switchMap((options) =>
+        this.cryptoPricesService
+          .getCurrencyConverterArgs(
+            get<any>((_options) => _options.symbol)(options)
+          )
+          .pipe(map((value) => [options, value]))
       )
-      .subscribe((x) => {
-        const foo1 = x;
-        const foo2 = this.data;
-      });
+    );
   }
 
   public tooltipClick() {
@@ -191,10 +187,13 @@ export class AmountCellComponent implements OnInit {
 
   private setAmountPiped() {
     const protocolIdentifier = get<any>((o) => o.symbol)(this.options) || 'xtz';
+    const pipeDecimals = get<any>((o) => o.decimals)(this.options) || undefined;
+
     const converted: string =
       this.amountConverterPipe.transform(this.data || 0, {
         protocolIdentifier,
         maxDigits: this.maxDigits,
+        decimals: pipeDecimals,
       }) || '0';
     const decimals = pipe<string, number, string>(
       (stringNumber) => parseFloat(stringNumber.replace(',', '')),
