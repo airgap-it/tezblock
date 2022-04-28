@@ -1,4 +1,9 @@
 {
+  "tez": {
+    "name": "Tezos",
+    "symbol": "tez",
+    "decimals": 6
+  },
   "KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL": {
     "symbol": "YOU",
     "name": "youves YOU Governance",

@@ -4,15 +4,10 @@ import {
   ChangeDetectionStrategy,
   OnInit,
 } from '@angular/core';
-import {
-  getTokenContractByAddress,
-  TokenContract,
-} from '@tezblock/domain/contract';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { AliasService } from '@tezblock/services/alias/alias.service';
 import { Options } from './options';
-import { TezosDomains, TezosProtocolNetwork } from '@airgap/coinlib-core';
-import { AccountService } from '@tezblock/services/account/account.service';
+import { ContractAddress } from '@tezblock/domain/contract';
 
 @Component({
   selector: 'address-item',
@@ -25,10 +20,6 @@ export class AddressItemComponent implements OnInit {
   set address(value: string) {
     if (value !== this._address) {
       this._address = value;
-      this.contract = getTokenContractByAddress(
-        value,
-        this.chainNetworkService.getNetwork()
-      );
       this.formattedAddress = this.getFormattedAddress();
     }
   }
@@ -42,10 +33,13 @@ export class AddressItemComponent implements OnInit {
     if (value !== this._options) {
       this._options = value;
       if (this.address) {
-        this.formattedAddress = this.getFormattedAddress();
+        this.formattedAddress =
+          this.options.useValue ?? this.getFormattedAddress();
         if (this._options.showTezosDomain) {
           this.tezosDomainName = this.getTezosDomainsName();
         }
+
+        this.isContract = this._options.isContract;
       }
     }
   }
@@ -70,15 +64,18 @@ export class AddressItemComponent implements OnInit {
   private _clickableButton: boolean | undefined;
 
   get path(): string {
-    return `/${this.contract ? 'contract' : 'account'}`;
+    return `/${this.isContract ? 'contract' : 'account'}/${this.address}`;
   }
 
   formattedAddress: string;
   tezosDomainName: Promise<string>;
 
-  private contract: TokenContract;
+  private isContract: boolean;
 
   private get clickable(): boolean {
+    if (this._address === ContractAddress.TEZ) {
+      return false;
+    }
     return this.options && this.options.pageId
       ? this.options.pageId !== this.address
       : true;

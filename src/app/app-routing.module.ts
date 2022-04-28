@@ -20,6 +20,7 @@ import { TransactionDetailComponent } from './pages/transaction-detail/transacti
 import { DappsComponent } from './pages/ecosystem/dapps/dapps.component';
 import { LibrariesComponent } from './pages/ecosystem/libraries/libraries.component';
 import { LiquidityBakingComponent } from './pages/liquidity-baking/liquidity-baking.component';
+import { PortfolioComponent } from './pages/portfolio/portfolio.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -41,6 +42,7 @@ const routes: Routes = [
   { path: 'ecosystem/wallets', component: WalletsComponent },
   { path: 'ecosystem/dapps', component: DappsComponent },
   { path: 'ecosystem/libraries', component: LibrariesComponent },
+  { path: 'portfolio', component: PortfolioComponent },
 ];
 
 @NgModule({

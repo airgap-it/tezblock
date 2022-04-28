@@ -3,42 +3,45 @@ import {
   Column,
   Template,
 } from '@tezblock/components/tezblock-table/tezblock-table.component';
-import { isConvertableToUSD } from '@tezblock/domain/airgap';
-import { TokenContract } from '@tezblock/domain/contract';
+import { isCurated } from '@tezblock/domain/account';
+import { sanitizeThumbnailUri } from '@tezblock/domain/contract';
+import { TokenAsset } from '@tezblock/services/contract/contract.service';
 
 export const columns = (translate: TranslateService): Column[] => [
   {
-    name: translate.instant('tezblock-table.token-contract.asset'),
-    field: 'id',
+    name: translate.instant('token-contract-overview.asset'),
+    field: 'asset',
     template: Template.address,
-  },
-  {
-    name: translate.instant('tezblock-table.token-contract.contract-address'),
-    field: 'id',
-    template: Template.address,
-    data: (item: any) => ({
-      data: item.id,
-      options: { showFullAddress: true, forceIdenticon: true },
-    }),
-  },
-  // {
-  //   name: 'Symbol',
-  //   field: 'symbol'
-  // },
-  {
-    name: translate.instant('tezblock-table.token-contract.total-supply'),
-    field: 'totalSupply',
-    template: Template.amount,
-    data: (item: TokenContract) => ({
-      data: item.totalSupply,
+    data: (item: TokenAsset) => ({
+      data: item.contract.address,
       options: {
-        symbol: item.symbol,
-        showFiatValue: isConvertableToUSD(item.symbol),
+        showFullAddress: !isCurated(item.contract.address),
+        forceIdenticon: false,
+        useValue: isCurated(item.contract.address)
+          ? undefined
+          : item?.metadata?.name,
+        useImgUrl: sanitizeThumbnailUri(item),
+        isContract: true,
       },
     }),
   },
+
   {
-    name: translate.instant('tezblock-table.token-contract.description'),
-    field: 'description',
+    name: translate.instant('token-contract-overview.supply'),
+    field: 'amount',
+    template: Template.amount,
+    data: (item: TokenAsset) => {
+      return {
+        data: item?.totalSupply,
+        options: {
+          symbol: item?.metadata?.symbol ?? 'NONE',
+          decimals: item?.metadata?.decimals,
+        },
+      };
+    },
+  },
+  {
+    name: translate.instant('token-contract-overview.transfers'),
+    field: 'transfersCount',
   },
 ];

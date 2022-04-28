@@ -1,0 +1,15 @@
+<ng-template #loading>
+  <div [ngClass]="isBlock ? 'd-block' : 'd-inline-block'">
+    <loading-item></loading-item>
+  </div>
+</ng-template>
+<ng-container *ngIf="amountAsObservable$ | async as amount; else loading">
+  <ng-container *ngIf="isNaN(amount.toNumber()); else showAmount">
+    0 {{ symbol }}</ng-container
+  >
+  <ng-template #showAmount>
+    <span>
+      {{ amount }}
+    </span>
+  </ng-template>
+</ng-container>

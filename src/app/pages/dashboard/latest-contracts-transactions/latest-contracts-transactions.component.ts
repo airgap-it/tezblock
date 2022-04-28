@@ -7,9 +7,9 @@ import {
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { TokenContract, ContractOperation } from '@tezblock/domain/contract';
 import * as fromRoot from '@tezblock/reducers';
 import * as actions from './actions';
+import { ContractOperation, TokenContract } from '@tezblock/domain/contract';
 
 @Component({
   selector: 'app-latest-contracts-transactions',

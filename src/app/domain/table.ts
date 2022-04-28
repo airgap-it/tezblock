@@ -20,7 +20,7 @@ export interface TableState<T> {
 
 export const getInitialTableState = (
   orderBy?: OrderBy,
-  selectedSize = 10
+  selectedSize = 20
 ): TableState<any> => ({
   data: undefined,
   pagination: {

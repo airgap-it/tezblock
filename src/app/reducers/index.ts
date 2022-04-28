@@ -14,6 +14,7 @@ import { dataSelector, showLoadMoreSelector } from '@tezblock/domain/table';
 import * as fromEndorsementDetails from '../pages/endorsement-detail/reducer';
 import * as fromList from '../pages/list/reducer';
 import * as fromAccountDetails from '../pages/account-detail/reducer';
+import * as fromPortfolio from '../pages/portfolio/reducer';
 import * as fromBlockDetails from '../pages/block-detail/reducer';
 import * as fromTransactionDetails from '../pages/transaction-detail/reducer';
 import * as fromProposalDetails from '../pages/proposal-detail/reducer';
@@ -26,20 +27,21 @@ import * as fromLiquidityBaking from '../pages/liquidity-baking/reducer';
 import * as fromApp from '../app.reducer';
 import * as fromDashboard from '../pages/dashboard/reducer';
 import * as fromDashboardLatestContractsTransactions from '../pages/dashboard/latest-contracts-transactions/reducer';
-import * as fromTokenContractOveview from '../pages/token-contract-overview/reducer';
+import * as fromtokenContractOverview from '../pages/token-contract-overview/reducer';
 import * as fromConnectedNodes from '../pages/nodes-on-map/reducer';
 
 export interface State {
   app: fromApp.State;
   accountsList: fromAccount.State;
   accountDetails: fromAccountDetails.State;
+  portfolio: fromPortfolio.State;
   bakerTable: fromBakerTable.State;
   bakers: fromBakers.State;
   blockDetails: fromBlockDetails.State;
   dashboard: fromDashboard.State;
   dashboardLatestContractsTransactions: fromDashboardLatestContractsTransactions.State;
   endorsementDetails: fromEndorsementDetails.State;
-  tokenContractOveview: fromTokenContractOveview.State;
+  tokenContractOverview: fromtokenContractOverview.State;
   transactionDetails: fromTransactionDetails.State;
   proposalDetails: fromProposalDetails.State;
   contractDetails: fromContractDetails.State;
@@ -61,6 +63,7 @@ export const ROOT_REDUCERS = new InjectionToken<
     app: fromApp.reducer,
     accountsList: fromAccount.reducer,
     accountDetails: fromAccountDetails.reducer,
+    portfolio: fromPortfolio.reducer,
     bakerTable: fromBakerTable.reducer,
     bakers: fromBakers.reducer,
     blockDetails: fromBlockDetails.reducer,
@@ -68,7 +71,7 @@ export const ROOT_REDUCERS = new InjectionToken<
     dashboardLatestContractsTransactions:
       fromDashboardLatestContractsTransactions.reducer,
     endorsementDetails: fromEndorsementDetails.reducer,
-    tokenContractOveview: fromTokenContractOveview.reducer,
+    tokenContractOverview: fromtokenContractOverview.reducer,
     transactionDetails: fromTransactionDetails.reducer,
     proposalDetails: fromProposalDetails.reducer,
     contractDetails: fromContractDetails.reducer,

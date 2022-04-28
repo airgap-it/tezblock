@@ -21,7 +21,7 @@ import {
 } from 'rxjs/operators';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Store } from '@ngrx/store';
-import { negate, isNil, isNumber, range, uniqBy } from 'lodash';
+import { negate, isNil, isNumber, uniqBy } from 'lodash';
 import { Actions, ofType } from '@ngrx/effects';
 import { ChartOptions } from 'chart.js';
 import { FormControl } from '@angular/forms';
@@ -56,7 +56,6 @@ import { OrderBy } from '@tezblock/services/base.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Title, Meta } from '@angular/platform-browser';
 import { AliasService } from '@tezblock/services/alias/alias.service';
-import { ContractAsset } from './model';
 import { isInBTC } from '@tezblock/domain/airgap';
 import * as appActions from '@tezblock/app.actions';
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component';
@@ -67,6 +66,7 @@ import { BeaconService } from '@tezblock/services/beacon/beacon.service';
 import { Asset } from '@tezblock/components/assets-value/assets-value.component';
 import { jsonAccounts } from '@tezblock/domain/account';
 import { TezosNetwork } from '@airgap/coinlib-core';
+import { ContractAsset } from '@tezblock/domain/contract';
 
 interface RightsPerBlockLevel {
   isInFuture: number;

@@ -341,48 +341,6 @@ export class EcosystemService {
       category: EcosystemCategory.wallet,
     },
     {
-      title: this.translateService.instant('ecosystem-wallets.magma.title'),
-      description: this.translateService.instant(
-        'ecosystem-wallets.magma.description'
-      ),
-      logo: 'magma.svg',
-      socials: [
-        {
-          type: SocialType.website,
-          url: 'https://magmawallet.io/',
-        },
-        {
-          type: SocialType.twitter,
-          url: 'https://twitter.com/MagmaWallet',
-        },
-        {
-          type: SocialType.medium,
-          url: 'https://camlcase.io/blog',
-        },
-        {
-          type: SocialType.github,
-          url: 'https://gitlab.com/camlcase-dev/',
-        },
-      ],
-      platforms: [
-        {
-          name: PlatformName.iOS,
-          icon: 'apple',
-          url: 'https://apps.apple.com/app/id1512745852#?platform=iphone',
-        },
-        {
-          name: PlatformName.Android,
-          icon: 'android',
-          url: 'https://play.google.com/store/apps/details?id=io.camlcase.smartwallet',
-        },
-      ],
-      features: [
-        this.translateService.instant('ecosystem-wallets.magma.features'),
-      ],
-      downloadLink: 'https://magmawallet.io/',
-      category: EcosystemCategory.wallet,
-    },
-    {
       title: this.translateService.instant(
         'ecosystem-wallets.simplestaking.title'
       ),

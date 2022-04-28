@@ -30,7 +30,6 @@ import * as fromReducer from './reducer';
 import { aggregateOperationCounts } from '@tezblock/domain/tab';
 import {
   getTokenContracts,
-  hasTokenHolders,
   fillTransferOperations,
 } from '@tezblock/domain/contract';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
@@ -41,6 +40,7 @@ import {
   CollectiblesService,
   DEFAULT_COLLECTIBLES_LIMIT,
 } from '@tezblock/services/collectibles/collectibles.service';
+import BigNumber from 'bignumber.js';
 
 @Injectable()
 export class AccountDetailEffects {
@@ -462,22 +462,13 @@ export class AccountDetailEffects {
         this.store$.select((state) => state.accountDetails.address)
       ),
       switchMap(([action, address]) =>
-        forkJoin(
-          getTokenContracts(this.chainNetworkService.getNetwork())
-            .data.filter(hasTokenHolders)
-            .map((contract) =>
-              this.contractService.loadTokenHolders(contract).pipe(
-                map((tokenHolders) => ({
-                  contract,
-                  amount: tokenHolders
-                    .filter((tokenHolder) => tokenHolder.address === address)
-                    .map((tokenHolder) => parseFloat(tokenHolder.amount))
-                    .reduce((a, b) => a + b, 0),
-                }))
-              )
+        this.contractService.fetchTokensByAddress(address).pipe(
+          map((data) =>
+            data.filter(
+              (item) =>
+                new BigNumber(item.amount).gt(0) && item.contract !== undefined
             )
-        ).pipe(
-          map((data) => data.filter((item) => item.amount > 0)),
+          ),
           map((data) => actions.loadContractAssetsSucceeded({ data })),
           catchError((error) => of(actions.loadContractAssetsFailed({ error })))
         )

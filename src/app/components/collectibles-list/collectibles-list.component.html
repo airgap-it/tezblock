@@ -20,7 +20,7 @@
       </div>
     </div>
   </div>
-  <p class="text-muted py-3">
+  <p class="text-muted m-0 py-3">
     <small
       >Powered by
       <a href="https://objkt.com" target="_blank">objkt.com</a></small
@@ -28,12 +28,11 @@
   </p>
 </div>
 
-<div class="py-3">
+<div class="py-3" *ngIf="data?.hasNext">
   <button
     type="button"
     class="btn btn-sm btn-primary-light w-100"
     (click)="loadMore()"
-    *ngIf="data?.hasNext"
   >
     {{ 'tezblock-table.load-more_button' | translate }}
   </button>

@@ -13,7 +13,7 @@ import { TranslatePipeMock } from '@tezblock/services/translation/translate.pipe
 describe('TokenContractOverviewComponent', () => {
   let component: TokenContractOverviewComponent;
   let fixture: ComponentFixture<TokenContractOverviewComponent>;
-  const initialState = { tokenContractOveview: tcoInitialState };
+  const initialState = { tokenContractOverview: tcoInitialState };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({

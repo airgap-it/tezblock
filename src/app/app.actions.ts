@@ -147,6 +147,24 @@ export const fetchConnectedWalletBalanceFailed = createAction(
   props<{ error: any }>()
 );
 
+export const transferOperation = createAction(
+  `[${featureName}] Transfer Operation`,
+  props<{
+    destination: string;
+    contractAddress: string;
+    amount: string;
+    tokenId: string;
+    contractType: string;
+  }>()
+);
+export const transferOperationSucceeded = createAction(
+  `[${featureName}] Transfer Operation Succeeded`
+);
+export const transferOperationFailed = createAction(
+  `[${featureName}] Transfer Operation Failed`,
+  props<{ error: any }>()
+);
+
 export const setSlippage = createAction(
   `[${featureName}] Set Slippage`,
   props<{ slippage: number }>()

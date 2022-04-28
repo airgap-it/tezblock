@@ -3,9 +3,14 @@
     <div class="row align-items-center">
       <div class="col-6 p-0">
         <address-item
-          [address]="contract.id"
+          [address]="contract.contractAddress"
+          [options]="{
+            isContract: true,
+            showFullAddress: false,
+            useValue: contract.name,
+            useImgUrl: contract.thumbnailUri
+          }"
           ng-href="#here"
-          (click)="inspectDetail(contract.id)"
         ></address-item>
       </div>
       <div class="col-6 p-0">
@@ -14,7 +19,8 @@
             [data]="contract.totalSupply"
             [options]="{
               symbol: contract.symbol,
-              showFiatValue: showFiatValue(contract)
+              showFiatValue: showFiatValue(contract),
+              decimals: contract.decimals
             }"
           ></amount-cell>
         </p>

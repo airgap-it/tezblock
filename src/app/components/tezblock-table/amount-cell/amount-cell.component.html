@@ -14,7 +14,7 @@
     {{ amountPipedLeadingChars }}
   </ng-template>
 </span>
-{{ options?.symbol || 'ꜩ' }}
+{{ options?.symbol === 'NONE' ? '' : options?.symbol ? options?.symbol : 'ꜩ' }}
 
 <ng-container *ngIf="enableComparison; else noComparison">
   <ng-container *ngIf="showOldValue">

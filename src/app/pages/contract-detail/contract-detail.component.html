@@ -22,6 +22,7 @@
                   "
                 >
                   <identicon
+                    [useImgUrl]="contract.thumbnailUri"
                     [address]="contract.id"
                     [sizeLarge]="true"
                   ></identicon>
@@ -143,7 +144,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row mb-3">
+              <div *ngIf="contract.name" class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
                     {{ 'contract-detail.name' | translate }}
@@ -153,7 +154,7 @@
                   <p class="mb-0">{{ contract.name }}</p>
                 </div>
               </div>
-              <div class="row mb-3">
+              <div *ngIf="contract.symbol" class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
                     {{ 'contract-detail.symbol' | translate }}
@@ -163,7 +164,7 @@
                   <p class="mb-0">{{ contract.symbol }}</p>
                 </div>
               </div>
-              <div class="row mb-3">
+              <div *ngIf="contract.totalSupply" class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
                     {{ 'contract-detail.total-supply' | translate }}
@@ -172,17 +173,19 @@
                 <div class="col-md-9">
                   <p class="mb-0">
                     <!-- TODO: remove showFiatValue: contract.showFiatValue || false with ... -->
+
                     <amount-cell
                       [data]="contract.totalSupply"
                       [options]="{
-                        symbol: contract.symbol,
-                        showFiatValue: showFiatValue$ | async
+                        symbol: contract.symbol ? contract.symbol : 'NONE',
+                        showFiatValue: showFiatValue$ | async,
+                        decimals: contract.decimals
                       }"
                     ></amount-cell>
                   </p>
                 </div>
               </div>
-              <div class="row mb-3">
+              <div *ngIf="contract.decimals" class="row mb-3">
                 <div class="col-md-3">
                   <p class="text-secondary mb-0">
                     {{ 'contract-detail.decimals' | translate }}
@@ -205,7 +208,10 @@
             </div>
           </div>
         </div>
-        <div class="col-lg-6 mb-4 mb-lg-0 card__top">
+        <div
+          *ngIf="contract.description"
+          class="col-lg-6 mb-4 mb-lg-0 card__top"
+        >
           <div class="card h-100 pt-3">
             <div class="card-body right p-4">
               <h5 class="card-title mb-4">

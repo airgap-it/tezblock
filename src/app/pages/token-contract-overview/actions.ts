@@ -1,23 +1,22 @@
 import { createAction, props } from '@ngrx/store';
-
-import { TokenContract } from '@tezblock/domain/contract';
 import { Pageable } from '@tezblock/domain/table';
+import { TokenAsset } from '@tezblock/services/contract/contract.service';
 
 const featureName = 'Token Contract Overview';
 
-export const loadTokenContracts = createAction(
-  `[${featureName}] Load Token Contracts`
+export const loadTokenAssets = createAction(
+  `[${featureName}] Load Token Assets`
 );
-export const loadTokenContractsSucceeded = createAction(
-  `[${featureName}] Load Token Contracts Succeeded`,
-  props<{ tokenContracts: Pageable<TokenContract> }>()
+export const loadTokenAssetsSucceeded = createAction(
+  `[${featureName}] Load Token Assets Succeeded`,
+  props<{ tokenAssets: Pageable<TokenAsset> }>()
 );
 export const loadTokenContractsFailed = createAction(
-  `[${featureName}] Load Token Contracts Failed`,
+  `[${featureName}] Load Token Assets Failed`,
   props<{ error: any }>()
 );
 export const increasePageOfTokenContracts = createAction(
-  `[${featureName}] Increase Page Of Token Contracts`
+  `[${featureName}] Increase Page Of Token Assets`
 );
 
 export const reset = createAction(`[${featureName}] Reset`);

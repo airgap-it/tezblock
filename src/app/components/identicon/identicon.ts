@@ -2,8 +2,8 @@ import { Component, Input, OnInit } from '@angular/core';
 import { createIcon } from '@download/blockies';
 import { BigNumber } from 'bignumber.js';
 import { toDataUrl } from 'myetherwallet-blockies';
-
 import { jsonAccounts } from '@tezblock/domain/account';
+import { ContractAddress } from '@tezblock/domain/contract';
 
 @Component({
   selector: 'identicon',
@@ -19,6 +19,9 @@ export class IdenticonComponent implements OnInit {
 
   @Input()
   sizeLarge: boolean = false;
+
+  @Input()
+  useImgUrl: string | undefined;
 
   @Input()
   set forceIdenticon(value: boolean) {
@@ -66,40 +69,44 @@ export class IdenticonComponent implements OnInit {
   }
 
   private setIdenticon() {
-    const address = this.address;
-
-    if (!address) {
+    if (!this.address) {
       return;
     }
 
-    const getIdenticon = (): string => {
-      if (address === 'TEZOS') {
-        return 'assets/img/symbols/tez.svg';
-      }
-      const displayLogo: boolean =
-        jsonAccounts.hasOwnProperty(address) &&
-        jsonAccounts[address].hasLogo &&
-        !this.forceIdenticon;
+    if (this.useImgUrl) {
+      this.identicon = this.useImgUrl;
+      return;
+    }
 
-      if (displayLogo) {
-        const logoReference = jsonAccounts[address].logoReference || address;
-        return `submodules/tezos_assets/imgs/${logoReference}.png`;
-      }
+    this.identicon = this.getIdenticon();
+  }
 
-      if (address.startsWith('ak_')) {
-        return createIcon({ seed: address }).toDataURL();
-      }
+  public getIdenticon() {
+    const address = this._address;
+    if (address === ContractAddress.TEZ) {
+      return 'assets/img/symbols/tez.svg';
+    }
+    const displayLogo: boolean =
+      jsonAccounts.hasOwnProperty(address) &&
+      jsonAccounts[address].hasLogo &&
+      !this.forceIdenticon;
 
-      if (address.startsWith('tz') || address.startsWith('kt')) {
-        return createIcon({
-          seed: `0${this.b582int(address)}`,
-          spotcolor: '#000',
-        }).toDataURL();
-      }
+    if (displayLogo) {
+      const logoReference = jsonAccounts[address].logoReference || address;
+      return `submodules/tezos_assets/imgs/${logoReference}.png`;
+    }
 
-      return toDataUrl(address);
-    };
+    if (address.startsWith('ak_')) {
+      return createIcon({ seed: address }).toDataURL();
+    }
 
-    this.identicon = getIdenticon();
+    if (address.startsWith('tz') || address.startsWith('kt')) {
+      return createIcon({
+        seed: `0${this.b582int(address)}`,
+        spotcolor: '#000',
+      }).toDataURL();
+    }
+
+    return toDataUrl(address);
   }
 }

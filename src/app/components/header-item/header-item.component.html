@@ -239,6 +239,15 @@
                           <a
                             class="dropdown-item"
                             routerLinkActive="active"
+                            [routerLink]="['/token-contract/list']"
+                          >
+                            {{ 'header-item.assets_button' | translate }}
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            class="dropdown-item"
+                            routerLinkActive="active"
                             [routerLink]="['/account/list']"
                           >
                             {{ 'header-item.top-accounts_button' | translate }}
@@ -258,17 +267,7 @@
                   </ul>
                 </span>
               </div>
-              <li class="nav-item">
-                <button
-                  type="button"
-                  class="btn"
-                  routerLinkActive="btn-link"
-                  [ngClass]="{ 'btn-link': activeLinkAssets }"
-                  [routerLink]="['/token-contract/list']"
-                >
-                  {{ 'header-item.assets_button' | translate }}
-                </button>
-              </li>
+
               <li class="nav-item">
                 <button
                   type="button"
@@ -278,6 +277,17 @@
                   [routerLink]="['/swap']"
                 >
                   {{ 'header-item.swap_button' | translate }}
+                </button>
+              </li>
+              <li class="nav-item">
+                <button
+                  type="button"
+                  class="btn"
+                  routerLinkActive="btn-link"
+                  [ngClass]="{ 'btn-link': activeLinkPortfolio }"
+                  [routerLink]="['/portfolio']"
+                >
+                  {{ 'header-item.portfolio_button' | translate }}
                 </button>
               </li>
               <li class="nav-item dropdown">

@@ -1,7 +1,9 @@
 <img
+  #img
   class="rounded-circle"
   *ngIf="identicon"
   [src]="identicon"
+  (error)="img.src = getIdenticon()"
   [ngClass]="sizeLarge ? 'img--lg' : 'img--sm'"
 />
 <div *ngIf="!identicon" [ngClass]="sizeLarge ? 'img--lg' : 'img--sm'"></div>

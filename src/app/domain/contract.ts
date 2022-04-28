@@ -20,8 +20,17 @@ import {
   TezosNetwork,
 } from '@airgap/coinlib-core';
 import { TezosTransactionParameters } from '@airgap/coinlib-core/protocols/tezos/types/operations/Transaction';
+import { TokenAsset } from '@tezblock/services/contract/contract.service';
 
 export const tokenContracts = data as { [key: string]: TokenContract };
+
+export interface ContractAsset {
+  contract: TokenContract;
+  amount: string;
+  value?: string;
+  decimals?: number;
+  thumbnailUri?: string;
+}
 
 export enum SocialType {
   website = 'website',
@@ -31,25 +40,85 @@ export enum SocialType {
   github = 'github',
 }
 
+export enum ContractAddress {
+  TEZ = 'tez',
+}
+
 export interface Social {
   type: SocialType;
   url: string;
 }
+export interface Creator {
+  alias: string;
+  address: string;
+}
+
+export interface Delegate {
+  address: string;
+  active: boolean;
+  alias: string;
+}
+
+export interface RawContractAsset {
+  type: string;
+  address: string;
+  kind: string;
+  tzips: string[];
+  alias: string;
+  balance: number;
+  creator: Creator;
+  numContracts: number;
+  activeTokensCount: number;
+  tokenBalancesCount: number;
+  tokenTransfersCount: number;
+  numDelegations: number;
+  numOriginations: number;
+  numTransactions: number;
+  numReveals: number;
+  numMigrations: number;
+  firstActivity: number;
+  firstActivityTime: Date;
+  lastActivity: number;
+  lastActivityTime: Date;
+  typeHash: number;
+  codeHash: number;
+  delegate: Delegate;
+  delegationLevel?: number;
+  delegationTime?: Date;
+  totalSupply?: string;
+}
+export interface Metadata {
+  name: string;
+  decimals: string;
+  symbol: string;
+  tags?: any[];
+  creator?: string;
+  formats?: {
+    uri: string;
+    mimeType: string;
+  }[];
+  artifactUri?: string;
+  description?: string;
+  thumbnailUri?: string;
+  booleanAmount?: boolean;
+  icon?: string;
+}
 
 export interface TokenContract {
   contractAddress?: string;
+  symbol?: string;
+  type?: string;
   id?: string;
-  symbol: string;
-  name: string;
-  website: string;
-  description: string;
-  socials: Social[];
+  name?: string;
+  website?: string;
+  description?: string;
+  socials?: Social[];
   tezosNetwork?: TezosNetwork[];
   totalSupply?: string;
   decimals?: number;
-  type?: string;
-  tokenID?: number;
+  tokenId?: number;
   ledgerBigMapID?: number;
+  thumbnailUri?: string;
 }
 
 export interface ContractOperation extends Transaction {
@@ -201,19 +270,6 @@ export const getCurrencyConverterPipeArgs = (
   };
 };
 
-export const hasTokenHolders = (contract: TokenContract): boolean =>
-  [
-    'STKR',
-    'tzBTC',
-    'USDtz',
-    'weCHF',
-    'ETHtz',
-    'wXTZ',
-    'kUSD',
-    'YOU',
-    'uUSD',
-  ].includes(contract.symbol);
-
 export interface TokenHolder {
   address: string;
   amount: string;
@@ -314,3 +370,9 @@ export const fillTransferOperations = async (
 // by default Transaction doesn't have symbol property, symbol is added by fillTransferOperations function
 export const isAsset = (transaction: Transaction): boolean =>
   !!transaction.symbol;
+
+export const sanitizeThumbnailUri = (contract: TokenAsset) => {
+  return (
+    contract?.metadata?.icon ?? contract?.metadata?.thumbnailUri
+  )?.replace('ipfs://', 'https://ipfs.io/ipfs/');
+};
