@@ -7,7 +7,7 @@ import { TezosCollectible } from './tezos/explorer/TezosCollectibleExplorer';
 
 const OBJKT_API_URL = 'https://data.objkt.com/v2/graphql';
 const OBJKT_PAGE_URL = 'https://objkt.com';
-const OBJKT_ASSETS_URL = 'https://assets.objkt.com/file/assets-001';
+const OBJKT_ASSETS_URL = 'https://assets.objkt.media/file/assets-003';
 export const DEFAULT_COLLECTIBLES_LIMIT = 12;
 
 @Injectable({
@@ -86,6 +86,7 @@ export class CollectiblesService {
           token {
             token_id
             metadata
+            artifact_uri
             description
             name
             fa {
@@ -121,14 +122,19 @@ export class CollectiblesService {
       protocolIdentifier: faProtocolSymbol('2', contractAddress),
       networkIdentifier: protocol.options.network.identifier,
       id,
-      thumbnail: this.getAssetUrl(contractAddress, id, 'thumb288'),
+      thumbnail: await this.getAssetUrl(contractAddress, id, 'thumb288'),
       contract: {
         address: contractAddress,
         name: contractName,
       },
       description,
       name,
-      displayImg: this.getAssetUrl(contractAddress, id, 'display'),
+      displayImg: await this.getAssetUrl(
+        contractAddress,
+        id,
+        'artifact',
+        tokenHolder.token?.artifact_uri
+      ),
       amount: amount.toString(),
       address: { type: 'contract', value: contractAddress },
       moreDetails: {
@@ -139,14 +145,37 @@ export class CollectiblesService {
     };
   }
 
-  private getAssetUrl(
+  private async getAssetUrl(
     contractAddress: string,
     tokenID: string,
-    type: 'thumb288' | 'thumb400' | 'display'
-  ): string {
-    const path = tokenID.slice(-2).padStart(2, '0').split('').join('/');
+    type: 'thumb288' | 'thumb400' | 'artifact',
+    artifactUri?: string
+  ): Promise<string> {
+    if (artifactUri) {
+      if (artifactUri.startsWith('ipfs')) {
+        const sanitizedArtifactUri = artifactUri.replace('ipfs://', '');
+        if (artifactUri.indexOf('?') !== -1) {
+          const split = sanitizedArtifactUri.split('?');
+          return `${OBJKT_ASSETS_URL}/${split[0]}/artifact/index.html?${split[1]}`; // query params in artifact_uri
+        }
+        return `${OBJKT_ASSETS_URL}/${sanitizedArtifactUri}/artifact`; // Single files (in directory) over IPFS
+      }
 
-    return `${OBJKT_ASSETS_URL}/${contractAddress}/${path}/${tokenID}/${type}`;
+      const digest = await this.digestMessage(artifactUri);
+      return `${OBJKT_ASSETS_URL}/${digest}/artifact`; // Single files over HTTP(s)
+    }
+    return `${OBJKT_ASSETS_URL}/${contractAddress}/${tokenID}/${type}`; // Thumbs
+  }
+
+  // From OBJKT CDN V2 documentation at https://gist.github.com/vhf/e6f63e4b9f400caa115884a19a12b5d4#objktcom-assets-cdn-v2
+  private async digestMessage(message) {
+    const msgUint8 = new TextEncoder().encode(message);
+    const hashBuffer = await crypto.subtle.digest('SHA-1', msgUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+    return hashHex;
   }
 
   private getDetailsUrl(contractAddress: string, tokenID: string): string {
@@ -199,6 +228,7 @@ interface Token {
   description?: string;
   name?: string;
   fa?: FA;
+  artifact_uri?: string;
 }
 
 interface TokenHolder {
