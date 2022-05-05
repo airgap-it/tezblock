@@ -1,18 +1,17 @@
 import { Component, OnChanges, SimpleChanges } from '@angular/core';
-import { combineLatest, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, ReplaySubject } from 'rxjs';
 import { formControlOptions, tezToMutez } from '../swap/swap-utils';
 import { Store } from '@ngrx/store';
 import * as fromRoot from '@tezblock/reducers';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormControl, Validators } from '@angular/forms';
 import BigNumber from 'bignumber.js';
-import { map, take, takeUntil } from 'rxjs/operators';
+import { take, takeUntil } from 'rxjs/operators';
 import { BeaconService } from '@tezblock/services/beacon/beacon.service';
-import { LiquidityBaseComponent } from '../liquidity-base/liquidity-base.component';
+import {
+  LastChanged,
+  LiquidityBaseComponent,
+  SwapDirection,
+} from '../liquidity-base/liquidity-base.component';
 
 @Component({
   selector: 'app-add-liquidity',
@@ -31,8 +30,14 @@ export class AddLiquidityComponent
   public availableBalance: BigNumber;
   public amountControl: FormControl;
   public liquidityAmountControl: FormControl;
-  public formGroup: FormGroup;
   public manualToggle$: ReplaySubject<void> = new ReplaySubject();
+
+  public fromAmount: FormControl;
+  public toAmount: FormControl;
+  lastChanged: BehaviorSubject<LastChanged> = new BehaviorSubject<LastChanged>({
+    direction: SwapDirection.FROM,
+    amount: 0,
+  });
 
   constructor(
     protected readonly store$: Store<fromRoot.State>,
@@ -41,36 +46,41 @@ export class AddLiquidityComponent
   ) {
     super(store$);
     this.manualToggle$.next();
-    this.formGroup = this.formBuilder.group({
-      amountControl: [null, formControlOptions],
-      liquidityControl: [
-        null,
-        Validators.compose([
-          Validators.min(0),
-          Validators.required,
-          Validators.pattern('^[+-]?(\\d*\\.)?\\d+$'),
-        ]),
-      ],
-    });
+
+    this.fromAmount = new FormControl(null, formControlOptions);
+    this.toAmount = new FormControl(null, [
+      Validators.min(0),
+      Validators.required,
+      Validators.pattern('^[+-]?(\\d*\\.)?\\d+$'),
+    ]);
+
+    this.toAmount.valueChanges
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((amount) => {
+        this.lastChanged.next({
+          direction: SwapDirection.TO,
+          amount,
+        });
+      });
+
+    this.fromAmount.valueChanges
+      .pipe(takeUntil(this.ngDestroyed$))
+      .subscribe((amount) => {
+        this.lastChanged.next({
+          direction: SwapDirection.FROM,
+          amount,
+        });
+      });
   }
 
   async ngOnChanges(_changes: SimpleChanges) {
     this.fromDecimals = this.fromCurrency.decimals;
     this.toDecimals = this.toCurrency.decimals;
-
-    const lastChanged = this.formGroup.controls[
-      'amountControl'
-    ].valueChanges.pipe(
-      map((amountInTez) => ({
-        addLiquidityManually: false,
-        amountInTez,
-      }))
-    );
-
     combineLatest([
-      lastChanged,
+      this.lastChanged,
       this.selectedSlippage$,
       this.connectedWallet$,
+      this.availableBalanceFrom$,
       this.availableBalanceTo$,
       this.manualToggle$,
     ])
@@ -80,6 +90,7 @@ export class AddLiquidityComponent
           lastChanged,
           slippage,
           connectedWallet,
+          availableBalanceFrom,
           availableBalanceTo,
           _manualToggle,
         ]): Promise<void> => {
@@ -90,7 +101,7 @@ export class AddLiquidityComponent
 
           this.maxTokenDeposited = new BigNumber(
             await this.toCurrency?.getExpectedTokenIn(
-              new BigNumber(lastChanged.amountInTez)
+              new BigNumber(lastChanged.amount)
                 .shiftedBy(this.fromDecimals)
                 .integerValue()
             )
@@ -100,37 +111,60 @@ export class AddLiquidityComponent
             .toString();
 
           if (this.addLiquidityManually) {
-            this.xtzAmount = new BigNumber(lastChanged.amountInTez).toString();
+            if (lastChanged.direction === SwapDirection.FROM) {
+              this.loadValuesBusy$.next(false);
 
-            this.loadValuesBusy$.next(false);
+              const estimatedTokenDeposit = new BigNumber(
+                this.maxTokenDeposited
+              ).gt(availableBalanceTo)
+                ? 'Insufficient'
+                : lastChanged.amount === null || lastChanged.amount === 0
+                ? 0
+                : new BigNumber(
+                    new BigNumber(this.maxTokenDeposited).toFixed(
+                      this.toCurrency?.decimals
+                    )
+                  ).toString();
 
-            const formControlMaxTokenDeposited = new BigNumber(
-              this.maxTokenDeposited
-            ).gt(availableBalanceTo)
-              ? 'Insufficient'
-              : lastChanged.amountInTez === '' ||
-                lastChanged.amountInTez === '0'
-              ? 0
-              : new BigNumber(
-                  new BigNumber(this.maxTokenDeposited).toFixed(
-                    this.toCurrency?.decimals
-                  )
-                ).toString();
-
-            this.formGroup.controls['liquidityControl'].setValue(
-              formControlMaxTokenDeposited,
-              {
+              this.toAmount.setValue(estimatedTokenDeposit, {
                 emitEvent: false,
-              }
-            );
-            this.formGroup.controls['liquidityControl'].markAsTouched();
+              });
+              this.toAmount.markAsTouched();
+            } else {
+              const expectedXtzIn = new BigNumber(
+                await this.toCurrency?.getExpectedXtzIn(
+                  new BigNumber(lastChanged.amount)
+                    .shiftedBy(this.toDecimals)
+                    .integerValue()
+                )
+              )
+                .div(percentage)
+                .shiftedBy(-1 * this.fromDecimals)
+                .toString();
+
+              const estimatedXtzDeposit = new BigNumber(expectedXtzIn).gt(
+                availableBalanceFrom
+              )
+                ? 'Insufficient'
+                : lastChanged.amount === null || lastChanged.amount === 0
+                ? 0
+                : new BigNumber(
+                    new BigNumber(expectedXtzIn).toFixed(
+                      this.fromCurrency?.decimals
+                    )
+                  ).toString();
+
+              this.fromAmount.setValue(estimatedXtzDeposit, {
+                emitEvent: false,
+              });
+            }
           } else {
-            this.xtzAmount = new BigNumber(lastChanged.amountInTez)
+            this.xtzAmount = new BigNumber(lastChanged.amount)
               .div(2)
               .toString();
 
             const priceImpact = await this.toCurrency?.estimatePriceImpact(
-              new BigNumber(lastChanged.amountInTez)
+              new BigNumber(lastChanged.amount)
                 .shiftedBy(this.fromDecimals)
                 .div(2)
             );
@@ -218,7 +252,7 @@ export class AddLiquidityComponent
   toggleManualMode() {
     this.addLiquidityManually = !this.addLiquidityManually;
     this.manualToggle$.next();
-    this.formGroup.controls['liquidityControl'].markAsUntouched();
+    this.toAmount.markAsUntouched();
   }
 
   public ngOnDestroy(): void {

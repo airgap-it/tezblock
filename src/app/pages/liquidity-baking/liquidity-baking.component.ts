@@ -23,6 +23,7 @@ import { ChartOptions } from 'chart.js';
 import { ApiService } from '@tezblock/services/api/api.service';
 import { getPrecision } from '@tezblock/components/tezblock-table/amount-cell/amount-cell.component';
 import { LiquidityBaseComponent } from '@tezblock/components/liquidity-base/liquidity-base.component';
+import { AccountInfo } from '@airgap/beacon-sdk';
 
 const liquidityChartOptions = (currency: AbstractCurrency): ChartOptions => {
   return {
@@ -75,21 +76,18 @@ export class LiquidityBakingComponent
   selectedTab: Tab | undefined = undefined;
   public priceSymbol: string;
   public priceReferenceSymbol: string;
-
   public availableBalanceFrom$: Observable<BigNumber | undefined> =
     new Observable();
-
   public availableBalanceTo$: Observable<BigNumber | undefined> =
     new Observable();
   public priceChartLabels$: Observable<string[]>;
   public priceChartDatasets$: Observable<{ data: number[]; label: string }[]>;
-
   public chartData$: Observable<CryptoPriceApiResponse[]>;
   public priceDelta$: Observable<string>;
   public pricePeriod$ = new BehaviorSubject<number>(PricePeriod.day);
   public totalValueLocked$: Observable<string>;
   public estimatedApy$: Observable<string>;
-
+  public connectedWallet$: Observable<AccountInfo | undefined>;
   public slippage: number = this.slippages[0];
   public chartOptions;
   public mainTab: MainTab = MainTab.SWAP;
@@ -136,12 +134,13 @@ export class LiquidityBakingComponent
   }
 
   async ngOnInit() {
+    this.connectedWallet$ = this.store$.select(getConnectedWallet);
+
     this.totalValueLocked$ = this.tokenCurrency.getTotalValueLocked();
     this.estimatedApy$ = this.tokenCurrency.estimateApy();
     if (!this.selectedTab) {
       this.updateSelectedTab(this.tabs[0]);
     }
-    super.ngOnInit();
 
     this.availableBalanceFrom$ = this.fromCurrency.getBalance();
     this.availableBalanceTo$ = this.toCurrency.getBalance();

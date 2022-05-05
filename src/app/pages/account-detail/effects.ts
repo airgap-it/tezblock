@@ -127,14 +127,16 @@ export class AccountDetailEffects {
       withLatestFrom(
         this.store$.select((state) => state.accountDetails.address)
       ),
-      switchMap(([_action, address]) =>
-        from(this.collectiblesService.getCollectiblesCount(address)).pipe(
+      switchMap(([_action, address]) => {
+        return from(
+          this.collectiblesService.getCollectiblesCount(address)
+        ).pipe(
           map((data) => actions.loadCollectiblesCountSucceeded({ data })),
           catchError((error) =>
             of(actions.loadCollectiblesCountFailed({ error }))
           )
-        )
-      )
+        );
+      })
     )
   );
 
