@@ -49,6 +49,10 @@ export abstract class MockBaseCurrency implements AbstractCurrency {
     throw new Error('Not implemented');
   }
 
+  getExpectedXtzIn(_tokenAmount: BigNumber): Promise<BigNumber> {
+    throw new Error('Not implemented');
+  }
+
   addLiquidity(
     _address: string,
     _mutezAmount: number,

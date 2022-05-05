@@ -2,7 +2,7 @@
   [tab]="'ADD_LIQUIDITY'"
   [currency]="fromCurrency"
   [balance]="availableBalanceFrom$ | async"
-  [amountControl]="formGroup.controls['amountControl']"
+  [amountControl]="fromAmount"
 ></app-liquidity-input>
 
 <div class="card">
@@ -119,8 +119,7 @@
     [tab]="'ADD_LIQUIDITY'"
     [currency]="toCurrency"
     [balance]="availableBalanceTo$ | async"
-    [amountControl]="formGroup.controls['liquidityControl']"
-    [toggleMaxDisabled]="true"
+    [amountControl]="toAmount"
   ></app-liquidity-input>
 </ng-container>
 
@@ -138,11 +137,8 @@
     type="button"
     class="btn btn-primary-light btn-block"
     [disabled]="
-      (formGroup.controls['liquidityControl'].touched
-        ? formGroup.invalid
-        : formGroup.controls['amountControl'].invalid) ||
-      formGroup.controls['amountControl'].value >
-        (availableBalanceFrom$ | async)?.toNumber() ||
+      (toAmount.touched ? toAmount.invalid : fromAmount.invalid) ||
+      fromAmount.value > (availableBalanceFrom$ | async)?.toNumber() ||
       (busy$ | async)
     "
     (click)="addLiquidity()"

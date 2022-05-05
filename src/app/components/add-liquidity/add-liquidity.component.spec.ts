@@ -59,6 +59,7 @@ describe('AddLiquidityComponent', () => {
     } as AccountInfo);
 
     component.availableBalanceTo$ = of(new BigNumber(1000000));
+    component.availableBalanceFrom$ = of(new BigNumber(1000000));
   }
 
   it('should create', () => {
@@ -90,7 +91,7 @@ describe('AddLiquidityComponent', () => {
             ),
           });
 
-          component.formGroup.controls.amountControl.setValue(tezAmount);
+          component.fromAmount.setValue(tezAmount);
 
           fixture.detectChanges();
           tick(1000);
@@ -151,7 +152,7 @@ describe('AddLiquidityComponent', () => {
             true
           ),
         });
-        component.formGroup.controls.amountControl.setValue(tezAmount);
+        component.fromAmount.setValue(tezAmount);
 
         component.ngOnChanges({
           addLiquidityManually: new SimpleChange(
@@ -168,7 +169,7 @@ describe('AddLiquidityComponent', () => {
           );
 
           const formControlAmountSlippageAdjusted = new BigNumber(
-            new BigNumber(component.formGroup.controls.liquidityControl.value)
+            new BigNumber(component.toAmount.value)
               .times(percentage)
               .toFixed(component.toCurrency.decimals)
           );

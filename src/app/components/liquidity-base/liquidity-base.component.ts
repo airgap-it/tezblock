@@ -10,6 +10,15 @@ import * as actions from '../../app.actions';
 import { BeaconEnabledComponent } from '../beacon-enabled-component';
 import { AbstractCurrency } from '../swap/swap-utils';
 
+export enum SwapDirection {
+  FROM = 'FROM',
+  TO = 'TO',
+}
+
+export interface LastChanged {
+  direction: SwapDirection;
+  amount: number;
+}
 @Component({
   template: '',
 })
