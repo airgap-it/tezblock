@@ -1,20 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
-import { Actions, ofType } from '@ngrx/effects';
-
+import { Actions } from '@ngrx/effects';
 import * as fromRoot from '@tezblock/reducers';
 import * as actions from './actions';
-import * as appActions from '@tezblock/app.actions';
 import { BaseComponent } from '@tezblock/components/base.component';
-import { TokenContract } from '@tezblock/domain/contract';
 import { OrderBy } from '@tezblock/services/base.service';
 import { Column } from '@tezblock/components/tezblock-table/tezblock-table.component';
 import { columns } from './table-definitions';
-import { getRefresh } from '@tezblock/domain/synchronization';
 import { TranslateService } from '@ngx-translate/core';
 import { Title, Meta } from '@angular/platform-browser';
+import { TokenAsset } from '@tezblock/services/contract/contract.service';
 
 @Component({
   selector: 'app-token-contract-overview',
@@ -25,7 +22,7 @@ export class TokenContractOverviewComponent
   extends BaseComponent
   implements OnInit
 {
-  data$: Observable<TokenContract[]>;
+  data$: Observable<TokenAsset[]>;
   loading$: Observable<boolean>;
   showLoadMore$: Observable<boolean>;
   orderBy$: Observable<OrderBy>;
@@ -45,13 +42,14 @@ export class TokenContractOverviewComponent
 
   ngOnInit() {
     this.data$ = this.store$.select(
-      (state) => state.tokenContractOveview.tokenContracts.data
+      (state) => state.tokenContractOverview.tokenAssets.data
     );
+
     this.loading$ = this.store$.select(
-      (state) => state.tokenContractOveview.tokenContracts.loading
+      (state) => state.tokenContractOverview.tokenAssets.loading
     );
     this.showLoadMore$ = this.store$
-      .select((state) => state.tokenContractOveview.tokenContracts)
+      .select((state) => state.tokenContractOverview.tokenAssets)
       .pipe(
         map(
           (contracts) =>
@@ -59,33 +57,11 @@ export class TokenContractOverviewComponent
         )
       );
     this.orderBy$ = this.store$.select(
-      (state) => state.tokenContractOveview.tokenContracts.orderBy
+      (state) => state.tokenContractOverview.tokenAssets.orderBy
     );
     this.columns = columns(this.translateService);
 
-    this.store$.dispatch(actions.loadTokenContracts());
-
-    this.subscriptions.push(
-      this.data$
-        .pipe(
-          filter(
-            (data) =>
-              Array.isArray(data) &&
-              data.some((item) => ['tzBTC', 'BTC'].includes(item.symbol))
-          ),
-          switchMap(() =>
-            getRefresh([
-              this.actions$.pipe(ofType(appActions.loadExchangeRateSucceeded)),
-              this.actions$.pipe(ofType(appActions.loadExchangeRateFailed)),
-            ])
-          )
-        )
-        .subscribe(() =>
-          this.store$.dispatch(
-            appActions.loadExchangeRate({ from: 'BTC', to: 'USD' })
-          )
-        )
-    );
+    this.store$.dispatch(actions.loadTokenAssets());
 
     this.titleService.setTitle(`Tezos Assets - tezblock`);
     this.metaTagService.updateTag({

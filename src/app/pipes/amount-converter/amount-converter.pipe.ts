@@ -64,7 +64,7 @@ const makeFullNumberSmaller = (value: BigNumber, maxDigits: number): string => {
     return [result.toFormat(), 'K'].join('');
   }
 
-  return [result.toFormat(), 'M'].join('');
+  return [result.dividedToIntegerBy(1000).toFormat(), 'M'].join('');
 };
 
 @Pipe({
@@ -75,7 +75,7 @@ export class AmountConverterPipe implements PipeTransform {
 
   public transform(
     value: BigNumber | string | number,
-    args: { protocolIdentifier: string; maxDigits?: number }
+    args: { protocolIdentifier: string; maxDigits?: number; decimals?: number }
   ): string {
     const _value = BigNumber.isBigNumber(value) ? value.toNumber() : value;
 
@@ -87,11 +87,12 @@ export class AmountConverterPipe implements PipeTransform {
     ) {
       return '';
     }
-
-    const decimals: number = getDecimalsForSymbol(
-      args.protocolIdentifier,
-      this.chainService.getNetwork()
-    );
+    const decimals: number =
+      args.decimals ??
+      getDecimalsForSymbol(
+        args.protocolIdentifier,
+        this.chainService.getNetwork()
+      );
 
     const BN = BigNumber.clone({
       FORMAT: {

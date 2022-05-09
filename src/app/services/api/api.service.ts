@@ -28,7 +28,7 @@ import { RewardService } from '@tezblock/services/reward/reward.service';
 import { Predicate, Operation, Options } from '../base.service';
 import { EnvironmentUrls } from '@tezblock/domain/generic/environment-urls';
 import { ProposalDto, RawProposalDto } from '@tezblock/interfaces/proposal';
-import { TokenContract } from '@tezblock/domain/contract';
+import { ContractAddress, TokenContract } from '@tezblock/domain/contract';
 import { sort } from '@tezblock/domain/table';
 import {
   RPCBlocksOpertions,
@@ -776,7 +776,9 @@ export class ApiService {
         {
           field: 'destination',
           operation: 'in',
-          set: supportedTokens.map((contract) => contract.id),
+          set: supportedTokens
+            .filter((contract) => contract.id !== ContractAddress.TEZ)
+            .map((contract) => contract.id),
           inverse: false,
         },
       ],

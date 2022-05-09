@@ -10,4 +10,7 @@ export interface Options {
   kind?: string; //TODO: not needed probably
   comparisonTimestamp?: number;
   cssClass?: string;
+  isContract?: boolean;
+  useValue?: string;
+  useImgUrl?: string;
 }

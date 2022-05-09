@@ -4,8 +4,13 @@
   [activeLinkAssets]="router.url.startsWith('/token-contract/list/')"
   [activeLinkSwap]="router.url.startsWith('/swap/')"
   [activeLinkEcosystem]="router.url.startsWith('/ecosystem/')"
+  [activeLinkPortfolio]="router.url.startsWith('/portfolio/')"
 ></header-item>
 <div class="container">
+  <div class="pt-4" *ngIf="!(router.url === '/')">
+    <app-sponsored-item></app-sponsored-item>
+  </div>
+
   <router-outlet></router-outlet>
 </div>
 <app-footer class="mt-auto"></app-footer>

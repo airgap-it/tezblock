@@ -1,4 +1,9 @@
 {
+  "tez": {
+    "name": "Tezos",
+    "symbol": "tez",
+    "decimals": 6
+  },
   "KT1Xobej4mc6XgEjDoJoHtTKgbD1ELMvcQuL": {
     "symbol": "YOU",
     "name": "youves YOU Governance",
@@ -188,23 +193,5 @@
     ],
     "tezosNetwork": ["mainnet"],
     "decimals": 0
-  },
-  "KT1SovvF5KRQjBiVX8cHFmEoMc7H54ehxstV": {
-    "symbol": "weCHF",
-    "name": "Wetzikoin",
-    "website": "https://ecoo.ch",
-    "description": "ecoo is a platform that unites you with your customers and partners in an agile financial platform. You use the ecoo platform to provide earmarked funds in the form of coins or points. Customers can utilise these funds to purchase goods or services from your partners. Your partners exchange the funds received through ecoo back into real money with you.",
-    "socials": [
-      {
-        "type": "website",
-        "url": "https://ecoo.ch"
-      }
-    ],
-    "tezosNetwork": ["mainnet"],
-    "decimals": 2,
-    "type": "fa2",
-    "tokenID": 0,
-    "ledgerBigMapID": 105,
-    "totalSupply": "25160000"
   }
 }

@@ -18,14 +18,14 @@ stages:
 build:
   stage: build
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg ITHACANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg ITHACANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg ITHACANET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg ITHACANET_TARGET_URL --build-arg GA_KEY --target angular-build -t $TEST_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg ITHACANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg ITHACANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg ITHACANET_CONSEIL_API_KEY --build-arg MAINNET_INDEXER_URL --build-arg ITHACANET_INDEXER_URL --build-arg MAINNET_TARGET_URL --build-arg ITHACANET_TARGET_URL --build-arg GA_KEY --target angular-build -t $TEST_TAG .
   tags:
     - docker
 
 build_serve:
   stage: build_serve
   script:
-    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg ITHACANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg ITHACANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg ITHACANET_CONSEIL_API_KEY --build-arg MAINNET_TARGET_URL --build-arg ITHACANET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
+    - docker build --build-arg FONTAWESOME_NPM_AUTH_TOKEN --build-arg MAINNET_RPC_URL --build-arg ITHACANET_RPC_URL --build-arg MAINNET_CONSEIL_URL --build-arg ITHACANET_CONSEIL_URL --build-arg MAINNET_CONSEIL_API_KEY --build-arg ITHACANET_CONSEIL_API_KEY --build-arg MAINNET_INDEXER_URL --build-arg ITHACANET_INDEXER_URL --build-arg MAINNET_TARGET_URL --build-arg ITHACANET_TARGET_URL --build-arg GA_KEY -t $GOOGLE_TAG .
   only:
     - master
     - develop
@@ -36,8 +36,8 @@ test:
   allow_failure: false
   stage: test
   script:
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e ITHACANET_RPC_URL -e MAINNET_CONSEIL_URL -e ITHACANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e ITHACANET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e ITHACANET_TARGET_URL -e GA_KEY --name unit-$CI_COMMIT_SHA $TEST_TAG yarn test-ci
-    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e ITHACANET_RPC_URL -e MAINNET_CONSEIL_URL -e ITHACANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e ITHACANET_CONSEIL_API_KEY -e MAINNET_TARGET_URL -e ITHACANET_TARGET_URL -e GA_KEY --name lint-$CI_COMMIT_SHA $TEST_TAG yarn lint-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e ITHACANET_RPC_URL -e MAINNET_CONSEIL_URL -e ITHACANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e ITHACANET_CONSEIL_API_KEY -e MAINNET_INDEXER_URL -e ITHACANET_INDEXER_URL -e MAINNET_TARGET_URL -e ITHACANET_TARGET_URL -e GA_KEY --name unit-$CI_COMMIT_SHA $TEST_TAG yarn test-ci
+    - docker run -e FONTAWESOME_NPM_AUTH_TOKEN -e MAINNET_RPC_URL -e ITHACANET_RPC_URL -e MAINNET_CONSEIL_URL -e ITHACANET_CONSEIL_URL -e MAINNET_CONSEIL_API_KEY -e ITHACANET_CONSEIL_API_KEY -e MAINNET_INDEXER_URL -e ITHACANET_INDEXER_URL -e MAINNET_TARGET_URL -e ITHACANET_TARGET_URL -e GA_KEY --name lint-$CI_COMMIT_SHA $TEST_TAG yarn lint-ci
     - docker cp unit-$CI_COMMIT_SHA:/app/coverage/tezblock/lcov.info lcov.info
     - docker cp lint-$CI_COMMIT_SHA:/app/lintReport.json lintReport.json
   after_script:

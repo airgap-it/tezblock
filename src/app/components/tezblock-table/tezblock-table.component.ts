@@ -26,6 +26,7 @@ export enum Template {
   percentage,
   symbol,
   timestamp,
+  swapOrTransfer,
 }
 
 export interface Column {
@@ -95,6 +96,8 @@ export class TezblockTableComponent implements OnInit {
   public hashTemplate: TemplateRef<any>;
   @ViewChild('modalTemplate', { static: true })
   public modalTemplate: TemplateRef<any>;
+  @ViewChild('swapOrTransferTemplate', { static: true })
+  public swapOrTransferTemplate: TemplateRef<any>;
 
   @Input() public data: any[];
 
@@ -209,6 +212,8 @@ export class TezblockTableComponent implements OnInit {
         return this.symbolTemplate;
       case Template.timestamp:
         return this.timestampTemplate;
+      case Template.swapOrTransfer:
+        return this.swapOrTransferTemplate;
       default:
         return this.basicTemplate;
     }

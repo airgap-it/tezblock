@@ -5,9 +5,10 @@ import {
   blockAndTxHashColumns,
 } from '@tezblock/components/tezblock-table/tezblock-table.component';
 import { Transaction } from '@tezblock/interfaces/Transaction';
-import { ContractAsset } from './model';
 import { isConvertableToUSD } from '@tezblock/domain/airgap';
 import { TranslateService } from '@ngx-translate/core';
+import { ContractAsset } from '@tezblock/domain/contract';
+import { isCurated } from '@tezblock/domain/account';
 
 export const columns: {
   [key: string]: (options: any, translateService: TranslateService) => Column[];
@@ -283,24 +284,34 @@ export const columns: {
     translateService: TranslateService
   ) => [
     {
-      name: translateService.instant('tezblock-table.contract.asset'),
+      name: translateService.instant('tezblock-table.portfolio-assets.asset'),
       template: Template.address,
       data: (item: ContractAsset) => ({
-        data: item.contract.id,
-        options: { showFullAddress: false, pageId: options.pageId },
+        data: item.contract.contractAddress,
+        options: {
+          useValue: isCurated(item.contract.contractAddress)
+            ? undefined
+            : item.contract.name,
+          showFullAddress: false,
+          pageId: options.pageId,
+          isContract: true,
+          useImgUrl: item.thumbnailUri,
+        },
       }),
     },
     {
-      name: translateService.instant('tezblock-table.contract.balance'),
+      name: translateService.instant('tezblock-table.portfolio-assets.balance'),
       field: 'amount',
       template: Template.amount,
-      data: (item: ContractAsset) => ({
-        data: item.amount,
-        options: {
-          showFiatValue: isConvertableToUSD(item.contract.symbol),
-          symbol: item.contract.symbol,
-        },
-      }),
+      data: (item: ContractAsset) => {
+        return {
+          data: item.amount,
+          options: {
+            symbol: item.contract.symbol ?? 'NONE',
+            decimals: item?.decimals,
+          },
+        };
+      },
     },
   ],
   [OperationTypes.Collectibles]: (

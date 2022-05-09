@@ -7,8 +7,9 @@ import { Balance } from '@tezblock/services/api/api.service';
 import { Count } from '@tezblock/domain/tab';
 import { OrderBy } from '@tezblock/services/base.service';
 import { OperationErrorsById } from '@tezblock/domain/operations';
-import { BakingRatingResponse, ContractAsset } from './model';
+import { BakingRatingResponse } from './model';
 import { TezosPayoutInfo } from '@airgap/coinlib-core';
+import { ContractAsset } from '@tezblock/domain/contract';
 
 const featureName = 'Account Detail';
 

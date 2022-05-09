@@ -96,6 +96,10 @@ export class TezosCurrency implements AbstractCurrency {
     throw new Error('Not implemented');
   }
 
+  getExpectedXtzIn(_tokenAmount: BigNumber): Promise<BigNumber> {
+    throw new Error('Not implemented');
+  }
+
   estimatePriceImpact(_mutezAmount: BigNumber): Promise<BigNumber> {
     throw new Error('Not implemented');
   }

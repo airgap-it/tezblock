@@ -56,6 +56,7 @@ export interface AbstractCurrency {
   estimateLiquidityCreated(mutezAmount: BigNumber): Promise<BigNumber>;
   getExpectedMinimumReceivedToken(mutezAmount: BigNumber): Promise<BigNumber>;
   getExpectedTokenIn(mutezAmount: BigNumber): Promise<BigNumber>;
+  getExpectedXtzIn(tokenAmount: BigNumber): Promise<BigNumber>;
   getExpectedMinimumReceivedTez(
     tokenAmount: number,
     tokenCurrency?: AbstractCurrency

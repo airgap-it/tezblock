@@ -416,18 +416,20 @@ export class TokenizedBitcoinCurrency implements AbstractCurrency {
     );
   }
 
-  estimateTokenIn(mutezAmount: number) {
-    return liquidityBakingCalculations.addLiquidityTokenIn(
-      mutezAmount,
-      this.xtzPool,
-      this.tokenPool
-    );
-  }
-
   async getExpectedTokenIn(mutezAmount: BigNumber): Promise<BigNumber> {
     return new BigNumber(
       liquidityBakingCalculations.addLiquidityTokenIn(
         mutezAmount.toNumber(),
+        this.xtzPool,
+        this.tokenPool
+      )
+    );
+  }
+
+  async getExpectedXtzIn(tokenAmount: BigNumber): Promise<BigNumber> {
+    return new BigNumber(
+      liquidityBakingCalculations.addLiquidityXtzIn(
+        tokenAmount.toNumber(),
         this.xtzPool,
         this.tokenPool
       )

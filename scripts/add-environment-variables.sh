@@ -13,6 +13,9 @@ replace_test_conseil_url_pattern="s~'ITHACANET_CONSEIL_URL'\(,\)\{0,1\}~'${ITHAC
 replace_main_conseil_api_pattern="s/'MAINNET_CONSEIL_API_KEY'\(,\)\{0,1\}/'${MAINNET_CONSEIL_API_KEY}'\1/g"
 replace_test_conseil_api_pattern="s/'ITHACANET_CONSEIL_API_KEY'\(,\)\{0,1\}/'${ITHACANET_CONSEIL_API_KEY}'\1/g"
 
+replace_main_indexer_url_pattern="s~'MAINNET_INDEXER_URL'\(,\)\{0,1\}~'${MAINNET_INDEXER_URL}'\1~g"
+replace_test_indexer_url_pattern="s~'ITHACANET_INDEXER_URL'\(,\)\{0,1\}~'${ITHACANET_INDEXER_URL}'\1~g"
+
 replace_main_target_url_pattern="s~'MAINNET_TARGET_URL'\(,\)\{0,1\}~'${MAINNET_TARGET_URL}'\1~g"
 replace_test_target_url_pattern="s~'ITHACANET_TARGET_URL'\(,\)\{0,1\}~'${ITHACANET_TARGET_URL}'\1~g"
 
@@ -26,6 +29,7 @@ needs_env_backup () {
 	[[ ! -z "${MAINNET_RPC_URL}" ]] || [[ ! -z "${ITHACANET_RPC_URL}" ]] ||
 	[[ ! -z "${MAINNET_CONSEIL_URL}" ]] || [[ ! -z "${ITHACANET_CONSEIL_URL}" ]] ||
 	[[ ! -z "${MAINNET_CONSEIL_API_KEY}" ]] || [[ ! -z "${ITHACANET_CONSEIL_API_KEY}" ]] ||
+	[[ ! -z "${MAINNET_INDEXER_URL}" ]] || [[ ! -z "${ITHACANET_INDEXER_URL}" ]] ||
 	[[ ! -z "${MAINNET_TARGET_URL}" ]] || [[ ! -z "${ITHACANET_TARGET_URL}" ]] ||
 	[[ ! -z "${GA_KEY}" ]] ||
 	[[ ! -z "${FONTAWESOME_NPM_AUTH_TOKEN}" ]]
@@ -76,6 +80,15 @@ replace_conseil_api_key () {
 	fi
 }
 
+replace_indexer_url () {
+	if [[ ! -z "${MAINNET_INDEXER_URL}" ]]; then
+		replace_in_env_files "${replace_main_indexer_url_pattern}"
+	fi
+	if [[ ! -z "${ITHACANET_INDEXER_URL}" ]]; then
+		replace_in_env_files "${replace_test_indexer_url_pattern}"
+	fi
+}
+
 replace_target_url () {
 	if [[ ! -z "${MAINNET_TARGET_URL}" ]]; then
 		replace_in_env_files "${replace_main_target_url_pattern}"
@@ -117,5 +130,6 @@ replace_fa_settings
 replace_rpc_url
 replace_conseil_url
 replace_conseil_api_key
+replace_indexer_url
 replace_target_url
 replace_ga_key

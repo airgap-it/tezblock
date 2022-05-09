@@ -5,22 +5,15 @@ import { TestScheduler } from 'rxjs/testing';
 import { EMPTY } from 'rxjs';
 import { Actions } from '@ngrx/effects';
 import { ActivatedRoute } from '@angular/router';
-
 import { BakerTableComponent } from './baker-table.component';
-import * as actions from './actions';
 import { initialState as btInitialState } from './reducer';
 import { initialState as appInitialState } from '@tezblock/app.reducer';
 import { initialState as adInitialState } from '@tezblock/pages/account-detail/reducer';
-import {
-  getActivatedRouteMock,
-  getParamMapValue,
-} from 'test-config/mocks/activated-route.mock';
+import { getActivatedRouteMock } from 'test-config/mocks/activated-route.mock';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { getChainNetworkServiceMock } from '@tezblock/services/chain-network/chain-network.service.mock';
 import { RewardService } from '@tezblock/services/reward/reward.service';
 import { getRewardServiceMock } from '@tezblock/services/reward/reward.service.mock';
-import { OperationTypes } from '@tezblock/domain/operations';
-import { DataSource } from '@tezblock/domain/table';
 import {
   TranslateModule,
   TranslateService,

@@ -24,6 +24,7 @@ export enum OperationTypes {
   Block = 'block',
   TokenContract = 'token contract',
   Contract = 'contract',
+  PortfolioAssets = 'assets',
   Account = 'account',
   Baker = 'baker',
   Collectibles = 'collectibles',

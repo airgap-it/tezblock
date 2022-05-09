@@ -4,25 +4,25 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { TabbedTableComponent } from './tabbed-table.component';
-import {
-  getActivatedRouteMock,
-  getParamMapValue,
-} from 'test-config/mocks/activated-route.mock';
+import { getActivatedRouteMock } from 'test-config/mocks/activated-route.mock';
 import { DownloadService } from '@tezblock/services/download/download.service';
 import { getDownloadServiceMock } from '@tezblock/services/download/download.service.mock';
 import { Tab } from '@tezblock/domain/tab';
+import { MockStore, provideMockStore } from '@ngrx/store/testing';
 
 describe('TabbedTableComponent', () => {
   let component: TabbedTableComponent;
   let fixture: ComponentFixture<TabbedTableComponent>;
   const activatedRouteMock = getActivatedRouteMock();
   const downloadServiceMock = getDownloadServiceMock();
+  let storeMock: MockStore<any>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         { provide: ActivatedRoute, useValue: activatedRouteMock },
         { provide: DownloadService, useValue: downloadServiceMock },
+        provideMockStore(),
       ],
       imports: [RouterTestingModule.withRoutes([])],
       declarations: [TabbedTableComponent],
@@ -31,6 +31,7 @@ describe('TabbedTableComponent', () => {
 
     fixture = TestBed.createComponent(TabbedTableComponent);
     component = fixture.componentInstance;
+    storeMock = TestBed.inject(MockStore);
   });
 
   it('should create', () => {

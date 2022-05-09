@@ -127,7 +127,7 @@ export const getTezosFA2ProtocolOptions = (
     contract.symbol,
     feeDefaults,
     contract.decimals ?? 0,
-    contract.tokenID ?? 0,
+    contract.tokenId ?? 0,
     undefined,
     contract.ledgerBigMapID,
     undefined

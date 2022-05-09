@@ -1,0 +1,132 @@
+<div class="mb-5 pt-5">
+  <div class="container p-0">
+    <h1 hidden="true">
+      Portfolio overview of a connected account. Assets, Transactions and
+      Collectibles.
+    </h1>
+    <div
+      class="row mb-4"
+      *ngIf="connectedWallet$ | async as connectedWallet; else emptyState"
+    >
+      <div class="col-lg-4 mb-4 mb-lg-0 card__top">
+        <div
+          *ngIf="portfolioValue$ | async as portfolioValue"
+          class="card pt-3"
+        >
+          <div class="card-body right p-4">
+            <h5 class="card-title__secondary mb-3">Total Portfolio Value</h5>
+            <h3>
+              $
+              {{
+                portfolioValue | amountConverter: { protocolIdentifier: 'USD' }
+              }}
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <div class="card h-100">
+        <div class="card-body p-4">
+          <div class="row">
+            <div
+              class="col px-2"
+              *ngIf="
+                connectedWallet$ | async as connectedWallet;
+                else emptyStateAssets
+              "
+            >
+              <tabbed-table
+                [forceTabPosition]="true"
+                [tabs]="tabs"
+                [page]="'account'"
+                [loading]="areTransactionsLoading$ | async"
+                [data]="transactions$ | async"
+                (tabClicked)="tabSelected($event)"
+                (loadMore)="onLoadMore()"
+                [downloadable]="true"
+                (onSort)="sortBy($event)"
+                [orderBy]="orderBy$ | async"
+              ></tabbed-table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pt-5">
+      <div class="card pt-3">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Collectibles</h5>
+          <!--TODO: always show the empty state if there are no collectibles-->
+          <ng-container *ngIf="collectibleCursor$ | async as collectibleCursor">
+            <ng-container
+              *ngIf="
+                collectibleCursor?.collectibles?.length > 0;
+                else emptyStateCollectibles
+              "
+            >
+              <app-collectibles-list
+                *ngIf="
+                  connectedWallet$ | async as connectedWallet;
+                  else emptyStateCollectibles
+                "
+                (onLoadMore)="onLoadMoreCollectibles()"
+                [data]="collectibleCursor$ | async"
+              >
+              </app-collectibles-list>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="row mb-4">
+      <div class="col-lg-4 mb-4 mb-lg-0 card__top">
+        <div class="card pt-3">
+          <div class="card-body right p-4">
+            <h5 class="card-title__secondary mb-3">Portfolio</h5>
+            <p>
+              Connect your wallet to get an overview of your assets,
+              collectibles and transactions.
+            </p>
+
+            <button
+              type="button"
+              class="btn btn-primary-light btn-block"
+              (click)="connectWallet()"
+            >
+              Connect Wallet
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+<ng-template #emptyStateAssets>
+  <tabset class="w-100">
+    <tab disabled="true">
+      <ng-template tabHeading>
+        <button type="button" class="btn p-0 mr-1">
+          <span class="d-sm-inline-block"> Assets </span>
+        </button>
+      </ng-template>
+    </tab>
+    <tab disabled="true">
+      <ng-template tabHeading>
+        <button type="button" class="btn p-0 mr-1">
+          <span class="d-sm-inline-block"> Transactions </span>
+        </button>
+      </ng-template>
+    </tab>
+  </tabset>
+
+  <p class="text-muted px-3 pt-3">No Asset or Transactions</p>
+</ng-template>
+<ng-template #emptyStateCollectibles>
+  <p class="text-muted">No Collectibles</p>
+</ng-template>

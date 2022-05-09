@@ -1,57 +1,35 @@
 import { Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
-import { getTokenContracts } from '@tezblock/domain/contract';
 import * as fromRoot from '@tezblock/reducers';
-import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { ContractService } from '@tezblock/services/contract/contract.service';
-import { forkJoin, of } from 'rxjs';
-import { catchError, map, switchMap, withLatestFrom } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { map, switchMap, withLatestFrom } from 'rxjs/operators';
 
 import * as listActions from './actions';
 
 @Injectable()
 export class TokenContractOverviewEffects {
-  public loadTokenContracts$ = createEffect(() =>
+  public loadTokenAssets$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(listActions.loadTokenContracts),
+      ofType(listActions.loadTokenAssets),
       withLatestFrom(
-        this.store$.select((state) => state.list.doubleEndorsements.pagination)
+        this.store$.select(
+          (state) => state.tokenContractOverview.tokenAssets.pagination
+        )
       ),
-      switchMap(([action, pagination]) => {
-        const contracts = getTokenContracts(
-          this.chainNetworkService.getNetwork(),
-          pagination.currentPage * pagination.selectedSize
-        );
-
-        if (!contracts || contracts.total === 0) {
-          return of(
-            listActions.loadTokenContractsSucceeded({
-              tokenContracts: { data: [], total: 0 },
+      switchMap(([_action, pagination]) => {
+        return this.contractService
+          .fetchContractAssets(pagination.currentPage, pagination.selectedSize)
+          .pipe(
+            switchMap((assets) => {
+              return of(
+                listActions.loadTokenAssetsSucceeded({
+                  tokenAssets: { data: assets, total: 10000 },
+                })
+              );
             })
           );
-        }
-
-        return forkJoin(
-          contracts.data.map((contract) =>
-            this.contractService.getTotalSupplyByContract(contract)
-          )
-        ).pipe(
-          map((totalSupplies) =>
-            listActions.loadTokenContractsSucceeded({
-              tokenContracts: {
-                data: totalSupplies.map((totalSupply, index) => ({
-                  ...contracts.data[index],
-                  totalSupply,
-                })),
-                total: contracts.total,
-              },
-            })
-          ),
-          catchError((error) =>
-            of(listActions.loadTokenContractsFailed({ error }))
-          )
-        );
       })
     )
   );
@@ -59,13 +37,11 @@ export class TokenContractOverviewEffects {
   public increasePageOfTokenContracts$ = createEffect(() =>
     this.actions$.pipe(
       ofType(listActions.increasePageOfTokenContracts),
-      map(() => listActions.loadTokenContracts())
+      map(() => listActions.loadTokenAssets())
     )
   );
-
   constructor(
     private readonly actions$: Actions,
-    private readonly chainNetworkService: ChainNetworkService,
     private readonly contractService: ContractService,
     private readonly store$: Store<fromRoot.State>
   ) {}

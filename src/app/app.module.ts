@@ -28,7 +28,6 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { NgxJsonViewerModule } from 'ngx-json-viewer';
 import { MomentModule } from 'ngx-moment';
 import { ToastrModule } from 'ngx-toastr';
-
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { AppRoutingModule } from './app-routing.module';
@@ -78,7 +77,7 @@ import { BlockDetailEffects } from './pages/block-detail/effects';
 import { ContractDetailComponent } from './pages/contract-detail/contract-detail.component';
 import { ContractDetailEffects } from './pages/contract-detail/effects';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { DashboarEffects } from './pages/dashboard/effects';
+import { DashboardEffects } from './pages/dashboard/effects';
 import { DashboardLatestContractsTransactionsEffects } from './pages/dashboard/latest-contracts-transactions/effects';
 import { LatestContractsTransactionsComponent } from './pages/dashboard/latest-contracts-transactions/latest-contracts-transactions.component';
 import { LatestContractsComponent } from './pages/dashboard/latest-contracts/latest-contracts.component';
@@ -124,6 +123,12 @@ import { SlippageComponent } from './components/slippage/slippage.component';
 import { CollectiblesModalItemComponent } from './components/collectibles-modal-item/collectibles-modal-item.component';
 import { CollectiblesService } from './services/collectibles/collectibles.service';
 import { CollectiblesListComponent } from './components/collectibles-list/collectibles-list.component';
+import { PortfolioComponent } from './pages/portfolio/portfolio.component';
+import { TransferModalComponent } from './components/transfer-modal/transfer-modal.component';
+import { AmountItemComponent } from './components/amount-item/amount-item.component';
+import { TransferButtonComponent } from './components/transfer-button/transfer-button.component';
+import { SponsoredItemComponent } from './components/sponsored-item/sponsored-item.component';
+import { PortfolioEffects } from './pages/portfolio/effects';
 
 function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http, './assets/i18n/', '.json');
@@ -167,6 +172,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
       EndorsementDetailEffects,
       ListEffects,
       AccountDetailEffects,
+      PortfolioEffects,
       BakerTableEffects,
       BlockDetailEffects,
       TransactionDetailEffects,
@@ -176,7 +182,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
       HealthEffects,
       LiquidityBakingEffects,
       AccountsEffects,
-      DashboarEffects,
+      DashboardEffects,
       DashboardLatestContractsTransactionsEffects,
       TokenContractOverviewEffects,
       NodesOnMapEffects,
@@ -258,6 +264,11 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     SlippageComponent,
     CollectiblesModalItemComponent,
     CollectiblesListComponent,
+    PortfolioComponent,
+    TransferModalComponent,
+    AmountItemComponent,
+    TransferButtonComponent,
+    SponsoredItemComponent,
   ],
 
   providers: [
@@ -268,6 +279,7 @@ function createTranslateLoader(http: HttpClient): TranslateHttpLoader {
     ChainNetworkService,
     AnalyticsService,
     CollectiblesService,
+
     {
       provide: APP_INITIALIZER,
       useFactory: (themeService: ThemeService) => () => themeService.setTheme(),

@@ -8,6 +8,7 @@ export interface Options {
   pageId: string;
   showFiatValue: boolean;
   symbol: string;
+  decimals?: number;
 }
 
 export const columns: {
@@ -51,6 +52,7 @@ export const columns: {
         options: {
           showFiatValue: options.showFiatValue,
           symbol: options.symbol,
+          decimals: options.decimals,
         },
       }),
       sortable: false,

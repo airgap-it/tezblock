@@ -32,6 +32,9 @@ import { ProtocolVariablesService } from '@tezblock/services/protocol-variables/
 import { ProposalService } from '@tezblock/services/proposal/proposal.service';
 import { BeaconService } from './services/beacon/beacon.service';
 import { ApiService } from './services/api/api.service';
+import { ContractService } from './services/contract/contract.service';
+import { PartialTezosOperation } from '@airgap/beacon-sdk';
+import { ContractAddress } from './domain/contract';
 
 @Injectable()
 export class AppEffects {
@@ -398,13 +401,92 @@ export class AppEffects {
     )
   );
 
+  transferOperation$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(actions.transferOperation),
+      withLatestFrom(this.store$.select((state) => state.app.connectedWallet)),
+      switchMap(
+        ([
+          { destination, contractAddress, amount, tokenId, contractType },
+          connectedWallet,
+        ]) => {
+          const handleTransferRequest = (
+            transferRequest: PartialTezosOperation
+          ) => {
+            const operationPromise = this.beaconService.operationRequest([
+              transferRequest,
+            ]);
+            return operationPromise
+              ? from(
+                  this.beaconService.operationRequest([transferRequest])
+                ).pipe(
+                  map(() => {
+                    return actions.transferOperationSucceeded();
+                  }),
+                  catchError((error) =>
+                    of(actions.transferOperationFailed({ error }))
+                  )
+                )
+              : of(
+                  actions.transferOperationFailed({
+                    error: 'invalid transfer operation',
+                  })
+                );
+          };
+
+          if (contractAddress === ContractAddress.TEZ) {
+            const transferRequest = {
+              kind: 'transaction',
+              amount,
+              destination,
+            } as PartialTezosOperation;
+            return handleTransferRequest(transferRequest);
+          }
+
+          const transferParamsPromise =
+            this.contractService.generateTransferParams(
+              connectedWallet?.address,
+              destination,
+              contractAddress,
+              amount,
+              tokenId,
+              contractType
+            );
+          return transferParamsPromise
+            ? from(transferParamsPromise).pipe(
+                switchMap((transferParams) => {
+                  const transferRequest = {
+                    kind: 'transaction',
+                    source: connectedWallet.address,
+                    amount: '0',
+                    destination: contractAddress,
+                    parameters: transferParams.parameter,
+                  } as PartialTezosOperation;
+
+                  return handleTransferRequest(transferRequest);
+                }),
+                catchError((error) =>
+                  of(actions.transferOperationFailed({ error }))
+                )
+              )
+            : of(
+                actions.transferOperationFailed({
+                  error: 'invalid transfer operation',
+                })
+              );
+        }
+      )
+    )
+  );
+
   constructor(
     private readonly actions$: Actions,
-    private readonly baseService: BaseService,
-    private readonly blockService: BlockService,
     private readonly apiService: ApiService,
-    private readonly cacheService: CacheService,
+    private readonly baseService: BaseService,
     private readonly beaconService: BeaconService,
+    private readonly blockService: BlockService,
+    private readonly cacheService: CacheService,
+    private readonly contractService: ContractService,
     private readonly cryptoPricesService: CryptoPricesService,
     private readonly protocolVariablesService: ProtocolVariablesService,
     private readonly proposalService: ProposalService,

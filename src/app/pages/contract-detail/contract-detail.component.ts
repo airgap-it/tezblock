@@ -17,7 +17,6 @@ import { BaseComponent } from '@tezblock/components/base.component';
 import { isConvertableToUSD } from '@tezblock/domain/airgap';
 import {
   ContractOperation,
-  hasTokenHolders,
   Social,
   SocialType,
   TokenContract,
@@ -328,10 +327,12 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
     );
 
     this.contract$
-      .pipe(filter((contract) => contract !== undefined))
-      .subscribe((contract) =>
-        this.store$.dispatch(actions.load24hTransferVolume({ contract }))
-      );
+      .pipe(filter((contract) => contract !== null && contract !== undefined))
+      .subscribe((contract) => {
+        return this.store$.dispatch(
+          actions.load24hTransferVolume({ contract })
+        );
+      });
 
     this.titleService.setTitle(
       `${this.aliasService.getFormattedAddress(
@@ -398,7 +399,7 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       .pipe(
         filter(negate(isNil)),
         map((contract) => {
-          const match = contract.socials.find(condition);
+          const match = contract.socials?.find(condition);
 
           return match ? match.url : null;
         })
@@ -411,10 +412,10 @@ export class ContractDetailComponent extends BaseComponent implements OnInit {
       pageId,
       showFiatValue,
       symbol: contract.symbol,
+      decimals: contract.decimals,
     };
-    const customTabs = hasTokenHolders(contract)
-      ? [this.getTokenHoldersTab(options)]
-      : [];
+    const customTabs = [this.getTokenHoldersTab(options)];
+
     const tabs = [
       {
         ...this.tabs[0],

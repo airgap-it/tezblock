@@ -5,21 +5,23 @@ import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as actions from '../../app.actions';
 import * as fromRoot from '@tezblock/reducers';
 import { ThemeService } from '@tezblock/services/theme/theme.service';
 import { ChainNetworkService } from '@tezblock/services/chain-network/chain-network.service';
 import { LanguagesService } from '@tezblock/services/translation/languages.service';
 import { TezosNetwork } from '@airgap/coinlib-core';
-import { AccountInfo } from '@airgap/beacon-sdk';
 import { getConnectedWallet } from '@tezblock/app.selectors';
+import { BeaconEnabledComponent } from '../beacon-enabled-component';
 
 @Component({
   selector: 'header-item',
   templateUrl: './header-item.component.html',
   styleUrls: ['./header-item.component.scss'],
 })
-export class HeaderItemComponent implements OnInit {
+export class HeaderItemComponent
+  extends BeaconEnabledComponent
+  implements OnInit
+{
   @Input()
   isMinimized: boolean = false;
 
@@ -28,6 +30,9 @@ export class HeaderItemComponent implements OnInit {
 
   @Input()
   activeLinkSwap: boolean = false;
+
+  @Input()
+  activeLinkPortfolio: boolean = false;
 
   @Input()
   activeLinkEcosystem: boolean = false;
@@ -47,19 +52,22 @@ export class HeaderItemComponent implements OnInit {
   hideDropdown = true;
   selectedNetwork: TezosNetwork;
   networks = TezosNetwork;
-  connectedWallet$: Observable<AccountInfo | undefined>;
 
   constructor(
+    protected readonly store$: Store<fromRoot.State>,
     private readonly router: Router,
     private readonly chainNetworkService: ChainNetworkService,
     private readonly breakpointObserver: BreakpointObserver,
-    private readonly store$: Store<fromRoot.State>,
     public readonly themeService: ThemeService,
     public translate: TranslateService,
     private readonly languagesService: LanguagesService
-  ) {}
+  ) {
+    super(store$);
+  }
 
   ngOnInit() {
+    super.ngOnInit();
+
     this.currentCycle$ = this.store$.select(fromRoot.app.currentCycle);
     this.cycleProgress$ = this.store$.select(fromRoot.app.cycleProgress);
     this.remainingTime$ = this.store$.select(fromRoot.app.remainingTime);
@@ -67,8 +75,6 @@ export class HeaderItemComponent implements OnInit {
     this.triggers$ = this.breakpointObserver
       .observe([Breakpoints.HandsetLandscape, Breakpoints.HandsetPortrait])
       .pipe(map((breakpointState) => (breakpointState.matches ? '' : 'hover')));
-
-    this.connectedWallet$ = this.store$.select(getConnectedWallet);
   }
 
   navigate(entity: string) {
@@ -90,13 +96,5 @@ export class HeaderItemComponent implements OnInit {
 
   changeLanguage(language: string) {
     this.languagesService.loadLanguages(language);
-  }
-
-  disconnectWallet() {
-    this.store$.dispatch(actions.disconnectWallet());
-  }
-
-  connectWallet() {
-    this.store$.dispatch(actions.connectWallet());
   }
 }

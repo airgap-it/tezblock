@@ -21,7 +21,7 @@
     "votes_button": "Wahlen",
     "proposals_button": "Proposals",
     "smart-contracts_button": "Smart Contracts",
-    "asset-smart-contracts_button": "Asset Smart Contracts",
+    "asset-smart-contracts_button": "Assets",
     "contracts_button": "Contracts",
     "assets_button": "Assets",
     "resources_button": "Ressourcen",
@@ -301,7 +301,7 @@
     "invalid-proposal-text": "Dieser Hash ist unbekannt."
   },
   "token-contract-overview": {
-    "asset-smart-contracts": "Asset Smart Contracts"
+    "asset-smart-contracts": "Assets"
   },
   "modal-component": {
     "none": "Keine",
