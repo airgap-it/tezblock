@@ -72,7 +72,7 @@
     "graphql": "^16.0.1",
     "graphql-request": "^3.7.0",
     "lodash": "^4.17.19",
-    "moment": "^2.27.0",
+    "moment": "^2.29.4",
     "myetherwallet-blockies": "^0.1.1",
     "ng2-charts": "^2.3.3",
     "ngx-bootstrap": "^5.6.1",
